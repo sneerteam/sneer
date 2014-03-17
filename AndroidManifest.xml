@@ -1,0 +1,33 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="sneerteam.snapi"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="17"
+        android:targetSdkVersion="19" />
+
+    <permission android:name="CLOUD" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+
+	<service
+        android:name="CloudService"
+        android:exported="true"
+        android:isolatedProcess="true"
+        android:permission="sneerteam.snapi.CLOUD">
+        <intent-filter>
+            <action android:name="sneerteam.intent.action.BIND_CLOUD_SERVICE" />
+        </intent-filter>
+      </service>
+
+    </application>
+
+</manifest>
