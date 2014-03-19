@@ -21,7 +21,6 @@
 	<service
         android:name="CloudService"
         android:exported="true"
-        android:isolatedProcess="true"
         android:permission="sneerteam.snapi.CLOUD">
         <intent-filter>
             <action android:name="sneerteam.intent.action.BIND_CLOUD_SERVICE" />
