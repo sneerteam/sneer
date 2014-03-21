@@ -1,19 +1,29 @@
 package sneerteam.snapi;
 
-import sneerteam.api.ICloud.Stub;
+import java.util.HashMap;
+import java.util.Map;
+
+import sneerteam.api.ICloud;
 
 public class CloudMasterImpl implements CloudMaster {
 
+	private final Map<Object, ICloudImpl> cloudsById = new HashMap<Object, ICloudImpl>();
+	
 	@Override
+	synchronized
 	public void close() {
-		// TODO Auto-generated method stub
-		
+		for (ICloudImpl cloud : cloudsById.values())
+			cloud.close();
+		cloudsById.clear();
 	}
 
 	@Override
-	public Stub freshCloudFor(Object id) {
-		// TODO Auto-generated method stub
-		return null;
+	synchronized
+	public ICloud.Stub freshCloudFor(Object id) {
+		ICloudImpl fresh = new ICloudImpl();
+		ICloudImpl old = cloudsById.put(id, fresh);
+		old.close();
+		return fresh;
 	}
 
 	
