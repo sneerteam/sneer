@@ -30,13 +30,19 @@ public class CloudService extends Service {
 		}
 		
 		@Override
-		public void pub(Uri path, Bundle value) throws RemoteException {
-			if (networker != null) {
-				String encoded = Encoder.unbundle(value);
-				log("pub(" + path + ", " + encoded + ")");
-				networker.send(encoded);
-			}
-		}		
+		public void pubValue(Uri path, Bundle value) throws RemoteException {
+			if (value == null) throw new IllegalArgumentException("Argument 'value' must not be null.");
+			if (networker == null) return;
+			
+			String encoded = Encoder.unbundle(value);
+			log("pub(" + path + ", " + encoded + ")");
+			networker.send(encoded);
+		}
+
+		@Override
+		public void pubPath(Uri path) throws RemoteException {
+			int implentMe;
+		}
 	};	
 	
 	final Networker.NetworkerListener listener = new Networker.NetworkerListener() {
@@ -97,7 +103,7 @@ public class CloudService extends Service {
 	void broadcast(Uri path, Bundle value) {
 		for (Subscription sub : subscriptions) {
 			try {
-				sub.subscriber.on(path,  value);
+				sub.subscriber.onValue(path,  value);
 			} catch (RemoteException e) {
 				subscriptions.remove(sub);
 			}
