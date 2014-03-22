@@ -16,20 +16,19 @@ class ICloudImpl extends ICloud.Stub {
 
 	@Override
 	public void pubPath(Uri path) throws RemoteException {
-		// TODO Auto-generated method stub
+		int implementMe;
 		
 	}
 
 	@Override
 	public void pubValue(Uri path, Bundle value) throws RemoteException {
-		// TODO Auto-generated method stub
+		int implementMe;
 		
 	}
 
 	@Override
-	public ISubscription sub(Uri path, ISubscriber subscriber)
-			throws RemoteException {
-		// TODO Auto-generated method stub
+	public ISubscription sub(Uri path, ISubscriber subscriber) throws RemoteException {
+		int implementMe;
 		return null;
 	}
 
