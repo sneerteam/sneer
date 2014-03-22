@@ -11,7 +11,6 @@ class ICloudImpl extends ICloud.Stub {
 
 	public void close() {
 		int implementMe;
-		
 	}
 
 	@Override

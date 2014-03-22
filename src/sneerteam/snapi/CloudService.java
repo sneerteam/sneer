@@ -2,6 +2,7 @@ package sneerteam.snapi;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -14,9 +15,9 @@ public class CloudService extends Service {
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-		log("onBind(" + intent.getAction() + ")");
-		Object appId = System.currentTimeMillis(); int RodrigoWeHowDoWeFindAnIdForTheCallingApp;
-		return master.freshCloudFor(appId);
+		String caller = getPackageManager().getNameForUid(Binder.getCallingUid());
+		log("onBind(" + intent.getAction() + ") Caller: " + caller);
+		return master.freshCloudFor(caller);
 	}
 	
 	private void log(String message) {
