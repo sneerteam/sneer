@@ -25,16 +25,30 @@ public class Path {
 		this.segments = segments;
 	}
 	
-	public void create() {
+	public void pub() {
 		try {
 			cloud().pubPath(path());
 		} catch (RemoteException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void pub(Object value) {
+		try {
+			cloud().pubValue(path(), Encoder.value(value));
+		} catch (RemoteException e) {
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 	
 	public Path append(Object segment) {
 		return new Path(cloudConnection, append(segments, segment));
+	}
+	
+	public Path prepend(Object segment) {
+		return new Path(cloudConnection, prepend(segments, segment));
 	}
 	
 	public rx.Observable<PathEvent> children() {
@@ -57,15 +71,17 @@ public class Path {
 					}
 				});
 				
-				subscriber.add(Subscriptions.create(new Action0() {@Override public void call() {
-					try {
-						sub.dispose();
-					} catch (RemoteException e) {
-						e.printStackTrace();
-					}
-				}}));
+				if (sub != null)
+					subscriber.add(Subscriptions.create(new Action0() {@Override public void call() {
+						try {
+							sub.dispose();
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					}}));
 				
 			} catch (RemoteException e) {
+				e.printStackTrace();
 				subscriber.onError(e);
 			}
 		}});
@@ -99,6 +115,7 @@ public class Path {
 				}}));
 				
 			} catch (RemoteException e) {
+				e.printStackTrace();
 				subscriber.onError(e);
 			}
 		}}) {
@@ -113,16 +130,12 @@ public class Path {
 
 			@Override
 			public void onNext(Object value) {
-				try {
-					cloud().pubValue(path(), Encoder.value(value));
-				} catch (RemoteException e) {
-					throw new RuntimeException(e);
-				}
+				pub(value);
 			}};
 	}
 	
 	private ISubscription sub(ISubscriber subscriber) throws RemoteException {
-		return cloud().sub(path(), subscriber); 
+		return cloudConnection.sub(path(), subscriber); 
 	}
 
 	private Bundle[] path() {
@@ -139,4 +152,11 @@ public class Path {
 		result.add(segment);
 		return result;
 	}	
+	
+	static List<Object> prepend(List<Object> segments, Object segment) {
+		ArrayList<Object> result = new ArrayList<Object>(segments.size() + 1);
+		result.add(segment);
+		result.addAll(segments);
+		return result;
+	}
 }

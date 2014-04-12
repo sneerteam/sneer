@@ -104,6 +104,7 @@ public class Encoder {
 		
 		if (value instanceof Map) {
 			bundle.putBundle(key,  fromMap((Map<?, ?>)value));
+			return;
 		}
 		
 		if (value instanceof Long) {
