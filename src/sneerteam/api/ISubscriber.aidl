@@ -1,9 +1,8 @@
 package sneerteam.api;
 
 import android.os.Bundle;
-import android.net.Uri;
 
 interface ISubscriber {
-	oneway void onPath(in Uri path);
-	oneway void onValue(in Uri path, in Bundle value);
+	oneway void onPath(in Bundle[] path);
+	oneway void onValue(in Bundle[] path, in Bundle value);
 }
