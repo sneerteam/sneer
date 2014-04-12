@@ -8,6 +8,7 @@ import rx.Observable.OnSubscribe;
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
+import sneerteam.api.ICloud;
 import sneerteam.api.ISubscriber;
 import sneerteam.api.ISubscription;
 import android.os.Bundle;
@@ -16,12 +17,20 @@ import android.os.RemoteException;
 
 public class Path {
 
-	private CloudConnection cloudConnection;
-	private List<Object> segments;
+	private final CloudConnection cloudConnection;
+	private final List<Object> segments;
 
 	Path(CloudConnection cloudConnection, List<Object> segments) {
 		this.cloudConnection = cloudConnection;
 		this.segments = segments;
+	}
+	
+	public void create() {
+		try {
+			cloud().pubPath(path());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public Path append(Object segment) {
@@ -31,7 +40,7 @@ public class Path {
 	public rx.Observable<PathEvent> children() {
 		return Observable.create(new OnSubscribe<PathEvent>() {@Override public void call(final Subscriber<? super PathEvent> subscriber) {
 			try {
-				final ISubscription sub = cloudConnection.cloud.sub(Encoder.pathEncode(segments), new ISubscriber() {
+				final ISubscription sub = sub(new ISubscriber() {
 					@Override
 					public void onPath(Bundle[] path) {
 						subscriber.onNext(
@@ -62,10 +71,10 @@ public class Path {
 		}});
 	}
 	
-	public rx.Observable<Object> value() {
-		return Observable.create(new OnSubscribe<Object>() {@Override public void call(final Subscriber<? super Object> subscriber) {
+	public rx.subjects.Subject<Object, Object> value() {
+		return new rx.subjects.Subject<Object, Object>(new OnSubscribe<Object>() {@Override public void call(final Subscriber<? super Object> subscriber) {
 			try {
-				final ISubscription sub = cloudConnection.cloud.sub(Encoder.pathEncode(segments), new ISubscriber() {
+				final ISubscription sub = sub(new ISubscriber() {
 					@Override
 					public void onPath(Bundle[] path) {
 					}
@@ -92,10 +101,38 @@ public class Path {
 			} catch (RemoteException e) {
 				subscriber.onError(e);
 			}
-		}});
+		}}) {
+			@Override
+			public void onCompleted() {
+			}
 
+			@Override
+			public void onError(Throwable e) {
+				e.printStackTrace();
+			}
+
+			@Override
+			public void onNext(Object value) {
+				try {
+					cloud().pubValue(path(), Encoder.value(value));
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);
+				}
+			}};
 	}
 	
+	private ISubscription sub(ISubscriber subscriber) throws RemoteException {
+		return cloud().sub(path(), subscriber); 
+	}
+
+	private Bundle[] path() {
+		return Encoder.pathEncode(segments);
+	}
+
+	private ICloud cloud() {
+		return cloudConnection.cloud;
+	}
+
 	static List<Object> append(List<Object> segments, Object segment) {
 		ArrayList<Object> result = new ArrayList<Object>(segments.size() + 1);
 		result.addAll(segments);
