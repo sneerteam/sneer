@@ -10,6 +10,7 @@ import android.os.RemoteException;
 import sneerteam.api.ICloud;
 import sneerteam.api.ISubscriber;
 import sneerteam.api.ISubscription;
+import sneerteam.api.Value;
 
 public class CloudConnection {
 	
@@ -37,19 +38,19 @@ public class CloudConnection {
 		return new Path(this, segments);
 	}	
 
-	ISubscription sub(Bundle[] path, ISubscriber subscriber) throws RemoteException {
+	ISubscription sub(Value[] path, ISubscriber subscriber) throws RemoteException {
 		return cloud.sub(path, remote ? stub(subscriber) : subscriber);
 	}
 
 	ISubscriber stub(final ISubscriber subscriber) {
 		return new ISubscriber.Stub() {
 			@Override
-			public void onValue(Bundle[] path, Bundle value) throws RemoteException {
+			public void onValue(Value[] path, Value value) throws RemoteException {
 				subscriber.onValue(path, value);
 			}
 			
 			@Override
-			public void onPath(Bundle[] path) throws RemoteException {
+			public void onPath(Value[] path) throws RemoteException {
 				subscriber.onPath(path);
 			}
 		};

@@ -11,7 +11,7 @@ import rx.subscriptions.Subscriptions;
 import sneerteam.api.ICloud;
 import sneerteam.api.ISubscriber;
 import sneerteam.api.ISubscription;
-import android.os.Bundle;
+import sneerteam.api.Value;
 import android.os.IBinder;
 import android.os.RemoteException;
 
@@ -36,7 +36,7 @@ public class Path {
 	
 	public void pub(Object value) {
 		try {
-			cloud().pubValue(path(), Encoder.value(value));
+			cloud().pubValue(path(), Value.of(value));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
@@ -56,13 +56,13 @@ public class Path {
 			try {
 				final ISubscription sub = sub(new ISubscriber() {
 					@Override
-					public void onPath(Bundle[] path) {
+					public void onPath(Value[] path) {
 						subscriber.onNext(
 								new PathEvent(cloudConnection.path(Encoder.pathDecode(path))));
 					}
 
 					@Override
-					public void onValue(Bundle[] path, Bundle value) {
+					public void onValue(Value[] path, Value value) {
 					}
 					
 					@Override
@@ -92,12 +92,12 @@ public class Path {
 			try {
 				final ISubscription sub = sub(new ISubscriber() {
 					@Override
-					public void onPath(Bundle[] path) {
+					public void onPath(Value[] path) {
 					}
 
 					@Override
-					public void onValue(Bundle[] path, Bundle value) {
-						subscriber.onNext(Encoder.unbundle(value));
+					public void onValue(Value[] path, Value value) {
+						subscriber.onNext(value.get());
 					}
 					
 					@Override
@@ -138,7 +138,7 @@ public class Path {
 		return cloudConnection.sub(path(), subscriber); 
 	}
 
-	private Bundle[] path() {
+	private Value[] path() {
 		return Encoder.pathEncode(segments);
 	}
 

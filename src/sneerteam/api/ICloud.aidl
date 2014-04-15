@@ -4,10 +4,11 @@ import android.os.Parcel;
 import android.os.Bundle;
 import sneerteam.api.ISubscriber;
 import sneerteam.api.ISubscription;
+import sneerteam.api.Value;
 
 interface ICloud {
-	oneway void pubPath(in Bundle[] path);	
-	oneway void pubValue(in Bundle[] path, in Bundle value);	
-	ISubscription sub(in Bundle[] path, in ISubscriber subscriber);
+	oneway void pubPath(in Value[] path);	
+	oneway void pubValue(in Value[] path, in Value value);	
+	ISubscription sub(in Value[] path, in ISubscriber subscriber);
 	byte[] ownPublicKey();
 }
