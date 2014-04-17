@@ -20,6 +20,7 @@ public class CloudServiceConnection {
 	final ServiceConnection snapi = new ServiceConnection() {		@Override
 		public void onServiceConnected(ComponentName name, IBinder binder) {
 			connection.onNext(new CloudConnection(binder));
+			connection.onCompleted();
 		}
 
 		@Override
