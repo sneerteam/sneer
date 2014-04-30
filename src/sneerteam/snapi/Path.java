@@ -146,14 +146,14 @@ public class Path {
 		return cloudConnection.cloud;
 	}
 
-	static List<Object> append(List<Object> segments, Object segment) {
+	public static List<Object> append(List<Object> segments, Object segment) {
 		ArrayList<Object> result = new ArrayList<Object>(segments.size() + 1);
 		result.addAll(segments);
 		result.add(segment);
 		return result;
 	}	
 	
-	static List<Object> prepend(List<Object> segments, Object segment) {
+	public static List<Object> prepend(List<Object> segments, Object segment) {
 		ArrayList<Object> result = new ArrayList<Object>(segments.size() + 1);
 		result.add(segment);
 		result.addAll(segments);
