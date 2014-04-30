@@ -11,4 +11,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <library />
+    <application
+        android:allowBackup="true"
+        android:label="SNAPI">
+    </application>
 </manifest>
