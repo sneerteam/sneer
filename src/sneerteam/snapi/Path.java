@@ -159,4 +159,8 @@ public class Path {
 		result.addAll(segments);
 		return result;
 	}
+
+    public Object getLastSegment() {
+        return segments.get(segments.size()-1);
+    }
 }
