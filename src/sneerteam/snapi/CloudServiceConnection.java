@@ -29,7 +29,7 @@ public class CloudServiceConnection {
 					}
 				};
 				
-				context.bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE + Context.BIND_ADJUST_WITH_ACTIVITY);
+				context.bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 				
 				subscriber.add(Subscriptions.create(new Action0() {
 					@Override
