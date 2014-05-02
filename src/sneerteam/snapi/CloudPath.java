@@ -2,9 +2,9 @@ package sneerteam.snapi;
 
 import rx.*;
 
-public interface EventualPath {
+public interface CloudPath {
 
-	EventualPath append(Object segment);
+	CloudPath append(Object segment);
 
 	Observable<PathEvent> children();
 

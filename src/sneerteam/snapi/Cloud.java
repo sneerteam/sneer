@@ -3,135 +3,84 @@ package sneerteam.snapi;
 import java.util.*;
 
 import rx.*;
-import rx.Observable.OnSubscribe;
 import rx.Observable;
 import rx.functions.*;
-import rx.subscriptions.*;
+import rx.observables.*;
+import rx.subjects.*;
 import android.content.*;
+import android.util.*;
 
 public class Cloud {
 	
-	private final class EventualPathImpl implements EventualPath {
+	private final class CloudPathImpl implements CloudPath {
 
 		private List<Object> segments;
-		private CompositeSubscription subscriptions = new CompositeSubscription();
 
-		public EventualPathImpl(List<Object> segments) {
+		public CloudPathImpl(List<Object> segments) {
 			this.segments = segments;
-			Cloud.this.subscriptions.add(subscriptions);
 		}
 
 		@Override
 		public Observable<PathEvent> children() {
-			return Observable.create(new OnSubscribe<PathEvent>() {
-				@Override
-				public void call(final Subscriber<? super PathEvent> subscriber) {
-					Subscription subscription = eventualCloud.subscribe(new Action1<CloudConnection>() {
-						@Override
-						public void call(CloudConnection cloud) {
-							subscriber.onNext(new PathEvent(cloud.path(segments)));
-						}
-					});
-					subscriptions.add(subscription);
-					subscriber.add(Subscriptions.create(new Action0() {
-						@Override
-						public void call() {
-							dispose();
-						}
-					}));
-				}
-			});
+			return eventualCloud.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
+				return cloud.path(segments).children();
+			}});
 		}
 
 		@Override
-		public EventualPath append(Object segment) {
+		public CloudPath append(Object segment) {
 			return path(Path.append(segments, segment));
-		}
-
-		public void dispose() {
-			Cloud.this.subscriptions.remove(subscriptions);
-			subscriptions.unsubscribe();
 		}
 
 		@Override
 		public void pub() {
-			Subscription subscription = eventualCloud.subscribe(new Action1<CloudConnection>() {
-				@Override
-				public void call(CloudConnection cloud) {
-					cloud.path(segments).pub();
-				}
-			});
-			subscriptions.add(subscription);
+			eventualCloud.first().subscribe(new Action1<CloudConnection>() {@Override public void call(CloudConnection cloud) {
+				cloud.path(segments).pub();
+			}});
 		}
 
 		@Override
 		public void pub(final Object value) {
-			Subscription subscription = eventualCloud.subscribe(new Action1<CloudConnection>() {
-				@Override
-				public void call(CloudConnection cloud) {
-					cloud.path(segments).pub(value);
-				}
-			});
-			subscriptions.add(subscription);
+			eventualCloud.first().subscribe(new Action1<CloudConnection>() {@Override public void call(CloudConnection cloud) {
+				cloud.path(segments).pub(value);
+			}});
 		}
+
 
 		@Override
 		public Observable<Object> value() {
-			return Observable.create(new OnSubscribe<Object>() {
-
-				@Override
-				public void call(final Subscriber<? super Object> subscriber) {
-					Subscription subscription = eventualCloud.subscribe(new Action1<CloudConnection>() {
-						@Override
-						public void call(CloudConnection cloud) {
-							final Subscription valueSubscription = cloud.path(segments).value().subscribe(new Action1<Object>() {
-								@Override
-								public void call(Object value) {
-									subscriber.onNext(value);
-								}
-							});
-							subscriber.add(Subscriptions.create(new Action0() {
-								@Override
-								public void call() {
-									valueSubscription.unsubscribe();
-								}
-							}));
-						}
-					});
-					subscriptions.add(subscription);
-					subscriber.add(Subscriptions.create(new Action0() {
-						@Override
-						public void call() {
-							dispose();
-						}
-					}));
-				}
-			});
+			return eventualCloud.flatMap(new Func1<CloudConnection, Observable<Object>>() {@Override public Observable<Object> call(CloudConnection cloud) {
+				return cloud.path(segments).value();
+			}});
 		}
 	}
 
-	private Observable<CloudConnection> eventualCloud;
-	private CompositeSubscription subscriptions = new CompositeSubscription(); 
+	private ReplaySubject<CloudConnection> eventualCloud;
+	private Subscription subscription;
 
 	public static Cloud cloudFor(final Context context) {
-		return new Cloud(CloudServiceConnection.cloudFor(context).publish().refCount());
+		return new Cloud(CloudServiceConnection.cloudFor(context).publish());
 	}
 
-	public Cloud(Observable<CloudConnection> eventualCloud) {
-		this.eventualCloud = eventualCloud;
+	public Cloud(ConnectableObservable<CloudConnection> eventualCloud) {
+		this.eventualCloud = ReplaySubject.create();
+		eventualCloud.subscribe(this.eventualCloud);
+		subscription = eventualCloud.connect();
 	}
 
 	public void dispose() {
-		subscriptions.unsubscribe();
-		subscriptions.clear();
+		subscription.unsubscribe();
 	}
 
-	public EventualPath path(Object... segments) {
+	public CloudPath path(Object... segments) {
 		return path(Arrays.asList(segments));
 	}
 
-	public EventualPath path(List<Object> list) {
-		return new EventualPathImpl(list);
+	public CloudPath path(List<Object> list) {
+		return new CloudPathImpl(list);
 	}
 
+	private static void log(String log) {
+		Log.d(CloudPathImpl.class.getSimpleName(), log);
+	}
 }
