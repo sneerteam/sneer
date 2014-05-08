@@ -160,7 +160,7 @@ public class Path {
 		return result;
 	}
 
-    public Object getLastSegment() {
+    public Object lastSegment() {
         return segments.get(segments.size()-1);
     }
 }
