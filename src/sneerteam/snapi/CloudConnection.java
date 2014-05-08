@@ -54,4 +54,10 @@ public class CloudConnection {
 			}
 		};
 	}
+
+	public byte[] ownPublicKey() throws RemoteException {
+		return cloud.ownPublicKey();
+	}
+	
+	
 }

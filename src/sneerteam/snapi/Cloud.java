@@ -3,12 +3,13 @@ package sneerteam.snapi;
 import java.util.*;
 
 import rx.*;
+import rx.Observable.OnSubscribe;
 import rx.Observable;
 import rx.functions.*;
-import rx.observables.*;
-import rx.subjects.*;
-import android.content.*;
-import android.util.*;
+import rx.observables.ConnectableObservable;
+import rx.subjects.ReplaySubject;
+import android.content.Context;
+import android.os.RemoteException;
 
 public class Cloud {
 	
@@ -79,8 +80,17 @@ public class Cloud {
 	public CloudPath path(List<Object> list) {
 		return new CloudPathImpl(list);
 	}
-
-	private static void log(String log) {
-		Log.d(CloudPathImpl.class.getSimpleName(), log);
+	
+	public Observable<byte[]> ownPublicKey() {
+		return Observable.create(new OnSubscribe<byte[]>() {@Override public void call(final Subscriber<? super byte[]> subscriber) {
+			eventualCloud.subscribe(new Action1<CloudConnection>() {@Override public void call(CloudConnection cloud) {
+				try {
+					subscriber.onNext(cloud.ownPublicKey());
+					subscriber.onCompleted();
+				} catch (RemoteException e) {
+					subscriber.onError(e);
+				}
+			}});
+		}});
 	}
 }
