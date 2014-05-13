@@ -163,4 +163,12 @@ public class Path {
     public Object lastSegment() {
         return segments.get(segments.size()-1);
     }
+
+    public List<Object> segments() {
+		return segments;
+	}
+    
+    public Path parent() {
+    	return new Path(cloudConnection, segments.subList(0, segments.size()-1));
+    }
 }
