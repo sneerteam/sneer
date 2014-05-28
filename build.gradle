@@ -1,5 +1,4 @@
 repositories {
-  mavenLocal()
   mavenCentral()
 }
 
@@ -10,7 +9,6 @@ configurations {
 dependencies {
   libs 'us.bpsm:edn-java:0.4.4'
   libs 'com.netflix.rxjava:rxjava-android:0.17.5'
-  libs 'sneerteam:networker:0.1.0'
 }
 
 task copyLibs(type: Copy) {
