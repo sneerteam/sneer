@@ -5,11 +5,13 @@ import java.util.*;
 import rx.*;
 import rx.Observable.OnSubscribe;
 import rx.Observable;
+import rx.android.schedulers.*;
 import rx.functions.*;
 import rx.observables.ConnectableObservable;
+import rx.schedulers.*;
 import rx.subjects.ReplaySubject;
 import android.content.Context;
-import android.os.RemoteException;
+import android.os.*;
 
 public class Cloud {
 	
@@ -60,8 +62,21 @@ public class Cloud {
 	private Subscription subscription;
 
 	public static Cloud cloudFor(final Context context) {
-		return new Cloud(CloudServiceConnection.cloudFor(context).publish());
+		return cloudFor(context, Schedulers.immediate());
 	}
+	
+	public static Cloud cloudObservingOnCurrentThread(Context context) {
+		return cloudFor(context, AndroidSchedulers.handlerThread(new Handler()));
+	}
+
+	public static Cloud cloudObservingOnAndroidMainThread(Context context) {
+		return cloudFor(context, AndroidSchedulers.mainThread());
+	}
+
+	public static Cloud cloudFor(final Context context, Scheduler scheduler) {
+		return new Cloud(CloudServiceConnection.cloudFor(context, scheduler).publish());
+	}
+	
 
 	public Cloud(ConnectableObservable<CloudConnection> eventualCloud) {
 		this.eventualCloud = ReplaySubject.create();

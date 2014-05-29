@@ -122,7 +122,7 @@ public class Encoder {
 			return;
 		}
 		
-		throw new UnsupportedOperationException("Cannot decode value `" + value + "' of type `" + value.getClass() + "'.");
+		throw new UnsupportedOperationException("Cannot decode value `" + value + "' of type `" + (value == null ? "(unknown)" : value.getClass()) + "'.");
 	}
 	
 	private static Bundle bundle(String key, Object value) {

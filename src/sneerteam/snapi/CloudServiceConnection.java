@@ -2,13 +2,14 @@ package sneerteam.snapi;
 
 import rx.*;
 import rx.functions.*;
+import rx.schedulers.*;
 import rx.subscriptions.*;
 import android.content.*;
 import android.os.*;
 
 public class CloudServiceConnection {
 	
-	public static Observable<CloudConnection> cloudFor(final Context context) {
+	public static Observable<CloudConnection> cloudFor(final Context context, final Scheduler scheduler) {
 		return Observable.create(new Observable.OnSubscribe<CloudConnection>() {
 
 			@Override
@@ -20,7 +21,7 @@ public class CloudServiceConnection {
 				final ServiceConnection serviceConnection = new ServiceConnection() {
 					@Override
 					public void onServiceConnected(ComponentName name, IBinder binder) {
-						subscriber.onNext(new CloudConnection(binder));
+						subscriber.onNext(new CloudConnection(binder, scheduler));
 					}
 
 					@Override
@@ -40,6 +41,10 @@ public class CloudServiceConnection {
 			}
 		});
 
+	}
+
+	public static Observable<CloudConnection> cloudFor(Context context) {
+		return cloudFor(context, Schedulers.immediate());
 	}
 	
 }
