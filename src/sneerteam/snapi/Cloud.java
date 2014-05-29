@@ -61,19 +61,19 @@ public class Cloud {
 	private ReplaySubject<CloudConnection> eventualCloud;
 	private Subscription subscription;
 
-	public static Cloud cloudFor(final Context context) {
-		return cloudFor(context, Schedulers.immediate());
+	public static Cloud cloudFor(Context context) {
+		return onScheduler(context, Schedulers.immediate());
 	}
 	
-	public static Cloud cloudObservingOnCurrentThread(Context context) {
-		return cloudFor(context, AndroidSchedulers.handlerThread(new Handler()));
+	public static Cloud onCurrentThread(Context context) {
+		return onScheduler(context, AndroidSchedulers.handlerThread(new Handler()));
 	}
 
-	public static Cloud cloudObservingOnAndroidMainThread(Context context) {
-		return cloudFor(context, AndroidSchedulers.mainThread());
+	public static Cloud onAndroidMainThread(Context context) {
+		return onScheduler(context, AndroidSchedulers.mainThread());
 	}
 
-	public static Cloud cloudFor(final Context context, Scheduler scheduler) {
+	public static Cloud onScheduler(final Context context, Scheduler scheduler) {
 		return new Cloud(CloudServiceConnection.cloudFor(context, scheduler).publish());
 	}
 	
