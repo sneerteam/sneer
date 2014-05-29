@@ -22,6 +22,7 @@ public class ContactUtils {
                 .map(new Func1<Pair<Integer, Object>, Object>() {@Override public Object call(Pair<Integer, Object> pair) {
                     return pair.second;
                 }})
+                .distinctUntilChanged()
                 .cast(String.class);
     }
     
