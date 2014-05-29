@@ -16,17 +16,13 @@ public class ContactUtils {
                 }}),
                 cloud.path(publicKey, "profile", "name").value().map(new Func1<Object, Pair<Integer, Object>>() {@Override public Pair<Integer, Object> call(Object nickname) {
                     return Pair.create(1, nickname);
-                }})).filter(new Func1<Pair<Integer, Object>, Boolean>() {
-                    int best = 0;
-                    @Override public Boolean call(Pair<Integer, Object> pair) {
-                        boolean ret = best <= pair.first;
-                        best = Math.max(pair.first, best);
-                        return ret;
-                    }
-                })
+                }})).scan(new Func2<Pair<Integer, Object>, Pair<Integer, Object>, Pair<Integer, Object>>() {@Override public Pair<Integer, Object> call(Pair<Integer, Object> a, Pair<Integer, Object> b) {
+                    return a.first > b.first ? a : b;
+                }})
                 .map(new Func1<Pair<Integer, Object>, Object>() {@Override public Object call(Pair<Integer, Object> pair) {
                     return pair.second;
                 }})
                 .cast(String.class);
     }
+    
 }
