@@ -19,7 +19,7 @@ public class ContactUtils {
                 }})).filter(new Func1<Pair<Integer, Object>, Boolean>() {
                     int best = 0;
                     @Override public Boolean call(Pair<Integer, Object> pair) {
-                        boolean ret = pair.first <= pair.first;
+                        boolean ret = best <= pair.first;
                         best = Math.max(pair.first, best);
                         return ret;
                     }
