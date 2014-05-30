@@ -3,10 +3,10 @@ package sneerteam.snapi;
 import java.util.Arrays;
 import java.util.List;
 
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-
+import rx.*;
+import rx.schedulers.*;
 import sneerteam.api.ICloud;
 import sneerteam.api.ISubscriber;
 import sneerteam.api.ISubscription;
@@ -16,18 +16,20 @@ public class CloudConnection {
 	
 	final ICloud cloud;
 	final boolean remote;
+	private Scheduler scheduler;
 
 	public CloudConnection(ICloud cloud) {
-		this(cloud, false);
+		this(cloud, false, Schedulers.immediate());
 	}
 	
-	public CloudConnection(IBinder binder) {
-		this(ICloud.Stub.asInterface(binder), true);
+	public CloudConnection(IBinder binder, Scheduler scheduler) {
+		this(ICloud.Stub.asInterface(binder), true, scheduler);
 	}
 	
-	public CloudConnection(ICloud cloud, boolean remote) {
+	public CloudConnection(ICloud cloud, boolean remote, Scheduler scheduler) {
 		this.cloud = cloud;
 		this.remote = remote;
+		this.scheduler = scheduler;
 	}
 
 	public Path path(Object... segments) {
@@ -59,6 +61,8 @@ public class CloudConnection {
 	public byte[] ownPublicKey() throws RemoteException {
 		return cloud.ownPublicKey();
 	}
-	
-	
+
+	public Scheduler scheduler() {
+		return scheduler;
+	}
 }

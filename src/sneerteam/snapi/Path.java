@@ -1,19 +1,15 @@
 package sneerteam.snapi;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import rx.Observable;
+import rx.*;
 import rx.Observable.OnSubscribe;
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.subscriptions.Subscriptions;
-import sneerteam.api.ICloud;
-import sneerteam.api.ISubscriber;
-import sneerteam.api.ISubscription;
-import sneerteam.api.Value;
-import android.os.IBinder;
-import android.os.RemoteException;
+import rx.Scheduler.Inner;
+import rx.Observable;
+import rx.functions.*;
+import rx.subscriptions.*;
+import sneerteam.api.*;
+import android.os.*;
 
 public class Path {
 
@@ -56,9 +52,11 @@ public class Path {
 			try {
 				final ISubscription sub = sub(new ISubscriber() {
 					@Override
-					public void onPath(Value[] path) {
-						subscriber.onNext(
-								new PathEvent(cloudConnection.path(Encoder.pathDecode(path))));
+					public void onPath(final Value[] path) {
+						cloudConnection.scheduler().schedule(new Action1<Scheduler.Inner>() {@Override public void call(Inner arg0) {
+							subscriber.onNext(
+									new PathEvent(cloudConnection.path(Encoder.pathDecode(path))));
+						}});
 					}
 
 					@Override
@@ -96,8 +94,10 @@ public class Path {
 					}
 
 					@Override
-					public void onValue(Value[] path, Value value) {
-						subscriber.onNext(value.get());
+					public void onValue(Value[] path, final Value value) {
+						cloudConnection.scheduler().schedule(new Action1<Scheduler.Inner>() {@Override public void call(Inner arg0) {
+							subscriber.onNext(value.get());
+						}});
 					}
 					
 					@Override
