@@ -4,9 +4,12 @@ import java.util.concurrent.*;
 
 import rx.*;
 import rx.functions.*;
+import us.bpsm.edn.*;
 
 public interface CloudPath {
-
+	
+	public static final Keyword ME = Keyword.newKeyword("me");
+	
 	CloudPath append(Object segment);
 
 	Observable<PathEvent> children();

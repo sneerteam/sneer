@@ -3,6 +3,8 @@ package sneerteam.api;
 import java.util.HashMap;
 import java.util.Map;
 
+import us.bpsm.edn.*;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -82,6 +84,17 @@ public class Value implements Parcelable {
 				dest.writeString((String)value);
 			}
 		},
+		KEYWORD {
+			@Override
+			public Object createFromParcel(Parcel in) {
+				return Keyword.newKeyword(in.readString());
+			}
+
+			@Override
+			public void writeToParcel(Parcel dest, Object value) {
+				dest.writeString(((Keyword)value).getName());
+			}
+		},
 		LONG {
 			@Override
 			public Object createFromParcel(Parcel in) {
@@ -122,6 +135,8 @@ public class Value implements Parcelable {
 				return LONG;
 			if (o instanceof Map)
 				return MAP;
+			if (o instanceof Keyword)
+				return KEYWORD;
 			return NULL;
 		}
 

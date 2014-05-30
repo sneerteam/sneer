@@ -1,6 +1,7 @@
 package sneerteam.snapi;
 
 import static android.util.Pair.*;
+import static sneerteam.snapi.CloudPath.*;
 import rx.*;
 import rx.functions.*;
 import android.util.*;
@@ -9,7 +10,7 @@ public class ContactUtils {
 
     public static Observable<String> nickname(Cloud cloud, String publicKey) {
         return Observable.merge(
-                cloud.path(":me", "contacts", publicKey, "nickname").value().map(new Func1<Object, Pair<Integer, Object>>() {@Override public Pair<Integer, Object> call(Object nickname) {
+                cloud.path(ME, "contacts", publicKey, "nickname").value().map(new Func1<Object, Pair<Integer, Object>>() {@Override public Pair<Integer, Object> call(Object nickname) {
                     return create(3, nickname);
                 }}),
                 cloud.path(publicKey, "profile", "nickname").value().map(new Func1<Object, Pair<Integer, Object>>() {@Override public Pair<Integer, Object> call(Object nickname) {
