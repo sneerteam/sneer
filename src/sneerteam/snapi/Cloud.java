@@ -1,6 +1,7 @@
 package sneerteam.snapi;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import rx.*;
 import rx.Observable.OnSubscribe;
@@ -10,7 +11,7 @@ import rx.functions.*;
 import rx.observables.ConnectableObservable;
 import rx.schedulers.*;
 import rx.subjects.ReplaySubject;
-import android.content.Context;
+import android.content.*;
 import android.os.*;
 
 public class Cloud {
@@ -56,6 +57,28 @@ public class Cloud {
 				return cloud.path(segments).value();
 			}});
 		}
+
+        @Override
+        public void ifAbsent(final long timeout, final TimeUnit unit, final Action0 action) {
+            queryExistence(timeout, unit, null, action);
+        }
+        
+        @Override
+        public void queryExistence(final long timeout, final TimeUnit unit, final Action0 exist, final Action0 absent) {
+            eventualCloud.subscribe(new Action1<CloudConnection>() {@Override public void call(CloudConnection cloud) {
+                final Object token = new Object();
+                Observable.merge(cloud.path(segments).value(), Observable.from(token).delay(timeout, unit))
+                .first()
+                .observeOn(cloud.scheduler())
+                .subscribe(new Action1<Object>() {@Override public void call(Object value) {
+                    if (value == token) {
+                        if (absent != null) absent.call();
+                    } else {
+                        if (exist != null) exist.call();
+                    }
+                }});
+            }});
+        }
 	}
 
 	private ReplaySubject<CloudConnection> eventualCloud;
