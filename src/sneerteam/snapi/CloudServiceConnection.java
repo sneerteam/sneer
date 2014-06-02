@@ -4,12 +4,18 @@ import rx.*;
 import rx.functions.*;
 import rx.schedulers.*;
 import rx.subscriptions.*;
+import android.app.*;
 import android.content.*;
 import android.os.*;
 
 public class CloudServiceConnection {
 
     public static Observable<CloudConnection> cloudFor(final Context context, final Scheduler scheduler) {
+        
+        if (context instanceof Activity) {
+            SneerUtils.showSneerInstallationMessageIfNecessary((Activity) context);
+        }
+        
         return Observable.create(new Observable.OnSubscribe<CloudConnection>() {
 
             @Override
