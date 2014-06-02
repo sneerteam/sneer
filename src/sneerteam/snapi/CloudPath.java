@@ -3,7 +3,6 @@ package sneerteam.snapi;
 import java.util.concurrent.*;
 
 import rx.*;
-import rx.functions.*;
 import us.bpsm.edn.*;
 
 public interface CloudPath {
@@ -19,7 +18,6 @@ public interface CloudPath {
 	
 	Observable<Object> value();
 	
-    void queryExistence(long timeout, TimeUnit unit, Action0 ifExist, Action0 ifAbsent);
-    void ifAbsent(long timeout, TimeUnit unit, Action0 action);
+	Observable<Boolean> exists(long timeout, TimeUnit unit);
 	
 }
