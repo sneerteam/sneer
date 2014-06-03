@@ -14,15 +14,15 @@ public class SneerUtils {
            pm.getPackageInfo("sneerteam.android.main", PackageManager.GET_ACTIVITIES);
         } catch (PackageManager.NameNotFoundException e) {
             new AlertDialog.Builder(activity)
-            .setTitle("Missing Sneer Core")
+            .setTitle("You Need the Sneer App")
             .setMessage("Do you want to install it now?")
-            .setPositiveButton("Yes!!!!", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
+            .setPositiveButton("Yes", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=sneerteam.android.main"));
                 goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 activity.startActivity(goToMarket);
                 activity.finish();
             }})
-            .setNegativeButton("No, thanks.", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
+            .setNegativeButton("No", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
                 activity.finish();
             }})
             .setIcon(android.R.drawable.ic_dialog_alert)
