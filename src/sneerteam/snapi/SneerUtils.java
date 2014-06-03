@@ -8,7 +8,7 @@ import android.net.*;
 
 public class SneerUtils {
 
-    public static void ensureInstalled(final Activity activity) {
+    public static void showSneerInstallationMessageIfNecessary(final Activity activity) {
         PackageManager pm = activity.getPackageManager();
         try {
            pm.getPackageInfo("sneerteam.android.main", PackageManager.GET_ACTIVITIES);
@@ -16,13 +16,13 @@ public class SneerUtils {
             new AlertDialog.Builder(activity)
             .setTitle("Missing Sneer Core")
             .setMessage("Do you want to install it now?")
-            .setPositiveButton("OK", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
+            .setPositiveButton("Yes!!!!", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=sneerteam.android.main"));
                 goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 activity.startActivity(goToMarket);
                 activity.finish();
             }})
-            .setNegativeButton("Cancel", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
+            .setNegativeButton("No, thanks.", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
                 activity.finish();
             }})
             .setIcon(android.R.drawable.ic_dialog_alert)
