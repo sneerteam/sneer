@@ -10,7 +10,7 @@ public class ContactPicker {
 		caller.startActivityForResult(intent, requestCode);
 	}
 	
-	public static String publicKeyFrom(Intent intent) {
-		return intent.getExtras().get("public_key").toString();
+	public static Contact contactFrom(Intent intent) {
+		return new Contact(intent.getExtras().get("public_key").toString(), intent.getExtras().get("nickname").toString());
 	}
 }

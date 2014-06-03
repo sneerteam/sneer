@@ -1,5 +1,7 @@
 package sneerteam.snapi;
 
+import static sneerteam.snapi.CloudPath.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -11,6 +13,7 @@ import rx.functions.*;
 import rx.observables.*;
 import rx.schedulers.*;
 import rx.subjects.*;
+import us.bpsm.edn.*;
 import android.content.*;
 import android.os.*;
 
@@ -125,4 +128,18 @@ public class Cloud {
 			}});
 		}});
 	}
+	
+	public Observable<Contact> contacts() {
+        return contacts(":me");
+	    
+	}
+
+    Observable<Contact> contacts(String root) {
+        return path(root, "contacts").children()
+                .flatMap(new Func1<PathEvent, Observable<Contact>>() {@Override public Observable<Contact> call(final PathEvent event) {
+                    return event.path().append("nickname").value().map(new Func1<Object, Contact>() {@Override public Contact call(Object nickname) {
+                        return new Contact((String) event.path().lastSegment(), (String) nickname);
+                    }});
+                }});
+    }
 }
