@@ -8,10 +8,9 @@ import rx.Observable.OnSubscribe;
 import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
-import rx.observables.ConnectableObservable;
+import rx.observables.*;
 import rx.schedulers.*;
-import rx.subjects.ReplaySubject;
-import rx.subscriptions.*;
+import rx.subjects.*;
 import android.content.*;
 import android.os.*;
 
