@@ -13,7 +13,6 @@ import rx.functions.*;
 import rx.observables.*;
 import rx.schedulers.*;
 import rx.subjects.*;
-import us.bpsm.edn.*;
 import android.content.*;
 import android.os.*;
 
