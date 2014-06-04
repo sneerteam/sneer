@@ -11,6 +11,8 @@ public class ContactPicker {
 	}
 	
 	public static Contact contactFrom(Intent intent) {
-		return new Contact(intent.getExtras().get("public_key").toString(), intent.getExtras().get("nickname").toString());
+		return new Contact(
+			intent.getExtras().get("public_key").toString(),
+			intent.getExtras().get("nickname").toString());
 	}
 }
