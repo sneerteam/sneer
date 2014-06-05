@@ -7,7 +7,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.8+'
-        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.9.+'        
+        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.9.+'
     }
 }
 
@@ -35,6 +35,7 @@ android {
 	        manifest.srcFile 'AndroidManifest.xml'
 	        aidl.srcDir 'src'
 	        java.srcDir 'src'
+	        res.srcDir 'res'
 	    }
 	}
 }
