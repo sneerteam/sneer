@@ -7,10 +7,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import rx.*;
 import rx.schedulers.*;
-import sneerteam.api.ICloud;
-import sneerteam.api.ISubscriber;
-import sneerteam.api.ISubscription;
-import sneerteam.api.Value;
+import sneerteam.api.*;
 
 public class CloudConnection {
 	

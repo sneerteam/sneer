@@ -1,14 +1,54 @@
-repositories {
-  mavenCentral()
+apply plugin: 'maven'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.8+'
+        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.9.+'        
+    }
 }
 
 configurations {
   libs
 }
 
+apply plugin: 'android-library'
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-  libs 'us.bpsm:edn-java:0.4.4'
-  libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+	compile 'us.bpsm:edn-java:0.4.4'
+    compile 'com.netflix.rxjava:rxjava-android:0.17.5'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    sourceSets {
+	    main {
+	        manifest.srcFile 'AndroidManifest.xml'
+	        aidl.srcDir 'src/sneerteam/api'
+	        java.srcDir 'src/sneerteam/snapi'
+	        res.srcDir 'res'	        
+	    }
+	}
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://github.com/sneerteam/sneerteam.github.io")
+            pom.groupId = 'sneerteam.snapi.lib'
+            pom.artifactId = 'sneer-api-nodeps'
+            pom.version = '1.0.0'
+        }
+    }
 }
 
 task copyLibs(type: Copy) {
