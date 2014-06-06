@@ -1,14 +1,14 @@
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 configurations {
-    libs
+  libs
 }
 
 dependencies {
-    libs 'us.bpsm:edn-java:0.4.4'
-    libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+  libs 'us.bpsm:edn-java:0.4.4'
+  libs 'com.netflix.rxjava:rxjava-android:0.17.5'
 }
 
 task copyLibs(type: Copy) {
