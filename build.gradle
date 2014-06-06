@@ -17,13 +17,8 @@ configurations {
 
 apply plugin: 'android-library'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-	compile 'us.bpsm:edn-java:0.4.4'
-    compile 'com.netflix.rxjava:rxjava-android:0.17.5'
+	compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 android {
@@ -38,6 +33,20 @@ android {
 	        res.srcDir 'res'
 	    }
 	}
+}
+
+android.libraryVariants.all {
+	variant ->
+	  	def name = variant.buildType.name
+		
+		if (name.equals(com.android.builder.BuilderConstants.DEBUG)) {
+		  return; // Skip debug builds.
+		}
+
+		def task = project.tasks.create "jar${name.capitalize()}", Jar
+		task.dependsOn variant.javaCompile
+		task.from variant.javaCompile.destinationDir
+		artifacts.add('archives', task);
 }
 
 uploadArchives {
