@@ -1,63 +1,10 @@
-apply plugin: 'maven'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.8+'
-        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.9.+'
-    }
+repositories {
+    mavenCentral()
 }
-
-configurations {
-  libs
-}
-
-apply plugin: 'android-library'
 
 dependencies {
-	compile fileTree(dir: 'libs', include: '*.jar')
-}
-
-android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.3"
-
-    sourceSets {
-	    main {
-	        manifest.srcFile 'AndroidManifest.xml'
-	        aidl.srcDir 'src'
-	        java.srcDir 'src'
-	        res.srcDir 'res'
-	    }
-	}
-}
-
-android.libraryVariants.all {
-	variant ->
-	  	def name = variant.buildType.name
-		
-		if (name.equals(com.android.builder.BuilderConstants.DEBUG)) {
-		  return; // Skip debug builds.
-		}
-
-		def task = project.tasks.create "jar${name.capitalize()}", Jar
-		task.dependsOn variant.javaCompile
-		task.from variant.javaCompile.destinationDir
-		artifacts.add('archives', task);
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "https://github.com/sneerteam/sneerteam.github.io")
-            pom.groupId = 'sneerteam.snapi.lib'
-            pom.artifactId = 'sneer-api-nodeps'
-            pom.version = '1.0.0'
-        }
-    }
+    libs 'us.bpsm:edn-java:0.4.4'
+    libs 'com.netflix.rxjava:rxjava-android:0.17.5'
 }
 
 task copyLibs(type: Copy) {
