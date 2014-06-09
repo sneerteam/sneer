@@ -65,7 +65,7 @@ artifacts {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "...")
+            repository(url: "....")
             pom.project {
                 name project.name
                 packaging 'jar'
