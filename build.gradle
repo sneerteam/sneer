@@ -1,19 +1,82 @@
-repositories {
-  mavenCentral()
+apply plugin: 'maven'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.8+'
+    }
 }
 
 configurations {
   libs
+  compile.extendsFrom libs
+}
+
+apply plugin: 'android-library'
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-  libs 'us.bpsm:edn-java:0.4.4'
-  libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+    libs 'us.bpsm:edn-java:0.4.4'
+    libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            aidl.srcDir 'src'
+            java.srcDir 'src'
+            res.srcDir 'res'
+        }
+    }
 }
 
 task copyLibs(type: Copy) {
   into "libs"
   from configurations.libs
+}
+
+task jarFat(type: Jar) {
+    android.libraryVariants.all {
+        if (it.name.equals("debug")) return
+        from it.javaCompile.destinationDir
+        from it.processResources.resDir
+    }
+
+    baseName = "sneer"
+    appendix = "api-nodeps"
+
+    from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+artifacts {
+    archives jarFat
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "...")
+            pom.project {
+                name project.name
+                packaging 'jar'
+                description project.description
+                url 'https://github.com/sneerteam/sneerteam.github.io'
+                groupId = 'sneerteam.snapi.lib'
+                artifactId = 'sneer-api-nodeps'
+                version = '1.0.0'
+            }
+        }
+    }
 }
 
 defaultTasks 'copyLibs'
