@@ -4,3 +4,4 @@ gen/
 /build/
 /libs
 /.gradle
+local.properties
