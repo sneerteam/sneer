@@ -1,4 +1,29 @@
+apply plugin: 'android-library'
 apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'me.sneer'
+version = '0.1.1'
+description = 'API for Sneer, the sovereign platform.' 
+ext.packaging = 'jar'
+
+
+def isDevBuild
+def isCiBuild
+def isReleaseBuild
+
+def sonatypeRepositoryUrl
+
+if(hasProperty("release")) {
+    isReleaseBuild = true
+    sonatypeRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+} else if (hasProperty("ci")) {
+    isCiBuild = true
+    version += "-SNAPSHOT"
+    sonatypeRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+} else {
+    isDevBuild = true
+}
 
 buildscript {
     repositories {
@@ -10,15 +35,13 @@ buildscript {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 configurations {
   libs
   compile.extendsFrom libs
-}
-
-apply plugin: 'android-library'
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -29,6 +52,11 @@ dependencies {
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.3"
+    
+    defaultConfig {
+     minSdkVersion 14
+     targetSdkVersion 18
+ }
 
     sourceSets {
         main {
@@ -45,36 +73,98 @@ task copyLibs(type: Copy) {
   from configurations.libs
 }
 
-task jarFat(type: Jar) {
+task jarNodeps(type: Jar) {
     android.libraryVariants.all {
         if (it.name.equals("debug")) return
         from it.javaCompile.destinationDir
         from it.processResources.resDir
     }
 
-    baseName = "sneer"
-    appendix = "api-nodeps"
+    baseName = "sneer-api"
+    appendix = "nodeps"
 
     from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
+task jar(type: Jar) {
+    android.libraryVariants.all {
+        if (it.name.equals("debug")) return
+        from it.javaCompile.destinationDir
+        from it.processResources.resDir
+    }
+
+    baseName = "sneer-api"
+}
+
 artifacts {
-    archives jarFat
+    archives jar
+}
+
+if(isReleaseBuild || isCiBuild) {
+    signing {
+        sign configurations.archives
+    }
+} else {
+    task signArchives {
+        // do nothing
+    }
 }
 
 uploadArchives {
     repositories {
-        mavenDeployer {
-            repository(url: "....")
-            pom.project {
-                name project.name
-                packaging 'jar'
-                description project.description
-                url 'https://github.com/sneerteam/sneerteam.github.io'
-                groupId = 'sneerteam.snapi.lib'
-                artifactId = 'sneer-api-nodeps'
-                version = '1.0.0'
+     if (isDevBuild) {
+         mavenLocal()
+     } else {
+         mavenDeployer {
+
+                if(isReleaseBuild || isCiBuild) { 
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                }
+
+                repository(url: sonatypeRepositoryUrl) {
+                  authentication(userName: nexusUsername, password: nexusPassword)
+                }
+                
+             pom.project {
+                 name "sneer-api"
+                 packaging 'jar'
+                 description project.description
+                 url 'http://sneer.me'
+        scm {
+            url 'https://github.com/sneerteam/snapi'
+            connection 'git@github.com:sneerteam/snapi.git'
+        }
+        licenses {
+            license {
+             name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
+                url 'http://opensource.org/licenses/lgpl-3.0.html'
+                distribution 'repo'
             }
+        }
+                   developers {
+                       developer {
+                           id 'klauswuestefeld'
+                           name 'Klaus Wuestefeld'
+                           email 'klauswuestefeld@gmail.com'
+                       }
+                       developer {
+                           id 'fabioroger'
+                           name 'Fabio Roger Manera'
+                           email 'fabioroger@gmail.com'
+                       }
+                       developer {
+                           id 'bamboo'
+                           name 'Rodrigo B. de Oliveira'
+                           email 'rbo@acm.org'
+                       }
+                       developer {
+                           id 'felipebueno'
+                           name 'Felipe Bueno'
+                           email 'bueno.felipe@gmail.com'
+                       }
+                   }
+             }
+   }
         }
     }
 }
