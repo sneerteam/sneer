@@ -1,10 +1,13 @@
 package sneerteam.snapi;
 
+import static sneerteam.snapi.SneerUtils.*;
 import rx.*;
 import rx.Observable.OnSubscribe;
 import rx.android.schedulers.*;
+import android.app.*;
 import android.content.*;
 import android.os.*;
+import android.util.*;
 
 public class ContactPicker {
 
@@ -20,7 +23,15 @@ public class ContactPicker {
 	                subscriber.onCompleted();
 	            }
 	        });
-	        context.startActivity(intent);
+	        try {
+	        	context.startActivity(intent);
+	        } catch (ActivityNotFoundException e) {
+	            if (context instanceof Activity) {
+	                showSneerInstallationMessageIfNecessary((Activity) context);
+	            } else {
+	            	Log.w(ContactPicker.class.getSimpleName(), "Can't start contact picker", e);
+	            }
+	        }
         }}).subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread());
 	}
 }
