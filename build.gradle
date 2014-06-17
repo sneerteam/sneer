@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'me.sneer'
-version = '0.1.1'
+version = '0.1.0'
 description = 'API for Sneer, the sovereign platform.' 
 ext.packaging = 'jar'
 
@@ -73,32 +73,54 @@ task copyLibs(type: Copy) {
   from configurations.libs
 }
 
-task jarNodeps(type: Jar) {
-    android.libraryVariants.all {
-        if (it.name.equals("debug")) return
-        from it.javaCompile.destinationDir
-        from it.processResources.resDir
+
+android.libraryVariants.all { variant ->
+	if (!variant.name.equals("release")) return
+    
+	task jarNodeps(type: Jar) {
+        from variant.javaCompile.destinationDir
+        from variant.processResources.resDir
+	
+	    appendix = "nodeps"
+	
+	    from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
+	}
+	
+    task javadocRelease(type: Javadoc) {
+        description = "Generates javadoc for release"
+        destinationDir = new File(destinationDir, variant.baseName)
+        source = files(variant.javaCompile.source)
+        classpath = files(android.plugin.runtimeJarList, variant.javaCompile.classpath)
+        exclude '**/R.html', '**/R.*.html'
     }
 
-    baseName = "sneer-api"
-    appendix = "nodeps"
 
-    from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
-}
-
-task jar(type: Jar) {
-    android.libraryVariants.all {
-        if (it.name.equals("debug")) return
-        from it.javaCompile.destinationDir
-        from it.processResources.resDir
+	task ourJar(type: Jar) {
+        from variant.javaCompile.destinationDir
+        from variant.processResources.resDir
     }
 
-    baseName = "sneer-api"
+	task javadocJar(type: Jar, dependsOn: javadocRelease) {
+		from javadocRelease.destinationDir
+	    classifier = 'javadoc'
+	}
+	
+	task sourcesJar(type: Jar) {
+        from variant.javaCompile.source
+	    classifier = 'sources'
+	}
+
+	artifacts {
+	    archives ourJar
+	    
+		archives javadocJar
+		archives sourcesJar
+	}
+		
 }
 
-artifacts {
-    archives jar
-}
+
+
 
 if(isReleaseBuild || isCiBuild) {
     signing {
@@ -126,7 +148,7 @@ uploadArchives {
                 }
                 
              pom.project {
-                 name "sneer-api"
+                 name project.name
                  packaging 'jar'
                  description project.description
                  url 'http://sneer.me'
