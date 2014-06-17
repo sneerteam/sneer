@@ -1,5 +1,6 @@
 package sneerteam.snapi;
 
+import static sneerteam.snapi.SneerUtils.*;
 import rx.*;
 import rx.functions.*;
 import rx.schedulers.*;
@@ -13,7 +14,7 @@ public class CloudServiceConnection {
     public static Observable<CloudConnection> cloudFor(final Context context, final Scheduler scheduler) {
         
         if (context instanceof Activity) {
-            SneerUtils.showSneerInstallationMessageIfNecessary((Activity) context);
+            showSneerInstallationMessageIfNecessary((Activity) context);
         }
         
         return Observable.create(new Observable.OnSubscribe<CloudConnection>() {
