@@ -2,8 +2,10 @@ apply plugin: 'android-library'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+def originalVersion = "0.1.0"
+
 group = 'me.sneer'
-version = '0.1.0'
+version = originalVersion
 description = 'API for Sneer, the sovereign platform.' 
 ext.packaging = 'jar'
 
@@ -79,6 +81,9 @@ android.libraryVariants.all { variant ->
         from variant.processResources.resDir
 	
 	    appendix = "nodeps"
+	    version = originalVersion
+	    def x = new XmlSlurper().parse("${SONATYPE_SNAPSHOT_URL}/me/sneer/${project.name}/${originalVersion}-SNAPSHOT/maven-metadata.xml".toURL().openStream())
+        classifier = "${x.versioning.snapshot.timestamp}-${x.versioning.snapshot.buildNumber}" 
 	
 	    from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
 	}
