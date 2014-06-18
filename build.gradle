@@ -31,7 +31,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.8+'
+        classpath 'com.android.tools.build:gradle:0.10.0+'
     }
 }
 
@@ -89,9 +89,13 @@ android.libraryVariants.all { variant ->
     task javadocRelease(type: Javadoc) {
         description = "Generates javadoc for release"
         destinationDir = new File(destinationDir, variant.baseName)
-        source = files(variant.javaCompile.source)
-        classpath = files(android.plugin.runtimeJarList, variant.javaCompile.classpath)
-        exclude '**/R.html', '**/R.*.html'
+		source = variant.javaCompile.source
+		ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+		classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+		options.links("http://docs.oracle.com/javase/7/docs/api/");
+		options.links("http://d.android.com/reference/");
+		exclude '**/BuildConfig.java'
+		exclude '**/R.java'
     }
 
 
@@ -132,63 +136,69 @@ if(isReleaseBuild || isCiBuild) {
     }
 }
 
-uploadArchives {
-    repositories {
-     if (isDevBuild) {
-         mavenLocal()
-     } else {
-         mavenDeployer {
-
-                if(isReleaseBuild || isCiBuild) { 
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-                }
-
-                repository(url: sonatypeRepositoryUrl) {
-                  authentication(userName: nexusUsername, password: nexusPassword)
-                }
-                
-             pom.project {
-                 name project.name
-                 packaging 'jar'
-                 description project.description
-                 url 'http://sneer.me'
-        scm {
-            url 'https://github.com/sneerteam/snapi'
-            connection 'git@github.com:sneerteam/snapi.git'
-        }
-        licenses {
-            license {
-             name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
-                url 'http://opensource.org/licenses/lgpl-3.0.html'
-                distribution 'repo'
-            }
-        }
-                   developers {
-                       developer {
-                           id 'klauswuestefeld'
-                           name 'Klaus Wuestefeld'
-                           email 'klauswuestefeld@gmail.com'
-                       }
-                       developer {
-                           id 'fabioroger'
-                           name 'Fabio Roger Manera'
-                           email 'fabioroger@gmail.com'
-                       }
-                       developer {
-                           id 'bamboo'
-                           name 'Rodrigo B. de Oliveira'
-                           email 'rbo@acm.org'
-                       }
-                       developer {
-                           id 'felipebueno'
-                           name 'Felipe Bueno'
-                           email 'bueno.felipe@gmail.com'
-                       }
-                   }
-             }
-   }
-        }
-    }
+afterEvaluate {
+	uploadArchives {
+		repositories {
+			if (isDevBuild) {
+			    mavenLocal()
+			} else {
+		        mavenDeployer {
+				
+					if(isReleaseBuild || isCiBuild) { 
+					    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+					}
+					
+					repository(url: sonatypeRepositoryUrl) {
+					  authentication(userName: nexusUsername, password: nexusPassword)
+					}
+			
+					pom.project {
+					    name project.name
+					    packaging 'jar'
+					    description project.description
+					    url 'http://sneer.me'
+			
+				        scm {
+				            url 'https://github.com/sneerteam/snapi'
+				            connection 'git@github.com:sneerteam/snapi.git'
+				        }
+			
+				        licenses {
+				            license {
+					            name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
+				                url 'http://opensource.org/licenses/lgpl-3.0.html'
+				                distribution 'repo'
+				            }
+				        }
+			
+						developers {
+						    developer {
+							    id 'klauswuestefeld'
+							    name 'Klaus Wuestefeld'
+							    email 'klauswuestefeld@gmail.com'
+						    }
+							developer {
+							    id 'fabioroger'
+							    name 'Fabio Roger Manera'
+							    email 'fabioroger@gmail.com'
+							}
+							developer {
+							    id 'bamboo'
+							    name 'Rodrigo B. de Oliveira'
+							    email 'rbo@acm.org'
+							}
+							developer {
+							    id 'felipebueno'
+							    name 'Felipe Bueno'
+							    email 'bueno.felipe@gmail.com'
+							}
+						}
+			        }
+			        
+			    }
+		    }
+	    }	    
+	}
 }
 
 defaultTasks 'copyLibs'
