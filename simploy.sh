@@ -9,7 +9,8 @@ echo "------ Removing build dir"
 rm -rf build
 
 echo "------ Building SNAPI"
-./gradlew clean jarNodeps uploadArchives -Pci 
+./gradlew clean uploadArchives -Pci 
+./gradlew jarNodeps -Pci 
 
 echo "------ Publishing sneer-api-nodeps"
 mkdir -p $DISTDIR
