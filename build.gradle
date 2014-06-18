@@ -75,6 +75,7 @@ android.libraryVariants.all { variant ->
     
 	task jarNodeps(type: Jar) {
         from variant.javaCompile.destinationDir
+        from variant.javaCompile.source
         from variant.processResources.resDir
 	
 	    appendix = "nodeps"
