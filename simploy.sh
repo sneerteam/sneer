@@ -10,7 +10,7 @@ rm -rf build
 
 echo "------ Building SNAPI"
 ./gradlew clean uploadArchives -Pci 
-./gradlew jarNodeps -Pci 
+./gradlew jarNodeps -Pci -PaddTimestamp 
 
 echo "------ Publishing sneer-api-nodeps"
 mkdir -p $DISTDIR

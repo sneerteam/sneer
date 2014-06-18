@@ -82,8 +82,11 @@ android.libraryVariants.all { variant ->
 	
 	    appendix = "nodeps"
 	    version = originalVersion
-	    def x = new XmlSlurper().parse("${SONATYPE_SNAPSHOT_URL}/me/sneer/${project.name}/${originalVersion}-SNAPSHOT/maven-metadata.xml".toURL().openStream())
-        classifier = "${x.versioning.snapshot.timestamp}-${x.versioning.snapshot.buildNumber}" 
+	    
+	    if (project.hasProperty("addTimestamp")) {
+		    def x = new XmlSlurper().parse("${SONATYPE_SNAPSHOT_URL}/me/sneer/${project.name}/${originalVersion}-SNAPSHOT/maven-metadata.xml".toURL().openStream())
+	        classifier = "${x.versioning.snapshot.timestamp}-${x.versioning.snapshot.buildNumber}"
+	    } 
 	
 	    from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
 	}
