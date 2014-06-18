@@ -7,22 +7,18 @@ version = '0.1.0'
 description = 'API for Sneer, the sovereign platform.' 
 ext.packaging = 'jar'
 
+def SONATYPE_RELEASE_URL = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+def SONATYPE_SNAPSHOT_URL = "https://oss.sonatype.org/content/repositories/snapshots/"
 
-def isDevBuild
-def isCiBuild
+def shouldPublish
 def isReleaseBuild
 
-def sonatypeRepositoryUrl
-
 if(hasProperty("release")) {
+    shouldPublish = true
     isReleaseBuild = true
-    sonatypeRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 } else if (hasProperty("ci")) {
-    isCiBuild = true
+    shouldPublish = true
     version += "-SNAPSHOT"
-    sonatypeRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-} else {
-    isDevBuild = true
 }
 
 buildscript {
@@ -54,9 +50,9 @@ android {
     buildToolsVersion "19.0.3"
     
     defaultConfig {
-     minSdkVersion 14
-     targetSdkVersion 18
- }
+	    minSdkVersion 15
+	    targetSdkVersion 19
+	 }
 
     sourceSets {
         main {
@@ -126,7 +122,7 @@ android.libraryVariants.all { variant ->
 
 
 
-if(isReleaseBuild || isCiBuild) {
+if(shouldPublish) {
     signing {
         sign configurations.archives
     }
@@ -139,16 +135,16 @@ if(isReleaseBuild || isCiBuild) {
 afterEvaluate {
 	uploadArchives {
 		repositories {
-			if (isDevBuild) {
+			if (!shouldPublish) {
 			    mavenLocal()
 			} else {
 		        mavenDeployer {
 				
-					if(isReleaseBuild || isCiBuild) { 
+					if(shouldPublish) { 
 					    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 					}
 					
-					repository(url: sonatypeRepositoryUrl) {
+					repository(url: (isReleaseBuild ? SONATYPE_RELEASE_URL : SONATYPE_SNAPSHOT_URL)) {
 					  authentication(userName: nexusUsername, password: nexusPassword)
 					}
 			
