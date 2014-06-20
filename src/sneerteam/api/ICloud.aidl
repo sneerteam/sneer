@@ -11,4 +11,5 @@ interface ICloud {
 	oneway void pubValue(in Value[] path, in Value value);	
 	ISubscription sub(in Value[] path, in ISubscriber subscriber);
 	byte[] ownPublicKey();
+	oneway void registerForNotification(in Value[] segment, in Intent intent);
 }

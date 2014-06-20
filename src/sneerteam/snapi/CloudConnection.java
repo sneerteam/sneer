@@ -3,6 +3,7 @@ package sneerteam.snapi;
 import java.util.Arrays;
 import java.util.List;
 
+import android.content.*;
 import android.os.IBinder;
 import android.os.RemoteException;
 import rx.*;
@@ -61,5 +62,9 @@ public class CloudConnection {
 
 	public Scheduler scheduler() {
 		return scheduler;
+	}
+
+	public void registerForNotification(Value[] segments, Intent intent) throws RemoteException {
+		cloud.registerForNotification(segments, intent);
 	}
 }

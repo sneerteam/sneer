@@ -141,4 +141,14 @@ public class Cloud {
                     }});
                 }});
     }
+    
+    public void registerForNotification(final Intent intent, final Object... segments) {
+		eventualCloud.first().subscribe(new Action1<CloudConnection>() {@Override public void call(CloudConnection cloud) {
+			try {
+				cloud.registerForNotification(Encoder.pathEncode(Arrays.asList(segments)), intent);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		}});
+    }
 }
