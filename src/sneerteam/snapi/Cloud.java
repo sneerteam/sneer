@@ -133,7 +133,7 @@ public class Cloud {
 	    
 	}
 
-    Observable<Contact> contacts(Object root) {
+    public Observable<Contact> contacts(Object root) {
         return path(root, "contacts").children()
                 .flatMap(new Func1<PathEvent, Observable<Contact>>() {@Override public Observable<Contact> call(final PathEvent event) {
                     return event.path().append("nickname").value().map(new Func1<Object, Contact>() {@Override public Contact call(Object nickname) {
