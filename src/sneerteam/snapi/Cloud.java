@@ -13,6 +13,7 @@ import rx.functions.*;
 import rx.observables.*;
 import rx.schedulers.*;
 import rx.subjects.*;
+import sneerteam.api.*;
 import android.content.*;
 import android.os.*;
 
@@ -77,8 +78,12 @@ public class Cloud {
         }
 	}
 
+	public static final int REGISTER_NOTIFICATION = 1;
+	public static final int UNREGISTER_NOTIFICATION = 2;
+
 	private ReplaySubject<CloudConnection> eventualCloud;
 	private Subscription subscription;
+	private Context context;
 
 	public static Cloud cloudFor(Context context) {
 		return onScheduler(context, Schedulers.immediate());
@@ -93,11 +98,12 @@ public class Cloud {
 	}
 
 	public static Cloud onScheduler(final Context context, Scheduler scheduler) {
-		return new Cloud(CloudServiceConnection.cloudFor(context, scheduler).publish());
+		return new Cloud(context, CloudServiceConnection.cloudFor(context, scheduler).publish());
 	}
 	
 
-	public Cloud(ConnectableObservable<CloudConnection> eventualCloud) {
+	public Cloud(Context context, ConnectableObservable<CloudConnection> eventualCloud) {
+		this.context = context;
 		this.eventualCloud = ReplaySubject.create();
 		eventualCloud.subscribe(this.eventualCloud);
 		subscription = eventualCloud.connect();
@@ -142,13 +148,28 @@ public class Cloud {
                 }});
     }
     
-    public void registerForNotification(final Intent intent, final Object... segments) {
-		eventualCloud.first().subscribe(new Action1<CloudConnection>() {@Override public void call(CloudConnection cloud) {
-			try {
-				cloud.registerForNotification(Encoder.pathEncode(Arrays.asList(segments)), intent);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}});
+    public void registerForNotification(final Intent launch, final Object... segments) {
+        Intent intent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
+        intent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
+        intent.putExtra("op", REGISTER_NOTIFICATION);
+        intent.putParcelableArrayListExtra("path", asParceableValue(segments));
+        intent.putExtra("launch", launch);
+        
+        context.startService(intent);
     }
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private ArrayList<Value> asParceableValue(final Object... segments) {
+		return new ArrayList(Arrays.asList(Encoder.pathEncode(Arrays.asList(segments))));
+	}
+    
+    public void unregisterForNotification(final Object... segments) {
+		Intent intent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
+		intent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
+		intent.putExtra("op", UNREGISTER_NOTIFICATION);
+		intent.putParcelableArrayListExtra("path", asParceableValue(segments));
+		
+		context.startService(intent);
+    }
+
 }
