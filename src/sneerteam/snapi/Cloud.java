@@ -14,10 +14,82 @@ import rx.observables.*;
 import rx.schedulers.*;
 import rx.subjects.*;
 import sneerteam.api.*;
+import android.app.*;
 import android.content.*;
 import android.os.*;
 
 public class Cloud {
+	
+	static final String NOTIFICATIONS = "notifications";
+	
+	private final class NotificationPathImpl implements NotificationPath {
+		
+		private static final String PAYLOAD = "payload";
+		private static final String TIMESTAMP = "timestamp";
+		private static final String CONTENT_TEXT = "content-text";
+		
+		private Object[] segments;
+		private Class<? extends Activity> activity;
+
+		public NotificationPathImpl(Class<? extends Activity> activity, Object... segments) {
+			this.activity = activity;
+			this.segments = segments;
+		}
+		
+		
+
+
+		@Override
+		public Observable<CloudNotification> notifications() {
+//			return contacts().flatMap(new Func1<Contact, Observable<CloudNotification>>() {  @Override public Observable<CloudNotification> call(final Contact contact) {
+//				return path(contact.publicKey(), NOTIFICATIONS).appends(segments).children().flatMap(new Func1<PathEvent, Observable<CloudNotification>>() {  @Override public Observable<CloudNotification> call(PathEvent idPath) {
+//					return path(idPath.path()).value().map(new Func1<Object, CloudNotification>() {  @Override public CloudNotification call(Object notification) {
+//						return asCloudNotification(contact, notification);
+//					}});
+//				}});
+//			}});
+			return Observable.create(new OnSubscribe<CloudNotification>() {
+				@Override
+				public void call(Subscriber<? super CloudNotification> subscriber) {
+					Intent launcher = new Intent(context, activity);
+					launcher.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					
+					Intent intent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
+				    intent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
+				    intent.putExtra("op", REGISTER_NOTIFICATION);
+				    intent.putParcelableArrayListExtra("path", asParceableValue(segments));
+				    intent.putExtra("launch", launcher);
+				        
+				    context.startService(intent);					
+				}
+			});
+		}
+
+
+		@Override
+		public void pub(String receiverPuk, CharSequence contentText, Object payload) {
+			CloudPath path = path(NOTIFICATIONS).append(receiverPuk).appends(segments);
+			path.pub(asMap(contentText, System.currentTimeMillis(), payload));
+		}
+
+
+		private Map<String, Object> asMap(CharSequence contentText, long timestamp, Object payload) {
+			Map<String, Object> ret = new HashMap<String, Object>();
+			ret.put(CONTENT_TEXT, contentText);
+			ret.put(TIMESTAMP, timestamp);
+			ret.put(PAYLOAD, payload);
+			return ret;
+		}
+
+
+		private CloudNotification asCloudNotification(Contact contact, Object notificationObj) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> notification = (Map<String, Object>) notificationObj;
+			return new CloudNotification(contact, (CharSequence)notification.get(CONTENT_TEXT), (Long)notification.get(TIMESTAMP), notification.get(PAYLOAD));
+		}
+
+
+	}
 	
 	private final class CloudPathImpl implements CloudPath {
 
@@ -37,6 +109,16 @@ public class Cloud {
 		@Override
 		public CloudPath append(Object segment) {
 			return path(Path.append(segments, segment));
+		}
+		
+		@Override
+		public CloudPath appends(Object... newSegments) {
+			return path(Path.appends(segments, newSegments));
+		}
+
+		@Override
+		public CloudPath appends(List<Object> newSegments) {
+			return path(Path.appends(segments, newSegments));
 		}
 
 		@Override
@@ -76,6 +158,7 @@ public class Cloud {
                 }});
             }});
         }
+	
 	}
 
 	public static final int REGISTER_NOTIFICATION = 1;
@@ -120,6 +203,12 @@ public class Cloud {
 	public CloudPath path(List<Object> list) {
 		return new CloudPathImpl(list);
 	}
+	
+	
+	public NotificationPath notificationPath(Class<? extends Activity> activity, Object... segments) {
+		return new NotificationPathImpl(activity, segments);
+	}
+	
 	
 	public Observable<byte[]> ownPublicKey() {
 		return Observable.create(new OnSubscribe<byte[]>() {@Override public void call(final Subscriber<? super byte[]> subscriber) {

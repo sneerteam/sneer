@@ -151,7 +151,18 @@ public class Path {
 		result.addAll(segments);
 		result.add(segment);
 		return result;
-	}	
+	}
+	
+	public static List<Object> appends(List<Object> segments, Object... newSegments) {
+		return appends(segments, Arrays.asList(newSegments));
+	}
+	
+	public static List<Object> appends(List<Object> segments, List<Object> newSegments) {
+		ArrayList<Object> result = new ArrayList<Object>(segments.size() + newSegments.size());
+		result.addAll(segments);
+		result.addAll(newSegments);
+		return result;
+	}
 	
 	public static List<Object> prepend(List<Object> segments, Object segment) {
 		ArrayList<Object> result = new ArrayList<Object>(segments.size() + 1);
