@@ -1,4 +1,4 @@
-package sneerteam.snapi;
+package sneer.snapi;
 
 import rx.*;
 

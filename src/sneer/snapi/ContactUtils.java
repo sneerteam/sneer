@@ -1,7 +1,7 @@
-package sneerteam.snapi;
+package sneer.snapi;
 
 import static android.util.Pair.*;
-import static sneerteam.snapi.CloudPath.*;
+import static sneer.snapi.CloudPath.*;
 import rx.*;
 import rx.functions.*;
 import android.util.*;

@@ -1,6 +1,6 @@
-package sneerteam.snapi;
+package sneer.snapi;
 
-import static sneerteam.snapi.CloudPath.*;
+import static sneer.snapi.CloudPath.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -13,7 +13,7 @@ import rx.functions.*;
 import rx.observables.*;
 import rx.schedulers.*;
 import rx.subjects.*;
-import sneerteam.api.*;
+import sneer.api.*;
 import android.app.*;
 import android.content.*;
 import android.os.*;
@@ -54,8 +54,8 @@ public class Cloud {
 					Intent launcher = new Intent(context, activity);
 					launcher.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					
-					Intent intent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
-				    intent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
+					Intent intent = new Intent("sneer.intent.action.BIND_CLOUD_SERVICE");
+				    intent.setClassName("sneer.android.main", "sneer.android.main.CloudService");
 				    intent.putExtra("op", REGISTER_NOTIFICATION);
 				    intent.putParcelableArrayListExtra("path", asParceableValue(segments));
 				    intent.putExtra("launch", launcher);
@@ -238,8 +238,8 @@ public class Cloud {
     }
     
     public void registerForNotification(final Intent launch, final Object... segments) {
-        Intent intent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
-        intent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
+        Intent intent = new Intent("sneer.intent.action.BIND_CLOUD_SERVICE");
+        intent.setClassName("sneer.android.main", "sneer.android.main.CloudService");
         intent.putExtra("op", REGISTER_NOTIFICATION);
         intent.putParcelableArrayListExtra("path", asParceableValue(segments));
         intent.putExtra("launch", launch);
@@ -253,8 +253,8 @@ public class Cloud {
 	}
     
     public void unregisterForNotification(final Object... segments) {
-		Intent intent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
-		intent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
+		Intent intent = new Intent("sneer.intent.action.BIND_CLOUD_SERVICE");
+		intent.setClassName("sneer.android.main", "sneer.android.main.CloudService");
 		intent.putExtra("op", UNREGISTER_NOTIFICATION);
 		intent.putParcelableArrayListExtra("path", asParceableValue(segments));
 		

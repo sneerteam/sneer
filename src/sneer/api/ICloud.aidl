@@ -1,10 +1,10 @@
-package sneerteam.api;
+package sneer.api;
 
 import android.os.Parcel;
 import android.os.Bundle;
-import sneerteam.api.ISubscriber;
-import sneerteam.api.ISubscription;
-import sneerteam.api.Value;
+import sneer.api.ISubscriber;
+import sneer.api.ISubscription;
+import sneer.api.Value;
 
 interface ICloud {
 	oneway void pubPath(in Value[] path);	

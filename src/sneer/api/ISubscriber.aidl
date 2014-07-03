@@ -1,7 +1,7 @@
-package sneerteam.api;
+package sneer.api;
 
 import android.os.Bundle;
-import sneerteam.api.Value;
+import sneer.api.Value;
 
 interface ISubscriber {
 	oneway void onPath(in Value[] path);

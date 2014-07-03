@@ -1,6 +1,6 @@
-package sneerteam.snapi;
+package sneer.snapi;
 
-import static sneerteam.snapi.SneerUtils.*;
+import static sneer.snapi.SneerUtils.*;
 import rx.*;
 import rx.Observable.OnSubscribe;
 import rx.android.schedulers.*;
@@ -13,7 +13,7 @@ public class ContactPicker {
 
 	public static Observable<Contact> pickContact(final Context context) {
 	    return Observable.create(new OnSubscribe<Contact>() {@Override public void call(final Subscriber<? super Contact> subscriber) {
-	        Intent intent = new Intent("sneerteam.intent.action.PICK_CONTACT");
+	        Intent intent = new Intent("sneer.intent.action.PICK_CONTACT");
 	        intent.putExtra("result", new ResultReceiver(null) {
 	            @Override
 	            protected void onReceiveResult(int resultCode, Bundle resultData) {

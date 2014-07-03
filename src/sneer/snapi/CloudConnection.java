@@ -1,10 +1,10 @@
-package sneerteam.snapi;
+package sneer.snapi;
 
 import java.util.*;
 
 import rx.*;
 import rx.schedulers.*;
-import sneerteam.api.*;
+import sneer.api.*;
 import android.os.*;
 
 public class CloudConnection {

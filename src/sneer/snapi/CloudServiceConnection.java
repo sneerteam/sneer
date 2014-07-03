@@ -1,6 +1,6 @@
-package sneerteam.snapi;
+package sneer.snapi;
 
-import static sneerteam.snapi.SneerUtils.*;
+import static sneer.snapi.SneerUtils.*;
 import rx.*;
 import rx.functions.*;
 import rx.schedulers.*;
@@ -22,8 +22,8 @@ public class CloudServiceConnection {
             @Override
             public void call(final Subscriber<? super CloudConnection> subscriber) {
 
-                Intent bindIntent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
-                bindIntent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
+                Intent bindIntent = new Intent("sneer.intent.action.BIND_CLOUD_SERVICE");
+                bindIntent.setClassName("sneer.android.main", "sneer.android.main.CloudService");
 
                 final ServiceConnection serviceConnection = new ServiceConnection() {
                     @Override

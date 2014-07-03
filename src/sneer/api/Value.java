@@ -1,4 +1,4 @@
-package sneerteam.api;
+package sneer.api;
 
 import java.util.HashMap;
 import java.util.Map;

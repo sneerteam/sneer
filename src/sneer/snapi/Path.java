@@ -1,4 +1,4 @@
-package sneerteam.snapi;
+package sneer.snapi;
 
 import java.util.*;
 
@@ -8,7 +8,7 @@ import rx.Scheduler.Inner;
 import rx.Observable;
 import rx.functions.*;
 import rx.subscriptions.*;
-import sneerteam.api.*;
+import sneer.api.*;
 import android.os.*;
 
 public class Path {
