@@ -41,12 +41,12 @@ public class InteractionDetailFragment extends Fragment {
 
 		Sneer sneer = ((SneerApp) getActivity().getApplication()).model();
 		
-		Party party = sneer.findParty(getArguments().getString(PARTY_PUK));
+		Party party = sneer.produceParty(getArguments().getString(PARTY_PUK));
 		final Interaction interaction = sneer.produceInteractionWith(party);
 
-		getActivity().setTitle(interaction.contact().nickname().toBlockingObservable().first());
+		getActivity().setTitle(interaction.party().nickname().toBlockingObservable().first());
 
-		interaction.interactionEvents().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() { @Override public void call(InteractionEvent msg) {
+		interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() { @Override public void call(InteractionEvent msg) {
 			onInteractionEvent(msg);
 		}});
 
@@ -64,7 +64,7 @@ public class InteractionDetailFragment extends Fragment {
 
 		Button b = (Button)rootView.findViewById(R.id.sendButton);
 		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			interaction.sendInteractionEvent(widget.getText().toString());
+			interaction.sendMessage(widget.getText().toString());
 			widget.setText("");
 		}});
 

@@ -1,94 +1,84 @@
 package sneer.simulator;
 
-import static basis.rx.RXUtils.*;
-import rx.*;
+import java.util.*;
+
+import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
+import sneer.impl.*;
+import sneer.rx.*;
 
-public class SneerSimulator implements Sneer {
+public class SneerSimulator extends SneerBase {
 
-	private final Subject<Contact, Contact> contacts = ReplaySubject.create();
-	private final PartySimulator self = new PartySimulator("Neide da Silva");
+	private final ReplaySubject<Party> parties = ReplaySubject.create();
+	private final ReplaySubject<Interaction> interactions = ReplaySubject.create();
+	private final Map<Party, Interaction> interactionsByParty = new HashMap<Party, Interaction>();
 
-	{
-		createExamples();
+	
+	@Override
+	public Party produceParty(final String publicKey) {
+		return first(parties.filter(new Func1<Party, Boolean>() { @Override public Boolean call(Party party) {
+			return first(party.publicKey()).equals(publicKey);
+		}}));
+		
+		//return findIndividualParty();
+	}
+
+
+	@Override
+	public Observable<Interaction> interactions() {
+		return interactions;
+	}
+
+	
+	@Override
+	public Interaction produceInteractionWith(Party party) {
+		Interaction ret = interactionsByParty.get(party);
+		if (ret == null) {
+			ret = new InteractionSimulator(party);
+			interactionsByParty.put(party, ret);
+			interactions.onNext(ret);
+		}
+		return ret;
 	}
 	
 	
+	static private <T> T first(Observable<T> observable) {
+		return observable.toBlockingObservable().first();
+	}
+
+	private Party findIndividualParty(){
+		//public IndividualSimulator(Observable<String> publicKey, Observable<String> nickname,Observable<String> name) {
+		return new IndividualSimulator(Observable.from("P00001"), Observable.from("Segunda-feira"));
+	}
+
+
 	@Override
 	public Self self() {
-		return self;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
 	@Override
 	public Observable<Contact> contacts() {
-		return contacts;
+		// TODO Auto-generated method stub
+		return null;
 	}
+
 
 	@Override
-	public Contact findContact(final String publicKey) {
-		return current(contacts.filter(new Func1<Contact, Boolean>() { @Override public Boolean call(Contact contact) {
-			return current(contact.party().publicKey()).equals(publicKey);
-		}}));
-	}
-	
-	
-	private void createExamples() {
-		addContact("Neo", "Thomas Anderson");
-		addContact("Morpheus", "Klaus Wuestefeld");
-		addContact("Zero Dois", "Felipe Bueno");
-		addContact("Zero Tres", "Diego Mendes");
-		addContact("Xerife", "Fabio Roger");
-	}
-	
-
-	private void addContact(String nickname, String partyName) {
-		addContact(nickname, new PartySimulator(partyName));
+	public Contact findContact(String publicKey) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	
+
 	@Override
 	public void addContact(String nickname, Party party) {
-		contacts.onNext(new ContactSimulator(nickname, party));
-	}
-
-
-
-
-	@Override
-	public Observable<Party> parties() {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
-
-
-
-	@Override
-	public Party findParty(String publicKey) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-
-	@Override
-	public Observable<Interaction> interactions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-
-	@Override
-	public Interaction produceInteractionWith(Party party) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
 }

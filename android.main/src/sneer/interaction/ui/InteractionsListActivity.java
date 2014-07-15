@@ -5,9 +5,9 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.android.main.R;
 import sneer.simulator.*;
 import sneer.snapi.*;
-import android.R;
 import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
@@ -66,24 +66,24 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 
 
 
-		chat().Interactions().observeOn(AndroidSchedulers.mainThread())
+		sneer().interactions().observeOn(AndroidSchedulers.mainThread())
 		.subscribe(new Action1<Interaction>() {
 			@Override
 			public void call(Interaction interaction) {
-				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"),Observable.from("joaozinho"),Observable.from("joao"));
+				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"), Observable.from("joao"));
 
-				Interaction.contact(member);
+				interaction.contact(member);
 				interactionsListFragment.addInteraction(interaction);
 			}
 		});
 
 
 
-		chat().Interactions().observeOn(AndroidSchedulers.mainThread())
+		sneer().interactions().observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Action1<Interaction>() {
 					@Override
 					public void call(Interaction interaction) {
-						interactionsListFragment.addInteraction(Interaction);
+						interactionsListFragment.addInteraction(interaction);
 					}
 				});
 
@@ -112,7 +112,7 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
 			arguments.putString(InteractionDetailFragment.PARTY_PUK,
-					Interaction.contact().publicKey().toBlockingObservable().first());
+					interaction.party().publicKey().toBlockingObservable().first());
 			InteractionDetailFragment fragment = new InteractionDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -122,7 +122,7 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 			Intent detailIntent = new Intent(this, InteractionDetailActivity.class);
 			detailIntent.putExtra(InteractionDetailFragment.PARTY_PUK,
 
-					Interaction.contact().publicKey().toBlockingObservable().first());
+					interaction.party().party().publicKey().toBlockingObservable().first());
 			startActivity(detailIntent);
 		}
 	}

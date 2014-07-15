@@ -5,6 +5,7 @@ import java.util.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
+import sneer.util.*;
 import android.app.*;
 import android.os.*;
 import android.support.v4.app.ListFragment;
@@ -30,7 +31,7 @@ public class InteractionsListFragment extends ListFragment {
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
 	private static final Comparator<? super Interaction> BY_TIMESTAMP = new Comparator<Interaction>() { @Override public int compare(Interaction lhs, Interaction rhs) {
-		return Comparators.compare(lhs.lastInteractionEventTimestamp(), rhs.lastInteractionEventTimestamp());
+		return Comparators.compare(lhs.mostRecentEventTimestamp(), rhs.mostRecentEventTimestamp());
 	}};
 	
 	/**
@@ -162,7 +163,7 @@ public class InteractionsListFragment extends ListFragment {
 	public void addInteraction(Interaction interaction) {
 		if (!interactions.contains(interaction)) {
 			interactions.add(interaction);
-			interaction.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+			interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() {@Override public void call(InteractionEvent event) {
 				Collections.sort(interactions, BY_TIMESTAMP);
 				interactionsAdapter.notifyDataSetChanged();
 			}});

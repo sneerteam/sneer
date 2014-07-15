@@ -60,7 +60,7 @@ public class OldContact {
 	
 	public int compareTo(OldContact contact) {
 		return this.getNickname().compareToIgnoreCase(((OldContact) contact).getNickname());
-	}	
+	}
  
 	public static Comparator<OldContact> BY_NICKNAME_IGNORING_CASE = new Comparator<OldContact>() {
  

@@ -13,25 +13,25 @@ public class InteractionSimulator implements Interaction {
 	
 	public InteractionSimulator(Party party) {
 		this.party = party;
-		sendInteractionEvent("q festa!!!! uhuu!!!");
+		sendMessage("q festa!!!! uhuu!!!");
 		interactionEvents.onNext(new InteractionEvent(now(), now(), this.party, "Onde? Onde??"));
 	}
 
 	
 	@Override
-	public Party contact() {
+	public Party party() {
 		return party;
 	}
 
 	
 	@Override
-	public Observable<InteractionEvent> interactionEvents() {
+	public Observable<InteractionEvent> events() {
 		return interactionEvents;
 	}
 
 	
 	@Override
-	public void sendInteractionEvent(String content) {
+	public void sendMessage(String content) {
 		interactionEvents.onNext(new InteractionEvent(now(), 0, party, content));
 	}
 	
@@ -42,15 +42,8 @@ public class InteractionSimulator implements Interaction {
 
 
 	@Override
-	public long lastInteractionEventTimestamp() {
+	public long mostRecentEventTimestamp() {
 		return 0;
-	}
-
-
-	@Override
-	public Party contact(Party party) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

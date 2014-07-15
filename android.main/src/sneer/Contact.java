@@ -1,12 +1,12 @@
 package sneer;
 
-import rx.*;
+import sneer.rx.*;
 
 public interface Contact {
 
 	Party party();
 	
-	Observable<String> nickname();
+	Observed<String> nickname();
 	void setNickname(String newNickname);
 	
 }

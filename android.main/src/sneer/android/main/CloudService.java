@@ -71,7 +71,7 @@ public class CloudService extends Service {
 			break;
 		default:
 			throw new RuntimeException("Unknown option: " + op);
-		}		
+		}
 	}
 	
 	

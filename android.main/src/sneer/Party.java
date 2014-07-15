@@ -1,13 +1,14 @@
 package sneer;
 
-import rx.Observable;
+import rx.*;
+import sneer.rx.*;
 
 /** An individual or a group. See type hierarchy. */
 public interface Party {
 
-	Observable<String> publicKey();
+	Observed<String> publicKey();
 
 	/** The name this Party gives itself. */
 	Observable<String> name();
-		
+			
 }

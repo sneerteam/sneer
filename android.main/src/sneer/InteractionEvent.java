@@ -17,23 +17,14 @@ public class InteractionEvent {
 	private final long timestampSent;
 	private final long timestampReceived;
 	
-	private boolean isOwn = false;
+	private final boolean isOwn;
 	
 	
-	public InteractionEvent(long timestampSent, String content) {
+	public InteractionEvent(long timestampSent, Self sender, String content) {
 		this.timestampSent = timestampSent;
 		this.timestampReceived = timestampSent;
-		this.sender = null;
-		this.content = content;
-	}
-	
-	
-	public InteractionEvent(long timestampSent, Party party, String content) {
-		this.timestampSent = timestampSent;
-		this.timestampReceived = timestampSent;
-		this.sender = party;
-		this.content = content;
-		
+		this.sender = sender;
+		this.content = content;		
 		this.isOwn = true;
 	}
 	
@@ -43,6 +34,7 @@ public class InteractionEvent {
 		this.timestampReceived = timestampReceived;
 		this.sender = sender;
 		this.content = content;
+		this.isOwn = false;
 	}
 
 	

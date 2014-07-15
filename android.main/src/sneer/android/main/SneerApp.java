@@ -10,8 +10,8 @@ public class SneerApp extends Application {
 
 	public Sneer model() {
 		if (model == null)
-			model = new InteractionsSimulator();
-//			model = new InteractionImpl(this);
+			model = new SneerSimulator();
+//			model = new SneerImpl(this);
 		return model;
 	}
 	
