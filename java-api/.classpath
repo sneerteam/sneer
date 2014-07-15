@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="output" path="bin"/>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" exported="true"/>
-	<classpathentry sourcepath="C:/Users/Raquel/.gradle/caches/modules-2/files-2.1/com.netflix.rxjava/rxjava-android/0.17.5/63d5976179081f0119e3b121070434c5b5b81213/rxjava-android-0.17.5-sources.jar" kind="lib" path="C:/Users/Raquel/.gradle/caches/modules-2/files-2.1/com.netflix.rxjava/rxjava-android/0.17.5/38c0a26e0ff41f22c1dca3405b55fe7af4d949c4/rxjava-android-0.17.5.jar" exported="true"/>
-	<classpathentry sourcepath="C:/Users/Raquel/.gradle/caches/modules-2/files-2.1/com.netflix.rxjava/rxjava-core/0.17.5/64d43b5b00d68b32677e63e3effc3ac04a5a00b0/rxjava-core-0.17.5-sources.jar" kind="lib" path="C:/Users/Raquel/.gradle/caches/modules-2/files-2.1/com.netflix.rxjava/rxjava-core/0.17.5/c832b52ab9ef5277dbf55fe1223ec52bafc63e60/rxjava-core-0.17.5.jar" exported="true"/>
-</classpath>
