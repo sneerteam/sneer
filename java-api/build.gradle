@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version = '0.0.1'
+group = 'sneer'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.netflix.rxjava:rxjava-android:0.17.5'
+}
+
+uploadArchives {
+    repositories {
+        mavenLocal()
+    }
+}
