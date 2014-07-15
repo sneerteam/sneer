@@ -5,7 +5,9 @@ import java.util.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
-import android.*;
+import sneer.android.main.*;
+import sneer.util.*;
+import android.R;
 import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
@@ -21,11 +23,11 @@ public class InteractionDetailFragment extends Fragment {
 	
 	static final String PARTY_PUK = "partyPuk";
 
-	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
+	private static final Comparator<? super InteractionEvent> BY_TIMESTAMP = new Comparator<InteractionEvent>() { @Override public int compare(InteractionEvent lhs, InteractionEvent rhs) {
 		return Comparators.compare(lhs.timestampSent(), rhs.timestampSent());
 	}};
 
-	private final List<Message> messages = new ArrayList<Message>();
+	private final List<InteractionEvent> messages = new ArrayList<InteractionEvent>();
 	private InteractionAdapter interactionAdapter;
 
 	
@@ -37,15 +39,15 @@ public class InteractionDetailFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_chat_detail,	container, false);
 
-		Chat chat = ((ChatApp) getActivity().getApplication()).model();
+		Sneer sneer = ((SneerApp) getActivity().getApplication()).model();
 		
-		Party party = chat.findParty(getArguments().getString(PARTY_PUK));
-		final Conversation conversation = chat.produceConversationWith(party);
+		Party party = sneer.findParty(getArguments().getString(PARTY_PUK));
+		final Interaction interaction = sneer.produceInteractionWith(party);
 
-		getActivity().setTitle(conversation.party().nickname().toBlockingObservable().first());
+		getActivity().setTitle(interaction.contact().nickname().toBlockingObservable().first());
 
-		conversation.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() { @Override public void call(Message msg) {
-			onMessage(msg);
+		interaction.interactionEvents().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() { @Override public void call(InteractionEvent msg) {
+			onInteractionEvent(msg);
 		}});
 
 		interactionAdapter = new InteractionAdapter(
@@ -62,7 +64,7 @@ public class InteractionDetailFragment extends Fragment {
 
 		Button b = (Button)rootView.findViewById(R.id.sendButton);
 		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			conversation.sendMessage(widget.getText().toString());
+			interaction.sendInteractionEvent(widget.getText().toString());
 			widget.setText("");
 		}});
 
@@ -70,7 +72,7 @@ public class InteractionDetailFragment extends Fragment {
 	}
 
 	
-	private void onMessage(Message msg) {
+	private void onInteractionEvent(InteractionEvent msg) {
 		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
 		if (insertionPointHint < 0) {
 			int insertionPoint = Math.abs(insertionPointHint) - 1;

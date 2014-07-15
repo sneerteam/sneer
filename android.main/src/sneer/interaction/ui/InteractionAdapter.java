@@ -3,7 +3,7 @@ package sneer.interaction.ui;
 import java.util.*;
 
 import sneer.*;
-import android.*;
+import sneer.android.main.*;
 import android.annotation.*;
 import android.content.*;
 import android.graphics.*;

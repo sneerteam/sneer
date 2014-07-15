@@ -8,7 +8,7 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context=".ChatListActivity" >
+    tools:context=".InteractionsListActivity" >
 
     <!--
     This layout is a two-pane layout for the Chats
@@ -22,15 +22,15 @@
     -->
 
     <fragment
-        android:id="@+id/chat_list"
-        android:name="sneer.android.chat.ui.ChatListFragment"
+        android:id="@+id/interactions_list"
+        android:name="sneer.interaction.ui.InteractionsListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         tools:layout="@android:layout/list_content" />
 
      <FrameLayout
-        android:id="@+id/chat_detail_container"
+        android:id="@+id/interactions_detail_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3" />

@@ -4,15 +4,15 @@ import rx.Observable;
 
 public interface Interaction {
 
-	Party party();
+	Contact contact();
 	
-	Party party(Party party);
+	Contact contact(Party party);
 	
 	Observable<InteractionEvent> interactionEvents();
 	
-	/** Publish a new InteractionEvent with isOwn() true, with party() as the audience, with the received content and using System.currentTimeMillis() as the timestamp. */
-	void sendMessage(String content);
+	/** Publish a new InteractionEvent with isOwn() true, with contact() as the audience, with the received content and using System.currentTimeMillis() as the timestamp. */
+	void sendInteractionEvent(String content);
 	
-	long lastMessageTimestamp();
+	long lastInteractionEventTimestamp();
 	
 }

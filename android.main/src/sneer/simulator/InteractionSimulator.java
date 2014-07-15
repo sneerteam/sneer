@@ -13,13 +13,13 @@ public class InteractionSimulator implements Interaction {
 	
 	public InteractionSimulator(Party party) {
 		this.party = party;
-		sendMessage("q festa!!!! uhuu!!!");
+		sendInteractionEvent("q festa!!!! uhuu!!!");
 		interactionEvents.onNext(new InteractionEvent(now(), now(), this.party, "Onde? Onde??"));
 	}
 
 	
 	@Override
-	public Party party() {
+	public Party contact() {
 		return party;
 	}
 
@@ -31,7 +31,7 @@ public class InteractionSimulator implements Interaction {
 
 	
 	@Override
-	public void sendMessage(String content) {
+	public void sendInteractionEvent(String content) {
 		interactionEvents.onNext(new InteractionEvent(now(), 0, party, content));
 	}
 	
@@ -42,13 +42,13 @@ public class InteractionSimulator implements Interaction {
 
 
 	@Override
-	public long lastMessageTimestamp() {
+	public long lastInteractionEventTimestamp() {
 		return 0;
 	}
 
 
 	@Override
-	public Party party(Party party) {
+	public Party contact(Party party) {
 		// TODO Auto-generated method stub
 		return null;
 	}

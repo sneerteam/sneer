@@ -1,58 +1,38 @@
 package sneer.android.main;
 
-import static sneer.snapi.Cloud.REGISTER_NOTIFICATION;
-import static sneer.snapi.Cloud.UNREGISTER_NOTIFICATION;
-import static sneer.snapi.CloudPath.ME;
+import static sneer.snapi.Cloud.*;
+import static sneer.snapi.CloudPath.*;
 
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.net.*;
+import java.util.*;
+import java.util.concurrent.*;
 
-import rx.Observable;
+import rx.*;
 import rx.Observable.OnSubscribe;
-import rx.Scheduler;
 import rx.Scheduler.Inner;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.observables.ConnectableObservable;
-import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
-import rx.subjects.ReplaySubject;
-import rx.subjects.Subject;
-import rx.subscriptions.CompositeSubscription;
-import rx.subscriptions.Subscriptions;
-import sneer.android.keys.Keys;
-import sneer.api.ICloud;
-import sneer.api.ISubscriber;
-import sneer.api.ISubscription;
-import sneer.api.Value;
+import rx.Observable;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import rx.observables.*;
+import rx.schedulers.*;
+import rx.subjects.*;
+import rx.subscriptions.*;
+import sneer.android.keys.*;
+import sneer.api.*;
+import sneer.cloud.client.*;
 import sneer.cloud.client.Cloud;
-import sneer.cloud.client.CloudMaster;
 import sneer.cloud.client.Subscriber;
 import sneer.cloud.client.Subscription;
-import sneer.cloud.client.impl.CloudMasterImpl;
-import sneer.keys.PublicKey;
-import sneer.snapi.Contact;
-import sneer.snapi.Encoder;
-import sneer.snapi.PathEvent;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.widget.Toast;
-import basis.Consumer;
+import sneer.cloud.client.impl.*;
+import sneer.keys.*;
+import sneer.snapi.*;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.support.v4.app.*;
+import android.util.*;
+import android.widget.*;
+import basis.*;
 
 public class CloudService extends Service {
 	
@@ -61,6 +41,7 @@ public class CloudService extends Service {
 	private ReplaySubject<sneer.snapi.Cloud> notificationConnection = ReplaySubject.create();
 	private Map<List<Object>, rx.Subscription> notificationRegistrar = new HashMap<List<Object>, rx.Subscription>();
 
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
@@ -73,6 +54,7 @@ public class CloudService extends Service {
 		
         return START_STICKY;
 	}
+	
 
 	@SuppressWarnings("unused")
 	private void handleMessage(Bundle bundle) {
@@ -89,9 +71,9 @@ public class CloudService extends Service {
 			break;
 		default:
 			throw new RuntimeException("Unknown option: " + op);
-		}
-		
+		}		
 	}
+	
 	
 	@Override
 	public void onCreate() {
@@ -135,15 +117,18 @@ public class CloudService extends Service {
 		}});
 	}
 	
+	
 	private void toast(String error) {
 		Toast.makeText(CloudService.this, error, Toast.LENGTH_LONG).show();
 	}
+	
 	
 	@Override
 	public void onDestroy() {
 		cloudMasterSubscription.unsubscribe();
 		super.onDestroy();
 	}
+	
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -158,8 +143,7 @@ public class CloudService extends Service {
 			@Override
 			public void pubPath(final Value[] path) throws RemoteException {
 				withCloud(new Action1<Cloud>() {@Override public void call(Cloud cloud) {
-					cloud.pubPath(Encoder.pathDecode(path));
-					
+					cloud.pubPath(Encoder.pathDecode(path));					
 				}});
 			}
 			
@@ -170,8 +154,7 @@ public class CloudService extends Service {
 			@Override
 			public void pubValue(final Value[] path, final Value value) throws RemoteException {
 				withCloud(new Action1<Cloud>() {@Override public void call(Cloud cloud) {
-					cloud.pubValue(Encoder.pathDecode(path), value.get());
-					
+					cloud.pubValue(Encoder.pathDecode(path), value.get());					
 				}});
 			}
 
@@ -211,14 +194,15 @@ public class CloudService extends Service {
 			public byte[] ownPublicKey() throws RemoteException {
 				return publicKey().bytes();
 			}
-
 		};
 	}
+	
 
 	private PublicKey publicKey() {
 		Keys.initKeys(getApplicationContext());
 		return PublicKey.fromByteArray(Keys.publicKey());
 	}
+	
 	
 	private void registerForNotification(final Intent intent, final List<Object> segments) {
 
@@ -237,13 +221,12 @@ public class CloudService extends Service {
 			.observeOn(AndroidSchedulers.mainThread())
 			.subscribe(new Action1<PathEvent>() {@Override public void call(PathEvent arg0) {
 				notifyUser(segments, intent);
-			}
-			}));
-
+			}}));
 		}}));
 		
 		notificationRegistrar.put(segments, sub);
 	}
+	
 
 	private void notifyUser(List<Object> segments, Intent intent) {
 		
@@ -262,15 +245,17 @@ public class CloudService extends Service {
 	    
 	    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(segments.hashCode(), builder.build());
-
 	}
+	
 	
 	private void unregisteForNotification(List<Object> path) {
 		notificationRegistrar.remove(path);
 	}
+	
 
 	@SuppressWarnings("unused")
 	static private void log(String message) {
 		Log.d(CloudService.class.getSimpleName(), message);
 	}
+	
 }

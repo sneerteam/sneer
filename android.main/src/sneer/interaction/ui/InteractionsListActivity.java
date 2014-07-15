@@ -35,14 +35,14 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 	/** Whether or not the activity is in two-pane mode, i.e. running on a tablet device. */
 	private boolean mTwoPane;
 
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.chat, menu);
 		return true;
 	}
 
-	
+
 //	@Override
 //	public boolean onOptionsItemSelected(MenuItem item) {
 //		if (item.getItemId() == R.id.action_contacts)
@@ -56,7 +56,7 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 //		return true;
 //	}
 
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,21 +64,21 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 
 		SneerUtils.showSneerInstallationMessageIfNecessary(this);
 
-		
-		
+
+
 		chat().Interactions().observeOn(AndroidSchedulers.mainThread())
 		.subscribe(new Action1<Interaction>() {
 			@Override
 			public void call(Interaction interaction) {
 				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"),Observable.from("joaozinho"),Observable.from("joao"));
-				
-				Interaction.party(member);
+
+				Interaction.contact(member);
 				interactionsListFragment.addInteraction(interaction);
 			}
 		});
-		
-		
-		
+
+
+
 		chat().Interactions().observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Action1<Interaction>() {
 					@Override
@@ -94,25 +94,25 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 			mTwoPane = true;
 			interactionsListFragment.setActivateOnItemClick(true);
 		}
-		
-		
-		
+
+
+
 	}
 
-	
+
 	protected void log(String string) {
 		Log.d(InteractionsListActivity.class.getSimpleName(), string);
 	}
 
-	
+
 	/** Callback method from {@link InteractionsListFragment.Callbacks} indicating that the item with the given ID was selected. */
 	@Override
 	public void onItemSelected(Interaction interaction) {
-		
+
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
 			arguments.putString(InteractionDetailFragment.PARTY_PUK,
-					Interaction.party().publicKey().toBlockingObservable().first());
+					Interaction.contact().publicKey().toBlockingObservable().first());
 			InteractionDetailFragment fragment = new InteractionDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -121,18 +121,18 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 		} else {
 			Intent detailIntent = new Intent(this, InteractionDetailActivity.class);
 			detailIntent.putExtra(InteractionDetailFragment.PARTY_PUK,
-					
-					Interaction.party().publicKey().toBlockingObservable().first());
+
+					Interaction.contact().publicKey().toBlockingObservable().first());
 			startActivity(detailIntent);
 		}
 	}
 
-	
-	private Interaction interaction() {
+
+	private Sneer sneer() {
 		return ((SneerApp) getApplication()).model();
 	}
 
-	
+
 	void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}

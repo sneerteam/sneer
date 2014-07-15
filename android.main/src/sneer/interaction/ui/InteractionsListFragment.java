@@ -30,7 +30,7 @@ public class InteractionsListFragment extends ListFragment {
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
 	private static final Comparator<? super Interaction> BY_TIMESTAMP = new Comparator<Interaction>() { @Override public int compare(Interaction lhs, Interaction rhs) {
-		return Comparators.compare(lhs.lastMessageTimestamp(), rhs.lastMessageTimestamp());
+		return Comparators.compare(lhs.lastInteractionEventTimestamp(), rhs.lastInteractionEventTimestamp());
 	}};
 	
 	/**

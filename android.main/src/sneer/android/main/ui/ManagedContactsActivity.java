@@ -36,7 +36,7 @@ public class ManagedContactsActivity extends Activity {
 				) {
 			String title;
 			
-			if((title = getIntent().getExtras().getString(TITLE)) != null){				
+			if ((title = getIntent().getExtras().getString(TITLE)) != null) {				
 				setTitle(title);
 				
 			}
