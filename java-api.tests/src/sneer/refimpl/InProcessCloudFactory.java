@@ -8,7 +8,7 @@ import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
 
-public class InMemoryLocalSneer implements Sneer {
+public class InProcessCloudFactory {
 
 	Subject<Tuple, Tuple> tuples = ReplaySubject.create();
 	
@@ -190,12 +190,10 @@ public class InMemoryLocalSneer implements Sneer {
 	}
 	
 
-	@Override
-	public KeyPair newKeyPair() {
+	public KeyPair createKeyPair() {
 		return new KeyPairImpl();
 	}
 
-	@Override
 	public Cloud newCloud(KeyPair identity) {
 		return new CloudImpl(identity);
 	}

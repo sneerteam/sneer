@@ -9,7 +9,7 @@ public class Groups extends TestsBase {
 	@Test
 	public void targetAudience() {
 		
-		KeyPair group = sneer.newKeyPair();
+		KeyPair group = sneerA.createKeyPair();
 		
 		cloudA.newTuplePublisher()
 			.audience(group.publicKey())
@@ -25,8 +25,8 @@ public class Groups extends TestsBase {
 	@Test
 	public void noLeak() {
 		
-		KeyPair group1 = sneer.newKeyPair();
-		KeyPair group2 = sneer.newKeyPair();
+		KeyPair group1 = sneerA.createKeyPair();
+		KeyPair group2 = sneerA.createKeyPair();
 		
 		cloudA.newTuplePublisher()
 		.audience(group1.publicKey())

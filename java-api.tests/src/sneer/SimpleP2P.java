@@ -220,7 +220,7 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void differenceAudience() {
 		
-		KeyPair group = sneer.newKeyPair();
+		KeyPair group = sneerA.createKeyPair();
 		
 		cloudA.newTuplePublisher()
 			.audience(group.publicKey())
