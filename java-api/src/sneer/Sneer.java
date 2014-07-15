@@ -2,8 +2,8 @@ package sneer;
 
 public interface Sneer {
 
-	KeyPair newKeyPair();
+	PrivateKey createPrivateKey();
 
-	Cloud newCloud(KeyPair identity);
+	Cloud newCloud(PrivateKey identity);
 
 }

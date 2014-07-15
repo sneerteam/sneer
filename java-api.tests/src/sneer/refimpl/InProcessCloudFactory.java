@@ -55,7 +55,7 @@ public class InProcessCloudFactory {
 	private final class CloudImpl implements Cloud {
 		
 		
-		private KeyPair identity;
+		private PrivateKey identity;
 
 		private final class TupleSubscriberImpl implements TupleSubscriber {
 			
@@ -158,7 +158,7 @@ public class InProcessCloudFactory {
 			}
 		}
 
-		public CloudImpl(KeyPair identity) {
+		public CloudImpl(PrivateKey identity) {
 			this.identity = identity;
 		}
 
@@ -173,28 +173,23 @@ public class InProcessCloudFactory {
 		}
 	}
 
-	private static final class KeyPairImpl implements KeyPair {
+	private static final class KeyPairImpl implements PrivateKey {
 
 		private PublicKey publicKey = new PublicKey() {};
-		private PrivateKey privateKey = new PrivateKey() {};
 
 		@Override
 		public PublicKey publicKey() {
 			return publicKey;
 		}
 
-		@Override
-		public PrivateKey privateKey() {
-			return privateKey;
-		}
 	}
 	
 
-	public KeyPair createKeyPair() {
+	public PrivateKey createKeyPair() {
 		return new KeyPairImpl();
 	}
 
-	public Cloud newCloud(KeyPair identity) {
+	public Cloud newCloud(PrivateKey identity) {
 		return new CloudImpl(identity);
 	}
 

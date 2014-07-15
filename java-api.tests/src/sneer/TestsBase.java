@@ -13,9 +13,9 @@ public class TestsBase {
 	Sneer sneerB = createSneer();
 	Sneer sneerC = createSneer();
 	
-	KeyPair userA = sneerA.createKeyPair();
-	KeyPair userB = sneerB.createKeyPair();
-	KeyPair userC = sneerC.createKeyPair();
+	PrivateKey userA = sneerA.createPrivateKey();
+	PrivateKey userB = sneerB.createPrivateKey();
+	PrivateKey userC = sneerC.createPrivateKey();
 	
 	Cloud cloudA = sneerA.newCloud(userA);
 	Cloud cloudB = sneerB.newCloud(userB);
@@ -25,12 +25,12 @@ public class TestsBase {
 	protected Sneer createSneer() {
 		return new Sneer() {
 			@Override
-			public KeyPair createKeyPair() {
+			public PrivateKey createPrivateKey() {
 				return inProcessCloudFacory.createKeyPair();
 			}
 
 			@Override
-			public Cloud newCloud(KeyPair identity) {
+			public Cloud newCloud(PrivateKey identity) {
 				return inProcessCloudFacory.newCloud(identity);
 			}
 		};

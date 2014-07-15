@@ -220,14 +220,14 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void differenceAudience() {
 		
-		KeyPair group = sneerA.createKeyPair();
+		PrivateKey group = sneerA.createPrivateKey();
 		
 		cloudA.newTuplePublisher()
 			.audience(group.publicKey())
 			.intent("chat/message")
 			.pub("hey people!");
 		
-		expectValues(cloudB.newTupleSubscriber().audience(group.privateKey()).tuples(), "hey people!");
+		expectValues(cloudB.newTupleSubscriber().audience(group).tuples(), "hey people!");
 		assertCount(0, cloudB.newTupleSubscriber().author(userC.publicKey()).tuples());
 	}
 	
