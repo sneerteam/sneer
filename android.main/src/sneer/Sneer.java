@@ -20,7 +20,7 @@ public interface Sneer {
 	Observed<String> labelFor(Party party);
 
 	/** All Interactions you have had. */
-	Observable<Interaction> interactions();
+	Observable<Set<Interaction>> interactions();
 
 	/** @return an existing Interaction with party or a new one if it doesn't exist. */
 	Interaction produceInteractionWith(Party party);
