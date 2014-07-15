@@ -1,0 +1,12 @@
+/pom.xml
+*jar
+/lib
+/classes
+/native
+/checkouts
+.lein*
+/target
+/tmp
+.nrepl-port
+logs
+*~

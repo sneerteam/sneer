@@ -1,0 +1,22 @@
+repositories {
+  mavenCentral()
+  maven {
+    url = "https://oss.sonatype.org/content/repositories/snapshots/"
+  }
+}
+
+configurations {
+  libs
+}
+
+dependencies {
+  libs 'me.sneer:sneer-api:0.1.1-SNAPSHOT'
+  libs 'org.easymock:easymock:3.2'
+}
+
+task copyLibs(type: Copy) {
+  into "libs"
+  from configurations.libs
+}
+
+defaultTasks 'copyLibs'

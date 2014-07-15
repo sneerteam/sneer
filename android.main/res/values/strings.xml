@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Sneer</string>
+    <string name="title_activity_main">Sneer</string>
+    <string name="title_activity_contact_add">Add Contact</string>
+    <string name="action_profile">Profile</string>
+    <string name="action_send_pk">Send your public key…</string>
+    <string name="action_copy_pk">Copy your public key</string>
+    <string name="action_add_contact">Add contact</string>
+    <string name="action_settings">Settings</string>
+    <string name="dummy_text">dummy</string>
+    <string name="send_contact">Send</string>
+    <string name="chat_contact">Chat</string>
+    <string name="edit_contact">Edit</string>
+    <string name="remove_contact">Remove</string>
+    <string name="nickname">Nickname</string>
+    <string name="comments">Comments</string>
+    <string name="send_contact_dialog">Sending contact</string>
+    
+</resources>

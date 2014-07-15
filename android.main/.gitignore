@@ -1,0 +1,9 @@
+.DS_Store
+bin
+gen
+target
+*.iml
+/build/
+libs/networker*
+
+
