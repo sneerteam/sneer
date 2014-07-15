@@ -1,0 +1,209 @@
+apply plugin: 'android-library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def originalVersion = "0.1.1"
+
+group = 'me.sneer'
+version = originalVersion
+description = 'API for Sneer, the sovereign platform.' 
+ext.packaging = 'jar'
+
+def SONATYPE_RELEASE_URL = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+def SONATYPE_SNAPSHOT_URL = "https://oss.sonatype.org/content/repositories/snapshots/"
+
+def shouldPublish
+def isReleaseBuild
+
+if(hasProperty("release")) {
+    shouldPublish = true
+    isReleaseBuild = true
+} else if (hasProperty("ci")) {
+    shouldPublish = true
+    version += "-SNAPSHOT"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.10.0+'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+  libs
+  compile.extendsFrom libs
+}
+
+dependencies {
+    libs 'us.bpsm:edn-java:0.4.4'
+    libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+    
+    defaultConfig {
+	    minSdkVersion 15
+	    targetSdkVersion 19
+	 }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            aidl.srcDir 'src'
+            java.srcDir 'src'
+            res.srcDir 'res'
+        }
+    }
+}
+
+task copyLibs(type: Copy) {
+  into "libs"
+  from configurations.libs
+}
+
+
+android.libraryVariants.all { variant ->
+	if (!variant.name.equals("release")) return
+    
+	task jarNodeps(type: Jar) {
+        from variant.javaCompile.destinationDir
+        from variant.javaCompile.source
+        from variant.processResources.resDir
+	
+	    appendix = "nodeps"
+	    version = originalVersion
+	    
+	    if (project.hasProperty("addTimestamp")) {
+		    def x = new XmlSlurper().parse("${SONATYPE_SNAPSHOT_URL}/me/sneer/${project.name}/${originalVersion}-SNAPSHOT/maven-metadata.xml".toURL().openStream())
+	        classifier = "${x.versioning.snapshot.timestamp}-${x.versioning.snapshot.buildNumber}"
+	    } 
+	
+	    from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
+	}
+	
+    task javadocRelease(type: Javadoc) {
+        description = "Generates javadoc for release"
+        destinationDir = new File(destinationDir, variant.baseName)
+		source = variant.javaCompile.source
+		ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+		classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+		options.links("http://docs.oracle.com/javase/7/docs/api/");
+		// options.links("http://d.android.com/reference/");
+		exclude '**/BuildConfig.java'
+		exclude '**/R.java'
+    }
+
+
+	task ourJar(type: Jar) {
+        from variant.javaCompile.destinationDir
+        from variant.processResources.resDir
+    }
+
+	task javadocJar(type: Jar, dependsOn: javadocRelease) {
+		from javadocRelease.destinationDir
+	    classifier = 'javadoc'
+	}
+	
+	task sourcesJar(type: Jar) {
+        from variant.javaCompile.source
+	    classifier = 'sources'
+	}
+
+	artifacts {
+	    archives ourJar
+	    
+		archives javadocJar
+		archives sourcesJar
+	}
+		
+}
+
+
+
+
+if(shouldPublish) {
+    signing {
+        sign configurations.archives
+    }
+} else {
+    task signArchives {
+        // do nothing
+    }
+}
+
+afterEvaluate {
+	uploadArchives {
+		repositories {
+			if (!shouldPublish) {
+			    mavenLocal()
+			} else {
+		        mavenDeployer {
+				
+					if(shouldPublish) { 
+					    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+					}
+					
+					repository(url: (isReleaseBuild ? SONATYPE_RELEASE_URL : SONATYPE_SNAPSHOT_URL)) {
+					  authentication(userName: nexusUsername, password: nexusPassword)
+					}
+			
+					pom.project {
+					    name project.name
+					    packaging 'jar'
+					    description project.description
+					    url 'http://sneer.me'
+			
+				        scm {
+				            url 'https://github.com/sneerteam/snapi'
+				            connection 'git@github.com:sneerteam/snapi.git'
+				        }
+			
+				        licenses {
+				            license {
+					            name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
+				                url 'http://opensource.org/licenses/lgpl-3.0.html'
+				                distribution 'repo'
+				            }
+				        }
+			
+						developers {
+						    developer {
+							    id 'klauswuestefeld'
+							    name 'Klaus Wuestefeld'
+							    email 'klauswuestefeld@gmail.com'
+						    }
+							developer {
+							    id 'fabioroger'
+							    name 'Fabio Roger Manera'
+							    email 'fabioroger@gmail.com'
+							}
+							developer {
+							    id 'bamboo'
+							    name 'Rodrigo B. de Oliveira'
+							    email 'rbo@acm.org'
+							}
+							developer {
+							    id 'felipebueno'
+							    name 'Felipe Bueno'
+							    email 'bueno.felipe@gmail.com'
+							}
+						}
+			        }
+			        
+			    }
+		    }
+	    }	    
+	}
+}
+
+defaultTasks 'copyLibs'
