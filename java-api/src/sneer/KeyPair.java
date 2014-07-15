@@ -1,5 +1,8 @@
 package sneer;
 
-public interface KeyPair extends PublicKey, PrivateKey {
+public interface KeyPair {
+	
+	PublicKey publicKey();
+	PrivateKey privateKey();
 
 }

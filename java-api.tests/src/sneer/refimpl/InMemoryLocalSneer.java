@@ -47,7 +47,7 @@ public class InMemoryLocalSneer implements Sneer {
 
 		@Override
 		public String toString() {
-			return "TupleImpl ["+this+"]";
+			return "TupleImpl ["+super.toString()+"]";
 		}
 		
 	}
@@ -174,6 +174,19 @@ public class InMemoryLocalSneer implements Sneer {
 	}
 
 	private static final class KeyPairImpl implements KeyPair {
+
+		private PublicKey publicKey = new PublicKey() {};
+		private PrivateKey privateKey = new PrivateKey() {};
+
+		@Override
+		public PublicKey publicKey() {
+			return publicKey;
+		}
+
+		@Override
+		public PrivateKey privateKey() {
+			return privateKey;
+		}
 	}
 	
 

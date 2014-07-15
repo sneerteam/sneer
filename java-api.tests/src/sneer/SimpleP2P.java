@@ -150,7 +150,7 @@ public class SimpleP2P extends TestsBase {
 	public void messagePassing() throws IOException {
 
 		TuplePublisher publisher = cloudA.newTuplePublisher()
-			.audience(userB)
+			.audience(userB.publicKey())
 			.intent("rock-paper-scissor/move")
 			.pub("paper");
 			
@@ -172,7 +172,7 @@ public class SimpleP2P extends TestsBase {
 	public void tupleWithIntent() throws IOException {
 
 		cloudA.newTuplePublisher()
-			.audience(userB)
+			.audience(userB.publicKey())
 			.intent("rock-paper-scissor/move")
 			.pub("paper")
 			.intent("rock-paper-scissor/message")
@@ -186,7 +186,7 @@ public class SimpleP2P extends TestsBase {
 	public void targetUser() {
 		
 		cloudA.newTuplePublisher()
-			.audience(userC)
+			.audience(userC.publicKey())
 			.intent("rock-paper-scissor/move")
 			.pub("paper");
 		
@@ -213,8 +213,8 @@ public class SimpleP2P extends TestsBase {
 			.intent("profile/name")
 			.pub("UserA McCloud");
 		
-		assertCount(1, cloudB.newTupleSubscriber().author(userA).tuples());
-		assertCount(0, cloudB.newTupleSubscriber().author(userC).tuples());
+		assertCount(1, cloudB.newTupleSubscriber().author(userA.publicKey()).tuples());
+		assertCount(0, cloudB.newTupleSubscriber().author(userC.publicKey()).tuples());
 	}
 	
 	@Test
@@ -223,12 +223,12 @@ public class SimpleP2P extends TestsBase {
 		KeyPair group = sneer.newKeyPair();
 		
 		cloudA.newTuplePublisher()
-			.audience(group)
+			.audience(group.publicKey())
 			.intent("chat/message")
 			.pub("hey people!");
 		
-		expectValues(cloudB.newTupleSubscriber().audience(group).tuples(), "hey people!");
-		assertCount(0, cloudB.newTupleSubscriber().author(userC).tuples());
+		expectValues(cloudB.newTupleSubscriber().audience(group.privateKey()).tuples(), "hey people!");
+		assertCount(0, cloudB.newTupleSubscriber().author(userC.publicKey()).tuples());
 	}
 	
 }
