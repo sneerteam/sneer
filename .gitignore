@@ -1,6 +1,9 @@
 .project
 .classpath
+.settings
+
 .gradle/
-.project
+
 local.properties
+
 .byke
