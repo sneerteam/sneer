@@ -20,4 +20,14 @@ public class UIUtils {
 		}});
 	}
 
+	@SuppressWarnings("unchecked")
+	static public <V> V findView(View view, int id) {
+		return (V)view.findViewById(id);
+	}
+
+	@SuppressWarnings("unchecked")
+	static public TextView findText(View view, int id) {
+		return (TextView)view.findViewById(id);
+	}
+
 }

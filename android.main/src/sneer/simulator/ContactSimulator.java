@@ -5,6 +5,7 @@ import java.util.*;
 import rx.Observable;
 import rx.subjects.*;
 import sneer.*;
+import sneer.rx.*;
 
 public class ContactSimulator implements Contact {
 
@@ -26,6 +27,20 @@ public class ContactSimulator implements Contact {
 	@Override
 	public Party party() {
 		return party;
+	}
+
+
+	@Override
+	public Observed<String> nickname() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setNickname(String newNickname) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

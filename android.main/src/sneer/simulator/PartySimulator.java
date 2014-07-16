@@ -3,22 +3,26 @@ package sneer.simulator;
 import rx.*;
 import rx.subjects.*;
 import sneer.*;
+import sneer.cloudnew.*;
+import sneer.keys.PublicKey;
+import sneer.rx.*;
 
 public class PartySimulator implements Self {
 
-	static private int nextPublicKey = 100;
+	private final Observed<PublicKey> publicKey;
 
-	private final Subject<String, String> publicKey;
-	private final Subject<String, String> name;
+	/** The name this Party gives itself. */
+	private final BehaviorSubject<String> name;
 	
-	public PartySimulator(String name) {
-		this.publicKey = BehaviorSubject.create("" + nextPublicKey++);
-		this.name = BehaviorSubject.create(name);
+	
+	public PartySimulator(PrivateKey prik) {
+		this.publicKey = new Observed<PublicKey>(Observable.from(prik.publicKey()));
+		this.name = BehaviorSubject.create("No name set yet (Puk " + puk + ")");
 	}
 
 	
 	@Override
-	public Observable<String> publicKey() {
+	public Observed<PublicKey> publicKey() {
 		return publicKey;
 	}
 

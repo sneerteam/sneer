@@ -1,75 +1,64 @@
 package sneer.simulator;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import rx.Observable;
-import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.impl.*;
-import sneer.rx.*;
+import sneer.keys.*;
 
 public class SneerSimulator extends SneerBase {
 
-	private final ReplaySubject<Party> parties = ReplaySubject.create();
-	private final ReplaySubject<Interaction> interactions = ReplaySubject.create();
-	private final Map<Party, Interaction> interactionsByParty = new HashMap<Party, Interaction>();
+	private final Map<PublicKey, Party> partiesByPuk = new ConcurrentHashMap<PublicKey, Party>();
+	private final Map<Party, Interaction> interactionsByParty = new ConcurrentHashMap<Party, Interaction>();
+	private final BehaviorSubject<Collection<Interaction>> interactions = BehaviorSubject.create(interactionsNow());
 
 	
 	@Override
-	public Party produceParty(final String publicKey) {
-		return first(parties.filter(new Func1<Party, Boolean>() { @Override public Boolean call(Party party) {
-			return first(party.publicKey()).equals(publicKey);
-		}}));
-		
-		//return findIndividualParty();
+	public Party produceParty(PublicKey publicKey) {
+		Party ret;
+		synchronized (partiesByPuk) {
+			ret = partiesByPuk.get(publicKey);
+			if (ret == null) {
+				ret = new PartySimulator(publicKey);
+				partiesByPuk.put(publicKey, ret);
+			}
+		}
+		return ret;
 	}
 
 
 	@Override
-	public Observable<Interaction> interactions() {
+	public Observable<Collection<Interaction>> interactions() {
 		return interactions;
 	}
 
 	
 	@Override
 	public Interaction produceInteractionWith(Party party) {
-		Interaction ret = interactionsByParty.get(party);
-		if (ret == null) {
-			ret = new InteractionSimulator(party);
-			interactionsByParty.put(party, ret);
-			interactions.onNext(ret);
+		Interaction ret;
+		synchronized (interactionsByParty) {
+			ret = interactionsByParty.get(party);
+			if (ret == null) {
+				ret = new InteractionSimulator(party);
+				interactionsByParty.put(party, ret);
+				interactions.onNext(interactionsNow());
+			}
 		}
 		return ret;
 	}
 	
-	
-	static private <T> T first(Observable<T> observable) {
-		return observable.toBlockingObservable().first();
-	}
-
-	private Party findIndividualParty(){
-		//public IndividualSimulator(Observable<String> publicKey, Observable<String> nickname,Observable<String> name) {
-		return new IndividualSimulator(Observable.from("P00001"), Observable.from("Segunda-feira"));
-	}
-
 
 	@Override
 	public Self self() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PartySimulator(createPrivateKey);
 	}
 
 
 	@Override
-	public Observable<Contact> contacts() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Contact findContact(String publicKey) {
+	public Contact findContact(Party party) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -81,4 +70,17 @@ public class SneerSimulator extends SneerBase {
 		
 	}
 
+
+	@Override
+	public Observable<Collection<Contact>> contacts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	private Collection<Interaction> interactionsNow() {
+		return new HashSet<Interaction>(interactionsByParty.values());
+	}
+	
+	
 }

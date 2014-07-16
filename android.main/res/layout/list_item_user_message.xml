@@ -22,27 +22,27 @@
 	    android:background="@drawable/user_speech_bubble">
 	
 		<TextView
-			android:id="@+id/messageSender"
+			android:id="@+id/interactionEventSender"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_alignLeft="@+id/messageContent"
+			android:layout_alignLeft="@+id/interactionEventContent"
 			android:textStyle="bold"
 			android:textColor="#D34F39"
 			android:text="@string/dummy_text" />
 	
 		<TextView
-			android:id="@+id/messageContent" 
+			android:id="@+id/interactionEventContent" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_below="@+id/messageSender"
+			android:layout_below="@+id/interactionEventSender"
 			android:text="@string/dummy_text" />
 		
 		<TextView
-			android:id="@+id/messageTime"
+			android:id="@+id/interactionEventTime"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_below="@+id/messageContent"
-			android:layout_alignLeft="@+id/messageContent"
+			android:layout_below="@+id/interactionEventContent"
+			android:layout_alignLeft="@+id/interactionEventContent"
 			android:textSize="12sp"
 			android:textColor="#777"
 			android:text="@string/dummy_text" />

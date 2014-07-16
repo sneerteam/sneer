@@ -28,6 +28,8 @@ import android.widget.*;
  * {@link InteractionDetailFragment}.
  * <p>
  */
+
+//ChatListActivity -> Listar chats
 public class InteractionsListActivity extends FragmentActivity implements InteractionsListFragment.Callbacks {
 
 	private static InteractionsListFragment interactionsListFragment;
