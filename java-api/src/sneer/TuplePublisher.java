@@ -6,7 +6,7 @@ public interface TuplePublisher extends Action1<Object>, Action0 {
 
 	TuplePublisher audience(PublicKey audience);
 
-	TuplePublisher intent(String... intent);
+	TuplePublisher intent(String intent);
 
 	TuplePublisher value(Object value);
 	

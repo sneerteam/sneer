@@ -178,7 +178,7 @@ public class SimpleP2P extends TestsBase {
 			.intent("rock-paper-scissor/message")
 			.pub("hehehe");
 		
-		assertEqualsUntilNow(cloudB.newTupleSubscriber().tuples().map(TO_INTENT), new String[]{"rock-paper-scissor/move"}, new String[]{"rock-paper-scissor/message"});
+		assertEqualsUntilNow(cloudB.newTupleSubscriber().tuples().map(TO_INTENT), "rock-paper-scissor/move", "rock-paper-scissor/message");
 		
 	}
 	
@@ -227,7 +227,7 @@ public class SimpleP2P extends TestsBase {
 			.intent("chat/message")
 			.pub("hey people!");
 		
-		expectValues(cloudB.newTupleSubscriber().audience(group).tuples(), "hey people!");
+		expectValues(cloudB.newTupleSubscriber().audience(group.publicKey()).tuples(), "hey people!");
 		assertCount(0, cloudB.newTupleSubscriber().author(userC.publicKey()).tuples());
 	}
 	

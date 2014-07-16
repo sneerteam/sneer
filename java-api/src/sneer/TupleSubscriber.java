@@ -6,7 +6,7 @@ public interface TupleSubscriber {
 
 	TupleSubscriber author(PublicKey author);
 
-	TupleSubscriber audience(PrivateKey audience);
+	TupleSubscriber audience(PublicKey audience);
 	
 	TupleSubscriber intent(String intent);
 
