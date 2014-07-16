@@ -1,3 +1,4 @@
 .gradle/
 .project
 local.properties
+.byke
