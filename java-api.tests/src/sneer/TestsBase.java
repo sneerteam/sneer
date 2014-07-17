@@ -1,44 +1,41 @@
 package sneer;
 
 import static sneer.ObservableTestUtils.*;
-import static sneer.commons.TupleUtils.*;
 import rx.*;
+import sneer.admin.*;
+import sneer.impl.*;
 import sneer.refimpl.*;
+import sneer.tuples.*;
 
 public class TestsBase {
 	
-	private final InProcessCloudFactory factory = new InProcessCloudFactory();
+	private final TuplesFactoryInProcess factory = new TuplesFactoryInProcess();
 	
-	Sneer sneerA = createSneer();
-	Sneer sneerB = createSneer();
-	Sneer sneerC = createSneer();
+	protected final PrivateKey userA = Keys.newPrivateKey();
+	protected final PrivateKey userB = Keys.newPrivateKey();
+	protected final PrivateKey userC = Keys.newPrivateKey();
 	
-	PrivateKey userA = sneerA.createPrivateKey();
-	PrivateKey userB = sneerB.createPrivateKey();
-	PrivateKey userC = sneerC.createPrivateKey();
-	
-	Cloud cloudA = sneerA.newCloud(userA);
-	Cloud cloudB = sneerB.newCloud(userB);
-	Cloud cloudC = sneerC.newCloud(userC);
+	protected final Tuples tuplesA = init(userA).tuples();
+	protected final Tuples tuplesB = init(userB).tuples();
+	protected final Tuples tuplesC = init(userC).tuples();
 
 	
-	protected Sneer createSneer() {
-		return new Sneer() {
-			@Override
-			public PrivateKey createPrivateKey() {
-				return factory.createPrivateKey();
-			}
-
-			@Override
-			public Cloud newCloud(PrivateKey identity) {
-				return factory.newCloud(identity);
-			}
-		};
+	protected SneerAdmin createSneerAdmin() {
+		return new SneerAdminInProcess(factory);
+	}
+	
+	
+	private Sneer init(PrivateKey prik) {
+		try {
+			return createSneerAdmin().initialize(prik);
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
-	
-	void expectValues(Observable<Tuple> tuples, Object... expecteds) {
-		assertEqualsUntilNow(tuples.map(TO_VALUE), expecteds);
+
+	protected void expectValues(Observable<Tuple> tuples, Object... expecteds) {
+		assertEqualsUntilNow(tuples.map(TupleUtils.TO_VALUE), expecteds);
 	}
 
 }

@@ -7,8 +7,9 @@ import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
+import sneer.tuples.*;
 
-public class InProcessCloudFactory {
+public class TuplesFactoryInProcess {
 
 	Subject<Tuple, Tuple> tuples = ReplaySubject.create();
 	
@@ -52,7 +53,7 @@ public class InProcessCloudFactory {
 		
 	}
 	
-	private final class CloudImpl implements Cloud {
+	private final class TuplesImpl implements Tuples {
 		
 		
 		private PrivateKey identity;
@@ -167,7 +168,7 @@ public class InProcessCloudFactory {
 			}
 		}
 
-		public CloudImpl(PrivateKey identity) {
+		public TuplesImpl(PrivateKey identity) {
 			this.identity = identity;
 		}
 
@@ -182,24 +183,8 @@ public class InProcessCloudFactory {
 		}
 	}
 
-	private static final class PrivateKeyImpl implements PrivateKey {
-
-		private PublicKey publicKey = new PublicKey() {};
-
-		@Override
-		public PublicKey publicKey() {
-			return publicKey;
-		}
-
-	}
-	
-
-	public PrivateKey createPrivateKey() {
-		return new PrivateKeyImpl();
-	}
-
-	public Cloud newCloud(PrivateKey identity) {
-		return new CloudImpl(identity);
+	public Tuples newTuples(PrivateKey identity) {
+		return new TuplesImpl(identity);
 	}
 
 }
