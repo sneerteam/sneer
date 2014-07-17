@@ -1,7 +1,6 @@
 package sneer.tuples;
 
 import rx.functions.*;
-import sneer.tuples.*;
 
 public class TupleUtils {
 
