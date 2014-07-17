@@ -23,9 +23,13 @@
           (with "intent" intent))
         (audience [this audience]
           (with "audience" audience))
+        (value [this value]
+          (with "value" value))
         (pub [this value]
-          (. tuples onNext (->tuple (assoc attrs "value" value)))
-          this)))))
+            (.. this (value value) pub))
+        (pub [this]
+            (. tuples onNext (->tuple attrs))
+            this)))))
 
 (defn new-tuple-subscriber [tuples]
   (reify TupleSubscriber
