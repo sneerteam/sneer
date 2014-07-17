@@ -2,6 +2,7 @@ package sneer.commons;
 
 import rx.functions.*;
 import sneer.*;
+import sneer.tuples.*;
 
 public class TupleUtils {
 

@@ -8,6 +8,8 @@ import android.widget.*;
 
 public class UIUtils {
 
+	private int moveThisClassToAndroidApiProject;
+	
 	public static void subscribeTextView(final TextView textView, Observable<?> observable) {
 		observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			textView.setText(obj.toString());

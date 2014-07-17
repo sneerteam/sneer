@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/interactions_list"
-        android:name="sneer.interaction.ui.InteractionsListFragment"
+        android:name="sneer.android.main.ui.interactions.InteractionsListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

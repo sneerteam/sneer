@@ -17,7 +17,6 @@ import rx.observables.*;
 import rx.schedulers.*;
 import rx.subjects.*;
 import rx.subscriptions.*;
-import sneer.android.keys.*;
 import sneer.api.*;
 import sneer.cloud.client.*;
 import sneer.cloud.client.Cloud;
@@ -199,8 +198,8 @@ public class CloudService extends Service {
 	
 
 	private PublicKey publicKey() {
-		Keys.initKeys(getApplicationContext());
-		return PublicKey.fromByteArray(Keys.publicKey());
+		KeyStore.initKeys(getApplicationContext());
+		return PublicKey.fromByteArray(KeyStore.publicKey());
 	}
 	
 	
