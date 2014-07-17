@@ -1,4 +1,4 @@
-package sneer.commons;
+package sneer.tuples;
 
 import rx.functions.*;
 import sneer.tuples.*;
