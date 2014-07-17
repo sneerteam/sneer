@@ -1,4 +1,6 @@
-package sneer;
+package sneer.impl;
+
+import sneer.*;
 
 public class Keys {
 
