@@ -14,7 +14,13 @@ public class SneerSimulator extends SneerBase {
 	private final Map<PublicKey, Party> partiesByPuk = new ConcurrentHashMap<PublicKey, Party>();
 	private final Map<Party, Interaction> interactionsByParty = new ConcurrentHashMap<Party, Interaction>();
 	private final BehaviorSubject<Collection<Interaction>> interactions = BehaviorSubject.create(interactionsNow());
+	private final PartySimulator self;
 
+	
+	public SneerSimulator(PublicKey puk) {
+		self = new PartySimulator(puk);
+	}
+	
 	
 	@Override
 	public Party produceParty(PublicKey publicKey) {
@@ -52,9 +58,8 @@ public class SneerSimulator extends SneerBase {
 	
 
 	@Override
-	public Self self() {
-		return null;
-		//return new PartySimulator(createPrivateKey);
+	public Party self() {
+		return self;
 	}
 
 
@@ -77,17 +82,22 @@ public class SneerSimulator extends SneerBase {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-	private Collection<Interaction> interactionsNow() {
-		return new HashSet<Interaction>(interactionsByParty.values());
-	}
 
 
 	@Override
 	public Tuples tuples() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	public void setOwnName(String newName) {
+		self.setName(newName);
+	}
+	
+	
+	private Collection<Interaction> interactionsNow() {
+		return new HashSet<Interaction>(interactionsByParty.values());
 	}
 
 	

@@ -1,5 +1,7 @@
 package sneer.impl.simulator;
 
+import static sneer.commons.Exceptions.*;
+
 import java.io.*;
 
 import sneer.*;
@@ -7,28 +9,26 @@ import sneer.admin.*;
 
 public class SneerAdminSimulator implements SneerAdmin {
 
+	private PrivateKey prik;
+	private SneerSimulator sneer;
+
 	@Override
-	public boolean isInitialized() {
-		// TODO Auto-generated method stub
-		return false;
+	public Sneer initialize(PrivateKey prik) throws WrongPrivateKey, IOException {
+		this.prik = prik;
+		this.sneer = new SneerSimulator(prik.publicKey());
+		return this.sneer;
 	}
 
 	@Override
-	public PrivateKey newPrivateKey() {
-		// TODO Auto-generated method stub
-		return null;
+	public PrivateKey privateKey() {
+		check(prik != null);
+		return prik;
 	}
 
 	@Override
-	public void initialize(PrivateKey prik) {
-		// TODO Auto-generated method stub
-		
+	public void setOwnName(String newName) {
+		sneer.setOwnName(newName);
 	}
 
-	@Override
-	public Sneer open(PrivateKey prik) throws WrongPrivateKey, IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

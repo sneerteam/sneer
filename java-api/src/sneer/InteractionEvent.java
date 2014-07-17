@@ -17,7 +17,7 @@ public class InteractionEvent {
 	private final boolean isOwn;
 	
 	
-	public InteractionEvent(long timestampSent, Self sender, String content) {
+	public InteractionEvent(long timestampSent, Party sender, String content) {
 		this.timestampSent = timestampSent;
 		this.timestampReceived = timestampSent;
 		this.sender = sender;

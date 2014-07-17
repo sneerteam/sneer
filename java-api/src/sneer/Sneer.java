@@ -8,7 +8,7 @@ import sneer.tuples.*;
 
 public interface Sneer {
 	
-	Self self();
+	Party self();
 	
 	/** All Individual contacts that you have and all Groups you are a member of. */
 	Observable<Collection<Contact>> contacts();

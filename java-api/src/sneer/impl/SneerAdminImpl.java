@@ -8,27 +8,20 @@ import sneer.admin.*;
 public class SneerAdminImpl implements SneerAdmin {
 
 	@Override
-	public boolean isInitialized() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public PrivateKey newPrivateKey() {
+	public Sneer initialize(PrivateKey prik) throws WrongPrivateKey, IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void initialize(PrivateKey prik) {
+	public PrivateKey privateKey() {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 	@Override
-	public Sneer open(PrivateKey prik) throws WrongPrivateKey, IOException {
+	public void setOwnName(String newName) {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
