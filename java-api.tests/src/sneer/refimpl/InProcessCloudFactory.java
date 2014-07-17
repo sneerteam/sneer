@@ -62,15 +62,19 @@ public class InProcessCloudFactory {
 			private Map<String, Object> where = new HashMap<String, Object>();
 			
 			{
-				where.put("audience", identity);
+				where.put("audience", identity.publicKey());
 			}
 
 			@Override
 			public Observable<Tuple> tuples() {
 				Observable<Tuple> t = tuples;
-				for (final Entry<String, Object> entry : where.entrySet()) {
+				for (final Entry<String, Object> criteria : where.entrySet()) {
 					t = t.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
-						return t1.get(entry.getKey()).equals(entry.getValue());
+						Object tupleValue = t1.get(criteria.getKey());
+						if (tupleValue == null && criteria.getKey().equals("audience")) {
+							return true;
+						}
+						return tupleValue.equals(criteria.getValue());
 					}});
 				}
 				return t;
@@ -89,7 +93,7 @@ public class InProcessCloudFactory {
 			}
 
 			@Override
-			public TupleSubscriber audience(PrivateKey audience) {
+			public TupleSubscriber audience(PublicKey audience) {
 				where("audience", audience);
 				return this;
 			}
@@ -111,6 +115,10 @@ public class InProcessCloudFactory {
 
 		private final class TuplePublisherImpl implements TuplePublisher {
 			private TupleImpl prototype = new TupleImpl();
+			
+			{
+				prototype.put("author", identity.publicKey());
+			}
 
 			@Override
 			public void call() {
@@ -141,7 +149,7 @@ public class InProcessCloudFactory {
 			}
 
 			@Override
-			public TuplePublisher intent(String... intent) {
+			public TuplePublisher intent(String intent) {
 				prototype.put("intent", intent);
 				return this;
 			}
@@ -154,6 +162,7 @@ public class InProcessCloudFactory {
 
 			@Override
 			public TuplePublisher put(String key, Object value) {
+				prototype.put(key, value);
 				return this;
 			}
 		}
@@ -173,7 +182,7 @@ public class InProcessCloudFactory {
 		}
 	}
 
-	private static final class KeyPairImpl implements PrivateKey {
+	private static final class PrivateKeyImpl implements PrivateKey {
 
 		private PublicKey publicKey = new PublicKey() {};
 
@@ -185,8 +194,8 @@ public class InProcessCloudFactory {
 	}
 	
 
-	public PrivateKey createKeyPair() {
-		return new KeyPairImpl();
+	public PrivateKey createPrivateKey() {
+		return new PrivateKeyImpl();
 	}
 
 	public Cloud newCloud(PrivateKey identity) {

@@ -1,7 +1,6 @@
 package sneer.commons;
 
 import rx.functions.*;
-import sneer.*;
 import sneer.tuples.*;
 
 public class TupleUtils {
@@ -11,8 +10,8 @@ public class TupleUtils {
 	}};
 
 	public static Func1<Tuple, String[]> TO_INTENT = new Func1<Tuple, String[]>() {  @Override public String[] call(Tuple t) {
-		throw new RuntimeException("fix me");
-//		return t.intent();
+		throw new RuntimeException("FixMe");
+		//return t.intent();
 	}};
 
 }

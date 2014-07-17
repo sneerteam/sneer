@@ -7,7 +7,7 @@ import sneer.refimpl.*;
 
 public class TestsBase {
 	
-	private final InProcessCloudFactory inProcessCloudFacory = new InProcessCloudFactory();
+	private final InProcessCloudFactory factory = new InProcessCloudFactory();
 	
 	Sneer sneerA = createSneer();
 	Sneer sneerB = createSneer();
@@ -26,12 +26,12 @@ public class TestsBase {
 		return new Sneer() {
 			@Override
 			public PrivateKey createPrivateKey() {
-				return inProcessCloudFacory.createKeyPair();
+				return factory.createPrivateKey();
 			}
 
 			@Override
 			public Cloud newCloud(PrivateKey identity) {
-				return inProcessCloudFacory.newCloud(identity);
+				return factory.newCloud(identity);
 			}
 		};
 	}
