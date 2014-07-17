@@ -4,51 +4,53 @@ import static sneer.ObservableTestUtils.*;
 
 import org.junit.*;
 
+import sneer.impl.*;
+
 public class Groups extends TestsBase {
 	
 	@Test
 	public void targetAudience() {
 		
-		PrivateKey group = sneerA.createPrivateKey();
+		PrivateKey group = Keys.newPrivateKey();
 		
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.audience(group.publicKey())
 			.intent("chat")
 			.put("intent", "message")
 			.pub("hey people!");
 		
-		expectValues(cloudB.newTupleSubscriber().audience(group.publicKey()).tuples(), "hey people!");
-		expectValues(cloudB.newTupleSubscriber().tuples());
-		assertCount(0, cloudB.newTupleSubscriber().author(userA.publicKey()).tuples());
-		assertCount(0, cloudC.newTupleSubscriber().tuples());
+		expectValues(tuplesB.newTupleSubscriber().audience(group.publicKey()).tuples(), "hey people!");
+		expectValues(tuplesB.newTupleSubscriber().tuples());
+		assertCount(0, tuplesB.newTupleSubscriber().author(userA.publicKey()).tuples());
+		assertCount(0, tuplesC.newTupleSubscriber().tuples());
 	}
 	
 	@Test
 	public void noLeaks() {
 		
-		PrivateKey group1 = sneerA.createPrivateKey();
-		PrivateKey group2 = sneerA.createPrivateKey();
+		PrivateKey group1 = Keys.newPrivateKey();
+		PrivateKey group2 = Keys.newPrivateKey();
 		
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.audience(group1.publicKey())
 			.intent("chat")
 			.put("intent", "message")
 			.pub("hey people!");
 	
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
 			.intent("chat")
 			.pub("hey B-dog!!");
 	
-		expectValues(cloudA.newTupleSubscriber().tuples());
-		expectValues(cloudA.newTupleSubscriber().audience(group1.publicKey()).tuples(), "hey people!");
-		expectValues(cloudA.newTupleSubscriber().audience(group2.publicKey()).tuples());
-		expectValues(cloudB.newTupleSubscriber().tuples(), "hey B-dog!!");
-		expectValues(cloudB.newTupleSubscriber().audience(group1.publicKey()).tuples(), "hey people!");
-		expectValues(cloudB.newTupleSubscriber().audience(group2.publicKey()).tuples());
-		expectValues(cloudC.newTupleSubscriber().tuples());
-		expectValues(cloudC.newTupleSubscriber().audience(group1.publicKey()).tuples(), "hey people!");
-		expectValues(cloudC.newTupleSubscriber().audience(group2.publicKey()).tuples());
+		expectValues(tuplesA.newTupleSubscriber().tuples());
+		expectValues(tuplesA.newTupleSubscriber().audience(group1.publicKey()).tuples(), "hey people!");
+		expectValues(tuplesA.newTupleSubscriber().audience(group2.publicKey()).tuples());
+		expectValues(tuplesB.newTupleSubscriber().tuples(), "hey B-dog!!");
+		expectValues(tuplesB.newTupleSubscriber().audience(group1.publicKey()).tuples(), "hey people!");
+		expectValues(tuplesB.newTupleSubscriber().audience(group2.publicKey()).tuples());
+		expectValues(tuplesC.newTupleSubscriber().tuples());
+		expectValues(tuplesC.newTupleSubscriber().audience(group1.publicKey()).tuples(), "hey people!");
+		expectValues(tuplesC.newTupleSubscriber().audience(group2.publicKey()).tuples());
 	}
 	
 }

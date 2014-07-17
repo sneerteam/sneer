@@ -1,11 +1,14 @@
 package sneer;
 
 import static sneer.ObservableTestUtils.*;
-import static sneer.commons.TupleUtils.*;
+import static sneer.tuples.TupleUtils.*;
 
 import java.io.*;
 
 import org.junit.*;
+
+import sneer.impl.*;
+import sneer.tuples.*;
 
 public class SimpleP2P extends TestsBase {
 	
@@ -149,7 +152,7 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void messagePassing() throws IOException {
 
-		TuplePublisher publisher = cloudA.newTuplePublisher()
+		TuplePublisher publisher = tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
 			.intent("rock-paper-scissor/move")
 			.pub("paper");
@@ -160,7 +163,7 @@ public class SimpleP2P extends TestsBase {
 			.pub("hehehe");
 		
 		
-		TupleSubscriber subscriber = cloudB.newTupleSubscriber();
+		TupleSubscriber subscriber = tuplesB.newTupleSubscriber();
 
 		expectValues(subscriber.tuples(), "paper", "rock", "hehehe");
 		expectValues(subscriber.intent("rock-paper-scissor/move").tuples(), "paper", "rock");
@@ -171,64 +174,64 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void tupleWithIntent() throws IOException {
 
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
 			.intent("rock-paper-scissor/move")
 			.pub("paper")
 			.intent("rock-paper-scissor/message")
 			.pub("hehehe");
 		
-		assertEqualsUntilNow(cloudB.newTupleSubscriber().tuples().map(TO_INTENT), "rock-paper-scissor/move", "rock-paper-scissor/message");
+		assertEqualsUntilNow(tuplesB.newTupleSubscriber().tuples().map(TO_INTENT), "rock-paper-scissor/move", "rock-paper-scissor/message");
 		
 	}
 	
 	@Test
 	public void targetUser() {
 		
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.audience(userC.publicKey())
 			.intent("rock-paper-scissor/move")
 			.pub("paper");
 		
-		assertCount(0, cloudB.newTupleSubscriber().tuples());
-		assertCount(1, cloudC.newTupleSubscriber().tuples());
+		assertCount(0, tuplesB.newTupleSubscriber().tuples());
+		assertCount(1, tuplesC.newTupleSubscriber().tuples());
 	}
 	
 	@Test
 	public void publicTuples() {
 		
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.intent("profile/name")
 			.pub("UserA McCloud");
 		
-		assertCount(1, cloudA.newTupleSubscriber().tuples()); // should I receive my own public tuples?
-		assertCount(1, cloudB.newTupleSubscriber().tuples());
-		assertCount(1, cloudC.newTupleSubscriber().tuples());
+		assertCount(1, tuplesA.newTupleSubscriber().tuples()); // should I receive my own public tuples?
+		assertCount(1, tuplesB.newTupleSubscriber().tuples());
+		assertCount(1, tuplesC.newTupleSubscriber().tuples());
 		
 	}
 	
 	@Test
 	public void byAuthor() {
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.intent("profile/name")
 			.pub("UserA McCloud");
 		
-		assertCount(1, cloudB.newTupleSubscriber().author(userA.publicKey()).tuples());
-		assertCount(0, cloudB.newTupleSubscriber().author(userC.publicKey()).tuples());
+		assertCount(1, tuplesB.newTupleSubscriber().author(userA.publicKey()).tuples());
+		assertCount(0, tuplesB.newTupleSubscriber().author(userC.publicKey()).tuples());
 	}
 	
 	@Test
 	public void differenceAudience() {
 		
-		PrivateKey group = sneerA.createPrivateKey();
+		PrivateKey group = Keys.newPrivateKey();
 		
-		cloudA.newTuplePublisher()
+		tuplesA.newTuplePublisher()
 			.audience(group.publicKey())
 			.intent("chat/message")
 			.pub("hey people!");
 		
-		expectValues(cloudB.newTupleSubscriber().audience(group.publicKey()).tuples(), "hey people!");
-		assertCount(0, cloudB.newTupleSubscriber().author(userC.publicKey()).tuples());
+		expectValues(tuplesB.newTupleSubscriber().audience(group.publicKey()).tuples(), "hey people!");
+		assertCount(0, tuplesB.newTupleSubscriber().author(userC.publicKey()).tuples());
 	}
 	
 }
