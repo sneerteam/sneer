@@ -9,8 +9,9 @@ import sneer.tuples.*;
 
 public class TestsBase {
 	
-	private final TuplesFactoryInProcess factory = new TuplesFactoryInProcess();
-	
+	private final Object session = createSession();
+
+
 	protected final PrivateKey userA = Keys.newPrivateKey();
 	protected final PrivateKey userB = Keys.newPrivateKey();
 	protected final PrivateKey userC = Keys.newPrivateKey();
@@ -20,14 +21,17 @@ public class TestsBase {
 	protected final Tuples tuplesC = init(userC).tuples();
 
 	
-	protected SneerAdmin createSneerAdmin() {
-		return new SneerAdminInProcess(factory);
+	protected SneerAdmin createSneerAdmin(Object session) {
+		return new SneerAdminInProcess((TuplesFactoryInProcess) session);
 	}
 	
+	protected Object createSession() {
+		return new TuplesFactoryInProcess();
+	}
 	
 	private Sneer init(PrivateKey prik) {
 		try {
-			return createSneerAdmin().initialize(prik);
+			return createSneerAdmin(session).initialize(prik);
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
