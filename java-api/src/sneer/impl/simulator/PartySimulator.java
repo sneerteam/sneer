@@ -3,6 +3,7 @@ package sneer.impl.simulator;
 import rx.*;
 import rx.subjects.*;
 import sneer.*;
+import sneer.impl.*;
 import sneer.rx.*;
 
 public class PartySimulator implements Party {
