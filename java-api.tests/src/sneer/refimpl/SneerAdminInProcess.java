@@ -1,6 +1,5 @@
 package sneer.refimpl;
 
-import java.io.*;
 import java.util.*;
 
 import rx.Observable;
@@ -21,7 +20,7 @@ public class SneerAdminInProcess implements SneerAdmin {
 	}
 
 	@Override
-	public Sneer initialize(PrivateKey prik) throws WrongPrivateKey, IOException {
+	public Sneer initialize(PrivateKey prik) {
 		Exceptions.check(privateKey == null);
 		privateKey = prik;
 		

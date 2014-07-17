@@ -1,14 +1,13 @@
 package sneer.impl;
 
-import java.io.*;
-
 import sneer.*;
 import sneer.admin.*;
+import sneer.commons.exceptions.*;
 
 public class SneerAdminImpl implements SneerAdmin {
 
 	@Override
-	public Sneer initialize(PrivateKey prik) throws WrongPrivateKey, IOException {
+	public Sneer initialize(PrivateKey prik) throws FriendlyException {
 		// TODO Auto-generated method stub
 		return null;
 	}
