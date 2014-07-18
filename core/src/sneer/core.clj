@@ -55,13 +55,20 @@
     (newTupleSubscriber [this]
       (new-tuple-subscriber my-tuples))))
 
+(defn visible-to [puk]
+  (fn [tuple]
+    (let [audience (. tuple audience)]
+      (or
+        (nil? audience)
+        (= audience puk)))))
+
 (defn new-sneer-admin [tuples]
   (reify SneerAdmin
     (initialize [this prik]
       (let [puk (. prik publicKey)]
         (reify Sneer
           (tuples [this]
-            (new-tuples tuples (rx/filter #(= (. % audience) puk) tuples))))))))
+            (new-tuples tuples (rx/filter (visible-to puk) tuples))))))))
 
 (defn new-session []
   (ReplaySubject/create))
