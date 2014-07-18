@@ -6,7 +6,7 @@ Getting Started
 - Run this:
 
 ```
-./gradlew eclipse
+./gradlew cleanEclipse eclipse
 ```
 
 - Import the projects into your eclipse
