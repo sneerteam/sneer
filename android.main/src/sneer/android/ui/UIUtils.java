@@ -27,7 +27,6 @@ public class UIUtils {
 		return (V)view.findViewById(id);
 	}
 
-	@SuppressWarnings("unchecked")
 	static public TextView findText(View view, int id) {
 		return (TextView)view.findViewById(id);
 	}

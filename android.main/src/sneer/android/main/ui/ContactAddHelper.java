@@ -1,16 +1,16 @@
 package sneer.android.main.ui;
 
 import sneer.*;
-import sneer.android.main.R;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.view.View;
-import android.widget.EditText;
+import sneer.android.main.*;
+import android.app.*;
+import android.content.*;
+import android.view.*;
+import android.widget.*;
 
 public class ContactAddHelper {
 	
 	public interface AddListener {
-		void add(OldContact contact);
+		void add(Contact contact);
 	}
 	
 	public ContactAddHelper(ManagedContactsActivity context, final AddListener addListener) {
@@ -22,7 +22,7 @@ public class ContactAddHelper {
 			.setTitle(R.string.action_add_contact)
 			.setNegativeButton("Cancel", null)
 			.setPositiveButton("Add", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				addListener.add(new OldContact(publicKeyEdit.getText().toString(), nicknameEdit.getText().toString()));
+				//addListener.add(new Contact(publicKeyEdit.getText().toString(), nicknameEdit.getText().toString()));
 			}})
 			.create();
 		alertDialog.show();

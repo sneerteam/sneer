@@ -1,4 +1,4 @@
-package sneer.android.main.ui.interactions;
+package sneer.android.main.ui;
 
 import static android.os.Build.VERSION.*;
 import static android.os.Build.VERSION_CODES.*;
@@ -9,8 +9,7 @@ import java.util.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
-import sneer.android.ui.*;
-import sneer.rx.*;
+import sneer.android.main.ui.drawable.*;
 import android.annotation.*;
 import android.content.*;
 import android.graphics.*;

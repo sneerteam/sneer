@@ -1,9 +1,7 @@
-package sneer.android.main.ui.interactions;
+package sneer.android.main.ui.drawable;
 
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.drawable.Drawable;
+import android.graphics.*;
+import android.graphics.drawable.*;
 
 public abstract class TriangleDrawable extends Drawable {
 

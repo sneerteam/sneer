@@ -1,11 +1,10 @@
 package sneer.android.main;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
+import android.preference.*;
 
 public class KeyStore {
 

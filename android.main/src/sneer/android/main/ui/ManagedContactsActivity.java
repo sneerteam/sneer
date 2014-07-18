@@ -4,8 +4,8 @@ import static sneer.android.ui.UIUtils.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
-import sneer.Cloud;
 import sneer.Contact;
+import sneer.android.main.*;
 import sneer.android.main.R;
 import sneer.snapi.*;
 import android.app.*;
@@ -30,15 +30,14 @@ public class ManagedContactsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_interaction_list);
 
 		if (getIntent() != null && getIntent().getExtras() != null
 				) {
 			String title;
 			
 			if ((title = getIntent().getExtras().getString(TITLE)) != null) {				
-				setTitle(title);
-				
+				setTitle(title);				
 			}
 		
 		}
@@ -56,7 +55,7 @@ public class ManagedContactsActivity extends Activity {
 			onContactClicked(contact);
 		}});
 
-		SneerSingleton.SNEER.contacts().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Contact>() {  @Override public void call(Contact newContact) {
+		SneerSingleton.SNEER_ADMIN.contacts().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Contact>() {  @Override public void call(Contact newContact) {
 			adapter.add(newContact);
 		}});
 	}

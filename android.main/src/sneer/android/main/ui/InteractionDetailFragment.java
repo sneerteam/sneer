@@ -1,14 +1,12 @@
-package sneer.android.main.ui.interactions;
+package sneer.android.main.ui;
 
 import java.util.*;
 
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
-import sneer.android.main.*;
 import sneer.commons.*;
-import sneer.util.*;
-import android.R;
+import android.*;
 import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
@@ -17,7 +15,7 @@ import android.widget.*;
 
 /**
  * A fragment representing a single Chat detail screen. This fragment is either
- * contained in a {@link InteractionsListActivity} in two-pane mode (on tablets) or a
+ * contained in a {@link InteractionListActivity} in two-pane mode (on tablets) or a
  * {@link InteractionDetailActivity} on handsets.
  */
 public class InteractionDetailFragment extends Fragment {

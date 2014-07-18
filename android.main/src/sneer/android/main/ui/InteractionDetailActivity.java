@@ -1,4 +1,4 @@
-package sneer.android.main.ui.interactions;
+package sneer.android.main.ui;
 
 import android.*;
 import android.content.*;
@@ -9,7 +9,7 @@ import android.view.*;
 /**
  * An activity representing a single Chat detail screen. This activity is only
  * used on handset devices. On tablet-size devices, item details are presented
- * side-by-side with a list of items in a {@link InteractionsListActivity}.
+ * side-by-side with a list of items in a {@link InteractionListActivity}.
  * <p>
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link InteractionDetailFragment}.
@@ -58,7 +58,7 @@ public class InteractionDetailActivity extends FragmentActivity {
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
 			NavUtils.navigateUpTo(this,
-					new Intent(this, InteractionsListActivity.class));
+					new Intent(this, InteractionListActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

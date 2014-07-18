@@ -1,10 +1,10 @@
 package sneer.android.main.ui;
 
 import sneer.android.main.R;
-import sneer.snapi.Cloud;
+import sneer.snapi.*;
 import android.content.*;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Bundle;
+import android.os.*;
 import android.preference.*;
 
 public class ProfileActivity extends PreferenceActivity {

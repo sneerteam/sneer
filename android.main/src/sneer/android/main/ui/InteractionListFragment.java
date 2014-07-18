@@ -1,4 +1,4 @@
-package sneer.android.main.ui.interactions;
+package sneer.android.main.ui;
 
 import java.util.*;
 
@@ -6,7 +6,6 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.commons.*;
-import sneer.util.*;
 import android.app.*;
 import android.os.*;
 import android.support.v4.app.ListFragment;
@@ -23,7 +22,7 @@ import android.widget.*;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class InteractionsListFragment extends ListFragment {
+public class InteractionListFragment extends ListFragment {
 
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
@@ -49,7 +48,7 @@ public class InteractionsListFragment extends ListFragment {
 	
 	
 	private List<Interaction> interactions = new ArrayList<Interaction>();
-	private ArrayAdapter<Interaction> interactionsAdapter;
+	private ArrayAdapter<Interaction> interactionAdapter;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -77,17 +76,17 @@ public class InteractionsListFragment extends ListFragment {
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public InteractionsListFragment() {
+	public InteractionListFragment() {
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		interactionsAdapter = new ArrayAdapter<Interaction>(getActivity(),
+		interactionAdapter = new ArrayAdapter<Interaction>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
 				android.R.id.text1, interactions);
-		setListAdapter(interactionsAdapter);
+		setListAdapter(interactionAdapter);
 		
 	}
 
@@ -154,8 +153,7 @@ public class InteractionsListFragment extends ListFragment {
 		// When setting CHOICE_MODE_SINGLE, ListView will automatically
 		// give items the 'activated' state when touched.
 		getListView().setChoiceMode(
-				activateOnItemClick ? ListView.CHOICE_MODE_SINGLE
-						: ListView.CHOICE_MODE_NONE);
+				activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 	}
 
 
@@ -166,7 +164,7 @@ public class InteractionsListFragment extends ListFragment {
 			interactions.add(interaction);
 			interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() {@Override public void call(InteractionEvent event) {
 				Collections.sort(interactions, BY_TIMESTAMP);
-				interactionsAdapter.notifyDataSetChanged();
+				interactionAdapter.notifyDataSetChanged();
 			}});
 		}
 	}

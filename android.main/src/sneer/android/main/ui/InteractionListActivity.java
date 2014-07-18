@@ -1,17 +1,14 @@
-package sneer.android.main.ui.interactions;
+package sneer.android.main.ui;
 
 import rx.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
-import sneer.android.main.*;
 import sneer.android.main.R;
-import sneer.simulator.*;
 import sneer.snapi.*;
 import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
-import android.util.*;
 import android.view.*;
 import android.widget.*;
 
@@ -24,15 +21,15 @@ import android.widget.*;
  * vertical panes.
  * <p>
  * The activity makes heavy use of fragments. The list of items is a
- * {@link InteractionsListFragment} and the item details (if present) is a
+ * {@link InteractionListFragment} and the item details (if present) is a
  * {@link InteractionDetailFragment}.
  * <p>
  */
 
 //ChatListActivity -> Listar chats
-public class InteractionsListActivity extends FragmentActivity implements InteractionsListFragment.Callbacks {
+public class InteractionListActivity extends FragmentActivity implements InteractionListFragment.Callbacks {
 
-	private static InteractionsListFragment interactionsListFragment;
+	private static InteractionListFragment interactionListFragment;
 
 	/** Whether or not the activity is in two-pane mode, i.e. running on a tablet device. */
 	private boolean mTwoPane;
@@ -75,7 +72,7 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"), Observable.from("joao"));
 
 				interaction.contact(member);
-				interactionsListFragment.addInteraction(interaction);
+				interactionListFragment.addInteraction(interaction);
 			}
 		});
 
@@ -85,16 +82,16 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 				.subscribe(new Action1<Interaction>() {
 					@Override
 					public void call(Interaction interaction) {
-						interactionsListFragment.addInteraction(interaction);
+						interactionListFragment.addInteraction(interaction);
 					}
 				});
 
-		interactionsListFragment = (InteractionsListFragment) getSupportFragmentManager()
+		interactionListFragment = (InteractionListFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.chat_list);
 
 		if (findViewById(R.id.chat_detail_container) != null) {
 			mTwoPane = true;
-			interactionsListFragment.setActivateOnItemClick(true);
+			interactionListFragment.setActivateOnItemClick(true);
 		}
 
 
@@ -102,12 +99,7 @@ public class InteractionsListActivity extends FragmentActivity implements Intera
 	}
 
 
-	protected void log(String string) {
-		Log.d(InteractionsListActivity.class.getSimpleName(), string);
-	}
-
-
-	/** Callback method from {@link InteractionsListFragment.Callbacks} indicating that the item with the given ID was selected. */
+	/** Callback method from {@link InteractionListFragment.Callbacks} indicating that the item with the given ID was selected. */
 	@Override
 	public void onItemSelected(Interaction interaction) {
 

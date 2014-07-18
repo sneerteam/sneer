@@ -83,7 +83,6 @@ public class Cloud {
 
 
 		private CloudNotification asCloudNotification(Contact contact, Object notificationObj) {
-			@SuppressWarnings("unchecked")
 			Map<String, Object> notification = (Map<String, Object>) notificationObj;
 			return new CloudNotification(contact, (CharSequence)notification.get(CONTENT_TEXT), (Long)notification.get(TIMESTAMP), notification.get(PAYLOAD));
 		}
