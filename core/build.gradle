@@ -1,0 +1,49 @@
+apply plugin: "clojure"
+apply plugin: "java"
+apply plugin: "eclipse"
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://clojars.org/repo" }
+    }
+    
+
+    dependencies {
+        classpath "clojuresque:clojuresque:1.7.0"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://clojars.org/repo" }
+}
+
+
+sourceSets { 
+    main { 
+        clojure {
+            srcDir 'src'
+            srcDir 'test'
+            aotCompile = true 
+        }
+        java {
+            srcDir 'src'
+            srcDir 'test'
+        }
+    } 
+}
+
+eclipse.project {
+    natures 'ccw.nature'
+    buildCommand 'ccw.builder'
+}
+
+dependencies {
+    compile 'org.clojure:clojure:1.6.0'
+    compile 'org.clojure:java.jdbc:0.3.4'
+    compile 'org.xerial:sqlite-jdbc:3.7.2'
+    compile 'com.netflix.rxjava:rxjava-clojure:0.19.6'
+    compile project(':java-api')
+    compile project(':java-api.tests')
+}
