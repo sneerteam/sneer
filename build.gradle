@@ -17,7 +17,7 @@ subprojects {
     afterEvaluate {
 	if (plugins.hasPlugin('android-library') || plugins.hasPlugin('android')) {
 	    task configureAndroidForEclipseTask << {
-	        //configureAndroidForEclipse(project)    
+	        //configureAndroidForEclipse(project)
 	        new File("project.properties").withWriter { writer ->
 	            writer << "target=${android.compileSdkVersion}\n"
 	            if (plugins.hasPlugin('android-library')) {
@@ -37,7 +37,7 @@ subprojects {
 		            buildCommand 'com.android.ide.eclipse.adt.PreCompilerBuilder'
 		            buildCommand 'com.android.ide.eclipse.adt.ApkBuilder'
 		        }
-		    
+
 		        classpath {
 		            file {
 		                withXml {
@@ -47,17 +47,17 @@ subprojects {
 		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK'])
 		                    node.appendNode('classpathentry', [kind: 'src', path: 'src'])
 		                    node.appendNode('classpathentry', [kind: 'src', path: 'gen'])
-		                    
+
 		                    configurations.each { conf ->
 		                        conf.dependencies.find {it instanceof ExternalModuleDependency}.collect{configurations.compile.files(it)}.flatten().each { f ->
 		                            node.appendNode('classpathentry', [kind: 'lib', path: f, exported: true])
 		                        }
 		                    }
-		                    
+
 		                    configurations.compile.dependencies.find {it instanceof ProjectDependency}.each {
-		                        node.appendNode('classpathentry', [kind: 'lib', path: "/${it.dependencyProject.name}", exported: true])
+		                        node.appendNode('classpathentry', [kind: 'src', path: "/${it.dependencyProject.name}", exported: true])
 		                    }
-		                    
+
 		                }
 		            }
 		        }
