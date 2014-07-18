@@ -18,6 +18,7 @@
   (reify+ Tuple
     (tuple-getter intent)
     (tuple-getter audience)
+    (tuple-getter author)
     (tuple-getter value)))
 
 (defmacro publisher-attr [a]
@@ -25,7 +26,6 @@
        (~'with ~(name a) ~a)))
 
 (defn new-tuple-publisher
-  ([tuples] (new-tuple-publisher tuples {}))
   ([tuples attrs]
     (letfn
       [(with [attr value]
@@ -40,18 +40,22 @@
            (. tuples onNext (->tuple attrs))
            this)))))
 
+(defmacro subscriber-filter [attr]
+  `(~attr [~'this ~'expected]
+     (new-tuple-subscriber
+       (rx/filter #(= (. % ~attr) ~'expected) ~'tuples))))
+
 (defn new-tuple-subscriber [tuples]
-  (reify TupleSubscriber
-    (intent [this expected]
-      (new-tuple-subscriber
-        (rx/filter #(= (. % intent) expected) tuples)))
+  (reify+ TupleSubscriber
+    (subscriber-filter intent)
+    (subscriber-filter author)
     (tuples [this]
       tuples)))
 
-(defn new-tuples [all-tuples my-tuples]
+(defn new-tuples [own-puk all-tuples my-tuples]
   (reify Tuples
     (newTuplePublisher [this]
-      (new-tuple-publisher all-tuples))
+      (new-tuple-publisher all-tuples {"author" own-puk}))
     (newTupleSubscriber [this]
       (new-tuple-subscriber my-tuples))))
 
@@ -68,7 +72,7 @@
       (let [puk (. prik publicKey)]
         (reify Sneer
           (tuples [this]
-            (new-tuples tuples (rx/filter (visible-to puk) tuples))))))))
+            (new-tuples puk tuples (rx/filter (visible-to puk) tuples))))))))
 
 (defn new-session []
   (ReplaySubject/create))
