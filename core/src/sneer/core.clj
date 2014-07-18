@@ -40,25 +40,6 @@
            (. tuples onNext (->tuple attrs))
            this)))))
 
-(defmacro subscriber-filter [attr]
-  `(~attr [~'this ~'expected]
-     (new-tuple-subscriber
-       (rx/filter #(= (. % ~attr) ~'expected) ~'tuples))))
-
-(defn new-tuple-subscriber [tuples]
-  (reify+ TupleSubscriber
-    (subscriber-filter intent)
-    (subscriber-filter author)
-    (tuples [this]
-      tuples)))
-
-(defn new-tuples [own-puk tuples-out tuples-in]
-  (reify Tuples
-    (newTuplePublisher [this]
-      (new-tuple-publisher tuples-out {"author" own-puk}))
-    (newTupleSubscriber [this]
-      (new-tuple-subscriber tuples-in))))
-
 (defn visible-to [puk]
   (fn [tuple]
     (let [audience (. tuple audience)]
@@ -66,13 +47,34 @@
         (nil? audience)
         (= audience puk)))))
 
+(defmacro subscriber-filter [attr]
+  `(~attr [~'this ~'expected]
+     (new-tuple-subscriber
+       ~'own-puk
+       (rx/filter #(= (. % ~attr) ~'expected) ~'tuples))))
+
+(defn new-tuple-subscriber [own-puk tuples]
+  (reify+ TupleSubscriber
+    (subscriber-filter intent)
+    (subscriber-filter author)
+    (subscriber-filter audience)
+    (tuples [this]
+      (rx/filter (visible-to own-puk) tuples))))
+
+(defn new-tuples [own-puk tuples]
+  (reify Tuples
+    (newTuplePublisher [this]
+      (new-tuple-publisher tuples {"author" own-puk}))
+    (newTupleSubscriber [this]
+      (new-tuple-subscriber own-puk tuples))))
+
 (defn new-sneer-admin [tuples]
   (reify SneerAdmin
     (initialize [this prik]
       (let [puk (. prik publicKey)]
         (reify Sneer
           (tuples [this]
-            (new-tuples puk tuples (rx/filter (visible-to puk) tuples))))))))
+            (new-tuples puk tuples)))))))
 
 (defn new-session []
   (ReplaySubject/create))
