@@ -1,0 +1,78 @@
+apply plugin: 'android'
+apply plugin: 'eclipse'
+
+group = 'me.sneer'
+version = "0.0.1"
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.10.0+'
+    }
+}
+
+eclipse {
+
+    project {
+	    natures 'com.android.ide.eclipse.adt.AndroidNature'
+	    buildCommand 'com.android.ide.eclipse.adt.ResourceManagerBuilder'
+	    buildCommand 'com.android.ide.eclipse.adt.PreCompilerBuilder'
+	    buildCommand 'com.android.ide.eclipse.adt.ApkBuilder'
+	}
+
+    classpath {
+        file {
+            withXml {
+                def node = it.asNode()
+                node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.LIBRARIES', exported: true])
+                node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.DEPENDENCIES', exported: true])
+                node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK'])
+                node.appendNode('classpathentry', [kind: 'src', path: 'src'])
+                node.appendNode('classpathentry', [kind: 'src', path: 'gen'])
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+  libs
+  compile.extendsFrom libs
+}
+
+dependencies {
+    libs 'us.bpsm:edn-java:0.4.4'
+    libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+    
+    defaultConfig {
+	    minSdkVersion 15
+	    targetSdkVersion 19
+	 }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+}
