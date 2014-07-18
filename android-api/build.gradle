@@ -1,6 +1,7 @@
 apply plugin: 'android-library'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'eclipse'
 
 def originalVersion = "0.1.1"
 
@@ -45,6 +46,7 @@ configurations {
 dependencies {
     libs 'us.bpsm:edn-java:0.4.4'
     libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+    compile project(':java-api')
 }
 
 android {

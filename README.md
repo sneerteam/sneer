@@ -1,3 +1,12 @@
-Qual é a real do gradle no raiz do sneer? É só rodar ele q ele já prepara tudo? Preciso rodar com a opcao eclipse p gerar os projetos?sneer
+Getting Started
+====
 
-Please answer these questions here in English. :)
+- Install Java and the Eclipse-based Android SDK
+- Install counterclockwise Eclipse plugin for clojure
+- Run this:
+
+```
+./gradlew cleanEclipse eclipse
+```
+
+- Import the projects into your eclipse
