@@ -1,5 +1,8 @@
 package sneer.android.main;
 
+import sneer.admin.*;
+import sneer.impl.simulator.*;
+
 
 public class SneerSingleton {
 	
