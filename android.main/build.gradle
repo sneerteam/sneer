@@ -18,41 +18,13 @@ buildscript {
     }
 }
 
-eclipse {
-
-    project {
-	    natures 'com.android.ide.eclipse.adt.AndroidNature'
-	    buildCommand 'com.android.ide.eclipse.adt.ResourceManagerBuilder'
-	    buildCommand 'com.android.ide.eclipse.adt.PreCompilerBuilder'
-	    buildCommand 'com.android.ide.eclipse.adt.ApkBuilder'
-	}
-
-    classpath {
-        file {
-            withXml {
-                def node = it.asNode()
-                node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.LIBRARIES', exported: true])
-                node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.DEPENDENCIES', exported: true])
-                node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK'])
-                node.appendNode('classpathentry', [kind: 'src', path: 'src'])
-                node.appendNode('classpathentry', [kind: 'src', path: 'gen'])
-            }
-        }
-    }
-}
-
 repositories {
     mavenCentral()
 }
 
-configurations {
-  libs
-  compile.extendsFrom libs
-}
-
 dependencies {
-    libs 'us.bpsm:edn-java:0.4.4'
-    libs 'com.netflix.rxjava:rxjava-android:0.17.5'
+    compile 'us.bpsm:edn-java:0.4.4'
+    compile project(':android-api')
 }
 
 android {

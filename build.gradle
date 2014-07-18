@@ -1,3 +1,6 @@
+import java.nio.file.*;
+import org.gradle.api.artifacts.*;
+
 buildscript {
     repositories {
         mavenCentral()
@@ -7,5 +10,60 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+    }
+}
+
+subprojects {
+    afterEvaluate {
+	if (plugins.hasPlugin('android-library') || plugins.hasPlugin('android')) {
+	    task configureAndroidForEclipseTask << {
+	        //configureAndroidForEclipse(project)    
+	        new File("project.properties").withWriter { writer ->
+	            writer << "target=${android.compileSdkVersion}\n"
+	            if (plugins.hasPlugin('android-library')) {
+	                writer << "android.library=true\n"
+	            }
+	            def count = 0;
+	            configurations.compile.dependencies.find {it instanceof ProjectDependency}.find{it.dependencyProject.plugins.hasPlugin('android-library')}.each {
+	                count++
+	                def relative = Paths.get(projectDir.toURI()).relativize(Paths.get(it.dependencyProject.projectDir.toURI())).toString()
+	                writer << "android.library.reference.${count}=${relative}\n"
+	            }
+	        }
+		    eclipse {
+		        project {
+		            natures 'com.android.ide.eclipse.adt.AndroidNature'
+		            buildCommand 'com.android.ide.eclipse.adt.ResourceManagerBuilder'
+		            buildCommand 'com.android.ide.eclipse.adt.PreCompilerBuilder'
+		            buildCommand 'com.android.ide.eclipse.adt.ApkBuilder'
+		        }
+		    
+		        classpath {
+		            file {
+		                withXml {
+		                    def node = it.asNode()
+		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.LIBRARIES', exported: true])
+		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.DEPENDENCIES', exported: true])
+		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK'])
+		                    node.appendNode('classpathentry', [kind: 'src', path: 'src'])
+		                    node.appendNode('classpathentry', [kind: 'src', path: 'gen'])
+		                    
+		                    configurations.each { conf ->
+		                        conf.dependencies.find {it instanceof ExternalModuleDependency}.collect{configurations.compile.files(it)}.flatten().each { f ->
+		                            node.appendNode('classpathentry', [kind: 'lib', path: f, exported: true])
+		                        }
+		                    }
+		                    
+		                    configurations.compile.dependencies.find {it instanceof ProjectDependency}.each {
+		                        node.appendNode('classpathentry', [kind: 'lib', path: "/${it.dependencyProject.name}", exported: true])
+		                    }
+		                    
+		                }
+		            }
+		        }
+		    }
+	    }
+	    tasks.eclipse.dependsOn(configureAndroidForEclipseTask)
+    }
     }
 }
