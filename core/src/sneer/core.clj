@@ -5,12 +5,24 @@
            [sneer.tuples Tuple Tuples TuplePublisher TupleSubscriber]
            [rx.subjects ReplaySubject]))
 
+(defmacro reify+
+  "expands to reify form after macro expanding the body"
+  [& body]  
+  `(reify ~@(map macroexpand body)))
+
+(defmacro tuple-getter [g]
+  `(~g [~'this]
+       (get ~'attrs ~(name g))))
+
 (defn ->tuple [attrs]
-  (reify Tuple
-    (intent [this]
-      (get attrs "intent"))
-    (value [this]
-      (get attrs "value"))))
+  (reify+ Tuple
+    (tuple-getter intent)
+    (tuple-getter audience)
+    (tuple-getter value)))
+
+(defmacro publisher-attr [a]
+  `(~a [~'this ~a]
+       (~'with ~(name a) ~a)))
 
 (defn new-tuple-publisher
   ([tuples] (new-tuple-publisher tuples {}))
@@ -18,13 +30,10 @@
     (letfn
       [(with [attr value]
           (new-tuple-publisher tuples (assoc attrs attr value)))]
-      (reify TuplePublisher
-        (intent [this intent]
-          (with "intent" intent))
-        (audience [this audience]
-          (with "audience" audience))
-        (value [this value]
-          (with "value" value))
+      (reify+ TuplePublisher
+        (publisher-attr intent)
+        (publisher-attr audience)
+        (publisher-attr value)
         (pub [this value]
             (.. this (value value) pub))
         (pub [this]
