@@ -198,6 +198,7 @@ public class SimpleP2P extends TestsBase {
 	}
 	
 	@Test
+	@Ignore("public tuples?")
 	public void publicTuples() {
 		
 		tuplesA.newTuplePublisher()

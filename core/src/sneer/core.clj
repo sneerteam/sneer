@@ -48,19 +48,20 @@
     (tuples [this]
       tuples)))
 
-(defn new-tuples [tuples]
+(defn new-tuples [all-tuples my-tuples]
   (reify Tuples
     (newTuplePublisher [this]
-      (new-tuple-publisher tuples))
+      (new-tuple-publisher all-tuples))
     (newTupleSubscriber [this]
-      (new-tuple-subscriber tuples))))
+      (new-tuple-subscriber my-tuples))))
 
 (defn new-sneer-admin [tuples]
   (reify SneerAdmin
-      (initialize [this pk]
+    (initialize [this prik]
+      (let [puk (. prik publicKey)]
         (reify Sneer
           (tuples [this]
-            (new-tuples tuples))))))
+            (new-tuples tuples (rx/filter #(= (. % audience) puk) tuples))))))))
 
 (defn new-session []
   (ReplaySubject/create))

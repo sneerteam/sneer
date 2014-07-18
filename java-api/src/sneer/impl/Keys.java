@@ -12,6 +12,13 @@ public class Keys {
 		
 		return new PrivateKey() {
 			
+			final PublicKey publicKey = new PublicKey() {
+				@Override
+				public String toString() {
+					return "PUK:" + number;
+				}
+			};
+			
 			@Override
 			public String toString() {
 				return "PRIK:" + number;
@@ -19,14 +26,8 @@ public class Keys {
 
 			@Override
 			public PublicKey publicKey() {
-				return new PublicKey() {
-					@Override
-					public String toString() {
-						return "PUK:" + number;
-					}
-				};
-			}
-			
+				return publicKey;
+			}			
 		};
 	}
 
