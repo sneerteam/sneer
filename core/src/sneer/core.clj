@@ -35,10 +35,10 @@
         (publisher-attr audience)
         (publisher-attr value)
         (pub [this value]
-            (.. this (value value) pub))
+           (.. this (value value) pub))
         (pub [this]
-            (. tuples onNext (->tuple attrs))
-            this)))))
+           (. tuples onNext (->tuple attrs))
+           this)))))
 
 (defn new-tuple-subscriber [tuples]
   (reify TupleSubscriber
