@@ -94,8 +94,8 @@ public class TuplesFactoryInProcess {
 			}
 
 			@Override
-			public TupleSubscriber audience(PublicKey audience) {
-				where("audience", audience);
+			public TupleSubscriber audience(PrivateKey audience) {
+				where("audience", audience.publicKey());
 				return this;
 			}
 

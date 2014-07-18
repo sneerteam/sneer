@@ -230,8 +230,8 @@ public class SimpleP2P extends TestsBase {
 			.intent("chat/message")
 			.pub("hey people!");
 		
-		expectValues(tuplesB.newTupleSubscriber().audience(group.publicKey()).tuples(), "hey people!");
 		assertCount(0, tuplesB.newTupleSubscriber().author(userC.publicKey()).tuples());
+		expectValues(tuplesB.newTupleSubscriber().audience(group).tuples(), "hey people!");
 	}
 	
 }
