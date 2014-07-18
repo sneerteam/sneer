@@ -52,12 +52,12 @@
     (tuples [this]
       tuples)))
 
-(defn new-tuples [own-puk all-tuples my-tuples]
+(defn new-tuples [own-puk tuples-out tuples-in]
   (reify Tuples
     (newTuplePublisher [this]
-      (new-tuple-publisher all-tuples {"author" own-puk}))
+      (new-tuple-publisher tuples-out {"author" own-puk}))
     (newTupleSubscriber [this]
-      (new-tuple-subscriber my-tuples))))
+      (new-tuple-subscriber tuples-in))))
 
 (defn visible-to [puk]
   (fn [tuple]
