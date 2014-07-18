@@ -14,7 +14,7 @@ public abstract class SneerBase implements Sneer {
 		Observable<String> ret = contact != null
 			? contact.nickname().observable()
 			: Observable.from("? PublicKey: " + party.publicKey().mostRecent());
-		return new Observed<String>(ret);
+		return ObservedSubject.create(ret.toBlockingObservable().first()).observed();
 	}
 
 }
