@@ -63,19 +63,23 @@ public class TuplesFactoryInProcess {
 			private Map<String, Object> where = new HashMap<String, Object>();
 			
 			{
-				where.put("audience", identity.publicKey());
+				where("audience", null);
 			}
-
+			
 			@Override
 			public Observable<Tuple> tuples() {
 				Observable<Tuple> t = tuples;
-				for (final Entry<String, Object> criteria : where.entrySet()) {
+				for (final Entry<String, Object> criterion : where.entrySet()) {
 					t = t.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
-						Object tupleValue = t1.get(criteria.getKey());
-						if (tupleValue == null && criteria.getKey().equals("audience")) {
-							return true;
+						String key = criterion.getKey();
+						Object tupleValue = t1.get(key);
+						Object value = criterion.getValue();
+						if (key.equals("audience") && value == null) {
+							return tupleValue == null || tupleValue.equals(identity.publicKey());
 						}
-						return tupleValue.equals(criteria.getValue());
+						return tupleValue == null
+							? value == null
+							: tupleValue.equals(value);
 					}});
 				}
 				return t;

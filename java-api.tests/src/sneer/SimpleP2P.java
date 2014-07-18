@@ -234,4 +234,15 @@ public class SimpleP2P extends TestsBase {
 		expectValues(tuplesB.newTupleSubscriber().audience(group).tuples(), "hey people!");
 	}
 	
+	@Test
+	public void audienceIgnoresPublic() {
+		
+		tuplesA.newTuplePublisher()
+			.intent("chat/message")
+			.pub("hey people!");
+		
+		PrivateKey group = Keys.newPrivateKey();
+		assertCount(0, tuplesB.newTupleSubscriber().audience(group).tuples());
+	}
+	
 }
