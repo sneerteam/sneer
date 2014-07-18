@@ -9,8 +9,7 @@ public class TupleUtils {
 	}};
 
 	public static Func1<Tuple, String> TO_INTENT = new Func1<Tuple, String>() { @Override public String call(Tuple t) {
-		throw new RuntimeException("FixMe");
-		//return t.intent();
+		return t.intent();
 	}};
 
 }
