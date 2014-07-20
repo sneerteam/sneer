@@ -9,9 +9,9 @@ Getting Started
 ```
 ./reset-environment.sh
 ```
-You can run this every time you want a clean rebuild.
+You can run the above every time you want a clean rebuild.
 
-- Import all projects contained in the repository into the Eclipse workspace.
+- Import all projects contained in this repository into the Eclipse workspace.
 
 (Optional) To work on the Sneer core in Clojure:
 - Install the [Counterclockwise](http://code.google.com/p/counterclockwise/) Clojure plugin for Eclipse.
