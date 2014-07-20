@@ -9,6 +9,7 @@ Getting Started
 ```
 ./reset-environment.sh
 ```
+You can run this every time you want a clean rebuild.
 
 - Import all projects contained in the repository into the Eclipse workspace.
 
