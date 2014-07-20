@@ -10,7 +10,7 @@ Getting Started
 ./reset-environment.sh
 ```
 
-- Import all projects into your eclipse
+- Import all projects contained in the repository into the Eclipse workspace.
 
-Optional, to work on the Sneer core in Clojure:
-- Install counterclockwise Eclipse plugin for clojure
+(Optional) To work on the Sneer core in Clojure:
+- Install the [Counterclockwise](http://code.google.com/p/counterclockwise/) Clojure plugin for Eclipse.
