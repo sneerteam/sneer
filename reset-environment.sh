@@ -1,7 +1,9 @@
+#Delete all untracked files and directories (-d), even ignored ones (-x).
 git clean -x -d --force --quiet
+
+#Revert all modified files.
 git reset --hard
+
 git pull --rebase
 
-#Is "gradlew" necessary before "gradlew eclipse"?
-./gradlew
-./gradlew eclipse
+./gradlew cleanEclipse eclipse
