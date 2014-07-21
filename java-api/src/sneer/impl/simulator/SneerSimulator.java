@@ -1,6 +1,7 @@
 package sneer.impl.simulator;
 
 import static sneer.Contact.*;
+import static sneer.Interaction.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -114,7 +115,7 @@ public class SneerSimulator extends SneerBase {
 	
 	private List<Interaction> interactionsSorted() {
 		ArrayList<Interaction> ret = new ArrayList<Interaction>(interactionsByParty.values());
-		Collections.sort(ret, Interaction.MOST_RECENT_FIRST);
+		Collections.sort(ret, MOST_RECENT_FIRST);
 		return ret;
 	}
 
