@@ -10,6 +10,9 @@ version = originalVersion
 description = 'API for Sneer, the sovereign platform.' 
 ext.packaging = 'jar'
 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
 def SONATYPE_RELEASE_URL = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 def SONATYPE_SNAPSHOT_URL = "https://oss.sonatype.org/content/repositories/snapshots/"
 
