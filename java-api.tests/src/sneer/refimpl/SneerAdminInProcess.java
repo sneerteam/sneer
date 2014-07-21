@@ -40,7 +40,7 @@ public class SneerAdminInProcess implements SneerAdmin {
 			@Override public Observable<Collection<Interaction>> interactions() { return untested(); }
 			@Override public Contact findContact(Party party) { return untested(); }
 			@Override public Observable<Collection<Contact>> contacts() { return untested(); }
-			@Override public void addContact(String nickname, Party party) { untested(); }
+			@Override public void setContact(String nickname, Party party) { untested(); }
 		};
 	}
 

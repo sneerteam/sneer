@@ -34,13 +34,6 @@ public class ContactSimulator implements Contact {
 	}
 
 
-	@Override
-	public void setNickname(String newNickname) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 //	@Override public Observable<String> nickname() { return nickname; }
 //	@Override public void setNickname(String newNickname) { nickname.onNext(newNickname); }
 //	
