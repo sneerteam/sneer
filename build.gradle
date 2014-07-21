@@ -51,12 +51,10 @@ subprojects {
 		                        conf.dependencies.findAll {it instanceof ExternalModuleDependency}.collect{conf.files(it)}.flatten().each { f ->
 		                            node.appendNode('classpathentry', [kind: 'lib', path: f, exported: true])
 		                        }
+			                    conf.dependencies.findAll {it instanceof ProjectDependency}.each {
+			                        node.appendNode('classpathentry', [kind: 'src', path: "/${it.dependencyProject.name}", exported: true])
+			                    }
 		                    }
-
-		                    configurations.compile.dependencies.findAll {it instanceof ProjectDependency}.each {
-		                        node.appendNode('classpathentry', [kind: 'src', path: "/${it.dependencyProject.name}", exported: true])
-		                    }
-
 		                }
 		            }
 		        }
