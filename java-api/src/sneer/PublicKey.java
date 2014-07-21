@@ -1,5 +1,7 @@
 package sneer;
 
-public interface PublicKey {
+import java.io.*;
+
+public interface PublicKey extends Serializable {
 
 }
