@@ -1,4 +1,4 @@
-package sneer.commons;
+package sneer.commons.exceptions;
 
 
 public class Exceptions {

@@ -2,7 +2,6 @@ package sneer.impl.simulator;
 
 import rx.*;
 import sneer.*;
-import sneer.impl.*;
 import sneer.rx.*;
 
 public class PartySimulator implements Party {
@@ -11,18 +10,11 @@ public class PartySimulator implements Party {
 
 	/** The name this Party gives itself. */
 	private final ObservedSubject<String> name;
-
 	
 	
-	public PartySimulator(PublicKey puk) {
-		this.publicKey = ObservedSubject.create(puk);
-		this.name = ObservedSubject.create("No name set yet (Puk " + puk + ")");
-	}
-
-	public PartySimulator(String partyName) {
-		PrivateKey prik = Keys.createPrivateKey();
+	public PartySimulator(String name, PrivateKey prik) {
 		this.publicKey = ObservedSubject.create(prik.publicKey());
-		this.name = ObservedSubject.create(partyName);
+		this.name = ObservedSubject.create(name);
 	}
 	
 	

@@ -8,6 +8,7 @@ import java.io.*;
 import org.junit.*;
 
 import sneer.impl.*;
+import sneer.impl.keys.*;
 import sneer.tuples.*;
 
 public class SimpleP2P extends TestsBase {

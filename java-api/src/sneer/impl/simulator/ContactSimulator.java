@@ -1,22 +1,16 @@
 package sneer.impl.simulator;
 
-import rx.subjects.*;
 import sneer.*;
 import sneer.rx.*;
 
 public class ContactSimulator implements Contact {
 
 	private final Party party;
-	private final Subject<String, String> nickname;
+	private final ObservedSubject<String> nickname;
 
 	
-	ContactSimulator(String nickname, String partyName) {
-		this(nickname, new PartySimulator(partyName));
-	}
-	
-	
-	public ContactSimulator(String nickname, Party party) {
-		this.nickname = BehaviorSubject.create(nickname);
+	ContactSimulator(String nickname, Party party) {
+		this.nickname = ObservedSubject.create(nickname);
 		this.party = party;
 	}
 
@@ -29,8 +23,7 @@ public class ContactSimulator implements Contact {
 
 	@Override
 	public Observed<String> nickname() {
-		// TODO Auto-generated method stub
-		return null;
+		return nickname.observed();
 	}
 
 

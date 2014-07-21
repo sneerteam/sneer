@@ -1,6 +1,6 @@
 package sneer.impl.simulator;
 
-import static sneer.commons.Exceptions.*;
+import static sneer.commons.exceptions.Exceptions.*;
 import sneer.*;
 import sneer.admin.*;
 
@@ -13,7 +13,7 @@ public class SneerAdminSimulator implements SneerAdmin {
 	public Sneer initialize(PrivateKey prik) {
 		check(privateKey == null);
 		privateKey = prik;
-		sneer = new SneerSimulator(privateKey.publicKey());
+		sneer = new SneerSimulator(privateKey);
 		return sneer;
 	}
 

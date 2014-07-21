@@ -4,6 +4,7 @@ import static sneer.ObservableTestUtils.*;
 import rx.*;
 import sneer.admin.*;
 import sneer.impl.*;
+import sneer.impl.keys.*;
 import sneer.refimpl.*;
 import sneer.tuples.*;
 

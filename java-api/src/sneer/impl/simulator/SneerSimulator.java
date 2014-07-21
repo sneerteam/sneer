@@ -7,6 +7,7 @@ import rx.Observable;
 import rx.subjects.*;
 import sneer.*;
 import sneer.impl.*;
+import sneer.impl.keys.*;
 import sneer.tuples.*;
 
 public class SneerSimulator extends SneerBase {
@@ -17,8 +18,10 @@ public class SneerSimulator extends SneerBase {
 	private final PartySimulator self;
 
 	
-	public SneerSimulator(PublicKey puk) {
-		self = new PartySimulator(puk);
+	public SneerSimulator(PrivateKey privateKey) {
+		self = new PartySimulator("Neide da Silva", privateKey);
+		
+		populate("Maicon", "Wesley", "Carla");
 	}
 	
 	
@@ -101,4 +104,14 @@ public class SneerSimulator extends SneerBase {
 	}
 
 	
+	private void populate(String... newContactNicks) {
+		for (String nick : newContactNicks) {
+			PrivateKey prik = Keys.createPrivateKey(nick);
+			String name = nick + " da Silva";
+			setContact(nick, new PartySimulator(name, prik));
+		}
+	}
+
 }
+
+
