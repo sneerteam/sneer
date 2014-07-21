@@ -11,9 +11,9 @@ public class TestsBase {
 	
 	private final Object session = createSession();
 
-	protected final PrivateKey userA = Keys.newPrivateKey();
-	protected final PrivateKey userB = Keys.newPrivateKey();
-	protected final PrivateKey userC = Keys.newPrivateKey();
+	protected final PrivateKey userA = Keys.createPrivateKey();
+	protected final PrivateKey userB = Keys.createPrivateKey();
+	protected final PrivateKey userC = Keys.createPrivateKey();
 	
 	protected final Tuples tuplesA = init(userA).tuples();
 	protected final Tuples tuplesB = init(userB).tuples();

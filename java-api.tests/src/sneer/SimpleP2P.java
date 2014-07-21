@@ -223,7 +223,7 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void differenceAudience() {
 		
-		PrivateKey group = Keys.newPrivateKey();
+		PrivateKey group = Keys.createPrivateKey();
 		
 		tuplesA.newTuplePublisher()
 			.audience(group.publicKey())
@@ -241,7 +241,7 @@ public class SimpleP2P extends TestsBase {
 			.intent("chat/message")
 			.pub("hey people!");
 		
-		PrivateKey group = Keys.newPrivateKey();
+		PrivateKey group = Keys.createPrivateKey();
 		assertCount(0, tuplesB.newTupleSubscriber().audience(group).tuples());
 	}
 	

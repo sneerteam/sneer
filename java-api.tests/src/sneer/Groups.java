@@ -11,7 +11,7 @@ public class Groups extends TestsBase {
 	@Test
 	public void targetAudience() {
 		
-		PrivateKey group = Keys.newPrivateKey();
+		PrivateKey group = Keys.createPrivateKey();
 		
 		tuplesA.newTuplePublisher()
 			.audience(group.publicKey())
@@ -28,8 +28,8 @@ public class Groups extends TestsBase {
 	@Test
 	public void noLeaks() {
 		
-		PrivateKey group1 = Keys.newPrivateKey();
-		PrivateKey group2 = Keys.newPrivateKey();
+		PrivateKey group1 = Keys.createPrivateKey();
+		PrivateKey group2 = Keys.createPrivateKey();
 		
 		tuplesA.newTuplePublisher()
 			.audience(group1.publicKey())

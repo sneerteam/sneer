@@ -6,7 +6,7 @@ public class Keys {
 
 	private static int nextNumber = 1;
 
-	public static PrivateKey newPrivateKey() {
+	public static PrivateKey createPrivateKey() {
 		
 		final long number = nextNumber++;
 		

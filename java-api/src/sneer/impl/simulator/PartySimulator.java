@@ -20,7 +20,7 @@ public class PartySimulator implements Party {
 	}
 
 	public PartySimulator(String partyName) {
-		PrivateKey prik = Keys.newPrivateKey();
+		PrivateKey prik = Keys.createPrivateKey();
 		this.publicKey = ObservedSubject.create(prik.publicKey());
 		this.name = ObservedSubject.create(partyName);
 	}
