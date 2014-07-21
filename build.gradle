@@ -15,7 +15,7 @@ allprojects {
 
 subprojects {
     afterEvaluate {
-	if (plugins.hasPlugin('android-library') || plugins.hasPlugin('android')) {
+	if (plugins.hasPlugin('eclipse') && (plugins.hasPlugin('android-library') || plugins.hasPlugin('android'))) {
 	    task configureAndroidForEclipseTask << {
 	        new File("project.properties").withWriter { writer ->
 	            writer << "target=${android.compileSdkVersion}\n"
@@ -23,11 +23,13 @@ subprojects {
 	                writer << "android.library=true\n"
 	            }
 	            def count = 0;
-	            configurations.compile.dependencies.findAll {it instanceof ProjectDependency}.findAll{it.dependencyProject.plugins.hasPlugin('android-library')}.each {
-	                count++
-	                def relative = Paths.get(projectDir.toURI()).relativize(Paths.get(it.dependencyProject.projectDir.toURI())).toString()
-	                writer << "android.library.reference.${count}=${relative}\n"
-	            }
+				configurations.each { conf ->
+		            conf.dependencies.findAll {it instanceof ProjectDependency}.findAll{it.dependencyProject.plugins.hasPlugin('android-library')}.each {
+		                count++
+		                def relative = Paths.get(projectDir.toURI()).relativize(Paths.get(it.dependencyProject.projectDir.toURI())).toString()
+		                writer << "android.library.reference.${count}=${relative}\n"
+		            }
+		        }
 	        }
 		    eclipse {
 		        project {
