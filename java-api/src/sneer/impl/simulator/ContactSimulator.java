@@ -27,6 +27,11 @@ public class ContactSimulator implements Contact {
 	}
 
 
+	void setNickname(String newNickname) {
+		nickname.set(newNickname);
+	}
+
+
 //	@Override public Observable<String> nickname() { return nickname; }
 //	@Override public void setNickname(String newNickname) { nickname.onNext(newNickname); }
 //	

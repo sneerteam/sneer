@@ -1,5 +1,7 @@
 package sneer.impl.simulator;
 
+import static sneer.Contact.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -12,10 +14,15 @@ import sneer.tuples.*;
 
 public class SneerSimulator extends SneerBase {
 
+	private final PartySimulator self;
+
 	private final Map<PublicKey, Party> partiesByPuk = new ConcurrentHashMap<PublicKey, Party>();
+
+	private final Map<Party, ContactSimulator> contactsByParty = new ConcurrentHashMap<Party, ContactSimulator>();
+	private final BehaviorSubject<List<Contact>> contacts = BehaviorSubject.create(contactsSorted());
+
 	private final Map<Party, Interaction> interactionsByParty = new ConcurrentHashMap<Party, Interaction>();
 	private final BehaviorSubject<List<Interaction>> interactions = BehaviorSubject.create(interactionsNow());
-	private final PartySimulator self;
 
 	
 	public SneerSimulator(PrivateKey privateKey) {
@@ -68,22 +75,32 @@ public class SneerSimulator extends SneerBase {
 
 	@Override
 	public Contact findContact(Party party) {
-		// TODO Auto-generated method stub
-		return null;
+		return contactsByParty.get(party);
 	}
 
 
 	@Override
 	public void setContact(String nickname, Party party) {
-		// TODO Auto-generated method stub
-		
+		synchronized (contactsByParty) {
+			ContactSimulator c = contactsByParty.get(party);
+			if (c == null) {
+				c = new ContactSimulator(nickname, party);
+				contactsByParty.put(party, c);
+			}
+			c.setNickname(nickname);
+			notifyContactsSubscribers();
+		}
+	}
+
+
+	private void notifyContactsSubscribers() {
+		contacts.onNext(contactsSorted());
 	}
 
 
 	@Override
 	public Observable<List<Contact>> contacts() {
-		// TODO Auto-generated method stub
-		return null;
+		return contacts.asObservable();
 	}
 
 
@@ -104,6 +121,13 @@ public class SneerSimulator extends SneerBase {
 	}
 
 	
+	private List<Contact> contactsSorted() {
+		ArrayList<Contact> ret = new ArrayList<Contact>(contactsByParty.values());
+		Collections.sort(ret, BY_NICKNAME);
+		return ret;
+	}
+
+	
 	private void populate(String... newContactNicks) {
 		for (String nick : newContactNicks) {
 			PrivateKey prik = Keys.createPrivateKey(nick);
@@ -113,5 +137,3 @@ public class SneerSimulator extends SneerBase {
 	}
 
 }
-
-
