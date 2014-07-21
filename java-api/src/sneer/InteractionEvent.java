@@ -3,11 +3,18 @@ package sneer;
 import java.text.*;
 import java.util.*;
 
+import sneer.commons.*;
+
 
 public class InteractionEvent {
 	
 	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm");
 
+	public static final Comparator<InteractionEvent> BY_TIME_RECEIVED = new Comparator<InteractionEvent>() { @Override public int compare(InteractionEvent e1, InteractionEvent e2) {
+		return Comparators.compare(e1.timestampReceived(), e2.timestampReceived());
+	}};
+
+	
 	private final String content;
 	private final Party sender;
 	
@@ -17,21 +24,22 @@ public class InteractionEvent {
 	private final boolean isOwn;
 	
 	
-	public InteractionEvent(long timestampSent, Party sender, String content) {
-		this.timestampSent = timestampSent;
-		this.timestampReceived = timestampSent;
-		this.sender = sender;
-		this.content = content;		
-		this.isOwn = true;
-	}
+	public static InteractionEvent createFrom(Party sender, long timeSent, long timeReceived, String content) {
+		return new InteractionEvent(sender, timeSent, timeReceived, content, false);
+	}	
+
 	
+	public static InteractionEvent createOwn(long timeSent, String content) {
+		return new InteractionEvent(null, timeSent, timeSent, content, true);
+	}	
+
 	
-	public InteractionEvent(long timestampSent, long timestampReceived, Party sender, String content) {
+	private InteractionEvent(Party sender, long timestampSent, long timestampReceived, String content, boolean isOwn) {
 		this.timestampSent = timestampSent;
 		this.timestampReceived = timestampReceived;
 		this.sender = sender;
 		this.content = content;
-		this.isOwn = false;
+		this.isOwn = isOwn;
 	}
 
 	
@@ -40,6 +48,7 @@ public class InteractionEvent {
 	}
 	
 	
+	/** @return The Party that sent this InteractionEvent or null if isOwn(). */
 	public Party sender() {
 		return sender;
 	}
@@ -70,6 +79,7 @@ public class InteractionEvent {
 	@Override
 	public String toString() {
 		return "InteractionEvent [" + timestampSent + " " + sender + ": " + content + "]";
-	}	
+	}
+
 	
 }

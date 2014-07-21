@@ -1,23 +1,32 @@
 package sneer.impl.simulator;
 
-import rx.*;
-import rx.subjects.*;
+import static sneer.InteractionEvent.*;
+import static sneer.commons.Lists.*;
+
+import java.util.*;
+
+import rx.Observable;
 import sneer.*;
+import sneer.rx.*;
 
 public class InteractionSimulator implements Interaction {
 
-	private final ReplaySubject<InteractionEvent> interactionEvents = ReplaySubject.create();
+	@SuppressWarnings("unchecked")
+	private static final List<InteractionEvent> NO_EVENTS = Collections.EMPTY_LIST;
 
-	private Party party;
+	
+	private final Party party;
+	private final ObservedSubject<List<InteractionEvent>> events = ObservedSubject.create(NO_EVENTS);
+	private final ObservedSubject<Long> mostRecentEventTimestamp = ObservedSubject.create(0L);
 
 	
 	public InteractionSimulator(Party party) {
 		this.party = party;
-		sendMessage("q festa!!!! uhuu!!!");
-		interactionEvents.onNext(new InteractionEvent(now(), now(), this.party, "Onde? Onde??"));
+		sendMessage("Vai ter festa!!!! Uhuu!!!");
+		addEvent(createFrom(this.party, now(), now(), "Onde? Onde??"));
 	}
 
-	
+
 	@Override
 	public Party party() {
 		return party;
@@ -25,25 +34,40 @@ public class InteractionSimulator implements Interaction {
 
 	
 	@Override
-	public Observable<InteractionEvent> events() {
-		return interactionEvents;
+	public Observable<List<InteractionEvent>> events() {
+		return events.observed().observable();
 	}
 
 	
 	@Override
 	public void sendMessage(String content) {
-		interactionEvents.onNext(new InteractionEvent(now(), 0, party, content));
+		addEvent(createOwn(now(), content));
+	}
+
+
+	@Override
+	public Observed<Long> mostRecentEventTimestamp() {
+		return mostRecentEventTimestamp.observed();
+	}
+	
+	
+	private void addEvent(InteractionEvent event) {
+		List<InteractionEvent> newEvents = eventsWith(event, BY_TIME_RECEIVED);
+		events.set(newEvents);
+		mostRecentEventTimestamp.set(lastIn(newEvents).timestampReceived());
+	}
+
+
+	private List<InteractionEvent> eventsWith(InteractionEvent event, Comparator<InteractionEvent> order) {
+		List<InteractionEvent> ret = new ArrayList<InteractionEvent>(events.observed().mostRecent());
+		ret.add(event);
+		Collections.sort(ret, order);
+		return ret;
 	}
 	
 	
 	static private long now() {
 		return System.currentTimeMillis();
-	}
-
-
-	@Override
-	public long mostRecentEventTimestamp() {
-		return 0;
 	}
 
 }
