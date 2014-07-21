@@ -1,6 +1,8 @@
 package sneer.android.main.ui;
 
 import static sneer.android.ui.UIUtils.*;
+import rx.*;
+import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import android.app.*;
@@ -11,11 +13,13 @@ public class InteractionsAdapter extends ArrayAdapter<Interaction> {
 
 	private Activity activity;
     int layoutResourceId;
+	private final Func1<Party, Observable<String>> labelProvider;
     
-    public InteractionsAdapter(Activity activity, int layoutResourceId) {
+    public InteractionsAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider) {
         super(activity, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         this.activity = activity;
+		this.labelProvider = labelProvider;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class InteractionsAdapter extends ArrayAdapter<Interaction> {
         }
         
         Interaction interaction = getItem(position);
-        subscribeTextView(holder.interactionSummary, interaction.party().name());
+        subscribeTextView(holder.interactionSummary, labelProvider.call(interaction.party()));
         
         return row;
     }
