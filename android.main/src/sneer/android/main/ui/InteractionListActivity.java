@@ -2,12 +2,14 @@ package sneer.android.main.ui;
 
 import java.util.*;
 
+import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.R;
 import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 import sneer.snapi.*;
 import android.app.*;
 import android.content.*;
@@ -43,8 +45,19 @@ public class InteractionListActivity extends Activity {
 		
 		}
 
+		final Sneer sneer;
+		try {
+			sneer = SneerSingleton.SNEER_ADMIN.initialize(Keys.createPrivateKey());
+		} catch (FriendlyException e1) {
+		 	toast(e1.getMessage());
+		 	this.finish();
+			return;
+		}
+
 		listView = (ListView)findViewById(R.id.listView);
-		adapter = new InteractionsAdapter(this, R.layout.list_item_interaction);
+		adapter = new InteractionsAdapter(this, R.layout.list_item_interaction, new Func1<Party, Observable<String>>() {  @Override public Observable<String> call(Party party) {
+			return sneer.labelFor(party).observable();
+		}});
 		listView.setAdapter(adapter);
 
 		registerForContextMenu(listView);
@@ -54,14 +67,10 @@ public class InteractionListActivity extends Activity {
 			onContactClicked(interaction);
 		}});
 
-		try {
-			SneerSingleton.SNEER_ADMIN.initialize(sneer.impl.Keys.newPrivateKey()).interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
-				for (Interaction interaction : interactions)
-					adapter.add(interaction);
-			}});
-		} catch (FriendlyException e) {
-			e.printStackTrace();
-		}
+		sneer.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+			for (Interaction interaction : interactions)
+				adapter.add(interaction);
+		}});
 	}
 
 	
