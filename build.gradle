@@ -1,6 +1,8 @@
 import java.nio.file.*;
 import org.gradle.api.artifacts.*;
 
+apply plugin: 'eclipse'
+
 buildscript {
     repositories {
         mavenCentral()
@@ -17,7 +19,6 @@ subprojects {
     afterEvaluate {
 	if (plugins.hasPlugin('android-library') || plugins.hasPlugin('android')) {
 	    task configureAndroidForEclipseTask << {
-	        //configureAndroidForEclipse(project)
 	        new File("project.properties").withWriter { writer ->
 	            writer << "target=${android.compileSdkVersion}\n"
 	            if (plugins.hasPlugin('android-library')) {
@@ -49,7 +50,7 @@ subprojects {
 		                    node.appendNode('classpathentry', [kind: 'src', path: 'gen'])
 
 		                    configurations.each { conf ->
-		                        conf.dependencies.find {it instanceof ExternalModuleDependency}.collect{configurations.compile.files(it)}.flatten().each { f ->
+		                        conf.dependencies.find {it instanceof ExternalModuleDependency}.collect{conf.files(it)}.flatten().each { f ->
 		                            node.appendNode('classpathentry', [kind: 'lib', path: f, exported: true])
 		                        }
 		                    }
