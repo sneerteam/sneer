@@ -1,8 +1,6 @@
 import java.nio.file.*;
 import org.gradle.api.artifacts.*;
 
-apply plugin: 'eclipse'
-
 buildscript {
     repositories {
         mavenCentral()
