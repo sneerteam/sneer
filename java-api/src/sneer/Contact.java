@@ -12,7 +12,7 @@ public interface Contact {
 	
 	
 	Comparator<Contact> BY_NICKNAME = new Comparator<Contact>() { @Override public int compare(Contact c1, Contact c2) {
-		return c1.nickname().mostRecent().compareTo(c2.nickname().mostRecent());
+		return c1.nickname().mostRecent().compareToIgnoreCase(c2.nickname().mostRecent());
 	}};
 
 	
