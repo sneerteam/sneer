@@ -1,12 +1,13 @@
 package sneer.android.main;
 
-import android.app.*;
-import sneer.admin.*;
-import sneer.impl.simulator.*;
+import sneer.Sneer;
+import sneer.impl.keys.Keys;
+import sneer.impl.simulator.SneerAdminSimulator;
+import android.app.Application;
 
 public class SneerSingleton extends Application {
 	
-	public static final SneerAdmin SNEER_ADMIN =
-		new SneerAdminSimulator();
+	public static final Sneer SNEER =
+		new SneerAdminSimulator().initialize(Keys.createPrivateKey());
 //		new SneerAdminImpl();
 }

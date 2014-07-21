@@ -1,24 +1,30 @@
 package sneer.android.main.ui;
 
-import java.util.*;
+import static sneer.android.main.SneerSingleton.SNEER;
+
+import java.util.Collection;
 
 import rx.Observable;
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.*;
-import sneer.android.main.*;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import sneer.Interaction;
+import sneer.Party;
 import sneer.android.main.R;
-import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
-import sneer.snapi.*;
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.util.*;
-import android.view.*;
+import sneer.snapi.Cloud;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.Toast;
 
 public class InteractionListActivity extends Activity {
 
@@ -45,18 +51,9 @@ public class InteractionListActivity extends Activity {
 		
 		}
 
-		final Sneer sneer;
-		try {
-			sneer = SneerSingleton.SNEER_ADMIN.initialize(Keys.createPrivateKey());
-		} catch (FriendlyException e1) {
-		 	toast(e1.getMessage());
-		 	this.finish();
-			return;
-		}
-
 		listView = (ListView)findViewById(R.id.listView);
 		adapter = new InteractionsAdapter(this, R.layout.list_item_interaction, new Func1<Party, Observable<String>>() {  @Override public Observable<String> call(Party party) {
-			return sneer.labelFor(party).observable();
+			return SNEER.labelFor(party).observable();
 		}});
 		listView.setAdapter(adapter);
 
@@ -67,7 +64,7 @@ public class InteractionListActivity extends Activity {
 			onContactClicked(interaction);
 		}});
 
-		sneer.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+		SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
 			for (Interaction interaction : interactions)
 				adapter.add(interaction);
 		}});
@@ -200,11 +197,9 @@ public class InteractionListActivity extends Activity {
 
 	
 	protected void onContactClicked(Interaction interaction) {
-//		Bundle extras = getIntent().getExtras();
-//		Intent intent = new Intent(extras.getString("Action"));
-//		intent.putExtra("partyPuk", interaction.party().publicKey().toBlockingObservable().first());
-//		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//		startActivity(intent);
+		Intent intent = new Intent(this, InteractionActivity.class);
+		intent.putExtra("partyPuk", interaction.party().publicKey().mostRecent());
+		startActivity(intent);
 	}
 
 }
