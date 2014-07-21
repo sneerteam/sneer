@@ -33,6 +33,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".ui.InteractionListActivity"
+            android:label="@string/title_interaction_list" >
+        </activity>
 
         <activity
             android:name=".ui.ProfileActivity"

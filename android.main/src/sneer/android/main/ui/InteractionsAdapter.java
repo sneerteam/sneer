@@ -7,12 +7,12 @@ import android.app.*;
 import android.view.*;
 import android.widget.*;
 
-public class ContactsAdapter extends ArrayAdapter<Contact> {
+public class InteractionsAdapter extends ArrayAdapter<Interaction> {
 
 	private Activity activity;
     int layoutResourceId;
     
-    public ContactsAdapter(Activity activity, int layoutResourceId) {
+    public InteractionsAdapter(Activity activity, int layoutResourceId) {
         super(activity, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         this.activity = activity;
@@ -21,28 +21,28 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        final ContactHolder holder;
+        final InteractiontHolder holder;
         
         if (row == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             
-            holder = new ContactHolder();
-            holder.contactNickName = (TextView)row.findViewById(R.id.contactNickName);
+            holder = new InteractiontHolder();
+            holder.interactionSummary = (TextView)row.findViewById(R.id.interactionSummary);
             
             row.setTag(holder);
         } else {
-            holder = (ContactHolder)row.getTag();
+            holder = (InteractiontHolder)row.getTag();
         }
         
-        Contact contact = getItem(position);
-//        subscribeTextView(holder.contactNickName, contact.nickname().mostRecent());
+        Interaction interaction = getItem(position);
+        subscribeTextView(holder.interactionSummary, interaction.party().name());
         
         return row;
     }
 
-	static class ContactHolder
+	static class InteractiontHolder
     {
-        TextView contactNickName;
+        TextView interactionSummary;
     }
 }

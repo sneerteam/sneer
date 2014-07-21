@@ -26,5 +26,6 @@
     <string name="action_group">Chat Group</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_dummy">DummyActivity</string>
+    <string name="title_interaction_list">Interaction List</string>
     
 </resources>

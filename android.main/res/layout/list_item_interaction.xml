@@ -3,7 +3,7 @@
     android:layout_height="match_parent" >
     
     <TextView
-        android:id="@+id/contactNickName"
+        android:id="@+id/interactionSummary"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:divider="@null"

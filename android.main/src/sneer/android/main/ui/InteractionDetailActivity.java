@@ -1,67 +1,83 @@
 package sneer.android.main.ui;
 
-import android.*;
+import java.util.*;
+
+import sneer.*;
+import sneer.android.main.*;
+import sneer.commons.*;
+import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
-import sneer.android.main.R;
 
-/**
- * An activity representing a single Chat detail screen. This activity is only
- * used on handset devices. On tablet-size devices, item details are presented
- * side-by-side with a list of items in a {@link InteractionListActivity}.
- * <p>
- * This activity is mostly just a 'shell' activity containing nothing more than
- * a {@link InteractionDetailFragment}.
- */
-public class InteractionDetailActivity extends FragmentActivity {
+public class InteractionDetailActivity extends Activity {
 
+	static final String PARTY_PUK = "partyPuk";
+
+	private static final Comparator<? super InteractionEvent> BY_TIMESTAMP = new Comparator<InteractionEvent>() { @Override public int compare(InteractionEvent lhs, InteractionEvent rhs) {
+		return Comparators.compare(lhs.timestampSent(), rhs.timestampSent());
+	}};
+
+	private final List<InteractionEvent> messages = new ArrayList<InteractionEvent>();
+	private InteractionAdapter interactionAdapter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction_detail);
 
-		
-		// Show the Up button in the action bar.
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		// savedInstanceState is non-null when there is fragment state
-		// saved from previous configurations of this activity
-		// (e.g. when rotating the screen from portrait to landscape).
-		// In this case, the fragment will automatically be re-added
-		// to its container so we don't need to manually add it.
-		// For more information, see the Fragments API guide at:
-		//
-		// http://developer.android.com/guide/components/fragments.html
-		//
-		if (savedInstanceState == null) {
-			// Create the detail fragment and add it to the activity
-			// using a fragment transaction.
-			InteractionDetailFragment fragment = new InteractionDetailFragment();
-			fragment.setArguments(new Bundle(getIntent().getExtras()));
-			
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.interaction_detail_container, fragment).commit();
-		}
+//		View rootView = inflater.inflate(R.layout.fragment_chat_detail,	container, false);
+//
+////		Sneer sneer = ((SneerApp) getActivity().getApplication()).model();
+//		
+////		Party party = sneer.produceParty(getArguments().getString(PARTY_PUK));
+////		final Interaction interaction = sneer.produceInteractionWith(party);
+//
+//		this.setTitle(interaction.party().nickname().toBlockingObservable().first());
+//
+//		interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() { @Override public void call(InteractionEvent msg) {
+//			onInteractionEvent(msg);
+//		}});
+//
+//		interactionAdapter = new InteractionAdapter(
+//			this.getActivity(),
+//			inflater,
+//			R.layout.list_item_user_message,
+//			R.layout.list_item_party_message,
+//			messages);
+//
+//		ListView listView = (ListView) rootView.findViewById(R.id.listView);
+//		listView.setAdapter(interactionAdapter);
+//
+//		final TextView widget = (TextView) rootView.findViewById(R.id.editText);
+//
+//		Button b = (Button)rootView.findViewById(R.id.sendButton);
+//		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+//			interaction.sendMessage(widget.getText().toString());
+//			widget.setText("");
+//		}});
 	}
+	
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
-			NavUtils.navigateUpTo(this,
-					new Intent(this, InteractionListActivity.class));
+			NavUtils.navigateUpTo(this, new Intent(this, InteractionListActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	
+	private void onInteractionEvent(InteractionEvent msg) {
+		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
+		if (insertionPointHint < 0) {
+			int insertionPoint = Math.abs(insertionPointHint) - 1;
+			messages.add(insertionPoint, msg);
+			interactionAdapter.notifyDataSetChanged();
+		}
 	}
 }

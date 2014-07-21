@@ -5,131 +5,197 @@ import java.util.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
+import sneer.android.main.*;
 import sneer.android.main.R;
+import sneer.commons.exceptions.*;
 import sneer.snapi.*;
+import android.app.*;
 import android.content.*;
 import android.os.*;
-import android.support.v4.app.*;
+import android.util.*;
 import android.view.*;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.*;
+import android.widget.AdapterView.OnItemClickListener;
 
-/**
- * This activity has different
- * presentations for handset and tablet-size devices. On handsets, the activity
- * presents a list of items, which when touched, lead to a
- * {@link InteractionDetailActivity} representing item details. On tablets, the
- * activity presents the list of items and item details side-by-side using two
- * vertical panes.
- * <p>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link InteractionListFragment} and the item details (if present) is a
- * {@link InteractionDetailFragment}.
- * <p>
- */
+public class InteractionListActivity extends Activity {
 
-//ChatListActivity -> Listar chats
-public class InteractionListActivity extends FragmentActivity implements InteractionListFragment.Callbacks {
+	private static final String DISABLE_MENUS = "disable-menus";
+	private static final String TITLE = "title";
+	private InteractionsAdapter adapter;
+	private Cloud cloud;
+	private ListView listView;
+	private Interaction interaction;
 
-	private static InteractionListFragment interactionListFragment;
-
-	/** Whether or not the activity is in two-pane mode, i.e. running on a tablet device. */
-	private boolean mTwoPane;
-
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//		if (item.getItemId() == R.id.action_contacts)
-//			chat().findParty().subscribe(new Action1<Party>() {
-//				@Override
-//				public void call(Party party) {
-//					onItemSelected(chat().produceInteractionWith(party));
-//				}
-//			});
-//
-//		return true;
-//	}
-
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_chat_list);
+		setContentView(R.layout.activity_interaction_list);
 
-		SneerUtils.showSneerInstallationMessageIfNecessary(this);
-
-
-
-		sneer().interactions().observeOn(AndroidSchedulers.mainThread())
-		.subscribe(new Action1<Collection<Interaction>>() {
-			@Override
-			public void call(Collection<Interaction> interaction) {
-//				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"), Observable.from("joao"));
-//
-//				interaction.contact(member);
-//				interactionListFragment.addInteraction(interaction);
+		if (getIntent() != null && getIntent().getExtras() != null
+				) {
+			String title;
+			
+			if ((title = getIntent().getExtras().getString(TITLE)) != null) {				
+				setTitle(title);				
 			}
-		});
-
-
-
-		sneer().interactions().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<Collection<Interaction>>() {
-					@Override
-					public void call(Collection<Interaction> interaction) {
-						interactionListFragment.addInteraction(interaction);
-					}
-				});
-
-		interactionListFragment = (InteractionListFragment) getSupportFragmentManager()
-				.findFragmentById(R.id.chat_list);
-
-		if (findViewById(R.id.interaction_detail_container) != null) {
-			mTwoPane = true;
-			interactionListFragment.setActivateOnItemClick(true);
+		
 		}
 
+		listView = (ListView)findViewById(R.id.listView);
+		adapter = new InteractionsAdapter(this, R.layout.list_item_interaction);
+		listView.setAdapter(adapter);
 
+		registerForContextMenu(listView);
 
+		listView.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
+			Interaction interaction = adapter.getItem(position);
+			onContactClicked(interaction);
+		}});
+
+		try {
+			SneerSingleton.SNEER_ADMIN.initialize(sneer.impl.Keys.newPrivateKey()).interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+				for (Interaction interaction : interactions)
+					adapter.add(interaction);
+			}});
+		} catch (FriendlyException e) {
+			e.printStackTrace();
+		}
 	}
 
-
-	/** Callback method from {@link InteractionListFragment.Callbacks} indicating that the item with the given ID was selected. */
+	
 	@Override
-	public void onItemSelected(Interaction interaction) {
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+		interaction = adapter.getItem(info.position);
+		menu.setHeaderTitle(interaction.party().name().toBlockingObservable().first());
+		getMenuInflater().inflate(R.menu.long_click, menu);
+	}
 
-		if (mTwoPane) {
-			Bundle arguments = new Bundle();
-			arguments.putString(InteractionDetailFragment.PARTY_PUK,
-					interaction.party().publicKey().mostRecent().toString());
-			InteractionDetailFragment fragment = new InteractionDetailFragment();
-			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.interaction_detail_container, fragment).commit();
-
-		} else {
-			Intent detailIntent = new Intent(this, InteractionDetailActivity.class);
-			detailIntent.putExtra(InteractionDetailFragment.PARTY_PUK,
-
-					interaction.party().publicKey().mostRecent().toString());
-			startActivity(detailIntent);
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.chat_contact:
+			toast(interaction.toString()); // Do something useful with interaction here.
+			break;
+		case R.id.edit_contact:
+			interaction.toString(); // Do something useful with interaction here.
+			break;
+		case R.id.remove_contact:
+			interaction.toString(); // Do something useful with interaction here.
+			break;
 		}
+
+		return true;
 	}
 
-
-	private Sneer sneer() {
-		return null;
-//		return ((SneerApp) getApplication()).model();
+	
+	@Override
+	protected void onDestroy() {
+		if(cloud!=null)
+			cloud.dispose();
+		super.onDestroy();
 	}
 
-
+	
 	void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
+
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		if (getIntent() != null && getIntent().getExtras() != null
+				&& getIntent().getExtras().getBoolean(DISABLE_MENUS)) {
+			return false;
+		}
+		getMenuInflater().inflate(R.menu.contacts, menu);
+		return true;
+	}
+
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_add_contact:
+			showContactAdd();
+			break;
+		case R.id.action_profile:
+			showProfile();
+			break;
+		case R.id.action_send_pk:
+			sendMyPublicKey();
+			break;
+		case R.id.action_copy_pk:
+			copyMyPublicKey();
+			break;
+		}
+
+		return true;
+	}
+
+	
+	private void showContactAdd() {
+//		new ContactAddHelper(this, new ContactAddHelper.AddListener() {
+//			@Override
+//			public void add(final OldContact interaction) {
+//				CloudPath contactPath = cloud.path("contacts",
+//						interaction.getPublicKey());
+//				contactPath.append("nickname").pub(interaction.getNickname());
+//			}
+//		});
+	}
+
+	
+	public static void log(String s) {
+		Log.d(InteractionListActivity.class.getSimpleName(), s);
+	}
+
+	
+	private void showProfile() {
+		startActivity(new Intent(this, ProfileActivity.class));
+	}
+
+	
+	private void sendMyPublicKey() {
+		cloud.ownPublicKey().subscribe(new Action1<byte[]>() {
+
+			@Override
+			public void call(byte[] publicKey) {
+//				String shareBody = PublicKey.bytesToHex(publicKey);
+//				log("ownPublicKey: " + shareBody);
+//				Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+//				sharingIntent.setType("text/plain");
+//				// sharingIntent.putExtra(Intent.EXTRA_SUBJECT,
+//				// "My Sneer public key");
+//				sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+//				startActivity(sharingIntent);
+			}
+		});
+	}
+
+	
+	private void copyMyPublicKey() {
+		cloud.ownPublicKey().subscribe(new Action1<byte[]>() {
+			@Override
+			public void call(byte[] publicKey) {
+//				ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+//				ClipData clip = ClipData.newPlainText("Public Key",
+//						PublicKey.bytesToHex(publicKey));
+//				clipboard.setPrimaryClip(clip);
+			}
+		});
+	}
+
+	
+	protected void onContactClicked(Interaction interaction) {
+//		Bundle extras = getIntent().getExtras();
+//		Intent intent = new Intent(extras.getString("Action"));
+//		intent.putExtra("partyPuk", interaction.party().publicKey().toBlockingObservable().first());
+//		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//		startActivity(intent);
+	}
+
 }

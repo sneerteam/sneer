@@ -9,5 +9,4 @@ public class SneerSingleton extends Application {
 	public static final SneerAdmin SNEER_ADMIN =
 		new SneerAdminSimulator();
 //		new SneerAdminImpl();
-
 }

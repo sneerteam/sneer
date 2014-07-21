@@ -13,7 +13,7 @@ public class ContactAddHelper {
 		void add(Contact contact);
 	}
 	
-	public ContactAddHelper(ManagedContactsActivity context, final AddListener addListener) {
+	public ContactAddHelper(InteractionListActivity context, final AddListener addListener) {
 		View addContactView = View.inflate(context, R.layout.activity_contact_add, null);
 		final EditText publicKeyEdit = (EditText) addContactView.findViewById(R.id.public_key);
 		final EditText nicknameEdit = (EditText) addContactView.findViewById(R.id.nickname);
