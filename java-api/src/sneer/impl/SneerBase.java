@@ -11,9 +11,9 @@ public abstract class SneerBase implements Sneer {
 	public Observed<String> labelFor(Party party) {
 		//TODO React party becoming a new contact or being deleted as a contact. Use party name before public key, if available.
 		Contact contact = findContact(party);
-		Observable<String> ret = contact != null
-			? contact.nickname().observable()
-			: Observable.from("? PublicKey: " + party.publicKey().mostRecent());
+		Observable<String> ret = contact == null
+			? Observable.from("? PublicKey: " + party.publicKey().mostRecent())
+			: contact.nickname().observable();
 		return ObservedSubject.create(ret.toBlockingObservable().first()).observed();
 	}
 
