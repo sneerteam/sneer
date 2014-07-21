@@ -22,12 +22,12 @@ public class SneerSimulator extends SneerBase {
 	private final BehaviorSubject<List<Contact>> contacts = BehaviorSubject.create(contactsSorted());
 
 	private final Map<Party, Interaction> interactionsByParty = new ConcurrentHashMap<Party, Interaction>();
-	private final BehaviorSubject<List<Interaction>> interactions = BehaviorSubject.create(interactionsNow());
+	private final BehaviorSubject<List<Interaction>> interactions = BehaviorSubject.create(interactionsSorted());
 
 	
 	public SneerSimulator(PrivateKey privateKey) {
 		self = new PartySimulator("Neide da Silva", privateKey);
-		
+
 		populate("Maicon", "Wesley", "Carla");
 	}
 	
@@ -60,7 +60,7 @@ public class SneerSimulator extends SneerBase {
 			if (ret == null) {
 				ret = new InteractionSimulator(party);
 				interactionsByParty.put(party, ret);
-				interactions.onNext(interactionsNow());
+				interactions.onNext(interactionsSorted());
 			}
 		}
 		return ret;
@@ -86,15 +86,11 @@ public class SneerSimulator extends SneerBase {
 			if (c == null) {
 				c = new ContactSimulator(nickname, party);
 				contactsByParty.put(party, c);
+				produceInteractionWith(party).sendMessage("Hey " + nickname + "!");
 			}
 			c.setNickname(nickname);
-			notifyContactsSubscribers();
+			contacts.onNext(contactsSorted());
 		}
-	}
-
-
-	private void notifyContactsSubscribers() {
-		contacts.onNext(contactsSorted());
 	}
 
 
@@ -116,8 +112,10 @@ public class SneerSimulator extends SneerBase {
 	}
 	
 	
-	private List<Interaction> interactionsNow() {
-		return new ArrayList<Interaction>(interactionsByParty.values());
+	private List<Interaction> interactionsSorted() {
+		ArrayList<Interaction> ret = new ArrayList<Interaction>(interactionsByParty.values());
+		Collections.sort(ret, Interaction.MOST_RECENT_FIRST);
+		return ret;
 	}
 
 	
@@ -132,7 +130,8 @@ public class SneerSimulator extends SneerBase {
 		for (String nick : newContactNicks) {
 			PrivateKey prik = Keys.createPrivateKey(nick);
 			String name = nick + " da Silva";
-			setContact(nick, new PartySimulator(name, prik));
+			Party party = new PartySimulator(name, prik);
+			setContact(nick, party);
 		}
 	}
 
