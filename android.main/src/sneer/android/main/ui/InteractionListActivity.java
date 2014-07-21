@@ -1,6 +1,7 @@
 package sneer.android.main.ui;
 
-import rx.*;
+import java.util.*;
+
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -37,7 +38,7 @@ public class InteractionListActivity extends FragmentActivity implements Interac
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.chat, menu);
+		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
 
@@ -66,22 +67,22 @@ public class InteractionListActivity extends FragmentActivity implements Interac
 
 
 		sneer().interactions().observeOn(AndroidSchedulers.mainThread())
-		.subscribe(new Action1<Interaction>() {
+		.subscribe(new Action1<Collection<Interaction>>() {
 			@Override
-			public void call(Interaction interaction) {
-				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"), Observable.from("joao"));
-
-				interaction.contact(member);
-				interactionListFragment.addInteraction(interaction);
+			public void call(Collection<Interaction> interaction) {
+//				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"), Observable.from("joao"));
+//
+//				interaction.contact(member);
+//				interactionListFragment.addInteraction(interaction);
 			}
 		});
 
 
 
 		sneer().interactions().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<Interaction>() {
+				.subscribe(new Action1<Collection<Interaction>>() {
 					@Override
-					public void call(Interaction interaction) {
+					public void call(Collection<Interaction> interaction) {
 						interactionListFragment.addInteraction(interaction);
 					}
 				});
@@ -89,7 +90,7 @@ public class InteractionListActivity extends FragmentActivity implements Interac
 		interactionListFragment = (InteractionListFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.chat_list);
 
-		if (findViewById(R.id.chat_detail_container) != null) {
+		if (findViewById(R.id.interaction_detail_container) != null) {
 			mTwoPane = true;
 			interactionListFragment.setActivateOnItemClick(true);
 		}
@@ -106,24 +107,25 @@ public class InteractionListActivity extends FragmentActivity implements Interac
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
 			arguments.putString(InteractionDetailFragment.PARTY_PUK,
-					interaction.party().publicKey().toBlockingObservable().first());
+					interaction.party().publicKey().mostRecent().toString());
 			InteractionDetailFragment fragment = new InteractionDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.chat_detail_container, fragment).commit();
+					.replace(R.id.interaction_detail_container, fragment).commit();
 
 		} else {
 			Intent detailIntent = new Intent(this, InteractionDetailActivity.class);
 			detailIntent.putExtra(InteractionDetailFragment.PARTY_PUK,
 
-					interaction.party().party().publicKey().toBlockingObservable().first());
+					interaction.party().publicKey().mostRecent().toString());
 			startActivity(detailIntent);
 		}
 	}
 
 
 	private Sneer sneer() {
-		return ((SneerApp) getApplication()).model();
+		return null;
+//		return ((SneerApp) getApplication()).model();
 	}
 
 

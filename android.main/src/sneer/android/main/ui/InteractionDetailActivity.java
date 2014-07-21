@@ -5,6 +5,7 @@ import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
+import sneer.android.main.R;
 
 /**
  * An activity representing a single Chat detail screen. This activity is only
@@ -20,7 +21,7 @@ public class InteractionDetailActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_chat_detail);
+		setContentView(R.layout.activity_interaction_detail);
 
 		
 		// Show the Up button in the action bar.
@@ -42,7 +43,7 @@ public class InteractionDetailActivity extends FragmentActivity {
 			fragment.setArguments(new Bundle(getIntent().getExtras()));
 			
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.chat_detail_container, fragment).commit();
+					.add(R.id.interaction_detail_container, fragment).commit();
 		}
 	}
 	

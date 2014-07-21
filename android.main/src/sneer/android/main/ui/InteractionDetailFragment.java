@@ -12,6 +12,7 @@ import android.support.v4.app.*;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
+import sneer.android.main.R;
 
 /**
  * A fragment representing a single Chat detail screen. This fragment is either
@@ -36,38 +37,39 @@ public class InteractionDetailFragment extends Fragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_chat_detail,	container, false);
+//		View rootView = inflater.inflate(R.layout.fragment_chat_detail,	container, false);
 
-		Sneer sneer = ((SneerApp) getActivity().getApplication()).model();
-		
-		Party party = sneer.produceParty(getArguments().getString(PARTY_PUK));
-		final Interaction interaction = sneer.produceInteractionWith(party);
+//		Sneer sneer = ((SneerApp) getActivity().getApplication()).model();
+//		
+//		Party party = sneer.produceParty(getArguments().getString(PARTY_PUK));
+//		final Interaction interaction = sneer.produceInteractionWith(party);
+//
+//		getActivity().setTitle(interaction.party().nickname().toBlockingObservable().first());
+//
+//		interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() { @Override public void call(InteractionEvent msg) {
+//			onInteractionEvent(msg);
+//		}});
+//
+//		interactionAdapter = new InteractionAdapter(
+//			this.getActivity(),
+//			inflater,
+//			R.layout.list_item_user_message,
+//			R.layout.list_item_party_message,
+//			messages);
 
-		getActivity().setTitle(interaction.party().nickname().toBlockingObservable().first());
+//		ListView listView = (ListView) rootView.findViewById(R.id.listView);
+//		listView.setAdapter(interactionAdapter);
+//
+//		final TextView widget = (TextView) rootView.findViewById(R.id.editText);
+//
+//		Button b = (Button)rootView.findViewById(R.id.sendButton);
+//		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+//			interaction.sendMessage(widget.getText().toString());
+//			widget.setText("");
+//		}});
 
-		interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() { @Override public void call(InteractionEvent msg) {
-			onInteractionEvent(msg);
-		}});
-
-		interactionAdapter = new InteractionAdapter(
-			this.getActivity(),
-			inflater,
-			R.layout.list_item_user_message,
-			R.layout.list_item_contact_message,
-			messages);
-
-		ListView listView = (ListView) rootView.findViewById(R.id.listView);
-		listView.setAdapter(interactionAdapter);
-
-		final TextView widget = (TextView) rootView.findViewById(R.id.editText);
-
-		Button b = (Button)rootView.findViewById(R.id.sendButton);
-		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			interaction.sendMessage(widget.getText().toString());
-			widget.setText("");
-		}});
-
-		return rootView;
+//		return rootView;
+		return null;
 	}
 
 	

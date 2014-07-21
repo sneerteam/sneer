@@ -36,7 +36,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
         }
         
         Contact contact = getItem(position);
-        subscribeTextView(holder.contactNickName, contact.nickname());
+//        subscribeTextView(holder.contactNickName, contact.nickname().mostRecent());
         
         return row;
     }

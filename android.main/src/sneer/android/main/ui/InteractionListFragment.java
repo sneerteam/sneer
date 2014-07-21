@@ -159,14 +159,14 @@ public class InteractionListFragment extends ListFragment {
 
 	
 	
-	public void addInteraction(Interaction interaction) {
-		if (!interactions.contains(interaction)) {
-			interactions.add(interaction);
-			interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() {@Override public void call(InteractionEvent event) {
-				Collections.sort(interactions, BY_TIMESTAMP);
-				interactionAdapter.notifyDataSetChanged();
-			}});
-		}
+	public void addInteraction(Collection<Interaction> interaction) {
+//		if (!interactions.contains(interaction)) {
+//			interactions.add(interaction);
+//			interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() {@Override public void call(InteractionEvent event) {
+//				Collections.sort(interactions, BY_TIMESTAMP);
+//				interactionAdapter.notifyDataSetChanged();
+//			}});
+//		}
 	}
 	
 
