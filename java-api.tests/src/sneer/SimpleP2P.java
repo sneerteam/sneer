@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.junit.*;
 
-import sneer.impl.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
@@ -219,20 +218,6 @@ public class SimpleP2P extends TestsBase {
 		
 		assertCount(1, tuplesB.newTupleSubscriber().author(userA.publicKey()).tuples());
 		assertCount(0, tuplesB.newTupleSubscriber().author(userC.publicKey()).tuples());
-	}
-	
-	@Test
-	public void differenceAudience() {
-		
-		PrivateKey group = Keys.createPrivateKey();
-		
-		tuplesA.newTuplePublisher()
-			.audience(group.publicKey())
-			.type("chat/message")
-			.pub("hey people!");
-		
-		assertCount(0, tuplesB.newTupleSubscriber().author(userC.publicKey()).tuples());
-		expectValues(tuplesB.newTupleSubscriber().audience(group).tuples(), "hey people!");
 	}
 	
 	@Test
