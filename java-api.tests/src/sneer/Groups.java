@@ -4,7 +4,6 @@ import static sneer.ObservableTestUtils.*;
 
 import org.junit.*;
 
-import sneer.impl.*;
 import sneer.impl.keys.*;
 
 public class Groups extends TestsBase {
