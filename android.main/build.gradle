@@ -24,6 +24,7 @@ repositories {
 
 dependencies {
     compile 'us.bpsm:edn-java:0.4.4'
+	compile 'com.google.android:support-v4:r7'
     compile project(':android-api')
 }
 
