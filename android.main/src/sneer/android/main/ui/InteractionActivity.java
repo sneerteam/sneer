@@ -4,6 +4,9 @@ import static sneer.android.main.SneerSingleton.*;
 
 import java.util.*;
 
+import rx.*;
+import rx.Observable.OnSubscribe;
+import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -33,18 +36,14 @@ public class InteractionActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction);
 		
-		Party party = SNEER.produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+		final Party party = SNEER.produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
 		this.setTitle(SNEER.labelFor(party).mostRecent());
 
-		SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Interaction>>() { @Override public void call(List<Interaction> interactions) {
-			for (Interaction interaction : interactions) {
-				interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
-					for (InteractionEvent event : events) {
-						onInteractionEvent(event);
-					}
-				}});
-			}
+		SNEER.produceInteractionWith(party).events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
+			messages.clear();
+			messages.addAll(events);
+			interactionAdapter.notifyDataSetChanged();
 		}});
 
 		interactionAdapter = new InteractionAdapter(this,
@@ -57,16 +56,17 @@ public class InteractionActivity extends Activity {
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(interactionAdapter);
 
-
 		final Button b = (Button)findViewById(R.id.sendButton);
+		final TextView widget = (TextView)findViewById(R.id.editText);
 		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Interaction>>() { @Override public void call(List<Interaction> interactions) {
-				final TextView widget = (TextView)findViewById(R.id.editText);
-				for (Interaction interaction : interactions)
+				for (Interaction interaction : interactions) {
+					if (interaction.party() != party)
+						continue;
 					interaction.sendMessage(widget.getText().toString());
-				
-				widget.setText("");
+				}
 			}});
+			widget.setText("");
 		}});
 	}
 	

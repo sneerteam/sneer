@@ -21,7 +21,6 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 
     int layoutUserResourceId;    
     int listContactResourceId;
-    List<InteractionEvent> data = null;
 	private LayoutInflater inflater;
 	private Sneer sneer;
     
@@ -35,13 +34,12 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
         this.listContactResourceId = listContactResourceId;
-        this.data = data;
 		this.sneer = sneer;
     }
 
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
-		final InteractionEvent event = data.get(position);
+		final InteractionEvent event = this.getItem(position);
         final View ret = inflater.inflate(
         	event.isOwn() ? layoutUserResourceId : listContactResourceId,
         	parent,
