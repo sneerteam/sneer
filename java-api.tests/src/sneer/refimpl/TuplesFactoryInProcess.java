@@ -37,8 +37,8 @@ public class TuplesFactoryInProcess {
 		}
 
 		@Override
-		public String intent() {
-			return (String) get("intent");
+		public String type() {
+			return (String) get("type");
 		}
 
 		@Override
@@ -86,8 +86,8 @@ public class TuplesFactoryInProcess {
 			}
 
 			@Override
-			public TupleSubscriber intent(String intent) {
-				where("intent", intent);
+			public TupleSubscriber type(String type) {
+				where("type", type);
 				return this;
 			}
 
@@ -154,8 +154,8 @@ public class TuplesFactoryInProcess {
 			}
 
 			@Override
-			public TuplePublisher intent(String intent) {
-				prototype.put("intent", intent);
+			public TuplePublisher type(String type) {
+				prototype.put("type", type);
 				return this;
 			}
 

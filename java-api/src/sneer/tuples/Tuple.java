@@ -8,7 +8,7 @@ public interface Tuple extends Map<String, Object> {
 
 	Object value();
 	
-	String intent();
+	String type();
 
 	PublicKey audience();
 

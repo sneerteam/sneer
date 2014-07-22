@@ -16,7 +16,7 @@
 
 (defn ->tuple [attrs]
   (reify+ Tuple
-    (tuple-getter intent)
+    (tuple-getter type)
     (tuple-getter audience)
     (tuple-getter author)
     (tuple-getter value)))
@@ -31,7 +31,7 @@
       [(with [attr value]
           (new-tuple-publisher tuples (assoc attrs attr value)))]
       (reify+ TuplePublisher
-        (publisher-attr intent)
+        (publisher-attr type)
         (publisher-attr audience)
         (publisher-attr value)
         (pub [this value]
@@ -55,7 +55,7 @@
 
 (defn new-tuple-subscriber [own-puk tuples]
   (reify+ TupleSubscriber
-    (subscriber-filter intent)
+    (subscriber-filter type)
     (subscriber-filter author)
     (subscriber-filter audience)
     (tuples [this]

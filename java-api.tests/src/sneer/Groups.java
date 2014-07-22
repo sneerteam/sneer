@@ -16,8 +16,8 @@ public class Groups extends TestsBase {
 		
 		tuplesA.newTuplePublisher()
 			.audience(group.publicKey())
-			.intent("chat")
-			.put("intent", "message")
+			.type("chat")
+			.put("type", "message")
 			.pub("hey people!");
 		
 		expectValues(tuplesB.newTupleSubscriber().audience(group).tuples(), "hey people!");
@@ -34,13 +34,13 @@ public class Groups extends TestsBase {
 		
 		tuplesA.newTuplePublisher()
 			.audience(group1.publicKey())
-			.intent("chat")
-			.put("intent", "message")
+			.type("chat")
+			.put("type", "message")
 			.pub("hey people!");
 	
 		tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
-			.intent("chat")
+			.type("chat")
 			.pub("hey B-dog!!");
 	
 		expectValues(tuplesA.newTupleSubscriber().tuples());

@@ -9,7 +9,7 @@ public interface TupleSubscriber {
 
 	TupleSubscriber audience(PrivateKey audience);
 	
-	TupleSubscriber intent(String intent);
+	TupleSubscriber type(String type);
 
 	Observable<Tuple> tuples();
 	Observable<Object> values();

@@ -11,7 +11,7 @@
   (sql/create-table-ddl
    :tuple
    [:id :integer "PRIMARY KEY AUTOINCREMENT"]
-   [:intent :varchar "NOT NULL"]
+   [:type :varchar "NOT NULL"]
    [:value :varchar]
    [:timestamp :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]
    [:author :blob "NOT NULL"]
@@ -24,7 +24,7 @@
   (sql/execute! db [(tuple-ddl)]))
 
 (defn insert-message! []
-  (let [m {:intent :chat-message
+  (let [m {:type :chat-message
            :author "fffff"
            :value "opa"
            :device "device"
@@ -43,5 +43,5 @@
     (reset-db!)
     (create-table!)
     (insert-message!)
-    (let [r (sql/query db ["SELECT id FROM tuple WHERE intent = ?" :chat-message])]
+    (let [r (sql/query db ["SELECT id FROM tuple WHERE type = ?" :chat-message])]
       (is (= [{:id 1}] r)))))

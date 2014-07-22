@@ -27,7 +27,7 @@ public class SimpleP2P extends TestsBase {
 //		
 //		
 //		cloud.newTuplePublisher()
-//			.intent("profile", "name")
+//			.type("profile", "name")
 //			.value("Fabio Roger Manera")
 //			.pub();
 //		
@@ -36,13 +36,13 @@ public class SimpleP2P extends TestsBase {
 //		
 //		cloud.newTuplePublisher()
 //			.audience(sneer.self())
-//			.intent("contact", felipePuk, "nickname")
+//			.type("contact", felipePuk, "nickname")
 //			.pub("Felipe");
 //		
 //		
 //		Map<String, Object> map = new HashMap<String, Object>();
 //		map.put("audience", sneer.self());
-//		map.put("intent", "contact");
+//		map.put("type", "contact");
 //		map.put("field", "nickname");
 //		map.put("puk", felipePuk);
 //		map.put("value", "Felipe");
@@ -54,13 +54,13 @@ public class SimpleP2P extends TestsBase {
 //		
 //		TuplePublisher moves = cloud.newTuplePublisher()
 //			.audience(felipePuk)
-//			.intent("rock-paper-scissor", "move");
+//			.type("rock-paper-scissor", "move");
 //		
 //		moves.pub("rock");
 //		moves.pub("paper");
 //	
 //		TuplePublisher messages = cloud.newTuplePublisher()
-//			.intent("rock-paper-scissor", "message");
+//			.type("rock-paper-scissor", "message");
 //		
 //		messages.audience(felipePuk).pub("opa!!");
 //		messages.audience(diegoPuk).pub("opa, beleza??");
@@ -73,14 +73,14 @@ public class SimpleP2P extends TestsBase {
 //		Cloud felipeCloud = null;
 //		
 //		felipeCloud.newTupleSubscriber()
-//			.intent("rock-paper-scissor")
+//			.type("rock-paper-scissor")
 //			.tuples()
 //			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 //				System.out.println("----> " + t1);
 //			}});
 //	
 //		felipeCloud.newTupleSubscriber()
-//			.intent("rock-paper-scissor", "message")
+//			.type("rock-paper-scissor", "message")
 //			.tuples()
 //			.map(new Func1<Tuple, String>() {  @Override public String call(Tuple t1) {
 //				return (String) t1.value(); 
@@ -95,7 +95,7 @@ public class SimpleP2P extends TestsBase {
 //	Tuple nickname = sneer.cloud().newTupleSubscriber()
 //			.audience(sneer.self())
 //			.author(sneer.self())
-//			.intent("nickname")
+//			.type("nickname")
 //			.where("puk", tuple.author())
 //			.localOrNull()
 //			.values()
@@ -111,7 +111,7 @@ public class SimpleP2P extends TestsBase {
 //		sneer.cloud().newTupleSubscriber()
 //			.audience(sneer.self())
 //			.author(sneer.self())
-//			.intent("picture")
+//			.type("picture")
 //			.where("puk", tuple.author())
 //			.values()
 //			.cast(String.class)
@@ -127,7 +127,7 @@ public class SimpleP2P extends TestsBase {
 //		sneer.cloud().newTupleSubscriber()
 //			.audience(sneer.self())
 //			.author(sneer.self())
-//			.intent("file")
+//			.type("file")
 //			.where("path", new Object[]{"notes", tuple.author()})
 //			.values()
 //			.cast(byte[].class)
@@ -155,34 +155,34 @@ public class SimpleP2P extends TestsBase {
 
 		TuplePublisher publisher = tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
-			.intent("rock-paper-scissor/move")
+			.type("rock-paper-scissor/move")
 			.pub("paper");
 			
 		publisher.pub("rock");
 		
-		publisher.intent("rock-paper-scissor/message")
+		publisher.type("rock-paper-scissor/message")
 			.pub("hehehe");
 		
 		
 		TupleSubscriber subscriber = tuplesB.newTupleSubscriber();
 
 		expectValues(subscriber.tuples(), "paper", "rock", "hehehe");
-		expectValues(subscriber.intent("rock-paper-scissor/move").tuples(), "paper", "rock");
-		expectValues(subscriber.intent("rock-paper-scissor/message").tuples(), "hehehe");
+		expectValues(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock");
+		expectValues(subscriber.type("rock-paper-scissor/message").tuples(), "hehehe");
 		
 	}
 
 	@Test
-	public void tupleWithIntent() throws IOException {
+	public void tupleWithType() throws IOException {
 
 		tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
-			.intent("rock-paper-scissor/move")
+			.type("rock-paper-scissor/move")
 			.pub("paper")
-			.intent("rock-paper-scissor/message")
+			.type("rock-paper-scissor/message")
 			.pub("hehehe");
 		
-		assertEqualsUntilNow(tuplesB.newTupleSubscriber().tuples().map(TO_INTENT), "rock-paper-scissor/move", "rock-paper-scissor/message");
+		assertEqualsUntilNow(tuplesB.newTupleSubscriber().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message");
 		
 	}
 	
@@ -191,7 +191,7 @@ public class SimpleP2P extends TestsBase {
 		
 		tuplesA.newTuplePublisher()
 			.audience(userC.publicKey())
-			.intent("rock-paper-scissor/move")
+			.type("rock-paper-scissor/move")
 			.pub("paper");
 		
 		assertCount(0, tuplesB.newTupleSubscriber().tuples());
@@ -202,7 +202,7 @@ public class SimpleP2P extends TestsBase {
 	public void publicTuples() {
 		
 		tuplesA.newTuplePublisher()
-			.intent("profile/name")
+			.type("profile/name")
 			.pub("UserA McCloud");
 		
 		assertCount(1, tuplesA.newTupleSubscriber().tuples()); // should I receive my own public tuples?
@@ -214,7 +214,7 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void byAuthor() {
 		tuplesA.newTuplePublisher()
-			.intent("profile/name")
+			.type("profile/name")
 			.pub("UserA McCloud");
 		
 		assertCount(1, tuplesB.newTupleSubscriber().author(userA.publicKey()).tuples());
@@ -228,7 +228,7 @@ public class SimpleP2P extends TestsBase {
 		
 		tuplesA.newTuplePublisher()
 			.audience(group.publicKey())
-			.intent("chat/message")
+			.type("chat/message")
 			.pub("hey people!");
 		
 		assertCount(0, tuplesB.newTupleSubscriber().author(userC.publicKey()).tuples());
@@ -239,7 +239,7 @@ public class SimpleP2P extends TestsBase {
 	public void audienceIgnoresPublic() {
 		
 		tuplesA.newTuplePublisher()
-			.intent("chat/message")
+			.type("chat/message")
 			.pub("hey people!");
 		
 		PrivateKey group = Keys.createPrivateKey();
