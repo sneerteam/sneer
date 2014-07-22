@@ -38,6 +38,11 @@
             android:name=".ui.InteractionListActivity"
             android:label="@string/title_interaction_list" >
         </activity>
+        
+        <activity
+            android:name=".ui.InteractionActivity"
+            android:label="@string/title_interaction" >
+        </activity>
 
         <activity
             android:name=".ui.ProfileActivity"

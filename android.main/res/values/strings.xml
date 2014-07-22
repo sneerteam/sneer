@@ -18,14 +18,15 @@
     <string name="comments">Comments</string>
     <string name="send_contact_dialog">Sending contact</string>
     
-    <string name="title_activity_chat">SneerChat</string>
-    <string name="button_send">Send</string>
     <string name="action_contacts">Contacts</string>
-    <string name="title_chat_list">SneerChat</string>
-    <string name="title_chat_detail">Chat Detail</string>
     <string name="action_group">Chat Group</string>
+    <string name="button_send">Send</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_dummy">DummyActivity</string>
+    <string name="title_activity_chat">SneerChat</string>
+    <string name="title_chat_list">SneerChat</string>
+    <string name="title_chat_detail">Chat Detail</string>
     <string name="title_interaction_list">Interaction List</string>
+    <string name="title_interaction">Interaction</string>
     
 </resources>

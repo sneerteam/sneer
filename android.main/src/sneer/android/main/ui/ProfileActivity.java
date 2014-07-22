@@ -1,5 +1,6 @@
 package sneer.android.main.ui;
 
+import sneer.*;
 import sneer.android.main.R;
 import sneer.snapi.*;
 import android.content.*;
@@ -9,23 +10,25 @@ import android.preference.*;
 
 public class ProfileActivity extends PreferenceActivity {
 
+	private Sneer cloud;
+	
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		setupSimplePreferencesScreen();
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		cloud = Cloud.cloudFor(this);
+//		cloud = Cloud.cloudFor(this);
 		prefs.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
 			@Override
 			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String field) {
-				cloud.path("info", field).pub(sharedPreferences.getString(field, null));
+//				cloud.path("info", field).pub(sharedPreferences.getString(field, null));
 			}
 		});
 	}
 	
 	@Override
 	protected void onDestroy() {
-		cloud.dispose();
+//		cloud.dispose();
 		super.onDestroy();
 	}
 	
@@ -52,8 +55,7 @@ public class ProfileActivity extends PreferenceActivity {
 			return true;
 		}
 	};
-	private Cloud cloud;
-
+	
 	private static void bindPreferenceSummaryToValue(Preference preference) {
 		preference.setOnPreferenceChangeListener(S_BIND_PREFERENCE_SUMMARY_TO_VALUE_LISTENER);
 		S_BIND_PREFERENCE_SUMMARY_TO_VALUE_LISTENER.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));

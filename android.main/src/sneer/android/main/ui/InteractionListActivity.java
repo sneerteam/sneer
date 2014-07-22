@@ -1,30 +1,23 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerSingleton.SNEER;
+import static sneer.android.main.SneerSingleton.*;
 
-import java.util.Collection;
+import java.util.*;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import sneer.Interaction;
-import sneer.Party;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import sneer.*;
 import sneer.android.main.R;
-import sneer.snapi.Cloud;
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.ContextMenu;
+import sneer.snapi.*;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.util.*;
+import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.Toast;
 
 public class InteractionListActivity extends Activity {
 

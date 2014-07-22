@@ -25,7 +25,12 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 	private LayoutInflater inflater;
 	private Sneer sneer;
     
-    public InteractionAdapter(Context context, LayoutInflater inflater, int layoutUserResourceId, int listContactResourceId, List<InteractionEvent> data, Sneer sneer) {
+    public InteractionAdapter(Context context,
+    		LayoutInflater inflater,
+    		int layoutUserResourceId,
+    		int listContactResourceId,
+    		List<InteractionEvent> data,
+    		Sneer sneer) {
         super(context, layoutUserResourceId, data);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
@@ -44,12 +49,14 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
         
         findText(ret, R.id.interactionEventContent).setText(event.content());
         findText(ret, R.id.interactionEventTime).setText(event.timeSent());
-
-        sneer.labelFor(event.sender()).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
-        	TextView senderView = findText(ret, R.id.interactionEventSender);
-        	senderView.setText(sender);
-        	setColors(senderView, ret, sender, event.isOwn());
-        }}); 
+        
+        //TODO event.sender() is null when interaction isOwn()
+        if (!event.isOwn())
+        	sneer.labelFor(event.sender()).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
+        		TextView senderView = findText(ret, R.id.interactionEventSender);
+        		senderView.setText(sender);
+        		setColors(senderView, ret, sender, event.isOwn());
+        	}});
         
         return ret;
     }

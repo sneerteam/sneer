@@ -39,7 +39,7 @@ public class SneerSimulator extends SneerBase {
 		synchronized (partiesByPuk) {
 			ret = partiesByPuk.get(publicKey);
 			if (ret == null) {
-				//ret = new PartySimulator(publicKey);
+				ret = new PartySimulator(null, Keys.createPrivateKey());
 				partiesByPuk.put(publicKey, ret);
 			}
 		}

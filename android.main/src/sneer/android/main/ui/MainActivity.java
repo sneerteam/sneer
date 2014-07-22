@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 //		sneer.self().name() está nulo?
 //		Se sim: Abrir tela de profile pro usuario entrar c seu nome e sobrenome; SneerAdmin.setOwnName(nome + " " + sobrenome);
 		
-//		For new we'll just call the InteractionListActivity
+//		For now we'll just call the InteractionListActivity
 		Intent interactionList = new Intent(this, InteractionListActivity.class);
 		startActivity(interactionList);
 	}

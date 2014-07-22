@@ -1,32 +1,21 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerSingleton.SNEER;
+import static sneer.android.main.SneerSingleton.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
-
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import sneer.InteractionEvent;
-import sneer.Party;
-import sneer.android.main.R;
-import sneer.android.main.SneerSingleton;
-import sneer.commons.Comparators;
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.view.MenuItem;
-import android.view.View;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import sneer.*;
+import sneer.android.main.*;
+import sneer.commons.*;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.support.v4.app.*;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 public class InteractionActivity extends Activity {
 
@@ -41,35 +30,44 @@ public class InteractionActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction);
 		
-//		SNEER.produceParty(getIntent().getExtras().getSerializable(PARTY_PUK));
-//		
-//		this.setTitle(SNEER.interactions());
-//
-//		interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InteractionEvent>() { @Override public void call(InteractionEvent msg) {
-//			onInteractionEvent(msg);
-//		}});
-//
-//		interactionAdapter = new InteractionAdapter(
-//			this.getActivity(),
-//			inflater,
-//			R.layout.list_item_user_message,
-//			R.layout.list_item_party_message,
-//			messages);
-//
-//		ListView listView = (ListView) findViewById(R.id.listView);
-//		listView.setAdapter(interactionAdapter);
-//
-//		final TextView widget = (TextView) rootView.findViewById(R.id.editText);
-//
-//		Button b = (Button)rootView.findViewById(R.id.sendButton);
-//		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-//			interaction.sendMessage(widget.getText().toString());
-//			widget.setText("");
-//		}});
+		Party party = SNEER.produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+		
+		this.setTitle(SNEER.labelFor(party).mostRecent());
+
+		SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Interaction>>() { @Override public void call(List<Interaction> interactions) {
+			for (Interaction interaction : interactions) {
+				interaction.events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
+					for (InteractionEvent event : events) {
+						onInteractionEvent(event);
+					}
+				}});
+			}
+		}});
+
+		interactionAdapter = new InteractionAdapter(this,
+			this.getLayoutInflater(),
+			R.layout.list_item_user_message,
+			R.layout.list_item_party_message,
+			messages,
+			SNEER);
+
+		ListView listView = (ListView) findViewById(R.id.listView);
+		listView.setAdapter(interactionAdapter);
+
+
+		final Button b = (Button)findViewById(R.id.sendButton);
+		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Interaction>>() { @Override public void call(List<Interaction> interactions) {
+				final TextView widget = (TextView)findViewById(R.id.editText);
+				for (Interaction interaction : interactions)
+					interaction.sendMessage(widget.getText().toString());
+				
+				widget.setText("");
+			}});
+		}});
 	}
 	
 	
