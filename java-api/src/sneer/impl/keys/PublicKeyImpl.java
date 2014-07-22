@@ -43,4 +43,10 @@ class PublicKeyImpl implements PublicKey {
 	
 	private static final long serialVersionUID = 1L;
 
+
+	@Override
+	public byte[] bytes() {
+		return bytes.clone();
+	}
+
 }

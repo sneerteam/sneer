@@ -1,9 +1,12 @@
 (ns sneer.core
-  (:require [rx.lang.clojure.core :as rx])
-  (:import [sneer.admin SneerAdmin]
-           [sneer Sneer PrivateKey]
-           [sneer.tuples Tuple Tuples TuplePublisher TupleSubscriber]
-           [rx.subjects ReplaySubject]))
+  (:require
+    [rx.lang.clojure.core :as rx]
+    [sneer.serialization :refer :all])
+  (:import
+    [sneer.admin SneerAdmin]
+    [sneer Sneer PrivateKey]
+    [sneer.tuples Tuple Tuples TuplePublisher TupleSubscriber]
+    [rx.subjects ReplaySubject]))
 
 (defmacro reify+
   "expands to reify form after macro expanding the body"
@@ -15,7 +18,8 @@
        (get ~'attrs ~(name g))))
 
 (defn ->tuple [attrs]
-  (reify+ Tuple
+  (reify+
+    Tuple
     (tuple-getter type)
     (tuple-getter audience)
     (tuple-getter author)
@@ -37,7 +41,7 @@
         (pub [this value]
            (.. this (value value) pub))
         (pub [this]
-           (. tuples onNext (->tuple attrs))
+           (. tuples onNext (serialize attrs))
            this)))))
 
 (defn visible-to [puk]
@@ -66,7 +70,7 @@
     (newTuplePublisher [this]
       (new-tuple-publisher tuples {"author" own-puk}))
     (newTupleSubscriber [this]
-      (new-tuple-subscriber own-puk tuples))))
+      (new-tuple-subscriber own-puk (rx/map (comp ->tuple deserialize) tuples)))))
 
 (defn new-sneer-admin [tuples]
   (reify SneerAdmin

@@ -1,8 +1,8 @@
 package sneer.impl.keys;
 
-import java.security.*;
+import java.security.SecureRandom;
 
-import sneer.PrivateKey;
+import sneer.*;
 import sneer.commons.*;
 
 public class Keys {
@@ -11,6 +11,11 @@ public class Keys {
 
 	public static PrivateKey createPrivateKey() {
 		return createPrivateKey("" + nextSeed++);
+	}
+	
+	
+	public static PublicKey createPublicKey(byte[] bytes) {
+		return new PublicKeyImpl(bytes);
 	}
 
 	
