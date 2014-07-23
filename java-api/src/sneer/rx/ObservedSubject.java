@@ -40,6 +40,7 @@ public class ObservedSubject<T> {
 
 	
 	public void set(T newValue) {
+		mostRecent = newValue;
 		subject.onNext(newValue);
 	}
 	
