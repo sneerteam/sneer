@@ -29,6 +29,9 @@
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
+(defn ->envelope [destination tuple]
+  {:address destination :payload tuple})
+
 (defn new-tuple-publisher
   ([tuples attrs]
     (letfn
@@ -41,15 +44,15 @@
         (pub [this value]
            (.. this (value value) pub))
         (pub [this]
-           (. tuples onNext (serialize attrs))
+           (. tuples onNext (->envelope (get attrs "audience") (serialize attrs)))
            this)))))
 
-(defn visible-to [puk]
-  (fn [tuple]
-    (let [audience (. tuple audience)]
+(defn addressed-to [puk]
+  (fn [envelope]
+    (let [destination-address (:address envelope)]
       (or
-        (nil? audience)
-        (= audience puk)))))
+        (nil? destination-address) ; public tuples
+        (= destination-address puk)))))
 
 (defmacro subscriber-filter [attr]
   `(~attr [~'this ~'expected]
@@ -62,23 +65,25 @@
     (subscriber-filter type)
     (subscriber-filter author)
     (subscriber-filter audience)
-    (tuples [this]
-      (rx/filter (visible-to own-puk) tuples))))
+    (tuples [this] tuples)))
 
-(defn new-tuples [own-puk tuples]
+(defn new-tuples [own-puk session]
   (reify Tuples
     (newTuplePublisher [this]
-      (new-tuple-publisher tuples {"author" own-puk}))
+      (new-tuple-publisher session {"author" own-puk}))
     (newTupleSubscriber [this]
-      (new-tuple-subscriber own-puk (rx/map (comp ->tuple deserialize) tuples)))))
+      (let [tuples-for-me (rx/filter (addressed-to own-puk) session)]
+        (new-tuple-subscriber own-puk (rx/map (comp ->tuple deserialize :payload) tuples-for-me))))))
 
-(defn new-sneer-admin [tuples]
-  (reify SneerAdmin
-    (initialize [this prik]
-      (let [puk (. prik publicKey)]
+(defn new-sneer-admin [session]
+  (let [prik (atom nil)]
+    (reify SneerAdmin
+      (initialize [this new-prik]
+        (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
+      (sneer [this]
         (reify Sneer
           (tuples [this]
-            (new-tuples puk tuples)))))))
+            (new-tuples (.publicKey @prik) session)))))))
 
 (defn new-session []
   (ReplaySubject/create))
