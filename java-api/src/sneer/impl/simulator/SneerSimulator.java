@@ -34,16 +34,15 @@ public class SneerSimulator extends SneerBase {
 	
 	
 	@Override
-	public Party produceParty(PublicKey publicKey) {
-		Party ret;
+	public Party produceParty(PublicKey puk) {
 		synchronized (partiesByPuk) {
-			ret = partiesByPuk.get(publicKey);
-			if (ret == null) {
-				ret = new PartySimulator(null, Keys.createPrivateKey());
-				partiesByPuk.put(publicKey, ret);
-			}
+			Party existing = partiesByPuk.get(puk);
+			if (existing != null) return existing;
+			
+			Party newParty = new PartySimulator(puk);
+			partiesByPuk.put(puk, newParty);
+			return newParty;
 		}
-		return ret;
 	}
 
 
