@@ -16,7 +16,6 @@ public class InteractionEvent {
 
 	
 	private final String content;
-	private final Party sender;
 	
 	private final long timestampSent;
 	private final long timestampReceived;
@@ -24,20 +23,19 @@ public class InteractionEvent {
 	private final boolean isOwn;
 	
 	
-	public static InteractionEvent createFrom(Party sender, long timeSent, long timeReceived, String content) {
-		return new InteractionEvent(sender, timeSent, timeReceived, content, false);
+	public static InteractionEvent createFrom(long timeSent, long timeReceived, String content) {
+		return new InteractionEvent(timeSent, timeReceived, content, false);
 	}	
 
 	
 	public static InteractionEvent createOwn(long timeSent, String content) {
-		return new InteractionEvent(null, timeSent, timeSent, content, true);
+		return new InteractionEvent(timeSent, timeSent, content, true);
 	}	
 
 	
-	private InteractionEvent(Party sender, long timestampSent, long timestampReceived, String content, boolean isOwn) {
+	private InteractionEvent(long timestampSent, long timestampReceived, String content, boolean isOwn) {
 		this.timestampSent = timestampSent;
 		this.timestampReceived = timestampReceived;
-		this.sender = sender;
 		this.content = content;
 		this.isOwn = isOwn;
 	}
@@ -45,12 +43,6 @@ public class InteractionEvent {
 	
 	public boolean isOwn() {
 		return isOwn;
-	}
-	
-	
-	/** @return The Party that sent this InteractionEvent or null if isOwn(). */
-	public Party sender() {
-		return sender;
 	}
 	
 	
@@ -78,7 +70,7 @@ public class InteractionEvent {
 	
 	@Override
 	public String toString() {
-		return "InteractionEvent [" + timestampSent + " " + sender + ": " + content + "]";
+		return "InteractionEvent [" + timestampSent + ": " + content + "]";
 	}
 
 	

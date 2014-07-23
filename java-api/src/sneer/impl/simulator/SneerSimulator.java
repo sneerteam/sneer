@@ -54,16 +54,15 @@ public class SneerSimulator extends SneerBase {
 	
 	@Override
 	public Interaction produceInteractionWith(Party party) {
-		Interaction ret;
 		synchronized (interactionsByParty) {
-			ret = interactionsByParty.get(party);
-			if (ret == null) {
-				ret = new InteractionSimulator(party);
-				interactionsByParty.put(party, ret);
-				interactions.onNext(interactionsSorted());
-			}
+			Interaction existing = interactionsByParty.get(party);
+			if (existing != null) return existing;
+			
+			InteractionSimulator newInteraction = new InteractionSimulator(party);
+			interactionsByParty.put(party, newInteraction);
+			interactions.onNext(interactionsSorted());
+			return newInteraction;
 		}
-		return ret;
 	}
 	
 

@@ -68,7 +68,7 @@ public class InteractionSimulator implements Interaction {
 	
 	
 	private void simulateReceivedMessage(String content) {
-		addEvent(createFrom(this.party, now(), now(), content));
+		addEvent(createFrom(now(), now(), content));
 	}
 	
 	
