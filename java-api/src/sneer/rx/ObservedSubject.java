@@ -43,5 +43,10 @@ public class ObservedSubject<T> {
 		mostRecent = newValue;
 		subject.onNext(newValue);
 	}
+
+
+	public Subject<T, T> subject() {
+		return subject();
+	}
 	
 }
