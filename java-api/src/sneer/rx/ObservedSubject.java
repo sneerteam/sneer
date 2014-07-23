@@ -46,7 +46,7 @@ public class ObservedSubject<T> {
 
 
 	public Subject<T, T> subject() {
-		return subject();
+		return subject;
 	}
 	
 }
