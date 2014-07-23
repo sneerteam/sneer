@@ -56,10 +56,15 @@ public class InteractionActivity extends Activity {
 		listView.setAdapter(adapter);
 
 		final Button b = (Button)findViewById(R.id.sendButton);
-		final TextView widget = (TextView)findViewById(R.id.editText);
+		final TextView editText = (TextView)findViewById(R.id.editText);
 		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			sneer().produceInteractionWith(party).sendMessage(widget.getText().toString());
-			widget.setText("");
+			sendMessage(party, editText.getText().toString().trim());
+			editText.setText("");
+		}
+
+		private void sendMessage(final Party party, final String text) {
+			if (text != null && !text.isEmpty())
+				sneer().produceInteractionWith(party).sendMessage(text);
 		}});
 	}
 	

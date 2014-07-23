@@ -56,7 +56,7 @@ public class InteractionListActivity extends Activity {
 		}});
 
 		sneer().interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
-//			adapter.clear();
+			adapter.clear();
 			adapter.addAll(interactions);
 			adapter.notifyDataSetChanged();
 		}});
