@@ -10,11 +10,10 @@ public class SneerAdminSimulator implements SneerAdmin {
 	private SneerSimulator sneer;
 
 	@Override
-	public Sneer initialize(PrivateKey prik) {
+	public void initialize(PrivateKey prik) {
 		check(privateKey == null);
 		privateKey = prik;
 		sneer = new SneerSimulator(privateKey);
-		return sneer;
 	}
 
 	@Override
@@ -26,6 +25,12 @@ public class SneerAdminSimulator implements SneerAdmin {
 	@Override
 	public void setOwnName(String newName) {
 		sneer.setOwnName(newName);
+	}
+
+	@Override
+	public Sneer sneer() {
+		check(sneer != null);
+		return sneer;
 	}
 
 

@@ -1,13 +1,30 @@
 package sneer.android.main;
 
-import sneer.Sneer;
-import sneer.impl.keys.Keys;
-import sneer.impl.simulator.SneerAdminSimulator;
-import android.app.Application;
+import sneer.*;
+import sneer.admin.*;
+import sneer.impl.keys.*;
+import sneer.impl.simulator.*;
 
-public class SneerSingleton extends Application {
+public class SneerSingleton {
 	
-	public static final Sneer SNEER =
-		new SneerAdminSimulator().initialize(Keys.createPrivateKey());
-//		new SneerAdminImpl();
+	@Deprecated
+	public static Sneer SNEER = sneer();
+	private static Sneer INSTANCE = null;
+
+	/*
+	dir = new File(context.getFilesDir(), "admin");
+	SneerAdmin admin = SneerAdminImpl(dir);
+	 */
+
+	public static Sneer sneer() {
+//		if (INSTANCE == null) throw new IllegalStateException("You must call SneerSingleton.setInstance(...) first.");
+		if (INSTANCE == null) {
+			SneerAdmin admin = new SneerAdminSimulator();
+			admin.initialize(Keys.createPrivateKey());
+			admin.setOwnName("Neide da Silva");
+			INSTANCE = admin.sneer();
+		}
+		return INSTANCE;
+	}
+
 }

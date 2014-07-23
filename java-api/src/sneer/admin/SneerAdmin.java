@@ -1,16 +1,18 @@
 package sneer.admin;
 
 import sneer.*;
-import sneer.commons.exceptions.*;
 
 public interface SneerAdmin {
 
-	Sneer initialize(PrivateKey prik) throws FriendlyException;
+	void initialize(PrivateKey prik);
 	
-	/** @return The private key used to initialize this Sneer node. The initialize method must have been called. */
+	/** @return The private key used to initialize this Sneer node. */
 	PrivateKey privateKey();
 	
-	/** The initialize method must have been called. */
+	/** This must have a privateKey(). */
 	void setOwnName(String newName);
+	
+	/** This must have a privateKey(). */
+	Sneer sneer();
 	
 }
