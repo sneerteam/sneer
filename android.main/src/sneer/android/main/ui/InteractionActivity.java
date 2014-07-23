@@ -35,7 +35,9 @@ public class InteractionActivity extends Activity {
 		
 		final Party party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
-		this.setTitle(sneer().labelFor(party).mostRecent());
+		sneer().labelFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
+			setTitle(label);
+		}});
 
 		sneer().produceInteractionWith(party).events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
 			messages.clear();

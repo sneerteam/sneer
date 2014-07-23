@@ -50,7 +50,6 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
         
         final TextView senderView = findText(ret, R.id.interactionEventSender);
         
-        //TODO event.sender() is null when interaction isOwn()
         if (!event.isOwn()) {
         	sneer.labelFor(event.sender()).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
         		senderView.setText(sender);

@@ -14,7 +14,7 @@
 	<RelativeLayout
         android:id="@+id/speechBubble"
 	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
+	    android:layout_height="wrap_content"	    
 	    android:padding="10dp"
 	    android:layout_toRightOf="@+id/speechBubbleArrowLeft"
 	    android:background="@drawable/contact_speech_bubble">
@@ -40,7 +40,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_below="@+id/interactionEventContent"
-			android:layout_alignParentRight="true"
+			android:layout_alignLeft="@+id/interactionEventContent"
 			android:textSize="12sp"
 			android:textColor="#777"
 			android:text="@string/dummy_text" />
