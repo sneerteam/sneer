@@ -1,6 +1,7 @@
 package sneer.rx;
 
 import rx.*;
+import rx.functions.*;
 import rx.subjects.*;
 
 
@@ -20,6 +21,9 @@ public class ObservedSubject<T> {
 	private ObservedSubject(T initialValue) {
 		mostRecent = initialValue;
 		subject = BehaviorSubject.create(initialValue);
+		subject.subscribe(new Action1<T>() { @Override public void call(T newValue) {
+			mostRecent = newValue;
+		}});
 	}
 
 	
@@ -40,7 +44,6 @@ public class ObservedSubject<T> {
 
 	
 	public void set(T newValue) {
-		mostRecent = newValue;
 		subject.onNext(newValue);
 	}
 

@@ -129,8 +129,8 @@ public class SneerSimulator extends SneerBase {
 	private void populate(String... newContactNicks) {
 		for (String nick : newContactNicks) {
 			PrivateKey prik = Keys.createPrivateKey(nick);
-			String name = nick + " da Silva";
-			Party party = new PartySimulator(name, prik);
+			Party party = produceParty(prik.publicKey());
+			((PartySimulator)party).setName(nick + " da Silva");
 			setContact(nick, party);
 		}
 	}
