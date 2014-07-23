@@ -9,13 +9,13 @@ import android.app.*;
 import android.view.*;
 import android.widget.*;
 
-public class InteractionsAdapter extends ArrayAdapter<Interaction> {
+public class InteractionListAdapter extends ArrayAdapter<Interaction> {
 
 	private Activity activity;
     int layoutResourceId;
 	private final Func1<Party, Observable<String>> labelProvider;
     
-    public InteractionsAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider) {
+    public InteractionListAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider) {
         super(activity, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         this.activity = activity;

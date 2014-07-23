@@ -23,7 +23,7 @@ public class InteractionListActivity extends Activity {
 
 	private static final String DISABLE_MENUS = "disable-menus";
 	private static final String TITLE = "title";
-	private InteractionsAdapter adapter;
+	private InteractionListAdapter adapter;
 	private Cloud cloud;
 	private ListView listView;
 	private Interaction interaction;
@@ -40,12 +40,11 @@ public class InteractionListActivity extends Activity {
 			
 			if ((title = getIntent().getExtras().getString(TITLE)) != null) {				
 				setTitle(title);				
-			}
-		
+			}		
 		}
 
 		listView = (ListView)findViewById(R.id.listView);
-		adapter = new InteractionsAdapter(this, R.layout.list_item_interaction, new Func1<Party, Observable<String>>() {  @Override public Observable<String> call(Party party) {
+		adapter = new InteractionListAdapter(this, R.layout.list_item_interaction, new Func1<Party, Observable<String>>() {  @Override public Observable<String> call(Party party) {
 			return SNEER.labelFor(party).observable();
 		}});
 		listView.setAdapter(adapter);
@@ -58,8 +57,9 @@ public class InteractionListActivity extends Activity {
 		}});
 
 		SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
-			for (Interaction interaction : interactions)
-				adapter.add(interaction);
+//			adapter.clear();
+			adapter.addAll(interactions);
+			adapter.notifyDataSetChanged();
 		}});
 	}
 

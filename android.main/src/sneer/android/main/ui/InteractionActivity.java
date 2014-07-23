@@ -4,9 +4,6 @@ import static sneer.android.main.SneerSingleton.*;
 
 import java.util.*;
 
-import rx.*;
-import rx.Observable.OnSubscribe;
-import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -29,7 +26,7 @@ public class InteractionActivity extends Activity {
 	}};
 
 	private final List<InteractionEvent> messages = new ArrayList<InteractionEvent>();
-	private InteractionAdapter interactionAdapter;
+	private InteractionAdapter adapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +38,12 @@ public class InteractionActivity extends Activity {
 		this.setTitle(SNEER.labelFor(party).mostRecent());
 
 		SNEER.produceInteractionWith(party).events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
-			messages.clear();
+//			messages.clear();
 			messages.addAll(events);
-			interactionAdapter.notifyDataSetChanged();
+			adapter.notifyDataSetChanged();
 		}});
 
-		interactionAdapter = new InteractionAdapter(this,
+		adapter = new InteractionAdapter(this,
 			this.getLayoutInflater(),
 			R.layout.list_item_user_message,
 			R.layout.list_item_party_message,
@@ -54,18 +51,12 @@ public class InteractionActivity extends Activity {
 			SNEER);
 
 		ListView listView = (ListView) findViewById(R.id.listView);
-		listView.setAdapter(interactionAdapter);
+		listView.setAdapter(adapter);
 
 		final Button b = (Button)findViewById(R.id.sendButton);
 		final TextView widget = (TextView)findViewById(R.id.editText);
 		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Interaction>>() { @Override public void call(List<Interaction> interactions) {
-				for (Interaction interaction : interactions) {
-					if (interaction.party() != party)
-						continue;
-					interaction.sendMessage(widget.getText().toString());
-				}
-			}});
+			SNEER.produceInteractionWith(party).sendMessage(widget.getText().toString());
 			widget.setText("");
 		}});
 	}
@@ -87,7 +78,7 @@ public class InteractionActivity extends Activity {
 		if (insertionPointHint < 0) {
 			int insertionPoint = Math.abs(insertionPointHint) - 1;
 			messages.add(insertionPoint, msg);
-			interactionAdapter.notifyDataSetChanged();
+			adapter.notifyDataSetChanged();
 		}
 	}
 }
