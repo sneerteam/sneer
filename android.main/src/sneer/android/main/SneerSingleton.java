@@ -7,8 +7,6 @@ import sneer.impl.simulator.*;
 
 public class SneerSingleton {
 	
-	@Deprecated
-	public static Sneer SNEER = sneer();
 	private static Sneer INSTANCE = null;
 
 	/*

@@ -48,14 +48,17 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
         findText(ret, R.id.interactionEventContent).setText(event.content());
         findText(ret, R.id.interactionEventTime).setText(event.timeSent());
         
+        final TextView senderView = findText(ret, R.id.interactionEventSender);
+        
         //TODO event.sender() is null when interaction isOwn()
-        if (!event.isOwn())
+        if (!event.isOwn()) {
         	sneer.labelFor(event.sender()).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
-        		TextView senderView = findText(ret, R.id.interactionEventSender);
         		senderView.setText(sender);
         		setColors(senderView, ret, sender, event.isOwn());
         	}});
-        
+        } else {
+			setColors(senderView, ret, null, true);
+        }
         return ret;
     }
 

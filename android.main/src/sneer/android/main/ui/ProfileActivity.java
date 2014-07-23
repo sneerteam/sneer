@@ -1,8 +1,7 @@
 package sneer.android.main.ui;
 
 import sneer.*;
-import sneer.android.main.R;
-import sneer.snapi.*;
+import sneer.android.main.*;
 import android.content.*;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.*;

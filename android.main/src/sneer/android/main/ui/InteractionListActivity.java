@@ -34,18 +34,17 @@ public class InteractionListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction_list);
 
-		if (getIntent() != null && getIntent().getExtras() != null
-				) {
+		if (getIntent() != null && getIntent().getExtras() != null) {
 			String title;
 			
 			if ((title = getIntent().getExtras().getString(TITLE)) != null) {				
-				setTitle(title);				
+				setTitle(title);
 			}		
 		}
 
 		listView = (ListView)findViewById(R.id.listView);
 		adapter = new InteractionListAdapter(this, R.layout.list_item_interaction, new Func1<Party, Observable<String>>() {  @Override public Observable<String> call(Party party) {
-			return SNEER.labelFor(party).observable();
+			return sneer().labelFor(party).observable();
 		}});
 		listView.setAdapter(adapter);
 
@@ -56,7 +55,7 @@ public class InteractionListActivity extends Activity {
 			onContactClicked(interaction);
 		}});
 
-		SNEER.interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+		sneer().interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
 //			adapter.clear();
 			adapter.addAll(interactions);
 			adapter.notifyDataSetChanged();
