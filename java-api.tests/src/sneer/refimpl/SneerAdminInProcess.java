@@ -1,11 +1,12 @@
 package sneer.refimpl;
 
+import static sneer.commons.exceptions.Exceptions.*;
+
 import java.util.*;
 
 import rx.Observable;
 import sneer.*;
 import sneer.admin.*;
-import sneer.commons.exceptions.*;
 import sneer.rx.*;
 import sneer.tuples.*;
 
@@ -13,6 +14,7 @@ public class SneerAdminInProcess implements SneerAdmin {
 
 	private final TuplesFactoryInProcess factory;
 	private PrivateKey privateKey;
+	private Sneer sneer;
 
 	
 	public SneerAdminInProcess(TuplesFactoryInProcess factory) {
@@ -20,11 +22,11 @@ public class SneerAdminInProcess implements SneerAdmin {
 	}
 
 	@Override
-	public Sneer initialize(PrivateKey prik) {
-		Exceptions.check(privateKey == null);
+	public void initialize(PrivateKey prik) {
+		check(privateKey == null);
 		privateKey = prik;
-		
-		return new Sneer() {
+
+		sneer = new Sneer() {
 
 			private final Tuples tuples = factory.newTuples(privateKey);
 
@@ -56,6 +58,12 @@ public class SneerAdminInProcess implements SneerAdmin {
 	
 	static private <T> T untested() {
 		throw new RuntimeException("This is not being tested yet.");
+	}
+
+	@Override
+	public Sneer sneer() {
+		check(sneer != null);
+		return sneer;
 	}
 
 }

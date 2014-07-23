@@ -30,7 +30,9 @@ public class TestsBase {
 	
 	private Sneer init(PrivateKey prik) {
 		try {
-			return createSneerAdmin(session).initialize(prik);
+			SneerAdmin admin = createSneerAdmin(session);
+			admin.initialize(prik);
+			return admin.sneer();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
