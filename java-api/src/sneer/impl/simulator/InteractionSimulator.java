@@ -23,7 +23,7 @@ public class InteractionSimulator implements Interaction {
 	public InteractionSimulator(Party party) {
 		this.party = party;
 		sendMessage("Vai ter festa!!!! Uhuu!!!");
-		addEvent(createFrom(this.party, now(), now(), "Onde? Onde??"));
+		simulateReceivedMessage("Onde? Onde??");
 	}
 
 
@@ -42,6 +42,7 @@ public class InteractionSimulator implements Interaction {
 	@Override
 	public void sendMessage(String content) {
 		addEvent(createOwn(now(), content));
+		simulateReceivedMessage("Echo: " + content);
 	}
 
 
@@ -63,6 +64,11 @@ public class InteractionSimulator implements Interaction {
 		ret.add(event);
 		Collections.sort(ret, order);
 		return ret;
+	}
+	
+	
+	private void simulateReceivedMessage(String content) {
+		addEvent(createFrom(this.party, now(), now(), content));
 	}
 	
 	
