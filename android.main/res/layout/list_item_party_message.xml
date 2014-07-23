@@ -20,19 +20,9 @@
 	    android:background="@drawable/contact_speech_bubble">
 	
 		<TextView
-			android:id="@+id/interactionEventSender"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignLeft="@+id/interactionEventContent"
-			android:textStyle="bold"
-			android:textColor="#383"
-			android:text="@string/dummy_text" />
-	
-		<TextView
 			android:id="@+id/interactionEventContent" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_below="@+id/interactionEventSender"
 			android:text="@string/dummy_text" />
 		
 		<TextView

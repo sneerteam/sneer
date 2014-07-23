@@ -23,17 +23,19 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
     int listContactResourceId;
 	private LayoutInflater inflater;
 	private Sneer sneer;
+	private Party party;
     
     public InteractionAdapter(Context context,
     		LayoutInflater inflater,
     		int layoutUserResourceId,
     		int listContactResourceId,
     		List<InteractionEvent> data,
-    		Sneer sneer) {
+    		Party party, Sneer sneer) {
         super(context, layoutUserResourceId, data);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
         this.listContactResourceId = listContactResourceId;
+		this.party = party;
 		this.sneer = sneer;
     }
 
@@ -48,21 +50,19 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
         findText(ret, R.id.interactionEventContent).setText(event.content());
         findText(ret, R.id.interactionEventTime).setText(event.timeSent());
         
-        final TextView senderView = findText(ret, R.id.interactionEventSender);
-        
         if (!event.isOwn()) {
-        	sneer.labelFor(event.sender()).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
-        		senderView.setText(sender);
-        		setColors(senderView, ret, sender, event.isOwn());
+        	sneer.labelFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
+        		setColors(ret, sender, event.isOwn());
         	}});
         } else {
-			setColors(senderView, ret, null, true);
+			setColors(ret, null, true);
         }
-        return ret;
+        
+       	return ret;
     }
 
 	@SuppressLint("NewApi")
-	private void setColors(TextView interactionEventSender, View row, String sender, boolean own) {
+	private void setColors(View row, String sender, boolean own) {
 		final RelativeLayout speechBubble = (RelativeLayout)row.findViewById(R.id.speechBubble);
 		if (own) {
 			View speechBubbleArrowRight = row.findViewById(R.id.speechBubbleArrowRight);
@@ -72,8 +72,6 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 				int drawTriangleRight;
 			}
 		} else {
-			interactionEventSender.setTextColor(darkColorDeterminedBy(sender));
-			
 			View speechBubbleArrowLeft = row.findViewById(R.id.speechBubbleArrowLeft);
 			if (SDK_INT >= ICE_CREAM_SANDWICH){
 				speechBubbleArrowLeft.setBackground(new TriangleLeftDrawable(darkColorDeterminedBy(sender)));

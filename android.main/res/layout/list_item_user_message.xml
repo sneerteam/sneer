@@ -12,7 +12,6 @@
 		android:layout_alignBottom="@+id/speechBubble"
 		android:background="@drawable/drawble_dummy" />
     
-    
     <RelativeLayout
         android:id="@+id/speechBubble"
 	    android:layout_width="wrap_content"
@@ -21,15 +20,6 @@
 	    android:padding="10dp"
 	    android:background="@drawable/user_speech_bubble">
 	    
-        <TextView
-			android:id="@+id/interactionEventSender"
-			android:layout_width="wrap_content"
-			android:layout_height="0px"
-			android:layout_alignLeft="@+id/interactionEventContent"
-			android:textStyle="bold"
-			android:textColor="#383"
-			android:text="@string/dummy_text" />
-	
 		<TextView
 			android:id="@+id/interactionEventContent" 
 			android:layout_width="wrap_content"

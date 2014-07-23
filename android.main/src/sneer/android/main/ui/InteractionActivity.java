@@ -50,6 +50,7 @@ public class InteractionActivity extends Activity {
 			R.layout.list_item_user_message,
 			R.layout.list_item_party_message,
 			messages,
+			party,
 			sneer());
 
 		ListView listView = (ListView) findViewById(R.id.listView);
