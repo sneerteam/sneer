@@ -87,7 +87,7 @@ public class TuplesFactoryInProcess {
 						}
 						return tupleValue == null
 							? value == null
-							: tupleValue.equals(value);
+							: (value.getClass().isArray() ? Arrays.equals((Object[])value, (Object[])tupleValue) : tupleValue.equals(value));
 					}});
 				}
 				return t;
