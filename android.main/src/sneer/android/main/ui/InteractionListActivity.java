@@ -2,6 +2,7 @@ package sneer.android.main.ui;
 
 import static sneer.android.main.SneerSingleton.*;
 
+import java.io.*;
 import java.util.*;
 
 import rx.Observable;
@@ -9,6 +10,8 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.R;
+import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 import sneer.snapi.*;
 import android.app.*;
 import android.content.*;
@@ -136,14 +139,25 @@ public class InteractionListActivity extends Activity {
 
 	
 	private void showContactAdd() {
-//		new ContactAddHelper(this, new ContactAddHelper.AddListener() {
-//			@Override
-//			public void add(final OldContact interaction) {
-//				CloudPath contactPath = cloud.path("contacts",
-//						interaction.getPublicKey());
-//				contactPath.append("nickname").pub(interaction.getNickname());
-//			}
-//		});
+		View addContactView = View.inflate(this, R.layout.activity_contact_add, null);
+		final EditText publicKeyEdit = (EditText) addContactView.findViewById(R.id.public_key);
+		final EditText nicknameEdit = (EditText) addContactView.findViewById(R.id.nickname);
+		AlertDialog alertDialog = new AlertDialog.Builder(this)
+			.setView(addContactView)
+			.setTitle(R.string.action_add_contact)
+			.setNegativeButton("Cancel", null)
+			.setPositiveButton("Add", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				PublicKey puk = Keys.createPublicKey(publicKeyEdit.getText().toString().getBytes());
+				String nickname = nicknameEdit.getText().toString();
+				Party party = sneer().produceParty((PublicKey)puk);
+				try {
+					sneer().setContact(nickname, party);
+				} catch (FriendlyException e) {
+					toast(e.getMessage());
+				}
+			}})
+			.create();
+		alertDialog.show();
 	}
 
 	
@@ -158,20 +172,20 @@ public class InteractionListActivity extends Activity {
 
 	
 	private void sendMyPublicKey() {
-		cloud.ownPublicKey().subscribe(new Action1<byte[]>() {
+//		cloud.ownPublicKey().subscribe(new Action1<byte[]>() {
 
-			@Override
-			public void call(byte[] publicKey) {
+//			@Override
+//			public void call(byte[] publicKey) {
 //				String shareBody = PublicKey.bytesToHex(publicKey);
 //				log("ownPublicKey: " + shareBody);
-//				Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-//				sharingIntent.setType("text/plain");
-//				// sharingIntent.putExtra(Intent.EXTRA_SUBJECT,
-//				// "My Sneer public key");
-//				sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-//				startActivity(sharingIntent);
-			}
-		});
+				Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+				sharingIntent.setType("text/plain");
+				// sharingIntent.putExtra(Intent.EXTRA_SUBJECT,
+				// "My Sneer public key");
+				sharingIntent.putExtra(Intent.EXTRA_TEXT, "lkdsfj");
+				startActivity(sharingIntent);
+//			}
+//		});
 	}
 
 	
