@@ -5,7 +5,7 @@ import rx.subjects.*;
 import sneer.*;
 import sneer.rx.*;
 
-public class PartySimulator implements Party {
+public class PartySimulator implements Party, Profile {
 
 	private final ObservedSubject<PublicKey> publicKey;
 
@@ -47,6 +47,62 @@ public class PartySimulator implements Party {
 
 	public Observed<PrivateKey> privateKey() {
 		return null;
+	}
+
+
+	@Override
+	public String firstName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String lastName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String country() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String city() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setFirstName(String firstName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setLastName(String lastName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setCountry(String country) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setCity(String city) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
