@@ -128,7 +128,7 @@ public class SimpleP2P extends TestsBase {
 		tuplesA.newTupleSubscriber()
 			.audience(userA)
 			.type("profile/name")
-			.localTuples().last().value());
+			.localTuples().toBlockingObservable().last().value());
 	}
 	
 	
