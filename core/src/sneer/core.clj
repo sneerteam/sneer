@@ -41,11 +41,13 @@
         (publisher-attr type)
         (publisher-attr audience)
         (publisher-attr value)
+        (put [this key value]
+             (with key value))
         (pub [this value]
            (.. this (value value) pub))
         (pub [this]
            (. tuples onNext (->envelope (get attrs "audience") (serialize attrs)))
-           this)))))
+           (->tuple attrs))))))
 
 (defn addressed-to [puk]
   (fn [envelope]
@@ -65,6 +67,10 @@
     (subscriber-filter type)
     (subscriber-filter author)
     (subscriber-filter audience)
+	  (where [this key value]
+          (new-tuple-subscriber
+			       own-puk
+			       (rx/filter #(= (. % key) value) tuples)))
     (tuples [this] tuples)))
 
 (defn new-tuples [own-puk session]
