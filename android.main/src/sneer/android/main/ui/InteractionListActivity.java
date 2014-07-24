@@ -15,6 +15,7 @@ import sneer.impl.keys.*;
 import sneer.snapi.*;
 import android.app.*;
 import android.content.*;
+import android.net.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -36,13 +37,10 @@ public class InteractionListActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction_list);
-
-		if (getIntent() != null && getIntent().getExtras() != null) {
-			String title;
-			
-			if ((title = getIntent().getExtras().getString(TITLE)) != null) {				
-				setTitle(title);
-			}		
+		
+		String title;
+		if (getIntent() != null && getIntent().getExtras() != null && (title = getIntent().getExtras().getString(TITLE)) != null) {				
+			setTitle(title);
 		}
 
 		listView = (ListView)findViewById(R.id.listView);

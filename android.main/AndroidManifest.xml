@@ -35,6 +35,11 @@
         <activity
             android:name=".ui.InteractionListActivity"
             android:label="@string/title_interaction_list" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="sneer.android.main.INTERACTION_LIST" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.InteractionActivity"
