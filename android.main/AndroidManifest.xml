@@ -51,11 +51,6 @@
                 <action android:name="sneer.intent.action.BIND_CLOUD_SERVICE" />
             </intent-filter>
         </service>
-
-        <activity
-            android:name="sneer.android.main.ui.ProfileActivity"
-            android:label="@string/title_activity_profile" >
-        </activity>
     </application>
 
 </manifest>
