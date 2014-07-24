@@ -8,6 +8,7 @@ import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
+import sneer.android.main.*;
 import sneer.android.main.R;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
