@@ -1,3 +1,4 @@
+.metadata/
 .project
 .classpath
 .settings
@@ -9,3 +10,4 @@ local.properties
 
 .byke
 build
+

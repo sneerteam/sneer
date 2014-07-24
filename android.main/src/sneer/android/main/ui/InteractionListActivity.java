@@ -2,7 +2,6 @@ package sneer.android.main.ui;
 
 import static sneer.android.main.SneerSingleton.*;
 
-import java.io.*;
 import java.util.*;
 
 import rx.Observable;
@@ -127,10 +126,10 @@ public class InteractionListActivity extends Activity {
 			showProfile();
 			break;
 		case R.id.action_send_pk:
-			sendMyPublicKey();
+			sendYoursPublicKey();
 			break;
 		case R.id.action_copy_pk:
-			copyMyPublicKey();
+			copyYoursPublicKey();
 			break;
 		}
 
@@ -171,34 +170,20 @@ public class InteractionListActivity extends Activity {
 	}
 
 	
-	private void sendMyPublicKey() {
-//		cloud.ownPublicKey().subscribe(new Action1<byte[]>() {
-
-//			@Override
-//			public void call(byte[] publicKey) {
-//				String shareBody = PublicKey.bytesToHex(publicKey);
-//				log("ownPublicKey: " + shareBody);
-				Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-				sharingIntent.setType("text/plain");
-				// sharingIntent.putExtra(Intent.EXTRA_SUBJECT,
-				// "My Sneer public key");
-				sharingIntent.putExtra(Intent.EXTRA_TEXT, "lkdsfj");
-				startActivity(sharingIntent);
-//			}
-//		});
+	private void sendYoursPublicKey() {
+		log("ownPublicKey: " + sneer().self().publicKey().mostRecent());
+		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+		sharingIntent.setType("text/plain");
+		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "My Sneer public key");
+		sharingIntent.putExtra(Intent.EXTRA_TEXT, sneer().self().publicKey().mostRecent().toString());
+		startActivity(sharingIntent);
 	}
 
 	
-	private void copyMyPublicKey() {
-		cloud.ownPublicKey().subscribe(new Action1<byte[]>() {
-			@Override
-			public void call(byte[] publicKey) {
-//				ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-//				ClipData clip = ClipData.newPlainText("Public Key",
-//						PublicKey.bytesToHex(publicKey));
-//				clipboard.setPrimaryClip(clip);
-			}
-		});
+	private void copyYoursPublicKey() {
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		ClipData clip = ClipData.newPlainText("Public Key", sneer().self().publicKey().mostRecent().toString());
+		clipboard.setPrimaryClip(clip);
 	}
 
 	

@@ -8,7 +8,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
-import sneer.commons.*;
+import sneer.commons.Comparators;
 import android.app.*;
 import android.content.*;
 import android.os.*;
