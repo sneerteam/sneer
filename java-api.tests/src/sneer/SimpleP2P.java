@@ -1,26 +1,43 @@
 package sneer;
 
+import static org.junit.Assert.*;
 import static sneer.ObservableTestUtils.*;
-import static sneer.tuples.TupleUtils.*;
+import static sneer.tuples.Tuple.*;
 
 import java.io.*;
 
 import org.junit.*;
 
+import rx.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
 public class SimpleP2P extends TestsBase {
 	
+	@Test
+	public void publisherFluentReturningNewInstance() {
+		assertNotSame(tuplesA.newTuplePublisher(), tuplesA.newTuplePublisher());
+		TuplePublisher publisher = tuplesA.newTuplePublisher();
+		assertNotSame(publisher, publisher.audience(userA.publicKey()));
+		assertNotSame(publisher, publisher.pub());
+	}
+	
+	@Test
+	public void subscriberFluentReturningNewInstance() {
+		assertNotSame(tuplesA.newTupleSubscriber(), tuplesA.newTupleSubscriber());
+		TupleSubscriber subscriber = tuplesA.newTupleSubscriber();
+		assertNotSame(subscriber, subscriber.audience(userA));
+		assertNotSame(subscriber, subscriber.type("bla"));
+	}
 	
 	@Test
 	public void messagePassing() throws IOException {
 
 		TuplePublisher publisher = tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
-			.type("rock-paper-scissor/move")
-			.pub("paper");
+			.type("rock-paper-scissor/move");
 			
+		publisher.pub("paper");
 		publisher.pub("rock");
 		
 		publisher.type("rock-paper-scissor/message")
@@ -38,12 +55,10 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void tupleWithType() throws IOException {
 
-		tuplesA.newTuplePublisher()
-			.audience(userB.publicKey())
-			.type("rock-paper-scissor/move")
-			.pub("paper")
-			.type("rock-paper-scissor/message")
-			.pub("hehehe");
+		TuplePublisher publisher = tuplesA.newTuplePublisher()
+			.audience(userB.publicKey());
+		publisher.type("rock-paper-scissor/move").pub("paper");
+		publisher.type("rock-paper-scissor/message").pub("hehehe");
 		
 		assertEqualsUntilNow(tuplesB.newTupleSubscriber().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message");
 		
@@ -95,4 +110,41 @@ public class SimpleP2P extends TestsBase {
 		assertCount(0, tuplesB.newTupleSubscriber().audience(group).tuples());
 	}
 	
+	@Test
+	public void completedLocalTuples() {
+		
+		TuplePublisher publisher = tuplesA.newTuplePublisher()
+			.audience(userA.publicKey())
+			.type("profile/name");
+		publisher.pub("old name");
+		publisher.pub("new name");
+
+		
+		assertEquals("new name",
+		tuplesA.newTupleSubscriber()
+			.audience(userA)
+			.type("profile/name")
+			.localTuples().toBlockingObservable().last().value());
+	}
+	
+	@Test
+	public void subscriberCriteriaWithArray() {
+		
+		Object[] array = new Object[]{"notes", userB.publicKey()};
+		
+		tuplesA.newTuplePublisher()
+			.audience(userA.publicKey())
+			.type("file")
+			.put("path", array)
+			.pub("userB is cool");
+			
+		Observable<Tuple> actual = tuplesA.newTupleSubscriber()
+				.audience(userA)
+				.type("file")
+				.where("path", array)
+				.tuples();
+		
+		expectValues(actual, "userB is cool");
+	}
+
 }

@@ -13,6 +13,11 @@ public interface TupleSubscriber {
 
 	Observable<Tuple> tuples();
 	Observable<Object> values();
+	
+	/**
+	 * @return an observable that completes after local tuples are emitted. 
+	 */
+	Observable<Tuple> localTuples();
 
 	TupleSubscriber where(String key, Object value);
 

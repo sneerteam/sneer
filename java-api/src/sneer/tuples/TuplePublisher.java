@@ -16,10 +16,10 @@ public interface TuplePublisher extends Action1<Object>, Action0 {
 	/**
 	 * Publishes an object. Equivalent to calling {@link #value(Object)} and {@link #pub()}.
 	 * @param value
-	 * @return this
+	 * @return the published tuple
 	 */
-	TuplePublisher pub(Object value);
+	Tuple pub(Object value);
 
-	TuplePublisher pub();
+	Tuple pub();
 
 }
