@@ -1,17 +1,28 @@
 package sneer;
 
+import java.io.*;
+
+import rx.*;
+import sneer.api.*;
 import sneer.snapi.*;
+import sneer.tuples.*;
+import sun.reflect.generics.reflectiveObjects.*;
 import android.app.*;
 import android.content.*;
+import android.os.*;
 
 public class SneerAndroid {
+
+	public static final String TITLE = "title";
+	public static final String TYPE = "type";
+	public static final String NEW_INTERACTION_ACTION = "newInteractionAction";
 
 	public static void startInteractionList(Activity activity, String title, String type, String newInteractionAction) {
 		try {
 			Intent intent = new Intent("sneer.android.main.INTERACTION_LIST");
-			intent.putExtra("title", title);
-			intent.putExtra("type", type);
-			intent.putExtra("newInteractionAction", newInteractionAction);
+			intent.putExtra(TITLE, title);
+			intent.putExtra(TYPE, type);
+			intent.putExtra(NEW_INTERACTION_ACTION, newInteractionAction);
 			activity.startActivity(intent);
 		} catch (ActivityNotFoundException e) {
 			SneerUtils.showInstallSneerDialog(activity);
@@ -33,8 +44,100 @@ public class SneerAndroid {
 		if (!(context instanceof Activity)) {
 			throw new IllegalStateException("Context expected to be an Activity, found " + context.getClass().getName());
 		}
-		return (Session<T>) ((Activity)context).getIntent().getExtras().get("session");
+		
+		return new Session<T>() {
+
+			private Contact contact;
+			@Override
+			public Contact contact() {
+				if (contact == null) {
+					contact = sneer().findContact(sneer().produceParty(partyPublicKey()));
+				}
+				return contact;
+			}
+
+			@Override
+			public void send(T value) {
+				sneer()
+					.tuples()
+					.newTuplePublisher()
+					.audience(contact().party().publicKey().mostRecent())
+					.type(type())
+					.pub(value);
+			}
+
+			private String type() {
+				return (String) getExtra(TYPE);
+			}
+
+			@Override
+			public Observable<T> received() {
+				return (Observable<T>) sneer().tuples().newTupleSubscriber()
+						.audience(myPrivateKey())
+						.author(contact().party().publicKey().mostRecent())
+						.type(type())
+						.tuples()
+						.map(Tuple.TO_VALUE);
+						
+			}
+
+			@Override
+			public void dispose() {
+				throw new NotImplementedException();
+			}
+			private PublicKey partyPublicKey() {
+				return (PublicKey) getExtra("partyPuk");
+			}
+			
+		};
+	}
+	
+//	public static class ClientPrivateKey implements PrivateKey, Parcelable {
+//		
+//		private PublicKey publicKey;
+//		private String privateKey;
+//
+//		private ClientPrivateKey(PublicKey publicKey) {
+//			this.publicKey = publicKey;
+//		}
+//
+//		@Override
+//		public int describeContents() {
+//			return 0;
+//		}
+//
+//		@Override
+//		public void writeToParcel(Parcel dest, int flags) {
+//			dest.writeSerializable(publicKey);
+//		}
+//
+//		@Override
+//		public PublicKey publicKey() {
+//			return publicKey;
+//		}
+//		
+//		public static final Parcelable.Creator<ClientPrivateKey> CREATOR = new Parcelable.Creator<ClientPrivateKey>() {
+//			public ClientPrivateKey createFromParcel(Parcel in) {
+//				return new ClientPrivateKey((PublicKey) in.readSerializable());
+//			}
+//			
+//			public ClientPrivateKey[] newArray(int size) {
+//				return new ClientPrivateKey[size];
+//			}
+//		};
+//		
+//	}
+
+	protected PrivateKey myPrivateKey() {
+		throw new NotImplementedException();
 	}
 
+	private Sneer sneer() {
+		throw new NotImplementedException();
+	}
+
+	private Object getExtra(String key) {
+		return ((Activity)context).getIntent().getExtras().get(key);
+	}
 
 }

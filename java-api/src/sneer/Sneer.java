@@ -24,9 +24,12 @@ public interface Sneer {
 
 	/** All Interactions you have had, ordered by most recent first. */
 	Observable<List<Interaction>> interactions();
+	/** All Interactions of eventType have had, ordered by most recent first. */
+	Observable<List<Interaction>> interactionsContaining(String eventType);
 	/** @return an existing Interaction with party or a new one if it doesn't exist. */
 	Interaction produceInteractionWith(Party party);
 	
 	Tuples tuples();
+
 
 }

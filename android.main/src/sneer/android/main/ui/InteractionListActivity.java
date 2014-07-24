@@ -8,14 +8,12 @@ import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
-import sneer.android.main.*;
 import sneer.android.main.R;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 import sneer.snapi.*;
 import android.app.*;
 import android.content.*;
-import android.net.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -26,7 +24,6 @@ import android.widget.AdapterView.OnItemClickListener;
 public class InteractionListActivity extends Activity {
 
 	private static final String DISABLE_MENUS = "disable-menus";
-	private static final String TITLE = "title";
 	private InteractionListAdapter adapter;
 	private Cloud cloud;
 	private ListView listView;
@@ -39,7 +36,7 @@ public class InteractionListActivity extends Activity {
 		setContentView(R.layout.activity_interaction_list);
 		
 		String title;
-		if (getIntent() != null && getIntent().getExtras() != null && (title = getIntent().getExtras().getString(TITLE)) != null) {				
+		if (getIntent() != null && getIntent().getExtras() != null && (title = getIntent().getExtras().getString(SneerAndroid.TITLE)) != null) {				
 			setTitle(title);
 		}
 
@@ -56,14 +53,22 @@ public class InteractionListActivity extends Activity {
 			onContactClicked(interaction);
 		}});
 
-		sneer().interactions().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+		sneer().interactionsContaining(requestedType()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
 			adapter.clear();
 			adapter.addAll(interactions);
 			adapter.notifyDataSetChanged();
 		}});
 	}
 
+	private String requestedInteractionAction() {
+		return (getIntent() != null && getIntent().getExtras() != null ? getIntent().getExtras().getString(SneerAndroid.NEW_INTERACTION_ACTION) : null);
+	}
 	
+	private String requestedType() {
+		return (getIntent() != null && getIntent().getExtras() != null ? getIntent().getExtras().getString(SneerAndroid.TYPE) : null);
+	}
+
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -187,7 +192,13 @@ public class InteractionListActivity extends Activity {
 
 	
 	protected void onContactClicked(Interaction interaction) {
-		Intent intent = new Intent(this, InteractionActivity.class);
+		Intent intent = new Intent();
+		if (requestedInteractionAction() != null) {
+			intent.putExtra(SneerAndroid.TYPE, requestedType());
+			intent.setAction(requestedInteractionAction());
+		} else {
+			intent.setClass(this, InteractionActivity.class);
+		}
 		intent.putExtra("partyPuk", interaction.party().publicKey().mostRecent());
 		startActivity(intent);
 	}
