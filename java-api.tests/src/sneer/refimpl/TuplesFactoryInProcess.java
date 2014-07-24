@@ -5,6 +5,8 @@ import java.util.Map.Entry;
 
 import rx.Observable;
 import rx.functions.*;
+import rx.observables.*;
+import rx.schedulers.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.tuples.*;
@@ -114,6 +116,18 @@ public class TuplesFactoryInProcess {
 			public TupleSubscriber where(String key, Object value) {
 				where.put(key, value);
 				return this;
+			}
+
+			@Override
+			public BlockingObservable<Tuple> localTuples() {
+				TestScheduler scheduler = new TestScheduler();
+				final List<Tuple> result = new ArrayList<Tuple>();
+				tuples().subscribeOn(scheduler).subscribe(new Action1<Tuple>() {  @Override public void call(Tuple item) {
+					result.add(item);
+				} });
+				scheduler.triggerActions();
+
+				return Observable.from(result).toBlockingObservable();
 			}
 
 		}

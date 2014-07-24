@@ -1,12 +1,18 @@
 package sneer;
 
+import static org.junit.Assert.*;
 import static sneer.ObservableTestUtils.*;
 import static sneer.tuples.TupleUtils.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.junit.*;
 
+import rx.*;
+import rx.Observable;
+import rx.Observable.*;
+import rx.schedulers.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
@@ -94,5 +100,22 @@ public class SimpleP2P extends TestsBase {
 		PrivateKey group = Keys.createPrivateKey();
 		assertCount(0, tuplesB.newTupleSubscriber().audience(group).tuples());
 	}
+	
+	@Test
+	public void completedLocalTuples() {
+		
+		tuplesA.newTuplePublisher()
+			.audience(userA.publicKey())
+			.type("profile/name")
+			.pub("old name").pub("new name");
+
+		
+		assertEquals("new name",
+		tuplesA.newTupleSubscriber()
+			.audience(userA)
+			.type("profile/name")
+			.localTuples().last().value());
+	}
+	
 	
 }

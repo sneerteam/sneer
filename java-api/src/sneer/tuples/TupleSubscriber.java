@@ -1,6 +1,7 @@
 package sneer.tuples;
 
 import rx.*;
+import rx.observables.*;
 import sneer.*;
 
 public interface TupleSubscriber {
@@ -13,6 +14,8 @@ public interface TupleSubscriber {
 
 	Observable<Tuple> tuples();
 	Observable<Object> values();
+	
+	BlockingObservable<Tuple> localTuples();
 
 	TupleSubscriber where(String key, Object value);
 
