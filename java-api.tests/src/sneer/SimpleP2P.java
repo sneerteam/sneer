@@ -2,7 +2,7 @@ package sneer;
 
 import static org.junit.Assert.*;
 import static sneer.ObservableTestUtils.*;
-import static sneer.tuples.TupleUtils.*;
+import static sneer.tuples.Tuple.*;
 
 import java.io.*;
 import java.util.*;
@@ -10,23 +10,38 @@ import java.util.*;
 import org.junit.*;
 
 import rx.*;
+import rx.Observable.OnSubscribe;
 import rx.Observable;
-import rx.Observable.*;
 import rx.schedulers.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
 public class SimpleP2P extends TestsBase {
 	
+	@Test
+	public void publisherFluentReturningNewInstance() {
+		assertNotSame(tuplesA.newTuplePublisher(), tuplesA.newTuplePublisher());
+		TuplePublisher publisher = tuplesA.newTuplePublisher();
+		assertNotSame(publisher, publisher.audience(userA.publicKey()));
+		assertNotSame(publisher, publisher.pub());
+	}
+	
+	@Test
+	public void subscriberFluentReturningNewInstance() {
+		assertNotSame(tuplesA.newTupleSubscriber(), tuplesA.newTupleSubscriber());
+		TupleSubscriber subscriber = tuplesA.newTupleSubscriber();
+		assertNotSame(subscriber, subscriber.audience(userA));
+		assertNotSame(subscriber, subscriber.type("bla"));
+	}
 	
 	@Test
 	public void messagePassing() throws IOException {
 
 		TuplePublisher publisher = tuplesA.newTuplePublisher()
 			.audience(userB.publicKey())
-			.type("rock-paper-scissor/move")
-			.pub("paper");
+			.type("rock-paper-scissor/move");
 			
+		publisher.pub("paper");
 		publisher.pub("rock");
 		
 		publisher.type("rock-paper-scissor/message")
@@ -44,12 +59,10 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void tupleWithType() throws IOException {
 
-		tuplesA.newTuplePublisher()
-			.audience(userB.publicKey())
-			.type("rock-paper-scissor/move")
-			.pub("paper")
-			.type("rock-paper-scissor/message")
-			.pub("hehehe");
+		TuplePublisher publisher = tuplesA.newTuplePublisher()
+			.audience(userB.publicKey());
+		publisher.type("rock-paper-scissor/move").pub("paper");
+		publisher.type("rock-paper-scissor/message").pub("hehehe");
 		
 		assertEqualsUntilNow(tuplesB.newTupleSubscriber().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message");
 		
@@ -104,10 +117,11 @@ public class SimpleP2P extends TestsBase {
 	@Test
 	public void completedLocalTuples() {
 		
-		tuplesA.newTuplePublisher()
+		TuplePublisher publisher = tuplesA.newTuplePublisher()
 			.audience(userA.publicKey())
-			.type("profile/name")
-			.pub("old name").pub("new name");
+			.type("profile/name");
+		publisher.pub("old name");
+		publisher.pub("new name");
 
 		
 		assertEquals("new name",

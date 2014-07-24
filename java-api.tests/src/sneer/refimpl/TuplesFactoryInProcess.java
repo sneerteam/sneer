@@ -3,6 +3,8 @@ package sneer.refimpl;
 import java.util.*;
 import java.util.Map.Entry;
 
+import rx.*;
+import rx.Observable.OnSubscribe;
 import rx.Observable;
 import rx.functions.*;
 import rx.observables.*;
@@ -52,7 +54,6 @@ public class TuplesFactoryInProcess {
 		public String toString() {
 			return "TupleImpl ["+super.toString()+"]";
 		}
-		
 	}
 	
 	private final class TuplesImpl implements Tuples {
@@ -64,10 +65,15 @@ public class TuplesFactoryInProcess {
 			
 			private Map<String, Object> where = new HashMap<String, Object>();
 			
-			{
-				where("audience", null);
+			public TupleSubscriberImpl() {
+				where.put("audience", null);
 			}
 			
+			public TupleSubscriberImpl(TupleSubscriberImpl other, String key, Object value) {
+				where.putAll(other.where);
+				where.put(key, value);
+			}
+
 			@Override
 			public Observable<Tuple> tuples() {
 				Observable<Tuple> t = tuples;
@@ -89,45 +95,39 @@ public class TuplesFactoryInProcess {
 
 			@Override
 			public TupleSubscriber type(String type) {
-				where("type", type);
-				return this;
+				return where("type", type);
 			}
 
 			@Override
 			public TupleSubscriber author(PublicKey author) {
-				where("author", author);
-				return this;
+				return where("author", author);
 			}
 
 			@Override
 			public TupleSubscriber audience(PrivateKey audience) {
-				where("audience", audience.publicKey());
-				return this;
+				return where("audience", audience.publicKey());
 			}
 
 			@Override
 			public Observable<Object> values() {
-				return tuples().map(new Func1<Tuple, Object>() {  @Override public Object call(Tuple t1) {
-					return t1.value();
-				}});
+				return tuples().map(Tuple.TO_VALUE);
 			}
 
 			@Override
 			public TupleSubscriber where(String key, Object value) {
-				where.put(key, value);
-				return this;
+				return new TupleSubscriberImpl(this, key, value);
 			}
 
 			@Override
-			public BlockingObservable<Tuple> localTuples() {
-				TestScheduler scheduler = new TestScheduler();
-				final List<Tuple> result = new ArrayList<Tuple>();
-				tuples().subscribeOn(scheduler).subscribe(new Action1<Tuple>() {  @Override public void call(Tuple item) {
-					result.add(item);
-				} });
-				scheduler.triggerActions();
-
-				return Observable.from(result).toBlockingObservable();
+			public Observable<Tuple> localTuples() {
+				return Observable.create(new OnSubscribe<Tuple>() { @Override public void call(final Subscriber<? super Tuple> t1) {
+					TestScheduler scheduler = new TestScheduler();
+					tuples().subscribeOn(scheduler).subscribe(new Action1<Tuple>() {  @Override public void call(Tuple item) {
+						t1.onNext(item);
+					} });
+					scheduler.triggerActions();
+					t1.onCompleted();
+				}});
 			}
 
 		}
@@ -138,6 +138,19 @@ public class TuplesFactoryInProcess {
 			{
 				prototype.put("author", identity.publicKey());
 			}
+
+			public TuplePublisherImpl() {
+			}
+
+			public TuplePublisherImpl(TuplePublisherImpl other) {
+				prototype.putAll(other.prototype);
+			}
+			
+			public TuplePublisherImpl(TuplePublisherImpl other, String key, Object value) {
+				this(other);
+				prototype.put(key, value);
+			}
+
 
 			@Override
 			public void call() {
@@ -150,39 +163,35 @@ public class TuplesFactoryInProcess {
 			}
 
 			@Override
+			public Tuple pub() {
+				TupleImpl ret = prototype.clone();
+				tuples.onNext(ret);
+				return ret;
+			}
+
+			@Override
+			public Tuple pub(Object value) {
+				return value(value).pub();
+			}
+
+			@Override
 			public TuplePublisher value(Object value) {
-				prototype.put("value", value);
-				return this;
+				return put("value", value);
 			}
-
-			@Override
-			public TuplePublisher pub() {
-				tuples.onNext(prototype.clone());
-				return this;
-			}
-
-			@Override
-			public TuplePublisher pub(Object value) {
-				value(value);
-				return pub();
-			}
-
+			
 			@Override
 			public TuplePublisher type(String type) {
-				prototype.put("type", type);
-				return this;
+				return put("type", type);
 			}
 
 			@Override
 			public TuplePublisher audience(PublicKey audience) {
-				prototype.put("audience", audience);
-				return this;
+				return put("audience", audience);
 			}
 
 			@Override
 			public TuplePublisher put(String key, Object value) {
-				prototype.put(key, value);
-				return this;
+				return new TuplePublisherImpl(this, key, value);
 			}
 		}
 

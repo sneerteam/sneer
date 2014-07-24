@@ -1,6 +1,7 @@
 package sneer;
 
 import static sneer.ObservableTestUtils.*;
+import static sneer.tuples.Tuple.*;
 import rx.*;
 import sneer.admin.*;
 import sneer.impl.keys.*;
@@ -40,7 +41,7 @@ public class TestsBase {
 
 
 	protected void expectValues(Observable<Tuple> tuples, Object... expecteds) {
-		assertEqualsUntilNow(tuples.map(TupleUtils.TO_VALUE), expecteds);
+		assertEqualsUntilNow(tuples.map(TO_VALUE), expecteds);
 	}
 
 }
