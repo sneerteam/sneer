@@ -10,6 +10,7 @@ import sneer.tuples.*;
 public interface Sneer {
 	
 	Party self();
+	Profile profileFor(Party party);
 	
 	/** All Individual contacts that you have and all Groups you are a member of ordered alphabetically. */
 	Observable<List<Contact>> contacts();

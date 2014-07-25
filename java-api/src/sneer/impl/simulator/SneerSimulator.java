@@ -12,7 +12,6 @@ import sneer.*;
 import sneer.impl.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
-import sun.reflect.generics.reflectiveObjects.*;
 
 public class SneerSimulator extends SneerBase {
 
@@ -139,6 +138,12 @@ public class SneerSimulator extends SneerBase {
 	@Override
 	public Observable<List<Interaction>> interactionsContaining(String eventType) {
 		return interactions();
+	}
+
+
+	@Override
+	public Profile profileFor(Party party) {
+		return (PartySimulator)party;
 	}
 
 }

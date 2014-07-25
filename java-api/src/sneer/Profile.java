@@ -1,22 +1,20 @@
 package sneer;
 
+import rx.*;
+import sneer.commons.exceptions.*;
+
 public interface Profile {
 
-	String firstName();
+	Observable<String> preferredNickname();
+	void setPreferredNickname(String newPreferredNickname);
+
+	Observable<byte[]> selfie();
+	void setSelfie(byte[] newSelfie) throws FriendlyException;
 	
-	String lastName();
+	Observable<String> country();
+	void setCountry(String newCountry);
 	
-	String country();
-	
-	String city();
-	
-	void setFirstName(String firstName);
-	
-	void setLastName(String lastName);
-	
-	void setCountry(String country);
-	
-	void setCity(String city);
-	
+	Observable<String> city();
+	void setCity(String newCity);
 
 }
