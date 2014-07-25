@@ -204,6 +204,11 @@ afterEvaluate {
 							    name 'Felipe Bueno'
 							    email 'bueno.felipe@gmail.com'
 							}
+							developer {
+							    id 'dhmendes'
+							    name 'Diego Mendes'
+							    email 'dhmendes@gmail.com'
+							}
 						}
 			        }
 			        
