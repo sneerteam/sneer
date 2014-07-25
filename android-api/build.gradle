@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'eclipse'
 
-def originalVersion = "0.1.1"
+def originalVersion = "0.1.2"
 
 group = 'me.sneer'
 version = originalVersion
