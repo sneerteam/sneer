@@ -7,7 +7,6 @@ import rx.*;
 import rx.Observable.OnSubscribe;
 import rx.Observable;
 import rx.functions.*;
-import rx.observables.*;
 import rx.schedulers.*;
 import rx.subjects.*;
 import sneer.*;
