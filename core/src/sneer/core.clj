@@ -5,7 +5,7 @@
   (:import
     [sneer.admin SneerAdmin]
     [sneer Sneer PrivateKey]
-    [sneer.tuples Tuple Tuples TuplePublisher TupleSubscriber]
+    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
     [rx.subjects ReplaySubject]))
 
 (defmacro reify+
@@ -15,17 +15,17 @@
 
 (defmacro tuple-getter [g]
   `(~g [~'this]
-       (get ~'attrs ~(name g))))
+       (get ~'tuple ~(name g))))
 
-(defn ->tuple [attrs]
+(defn reify-tuple [tuple]
   (reify+
     Tuple
     (tuple-getter type)
     (tuple-getter audience)
     (tuple-getter author)
-    (tuple-getter value)))
+    (tuple-getter payload)))
 
-(defmacro publisher-attr [a]
+(defmacro publisher-field [a]
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
@@ -33,21 +33,21 @@
   {:address destination :payload tuple})
 
 (defn new-tuple-publisher
-  ([tuples attrs]
+  ([tuples tuple]
     (letfn
-      [(with [attr value]
-          (new-tuple-publisher tuples (assoc attrs attr value)))]
+      [(with [field value]
+          (new-tuple-publisher tuples (assoc tuple field value)))]
       (reify+ TuplePublisher
-        (publisher-attr type)
-        (publisher-attr audience)
-        (publisher-attr value)
-        (put [this key value]
-             (with key value))
-        (pub [this value]
-           (.. this (value value) pub))
+        (publisher-field type)
+        (publisher-field audience)
+        (publisher-field payload)
+        (field [this field value]
+             (with field value))
+        (pub [this payload]
+           (.. this (payload payload) pub))
         (pub [this]
-           (. tuples onNext (->envelope (get attrs "audience") (serialize attrs)))
-           (->tuple attrs))))))
+           (. tuples onNext (->envelope (get tuple "audience") (serialize tuple)))
+           (reify-tuple tuple))))))
 
 (defn addressed-to [puk]
   (fn [envelope]
@@ -56,30 +56,30 @@
         (nil? destination-address) ; public tuples
         (= destination-address puk)))))
 
-(defmacro subscriber-filter [attr]
-  `(~attr [~'this ~'expected]
-     (new-tuple-subscriber
+(defmacro subscriber-filter [field]
+  `(~field [~'this ~'expected]
+     (new-tuple-filter
        ~'own-puk
-       (rx/filter #(= (. % ~attr) ~'expected) ~'tuples))))
+       (rx/filter #(= (. % ~field) ~'expected) ~'tuples))))
 
-(defn new-tuple-subscriber [own-puk tuples]
-  (reify+ TupleSubscriber
+(defn new-tuple-filter [own-puk tuples]
+  (reify+ TupleFilter
     (subscriber-filter type)
     (subscriber-filter author)
     (subscriber-filter audience)
-	  (where [this key value]
-          (new-tuple-subscriber
+	  (field [this field value]
+          (new-tuple-filter
 			       own-puk
-			       (rx/filter #(= (. % key) value) tuples)))
+			       (rx/filter #(= (. % field) value) tuples)))
     (tuples [this] tuples)))
 
 (defn new-tuples [own-puk session]
-  (reify Tuples
-    (newTuplePublisher [this]
+  (reify TupleSpace
+    (publisher [this]
       (new-tuple-publisher session {"author" own-puk}))
-    (newTupleSubscriber [this]
+    (filter [this]
       (let [tuples-for-me (rx/filter (addressed-to own-puk) session)]
-        (new-tuple-subscriber own-puk (rx/map (comp ->tuple deserialize :payload) tuples-for-me))))))
+        (new-tuple-filter own-puk (rx/map (comp reify-tuple deserialize :payload) tuples-for-me))))))
 
 (defn new-sneer-admin [session]
   (let [prik (atom nil)]
@@ -88,7 +88,7 @@
         (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
       (sneer [this]
         (reify Sneer
-          (tuples [this]
+          (tupleSpace [this]
             (new-tuples (.publicKey @prik) session)))))))
 
 (defn new-session []
