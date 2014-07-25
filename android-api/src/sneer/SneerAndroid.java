@@ -3,7 +3,6 @@ package sneer;
 import rx.*;
 import sneer.snapi.*;
 import sneer.tuples.*;
-import sun.reflect.generics.reflectiveObjects.*;
 import android.app.*;
 import android.content.*;
 
@@ -125,11 +124,11 @@ public class SneerAndroid {
 //	}
 
 	protected PrivateKey myPrivateKey() {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not implemented yet.");
 	}
 
 	private Sneer sneer() {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not implemented yet.");
 	}
 
 	private Object getExtra(String key) {

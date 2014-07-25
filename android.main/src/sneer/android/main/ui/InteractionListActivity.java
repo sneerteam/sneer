@@ -193,11 +193,10 @@ public class InteractionListActivity extends Activity {
 	
 	protected void onContactClicked(Interaction interaction) {
 		Intent intent = new Intent();
+		intent.setClass(this, InteractionActivity.class);
 		if (requestedInteractionAction() != null) {
 			intent.putExtra(SneerAndroid.TYPE, requestedType());
-			intent.setAction(requestedInteractionAction());
-		} else {
-			intent.setClass(this, InteractionActivity.class);
+			intent.putExtra(SneerAndroid.NEW_INTERACTION_ACTION, requestedInteractionAction());
 		}
 		intent.putExtra("partyPuk", interaction.party().publicKey().mostRecent());
 		startActivity(intent);
