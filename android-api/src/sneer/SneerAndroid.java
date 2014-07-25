@@ -1,15 +1,11 @@
 package sneer;
 
-import java.io.*;
-
 import rx.*;
-import sneer.api.*;
 import sneer.snapi.*;
 import sneer.tuples.*;
 import sun.reflect.generics.reflectiveObjects.*;
 import android.app.*;
 import android.content.*;
-import android.os.*;
 
 public class SneerAndroid {
 
@@ -83,7 +79,7 @@ public class SneerAndroid {
 
 			@Override
 			public void dispose() {
-				throw new NotImplementedException();
+				throw new RuntimeException("Not implemented yet.");
 			}
 			private PublicKey partyPublicKey() {
 				return (PublicKey) getExtra("partyPuk");
