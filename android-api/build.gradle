@@ -81,6 +81,8 @@ android.libraryVariants.all { variant ->
 	if (!variant.name.equals("release")) return
     
 	task jarNodeps(type: Jar) {
+		dependsOn build
+		
         from variant.javaCompile.destinationDir
         from variant.javaCompile.source
         from variant.processResources.resDir
@@ -93,7 +95,7 @@ android.libraryVariants.all { variant ->
 	        classifier = "${x.versioning.snapshot.timestamp}-${x.versioning.snapshot.buildNumber}"
 	    } 
 	
-	    from { configurations.libs.collect { it.isDirectory() ? it : zipTree(it) } }
+	    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 	}
 	
     task javadocRelease(type: Javadoc) {
