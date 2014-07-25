@@ -3,6 +3,7 @@ package sneer.impl.simulator;
 import rx.*;
 import rx.subjects.*;
 import sneer.*;
+import sneer.commons.exceptions.*;
 import sneer.rx.*;
 
 public class PartySimulator implements Party, Profile {
@@ -49,58 +50,62 @@ public class PartySimulator implements Party, Profile {
 		return null;
 	}
 
+	
+	/////////////////////// Profile
 
 	@Override
-	public String firstName() {
+	public Observable<String> preferredNickname() {
 		// TODO Auto-generated method stub
+		
+		// Usar BehaviorSubject, como o this.name usa.
 		return null;
 	}
 
 
 	@Override
-	public String lastName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public String country() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public String city() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public void setFirstName(String firstName) {
+	public void setPreferredNickname(String newPreferredNickname) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
 	@Override
-	public void setLastName(String lastName) {
+	public Observable<byte[]> selfie() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setSelfie(byte[] newSelfie) throws FriendlyException {
 		// TODO Auto-generated method stub
 		
 	}
 
 
 	@Override
-	public void setCountry(String country) {
+	public Observable<String> country() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setCountry(String newCountry) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
 	@Override
-	public void setCity(String city) {
+	public Observable<String> city() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setCity(String newCity) {
 		// TODO Auto-generated method stub
 		
 	}
