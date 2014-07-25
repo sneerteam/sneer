@@ -81,6 +81,7 @@ public class InteractionActivity extends Activity {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private void onInteractionEvent(InteractionEvent msg) {
 		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
 		if (insertionPointHint < 0) {
