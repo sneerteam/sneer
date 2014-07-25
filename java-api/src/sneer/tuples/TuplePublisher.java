@@ -10,7 +10,7 @@ public interface TuplePublisher extends Action1<Object>, Action0 {
 	TuplePublisher payload(Object payload);
 	TuplePublisher field(String field, Object value);
 	
-	/** Publishes a tuple with the given paylod. Equivalent to calling {@link #payload(Object)} and {@link #pub()}.
+	/** Publishes a tuple with the given payload. Equivalent to calling {@link #payload(Object)} and {@link #pub()}.
 	 * @return The published tuple. */
 	Tuple pub(Object payload);
 
