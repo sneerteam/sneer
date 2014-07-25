@@ -28,10 +28,10 @@ public class SneerAdminInProcess implements SneerAdmin {
 
 		sneer = new Sneer() {
 
-			private final Tuples tuples = factory.newTuples(privateKey);
+			private final TupleSpace tuples = factory.newTuples(privateKey);
 
 			@Override
-			public Tuples tuples() {
+			public TupleSpace tupleSpace() {
 				return tuples;
 			}
 			

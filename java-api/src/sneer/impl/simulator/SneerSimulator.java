@@ -100,7 +100,7 @@ public class SneerSimulator extends SneerBase {
 
 
 	@Override
-	public Tuples tuples() {
+	public TupleSpace tupleSpace() {
 		// TODO Auto-generated method stub
 		return null;
 	}

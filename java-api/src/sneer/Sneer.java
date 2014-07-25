@@ -30,7 +30,7 @@ public interface Sneer {
 	/** @return an existing Interaction with party or a new one if it doesn't exist. */
 	Interaction produceInteractionWith(Party party);
 	
-	Tuples tuples();
+	TupleSpace tupleSpace();
 
 
 }

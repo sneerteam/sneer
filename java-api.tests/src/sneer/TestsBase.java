@@ -16,9 +16,9 @@ public class TestsBase {
 	protected final PrivateKey userB = Keys.createPrivateKey();
 	protected final PrivateKey userC = Keys.createPrivateKey();
 	
-	protected final Tuples tuplesA = init(userA).tuples();
-	protected final Tuples tuplesB = init(userB).tuples();
-	protected final Tuples tuplesC = init(userC).tuples();
+	protected final TupleSpace tuplesA = init(userA).tupleSpace();
+	protected final TupleSpace tuplesB = init(userB).tupleSpace();
+	protected final TupleSpace tuplesC = init(userC).tupleSpace();
 
 	
 	protected SneerAdmin createSneerAdmin(Object session) {
@@ -41,7 +41,7 @@ public class TestsBase {
 
 
 	protected void expectValues(Observable<Tuple> tuples, Object... expecteds) {
-		assertEqualsUntilNow(tuples.map(TO_VALUE), expecteds);
+		assertEqualsUntilNow(tuples.map(TO_PAYLOAD), expecteds);
 	}
 
 }

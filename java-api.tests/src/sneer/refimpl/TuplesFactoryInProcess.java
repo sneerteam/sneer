@@ -35,8 +35,8 @@ public class TuplesFactoryInProcess {
 		}
 
 		@Override
-		public Object value() {
-			return get("value");
+		public Object payload() {
+			return get("payload");
 		}
 
 		@Override
@@ -55,12 +55,12 @@ public class TuplesFactoryInProcess {
 		}
 	}
 	
-	private final class TuplesImpl implements Tuples {
+	private final class TuplesImpl implements TupleSpace {
 		
 		
 		private PrivateKey identity;
 
-		private final class TupleSubscriberImpl implements TupleSubscriber {
+		private final class TupleSubscriberImpl implements TupleFilter {
 			
 			private Map<String, Object> where = new HashMap<String, Object>();
 			
@@ -93,27 +93,22 @@ public class TuplesFactoryInProcess {
 			}
 
 			@Override
-			public TupleSubscriber type(String type) {
-				return where("type", type);
+			public TupleFilter byType(String type) {
+				return byField("type", type);
 			}
 
 			@Override
-			public TupleSubscriber author(PublicKey author) {
-				return where("author", author);
+			public TupleFilter byAuthor(PublicKey author) {
+				return byField("author", author);
 			}
 
 			@Override
-			public TupleSubscriber audience(PrivateKey audience) {
-				return where("audience", audience.publicKey());
+			public TupleFilter byAudience(PrivateKey audience) {
+				return byField("audience", audience.publicKey());
 			}
 
 			@Override
-			public Observable<Object> values() {
-				return tuples().map(Tuple.TO_VALUE);
-			}
-
-			@Override
-			public TupleSubscriber where(String key, Object value) {
+			public TupleFilter byField(String key, Object value) {
 				return new TupleSubscriberImpl(this, key, value);
 			}
 
@@ -170,26 +165,26 @@ public class TuplesFactoryInProcess {
 
 			@Override
 			public Tuple pub(Object value) {
-				return value(value).pub();
+				return payload(value).pub();
 			}
 
 			@Override
-			public TuplePublisher value(Object value) {
-				return put("value", value);
+			public TuplePublisher payload(Object value) {
+				return field("payload", value);
 			}
 			
 			@Override
 			public TuplePublisher type(String type) {
-				return put("type", type);
+				return field("type", type);
 			}
 
 			@Override
 			public TuplePublisher audience(PublicKey audience) {
-				return put("audience", audience);
+				return field("audience", audience);
 			}
 
 			@Override
-			public TuplePublisher put(String key, Object value) {
+			public TuplePublisher field(String key, Object value) {
 				return new TuplePublisherImpl(this, key, value);
 			}
 		}
@@ -199,17 +194,17 @@ public class TuplesFactoryInProcess {
 		}
 
 		@Override
-		public TupleSubscriber newTupleSubscriber() {
+		public TupleFilter filter() {
 			return new TupleSubscriberImpl();
 		}
 
 		@Override
-		public TuplePublisher newTuplePublisher() {
+		public TuplePublisher publisher() {
 			return new TuplePublisherImpl();
 		}
 	}
 
-	public Tuples newTuples(PrivateKey identity) {
+	public TupleSpace newTuples(PrivateKey identity) {
 		return new TuplesImpl(identity);
 	}
 

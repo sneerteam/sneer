@@ -13,16 +13,16 @@ public class Groups extends TestsBase {
 		
 		PrivateKey group = Keys.createPrivateKey();
 		
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.audience(group.publicKey())
 			.type("chat")
-			.put("type", "message")
+			.field("type", "message")
 			.pub("hey people!");
 		
-		expectValues(tuplesB.newTupleSubscriber().audience(group).tuples(), "hey people!");
-		expectValues(tuplesB.newTupleSubscriber().tuples());
-		assertCount(0, tuplesB.newTupleSubscriber().author(userA.publicKey()).tuples());
-		assertCount(0, tuplesC.newTupleSubscriber().tuples());
+		expectValues(tuplesB.filter().byAudience(group).tuples(), "hey people!");
+		expectValues(tuplesB.filter().tuples());
+		assertCount(0, tuplesB.filter().byAuthor(userA.publicKey()).tuples());
+		assertCount(0, tuplesC.filter().tuples());
 	}
 	
 	@Test
@@ -31,26 +31,26 @@ public class Groups extends TestsBase {
 		PrivateKey group1 = Keys.createPrivateKey();
 		PrivateKey group2 = Keys.createPrivateKey();
 		
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.audience(group1.publicKey())
 			.type("chat")
-			.put("type", "message")
+			.field("type", "message")
 			.pub("hey people!");
 	
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.audience(userB.publicKey())
 			.type("chat")
 			.pub("hey B-dog!!");
 	
-		expectValues(tuplesA.newTupleSubscriber().tuples());
-		expectValues(tuplesA.newTupleSubscriber().audience(group1).tuples(), "hey people!");
-		expectValues(tuplesA.newTupleSubscriber().audience(group2).tuples());
-		expectValues(tuplesB.newTupleSubscriber().tuples(), "hey B-dog!!");
-		expectValues(tuplesB.newTupleSubscriber().audience(group1).tuples(), "hey people!");
-		expectValues(tuplesB.newTupleSubscriber().audience(group2).tuples());
-		expectValues(tuplesC.newTupleSubscriber().tuples());
-		expectValues(tuplesC.newTupleSubscriber().audience(group1).tuples(), "hey people!");
-		expectValues(tuplesC.newTupleSubscriber().audience(group2).tuples());
+		expectValues(tuplesA.filter().tuples());
+		expectValues(tuplesA.filter().byAudience(group1).tuples(), "hey people!");
+		expectValues(tuplesA.filter().byAudience(group2).tuples());
+		expectValues(tuplesB.filter().tuples(), "hey B-dog!!");
+		expectValues(tuplesB.filter().byAudience(group1).tuples(), "hey people!");
+		expectValues(tuplesB.filter().byAudience(group2).tuples());
+		expectValues(tuplesC.filter().tuples());
+		expectValues(tuplesC.filter().byAudience(group1).tuples(), "hey people!");
+		expectValues(tuplesC.filter().byAudience(group2).tuples());
 	}
 	
 }

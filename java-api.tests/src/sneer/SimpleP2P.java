@@ -16,24 +16,24 @@ public class SimpleP2P extends TestsBase {
 	
 	@Test
 	public void publisherFluentReturningNewInstance() {
-		assertNotSame(tuplesA.newTuplePublisher(), tuplesA.newTuplePublisher());
-		TuplePublisher publisher = tuplesA.newTuplePublisher();
+		assertNotSame(tuplesA.publisher(), tuplesA.publisher());
+		TuplePublisher publisher = tuplesA.publisher();
 		assertNotSame(publisher, publisher.audience(userA.publicKey()));
 		assertNotSame(publisher, publisher.pub());
 	}
 	
 	@Test
 	public void subscriberFluentReturningNewInstance() {
-		assertNotSame(tuplesA.newTupleSubscriber(), tuplesA.newTupleSubscriber());
-		TupleSubscriber subscriber = tuplesA.newTupleSubscriber();
-		assertNotSame(subscriber, subscriber.audience(userA));
-		assertNotSame(subscriber, subscriber.type("bla"));
+		assertNotSame(tuplesA.filter(), tuplesA.filter());
+		TupleFilter subscriber = tuplesA.filter();
+		assertNotSame(subscriber, subscriber.byAudience(userA));
+		assertNotSame(subscriber, subscriber.byType("bla"));
 	}
 	
 	@Test
 	public void messagePassing() throws IOException {
 
-		TuplePublisher publisher = tuplesA.newTuplePublisher()
+		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userB.publicKey())
 			.type("rock-paper-scissor/move");
 			
@@ -44,76 +44,76 @@ public class SimpleP2P extends TestsBase {
 			.pub("hehehe");
 		
 		
-		TupleSubscriber subscriber = tuplesB.newTupleSubscriber();
+		TupleFilter subscriber = tuplesB.filter();
 
 		expectValues(subscriber.tuples(), "paper", "rock", "hehehe");
-		expectValues(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock");
-		expectValues(subscriber.type("rock-paper-scissor/message").tuples(), "hehehe");
+		expectValues(subscriber.byType("rock-paper-scissor/move").tuples(), "paper", "rock");
+		expectValues(subscriber.byType("rock-paper-scissor/message").tuples(), "hehehe");
 		
 	}
 
 	@Test
 	public void tupleWithType() throws IOException {
 
-		TuplePublisher publisher = tuplesA.newTuplePublisher()
+		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userB.publicKey());
 		publisher.type("rock-paper-scissor/move").pub("paper");
 		publisher.type("rock-paper-scissor/message").pub("hehehe");
 		
-		assertEqualsUntilNow(tuplesB.newTupleSubscriber().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message");
+		assertEqualsUntilNow(tuplesB.filter().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message");
 		
 	}
 	
 	@Test
 	public void targetUser() {
 		
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.audience(userC.publicKey())
 			.type("rock-paper-scissor/move")
 			.pub("paper");
 		
-		assertCount(0, tuplesB.newTupleSubscriber().tuples());
-		assertCount(1, tuplesC.newTupleSubscriber().tuples());
+		assertCount(0, tuplesB.filter().tuples());
+		assertCount(1, tuplesC.filter().tuples());
 	}
 	
 	@Test
 	public void publicTuples() {
 		
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.type("profile/name")
 			.pub("UserA McCloud");
 		
-		assertCount(1, tuplesA.newTupleSubscriber().tuples()); // should I receive my own public tuples?
-		assertCount(1, tuplesB.newTupleSubscriber().tuples());
-		assertCount(1, tuplesC.newTupleSubscriber().tuples());
+		assertCount(1, tuplesA.filter().tuples()); // should I receive my own public tuples?
+		assertCount(1, tuplesB.filter().tuples());
+		assertCount(1, tuplesC.filter().tuples());
 		
 	}
 	
 	@Test
 	public void byAuthor() {
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.type("profile/name")
 			.pub("UserA McCloud");
 		
-		assertCount(1, tuplesB.newTupleSubscriber().author(userA.publicKey()).tuples());
-		assertCount(0, tuplesB.newTupleSubscriber().author(userC.publicKey()).tuples());
+		assertCount(1, tuplesB.filter().byAuthor(userA.publicKey()).tuples());
+		assertCount(0, tuplesB.filter().byAuthor(userC.publicKey()).tuples());
 	}
 	
 	@Test
 	public void audienceIgnoresPublic() {
 		
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.type("chat/message")
 			.pub("hey people!");
 		
 		PrivateKey group = Keys.createPrivateKey();
-		assertCount(0, tuplesB.newTupleSubscriber().audience(group).tuples());
+		assertCount(0, tuplesB.filter().byAudience(group).tuples());
 	}
 	
 	@Test
 	public void completedLocalTuples() {
 		
-		TuplePublisher publisher = tuplesA.newTuplePublisher()
+		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userA.publicKey())
 			.type("profile/name");
 		publisher.pub("old name");
@@ -121,27 +121,26 @@ public class SimpleP2P extends TestsBase {
 
 		
 		assertEquals("new name",
-		tuplesA.newTupleSubscriber()
-			.audience(userA)
-			.type("profile/name")
-			.localTuples().toBlockingObservable().last().value());
+		tuplesA.filter()
+			.byAudience(userA)
+			.byType("profile/name")
+			.localTuples().toBlockingObservable().last().payload());
 	}
 	
 	@Test
 	public void subscriberCriteriaWithArray() {
-		
 		Object[] array = new Object[]{"notes", userB.publicKey()};
 		
-		tuplesA.newTuplePublisher()
+		tuplesA.publisher()
 			.audience(userA.publicKey())
 			.type("file")
-			.put("path", array)
+			.field("path", array)
 			.pub("userB is cool");
 			
-		Observable<Tuple> actual = tuplesA.newTupleSubscriber()
-				.audience(userA)
-				.type("file")
-				.where("path", array)
+		Observable<Tuple> actual = tuplesA.filter()
+				.byAudience(userA)
+				.byType("file")
+				.byField("path", array)
 				.tuples();
 		
 		expectValues(actual, "userB is cool");

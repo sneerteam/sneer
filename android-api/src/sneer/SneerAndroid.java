@@ -53,9 +53,7 @@ public class SneerAndroid {
 
 			@Override
 			public void send(T value) {
-				sneer()
-					.tuples()
-					.newTuplePublisher()
+				sneer().tupleSpace().publisher()
 					.audience(contact().party().publicKey().mostRecent())
 					.type(type())
 					.pub(value);
@@ -67,12 +65,12 @@ public class SneerAndroid {
 
 			@Override
 			public Observable<T> received() {
-				return (Observable<T>) sneer().tuples().newTupleSubscriber()
-						.audience(myPrivateKey())
-						.author(contact().party().publicKey().mostRecent())
-						.type(type())
+				return (Observable<T>) sneer().tupleSpace().filter()
+						.byAudience(myPrivateKey())
+						.byAuthor(contact().party().publicKey().mostRecent())
+						.byType(type())
 						.tuples()
-						.map(Tuple.TO_VALUE);
+						.map(Tuple.TO_PAYLOAD);
 						
 			}
 

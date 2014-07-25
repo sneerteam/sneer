@@ -6,20 +6,16 @@ import sneer.*;
 public interface TuplePublisher extends Action1<Object>, Action0 {
 
 	TuplePublisher audience(PublicKey audience);
-
 	TuplePublisher type(String type);
-
-	TuplePublisher value(Object value);
+	TuplePublisher payload(Object payload);
+	TuplePublisher field(String field, Object value);
 	
-	TuplePublisher put(String key, Object value);
-	
-	/**
-	 * Publishes an object. Equivalent to calling {@link #value(Object)} and {@link #pub()}.
-	 * @param value
-	 * @return the published tuple
-	 */
-	Tuple pub(Object value);
+	/** Publishes a tuple with the given paylod. Equivalent to calling {@link #payload(Object)} and {@link #pub()}.
+	 * @return The published tuple. */
+	Tuple pub(Object payload);
 
+	/** Publishes a tuple with the values set in this publisher.
+	 * @return The published tuple. */
 	Tuple pub();
 
 }
