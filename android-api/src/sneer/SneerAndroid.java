@@ -66,9 +66,9 @@ public class SneerAndroid {
 			@Override
 			public Observable<T> received() {
 				return (Observable<T>) sneer().tupleSpace().filter()
-						.byAudience(myPrivateKey())
-						.byAuthor(contact().party().publicKey().mostRecent())
-						.byType(type())
+						.audience(myPrivateKey())
+						.author(contact().party().publicKey().mostRecent())
+						.type(type())
 						.tuples()
 						.map(Tuple.TO_PAYLOAD);
 						

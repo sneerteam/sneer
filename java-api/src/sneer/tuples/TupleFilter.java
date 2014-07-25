@@ -5,10 +5,10 @@ import sneer.*;
 
 public interface TupleFilter {
 
-	TupleFilter byAuthor(PublicKey author);
-	TupleFilter byAudience(PrivateKey audience);
-	TupleFilter byType(String type);
-	TupleFilter byField(String field, Object value);
+	TupleFilter author(PublicKey author);
+	TupleFilter audience(PrivateKey audience);
+	TupleFilter type(String type);
+	TupleFilter field(String field, Object value);
 
 	/** @return An observable that emits tuples satisfying this filter. The returned Observable does not complete. */
 	Observable<Tuple> tuples();

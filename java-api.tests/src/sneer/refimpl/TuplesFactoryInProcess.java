@@ -93,22 +93,22 @@ public class TuplesFactoryInProcess {
 			}
 
 			@Override
-			public TupleFilter byType(String type) {
-				return byField("type", type);
+			public TupleFilter type(String type) {
+				return field("type", type);
 			}
 
 			@Override
-			public TupleFilter byAuthor(PublicKey author) {
-				return byField("author", author);
+			public TupleFilter author(PublicKey author) {
+				return field("author", author);
 			}
 
 			@Override
-			public TupleFilter byAudience(PrivateKey audience) {
-				return byField("audience", audience.publicKey());
+			public TupleFilter audience(PrivateKey audience) {
+				return field("audience", audience.publicKey());
 			}
 
 			@Override
-			public TupleFilter byField(String key, Object value) {
+			public TupleFilter field(String key, Object value) {
 				return new TupleSubscriberImpl(this, key, value);
 			}
 

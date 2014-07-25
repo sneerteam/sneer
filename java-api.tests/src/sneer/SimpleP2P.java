@@ -26,8 +26,8 @@ public class SimpleP2P extends TestsBase {
 	public void subscriberFluentReturningNewInstance() {
 		assertNotSame(tuplesA.filter(), tuplesA.filter());
 		TupleFilter subscriber = tuplesA.filter();
-		assertNotSame(subscriber, subscriber.byAudience(userA));
-		assertNotSame(subscriber, subscriber.byType("bla"));
+		assertNotSame(subscriber, subscriber.audience(userA));
+		assertNotSame(subscriber, subscriber.type("bla"));
 	}
 	
 	@Test
@@ -47,8 +47,8 @@ public class SimpleP2P extends TestsBase {
 		TupleFilter subscriber = tuplesB.filter();
 
 		expectValues(subscriber.tuples(), "paper", "rock", "hehehe");
-		expectValues(subscriber.byType("rock-paper-scissor/move").tuples(), "paper", "rock");
-		expectValues(subscriber.byType("rock-paper-scissor/message").tuples(), "hehehe");
+		expectValues(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock");
+		expectValues(subscriber.type("rock-paper-scissor/message").tuples(), "hehehe");
 		
 	}
 
@@ -95,8 +95,8 @@ public class SimpleP2P extends TestsBase {
 			.type("profile/name")
 			.pub("UserA McCloud");
 		
-		assertCount(1, tuplesB.filter().byAuthor(userA.publicKey()).tuples());
-		assertCount(0, tuplesB.filter().byAuthor(userC.publicKey()).tuples());
+		assertCount(1, tuplesB.filter().author(userA.publicKey()).tuples());
+		assertCount(0, tuplesB.filter().author(userC.publicKey()).tuples());
 	}
 	
 	@Test
@@ -107,7 +107,7 @@ public class SimpleP2P extends TestsBase {
 			.pub("hey people!");
 		
 		PrivateKey group = Keys.createPrivateKey();
-		assertCount(0, tuplesB.filter().byAudience(group).tuples());
+		assertCount(0, tuplesB.filter().audience(group).tuples());
 	}
 	
 	@Test
@@ -122,8 +122,8 @@ public class SimpleP2P extends TestsBase {
 		
 		assertEquals("new name",
 		tuplesA.filter()
-			.byAudience(userA)
-			.byType("profile/name")
+			.audience(userA)
+			.type("profile/name")
 			.localTuples().toBlockingObservable().last().payload());
 	}
 	
@@ -138,9 +138,9 @@ public class SimpleP2P extends TestsBase {
 			.pub("userB is cool");
 			
 		Observable<Tuple> actual = tuplesA.filter()
-				.byAudience(userA)
-				.byType("file")
-				.byField("path", array)
+				.audience(userA)
+				.type("file")
+				.field("path", array)
 				.tuples();
 		
 		expectValues(actual, "userB is cool");
