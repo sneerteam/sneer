@@ -16,11 +16,11 @@ public class MainActivity extends Activity {
 //		Tenho prik guardada nas private preferences do Android?
 //		Se sim: sneer = SneerAdmin.initialize(prik)
 //		Se nao: prik = Keys.newPrivateKey(); salvar prik nas preferences; SneerAdmin.initialize(prik);
-//		sneer.self().name() está nulo?
+//		sneer.self().name() estï¿½ nulo?
 //		Se sim: Abrir tela de profile pro usuario entrar c seu nome e sobrenome; SneerAdmin.setOwnName(nome + " " + sobrenome);
 		
 //		For now we'll just call the InteractionListActivity
-		Intent interactionList = new Intent(this, InteractionListActivity.class);
+		Intent interactionList = new Intent(this, ProfileActivity.class);
 		startActivity(interactionList);
 	}
 

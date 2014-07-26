@@ -34,11 +34,12 @@
     <string name="profile_view_content_description">Your Picture</string>
 	<string name="profile_view_first_name">First Name</string>
 	<string name="profile_view_last_name">Last Name</string>
-    <string name="profile_view_nickname">Nickname</string>
+    <string name="profile_view_preferred_nickname">Nickname</string>
     <string name="profile_view_country">Country</string>
     <string name="profile_view_city">City</string>
     <string name="profile_view_optional">OPTIONAL</string>
     <string name="profile_view_privacy_title">PRIVACY</string>
     <string name="profile_view_privacy_text">People can find me using public search</string>
+    <string name="action_save_profile">Save</string>
     <!-- Profile View -->
 </resources>
