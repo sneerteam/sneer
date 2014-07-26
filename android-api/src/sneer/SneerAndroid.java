@@ -10,13 +10,15 @@ public class SneerAndroid {
 
 	public static final String TITLE = "title";
 	public static final String TYPE = "type";
+	public static final String NEW_INTERACTION_LABEL = "newInteractionLabel";
 	public static final String NEW_INTERACTION_ACTION = "newInteractionAction";
 
-	public static void startInteractionList(Activity activity, String title, String type, String newInteractionAction) {
+	public static void startInteractionList(Activity activity, String title, String type, String newInteractionLabel, String newInteractionAction) {
 		try {
 			Intent intent = new Intent("sneer.android.main.INTERACTION_LIST");
 			intent.putExtra(TITLE, title);
 			intent.putExtra(TYPE, type);
+			intent.putExtra(NEW_INTERACTION_LABEL, newInteractionLabel);
 			intent.putExtra(NEW_INTERACTION_ACTION, newInteractionAction);
 			activity.startActivity(intent);
 		} catch (ActivityNotFoundException e) {
@@ -29,6 +31,7 @@ public class SneerAndroid {
 	}
 	
 	private Context context;
+	public static final String DISABLE_MENUS = "disable-menus";
 	
 	public SneerAndroid(Context context) {
 		this.context = context;

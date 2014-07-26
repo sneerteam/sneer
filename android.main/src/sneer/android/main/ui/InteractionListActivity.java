@@ -2,6 +2,7 @@ package sneer.android.main.ui;
 
 import static sneer.android.main.SneerSingleton.*;
 
+import java.io.*;
 import java.util.*;
 
 import rx.Observable;
@@ -23,11 +24,42 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class InteractionListActivity extends Activity {
 
-	private static final String DISABLE_MENUS = "disable-menus";
 	private InteractionListAdapter adapter;
 	private Cloud cloud;
 	private ListView listView;
 	private Interaction interaction;
+	private EmbeddedOptions embeddedOptions;
+	
+	
+	/**
+	 * Used when this activity is launched by another application with options to modify its behaviour
+	 * @author fabio
+	 *
+	 */
+	public static class EmbeddedOptions implements Serializable {
+		private static final long serialVersionUID = 1L;
+		public String interactionAction;
+		public String type;
+		public String title;
+		public String interactionLabel;
+		public boolean disableMenus;
+
+		public EmbeddedOptions(Intent intent) {
+			if (intent == null || intent.getExtras() == null) {
+				return;
+			}
+			interactionAction = intent.getExtras().getString(SneerAndroid.NEW_INTERACTION_ACTION);
+			interactionLabel = intent.getExtras().getString(SneerAndroid.NEW_INTERACTION_LABEL);
+			type = intent.getExtras().getString(SneerAndroid.TYPE);
+			title = intent.getExtras().getString(SneerAndroid.TITLE);
+			disableMenus = intent.getExtras().getBoolean(SneerAndroid.DISABLE_MENUS, false);
+		}
+		
+		public boolean wasEmbedded() {
+			return interactionAction != null;
+		}
+		
+	}
 
 	
 	@Override
@@ -35,9 +67,11 @@ public class InteractionListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction_list);
 		
+		embeddedOptions = new EmbeddedOptions(getIntent());
+		
 		String title;
-		if (getIntent() != null && getIntent().getExtras() != null && (title = getIntent().getExtras().getString(SneerAndroid.TITLE)) != null) {				
-			setTitle(title);
+		if (embeddedOptions.title != null) {				
+			setTitle(embeddedOptions.title);
 		}
 
 		listView = (ListView)findViewById(R.id.listView);
@@ -53,19 +87,12 @@ public class InteractionListActivity extends Activity {
 			onContactClicked(interaction);
 		}});
 
-		sneer().interactionsContaining(requestedType()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+		
+		sneer().interactionsContaining(embeddedOptions.type).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
 			adapter.clear();
 			adapter.addAll(interactions);
 			adapter.notifyDataSetChanged();
 		}});
-	}
-
-	private String requestedInteractionAction() {
-		return (getIntent() != null && getIntent().getExtras() != null ? getIntent().getExtras().getString(SneerAndroid.NEW_INTERACTION_ACTION) : null);
-	}
-	
-	private String requestedType() {
-		return (getIntent() != null && getIntent().getExtras() != null ? getIntent().getExtras().getString(SneerAndroid.TYPE) : null);
 	}
 
 
@@ -111,8 +138,7 @@ public class InteractionListActivity extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (getIntent() != null && getIntent().getExtras() != null
-				&& getIntent().getExtras().getBoolean(DISABLE_MENUS)) {
+		if (embeddedOptions.disableMenus) {
 			return false;
 		}
 		getMenuInflater().inflate(R.menu.contacts, menu);
@@ -194,10 +220,7 @@ public class InteractionListActivity extends Activity {
 	protected void onContactClicked(Interaction interaction) {
 		Intent intent = new Intent();
 		intent.setClass(this, InteractionActivity.class);
-		if (requestedInteractionAction() != null) {
-			intent.putExtra(SneerAndroid.TYPE, requestedType());
-			intent.putExtra(SneerAndroid.NEW_INTERACTION_ACTION, requestedInteractionAction());
-		}
+		intent.putExtra("embeddedOptions", embeddedOptions);
 		intent.putExtra("partyPuk", interaction.party().publicKey().mostRecent());
 		startActivity(intent);
 	}

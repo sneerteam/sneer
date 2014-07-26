@@ -8,6 +8,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.android.main.ui.InteractionListActivity.EmbeddedOptions;
 import sneer.commons.Comparators;
 import android.app.*;
 import android.content.*;
@@ -27,11 +28,15 @@ public class InteractionActivity extends Activity {
 
 	private final List<InteractionEvent> messages = new ArrayList<InteractionEvent>();
 	private InteractionAdapter adapter;
+
+	private EmbeddedOptions embeddedOptions;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction);
+		
+		embeddedOptions = (EmbeddedOptions) getIntent().getExtras().getSerializable("embeddedOptions");
 		
 		final Party party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
@@ -67,12 +72,30 @@ public class InteractionActivity extends Activity {
 			if (text != null && !text.isEmpty())
 				sneer().produceInteractionWith(party).sendMessage(text);
 		}});
+		
 	}
 	
 	
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		if (embeddedOptions.interactionAction == null) {
+			return false;
+		}
+		getMenuInflater().inflate(R.menu.interaction, menu);
+		if (embeddedOptions.interactionLabel != null) {
+			MenuItem item = menu.findItem(R.id.action_new_interaction);
+			item.setTitle(embeddedOptions.interactionLabel);
+		}
+		return true;
+	}
+
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.action_new_interaction:
+			startActivity(new Intent(embeddedOptions.interactionAction));
+			return true;
 		case android.R.id.home:
 			NavUtils.navigateUpTo(this, new Intent(this, InteractionListActivity.class));
 			return true;

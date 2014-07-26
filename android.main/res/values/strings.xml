@@ -28,8 +28,8 @@
     <string name="title_interaction_list">Interaction List</string>
     <string name="title_interaction">Interaction</string>
     <string name="title_activity_profile">ProfileActivity</string>
-    
-    
+    <string name="action_new_interaction">New Event</string>
+
     <!-- Profile View -->
     <string name="profile_view_content_description">Your Picture</string>
 	<string name="profile_view_first_name">First Name</string>
