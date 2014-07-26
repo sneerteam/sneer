@@ -28,8 +28,11 @@ public class SneerSimulator extends SneerBase {
 
 	private TupleSpace tupleSpace;
 
+	private PrivateKey privateKey;
+
 	
 	public SneerSimulator(PrivateKey privateKey) {
+		this.privateKey = privateKey;
 		self = new PartySimulator("Neide da Silva", privateKey);
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
@@ -39,13 +42,19 @@ public class SneerSimulator extends SneerBase {
 		setupMockupRPSPlayer(cloud, addContact("Wesley Pedrera"), "ROCK");
 		setupMockupRPSPlayer(cloud, addContact("Carla Folhada"), "PAPER");
 	}
+	
+	public PrivateKey privateKey() {
+		return privateKey;
+	}
 
 
 	private void setupMockupRPSPlayer(TuplesFactoryInProcess cloud, PrivateKey playerPrik, final String move) {
 		final TupleSpace tupleSpaceMaicon = cloud.newTupleSpace(playerPrik);
-		tupleSpaceMaicon.filter().type("rock-paper-scissors/move").tuples().subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
-			tupleSpaceMaicon.publisher().type("rock-paper-scissors/move").audience(t1.author()).pub(move);
-		}});
+		tupleSpaceMaicon.filter().type("rock-paper-scissors/move").tuples()
+			.delay(2, TimeUnit.SECONDS)
+			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+				tupleSpaceMaicon.publisher().type("rock-paper-scissors/move").audience(t1.author()).pub(move);
+			}});
 	}
 	
 	
@@ -140,13 +149,6 @@ public class SneerSimulator extends SneerBase {
 	}
 
 	
-	private void populate(String... newContactNicks) {
-		for (String nick : newContactNicks) {
-			addContact(nick);
-		}
-	}
-
-
 	private PrivateKey addContact(String nick) {
 		PrivateKey prik = Keys.createPrivateKey(nick);
 		Party party = produceParty(prik.publicKey());

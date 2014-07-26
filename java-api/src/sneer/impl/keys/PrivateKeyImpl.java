@@ -7,16 +7,18 @@ import sneer.*;
 class PrivateKeyImpl implements PrivateKey {
 
 	private final byte[] bytes;
+	private PublicKeyImpl publicKeyImpl;
 
 	
 	PrivateKeyImpl(byte[] bytes) {
 		this.bytes = bytes;
+		publicKeyImpl = new PublicKeyImpl(bytes);
 	}
 
 	
 	@Override
 	public PublicKey publicKey() {
-		return new PublicKeyImpl(bytes);
+		return publicKeyImpl;
 	}
 
 	

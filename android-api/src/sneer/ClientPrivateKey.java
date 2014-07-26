@@ -1,23 +1,17 @@
 package sneer;
 
-import android.os.*;
+import java.io.*;
 
-public class ClientPrivateKey implements PrivateKey, Parcelable {
-	
+public class ClientPrivateKey implements PrivateKey, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private PublicKey publicKey;
+	
+	public ClientPrivateKey() {
+	}
 
 	public ClientPrivateKey(PublicKey publicKey) {
 		this.publicKey = publicKey;
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeSerializable(publicKey);
 	}
 
 	@Override
@@ -25,14 +19,9 @@ public class ClientPrivateKey implements PrivateKey, Parcelable {
 		return publicKey;
 	}
 	
-	public static final Parcelable.Creator<ClientPrivateKey> CREATOR = new Parcelable.Creator<ClientPrivateKey>() {
-		public ClientPrivateKey createFromParcel(Parcel in) {
-			return new ClientPrivateKey((PublicKey) in.readSerializable());
-		}
-		
-		public ClientPrivateKey[] newArray(int size) {
-			return new ClientPrivateKey[size];
-		}
-	};
+	@Override
+	public String toString() {
+		return "ClientPrivateKey ["+publicKey+"]";
+	}
 	
 }

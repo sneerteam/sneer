@@ -1,5 +1,6 @@
 package sneer;
 
+import java.io.*;
 import java.util.*;
 
 import rx.*;
@@ -63,8 +64,32 @@ public class SneerAndroid {
 		protected void publishTuple(Tuple ret) {
 			Intent intent = new Intent(SNEER_SERVICE);
 			intent.putExtra("op", TupleSpaceOp.PUBLISH);
-			intent.putExtra("tuple", new HashMap<String, Object>(ret));
+			intent.putExtra("tuple", serialize(ret));
 			context.startService(intent);
+		}
+
+		private byte[] serialize(Object obj) {
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			try {
+				ObjectOutputStream out = new ObjectOutputStream(bytes);
+				out.writeObject(obj);
+				out.flush();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return bytes.toByteArray();
+		}
+
+		private Object deserialize(byte[] bytes) {
+			try {
+				return new ObjectInputStream(new ByteArrayInputStream(bytes)).readObject();
+			} catch (OptionalDataException e) {
+				throw new RuntimeException(e);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 		@Override
@@ -72,7 +97,7 @@ public class SneerAndroid {
 			return Observable.create(new Observable.OnSubscribe<Tuple>() {  @Override public void call(final Subscriber<? super Tuple> subscriber) {
 				Intent intent = new Intent(SNEER_SERVICE);
 				intent.putExtra("op", TupleSpaceOp.SUBSCRIBE);
-				intent.putExtra("criteria", new HashMap<String, Object>(criteria)); // why the error if passing criteria directly??
+				intent.putExtra("criteria", serialize(criteria));
 				intent.putExtra("resultReceiver", new ResultReceiver(null) {
 						
 					private int subscriptionId = -1;
@@ -85,7 +110,7 @@ public class SneerAndroid {
 							subscriber.onCompleted();
 							break;
 						case ON_NEXT:
-							subscriber.onNext(newTupleFromMap((Map<String, Object>) unbundle(resultData)));
+							subscriber.onNext(newTupleFromMap((Map<String, Object>) deserialize((byte[]) unbundle(resultData))));
 							break;
 						case SUBSCRIPTION_ID:
 							subscriptionId = (Integer) unbundle(resultData);
