@@ -50,7 +50,7 @@ public class SneerSimulator extends SneerBase {
 	private void setupMockupRPSPlayer(TuplesFactoryInProcess cloud, PrivateKey playerPrik, final String move) {
 		final TupleSpace tupleSpace = cloud.newTupleSpace(playerPrik);
 		tupleSpace.filter().type("rock-paper-scissors/move").audience(playerPrik).tuples()
-//			.delay(2, TimeUnit.SECONDS)
+			.delay(2, TimeUnit.SECONDS)
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 				tupleSpace.publisher().type("rock-paper-scissors/move").audience(t1.author()).pub(move);
 			}});
