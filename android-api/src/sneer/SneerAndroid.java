@@ -5,6 +5,8 @@ import java.util.*;
 
 import rx.*;
 import rx.Observable;
+import rx.Scheduler.*;
+import rx.android.schedulers.*;
 import rx.functions.*;
 import rx.subscriptions.*;
 import sneer.api.*;
@@ -61,11 +63,13 @@ public class SneerAndroid {
 	class TupleSpaceFactoryClient extends LocalTuplesFactory {
 
 		@Override
-		protected void publishTuple(Tuple ret) {
-			Intent intent = new Intent(SNEER_SERVICE);
-			intent.putExtra("op", TupleSpaceOp.PUBLISH);
-			intent.putExtra("tuple", serialize(ret));
-			context.startService(intent);
+		protected void publishTuple(final Tuple ret) {
+			AndroidSchedulers.mainThread().schedule(new Action1<Scheduler.Inner>() {  @Override public void call(Inner t1) {
+				Intent intent = new Intent(SNEER_SERVICE);
+				intent.putExtra("op", TupleSpaceOp.PUBLISH);
+				intent.putExtra("tuple", serialize(ret));
+				context.startService(intent);
+			}});
 		}
 
 		private byte[] serialize(Object obj) {
@@ -130,7 +134,7 @@ public class SneerAndroid {
 					}
 				});
 				context.startService(intent);
-			}});
+			}}).observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread());
 		}
 
 	}
@@ -189,14 +193,17 @@ public class SneerAndroid {
 						.author(partyPublicKey())
 						.type(type())
 						.tuples()
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribeOn(AndroidSchedulers.mainThread())
 						.map(Tuple.TO_PAYLOAD);
 						
 			}
 
 			@Override
 			public void dispose() {
-				throw new RuntimeException("Not implemented yet.");
+				// TODO
 			}
+			
 			private PublicKey partyPublicKey() {
 				return (PublicKey) getExtra("contactPuk");
 			}

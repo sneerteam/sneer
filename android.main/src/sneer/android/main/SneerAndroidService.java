@@ -16,6 +16,7 @@ import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
 import android.os.*;
+import android.util.*;
 
 public class SneerAndroidService extends Service {
 	
@@ -110,7 +111,10 @@ public class SneerAndroidService extends Service {
 		if (subscriptionId == -1) {
 			throw new IllegalArgumentException("Unknown subscription: " + subscriptionId);
 		}
-		subscriptions.remove(subscriptionId).unsubscribe();
+		Subscription s = subscriptions.remove(subscriptionId);
+		if (s != null) {
+			s.unsubscribe();
+		}
 	}
 
 	private void subscribe(Map<String, Object> criteria, final ResultReceiver resultReceiver) {
