@@ -18,7 +18,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <receiver android:name=".CloudBroadcastReceiver" >
+        <receiver android:name=".SneerBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -51,10 +51,10 @@
             android:label="@string/title_activity_profile" />
 
         <service
-            android:name=".CloudService"
+            android:name=".SneerAndroidService"
             android:exported="true" >
             <intent-filter>
-                <action android:name="sneer.intent.action.BIND_CLOUD_SERVICE" />
+                <action android:name="sneer.android.service.BACKEND" />
             </intent-filter>
         </service>
     </application>

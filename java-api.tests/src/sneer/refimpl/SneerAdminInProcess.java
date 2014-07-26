@@ -12,12 +12,12 @@ import sneer.tuples.*;
 
 public class SneerAdminInProcess implements SneerAdmin {
 
-	private final TuplesFactoryInProcess factory;
+	private final LocalTuplesFactory factory;
 	private PrivateKey privateKey;
 	private Sneer sneer;
 
 	
-	public SneerAdminInProcess(TuplesFactoryInProcess factory) {
+	public SneerAdminInProcess(LocalTuplesFactory factory) {
 		this.factory = factory;
 	}
 
@@ -28,7 +28,7 @@ public class SneerAdminInProcess implements SneerAdmin {
 
 		sneer = new Sneer() {
 
-			private final TupleSpace tuples = factory.newTuples(privateKey);
+			private final TupleSpace tuples = factory.newTupleSpace(privateKey);
 
 			@Override
 			public TupleSpace tupleSpace() {

@@ -1,21 +1,17 @@
 package sneer.refimpl;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import rx.*;
 import rx.Observable.OnSubscribe;
 import rx.Observable;
 import rx.functions.*;
 import rx.schedulers.*;
-import rx.subjects.*;
 import sneer.*;
 import sneer.tuples.*;
 
-public class TuplesFactoryInProcess {
+public abstract class LocalTuplesFactory {
 
-	Subject<Tuple, Tuple> tuples = ReplaySubject.create();
-	
 	private static final class TupleImpl extends HashMap<String, Object> implements Tuple {
 		private static final long serialVersionUID = 1L;
 
@@ -55,12 +51,18 @@ public class TuplesFactoryInProcess {
 		}
 	}
 	
-	private final class TuplesImpl implements TupleSpace {
+	protected Tuple newTupleFromMap(Map<String, Object> map) {
+		TupleImpl t = new TupleImpl();
+		t.putAll(map);
+		return t;
+	}
+	
+	protected class TupleSpaceImpl implements TupleSpace {
 		
 		
 		private PrivateKey identity;
 
-		private final class TupleSubscriberImpl implements TupleFilter {
+		protected final class TupleSubscriberImpl implements TupleFilter {
 			
 			private Map<String, Object> where = new HashMap<String, Object>();
 			
@@ -75,21 +77,7 @@ public class TuplesFactoryInProcess {
 
 			@Override
 			public Observable<Tuple> tuples() {
-				Observable<Tuple> t = tuples;
-				for (final Entry<String, Object> criterion : where.entrySet()) {
-					t = t.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
-						String key = criterion.getKey();
-						Object tupleValue = t1.get(key);
-						Object value = criterion.getValue();
-						if (key.equals("audience") && value == null) {
-							return tupleValue == null || tupleValue.equals(identity.publicKey());
-						}
-						return tupleValue == null
-							? value == null
-							: (value.getClass().isArray() ? Arrays.equals((Object[])value, (Object[])tupleValue) : tupleValue.equals(value));
-					}});
-				}
-				return t;
+				return query(identity, where);
 			}
 
 			@Override
@@ -122,6 +110,13 @@ public class TuplesFactoryInProcess {
 					scheduler.triggerActions();
 					t1.onCompleted();
 				}});
+			}
+
+			@Override
+			public TupleFilter putFields(Map<String, Object> fields) {
+				TupleSubscriberImpl s = new TupleSubscriberImpl();
+				s.where.putAll(fields);
+				return s;
 			}
 
 		}
@@ -159,7 +154,7 @@ public class TuplesFactoryInProcess {
 			@Override
 			public Tuple pub() {
 				TupleImpl ret = prototype.clone();
-				tuples.onNext(ret);
+				publishTuple(ret);
 				return ret;
 			}
 
@@ -187,9 +182,16 @@ public class TuplesFactoryInProcess {
 			public TuplePublisher field(String key, Object value) {
 				return new TuplePublisherImpl(this, key, value);
 			}
+
+			@Override
+			public TuplePublisher putFields(Map<String, Object> fields) {
+				TuplePublisherImpl t = new TuplePublisherImpl();
+				t.prototype.putAll(fields);
+				return t;
+			}
 		}
 
-		public TuplesImpl(PrivateKey identity) {
+		public TupleSpaceImpl(PrivateKey identity) {
 			this.identity = identity;
 		}
 
@@ -204,8 +206,12 @@ public class TuplesFactoryInProcess {
 		}
 	}
 
-	public TupleSpace newTuples(PrivateKey identity) {
-		return new TuplesImpl(identity);
+	abstract protected void publishTuple(Tuple ret);
+	
+	abstract protected Observable<Tuple> query(PrivateKey identity, Map<String, Object> criteria);
+	
+	public TupleSpace newTupleSpace(PrivateKey identity) {
+		return new TupleSpaceImpl(identity);
 	}
 
 }

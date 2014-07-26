@@ -30,6 +30,8 @@ public class InteractionActivity extends Activity {
 	private InteractionAdapter adapter;
 
 	private EmbeddedOptions embeddedOptions;
+
+	private Party party;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,7 @@ public class InteractionActivity extends Activity {
 		
 		embeddedOptions = (EmbeddedOptions) getIntent().getExtras().getSerializable("embeddedOptions");
 		
-		final Party party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
 		sneer().labelFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
 			setTitle(label);
@@ -94,13 +96,22 @@ public class InteractionActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_new_interaction:
-			startActivity(new Intent(embeddedOptions.interactionAction));
+			launchNewInteraction();
 			return true;
 		case android.R.id.home:
 			NavUtils.navigateUpTo(this, new Intent(this, InteractionListActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+
+	private void launchNewInteraction() {
+		Intent intent = new Intent(embeddedOptions.interactionAction);
+		intent.putExtra("myPrivateKey", new ClientPrivateKey(sneer().self().publicKey().mostRecent()));
+		intent.putExtra("contactNickname", sneer().findContact(party).nickname().mostRecent());
+		intent.putExtra("contactPuk", party.publicKey().mostRecent());
+		startActivity(intent);
 	}
 	
 	

@@ -15,7 +15,6 @@ public class SneerSingleton {
 	 */
 
 	public static Sneer sneer() {
-//		if (INSTANCE == null) throw new IllegalStateException("You must call SneerSingleton.setInstance(...) first.");
 		if (INSTANCE == null) {
 			synchronized (SneerSingleton.class) {
 				if (INSTANCE == null) {

@@ -1,6 +1,8 @@
 package sneer.tuples;
 
-import rx.*;
+import java.util.*;
+
+import rx.Observable;
 import sneer.*;
 
 public interface TupleFilter {
@@ -9,6 +11,7 @@ public interface TupleFilter {
 	TupleFilter audience(PrivateKey audience);
 	TupleFilter type(String type);
 	TupleFilter field(String field, Object value);
+	TupleFilter putFields(Map<String, Object> fields);
 
 	/** @return An observable that emits tuples satisfying this filter. The returned Observable does not complete. */
 	Observable<Tuple> tuples();

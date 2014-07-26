@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import rx.Observable;
+import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.impl.*;
@@ -25,11 +26,24 @@ public class SneerSimulator extends SneerBase {
 	private final Map<Party, Interaction> interactionsByParty = new ConcurrentHashMap<Party, Interaction>();
 	private final BehaviorSubject<List<Interaction>> interactions = BehaviorSubject.create(interactionsSorted());
 
+	private TupleSpace tupleSpace;
+
 	
 	public SneerSimulator(PrivateKey privateKey) {
 		self = new PartySimulator("Neide da Silva", privateKey);
 
-		populate("Maicon", "Wesley", "Carla");
+		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
+		tupleSpace = cloud.newTupleSpace(privateKey);
+		
+		PrivateKey maicon = addContact("Maicon Tesourinha");
+		PrivateKey wesley = addContact("Wesley Pedrera");
+		PrivateKey carla = addContact("Carla Folhada");
+		
+//		TupleSpace tupleSpaceMaicon = cloud.newTupleSpace(maicon);
+//		tupleSpaceMaicon.filter().type("rock-paper-scissors/move").tuples().subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+//		}});
+		
+		
 	}
 	
 	
@@ -101,8 +115,7 @@ public class SneerSimulator extends SneerBase {
 
 	@Override
 	public TupleSpace tupleSpace() {
-		// TODO Auto-generated method stub
-		return null;
+		return tupleSpace;
 	}
 
 
@@ -127,11 +140,17 @@ public class SneerSimulator extends SneerBase {
 	
 	private void populate(String... newContactNicks) {
 		for (String nick : newContactNicks) {
-			PrivateKey prik = Keys.createPrivateKey(nick);
-			Party party = produceParty(prik.publicKey());
-			((PartySimulator)party).setName(nick + " da Silva");
-			setContact(nick, party);
+			addContact(nick);
 		}
+	}
+
+
+	private PrivateKey addContact(String nick) {
+		PrivateKey prik = Keys.createPrivateKey(nick);
+		Party party = produceParty(prik.publicKey());
+		((PartySimulator)party).setName(nick + " da Silva");
+		setContact(nick, party);
+		return prik;
 	}
 
 

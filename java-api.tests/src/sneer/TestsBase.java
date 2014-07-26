@@ -22,7 +22,7 @@ public class TestsBase {
 
 	
 	protected SneerAdmin createSneerAdmin(Object session) {
-		return new SneerAdminInProcess((TuplesFactoryInProcess) session);
+		return new SneerAdminInProcess((LocalTuplesFactory) session);
 	}
 	
 	protected Object createSession() {
