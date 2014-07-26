@@ -35,15 +35,17 @@ public class SneerSimulator extends SneerBase {
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(privateKey);
 		
-		PrivateKey maicon = addContact("Maicon Tesourinha");
-		PrivateKey wesley = addContact("Wesley Pedrera");
-		PrivateKey carla = addContact("Carla Folhada");
-		
-//		TupleSpace tupleSpaceMaicon = cloud.newTupleSpace(maicon);
-//		tupleSpaceMaicon.filter().type("rock-paper-scissors/move").tuples().subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
-//		}});
-		
-		
+		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha"), "SCISSORS");
+		setupMockupRPSPlayer(cloud, addContact("Wesley Pedrera"), "ROCK");
+		setupMockupRPSPlayer(cloud, addContact("Carla Folhada"), "PAPER");
+	}
+
+
+	private void setupMockupRPSPlayer(TuplesFactoryInProcess cloud, PrivateKey playerPrik, final String move) {
+		final TupleSpace tupleSpaceMaicon = cloud.newTupleSpace(playerPrik);
+		tupleSpaceMaicon.filter().type("rock-paper-scissors/move").tuples().subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+			tupleSpaceMaicon.publisher().type("rock-paper-scissors/move").audience(t1.author()).pub(move);
+		}});
 	}
 	
 	
