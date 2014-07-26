@@ -29,12 +29,12 @@ public class SneerSimulator extends SneerBase {
 	private TupleSpace tupleSpace;
 
 	private PrivateKey privateKey;
-	public static TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 	
 	public SneerSimulator(PrivateKey privateKey) {
 		this.privateKey = privateKey;
 		self = new PartySimulator("Neide da Silva", privateKey);
 
+		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(privateKey);
 		
 		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha"), "SCISSORS");
