@@ -108,6 +108,7 @@ public class InteractionActivity extends Activity {
 
 	private void launchNewInteraction() {
 		Intent intent = new Intent(embeddedOptions.interactionAction);
+		intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
 		intent.putExtra("myPrivateKey", new ClientPrivateKey(sneer().self().publicKey().mostRecent()));
 		intent.putExtra("contactNickname", sneer().findContact(party).nickname().mostRecent());
 		intent.putExtra("contactPuk", party.publicKey().mostRecent());

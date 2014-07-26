@@ -173,7 +173,7 @@ public class SneerAndroid {
 				throw new RuntimeException("Not implemented yet.");
 			}
 			private PublicKey partyPublicKey() {
-				return (PublicKey) getExtra("partyPuk");
+				return (PublicKey) getExtra("contactPuk");
 			}
 			
 		};
