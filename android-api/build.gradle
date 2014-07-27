@@ -88,6 +88,7 @@ android.libraryVariants.all { variant ->
         from variant.processResources.resDir
 	
 	    appendix = "nodeps"
+	    baseName = "sneer-android-api"
 	    version = originalVersion
 	    
 	    if (project.hasProperty("addTimestamp")) {
