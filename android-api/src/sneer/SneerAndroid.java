@@ -102,37 +102,28 @@ public class SneerAndroid {
 				Intent intent = new Intent(SNEER_SERVICE);
 				intent.putExtra("op", TupleSpaceOp.SUBSCRIBE);
 				intent.putExtra("criteria", serialize(criteria));
-				intent.putExtra("resultReceiver", new ResultReceiver(null) {
-						
-					private int subscriptionId = -1;
-
-					@SuppressWarnings("unchecked")
-					@Override
-					protected void onReceiveResult(int resultCode, Bundle resultData) {
-						switch (SubscriptionOp.values()[resultCode]) {
-						case ON_COMPLETED:
-							subscriber.onCompleted();
-							break;
-						case ON_NEXT:
-							subscriber.onNext(newTupleFromMap((Map<String, Object>) deserialize((byte[]) unbundle(resultData))));
-							break;
-						case SUBSCRIPTION_ID:
-							subscriptionId = (Integer) unbundle(resultData);
-							break;
-						default:
-							break;
-						}
+				intent.putExtra("resultReceiver", new ResultReceiver(null) {  @SuppressWarnings("unchecked") @Override protected void onReceiveResult(int resultCode, Bundle resultData) {
+					switch (SubscriptionOp.values()[resultCode]) {
+					case ON_COMPLETED:
+						subscriber.onCompleted();
+						break;
+					case ON_NEXT:
+						subscriber.onNext(newTupleFromMap((Map<String, Object>) deserialize((byte[]) unbundle(resultData))));
+						break;
+					case SUBSCRIPTION_ID: {
+						final int subscriptionId = (Integer) unbundle(resultData);
 						subscriber.add(Subscriptions.create(new Action0() { @Override public void call() {
-							if (subscriptionId == -1) {
-								return;
-							}
 							Intent intent = new Intent(SNEER_SERVICE);
 							intent.putExtra("op", TupleSpaceOp.UNSUBSCRIBE);
 							intent.putExtra("subscription", subscriptionId);
 							context.startService(intent);
 						}}));
+						break;
 					}
-				});
+					default:
+						break;
+					}
+				}});
 				context.startService(intent);
 			}}).observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread());
 		}
