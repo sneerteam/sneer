@@ -14,22 +14,22 @@
 
         <ImageView
             android:id="@+id/selfie"
-            android:clickable="true"
-            android:onClick="selfieOnClick" 
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="15dp"
+            android:clickable="true"
             android:contentDescription="@string/profile_view_content_description"
-            android:src="@drawable/neide" />
+            android:onClick="selfieOnClick"
+            android:src="@drawable/ic_launcher" />
 
         <EditText
             android:id="@+id/firstName"
-            android:layout_width="160dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="35dp"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="15dp"
             android:layout_toRightOf="@+id/selfie"
             android:ems="10"
@@ -41,15 +41,29 @@
 
         <EditText
             android:id="@+id/lastName"
-            android:layout_width="160dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/firstName"
-            android:layout_marginLeft="35dp"
+            android:layout_marginLeft="15dp"
             android:layout_toRightOf="@+id/selfie"
             android:ems="10"
             android:hint="@string/profile_view_last_name"
             android:inputType="textPersonName"
             android:paddingLeft="10dp" >
+        </EditText>
+        
+         <EditText
+             android:id="@+id/preferredNickName"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_below="@+id/lastName"
+             android:layout_marginLeft="15dp"
+             android:layout_toRightOf="@+id/selfie"
+             android:ems="10"
+             android:hint="@string/profile_view_preferred_nickname"
+             android:inputType="textPersonName"
+             android:paddingLeft="10dp" >
+
         </EditText>
     </RelativeLayout>
 
@@ -60,41 +74,20 @@
         android:layout_below="@+id/nameRelativeLayout"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/textViewOptional"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/profile_view_optional"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
         <View
             android:id="@+id/view"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@+id/textViewOptional"
+            android:layout_marginTop="35dp"
             android:background="@android:color/black" />
 
         <EditText
-            android:id="@+id/preferredNickName"
-            android:layout_width="290dp"
+            android:id="@+id/country"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/view"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="10dp"
-            android:ems="10"
-            android:hint="@string/profile_view_preferred_nickname"
-            android:inputType="textPersonName"
-            android:paddingLeft="10dp" >
-        </EditText>
-
-        <EditText
-            android:id="@+id/country"
-            android:layout_width="290dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/preferredNickName"
-            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
             android:ems="10"
             android:hint="@string/profile_view_country"
             android:inputType="textPersonName"
@@ -103,7 +96,7 @@
 
         <EditText
             android:id="@+id/city"
-            android:layout_width="290dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/country"
             android:layout_marginLeft="15dp"
@@ -135,16 +128,17 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/textViewPrivacyTitle"
+            android:layout_marginTop="5dp"
             android:background="@android:color/black" />
         
-
         <CheckBox
             android:id="@+id/privacycheckBox"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/viewPrivacy"
             android:layout_centerHorizontal="true"
-            android:text="@string/profile_view_privacy_text" 
+            android:layout_marginTop="15dp"
+            android:text="@string/profile_view_privacy_text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         
     </RelativeLayout>

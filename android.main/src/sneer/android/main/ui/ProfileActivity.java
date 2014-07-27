@@ -60,36 +60,15 @@ public class ProfileActivity extends Activity {
 
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.profile, menu);
-		return true;
-	}
-	
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.action_save_profile:
-			try {
-				saveProfile();
-			} catch (FriendlyException e) {
-				toast(e.getMessage());
-			}
-			break;
-		}
-		return true;
-	}
-	
-
-	@Override
 	public void onContentChanged() {
 		super.onContentChanged();
 	}
 	
+	
     @Override
     protected void onResume() {
     	super.onResume();
-    	LayoutInflater inflater1 = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //    	 TODO Redraw UI here to update EditTexts text.
     }
 	
