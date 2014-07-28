@@ -4,6 +4,8 @@ import static sneer.android.main.SneerSingleton.*;
 
 import java.io.*;
 
+import rx.android.schedulers.*;
+import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.commons.exceptions.*;
@@ -24,6 +26,8 @@ public class ProfileActivity extends Activity {
 	ImageView selfieImage;
 	View profileView;
 	
+	Profile profile;
+	
 	EditText firstNameEdit;
 	EditText lastNameEdit;
 	EditText preferredNickNameEdit;
@@ -38,6 +42,8 @@ public class ProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		
+		profile = sneer().profileFor(sneer().self());
+
 		profileView = View.inflate(this, R.layout.activity_profile, null);
 		
 		firstNameEdit = (EditText) profileView.findViewById(R.id.firstName);
@@ -52,8 +58,25 @@ public class ProfileActivity extends Activity {
 	
 	
 	private void loadProfile() {
-//	     TODO Load user profile here
-//		firstNameEdit.setText(...);
+		firstNameEdit.setText("this is not working");
+		
+		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
+			preferredNickNameEdit.setText(preferredNickname);
+		}});
+		
+		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
+			countryEdit.setText(country);
+		}});
+		
+		profile.city().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String city) {
+			cityEdit.setText(city);
+		}});
+		
+//		profile.selfie().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
+//			BitmapFactory.Options options = new BitmapFactory.Options();
+//			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
+//			selfieImage.setImageBitmap(bitmap);
+//		}});
 	}
 
 
@@ -63,19 +86,7 @@ public class ProfileActivity extends Activity {
 	}
 	
 	
-    @Override
-    protected void onResume() {
-    	super.onResume();
-    	LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//    	 TODO Redraw UI here to update EditTexts text.
-    }
-	
-
 	public void saveProfile() throws FriendlyException {
-		toast("saving profile...");
-
-		Profile profile = sneer().profileFor(sneer().self());
-	
 		String preferredNickname = preferredNickNameEdit.getText().toString();
 		profile.setPreferredNickname(preferredNickname);
 		
@@ -91,6 +102,8 @@ public class ProfileActivity extends Activity {
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 		byte[] imageInByte = stream.toByteArray();
 		profile.setSelfie(imageInByte);
+
+		toast("profile saved...");
 	}
 	
 	
@@ -109,7 +122,7 @@ public class ProfileActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == TAKE_PICTURE && resultCode== RESULT_OK && intent != null){
 			Bundle extras = intent.getExtras();
-			bitMap = (Bitmap) extras.get("data");
+			bitMap = (Bitmap)extras.get("data");
 
 //			 TODO setImageBitmap not working
 			selfieImage.setImageBitmap(bitMap);
@@ -121,10 +134,29 @@ public class ProfileActivity extends Activity {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
  
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+			saveProfile();
+		} catch (FriendlyException e) {
+			toast(e.getMessage());
+		}
+    }
+    
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//    	 TODO Redraw UI here to update EditTexts text.
+    }
 
+    
     private void toast(String message) {
-		Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-		toast.show();
-	}
+    	Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+    	toast.show();
+    }
 	
 }
