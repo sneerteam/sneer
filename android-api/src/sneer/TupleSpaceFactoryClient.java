@@ -8,6 +8,7 @@ import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import rx.subscriptions.*;
+import sneer.commons.*;
 import sneer.refimpl.*;
 import sneer.tuples.*;
 import android.content.*;

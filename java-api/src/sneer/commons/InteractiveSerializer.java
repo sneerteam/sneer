@@ -1,4 +1,4 @@
-package sneer;
+package sneer.commons;
 
 import java.io.*;
 import java.util.*;

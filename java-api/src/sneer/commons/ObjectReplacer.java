@@ -1,4 +1,4 @@
-package sneer;
+package sneer.commons;
 
 public interface ObjectReplacer<LocalType, RemoteType> {
 	

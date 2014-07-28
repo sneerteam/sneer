@@ -10,6 +10,7 @@ import rx.*;
 import rx.Observable;
 import rx.functions.*;
 import sneer.*;
+import sneer.commons.*;
 import sneer.impl.simulator.*;
 import sneer.tuples.*;
 import android.app.*;
