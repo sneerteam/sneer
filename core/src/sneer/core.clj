@@ -29,8 +29,8 @@
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
-(defn ->envelope [destination payload]
-  {:address destination :payload payload})
+(defn ->envelope [destination type payload]
+  {:address destination type (serialize payload)})
 
 (defn new-tuple-publisher
   ([tuples tuple]
@@ -46,7 +46,7 @@
         (pub [this payload]
            (.. this (payload payload) pub))
         (pub [this]
-           (. tuples onNext (->envelope (get tuple "audience") (serialize tuple)))
+           (. tuples onNext (->envelope (get tuple "audience") :tuple tuple))
            (reify-tuple tuple))))))
 
 (defn addressed-to [puk]
@@ -56,6 +56,15 @@
 
 (defmacro subscriber-filter [a]
   `(~'publisher-field ~a))
+
+(defn on-subscriber [subscriber criteria session]
+  (println criteria))
+
+(defn filter-by [criteria tuples]
+  (reduce
+    (fn [tuples [f v]] (rx/filter #(= (get % f) v) tuples))
+    tuples
+    criteria))
 
 (defn new-tuple-filter
   ([tuples-for-me] (new-tuple-filter tuples-for-me {}))
@@ -69,20 +78,45 @@
           (subscriber-filter audience)
           (field [this field value] (with field value))
           (tuples [this]
+            (let [tuples 
                   (->> 
-                    (reduce
-                      (fn [tuples [f v]] (rx/filter #(= (get % f) v) tuples))
-                      tuples-for-me
-                      criteria)
-                    (rx/map reify-tuple)))))))
+                    tuples-for-me
+                    (filter-by criteria)
+                    (rx/map reify-tuple))
+                  session {}]
+              
+              (rx/observable*
+                (fn [subscriber]
+                  (on-subscriber subscriber criteria session)
+                  (. subscriber add
+                    (. tuples subscribe subscriber))))))))))
 
-(defn new-tuples [own-puk session]
-  (reify TupleSpace
-    (publisher [this]
-      (new-tuple-publisher session {"author" own-puk}))
-    (filter [this]
-      (let [tuples-for-me (rx/filter (addressed-to own-puk) session)]
-        (new-tuple-filter (rx/map (comp deserialize :payload) tuples-for-me))))))
+(defn payloads [type envelopes]
+  (->> envelopes
+    (rx/map type)
+    (rx/filter (complement nil?))
+    (rx/map deserialize)))
+
+(defn reify-tuple-space [own-puk session]
+  (let [local-tuples (ReplaySubject/create)
+        envelopes-for-me (rx/filter (addressed-to own-puk) session)
+        tuples-for-me (payloads :tuple envelopes-for-me)
+        subscriptions-for-me (payloads :subscription envelopes-for-me)]
+    (rx/subscribe
+      subscriptions-for-me
+      (fn [subscription]
+        (let [sender (:sender subscription)
+              criteria (dissoc subscription :sender)
+              tuples-for-subscriber (->> local-tuples
+                                      (filter-by criteria)
+                                      (rx/map #(->envelope sender :tuple %)))]
+          (rx/subscribe tuples-for-subscriber (partial rx/on-next session)))))
+    (reify TupleSpace
+      (publisher [this]
+        ; TODO: session becomes local-tuples after :subscription envelopes start to be sent 
+        (new-tuple-publisher session {"author" own-puk}))
+      (filter [this]
+        (new-tuple-filter tuples-for-me)))))
 
 (defn new-sneer-admin [session]
   (let [prik (atom nil)]
@@ -90,9 +124,9 @@
       (initialize [this new-prik]
         (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
       (sneer [this]
-        (reify Sneer
-          (tupleSpace [this]
-            (new-tuples (.publicKey @prik) session)))))))
+        (let [tuple-space (reify-tuple-space (.publicKey @prik) session)]
+          (reify Sneer
+            (tupleSpace [this] tuple-space)))))))
 
 (defn new-session []
   (ReplaySubject/create))
