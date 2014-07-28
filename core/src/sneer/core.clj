@@ -29,8 +29,8 @@
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
-(defn ->envelope [destination tuple]
-  {:address destination :payload tuple})
+(defn ->envelope [destination payload]
+  {:address destination :payload payload})
 
 (defn new-tuple-publisher
   ([tuples tuple]
