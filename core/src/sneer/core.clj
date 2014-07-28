@@ -52,26 +52,29 @@
 (defn addressed-to [puk]
   (fn [envelope]
     (let [destination-address (:address envelope)]
-      (or
-        (nil? destination-address) ; public tuples
-        (= destination-address puk)))))
+      (= destination-address puk))))
 
-(defmacro subscriber-filter [field]
-  `(~field [~'this ~'expected]
-     (new-tuple-filter
-       ~'own-puk
-       (rx/filter #(= (. % ~field) ~'expected) ~'tuples))))
+(defmacro subscriber-filter [a]
+  `(~'publisher-field ~a))
 
-(defn new-tuple-filter [own-puk tuples]
-  (reify+ TupleFilter
-    (subscriber-filter type)
-    (subscriber-filter author)
-    (subscriber-filter audience)
-	  (field [this field value]
-          (new-tuple-filter
-			       own-puk
-			       (rx/filter #(= (. % field) value) tuples)))
-    (tuples [this] tuples)))
+(defn new-tuple-filter
+  ([tuples-for-me] (new-tuple-filter tuples-for-me {}))
+  ([tuples-for-me criteria]
+    (letfn
+        [(with [field value]
+            (new-tuple-filter tuples-for-me (assoc criteria field value)))]
+        (reify+ TupleFilter
+          (subscriber-filter type)
+          (subscriber-filter author)
+          (subscriber-filter audience)
+          (field [this field value] (with field value))
+          (tuples [this]
+                  (->> 
+                    (reduce
+                      (fn [tuples [f v]] (rx/filter #(= (get % f) v) tuples))
+                      tuples-for-me
+                      criteria)
+                    (rx/map reify-tuple)))))))
 
 (defn new-tuples [own-puk session]
   (reify TupleSpace
@@ -79,7 +82,7 @@
       (new-tuple-publisher session {"author" own-puk}))
     (filter [this]
       (let [tuples-for-me (rx/filter (addressed-to own-puk) session)]
-        (new-tuple-filter own-puk (rx/map (comp reify-tuple deserialize :payload) tuples-for-me))))))
+        (new-tuple-filter (rx/map (comp deserialize :payload) tuples-for-me))))))
 
 (defn new-sneer-admin [session]
   (let [prik (atom nil)]
