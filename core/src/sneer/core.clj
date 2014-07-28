@@ -25,7 +25,7 @@
     (tuple-getter author)
     (tuple-getter payload)))
 
-(defmacro publisher-field [a]
+(defmacro with-field [a]
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
@@ -38,9 +38,9 @@
       [(with [field value]
           (new-tuple-publisher tuples (assoc tuple field value)))]
       (reify+ TuplePublisher
-        (publisher-field type)
-        (publisher-field audience)
-        (publisher-field payload)
+        (with-field type)
+        (with-field audience)
+        (with-field payload)
         (field [this field value]
              (with field value))
         (pub [this payload]
@@ -53,9 +53,6 @@
   (fn [envelope]
     (let [destination-address (:address envelope)]
       (= destination-address puk))))
-
-(defmacro subscriber-filter [a]
-  `(~'publisher-field ~a))
 
 (defn on-subscriber [subscriber criteria session]
   (println criteria))
@@ -73,9 +70,9 @@
         [(with [field value]
             (new-tuple-filter tuples-for-me (assoc criteria field value)))]
         (reify+ TupleFilter
-          (subscriber-filter type)
-          (subscriber-filter author)
-          (subscriber-filter audience)
+          (with-field type)
+          (with-field author)
+          (with-field audience)
           (field [this field value] (with field value))
           (tuples [this]
             (let [tuples 
