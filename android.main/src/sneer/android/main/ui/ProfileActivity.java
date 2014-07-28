@@ -29,7 +29,6 @@ public class ProfileActivity extends Activity {
 	EditText preferredNickNameEdit;
 	EditText countryEdit;
 	EditText cityEdit;
-	CheckBox privacyCheckBox;
 	
 	Bitmap bitMap;
 	
@@ -47,7 +46,6 @@ public class ProfileActivity extends Activity {
 		selfieImage = (ImageView) profileView.findViewById(R.id.selfie);
 		countryEdit = (EditText) profileView.findViewById(R.id.country);
 		cityEdit = (EditText) profileView.findViewById(R.id.city);
-		privacyCheckBox = (CheckBox) profileView.findViewById(R.id.privacycheckBox);
 		
 		loadProfile();
 	}
@@ -113,7 +111,8 @@ public class ProfileActivity extends Activity {
 			Bundle extras = intent.getExtras();
 			bitMap = (Bitmap) extras.get("data");
 
-			selfieImage.setImageBitmap(bitMap); // TODO setImageBitmap not working
+//			 TODO setImageBitmap not working
+			selfieImage.setImageBitmap(bitMap);
 		}
     }
 	

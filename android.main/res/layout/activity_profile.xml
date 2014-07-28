@@ -14,29 +14,27 @@
 
         <ImageView
             android:id="@+id/selfie"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="15dp"
             android:clickable="true"
+            android:layout_centerVertical="true"
             android:contentDescription="@string/profile_view_content_description"
             android:onClick="selfieOnClick"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/avatar" />
 
         <EditText
             android:id="@+id/firstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="15dp"
             android:layout_toRightOf="@+id/selfie"
-            android:ems="10"
             android:hint="@string/profile_view_first_name"
             android:inputType="textPersonName" >
 
-            <requestFocus />
+            <requestFocus android:layout_width="wrap_content" />
         </EditText>
 
         <EditText
@@ -45,25 +43,26 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/firstName"
             android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@+id/selfie"
-            android:ems="10"
             android:hint="@string/profile_view_last_name"
             android:inputType="textPersonName"
             android:paddingLeft="10dp" >
         </EditText>
-        
-         <EditText
-             android:id="@+id/preferredNickName"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:layout_below="@+id/lastName"
-             android:layout_marginLeft="15dp"
-             android:layout_toRightOf="@+id/selfie"
-             android:ems="10"
-             android:hint="@string/profile_view_preferred_nickname"
-             android:inputType="textPersonName"
-             android:paddingLeft="10dp" >
 
+        <EditText
+            android:id="@+id/preferredNickName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lastName"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="8dp"
+            android:layout_toRightOf="@+id/selfie"
+            android:hint="@string/profile_view_preferred_nickname"
+            android:inputType="textPersonName"
+            android:paddingLeft="10dp" > 
         </EditText>
     </RelativeLayout>
 
@@ -74,12 +73,25 @@
         android:layout_below="@+id/nameRelativeLayout"
         android:orientation="vertical" >
 
+        <TextView
+            android:id="@+id/lblLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/profile_view_location" />
+
         <View
             android:id="@+id/view"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="35dp"
-            android:background="@android:color/black" />
+            android:layout_below="@+id/lblLocation"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="3dp"
+            android:background="@android:color/black"
+            android:hint="@string/profile_view_location" />
 
         <EditText
             android:id="@+id/country"
@@ -87,10 +99,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/view"
             android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="15dp"
-            android:ems="10"
             android:hint="@string/profile_view_country"
-            android:inputType="textPersonName"
             android:paddingLeft="10dp" >
         </EditText>
 
@@ -100,49 +111,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/country"
             android:layout_marginLeft="15dp"
-            android:ems="10"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="8dp"
             android:hint="@string/profile_view_city"
-            android:inputType="textPersonName"
             android:paddingLeft="10dp" >
         </EditText>
     </RelativeLayout>
-
-   <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/optionalRelativeLayout"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/textViewPrivacyTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="30dp"
-            android:text="@string/profile_view_privacy_title"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <View
-            android:id="@+id/viewPrivacy"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/textViewPrivacyTitle"
-            android:layout_marginTop="5dp"
-            android:background="@android:color/black" />
-        
-        <CheckBox
-            android:id="@+id/privacycheckBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/viewPrivacy"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="15dp"
-            android:text="@string/profile_view_privacy_text"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        
-    </RelativeLayout>
-
     
-
 </RelativeLayout>

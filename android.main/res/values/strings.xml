@@ -27,19 +27,19 @@
     <string name="title_chat_detail">Chat Detail</string>
     <string name="title_interaction_list">Interaction List</string>
     <string name="title_interaction">Interaction</string>
-    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_profile">Public Profile</string>
     <string name="action_new_interaction">New Event</string>
 
     <!-- Profile View -->
     <string name="profile_view_content_description">Your Picture</string>
-	<string name="profile_view_first_name">First Name</string>
-	<string name="profile_view_last_name">Last Name</string>
-    <string name="profile_view_preferred_nickname">Preferred Nickname</string>
+    <string name="profile_view_first_name">First name</string>
+    <string name="profile_view_last_name">Last name</string>
+    <string name="profile_view_preferred_nickname">Preferred nickname (optional)</string>
     <string name="profile_view_country">Country (optional)</string>
     <string name="profile_view_city">City (optional)</string>
-    <string name="profile_view_optional">OPTIONAL</string>
-    <string name="profile_view_privacy_title">PRIVACY</string>
-    <string name="profile_view_privacy_text">People can find me using public search</string>
     <string name="action_save_profile">Save</string>
+    <string name="profile_view_location">LOCATION</string>
+
     <!-- Profile View -->
+
 </resources>

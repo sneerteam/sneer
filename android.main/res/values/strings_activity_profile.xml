@@ -1,7 +1,5 @@
 <resources>
 
-    <string name="title_activity_profile">Profile</string>
-
     <string name="pref_title_name">Name</string>
     <string name="pref_title_nickname">Nickname (optional)</string>
 
