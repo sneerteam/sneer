@@ -120,16 +120,17 @@ public class SimpleP2P extends TestsBase {
 		publisher.pub("new name");
 
 		
-		assertEquals("new name",
-		tuplesA.filter()
-			.audience(userA)
-			.type("profile/name")
-			.localTuples().toBlockingObservable().last().payload());
+		assertEquals(
+			"new name",
+			tuplesA.filter()
+				.audience(userA)
+				.type("profile/name")
+				.localTuples().toBlockingObservable().last().payload());
 	}
 	
 	@Test
 	public void subscriberCriteriaWithArray() {
-		Object[] array = new Object[]{"notes", userB.publicKey()};
+		Object[] array = {"notes", userB.publicKey()};
 		
 		tuplesA.publisher()
 			.audience(userA.publicKey())
