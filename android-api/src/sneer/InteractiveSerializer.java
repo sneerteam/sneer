@@ -6,12 +6,12 @@ import java.util.*;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class InteractiveSerializer {
 
-	private Map<Class<?>, ObjectReplacer> from = new HashMap<Class<?>, ObjectReplacer>();
-	private Map<Class<?>, ObjectReplacer> to = new HashMap<Class<?>, ObjectReplacer>();
+	private Map<Class<?>, ObjectReplacer> localTypes = new HashMap<Class<?>, ObjectReplacer>();
+	private Map<Class<?>, ObjectReplacer> remoteTypes = new HashMap<Class<?>, ObjectReplacer>();
 
-	public <LocalType, RemoteType extends LocalType> void registerReplacer(Class<LocalType> from, Class<RemoteType> to, ObjectReplacer<LocalType, RemoteType> objectReplacer) {
-		this.from.put(from, objectReplacer);
-		this.to.put(to, objectReplacer);
+	public <LocalType, RemoteType extends LocalType> void registerReplacer(Class<LocalType> local, Class<RemoteType> remote, ObjectReplacer<LocalType, RemoteType> replacer) {
+		this.localTypes.put(local, replacer);
+		this.remoteTypes.put(remote, replacer);
 	}
 
 	public byte[] serialize(Object obj) {
@@ -19,7 +19,7 @@ public class InteractiveSerializer {
 		try {
 			ObjectOutputStream out = new ObjectOutputStream(bytes) {
 				{
-					if (!from.isEmpty()) {
+					if (!localTypes.isEmpty()) {
 						enableReplaceObject(true);
 					}
 				}
@@ -27,7 +27,7 @@ public class InteractiveSerializer {
 				@Override
 				protected Object replaceObject(Object obj) throws IOException {
 					for (Class<?> clazz : obj.getClass().getClasses()) {
-						ObjectReplacer replacer = from.get(clazz);
+						ObjectReplacer replacer = localTypes.get(clazz);
 						if (replacer != null) {
 							return replacer.outgoing(obj);
 						}
@@ -47,14 +47,14 @@ public class InteractiveSerializer {
 		try {
 			return new ObjectInputStream(new ByteArrayInputStream(bytes)) {
 				{
-					if (!to.isEmpty()) {
+					if (!remoteTypes.isEmpty()) {
 						enableResolveObject(true);
 					}
 				}
 				@Override
 				protected Object resolveObject(Object obj) throws IOException {
 					for (Class<?> clazz : obj.getClass().getClasses()) {
-						ObjectReplacer replacer = to.get(clazz);
+						ObjectReplacer replacer = remoteTypes.get(clazz);
 						if (replacer != null) {
 							return replacer.incoming(obj);
 						}
