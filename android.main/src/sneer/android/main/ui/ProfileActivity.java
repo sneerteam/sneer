@@ -55,6 +55,10 @@ public class ProfileActivity extends Activity {
 	
 	
 	private void loadProfile() {
+		sneer().self().name().subscribe(new Action1<String>() { @Override public void call(String name) {
+			firstNameEdit.setText(name);	
+		}});
+		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 			preferredNickNameEdit.setText(preferredNickname);
 		}});
@@ -82,6 +86,8 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void saveProfile() throws FriendlyException {
+//		SneerSingleton.admin().setOwnName(newName)
+		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
 		profile.setPreferredNickname(preferredNickname);
 		

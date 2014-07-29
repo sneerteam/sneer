@@ -7,7 +7,7 @@ import sneer.impl.simulator.*;
 
 public class SneerSingleton {
 	
-	private volatile static Sneer INSTANCE = null;
+	private volatile static SneerAdmin ADMIN = null;
 	
 	/*
 	dir = new File(context.getFilesDir(), "admin");
@@ -15,17 +15,20 @@ public class SneerSingleton {
 	 */
 
 	public static Sneer sneer() {
-		if (INSTANCE == null) {
+		return ADMIN.sneer();
+	}
+	
+	public static SneerAdmin admin() {
+		if (ADMIN == null) {
 			synchronized (SneerSingleton.class) {
-				if (INSTANCE == null) {
-					SneerAdmin admin = new SneerAdminSimulator();
-					admin.initialize(Keys.createPrivateKey());
-					admin.setOwnName("Neide da Silva");
-					INSTANCE = admin.sneer();
+				if (ADMIN == null) {
+					ADMIN = new SneerAdminSimulator();
+					ADMIN.initialize(Keys.createPrivateKey());
+					ADMIN.setOwnName("Neide da Silva");
 				}
 			}
 		}
-		return INSTANCE;
+		return ADMIN;
 	}
 
 }
