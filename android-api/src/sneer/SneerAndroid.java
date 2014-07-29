@@ -5,6 +5,7 @@ import rx.android.schedulers.*;
 import sneer.rx.*;
 import sneer.snapi.*;
 import sneer.tuples.*;
+import sneer.utils.*;
 import android.app.*;
 import android.content.*;
 import android.os.*;

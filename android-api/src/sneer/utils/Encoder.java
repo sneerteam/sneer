@@ -1,9 +1,9 @@
-package sneer.snapi;
+package sneer.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import sneer.api.*;
+import sneer.utils.*;
 import us.bpsm.edn.Keyword;
 
 public class Encoder {
