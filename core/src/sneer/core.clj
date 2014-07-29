@@ -46,7 +46,7 @@
         (pub [this payload]
            (.. this (payload payload) pub))
         (pub [this]
-           (. tuples onNext (->envelope (get tuple "audience") :tuple tuple))
+           (rx/on-next tuples tuple)
            (reify-tuple tuple))))))
 
 (defn addressed-to [puk]
