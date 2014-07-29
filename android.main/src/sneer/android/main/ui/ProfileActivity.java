@@ -24,7 +24,6 @@ public class ProfileActivity extends Activity {
 	static int TAKE_PICTURE = 1;
 	
 	ImageView selfieImage;
-	View profileView;
 	
 	Profile profile;
 	
@@ -44,22 +43,18 @@ public class ProfileActivity extends Activity {
 		
 		profile = sneer().profileFor(sneer().self());
 
-		profileView = View.inflate(this, R.layout.activity_profile, null);
-		
-		firstNameEdit = (EditText) profileView.findViewById(R.id.firstName);
-		lastNameEdit = (EditText) profileView.findViewById(R.id.lastName);
-		preferredNickNameEdit = (EditText) profileView.findViewById(R.id.preferredNickName);
-		selfieImage = (ImageView) profileView.findViewById(R.id.selfie);
-		countryEdit = (EditText) profileView.findViewById(R.id.country);
-		cityEdit = (EditText) profileView.findViewById(R.id.city);
+		firstNameEdit = (EditText) findViewById(R.id.firstName);
+		lastNameEdit = (EditText) findViewById(R.id.lastName);
+		preferredNickNameEdit = (EditText) findViewById(R.id.preferredNickName);
+		selfieImage = (ImageView) findViewById(R.id.selfie);
+		countryEdit = (EditText) findViewById(R.id.country);
+		cityEdit = (EditText) findViewById(R.id.city);
 		
 		loadProfile();
 	}
 	
 	
 	private void loadProfile() {
-		firstNameEdit.setText("this is not working");
-		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 			preferredNickNameEdit.setText(preferredNickname);
 		}});
@@ -124,7 +119,6 @@ public class ProfileActivity extends Activity {
 			Bundle extras = intent.getExtras();
 			bitMap = (Bitmap)extras.get("data");
 
-//			 TODO setImageBitmap not working
 			selfieImage.setImageBitmap(bitMap);
 		}
     }
@@ -145,14 +139,6 @@ public class ProfileActivity extends Activity {
 		}
     }
     
-    
-    @Override
-    protected void onResume() {
-    	super.onResume();
-    	LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//    	 TODO Redraw UI here to update EditTexts text.
-    }
-
     
     private void toast(String message) {
     	Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
