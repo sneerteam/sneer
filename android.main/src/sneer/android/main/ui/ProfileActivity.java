@@ -16,6 +16,7 @@ import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.*;
 import android.provider.*;
+import android.text.*;
 import android.view.*;
 import android.widget.*;
 
@@ -44,6 +45,19 @@ public class ProfileActivity extends Activity {
 		profile = sneer().profileFor(sneer().self());
 
 		firstNameEdit = (EditText) findViewById(R.id.firstName);
+		
+		firstNameEdit.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+	
+			public void afterTextChanged(Editable s) { isOnlyOneCharacter(firstNameEdit); }
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+		});
+		
+		
 		lastNameEdit = (EditText) findViewById(R.id.lastName);
 		preferredNickNameEdit = (EditText) findViewById(R.id.preferredNickName);
 		selfieImage = (ImageView) findViewById(R.id.selfie);
@@ -93,7 +107,10 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void saveProfile() throws FriendlyException {
-		SneerSingleton.admin().setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
+		
+
+		if(firstNameEdit.getText().length()>1)
+			SneerSingleton.admin().setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
 		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
 		profile.setPreferredNickname(preferredNickname);
@@ -157,5 +174,13 @@ public class ProfileActivity extends Activity {
     	Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
     	toast.show();
     }
+    
+    public void isOnlyOneCharacter(EditText edt) {
+		if (edt.getText().toString().length() <= 1) {
+			edt.setError("Cara o que vc tá fazendo?. Teu nome só tem um maldito caracter?");
+		} 
+
+	}
+    
 	
 }
