@@ -54,9 +54,6 @@
     (let [destination-address (:address envelope)]
       (= destination-address puk))))
 
-(defn on-subscriber [subscriber criteria session]
-  (println criteria))
-
 (defn filter-by [criteria tuples]
   (reduce
     (fn [tuples [f v]] (rx/filter #(= (get % f) v) tuples))
@@ -64,11 +61,11 @@
     criteria))
 
 (defn new-tuple-filter
-  ([tuples-for-me] (new-tuple-filter tuples-for-me {}))
-  ([tuples-for-me criteria]
+  ([tuples-for-me subscriptions-for-peers] (new-tuple-filter tuples-for-me subscriptions-for-peers {}))
+  ([tuples-for-me subscriptions-for-peers criteria]
     (letfn
         [(with [field value]
-            (new-tuple-filter tuples-for-me (assoc criteria field value)))]
+           (new-tuple-filter tuples-for-me  subscriptions-for-peers (assoc criteria field value)))]
         (reify+ TupleFilter
           (with-field type)
           (with-field author)
@@ -84,7 +81,7 @@
               
               (rx/observable*
                 (fn [subscriber]
-                  (on-subscriber subscriber criteria session)
+                  (rx/on-next subscriptions-for-peers criteria)
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
 
@@ -94,11 +91,38 @@
     (rx/filter (complement nil?))
     (rx/map deserialize)))
 
+(defn broadcast? [envelope]
+  (-> envelope :address nil?))
+
+(defn announce-peer [session puk]
+  (rx/on-next session (->envelope nil :peer-announcement puk)))
+
 (defn reify-tuple-space [own-puk session]
+  
   (let [local-tuples (ReplaySubject/create)
         envelopes-for-me (rx/filter (addressed-to own-puk) session)
         tuples-for-me (payloads :tuple envelopes-for-me)
-        subscriptions-for-me (payloads :subscription envelopes-for-me)]
+        subscriptions-for-me (payloads :subscription envelopes-for-me)
+        
+        broadcasts (rx/filter broadcast? session)
+        peer-announcements (->>
+                             (payloads :peer-announcement broadcasts)
+                             (rx/filter #(not= own-puk %))
+                             rx/distinct)
+        subscriptions-for-peers (ReplaySubject/create)]
+    
+    (announce-peer session own-puk)
+    
+    (rx/subscribe
+      peer-announcements
+      (fn [peer-puk]
+        ; subscribe to tuples for me coming from peer
+        (rx/on-next session
+                    (->envelope peer-puk :subscription {"audience" own-puk :sender own-puk}))
+        
+        ; filter subscriptions-for-peers by peer-puk
+        ))
+    
     (rx/subscribe
       subscriptions-for-me
       (fn [subscription]
@@ -107,13 +131,18 @@
               tuples-for-subscriber (->> local-tuples
                                       (filter-by criteria)
                                       (rx/map #(->envelope sender :tuple %)))]
-          (rx/subscribe tuples-for-subscriber (partial rx/on-next session)))))
+          (println "subscription from" sender "to" own-puk "where" criteria)
+          (rx/subscribe
+            tuples-for-subscriber
+            (fn [tuple]
+              (println "sending" tuple)
+              (rx/on-next session tuple))))))
+    
     (reify TupleSpace
-      (publisher [this]
-        ; TODO: session becomes local-tuples after :subscription envelopes start to be sent 
-        (new-tuple-publisher session {"author" own-puk}))
+      (publisher [this] 
+        (new-tuple-publisher local-tuples {"author" own-puk}))
       (filter [this]
-        (new-tuple-filter tuples-for-me)))))
+        (new-tuple-filter tuples-for-me subscriptions-for-peers)))))
 
 (defn new-sneer-admin [session]
   (let [prik (atom nil)]
