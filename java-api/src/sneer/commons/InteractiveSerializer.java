@@ -2,12 +2,13 @@ package sneer.commons;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class InteractiveSerializer {
 
-	private Map<Class<?>, ObjectReplacer> localTypes = new HashMap<Class<?>, ObjectReplacer>();
-	private Map<Class<?>, ObjectReplacer> remoteTypes = new HashMap<Class<?>, ObjectReplacer>();
+	private ConcurrentMap<Class<?>, ObjectReplacer> localTypes = new ConcurrentHashMap<Class<?>, ObjectReplacer>();
+	private ConcurrentMap<Class<?>, ObjectReplacer> remoteTypes = new ConcurrentHashMap<Class<?>, ObjectReplacer>();
 
 	public <LocalType, RemoteType extends LocalType> void registerReplacer(Class<LocalType> local, Class<RemoteType> remote, ObjectReplacer<LocalType, RemoteType> replacer) {
 		this.localTypes.put(local, replacer);
@@ -26,13 +27,8 @@ public class InteractiveSerializer {
 
 				@Override
 				protected Object replaceObject(Object obj) throws IOException {
-					for (Class<?> clazz : obj.getClass().getClasses()) {
-						ObjectReplacer replacer = localTypes.get(clazz);
-						if (replacer != null) {
-							return replacer.outgoing(obj);
-						}
-					}
-					return super.replaceObject(obj);
+					ObjectReplacer replacer = resolveAndCacheInstanceOf(localTypes, obj.getClass());
+					return replacer != null ? replacer.outgoing(obj) : super.replaceObject(obj); 
 				}
 			};
 			out.writeObject(obj);
@@ -41,6 +37,31 @@ public class InteractiveSerializer {
 			throw new RuntimeException(e);
 		}
 		return bytes.toByteArray();
+	}
+	
+	public static <T> T resolveAndCacheInstanceOf(Map<Class<?>, T> map, Class<?> originalClass) {
+		Class<?> candidate = originalClass;
+		T ret = null;
+		try {
+			while (candidate != Object.class) {
+				ret = map.get(candidate);
+				if (ret != null) return ret;
+				Class<?>[] ifaces = candidate.getInterfaces();
+				for (Class<?> iface : ifaces) {
+					ret = map.get(iface);
+					if (ret != null) {
+						candidate = iface;
+						return ret;
+					}
+				}
+				candidate = candidate.getSuperclass();
+			}
+		} finally {
+			if (ret != null && candidate != originalClass) {
+				map.put(candidate, ret);
+			}
+		}
+		return ret;
 	}
 
 	public Object deserialize(byte[] bytes) {
@@ -53,13 +74,8 @@ public class InteractiveSerializer {
 				}
 				@Override
 				protected Object resolveObject(Object obj) throws IOException {
-					for (Class<?> clazz : obj.getClass().getClasses()) {
-						ObjectReplacer replacer = remoteTypes.get(clazz);
-						if (replacer != null) {
-							return replacer.incoming(obj);
-						}
-					}
-					return obj;
+					ObjectReplacer replacer = resolveAndCacheInstanceOf(remoteTypes, obj.getClass());
+					return replacer != null ? replacer.incoming(obj) : super.resolveObject(obj); 
 				};
 			}.readObject();
 		} catch (OptionalDataException e) {
