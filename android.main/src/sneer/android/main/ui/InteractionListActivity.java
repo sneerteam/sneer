@@ -9,6 +9,7 @@ import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
+import sneer.android.main.*;
 import sneer.android.main.R;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
@@ -87,12 +88,12 @@ public class InteractionListActivity extends Activity {
 			onContactClicked(interaction);
 		}});
 
-		
-		sneer().interactionsContaining(embeddedOptions.type).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+		SneerSingleton.admin().sneer().interactionsContaining(embeddedOptions.type).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
 			adapter.clear();
 			adapter.addAll(interactions);
 			adapter.notifyDataSetChanged();
 		}});
+		
 	}
 
 

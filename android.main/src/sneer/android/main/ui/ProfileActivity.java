@@ -16,6 +16,7 @@ import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.*;
 import android.provider.*;
+import android.provider.ContactsContract.CommonDataKinds.*;
 import android.view.*;
 import android.widget.*;
 
@@ -55,10 +56,23 @@ public class ProfileActivity extends Activity {
 	
 	
 	private void loadProfile() {
+		
+		//Testar se firstName != null
+		
+		//Se sim lastname se torna invisivel e sobe o nickname pra ficar no lugar do lastname
+		//Se nao...show of ball - como diriam os ingleses
+		
 		sneer().self().name().subscribe(new Action1<String>() { @Override public void call(String name) {
-			firstNameEdit.setText(name);	
+			if(name.trim()!=null && !name.trim().isEmpty()){
+				firstNameEdit.setText(name);	
+				lastNameEdit.setVisibility(lastNameEdit.GONE);
+			}else
+				lastNameEdit.setVisibility(lastNameEdit.VISIBLE);
+			
 		}});
 		
+		
+			
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 			preferredNickNameEdit.setText(preferredNickname);
 		}});
@@ -86,7 +100,7 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void saveProfile() throws FriendlyException {
-//		SneerSingleton.admin().setOwnName(newName)
+		SneerSingleton.admin().setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
 		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
 		profile.setPreferredNickname(preferredNickname);
