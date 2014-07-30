@@ -10,7 +10,7 @@ import sneer.tuples.*;
 
 public class TestsBase {
 	
-	private final Object session = createSession();
+	private final Object network = createNetwork();
 
 	protected final PrivateKey userA = Keys.createPrivateKey();
 	protected final PrivateKey userB = Keys.createPrivateKey();
@@ -25,13 +25,13 @@ public class TestsBase {
 		return new SneerAdminInProcess((LocalTuplesFactory) session);
 	}
 	
-	protected Object createSession() {
+	protected Object createNetwork() {
 		return new TuplesFactoryInProcess();
 	}
 	
 	private Sneer init(PrivateKey prik) {
 		try {
-			SneerAdmin admin = createSneerAdmin(session);
+			SneerAdmin admin = createSneerAdmin(network);
 			admin.initialize(prik);
 			return admin.sneer();
 		} catch (Exception e) {

@@ -9,7 +9,7 @@ public class SimpleP2PGlue extends sneer.SimpleP2P {
 	}
 	
 	@Override
-	protected Object createSession() {
-		return Glue.newSession();
+	protected Object createNetwork() {
+		return Glue.newNetwork();
 	}
 }

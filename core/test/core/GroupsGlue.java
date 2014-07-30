@@ -9,7 +9,7 @@ public class GroupsGlue extends sneer.Groups {
 	}
 	
 	@Override
-	protected Object createSession() {
-		return Glue.newSession();
+	protected Object createNetwork() {
+		return Glue.newNetwork();
 	}
 }

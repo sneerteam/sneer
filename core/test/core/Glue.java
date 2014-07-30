@@ -6,17 +6,17 @@ import clojure.lang.*;
 
 class Glue {
 
-	public static SneerAdmin newSneerAdmin(Object session) {
+	public static SneerAdmin newSneerAdmin(Object network) {
 		try {
-			return (SneerAdmin) sneerCoreVar("new-sneer-admin").invoke(session);
+			return (SneerAdmin) sneerCoreVar("new-sneer-admin").invoke(network);
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	public static Object newSession() {
+	public static Object newNetwork() {
 		try {
-			return sneerCoreVar("new-session").call();
+			return sneerCoreVar("new-network").call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
