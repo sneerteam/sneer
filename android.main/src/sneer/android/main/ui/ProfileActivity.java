@@ -11,9 +11,13 @@ import sneer.android.main.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
+import android.database.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import android.media.*;
+import android.net.*;
 import android.os.*;
+import android.provider.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
@@ -21,7 +25,8 @@ import android.widget.*;
 public class ProfileActivity extends Activity {
 
 	static int TAKE_PICTURE = 1;
-	
+	static int THUMBNAIL_SIZE = 128;
+
 	ImageView selfieImage;
 	
 	Profile profile;
@@ -139,17 +144,62 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void selfieOnClick(View v) {
-		ImageUtils.openMediaSelector(this);
+		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+		galleryIntent.setType("image/*");
+		
+		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
+		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
+
+		startActivityForResult(chooser, TAKE_PICTURE);
 	}
 	
 	
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		if (requestCode == TAKE_PICTURE && resultCode== RESULT_OK && intent != null){
-			Bundle extras = intent.getExtras();
-			bitMap = (Bitmap)extras.get("data");
-			selfieImage.setImageBitmap(bitMap);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK && data != null){
+			Bundle extras = data.getExtras();
+//			bitMap = (Bitmap)extras.get("data");			
+			
+	        Uri selectedImage = data.getData();
+	        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+	        Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+	        cursor.moveToFirst();
+	        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	        String picturePath = cursor.getString(columnIndex);
+	        
+	        bitMap = BitmapFactory.decodeFile(picturePath.toString());
+	        ByteArrayOutputStream out = new ByteArrayOutputStream();
+	        
+	        bitMap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(picturePath), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+	        bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+
+	        byte[] bytes = out.toByteArray();
+	        toast("size: " + bytes.length);	        
+	        
+	        selfieImage.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
 		}
+		
+		
+		
+//		if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+//	        Uri selectedImage = data.getData();
+//	        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//	        Cursor cursor = getContentResolver().query(selectedImage,
+//	                filePathColumn, null, null, null);
+//	        cursor.moveToFirst();
+//	        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//	        String picturePath = cursor.getString(columnIndex);
+//	        photo = decodeFilePath(picturePath.toString());
+//
+//	        List<Bitmap> bitmap = new ArrayList<Bitmap>();
+//	        bitmap.add(photo);
+//	        ImageAdapter imageAdapter = new ImageAdapter(
+//	                AddIncidentScreen.this, bitmap);
+//	        imageAdapter.notifyDataSetChanged();
+//	        newTagImage.setAdapter(imageAdapter);
+//	    }
+
     }
 	
 
@@ -165,7 +215,7 @@ public class ProfileActivity extends Activity {
     
     
     private void toast(String message) {
-    	Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+    	Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
     	toast.show();
     }
     
