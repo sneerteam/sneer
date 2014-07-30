@@ -3,6 +3,7 @@ package sneer.android.main.ui;
 import static sneer.android.main.SneerSingleton.*;
 
 import java.io.*;
+import java.util.*;
 
 import rx.android.schedulers.*;
 import rx.functions.*;
@@ -63,6 +64,18 @@ public class ProfileActivity extends Activity {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 		});
 		
+		lastNameEdit.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+	
+			public void afterTextChanged(Editable s) {
+				isOnlyOneCharacter(lastNameEdit);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+		});
+		
 		loadProfile();
 	}
 	
@@ -105,7 +118,7 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void saveProfile() throws FriendlyException {
-		if (firstNameEdit.getText().toString().trim().length() > 1)
+		if (firstNameEdit.getText().toString().trim().length() > 1 && lastNameEdit.getText().toString().trim().length() > 1) 
 			SneerSingleton.admin().setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
 		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
@@ -129,13 +142,7 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void selfieOnClick(View v) {
-		if (hasCamera()) {
-			toast("Selfie was clicked. :-)");
-			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			startActivityForResult(intent, TAKE_PICTURE);
-		} else {
-			toast("Your phone doesn't have a camera. :-(");
-		}
+		ImageUtils.openMediaSelector(this);
 	}
 	
 	
@@ -149,11 +156,6 @@ public class ProfileActivity extends Activity {
     }
 	
 
-	private boolean hasCamera(){
-        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
-    }
- 
-    
     @Override
     protected void onStop() {
         super.onStop();

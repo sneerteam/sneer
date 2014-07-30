@@ -39,7 +39,10 @@
     <string name="profile_view_city">City (optional)</string>
     <string name="action_save_profile">Save</string>
     <string name="profile_view_location">LOCATION</string>
-
     <!-- Profile View -->
+
+    <string name="action_select">Complete action using</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="pick_image_action_list_icon_description">Action Icon</string>
 
 </resources>
