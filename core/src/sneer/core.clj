@@ -4,9 +4,10 @@
     [sneer.serialization :refer :all])
   (:import
     [sneer.admin SneerAdmin]
-    [sneer Sneer PrivateKey]
+    [sneer Sneer PrivateKey Party Contact]
+    [sneer.rx ObservedSubject]
     [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
-    [rx.subjects ReplaySubject]))
+    [rx.subjects ReplaySubject PublishSubject]))
 
 (defmacro reify+
   "expands to reify form after macro expanding the body"
@@ -91,35 +92,26 @@
     (rx/filter (complement nil?))
     (rx/map deserialize)))
 
-(defn broadcast? [envelope]
-  (-> envelope :address nil?))
-
-(defn announce-peer [network puk]
-  (rx/on-next network (->envelope nil :peer-announcement puk)))
-
-(defn reify-tuple-space [own-puk network]
+(defn reify-tuple-space [own-puk contacts network]
   
   (let [local-tuples (ReplaySubject/create)
         envelopes-for-me (rx/filter (addressed-to own-puk) network)
         tuples-for-me (payloads :tuple envelopes-for-me)
         subscriptions-for-me (payloads :subscription envelopes-for-me)
         
-        broadcasts (rx/filter broadcast? network)
-        peer-announcements (->>
-                             (payloads :peer-announcement broadcasts)
-                             (rx/filter #(not= own-puk %))
-                             rx/distinct)
+        peers (->>
+                contacts
+                (rx/map #(.. % party publicKey mostRecent))
+                rx/distinct)
         subscriptions-for-peers (ReplaySubject/create)]
     
-    (announce-peer network own-puk)
-    
     (rx/subscribe
-      peer-announcements
+      peers
       (fn [peer-puk]
+        
         ; subscribe to tuples for me coming from peer
         (rx/on-next network
                     (->envelope peer-puk :subscription {"audience" own-puk :sender own-puk}))
-        
         ; filter subscriptions-for-peers by peer-puk
         ))
     
@@ -144,14 +136,35 @@
       (filter [this]
         (new-tuple-filter tuples-for-me subscriptions-for-peers)))))
 
+(defn ->observed [value]
+  (.observed (ObservedSubject/create value)))
+
+(defn reify-party [puk]
+  (let [observed-puk (->observed puk)]
+    (reify Party
+      (publicKey [this] observed-puk))))
+
+(defn reify-contact [nickname party]
+  (let [observed-name (->observed nickname)]
+    (reify Contact
+      (nickname [this] observed-name)
+      (party [this] party))))
+
 (defn new-sneer-admin [network]
   (let [prik (atom nil)]
     (reify SneerAdmin
       (initialize [this new-prik]
         (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
       (sneer [this]
-        (let [tuple-space (reify-tuple-space (.publicKey @prik) network)]
+        (let [puk (.publicKey @prik)              
+              contacts (PublishSubject/create)
+              tuple-space (reify-tuple-space puk contacts network)]
           (reify Sneer
+            (self [this] (reify-party puk))
+            (produceParty [this puk] (reify-party puk))
+            (setContact [this nickname party]
+              (let [contact (reify-contact nickname party)]
+                (rx/on-next contacts contact)))
             (tupleSpace [this] tuple-space)))))))
 
 (defn new-network []
