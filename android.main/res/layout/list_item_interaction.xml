@@ -2,6 +2,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
+    <ImageView 
+        android:id="@+id/interactionPicture"
+    	android:layout_width="15dp"
+    	android:layout_height="15dp"
+    	android:contentDescription="@string/interaction_summary_picture"
+    	android:src="@drawable/neide"
+    	
+    />
+    
     <TextView
         android:id="@+id/interactionSummary"
         android:layout_width="fill_parent"

@@ -44,5 +44,6 @@
     <string name="action_select">Complete action using</string>
     <string name="action_cancel">Cancel</string>
     <string name="pick_image_action_list_icon_description">Action Icon</string>
+    <string name="interaction_summary_picture">Interaction Summary Picture</string>
 
 </resources>
