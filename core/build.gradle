@@ -45,6 +45,7 @@ dependencies {
     compile 'org.xerial:sqlite-jdbc:3.7.2'
     compile 'com.netflix.rxjava:rxjava-clojure:0.19.6'
     compile 'com.cognitect:transit-clj:0.8.229'
+	compile 'com.google.guava:guava:17.0'
     compile project(':java-api')
     compile project(':java-api.tests')
 }

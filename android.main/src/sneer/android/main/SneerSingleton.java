@@ -23,6 +23,7 @@ public class SneerSingleton {
 			synchronized (SneerSingleton.class) {
 				if (ADMIN == null) {
 					ADMIN = new SneerAdminSimulator();
+//					ADMIN = new TupleSpaceSneerAdmin(new TuplesFactoryInProcess().newTupleSpace(Keys.createPrivateKey()));
 					ADMIN.initialize(Keys.createPrivateKey());
 				}
 			}
