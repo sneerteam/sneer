@@ -39,7 +39,7 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 		this.sneer = sneer;
     }
 
-	@Override
+	@SuppressLint("ViewHolder") @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 		final InteractionEvent event = this.getItem(position);
         final View ret = inflater.inflate(
@@ -68,16 +68,13 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 			View speechBubbleArrowRight = row.findViewById(R.id.speechBubbleArrowRight);
 			if (SDK_INT >= ICE_CREAM_SANDWICH){
 				speechBubbleArrowRight.setBackground(new TriangleRightDrawable(Color.parseColor("#D34F39")));
-			} else {
-				int drawTriangleRight;
-			}
+			} 
+			
 		} else {
 			View speechBubbleArrowLeft = row.findViewById(R.id.speechBubbleArrowLeft);
 			if (SDK_INT >= ICE_CREAM_SANDWICH){
 				speechBubbleArrowLeft.setBackground(new TriangleLeftDrawable(darkColorDeterminedBy(sender)));
-			} else {
-				int drawTriangleLeft;
-			}
+			} 
 			
 			LayerDrawable bubbleLayer = (LayerDrawable) speechBubble.getBackground();
 			GradientDrawable bubbleBackground = (GradientDrawable) bubbleLayer.findDrawableByLayerId(R.id.bubbleBackground);

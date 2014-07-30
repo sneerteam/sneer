@@ -4,8 +4,6 @@ import static sneer.android.main.SneerSingleton.*;
 
 import java.io.*;
 
-import javax.management.*;
-
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -13,9 +11,7 @@ import sneer.android.main.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
-import android.database.*;
 import android.graphics.*;
-import android.graphics.drawable.*;
 import android.media.*;
 import android.net.*;
 import android.os.*;
@@ -38,7 +34,7 @@ public class ProfileActivity extends Activity {
 	EditText preferredNickNameEdit;
 	EditText countryEdit;
 	EditText cityEdit;
-	private byte[] bytes;
+	private byte[] selfieBytes;
 	
 	
 	@Override
@@ -132,8 +128,8 @@ public class ProfileActivity extends Activity {
 		String city = cityEdit.getText().toString();
 		profile.setCity(city);
 		
-		if (bytes != null)
-			profile.setSelfie(bytes);
+		if (selfieBytes != null)
+			profile.setSelfie(selfieBytes);
 
 		toast("profile saved...");
 	}
@@ -176,12 +172,12 @@ public class ProfileActivity extends Activity {
 			do {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-				bytes = out.toByteArray();
+				selfieBytes = out.toByteArray();
 				size = (int) (size * 0.9f);
-			} while (bytes.length > 1024 * 10);
+			} while (selfieBytes.length > 1024 * 10);
 	        
-	        toast("size: " + bytes.length);	        
-	        selfieImage.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+	        toast("size: " + selfieBytes.length);	        
+	        selfieImage.setImageBitmap(BitmapFactory.decodeByteArray(selfieBytes, 0, selfieBytes.length));
 		}		
     }
 	
