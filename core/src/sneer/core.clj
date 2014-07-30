@@ -77,8 +77,7 @@
                   (->> 
                     tuples-for-me
                     (filter-by criteria)
-                    (rx/map reify-tuple))
-                  network {}]
+                    (rx/map reify-tuple))]
               
               (rx/observable*
                 (fn [subscriber]
