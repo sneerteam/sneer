@@ -4,6 +4,8 @@ import static sneer.android.main.SneerSingleton.*;
 
 import java.io.*;
 
+import javax.management.*;
+
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -37,7 +39,6 @@ public class ProfileActivity extends Activity {
 	EditText countryEdit;
 	EditText cityEdit;
 	
-	Bitmap bitMap;
 	
 	
 	@Override
@@ -156,50 +157,41 @@ public class ProfileActivity extends Activity {
 	
 	
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
 		if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK && data != null){
-			Bundle extras = data.getExtras();
-//			bitMap = (Bitmap)extras.get("data");			
 			
-	        Uri selectedImage = data.getData();
-	        String[] filePathColumn = { MediaStore.Images.Media.DATA };
-	        Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-	        cursor.moveToFirst();
-	        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-	        String picturePath = cursor.getString(columnIndex);
-	        
-	        bitMap = BitmapFactory.decodeFile(picturePath.toString());
-	        ByteArrayOutputStream out = new ByteArrayOutputStream();
-	        
-	        bitMap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(picturePath), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-	        bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        int size = THUMBNAIL_SIZE;
+	        Bitmap bitMap;
 
-	        byte[] bytes = out.toByteArray();
-	        toast("size: " + bytes.length);	        
+	        if (data.getExtras()!=null && data.getExtras().get("data") !=  null) {
+	        	bitMap = (Bitmap) data.getExtras().get("data");
+			}else if(data.getData()!=null){				
+				Uri selectedImage = data.getData();
+				try {
+					bitMap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage)), size, size);
+					
+				} catch (FileNotFoundException e) {
+					toast("Error loading " + selectedImage);
+					return;
+				}
+			}else{
+				toast("Error selecting image source.");
+				return;
+			}
 	        
+	        
+	        byte[] bytes;
+	        do{
+	        	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	        	bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        	bytes = out.toByteArray();
+	        	size = (int) (size * 0.9f);
+	        }while(bytes.length > 1024*10);
+	        
+	        toast("size: " + bytes.length);	        
 	        selfieImage.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
 		}
 		
-		
-		
-//		if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-//	        Uri selectedImage = data.getData();
-//	        String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//	        Cursor cursor = getContentResolver().query(selectedImage,
-//	                filePathColumn, null, null, null);
-//	        cursor.moveToFirst();
-//	        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//	        String picturePath = cursor.getString(columnIndex);
-//	        photo = decodeFilePath(picturePath.toString());
-//
-//	        List<Bitmap> bitmap = new ArrayList<Bitmap>();
-//	        bitmap.add(photo);
-//	        ImageAdapter imageAdapter = new ImageAdapter(
-//	                AddIncidentScreen.this, bitmap);
-//	        imageAdapter.notifyDataSetChanged();
-//	        newTagImage.setAdapter(imageAdapter);
-//	    }
-
     }
 	
 
