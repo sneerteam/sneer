@@ -107,27 +107,46 @@
     (rx/subscribe
       peers
       (fn [peer-puk]
-        
-        ; subscribe to tuples for me coming from peer
-        (rx/on-next network
-                    (->envelope peer-puk :subscription {"audience" own-puk :sender own-puk}))
-        ; filter subscriptions-for-peers by peer-puk
-        ))
+        (rx/subscribe
+            (->> subscriptions-for-peers
+              (rx/map #(assoc % "author" peer-puk))
+              (rx/map #(->envelope peer-puk :subscription (assoc % :sender own-puk))))
+            #(rx/on-next network %))))
     
-    (rx/subscribe
-      subscriptions-for-me
-      (fn [subscription]
-        (let [sender (:sender subscription)
-              criteria (dissoc subscription :sender)
-              tuples-for-subscriber (->> local-tuples
-                                      (filter-by criteria)
-                                      (rx/map #(->envelope sender :tuple %)))]
-          (println "subscription from" sender "to" own-puk "where" criteria)
-          (rx/subscribe
-            tuples-for-subscriber
-            (fn [tuple]
-              (println "sending" tuple)
-              (rx/on-next network tuple))))))
+    (let [subscriptions-by-sender (atom {})]
+      
+      (rx/subscribe
+        subscriptions-for-me
+        (fn [subscription]
+          (let [sender (:sender subscription)
+                criteria (dissoc subscription :sender)]
+            
+            (swap!
+              subscriptions-by-sender
+              (fn [cur]                
+                (if-let [existing (get cur sender)]
+                  
+                  (let [{old-criteria :criteria subscription :subscription} existing]
+                    (println "UPDATE: from" sender "to" own-puk "where" criteria)
+                    (.unsubscribe subscription)
+                    
+                    ;TODO: combine old and new criteria
+                    (let [subscription
+                          (rx/subscribe
+                            (->> local-tuples
+                              (filter-by criteria)
+                              (rx/map #(->envelope sender :tuple %)))
+                            (fn [tuple] (rx/on-next network tuple)))]
+                      (assoc cur sender {:criteria criteria :subscription subscription})))
+                  
+                  (let [subscription
+                        (rx/subscribe
+                          (->> local-tuples
+                            (filter-by criteria)
+                            (rx/map #(->envelope sender :tuple %)))
+                          (fn [tuple] (rx/on-next network tuple)))]
+                    (println "NEW: from" sender "to" own-puk "where" criteria)
+                    (assoc cur sender {:criteria criteria :subscription subscription})))))))))
     
     (reify TupleSpace
       (publisher [this] 
