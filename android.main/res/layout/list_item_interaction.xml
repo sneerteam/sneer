@@ -4,17 +4,18 @@
     
     <ImageView 
         android:id="@+id/interactionPicture"
-    	android:layout_width="15dp"
-    	android:layout_height="15dp"
+    	android:layout_width="30dp"
+    	android:layout_height="30dp"
+    	android:layout_centerVertical="true"
+    	android:layout_marginLeft="5dp"
     	android:contentDescription="@string/interaction_summary_picture"
-    	android:src="@drawable/neide"
-    	
-    />
+    	android:src="@drawable/neide" />
     
     <TextView
         android:id="@+id/interactionSummary"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/interactionPicture"
         android:divider="@null"
         android:padding="10dp"
         android:text="@string/dummy_text" />

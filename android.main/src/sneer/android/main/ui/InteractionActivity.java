@@ -73,8 +73,7 @@ public class InteractionActivity extends Activity {
 		private void sendMessage(final Party party, final String text) {
 			if (text != null && !text.isEmpty())
 				sneer().produceInteractionWith(party).sendMessage(text);
-		}});
-		
+		}});		
 	}
 	
 	

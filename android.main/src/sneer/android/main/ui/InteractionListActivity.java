@@ -30,7 +30,7 @@ public class InteractionListActivity extends Activity {
 	
 	
 	/**
-	 * Used when this activity is launched by another application with options to modify its behaviour
+	 * Used when this activity is launched by another application with options to modify its behavior
 	 * @author fabio
 	 *
 	 */
@@ -55,8 +55,7 @@ public class InteractionListActivity extends Activity {
 		
 		public boolean wasEmbedded() {
 			return interactionAction != null;
-		}
-		
+		}		
 	}
 
 	
@@ -88,8 +87,7 @@ public class InteractionListActivity extends Activity {
 			adapter.clear();
 			adapter.addAll(interactions);
 			adapter.notifyDataSetChanged();
-		}});
-		
+		}});		
 	}
 
 
