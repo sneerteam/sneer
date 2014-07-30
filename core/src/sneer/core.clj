@@ -100,7 +100,7 @@
         
         peers (->>
                 contacts
-                (rx/map #(.. % party publicKey mostRecent))
+                (rx/mapcat #(.. % party publicKey observable))
                 rx/distinct)
         subscriptions-for-peers (ReplaySubject/create)]
     
