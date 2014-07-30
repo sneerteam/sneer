@@ -3,7 +3,6 @@ package sneer.android.main.ui;
 import static sneer.android.main.SneerSingleton.*;
 
 import java.io.*;
-import java.util.*;
 
 import rx.android.schedulers.*;
 import rx.functions.*;
@@ -12,11 +11,9 @@ import sneer.android.main.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
-import android.content.pm.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.*;
-import android.provider.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
