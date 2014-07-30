@@ -4,8 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import rx.*;
-import rx.Observable.OnSubscribe;
-import rx.functions.*;
 import rx.Observable;
 import sneer.admin.*;
 import sneer.commons.exceptions.*;
@@ -13,7 +11,6 @@ import sneer.rx.*;
 import sneer.tuples.*;
 
 import com.google.common.cache.*;
-import com.google.common.collect.*;
 
 public class TupleSpaceSneerAdmin implements SneerAdmin {
 	
@@ -213,7 +210,7 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 				if (party.publicKey() != prik.publicKey()) {
 					throw new IllegalArgumentException("Editing someone else's profile is unsupported.");
 				}
-				WritableContact contact = contacts.getUnchecked((WritableParty) party);
+				final WritableContact contact = contacts.getUnchecked((WritableParty) party);
 				class PublishableContact {
 					void pub(String field, Object value) {
 						tupleSpace.publisher()
@@ -225,7 +222,7 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 					}
 					
 				}
-				PublishableContact fields = new PublishableContact();
+				final PublishableContact fields = new PublishableContact();
 				return new Profile() {
 					
 					@Override
