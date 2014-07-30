@@ -15,10 +15,10 @@ public class PartySimulator implements Party, Profile {
 	private final BehaviorSubject<String> name;
 
 	/** Profile */
-	private BehaviorSubject<String> preferredNickname = BehaviorSubject.create("dude");
-	private BehaviorSubject<String> city = BehaviorSubject.create("Campinas");
-	private BehaviorSubject<String> country = BehaviorSubject.create("Brazil");
-	private BehaviorSubject<byte[]> selfie;
+	private Subject<String, String> preferredNickname = BehaviorSubject.create("dude");
+	private Subject<String, String> city = BehaviorSubject.create("Campinas");
+	private Subject<String, String> country = BehaviorSubject.create("Brazil");
+	private PublishSubject<byte[]> selfie = PublishSubject.create();
 	
 	
 	public PartySimulator(String name, PrivateKey prik) {
@@ -73,13 +73,13 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public Observable<byte[]> selfie() {
-		return null;
+		return selfie;
 	}
 
 
 	@Override
 	public void setSelfie(byte[] newSelfie) throws FriendlyException {
-//		selfie.onNext(newSelfie);
+		selfie.onNext(newSelfie);
 	}
 
 

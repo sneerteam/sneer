@@ -38,7 +38,7 @@ public class ProfileActivity extends Activity {
 	EditText preferredNickNameEdit;
 	EditText countryEdit;
 	EditText cityEdit;
-	
+	private byte[] bytes;
 	
 	
 	@Override
@@ -55,6 +55,7 @@ public class ProfileActivity extends Activity {
 		countryEdit = (EditText) findViewById(R.id.country);
 		cityEdit = (EditText) findViewById(R.id.city);
 
+		
 		firstNameEdit.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) { }
@@ -93,7 +94,6 @@ public class ProfileActivity extends Activity {
 			}
 		}});
 		
-			
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 			preferredNickNameEdit.setText(preferredNickname);
 		}});
@@ -106,11 +106,10 @@ public class ProfileActivity extends Activity {
 			cityEdit.setText(city);
 		}});
 		
-//		profile.selfie().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
-//			BitmapFactory.Options options = new BitmapFactory.Options();
-//			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
-//			selfieImage.setImageBitmap(bitmap);
-//		}});
+		profile.selfie().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
+			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
+			selfieImage.setImageBitmap(bitmap);
+		}});
 	}
 
 
@@ -133,12 +132,8 @@ public class ProfileActivity extends Activity {
 		String city = cityEdit.getText().toString();
 		profile.setCity(city);
 		
-		BitmapDrawable selfieDrawable = ((BitmapDrawable) selfieImage.getDrawable());
-		Bitmap bitmap = selfieDrawable.getBitmap();
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-		byte[] imageInByte = stream.toByteArray();
-		profile.setSelfie(imageInByte);
+		if (bytes != null)
+			profile.setSelfie(bytes);
 
 		toast("profile saved...");
 	}
@@ -159,13 +154,12 @@ public class ProfileActivity extends Activity {
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
 		if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK && data != null){
-			
 	        int size = THUMBNAIL_SIZE;
 	        Bitmap bitMap;
 
-	        if (data.getExtras()!=null && data.getExtras().get("data") !=  null) {
-	        	bitMap = (Bitmap) data.getExtras().get("data");
-			}else if(data.getData()!=null){				
+			if (data.getExtras() != null && data.getExtras().get("data") != null) {
+				bitMap = (Bitmap) data.getExtras().get("data");
+			} else if (data.getData() != null) {			
 				Uri selectedImage = data.getData();
 				try {
 					bitMap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage)), size, size);
@@ -174,24 +168,21 @@ public class ProfileActivity extends Activity {
 					toast("Error loading " + selectedImage);
 					return;
 				}
-			}else{
+			} else {
 				toast("Error selecting image source.");
 				return;
 			}
-	        
-	        
-	        byte[] bytes;
-	        do{
-	        	ByteArrayOutputStream out = new ByteArrayOutputStream();
-	        	bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-	        	bytes = out.toByteArray();
-	        	size = (int) (size * 0.9f);
-	        }while(bytes.length > 1024*10);
+	        	        
+			do {
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+				bytes = out.toByteArray();
+				size = (int) (size * 0.9f);
+			} while (bytes.length > 1024 * 10);
 	        
 	        toast("size: " + bytes.length);	        
 	        selfieImage.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-		}
-		
+		}		
     }
 	
 
