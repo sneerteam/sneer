@@ -1,4 +1,4 @@
-package sneer.snapi;
+package sneer.utils;
 
 import android.app.*;
 import android.content.*;

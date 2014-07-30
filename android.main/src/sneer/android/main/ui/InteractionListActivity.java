@@ -10,10 +10,8 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
-import sneer.android.main.R;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
-import sneer.snapi.*;
 import android.app.*;
 import android.content.*;
 import android.os.*;
@@ -26,7 +24,6 @@ import android.widget.AdapterView.OnItemClickListener;
 public class InteractionListActivity extends Activity {
 
 	private InteractionListAdapter adapter;
-	private Cloud cloud;
 	private ListView listView;
 	private Interaction interaction;
 	private EmbeddedOptions embeddedOptions;
@@ -70,7 +67,6 @@ public class InteractionListActivity extends Activity {
 		
 		embeddedOptions = new EmbeddedOptions(getIntent());
 		
-		String title;
 		if (embeddedOptions.title != null) {				
 			setTitle(embeddedOptions.title);
 		}
@@ -121,14 +117,6 @@ public class InteractionListActivity extends Activity {
 		}
 
 		return true;
-	}
-
-	
-	@Override
-	protected void onDestroy() {
-		if(cloud!=null)
-			cloud.dispose();
-		super.onDestroy();
 	}
 
 	

@@ -77,7 +77,7 @@
                     tuples-for-me
                     (filter-by criteria)
                     (rx/map reify-tuple))
-                  session {}]
+                  network {}]
               
               (rx/observable*
                 (fn [subscriber]
@@ -94,30 +94,30 @@
 (defn broadcast? [envelope]
   (-> envelope :address nil?))
 
-(defn announce-peer [session puk]
-  (rx/on-next session (->envelope nil :peer-announcement puk)))
+(defn announce-peer [network puk]
+  (rx/on-next network (->envelope nil :peer-announcement puk)))
 
-(defn reify-tuple-space [own-puk session]
+(defn reify-tuple-space [own-puk network]
   
   (let [local-tuples (ReplaySubject/create)
-        envelopes-for-me (rx/filter (addressed-to own-puk) session)
+        envelopes-for-me (rx/filter (addressed-to own-puk) network)
         tuples-for-me (payloads :tuple envelopes-for-me)
         subscriptions-for-me (payloads :subscription envelopes-for-me)
         
-        broadcasts (rx/filter broadcast? session)
+        broadcasts (rx/filter broadcast? network)
         peer-announcements (->>
                              (payloads :peer-announcement broadcasts)
                              (rx/filter #(not= own-puk %))
                              rx/distinct)
         subscriptions-for-peers (ReplaySubject/create)]
     
-    (announce-peer session own-puk)
+    (announce-peer network own-puk)
     
     (rx/subscribe
       peer-announcements
       (fn [peer-puk]
         ; subscribe to tuples for me coming from peer
-        (rx/on-next session
+        (rx/on-next network
                     (->envelope peer-puk :subscription {"audience" own-puk :sender own-puk}))
         
         ; filter subscriptions-for-peers by peer-puk
@@ -136,7 +136,7 @@
             tuples-for-subscriber
             (fn [tuple]
               (println "sending" tuple)
-              (rx/on-next session tuple))))))
+              (rx/on-next network tuple))))))
     
     (reify TupleSpace
       (publisher [this] 
@@ -144,16 +144,16 @@
       (filter [this]
         (new-tuple-filter tuples-for-me subscriptions-for-peers)))))
 
-(defn new-sneer-admin [session]
+(defn new-sneer-admin [network]
   (let [prik (atom nil)]
     (reify SneerAdmin
       (initialize [this new-prik]
         (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
       (sneer [this]
-        (let [tuple-space (reify-tuple-space (.publicKey @prik) session)]
+        (let [tuple-space (reify-tuple-space (.publicKey @prik) network)]
           (reify Sneer
             (tupleSpace [this] tuple-space)))))))
 
-(defn new-session []
+(defn new-network []
   (ReplaySubject/create))
 

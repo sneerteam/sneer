@@ -43,9 +43,6 @@ subprojects {
 		            file {
 		                withXml {
 		                    def node = it.asNode()
-		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.LIBRARIES', exported: true])
-		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.DEPENDENCIES', exported: true])
-		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK'])
 		                    node.appendNode('classpathentry', [kind: 'src', path: 'src'])
 		                    node.appendNode('classpathentry', [kind: 'src', path: 'gen'])
 
@@ -57,6 +54,9 @@ subprojects {
 			                        node.appendNode('classpathentry', [kind: 'src', path: "/${it.dependencyProject.name}", exported: true])
 			                    }
 		                    }
+		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.LIBRARIES', exported: true])
+		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.DEPENDENCIES', exported: true])
+		                    node.appendNode('classpathentry', [kind: 'con', path: 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK'])
 		                }
 		            }
 		        }
