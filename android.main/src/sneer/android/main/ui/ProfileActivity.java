@@ -45,38 +45,36 @@ public class ProfileActivity extends Activity {
 		profile = sneer().profileFor(sneer().self());
 
 		firstNameEdit = (EditText) findViewById(R.id.firstName);
-		
-		firstNameEdit.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-	
-			public void afterTextChanged(Editable s) { isOnlyOneCharacter(firstNameEdit); }
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-		});
-		
-		
 		lastNameEdit = (EditText) findViewById(R.id.lastName);
 		preferredNickNameEdit = (EditText) findViewById(R.id.preferredNickName);
 		selfieImage = (ImageView) findViewById(R.id.selfie);
 		countryEdit = (EditText) findViewById(R.id.country);
 		cityEdit = (EditText) findViewById(R.id.city);
+
+		firstNameEdit.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+	
+			public void afterTextChanged(Editable s) {
+				isOnlyOneCharacter(firstNameEdit);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+		});
 		
 		loadProfile();
 	}
 	
 	
 	private void loadProfile() {
-		
 		sneer().self().name().subscribe(new Action1<String>() { @Override public void call(String name) {
-			if(name.trim()!=null && !name.trim().isEmpty()){
-				firstNameEdit.setText(name);	
+			if (name.trim() != null && !name.trim().isEmpty()) {
+				firstNameEdit.setText(name);
 				lastNameEdit.setVisibility(View.GONE);
-			}else
+			} else {
 				lastNameEdit.setVisibility(View.VISIBLE);
-			
+			}
 		}});
 		
 			
@@ -107,9 +105,7 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void saveProfile() throws FriendlyException {
-		
-
-		if(firstNameEdit.getText().length()>1)
+		if (firstNameEdit.getText().toString().trim().length() > 1)
 			SneerSingleton.admin().setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
 		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
@@ -148,7 +144,6 @@ public class ProfileActivity extends Activity {
 		if (requestCode == TAKE_PICTURE && resultCode== RESULT_OK && intent != null){
 			Bundle extras = intent.getExtras();
 			bitMap = (Bitmap)extras.get("data");
-
 			selfieImage.setImageBitmap(bitMap);
 		}
     }
@@ -175,12 +170,10 @@ public class ProfileActivity extends Activity {
     	toast.show();
     }
     
-    public void isOnlyOneCharacter(EditText edt) {
-		if (edt.getText().toString().length() <= 1) {
-			edt.setError("Cara o que vc tá fazendo?. Teu nome só tem um maldito caracter?");
-		} 
-
+	public void isOnlyOneCharacter(EditText edt) {
+		if (edt.getText().toString().trim().length() <= 1) {
+			edt.setError("Name too short");
+		}
 	}
-    
 	
 }

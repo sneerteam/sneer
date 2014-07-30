@@ -24,7 +24,6 @@ public class SneerSingleton {
 				if (ADMIN == null) {
 					ADMIN = new SneerAdminSimulator();
 					ADMIN.initialize(Keys.createPrivateKey());
-					ADMIN.setOwnName("Neide da Silva");
 				}
 			}
 		}
