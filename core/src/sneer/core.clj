@@ -136,7 +136,7 @@
                             (->> local-tuples
                               (filter-by criteria)
                               (rx/map #(->envelope sender :tuple %)))
-                            (fn [tuple] (rx/on-next network tuple)))]
+                            (partial rx/on-next network))]
                       (assoc cur sender {:criteria criteria :subscription subscription})))
                   
                   (let [subscription
@@ -144,7 +144,7 @@
                           (->> local-tuples
                             (filter-by criteria)
                             (rx/map #(->envelope sender :tuple %)))
-                          (fn [tuple] (rx/on-next network tuple)))]
+                          (partial rx/on-next network))]
                     (println "NEW: from" sender "to" own-puk "where" criteria)
                     (assoc cur sender {:criteria criteria :subscription subscription})))))))))
     
