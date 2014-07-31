@@ -95,7 +95,9 @@
   
   (let [local-tuples (ReplaySubject/create)
         envelopes-for-me (rx/filter (addressed-to own-puk) network)
-        tuples-for-me (payloads :tuple envelopes-for-me)
+        tuples-for-me (->>
+                        (payloads :tuple envelopes-for-me)
+                        rx/distinct)
         subscriptions-for-me (payloads :subscription envelopes-for-me)
         
         peers (->>
@@ -148,11 +150,14 @@
                     (println "NEW: from" sender "to" own-puk "where" criteria)
                     (assoc cur sender {:criteria criteria :subscription subscription})))))))))
     
+    (rx/subscribe tuples-for-me
+                  (partial rx/on-next local-tuples))
+    
     (reify TupleSpace
       (publisher [this] 
         (new-tuple-publisher local-tuples {"author" own-puk}))
       (filter [this]
-        (new-tuple-filter tuples-for-me subscriptions-for-peers)))))
+        (new-tuple-filter local-tuples subscriptions-for-peers)))))
 
 (defn ->observed [value]
   (.observed (ObservedSubject/create value)))
@@ -186,5 +191,5 @@
             (tupleSpace [this] tuple-space)))))))
 
 (defn new-network []
-  (ReplaySubject/create))
+  (PublishSubject/create))
 
