@@ -70,7 +70,7 @@
         (reify+ TupleFilter
           (with-field type)
           (with-field author)
-          (with-field audience)
+          (audience [this prik] (with "audience" (.publicKey prik)))
           (field [this field value] (with field value))
           (tuples [this]
             (let [tuples 
