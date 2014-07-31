@@ -10,6 +10,7 @@ import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
+import sneer.commons.exceptions.*;
 import sneer.impl.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
@@ -32,7 +33,7 @@ public class SneerSimulator extends SneerBase {
 	
 	public SneerSimulator(PrivateKey privateKey) {
 		this.privateKey = privateKey;
-		self = new PartySimulator("", privateKey);
+		self = new PartySimulator("Neide da Silva", privateKey);
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(privateKey);
@@ -154,6 +155,16 @@ public class SneerSimulator extends SneerBase {
 		((PartySimulator)party).setName(nick + " da Silva");
 		setContact(nick, party);
 		return prik;
+	}
+	
+	public void setSelfieToAllParties(byte[] pic) {
+		for (Party party : partiesByPuk.values()) {
+			try {
+				((PartySimulator)party).setSelfie(pic);
+			} catch (FriendlyException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 

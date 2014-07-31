@@ -71,9 +71,11 @@ public class InteractionListActivity extends Activity {
 		}
 
 		listView = (ListView)findViewById(R.id.listView);
-		adapter = new InteractionListAdapter(this, R.layout.list_item_interaction, new Func1<Party, Observable<String>>() {  @Override public Observable<String> call(Party party) {
-			return sneer().labelFor(party).observable();
-		}});
+		adapter = new InteractionListAdapter(this, 
+				R.layout.list_item_interaction, 
+				new Func1<Party, Observable<String>>() { @Override public Observable<String> call(Party party) { return sneer().labelFor(party).observable(); }},
+				new Func1<Party, Observable<byte[]>>() { @Override public Observable<byte[]> call(Party party) { return sneer().profileFor(party).selfie(); }}
+				);
 		listView.setAdapter(adapter);
 
 		registerForContextMenu(listView);
@@ -129,6 +131,11 @@ public class InteractionListActivity extends Activity {
 			return false;
 		}
 		getMenuInflater().inflate(R.menu.contacts, menu);
+		
+//		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+//		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+		
 		return true;
 	}
 

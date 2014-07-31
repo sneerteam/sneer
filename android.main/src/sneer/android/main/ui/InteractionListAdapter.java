@@ -14,12 +14,14 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
 	private Activity activity;
     int layoutResourceId;
 	private final Func1<Party, Observable<String>> labelProvider;
+	private final Func1<Party, Observable<byte[]>> imageProvider;
     
-    public InteractionListAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider) {
+    public InteractionListAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider, Func1<Party, Observable<byte[]>> imageProvider) {
         super(activity, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         this.activity = activity;
 		this.labelProvider = labelProvider;
+		this.imageProvider = imageProvider;
     }
 
     @Override
@@ -33,6 +35,7 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
             
             holder = new InteractiontHolder();
             holder.interactionSummary = (TextView)row.findViewById(R.id.interactionSummary);
+            holder.interactionPicture = (ImageView)row.findViewById(R.id.interactionPicture);
             
             row.setTag(holder);
         } else {
@@ -41,6 +44,7 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
         
         Interaction interaction = getItem(position);
         subscribeTextView(holder.interactionSummary, labelProvider.call(interaction.party()));
+        subscribeImageView(holder.interactionPicture, imageProvider.call(interaction.party()));
         
         return row;
     }
@@ -48,5 +52,6 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
 	static class InteractiontHolder
     {
         TextView interactionSummary;
+        ImageView interactionPicture;
     }
 }

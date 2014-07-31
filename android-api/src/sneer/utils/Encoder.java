@@ -1,10 +1,8 @@
 package sneer.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import sneer.utils.*;
-import us.bpsm.edn.Keyword;
+import us.bpsm.edn.*;
 
 public class Encoder {
 	

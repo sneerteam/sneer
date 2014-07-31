@@ -1,9 +1,14 @@
 package sneer.android.main.ui;
 
+import java.io.*;
+
 import rx.functions.*;
 import sneer.android.main.*;
+import sneer.impl.simulator.*;
 import android.app.*;
 import android.content.*;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.*;
 import android.os.*;
 
 public class MainActivity extends Activity {
@@ -13,6 +18,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		((SneerSimulator)SneerSingleton.admin().sneer()).setSelfieToAllParties(getBitmapByteArray(R.drawable.neide));
 //		Fluxo da inicializacao do main:
 //		Tenho prik guardada nas private preferences do Android?
 //		Se sim: sneer = SneerAdmin.initialize(prik)
@@ -26,6 +32,12 @@ public class MainActivity extends Activity {
 			else
 				startActivity(new Intent(MainActivity.this, InteractionListActivity.class));
 		}});
+	}
+
+	private byte[] getBitmapByteArray(int contact) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		BitmapFactory.decodeResource(getResources(), contact).compress(CompressFormat.JPEG, 90, out);
+		return out.toByteArray();
 	}
 
 }

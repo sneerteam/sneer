@@ -9,9 +9,11 @@ import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.InteractionListActivity.EmbeddedOptions;
-import sneer.commons.Comparators;
+import sneer.commons.*;
 import android.app.*;
 import android.content.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
 import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
@@ -44,6 +46,10 @@ public class InteractionActivity extends Activity {
 		
 		sneer().labelFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
 			setTitle(label);
+		}});
+		
+		sneer().profileFor(party).selfie().observeOn(AndroidSchedulers.mainThread()).cast(byte[].class).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
+			getActionBar().setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
 		}});
 
 		sneer().produceInteractionWith(party).events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
