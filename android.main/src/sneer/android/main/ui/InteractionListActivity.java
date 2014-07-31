@@ -14,6 +14,8 @@ import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -64,11 +66,21 @@ public class InteractionListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction_list);
 		
+		final ActionBar actionBar = getActionBar();
+
 		embeddedOptions = new EmbeddedOptions(getIntent());
 		
 		if (embeddedOptions.title != null) {				
-			setTitle(embeddedOptions.title);
+			actionBar.setTitle(embeddedOptions.title);
 		}
+		
+		sneer().self().name().subscribe(new Action1<String>() { @Override public void call(String label) {
+			actionBar.setTitle(label);
+		}});
+		
+		sneer().profileFor(sneer().self()).selfie().observeOn(AndroidSchedulers.mainThread()).cast(byte[].class).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
+			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
+		}});
 
 		listView = (ListView)findViewById(R.id.listView);
 		adapter = new InteractionListAdapter(this, 
