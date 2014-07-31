@@ -35,21 +35,29 @@ public class InteractionActivity extends Activity {
 
 	private Party party;
 	
+	// action bar
+	private ActionBar actionBar;
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_interaction);
+		
+		actionBar = getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		actionBar.setHomeButtonEnabled(true);
 		
 		embeddedOptions = (EmbeddedOptions) getIntent().getExtras().getSerializable("embeddedOptions");
 		
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
 		sneer().labelFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
-			setTitle(label);
+			actionBar.setTitle(label);
 		}});
 		
 		sneer().profileFor(party).selfie().observeOn(AndroidSchedulers.mainThread()).cast(byte[].class).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
-			getActionBar().setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
+			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
 		}});
 
 		sneer().produceInteractionWith(party).events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
@@ -104,7 +112,7 @@ public class InteractionActivity extends Activity {
 			launchNewInteraction();
 			return true;
 		case android.R.id.home:
-			NavUtils.navigateUpTo(this, new Intent(this, InteractionListActivity.class));
+			NavUtils.navigateUpTo(this, new Intent(this, ProfileActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -130,4 +138,6 @@ public class InteractionActivity extends Activity {
 			adapter.notifyDataSetChanged();
 		}
 	}
+	
+	
 }
