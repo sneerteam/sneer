@@ -122,33 +122,25 @@
         (fn [subscription]
           (let [sender (:sender subscription)
                 criteria (dissoc subscription :sender)]
-            
             (swap!
               subscriptions-by-sender
               (fn [cur]                
-                (if-let [existing (get cur sender)]
+                (let [existing (get cur sender)]
                   
-                  (let [{old-criteria :criteria subscription :subscription} existing]
-                    (println "UPDATE: from" sender "to" own-puk "where" criteria)
-                    (.unsubscribe subscription)
-                    
-                    ;TODO: combine old and new criteria
-                    (let [subscription
-                          (rx/subscribe
-                            (->> local-tuples
-                              (filter-by criteria)
-                              (rx/map #(->envelope sender :tuple %)))
-                            (partial rx/on-next network))]
-                      (assoc cur sender {:criteria criteria :subscription subscription})))
+                  (when-let [{subscription :subscription} existing]
+                      (.unsubscribe subscription))
                   
-                  (let [subscription
-                        (rx/subscribe
-                          (->> local-tuples
-                            (filter-by criteria)
-                            (rx/map #(->envelope sender :tuple %)))
-                          (partial rx/on-next network))]
-                    (println "NEW: from" sender "to" own-puk "where" criteria)
-                    (assoc cur sender {:criteria criteria :subscription subscription})))))))))
+                   ; TODO: combine existing criteria with new one
+                   (let [subscription
+                         (rx/subscribe
+                           (->> local-tuples
+                             (rx/filter #(let [audience (get "audience" %)]
+                                             (or (nil? audience) (= sender audience))))
+                             (filter-by criteria)
+                             (rx/map #(->envelope sender :tuple %)))
+                           (partial rx/on-next network))]
+                     
+                     (assoc cur sender {:criteria criteria :subscription subscription})))))))))
     
     (rx/subscribe tuples-for-me
                   (partial rx/on-next local-tuples))
