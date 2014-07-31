@@ -15,9 +15,9 @@ public class PartySimulator implements Party, Profile {
 	private final BehaviorSubject<String> name;
 
 	/** Profile */
-	private Subject<String, String> preferredNickname = BehaviorSubject.create("dude");
-	private Subject<String, String> city = BehaviorSubject.create("Campinas");
-	private Subject<String, String> country = BehaviorSubject.create("Brazil");
+	private Subject<String, String> preferredNickname = BehaviorSubject.create("neide");
+	private Subject<String, String> city = BehaviorSubject.create("Jundiaí");
+	private Subject<String, String> country = BehaviorSubject.create("Brasil");
 	private ReplaySubject<byte[]> selfie = ReplaySubject.create();
 	
 	
@@ -27,7 +27,7 @@ public class PartySimulator implements Party, Profile {
 	
 	
 	PartySimulator(PublicKey puk) {
-		this("?", puk);
+		this("Neide da Silva", puk);
 	}
 
 

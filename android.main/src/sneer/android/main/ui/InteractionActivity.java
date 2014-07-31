@@ -15,7 +15,6 @@ import android.content.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.*;
-import android.support.v4.app.*;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -31,13 +30,9 @@ public class InteractionActivity extends Activity {
 	private final List<InteractionEvent> messages = new ArrayList<InteractionEvent>();
 	private InteractionAdapter adapter;
 
-	private EmbeddedOptions embeddedOptions;
-
-	private Party party;
-	
-	// action bar
 	private ActionBar actionBar;
-	
+	private EmbeddedOptions embeddedOptions;
+	private Party party;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -112,10 +107,18 @@ public class InteractionActivity extends Activity {
 			launchNewInteraction();
 			return true;
 		case android.R.id.home:
-			NavUtils.navigateUpTo(this, new Intent(this, ProfileActivity.class));
+			navigateToProfile();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+
+	private void navigateToProfile() {
+		Intent intent = new Intent();
+		intent.setClass(this, ProfileActivity.class);
+		intent.putExtra("partyPuk", party.publicKey().mostRecent());
+		startActivity(intent);
 	}
 
 

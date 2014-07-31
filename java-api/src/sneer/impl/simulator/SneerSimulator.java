@@ -38,9 +38,9 @@ public class SneerSimulator extends SneerBase {
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(privateKey);
 		
-		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha"), "SCISSORS");
-		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira"), "ROCK");
-		setupMockupRPSPlayer(cloud, addContact("Carla Folhada"), "PAPER");
+		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este"), "SCISSORS");
+		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles"), "ROCK");
+		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis"), "PAPER");
 	}
 	
 	public PrivateKey privateKey() {
@@ -149,11 +149,14 @@ public class SneerSimulator extends SneerBase {
 	}
 
 	
-	private PrivateKey addContact(String nick) {
-		PrivateKey prik = Keys.createPrivateKey(nick);
+	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city) {
+		PrivateKey prik = Keys.createPrivateKey(name);
 		Party party = produceParty(prik.publicKey());
-		((PartySimulator)party).setName(nick + " da Silva");
-		setContact(nick, party);
+		((PartySimulator)party).setName(name);
+		((PartySimulator)party).setPreferredNickname(preferredNicknane);
+		((PartySimulator)party).setCountry(coutry);
+		((PartySimulator)party).setCity(city);
+		setContact(name, party);
 		return prik;
 	}
 	

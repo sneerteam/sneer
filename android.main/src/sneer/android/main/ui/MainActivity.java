@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		((SneerSimulator)SneerSingleton.admin().sneer()).setSelfieToAllParties(getBitmapByteArray(R.drawable.neide));
+		((SneerSimulator)SneerSingleton.admin().sneer()).setSelfieToAllParties(getBitmapByteArray(R.drawable.maicon));
 //		Fluxo da inicializacao do main:
 //		Tenho prik guardada nas private preferences do Android?
 //		Se sim: sneer = SneerAdmin.initialize(prik)

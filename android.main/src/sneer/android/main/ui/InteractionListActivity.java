@@ -147,10 +147,10 @@ public class InteractionListActivity extends Activity {
 			showContactAdd();
 			break;
 		case R.id.action_profile:
-			showProfile();
+			navigateToProfile();
 			break;
 		case R.id.action_send_pk:
-			sendYoursPublicKey();
+			sendYourPublicKey();
 			break;
 		case R.id.action_copy_pk:
 			copyYoursPublicKey();
@@ -189,12 +189,15 @@ public class InteractionListActivity extends Activity {
 	}
 
 	
-	private void showProfile() {
-		startActivity(new Intent(this, ProfileActivity.class));
+	private void navigateToProfile() {
+		Intent intent = new Intent();
+		intent.setClass(this, ProfileActivity.class);
+		intent.putExtra("partyPuk", sneer().self().publicKey().mostRecent());
+		startActivity(intent);
 	}
 
 	
-	private void sendYoursPublicKey() {
+	private void sendYourPublicKey() {
 		log("ownPublicKey: " + sneer().self().publicKey().mostRecent());
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");

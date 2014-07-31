@@ -22,8 +22,9 @@ import android.widget.*;
 
 public class ProfileActivity extends Activity {
 
-	static int TAKE_PICTURE = 1;
-	static int THUMBNAIL_SIZE = 128;
+	static final String PARTY_PUK = "partyPuk";
+	static final int TAKE_PICTURE = 1;
+	static final int THUMBNAIL_SIZE = 128;
 
 	ImageView selfieImage;
 	
@@ -35,6 +36,7 @@ public class ProfileActivity extends Activity {
 	EditText countryEdit;
 	EditText cityEdit;
 	private byte[] selfieBytes;
+	private Party party;
 	
 	
 	@Override
@@ -42,7 +44,9 @@ public class ProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		
-		profile = sneer().profileFor(sneer().self());
+		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+		
+		profile = sneer().profileFor(party);
 
 		firstNameEdit = (EditText) findViewById(R.id.firstName);
 		lastNameEdit = (EditText) findViewById(R.id.lastName);
@@ -50,38 +54,30 @@ public class ProfileActivity extends Activity {
 		selfieImage = (ImageView) findViewById(R.id.selfie);
 		countryEdit = (EditText) findViewById(R.id.country);
 		cityEdit = (EditText) findViewById(R.id.city);
-
 		
-		firstNameEdit.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-	
-			public void afterTextChanged(Editable s) {
-				isOnlyOneCharacter(firstNameEdit);
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-		});
-		
-		lastNameEdit.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-	
-			public void afterTextChanged(Editable s) {
-				isOnlyOneCharacter(lastNameEdit);
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-		});
+		afterTextChanged(firstNameEdit);
+		afterTextChanged(lastNameEdit);
 		
 		loadProfile();
+	}
+
+
+	private void afterTextChanged(final EditText textView) {
+		textView.addTextChangedListener(new TextWatcher() {
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+	
+			public void afterTextChanged(Editable s) {
+				isOnlyOneCharacter(textView);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+		});
 	}
 	
 	
 	private void loadProfile() {
-		sneer().self().name().subscribe(new Action1<String>() { @Override public void call(String name) {
+		party.name().subscribe(new Action1<String>() { @Override public void call(String name) {
 			if (name.trim() != null && !name.trim().isEmpty()) {
 				firstNameEdit.setText(name);
 				lastNameEdit.setVisibility(View.GONE);
