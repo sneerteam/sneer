@@ -12,7 +12,8 @@ public class ObservableTestUtils {
 	
 	public static <T> void assertEqualsUntilNow(Observable<T> seq, T... expecteds) {
 		List<T> list = takeAllUntilNow(seq);
-		assertEquals("Wrong number of items.", expecteds.length, list.size());
+		if (expecteds.length != list.size())
+			fail("Expecting `" + Arrays.asList(expecteds) + "', got `" + list + "'");
 		Iterator<T> it = list.iterator();
 		for (Object expected : expecteds) {
 			if (expected.getClass().isArray()) {
