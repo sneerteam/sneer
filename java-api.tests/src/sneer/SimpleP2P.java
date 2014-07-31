@@ -106,8 +106,8 @@ public class SimpleP2P extends TestsBase {
 			.type("chat/message")
 			.pub("hey people!");
 		
-		PrivateKey group = Keys.createPrivateKey();
-		assertCount(0, tuplesB.filter().audience(group).tuples());
+		PrivateKey neide = Keys.createPrivateKey();
+		assertCount(0, tuplesB.filter().audience(neide).tuples());
 	}
 	
 	@Test
