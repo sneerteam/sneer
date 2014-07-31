@@ -67,7 +67,9 @@ public class InteractionListActivity extends Activity {
 		setContentView(R.layout.activity_interaction_list);
 		
 		final ActionBar actionBar = getActionBar();
-
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		actionBar.setHomeButtonEnabled(true);
+		
 		embeddedOptions = new EmbeddedOptions(getIntent());
 		
 		if (embeddedOptions.title != null) {				
@@ -142,7 +144,7 @@ public class InteractionListActivity extends Activity {
 		if (embeddedOptions.disableMenus) {
 			return false;
 		}
-		getMenuInflater().inflate(R.menu.contacts, menu);
+		getMenuInflater().inflate(R.menu.interaction_list, menu);
 		
 //		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 //		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
@@ -155,11 +157,11 @@ public class InteractionListActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case android.R.id.home:
+			navigateToProfile();
+			break;
 		case R.id.action_add_contact:
 			showContactAdd();
-			break;
-		case R.id.action_profile:
-			navigateToProfile();
 			break;
 		case R.id.action_send_pk:
 			sendYourPublicKey();
