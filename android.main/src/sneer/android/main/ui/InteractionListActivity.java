@@ -192,6 +192,7 @@ public class InteractionListActivity extends Activity {
 	private void navigateToProfile() {
 		Intent intent = new Intent();
 		intent.setClass(this, ProfileActivity.class);
+		intent.putExtra("isOwn", true);
 		intent.putExtra("partyPuk", sneer().self().publicKey().mostRecent());
 		startActivity(intent);
 	}

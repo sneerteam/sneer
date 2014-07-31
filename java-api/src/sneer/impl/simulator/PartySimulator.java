@@ -27,7 +27,7 @@ public class PartySimulator implements Party, Profile {
 	
 	
 	PartySimulator(PublicKey puk) {
-		this("Neide da Silva", puk);
+		this("?", puk);
 	}
 
 
