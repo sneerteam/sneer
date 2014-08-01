@@ -7,7 +7,9 @@
     [sneer Sneer PrivateKey Party Contact]
     [sneer.rx ObservedSubject]
     [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
+    [rx.schedulers TestScheduler]
     [rx.subjects ReplaySubject PublishSubject]))
+
 
 (defmacro reify+
   "expands to reify form after macro expanding the body"
@@ -72,6 +74,18 @@
           (with-field author)
           (audience [this prik] (with "audience" (.publicKey prik)))
           (field [this field value] (with field value))
+          (localTuples [this]
+                       (rx/observable*
+                         (fn [subscriber]
+                           (let [scheduler (TestScheduler.)
+                                 tuples (->> 
+                                          tuples-for-me
+                                          (filter-by criteria)
+                                          (rx/map reify-tuple)
+                                          (rx/subscribe-on scheduler))]
+                             (rx/subscribe tuples #(rx/on-next subscriber %))
+                             (. scheduler triggerActions)
+                             (rx/on-completed subscriber)))))
           (tuples [this]
             (let [tuples 
                   (->> 
