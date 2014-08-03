@@ -1,16 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    
-    <ImageView 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <ImageView
         android:id="@+id/interactionPicture"
-    	android:layout_width="35dp"
-    	android:layout_height="35dp"
-    	android:layout_centerVertical="true"
-    	android:layout_marginLeft="5dp"
-    	android:contentDescription="@string/interaction_summary_picture"
-    	android:src="@drawable/neide" />
-    
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:contentDescription="@string/interaction_summary_picture"
+        android:src="@drawable/neide" />
+
     <TextView
         android:id="@+id/interactionSummary"
         android:layout_width="wrap_content"
@@ -18,6 +19,26 @@
         android:layout_toRightOf="@+id/interactionPicture"
         android:divider="@null"
         android:padding="10dp"
-        android:text="@string/dummy_text" />
-    
+        android:text="@string/dummy_text"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:id="@+id/interactionDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:divider="@null"
+        android:text="@string/dummy_date" />
+
+    <TextView
+        android:id="@+id/Description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/interactionSummary"
+        android:layout_toRightOf="@+id/interactionPicture"
+        android:padding="10dp"
+        android:text="@string/string_dummy_interaction_text"
+        android:textColor="#6f6f6f" >
+    </TextView>
+
 </RelativeLayout>
