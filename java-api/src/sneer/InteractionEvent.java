@@ -51,13 +51,13 @@ public class InteractionEvent {
 	}
 	
 
-	/** When this message was sent. */
+	/** When this event was sent. */
 	public long timestampSent() {
 		return timestampSent;
 	}
 
 	
-	/** When this message was received. */
+	/** When this event was received. */
 	public long timestampReceived() {
 		return timestampReceived;
 	}

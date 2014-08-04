@@ -188,7 +188,7 @@ public class ProfileActivity extends Activity {
 				toast("Error selecting image source.");
 				return;
 			}
-	        	        
+
 			do {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
