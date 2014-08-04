@@ -34,8 +34,10 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
             row = inflater.inflate(layoutResourceId, parent, false);
             
             holder = new InteractiontHolder();
-            holder.interactionSummary = (TextView)row.findViewById(R.id.interactionSummary);
-            holder.interactionPicture = (ImageView)row.findViewById(R.id.interactionPicture);
+            holder.interactionParty = findView(row, R.id.interactionParty);
+            holder.interactionSummary = findView(row, R.id.interactionSummary);
+            holder.interactionDate = findView(row, R.id.interactionDate);
+            holder.interactionPicture = findView(row, R.id.interactionPicture);
             
             row.setTag(holder);
         } else {
@@ -51,7 +53,9 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
 
 	static class InteractiontHolder
     {
+        TextView interactionParty;
         TextView interactionSummary;
+        TextView interactionDate;
         ImageView interactionPicture;
     }
 }

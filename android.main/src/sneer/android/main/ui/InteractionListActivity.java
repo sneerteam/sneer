@@ -120,6 +120,9 @@ public class InteractionListActivity extends Activity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.action_search:
+			// search action
+			break;
 		case R.id.chat_contact:
 			toast(interaction.toString()); // Do something useful with interaction here.
 			break;
@@ -130,7 +133,6 @@ public class InteractionListActivity extends Activity {
 			interaction.toString(); // Do something useful with interaction here.
 			break;
 		}
-
 		return true;
 	}
 
@@ -147,11 +149,11 @@ public class InteractionListActivity extends Activity {
 		}
 		getMenuInflater().inflate(R.menu.interaction_list, menu);
 		
-//		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 		
-		return true;
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	
@@ -214,7 +216,6 @@ public class InteractionListActivity extends Activity {
 
 	
 	private void sendYourPublicKey() {
-		log("ownPublicKey: " + sneer().self().publicKey().mostRecent());
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "My Sneer public key");

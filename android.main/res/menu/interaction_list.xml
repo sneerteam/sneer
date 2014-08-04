@@ -3,6 +3,7 @@
     <!-- Search / will display always -->
     <item
         android:id="@+id/action_search"
+        android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/ic_action_search_holo_dark"
         android:showAsAction="ifRoom"
         android:title="@string/action_search"/>

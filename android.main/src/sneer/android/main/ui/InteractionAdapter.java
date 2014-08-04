@@ -47,8 +47,8 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
         	parent,
         	false);
         
-        findText(ret, R.id.interactionEventContent).setText(event.content());
-        findText(ret, R.id.interactionEventTime).setText(event.timeSent());
+        findTextView(ret, R.id.interactionEventContent).setText(event.content());
+        findTextView(ret, R.id.interactionEventTime).setText(event.timeSent());
         
         if (!event.isOwn()) {
         	sneer.labelFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 

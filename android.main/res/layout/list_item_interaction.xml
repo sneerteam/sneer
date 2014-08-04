@@ -8,17 +8,20 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
         android:contentDescription="@string/interaction_summary_picture"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
         android:src="@drawable/neide" />
 
     <TextView
-        android:id="@+id/interactionSummary"
+        android:id="@+id/interactionParty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/interactionPicture"
         android:divider="@null"
-        android:padding="10dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
         android:text="@string/dummy_text"
         android:textStyle="normal|bold" />
 
@@ -28,15 +31,21 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:divider="@null"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:textSize="12sp"
         android:text="@string/dummy_date" />
 
     <TextView
-        android:id="@+id/Description"
+        android:id="@+id/interactionSummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/interactionSummary"
+        android:layout_below="@+id/interactionParty"
         android:layout_toRightOf="@+id/interactionPicture"
-        android:padding="10dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:lines="1"
         android:text="@string/string_dummy_interaction_text"
         android:textColor="#6f6f6f" >
     </TextView>

@@ -40,6 +40,9 @@
     <string name="action_save_profile">Save</string>
     <string name="profile_view_location">LOCATION</string>
     <!-- Profile View -->
+    
+    <!-- Search  -->
+    <string name="search_hint">Search interactions...</string>
 
     <string name="action_select">Complete action using</string>
     <string name="action_cancel">Cancel</string>
