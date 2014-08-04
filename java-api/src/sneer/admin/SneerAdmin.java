@@ -10,6 +10,7 @@ public interface SneerAdmin {
 	PrivateKey privateKey();
 	
 	/** This must have a privateKey(). */
+	@Deprecated
 	void setOwnName(String newName);
 	
 	/** This must have a privateKey(). */
