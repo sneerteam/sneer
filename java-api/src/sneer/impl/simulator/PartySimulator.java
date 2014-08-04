@@ -51,23 +51,33 @@ public class PartySimulator implements Party, Profile {
 	public Observable<String> name() {
 		return name.asObservable();
 	}
-	
+
 	
 	@Override
 	public void setName(String newName) {
 		check(isSelf);
+		simulateSetName(newName);
+	}
+	
+	
+	public void simulateSetName(String newName) {
 		name.onNext(newName);
 	}
+	
 	
 	@Override
 	public Observable<String> preferredNickname() {	
 		return preferredNickname;
 	}
 
-
 	@Override
 	public void setPreferredNickname(String newPreferredNickname) {
 		check(isSelf);
+		simulateSetPreferredNickname(newPreferredNickname);
+	}
+
+
+	protected void simulateSetPreferredNickname(String newPreferredNickname) {
 		preferredNickname.onNext(newPreferredNickname);
 	}
 
@@ -81,6 +91,11 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setSelfie(byte[] newSelfie) throws FriendlyException {
 		check(isSelf);
+		simulateSetSelfie(newSelfie);
+	}
+
+
+	protected void simulateSetSelfie(byte[] newSelfie) {
 		selfie.onNext(newSelfie);
 	}
 
@@ -94,6 +109,11 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setCity(String newCity) {
 		check(isSelf);
+		simulateSetCity(newCity);
+	}
+
+
+	protected void simulateSetCity(String newCity) {
 		city.onNext(newCity);
 	}
 	
@@ -107,7 +127,13 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setCountry(String newCountry) {
 		check(isSelf);
+		simulateSetCountry(newCountry);
+	}
+
+
+	protected void simulateSetCountry(String newCountry) {
 		country.onNext(newCountry);
 	}
+
 
 }

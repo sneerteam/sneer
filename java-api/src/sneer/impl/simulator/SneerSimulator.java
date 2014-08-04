@@ -153,10 +153,10 @@ public class SneerSimulator extends SneerBase {
 	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city) {
 		PrivateKey prik = Keys.createPrivateKey(name);
 		Party party = produceParty(prik.publicKey());
-		((PartySimulator)party).setName(name);
-		((PartySimulator)party).setPreferredNickname(preferredNicknane);
-		((PartySimulator)party).setCountry(coutry);
-		((PartySimulator)party).setCity(city);
+		((PartySimulator)party).simulateSetName(name);
+		((PartySimulator)party).simulateSetPreferredNickname(preferredNicknane);
+		((PartySimulator)party).simulateSetCountry(coutry);
+		((PartySimulator)party).simulateSetCity(city);
 		setContact(name, party);
 		return prik;
 	}
