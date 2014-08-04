@@ -26,13 +26,13 @@ public class UIUtils {
 			menu.setHeaderTitle(obj.toString());
 		}});
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	static public <V> V findView(View view, int id) {
 		return (V)view.findViewById(id);
 	}
 
-	static public TextView findText(View view, int id) {
+	static public TextView findTextView(View view, int id) {
 		return (TextView)view.findViewById(id);
 	}
 
