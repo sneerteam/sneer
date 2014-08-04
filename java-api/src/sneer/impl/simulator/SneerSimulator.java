@@ -10,7 +10,6 @@ import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
-import sneer.commons.exceptions.*;
 import sneer.impl.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
@@ -162,16 +161,6 @@ public class SneerSimulator extends SneerBase {
 		return prik;
 	}
 	
-	public void setSelfieToAllParties(byte[] pic) {
-		for (Party party : partiesByPuk.values()) {
-			try {
-				((PartySimulator)party).setSelfie(pic);
-			} catch (FriendlyException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
 
 	@Override
 	public Observable<List<Interaction>> interactionsContaining(String eventType) {
