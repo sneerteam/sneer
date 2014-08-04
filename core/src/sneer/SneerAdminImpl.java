@@ -12,7 +12,7 @@ import sneer.tuples.*;
 
 import com.google.common.cache.*;
 
-public class TupleSpaceSneerAdmin implements SneerAdmin {
+public class SneerAdminImpl implements SneerAdmin {
 	
 	private TupleSpace tupleSpace;
 	private PrivateKey prik;
@@ -141,7 +141,7 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 		return new WritableContact(party);
 	}});
 
-	public TupleSpaceSneerAdmin(TupleSpace tupleSpace) {
+	public SneerAdminImpl(TupleSpace tupleSpace) {
 		this.tupleSpace = tupleSpace;
 	}
 
