@@ -232,20 +232,17 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 					
 					@Override
 					public void setCountry(String newCountry) {
-						// TODO Auto-generated method stub
-						
+						fields.pub("country", newCountry);
 					}
 					
 					@Override
 					public void setCity(String newCity) {
-						// TODO Auto-generated method stub
-						
+						fields.pub("city", newCity);
 					}
 					
 					@Override
 					public Observable<byte[]> selfie() {
-						// TODO Auto-generated method stub
-						return null;
+						return fields.get(byte[].class, "selfie");
 					}
 					
 					@Override
@@ -255,14 +252,12 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 					
 					@Override
 					public Observable<String> country() {
-						// TODO Auto-generated method stub
-						return null;
+						return fields.get(String.class, "country");
 					}
 					
 					@Override
 					public Observable<String> city() {
-						// TODO Auto-generated method stub
-						return null;
+						return fields.get(String.class, "city");
 					}
 				};
 			}
