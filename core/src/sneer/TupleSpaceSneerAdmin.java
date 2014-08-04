@@ -86,26 +86,6 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 			
 		}
 		
-//		@Override
-//		public Observable<String> name() {
-//			return tupleSpace.filter()
-//					.audience(prik)
-//					.author(prik.publicKey())
-//					.type("sneer/profile.name")
-//					.field("party", key)
-//					.tuples()
-//					.map(Tuple.TO_PAYLOAD)
-//					.cast(String.class);
-//		}
-//
-//		public void setOwnName(String newName) {
-//			tupleSpace.publisher()
-//				.audience(prik.publicKey())
-//				.type("sneer/profile.name")
-//				.field("party", key)
-//				.pub(newName);
-//		}
-
 		public PartyKey key() {
 			return key;
 		}
@@ -175,12 +155,7 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 		return prik;
 	}
 
-//	@Override
-//	public void setOwnName(String myName) {
-//		producePartyKey(prik.publicKey()).setOwnName(myName);
-//	}
-	
-	private WritableParty producePartyKey(PublicKey puk) {
+	private WritableParty producePartyFromPuk(PublicKey puk) {
 		WritableParty party = parties.getUnchecked(keys.getUnchecked(puk));
 		party.setPublicKey(puk);
 		return party;
@@ -214,11 +189,21 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 				class PublishableContact {
 					void pub(String field, Object value) {
 						tupleSpace.publisher()
-						.audience(prik.publicKey())
-						.type("sneer/profile." + field)
-						.field("party", contact.party())
-						.field(field, value)
-						.pub();
+							.audience(prik.publicKey())
+							.type("sneer/profile." + field)
+							.field("party", contact.party())
+							.pub(value);
+					}
+
+					public <T> Observable<T> get(Class<T> clazz, String field) {
+						return tupleSpace.filter()
+								.author(prik.publicKey())
+								.audience(prik)
+								.type("sneer/profile."+field)
+								.field("party", contact.party())
+								.tuples()
+								.map(Tuple.TO_PAYLOAD)
+								.cast(clazz);
 					}
 					
 				}
@@ -227,13 +212,12 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 					
 					@Override
 					public Observable<String> name() {
-						int implement; //See all commented code above.
-						return null;
+						return fields.get(String.class, "name");
 					}
 					
 					@Override
-					public void setName(String string) {
-						int implement; //See all commented code above.
+					public void setName(String name) {
+						fields.pub("name", name);
 					}
 					
 					@Override
@@ -285,7 +269,7 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 			
 			@Override
 			public Party produceParty(PublicKey publicKey) {
-				return produceParty(publicKey);
+				return producePartyFromPuk(publicKey);
 			}
 			
 			@Override
