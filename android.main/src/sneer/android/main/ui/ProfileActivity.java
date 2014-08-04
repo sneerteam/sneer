@@ -25,7 +25,6 @@ public class ProfileActivity extends Activity {
 	static final String PARTY_PUK = "partyPuk";
 	static final int TAKE_PICTURE = 1;
 	static final int THUMBNAIL_SIZE = 128;
-	static final String IS_OWN = "isOwn";
 
 	ImageView selfieImage;
 	
@@ -44,12 +43,10 @@ public class ProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		
-//		boolean isOwn = getIntent().getExtras().getBoolean(IS_OWN);
-		boolean isOwn = true;
-		
-		Party party = isOwn
+		PublicKey partyPuk = partyPuk();
+		Party party = partyPuk == null
 			? sneer().self()
-			: sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+			: sneer().produceParty(partyPuk);
 		
 		profile = sneer().profileFor(party);
 
@@ -60,7 +57,7 @@ public class ProfileActivity extends Activity {
 		countryEdit = (EditText) findViewById(R.id.country);
 		cityEdit = (EditText) findViewById(R.id.city);
 		
-		if (!isOwn) {
+		if (partyPuk != null) {
 			readonly();
 			preferredNickNameEdit.setHint("nickname");
 		}
@@ -69,6 +66,14 @@ public class ProfileActivity extends Activity {
 		afterTextChanged(lastNameEdit);
 		
 		loadProfile();
+	}
+
+
+	private PublicKey partyPuk() {
+		Bundle extras = getIntent().getExtras();
+		if (extras == null) return null;
+		
+		return (PublicKey)extras.getSerializable(PARTY_PUK);
 	}
 
 
