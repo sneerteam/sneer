@@ -21,18 +21,11 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		((SneerSimulator)SneerSingleton.admin().sneer()).setSelfieToAllParties(getBitmapByteArray(R.drawable.maicon));
-//		Fluxo da inicializacao do main:
-//		Tenho prik guardada nas private preferences do Android?
-//		Se sim: sneer = SneerAdmin.initialize(prik)
-//		Se nao: prik = Keys.newPrivateKey(); salvar prik nas preferences; SneerAdmin.initialize(prik);
-
-//		sneer.self().name() está nulo?
-//		Se sim: Abrir tela de profile pro usuario entrar c seu nome e sobrenome; SneerAdmin.setOwnName(nome + " " + sobrenome);
 		sneer().profileFor(sneer().self()).name().subscribe(new Action1<String>() { @Override public void call(String name) {
-			if (name == null || name.isEmpty())
-				startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-			else
-				startActivity(new Intent(MainActivity.this, InteractionListActivity.class));
+			Class<?> activity = name.isEmpty()
+				? ProfileActivity.class
+				: InteractionListActivity.class;
+			startActivity(new Intent(MainActivity.this, activity));
 		}});
 	}
 
