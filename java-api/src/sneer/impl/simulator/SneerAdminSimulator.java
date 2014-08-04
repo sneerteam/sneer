@@ -3,6 +3,7 @@ package sneer.impl.simulator;
 import static sneer.commons.exceptions.Exceptions.*;
 import sneer.*;
 import sneer.admin.*;
+import sneer.impl.keys.*;
 
 public class SneerAdminSimulator implements SneerAdmin {
 
@@ -29,6 +30,11 @@ public class SneerAdminSimulator implements SneerAdmin {
 	public Sneer sneer() {
 		check(sneer != null);
 		return sneer;
+	}
+
+
+	public void populate() {
+		initialize(Keys.createPrivateKey());
 	}
 
 
