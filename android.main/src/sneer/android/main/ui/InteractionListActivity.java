@@ -111,7 +111,7 @@ public class InteractionListActivity extends Activity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		interaction = adapter.getItem(info.position);
-		menu.setHeaderTitle(interaction.party().name().toBlockingObservable().first());
+		menu.setHeaderTitle(sneer().labelFor(interaction.party()).mostRecent());
 		getMenuInflater().inflate(R.menu.long_click, menu);
 	}
 
