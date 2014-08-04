@@ -7,7 +7,7 @@ import sneer.impl.simulator.*;
 
 public class SneerSingleton {
 	
-	private volatile static SneerAdmin ADMIN = null;
+	private static SneerAdmin ADMIN = null;
 	
 	/*
 	dir = new File(context.getFilesDir(), "admin");
@@ -23,8 +23,8 @@ public class SneerSingleton {
 
 		synchronized (SneerSingleton.class) {
 			if (ADMIN == null) {
+//				ADMIN = new TupleSpaceSneerAdmin(new TuplesFactoryInProcess().newTupleSpace(Keys.createPrivateKey()));
 				ADMIN = new SneerAdminSimulator();
-//					ADMIN = new TupleSpaceSneerAdmin(new TuplesFactoryInProcess().newTupleSpace(Keys.createPrivateKey()));
 				ADMIN.initialize(Keys.createPrivateKey());
 			}
 			return ADMIN;
