@@ -19,16 +19,16 @@ public class SneerSingleton {
 	}
 	
 	public static SneerAdmin admin() {
-		if (ADMIN == null) {
-			synchronized (SneerSingleton.class) {
-				if (ADMIN == null) {
-					ADMIN = new SneerAdminSimulator();
+		if (ADMIN != null) return ADMIN;
+
+		synchronized (SneerSingleton.class) {
+			if (ADMIN == null) {
+				ADMIN = new SneerAdminSimulator();
 //					ADMIN = new TupleSpaceSneerAdmin(new TuplesFactoryInProcess().newTupleSpace(Keys.createPrivateKey()));
-					ADMIN.initialize(Keys.createPrivateKey());
-				}
+				ADMIN.initialize(Keys.createPrivateKey());
 			}
+			return ADMIN;
 		}
-		return ADMIN;
 	}
 
 }
