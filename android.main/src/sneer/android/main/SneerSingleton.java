@@ -24,8 +24,9 @@ public class SneerSingleton {
 		synchronized (SneerSingleton.class) {
 			if (ADMIN == null) {
 //				ADMIN = new TupleSpaceSneerAdmin(new TuplesFactoryInProcess().newTupleSpace(Keys.createPrivateKey()));
-				ADMIN = new SneerAdminSimulator();
-				ADMIN.initialize(Keys.createPrivateKey());
+				SneerAdminSimulator admin = new SneerAdminSimulator();
+				admin.initialize(Keys.createPrivateKey());
+				ADMIN = admin;
 			}
 			return ADMIN;
 		}
