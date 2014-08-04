@@ -1,17 +1,18 @@
 package sneer.android.main;
 
+import static sneer.TupleSpaceFactoryClient.SubscriptionOp.*;
+import static sneer.android.main.SneerSingleton.*;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import static sneer.TupleSpaceFactoryClient.SubscriptionOp.*;
 import rx.*;
 import rx.Observable;
 import rx.functions.*;
 import sneer.*;
 import sneer.commons.*;
-import sneer.impl.simulator.*;
 import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
@@ -25,7 +26,7 @@ public class SneerAndroidService extends Service {
 	private InteractiveSerializer serializer = new InteractiveSerializer();
 	
 	{
-		PrivateKey myPrik = ((SneerSimulator)SneerSingleton.sneer()).privateKey();
+		PrivateKey myPrik = admin().privateKey();
 		keys.put(myPrik.publicKey(), myPrik);
 
 		serializer.registerReplacer(PrivateKey.class, ClientPrivateKey.class, new ObjectReplacer<PrivateKey, ClientPrivateKey>() {
