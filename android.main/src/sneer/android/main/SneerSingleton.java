@@ -15,7 +15,7 @@ public class SneerSingleton {
 	 */
 
 	public static Sneer sneer() {
-		return ADMIN.sneer();
+		return admin().sneer();
 	}
 	
 	public static SneerAdmin admin() {
