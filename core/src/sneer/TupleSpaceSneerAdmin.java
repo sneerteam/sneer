@@ -175,10 +175,10 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 		return prik;
 	}
 
-	@Override
-	public void setOwnName(String myName) {
-		producePartyKey(prik.publicKey()).setOwnName(myName);
-	}
+//	@Override
+//	public void setOwnName(String myName) {
+//		producePartyKey(prik.publicKey()).setOwnName(myName);
+//	}
 	
 	private WritableParty producePartyKey(PublicKey puk) {
 		WritableParty party = parties.getUnchecked(keys.getUnchecked(puk));
@@ -224,6 +224,17 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 				}
 				final PublishableContact fields = new PublishableContact();
 				return new Profile() {
+					
+					@Override
+					public Observable<String> name() {
+						int implement;
+						return null;
+					}
+					
+					@Override
+					public void setName(String string) {
+						int implement;
+					}
 					
 					@Override
 					public void setSelfie(byte[] newSelfie) throws FriendlyException {

@@ -53,19 +53,16 @@ public class SneerAdminInProcess implements SneerAdmin {
 		return privateKey;
 	}
 
-	@Override
-	public void setOwnName(String newName) {
-		untested();
-	}
 	
-	static private <T> T untested() {
-		throw new RuntimeException("This is not being tested yet.");
-	}
-
 	@Override
 	public Sneer sneer() {
 		check(sneer != null);
 		return sneer;
+	}
+	
+	
+	static private <T> T untested() {
+		throw new RuntimeException("This is not being tested yet.");
 	}
 
 }

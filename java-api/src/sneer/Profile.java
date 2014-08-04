@@ -5,6 +5,9 @@ import sneer.commons.exceptions.*;
 
 public interface Profile {
 
+	Observable<String> name();
+	void setName(String string);
+	
 	Observable<String> preferredNickname();
 	void setPreferredNickname(String newPreferredNickname);
 

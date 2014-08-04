@@ -9,6 +9,7 @@ public class SneerAdminSimulator implements SneerAdmin {
 	private PrivateKey privateKey;
 	private SneerSimulator sneer;
 
+	
 	@Override
 	public void initialize(PrivateKey prik) {
 		check(privateKey == null);
@@ -16,16 +17,13 @@ public class SneerAdminSimulator implements SneerAdmin {
 		sneer = new SneerSimulator(privateKey);
 	}
 
+	
 	@Override
 	public PrivateKey privateKey() {
 		check(privateKey != null);
 		return privateKey;
 	}
 
-	@Override
-	public void setOwnName(String newName) {
-		sneer.setOwnName(newName);
-	}
 
 	@Override
 	public Sneer sneer() {

@@ -98,7 +98,7 @@ public class ProfileActivity extends Activity {
 	
 	private void loadProfile() {
 		party.name().subscribe(new Action1<String>() { @Override public void call(String name) {
-			if (name.trim() != null && !name.trim().isEmpty()) {
+			if (name != null && !name.trim().isEmpty()) {
 				firstNameEdit.setText(name);
 				lastNameEdit.setVisibility(View.GONE);
 			} else {
@@ -133,7 +133,7 @@ public class ProfileActivity extends Activity {
 	
 	public void saveProfile() throws FriendlyException {
 		if (firstNameEdit.getText().toString().trim().length() > 1 && lastNameEdit.getText().toString().trim().length() > 1) 
-			SneerSingleton.admin().setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
+			profile.setName(firstNameEdit.getText() + " " + lastNameEdit.getText());
 		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
 		profile.setPreferredNickname(preferredNickname);
