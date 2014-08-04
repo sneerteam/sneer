@@ -100,7 +100,7 @@ public class InteractionListActivity extends Activity {
 			onContactClicked(interaction);
 		}});
 
-		SneerSingleton.admin().sneer().interactionsContaining(embeddedOptions.type).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
+		sneer().interactionsContaining(embeddedOptions.type).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Collection<Interaction>>() { @Override public void call(Collection<Interaction> interactions) {
 			adapter.clear();
 			adapter.addAll(interactions);
 			adapter.notifyDataSetChanged();
