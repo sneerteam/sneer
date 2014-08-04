@@ -7,6 +7,7 @@ import rx.*;
 import rx.Observable;
 import sneer.admin.*;
 import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 import sneer.rx.*;
 import sneer.tuples.*;
 
@@ -141,8 +142,8 @@ public class SneerAdminImpl implements SneerAdmin {
 		return new WritableContact(party);
 	}});
 
-	public SneerAdminImpl(TupleSpace tupleSpace) {
-		this.tupleSpace = tupleSpace;
+	public SneerAdminImpl(File secureFolder) {
+		this.tupleSpace = new TuplesFactoryInProcess().newTupleSpace(Keys.createPrivateKey());
 	}
 
 	@Override

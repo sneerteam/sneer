@@ -13,6 +13,7 @@ import rx.Observable;
 import rx.functions.*;
 import sneer.*;
 import sneer.commons.*;
+import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
@@ -24,8 +25,13 @@ public class SneerAndroidService extends Service {
 	private ConcurrentMap<Integer, Subscription> subscriptions = new ConcurrentHashMap<Integer, Subscription>();
 	private ConcurrentMap<PublicKey, PrivateKey> keys = new ConcurrentHashMap<PublicKey, PrivateKey>();
 	private InteractiveSerializer serializer = new InteractiveSerializer();
+
+	private String friendlyErrorMessage; //Return this to the callers. See how it is set, below.
+	
 	
 	{
+		init();
+		
 		PrivateKey myPrik = admin().privateKey();
 		keys.put(myPrik.publicKey(), myPrik);
 
@@ -49,6 +55,17 @@ public class SneerAndroidService extends Service {
 		});
 	}
 
+	
+	private void init() {
+		Context context = getApplicationContext();
+		try {
+			SneerSingleton.initializeIfNecessary(context);
+		} catch (FriendlyException e) {
+			friendlyErrorMessage = e.getMessage();
+		}
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
