@@ -43,8 +43,8 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
         }
         
         Interaction interaction = getItem(position);
-        subscribeTextView(holder.interactionSummary, labelProvider.call(interaction.party()));
-        subscribeImageView(holder.interactionPicture, imageProvider.call(interaction.party()));
+        plug(holder.interactionSummary, labelProvider.call(interaction.party()));
+        plug(holder.interactionPicture, imageProvider.call(interaction.party()));
         
         return row;
     }

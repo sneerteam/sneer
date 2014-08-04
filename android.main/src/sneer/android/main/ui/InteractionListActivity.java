@@ -1,6 +1,7 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerSingleton.*;
+import static sneer.android.ui.UIUtils.*;
 
 import java.io.*;
 import java.util.*;
@@ -76,7 +77,7 @@ public class InteractionListActivity extends Activity {
 			actionBar.setTitle(embeddedOptions.title);
 		}
 		
-		sneer().self().name().subscribe(new Action1<String>() { @Override public void call(String label) {
+		sneer().profileFor(sneer().self()).name().subscribe(new Action1<String>() { @Override public void call(String label) {
 			actionBar.setTitle(label);
 		}});
 		
@@ -111,7 +112,7 @@ public class InteractionListActivity extends Activity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		interaction = adapter.getItem(info.position);
-		menu.setHeaderTitle(sneer().labelFor(interaction.party()).mostRecent());
+		plugHeaderTitle(menu, sneer().labelFor(interaction.party()).observable());
 		getMenuInflater().inflate(R.menu.long_click, menu);
 	}
 

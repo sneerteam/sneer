@@ -86,25 +86,25 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 			
 		}
 		
-		@Override
-		public Observable<String> name() {
-			return tupleSpace.filter()
-					.audience(prik)
-					.author(prik.publicKey())
-					.type("sneer/profile.name")
-					.field("party", key)
-					.tuples()
-					.map(Tuple.TO_PAYLOAD)
-					.cast(String.class);
-		}
-
-		public void setOwnName(String newName) {
-			tupleSpace.publisher()
-				.audience(prik.publicKey())
-				.type("sneer/profile.name")
-				.field("party", key)
-				.pub(newName);
-		}
+//		@Override
+//		public Observable<String> name() {
+//			return tupleSpace.filter()
+//					.audience(prik)
+//					.author(prik.publicKey())
+//					.type("sneer/profile.name")
+//					.field("party", key)
+//					.tuples()
+//					.map(Tuple.TO_PAYLOAD)
+//					.cast(String.class);
+//		}
+//
+//		public void setOwnName(String newName) {
+//			tupleSpace.publisher()
+//				.audience(prik.publicKey())
+//				.type("sneer/profile.name")
+//				.field("party", key)
+//				.pub(newName);
+//		}
 
 		public PartyKey key() {
 			return key;
@@ -227,13 +227,13 @@ public class TupleSpaceSneerAdmin implements SneerAdmin {
 					
 					@Override
 					public Observable<String> name() {
-						int implement;
+						int implement; //See all commented code above.
 						return null;
 					}
 					
 					@Override
 					public void setName(String string) {
-						int implement;
+						int implement; //See all commented code above.
 					}
 					
 					@Override

@@ -9,19 +9,19 @@ import android.widget.*;
 
 public class UIUtils {
 
-	public static void subscribeTextView(final TextView textView, Observable<?> observable) {
+	public static void plug(final TextView textView, Observable<?> observable) {
 		observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			textView.setText(obj.toString());
 		}});
 	}
 
-	public static void subscribeImageView(final ImageView imageView, Observable<?> observable) {
-		observable.observeOn(AndroidSchedulers.mainThread()).cast(byte[].class).subscribe(new Action1<byte[]>() { @Override public void call(byte[] obj) {
+	public static void plug(final ImageView imageView, Observable<byte[]> observable) {
+		observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] obj) {
 			imageView.setImageBitmap(BitmapFactory.decodeByteArray(obj, 0, obj.length));
 		}});
 	}
 	
-	public static void subscribeMenuHeader(final ContextMenu menu, Observable<?> observable) {
+	public static void plugHeaderTitle(final ContextMenu menu, Observable<?> observable) {
 		observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			menu.setHeaderTitle(obj.toString());
 		}});

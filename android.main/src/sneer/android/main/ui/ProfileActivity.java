@@ -37,7 +37,6 @@ public class ProfileActivity extends Activity {
 	EditText countryEdit;
 	EditText cityEdit;
 	private byte[] selfieBytes;
-	private Party party;
 	
 	
 	@Override
@@ -46,11 +45,10 @@ public class ProfileActivity extends Activity {
 		setContentView(R.layout.activity_profile);
 		
 		boolean isOwn = getIntent().getExtras().getBoolean(IS_OWN);
-		
-		if (isOwn)
-			party = sneer().self();
-		else
-			party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+
+		Party party = isOwn
+			? sneer().self()
+			: sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
 		profile = sneer().profileFor(party);
 
@@ -97,7 +95,7 @@ public class ProfileActivity extends Activity {
 	
 	
 	private void loadProfile() {
-		party.name().subscribe(new Action1<String>() { @Override public void call(String name) {
+		profile.name().subscribe(new Action1<String>() { @Override public void call(String name) {
 			if (name != null && !name.trim().isEmpty()) {
 				firstNameEdit.setText(name);
 				lastNameEdit.setVisibility(View.GONE);
