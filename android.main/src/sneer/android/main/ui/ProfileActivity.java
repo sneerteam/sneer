@@ -44,8 +44,9 @@ public class ProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		
-		boolean isOwn = getIntent().getExtras().getBoolean(IS_OWN);
-
+//		boolean isOwn = getIntent().getExtras().getBoolean(IS_OWN);
+		boolean isOwn = true;
+		
 		Party party = isOwn
 			? sneer().self()
 			: sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
