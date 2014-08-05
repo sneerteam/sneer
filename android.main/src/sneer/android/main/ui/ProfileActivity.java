@@ -8,7 +8,6 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
-import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -91,7 +90,7 @@ public class ProfileActivity extends Activity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 	
 			public void afterTextChanged(Editable s) {
-				isOnlyOneCharacter(textView);
+				checkMoreThanOneCharacter(textView);
 			}
 
 			@Override
@@ -135,7 +134,7 @@ public class ProfileActivity extends Activity {
 	}
 	
 	
-	public void saveProfile() throws FriendlyException {
+	public void saveProfile() {
 		if (firstNameEdit.getText().toString().trim().length() > 1 && lastNameEdit.getText().toString().trim().length() > 1) 
 			profile.setName(firstNameEdit.getText() + " " + lastNameEdit.getText());
 		
@@ -204,24 +203,26 @@ public class ProfileActivity extends Activity {
 
     @Override
     protected void onStop() {
-        super.onStop();
-        try {
-			saveProfile();
-		} catch (FriendlyException e) {
-			toast(e.getMessage());
-		}
+    	if (profile == self())
+    		saveProfile();
+		super.onStop();
     }
+
+
+	private Profile self() {
+		return sneer().profileFor(sneer().self());
+	}
     
     
     private void toast(String message) {
     	Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
     	toast.show();
     }
+
     
-	public void isOnlyOneCharacter(EditText edt) {
-		if (edt.getText().toString().trim().length() <= 1) {
+	public void checkMoreThanOneCharacter(EditText edt) {
+		if (edt.getText().toString().trim().length() <= 1)
 			edt.setError("Name too short");
-		}
 	}
 	
 }
