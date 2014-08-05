@@ -1,7 +1,6 @@
 package sneer;
 
 import rx.*;
-import sneer.commons.exceptions.*;
 
 public interface Profile {
 
@@ -12,7 +11,7 @@ public interface Profile {
 	void setPreferredNickname(String newPreferredNickname);
 
 	Observable<byte[]> selfie();
-	void setSelfie(byte[] newSelfie) throws FriendlyException;
+	void setSelfie(byte[] newSelfie);
 	
 	Observable<String> country();
 	void setCountry(String newCountry);

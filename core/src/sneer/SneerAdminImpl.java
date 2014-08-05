@@ -222,7 +222,8 @@ public class SneerAdminImpl implements SneerAdmin {
 					}
 					
 					@Override
-					public void setSelfie(byte[] newSelfie) throws FriendlyException {
+					public void setSelfie(byte[] newSelfie) {
+						if (newSelfie.length > 1024 * 10) throw new IllegalArgumentException("Selfie must be less than 10 kBytes. Was " + newSelfie.length + " bytes.");
 						fields.pub("selfie", newSelfie);
 					}
 					

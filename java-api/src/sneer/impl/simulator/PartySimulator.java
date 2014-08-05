@@ -4,7 +4,6 @@ import static sneer.commons.exceptions.Exceptions.*;
 import rx.*;
 import rx.subjects.*;
 import sneer.*;
-import sneer.commons.exceptions.*;
 import sneer.rx.*;
 
 
@@ -89,7 +88,7 @@ public class PartySimulator implements Party, Profile {
 
 
 	@Override
-	public void setSelfie(byte[] newSelfie) throws FriendlyException {
+	public void setSelfie(byte[] newSelfie) {
 		check(isSelf);
 		simulateSetSelfie(newSelfie);
 	}
