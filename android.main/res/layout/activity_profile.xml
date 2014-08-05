@@ -95,28 +95,29 @@
             android:hint="@string/profile_view_location" />
 
         <EditText
-            android:id="@+id/country"
+            android:id="@+id/city"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/view"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_marginTop="15dp"
+            android:hint="@string/profile_view_city"
+            android:paddingLeft="10dp" >
+        </EditText>
+        
+        <EditText
+            android:id="@+id/country"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/city"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="8dp"
             android:hint="@string/profile_view_country"
             android:paddingLeft="10dp" >
         </EditText>
 
-        <EditText
-            android:id="@+id/city"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/country"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="8dp"
-            android:hint="@string/profile_view_city"
-            android:paddingLeft="10dp" >
-        </EditText>
     </RelativeLayout>
     
 </RelativeLayout>

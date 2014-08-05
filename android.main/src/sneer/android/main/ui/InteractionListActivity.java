@@ -26,6 +26,8 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class InteractionListActivity extends Activity {
 
+	
+	static final String PARTY_PUK = "partyPuk";
 	private InteractionListAdapter adapter;
 	private ListView listView;
 	private Interaction interaction;
@@ -210,7 +212,7 @@ public class InteractionListActivity extends Activity {
 		Intent intent = new Intent();
 		intent.setClass(this, ProfileActivity.class);
 		intent.putExtra("isOwn", true);
-		intent.putExtra("partyPuk", sneer().self().publicKey().mostRecent());
+		intent.putExtra(PARTY_PUK, sneer().self().publicKey().mostRecent());
 		startActivity(intent);
 	}
 
