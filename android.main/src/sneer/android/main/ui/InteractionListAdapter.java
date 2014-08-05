@@ -1,6 +1,7 @@
 package sneer.android.main.ui;
 
 import static sneer.android.ui.UIUtils.*;
+import static sneer.android.main.ui.utils.DateUtils.*;
 import rx.*;
 import rx.functions.*;
 import sneer.*;
@@ -47,8 +48,8 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
         Interaction interaction = getItem(position);
         plug(holder.interactionParty, labelProvider.call(interaction.party()));
         plug(holder.interactionSummary, interaction.mostRecentEventContent().observable());
-        plug(holder.interactionDate, interaction.mostRecentEventTimestamp().observable());
         plug(holder.interactionPicture, imageProvider.call(interaction.party()));
+        plugDate(holder.interactionDate, interaction.mostRecentEventTimestamp().observable());
         
         return row;
     }
