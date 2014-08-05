@@ -2,7 +2,9 @@ package sneer.impl.simulator;
 
 import static sneer.Contact.*;
 import static sneer.Interaction.*;
+import static sneer.commons.utils.StreamUtils.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -33,14 +35,23 @@ public class SneerSimulator extends SneerBase {
 	
 	public SneerSimulator(PrivateKey privateKey) {
 		this.privateKey = privateKey;
-		self = new PartySimulator("Neide Silva e Silva", privateKey);
+		self = new PartySimulator("Neide da Silva", privateKey);
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(privateKey);
 		
-		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este"), "SCISSORS");
-		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles"), "ROCK");
-		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis"), "PAPER");
+		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este", getImage("maicon.jpg")), "SCISSORS");
+		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles", getImage("wesley.jpg")), "ROCK");
+		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis", getImage("carla.jpg")), "PAPER");
+	}
+
+
+	private byte[] getImage(String image) {
+		try {
+			return readFully(getClass().getResourceAsStream(image));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -150,13 +161,14 @@ public class SneerSimulator extends SneerBase {
 	}
 
 	
-	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city) {
+	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city, byte[] selfie) {
 		PrivateKey prik = Keys.createPrivateKey(name);
 		Party party = produceParty(prik.publicKey());
 		((PartySimulator)party).simulateSetName(name);
 		((PartySimulator)party).simulateSetPreferredNickname(preferredNicknane);
 		((PartySimulator)party).simulateSetCountry(coutry);
 		((PartySimulator)party).simulateSetCity(city);
+		((PartySimulator)party).simulateSetSelfie(selfie);
 		setContact(name, party);
 		return prik;
 	}
