@@ -45,7 +45,9 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
         }
         
         Interaction interaction = getItem(position);
-        plug(holder.interactionSummary, labelProvider.call(interaction.party()));
+        plug(holder.interactionParty, labelProvider.call(interaction.party()));
+        plug(holder.interactionSummary, interaction.mostRecentEventContent().observable());
+        plug(holder.interactionDate, interaction.mostRecentEventTimestamp().observable());
         plug(holder.interactionPicture, imageProvider.call(interaction.party()));
         
         return row;

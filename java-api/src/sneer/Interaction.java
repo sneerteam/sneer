@@ -12,7 +12,7 @@ public interface Interaction {
 		
 	Observable<List<InteractionEvent>> events();
 	Observed<Long> mostRecentEventTimestamp();
-	Observable<InteractionEvent> mostRecentEvent();
+	Observed<String> mostRecentEventContent();
 	
 	/** Publish a new message with isOwn() true, with party() as the audience and using System.currentTimeMillis() as the timestamp. */
 	void sendMessage(String content);

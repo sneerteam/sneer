@@ -33,7 +33,7 @@ public class SneerSimulator extends SneerBase {
 	
 	public SneerSimulator(PrivateKey privateKey) {
 		this.privateKey = privateKey;
-		self = new PartySimulator("", privateKey);
+		self = new PartySimulator("Neide Silva e Silva", privateKey);
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(privateKey);

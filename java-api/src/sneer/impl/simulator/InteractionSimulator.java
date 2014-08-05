@@ -6,7 +6,6 @@ import static sneer.commons.Lists.*;
 import java.util.*;
 
 import rx.Observable;
-import rx.functions.*;
 import sneer.*;
 import sneer.rx.*;
 
@@ -19,6 +18,7 @@ public class InteractionSimulator implements Interaction {
 	private final Party party;
 	private final ObservedSubject<List<InteractionEvent>> events = ObservedSubject.create(NO_EVENTS);
 	private final ObservedSubject<Long> mostRecentEventTimestamp = ObservedSubject.create(0L);
+	private final ObservedSubject<String> mostRecentEventContent = ObservedSubject.create("");
 	
 	public InteractionSimulator(Party party) {
 		this.party = party;
@@ -53,17 +53,17 @@ public class InteractionSimulator implements Interaction {
 	
 	
 	@Override
-	public Observable<InteractionEvent> mostRecentEvent() {
-		return events().map(new Func1<List<InteractionEvent>, InteractionEvent>() { @Override public InteractionEvent call(List<InteractionEvent> list) {
-			return lastIn(list);
-		}});
+	public Observed<String> mostRecentEventContent() {
+		return mostRecentEventContent.observed();
 	}
 	
 	
 	private void addEvent(InteractionEvent event) {
 		List<InteractionEvent> newEvents = eventsWith(event, BY_TIME_RECEIVED);
 		events.set(newEvents);
-		mostRecentEventTimestamp.set(lastIn(newEvents).timestampReceived());
+		InteractionEvent last = lastIn(newEvents);
+		mostRecentEventTimestamp.set(last.timestampReceived());
+		mostRecentEventContent.set(last.content());
 	}
 
 
@@ -71,6 +71,7 @@ public class InteractionSimulator implements Interaction {
 		List<InteractionEvent> ret = new ArrayList<InteractionEvent>(events.observed().mostRecent());
 		ret.add(event);
 		Collections.sort(ret, order);
+		System.out.println(ret);
 		return ret;
 	}
 	
