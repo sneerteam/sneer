@@ -148,8 +148,8 @@
                    (let [subscription
                          (rx/subscribe
                            (->> local-tuples
-                             (rx/filter #(let [audience (get "audience" %)]
-                                             (or (nil? audience) (= sender audience))))
+                             (rx/filter #(let [audience (get % "audience")]
+                                           (or (nil? audience) (= sender audience))))
                              (filter-by criteria)
                              (rx/map #(->envelope sender :tuple %)))
                            (partial rx/on-next network))]
