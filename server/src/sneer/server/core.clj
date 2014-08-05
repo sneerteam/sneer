@@ -1,35 +1,3 @@
-; Server:
-;
-; Tree of paths per seal.
-; Subscriptions per seal for matching.
-; Channels (active sessions) per seal.
-
-
-; My tree:
-;
-; seal - [seal]
-; subscriptions
-; notifications (announcements? adverts? tips?)
-;   [seal]     ; Peer you want to notify.
-;     chat
-;       rooms
-;         [id]
-;  party
-;      pool
-; profile
-;   name - "Neide da Silva"
-;   picture
-;     format - "png"
-;     data - byte[]
-; contacts
-;   [seal]
-;     nickname - "Maicon"
-; groups
-;   "galera do futebol"
-;     [seal 1..n]
-;
-; Any - Wildcard for any single path segment.
-
 (ns sneer.server.core
   (:require
    [clojure.core.async :as async :refer [chan >! <! >!! <!! alts!! timeout]]
@@ -50,9 +18,9 @@
   `(async/go
      (try
        ~@forms
-       (catch java.lang.Exception e
-         (println "GO ERROR" e)
-         (. e printStackTrace)))))
+       (catch java.lang.Exception ~'e
+         (println "GO ERROR" ~'e)
+         (. ~'e printStackTrace)))))
 
 (defmacro go-while-let
   "Makes it easy to continue processing data from a channel until it closes"
