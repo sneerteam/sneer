@@ -5,6 +5,7 @@ import static sneer.ObservableTestUtils.*;
 
 import org.junit.*;
 
+import rx.subjects.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 
@@ -68,5 +69,29 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 		sneerA.setContact("Party Boy", sneerA.produceParty(prikB.publicKey()));
 		sneerA.setContact("Party Boy", sneerA.produceParty(prikC.publicKey()));
 	}
+	
+	@Test
+	public void changeContactNickname() throws FriendlyException {
+		
+		Party partyB = sneerA.produceParty(prikB.publicKey());
+		
+		sneerA.setContact("Party Boy", partyB);
+		
+		Contact contactB = sneerA.findContact(partyB);
+		
+		assertEquals("Party Boy", contactB.nickname().mostRecent());
+		
+		ReplaySubject<String> nicknames = ReplaySubject.create();
+		
+		contactB.nickname().observable().subscribe(nicknames);
+		
+		sneerA.setContact("Party Man", partyB);
+		
+		assertEqualsUntilNow(nicknames, "Party Boy", "Party Man");
+		
+		assertEqualsUntilNow(contactB.nickname().observable(), "Party Man");
+	}
+	
+	
 
 }
