@@ -7,3 +7,5 @@ git reset --hard
 git pull --rebase
 
 ./gradlew cleanEclipse eclipse
+
+cp -f android-api/bin/*.jar ../rockpaperscissors/libs/
