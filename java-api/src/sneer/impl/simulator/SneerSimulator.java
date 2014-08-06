@@ -4,7 +4,6 @@ import static sneer.Contact.*;
 import static sneer.Interaction.*;
 import static sneer.commons.utils.StreamUtils.*;
 
-import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -19,6 +18,8 @@ import sneer.tuples.*;
 public class SneerSimulator extends SneerBase {
 
 	private final PartySimulator self;
+	private final TupleSpace tupleSpace;
+	private final PrivateKey privateKey;
 
 	private final Map<PublicKey, Party> partiesByPuk = new ConcurrentHashMap<PublicKey, Party>();
 
@@ -28,33 +29,21 @@ public class SneerSimulator extends SneerBase {
 	private final Map<Party, Interaction> interactionsByParty = new ConcurrentHashMap<Party, Interaction>();
 	private final BehaviorSubject<List<Interaction>> interactions = BehaviorSubject.create(interactionsSorted());
 
-	private TupleSpace tupleSpace;
-
-	private PrivateKey privateKey;
-	
 	
 	public SneerSimulator(PrivateKey privateKey) {
 		this.privateKey = privateKey;
 		self = new PartySimulator("Neide da Silva", privateKey);
+		self.setSelfie(selfieFromFileSystem("neide.png"));
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(privateKey);
 		
-		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este", getImage("maicon.jpg")), "SCISSORS");
-		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles", getImage("wesley.jpg")), "ROCK");
-		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis", getImage("carla.jpg")), "PAPER");
+		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("maicon.jpg")), "SCISSORS");
+		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("wesley.jpg")), "ROCK");
+		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("carla.jpg")), "PAPER");
 	}
 
 
-	private byte[] getImage(String image) {
-		try {
-			return readFully(getClass().getResourceAsStream(image));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	
 	public PrivateKey privateKey() {
 		return privateKey;
 	}
@@ -183,6 +172,11 @@ public class SneerSimulator extends SneerBase {
 	@Override
 	public Profile profileFor(Party party) {
 		return (PartySimulator)party;
+	}
+	
+	
+	private byte[] selfieFromFileSystem(String fileName) {
+		return readFully(getClass().getResourceAsStream(fileName));
 	}
 
 }

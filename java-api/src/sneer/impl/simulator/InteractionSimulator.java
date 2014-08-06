@@ -14,16 +14,16 @@ public class InteractionSimulator implements Interaction {
 	@SuppressWarnings("unchecked")
 	private static final List<InteractionEvent> NO_EVENTS = Collections.EMPTY_LIST;
 
-	
 	private final Party party;
 	private final ObservedSubject<List<InteractionEvent>> events = ObservedSubject.create(NO_EVENTS);
 	private final ObservedSubject<Long> mostRecentEventTimestamp = ObservedSubject.create(0L);
 	private final ObservedSubject<String> mostRecentEventContent = ObservedSubject.create("");
 	
+	
 	public InteractionSimulator(Party party) {
 		this.party = party;
 		sendMessage("Vai ter festa!!!! Uhuu!!!");
-		simulateReceivedMessage("Onde? Onde??");
+		simulateReceivedMessage("Onde? Onde?? o0");
 	}
 
 
@@ -71,7 +71,6 @@ public class InteractionSimulator implements Interaction {
 		List<InteractionEvent> ret = new ArrayList<InteractionEvent>(events.observed().mostRecent());
 		ret.add(event);
 		Collections.sort(ret, order);
-		System.out.println(ret);
 		return ret;
 	}
 	
