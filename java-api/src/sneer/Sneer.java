@@ -3,7 +3,6 @@ package sneer;
 import java.util.*;
 
 import rx.Observable;
-import rx.subjects.*;
 import sneer.commons.exceptions.*;
 import sneer.rx.*;
 import sneer.tuples.*;
@@ -13,9 +12,7 @@ public interface Sneer {
 	Party self();
 	Profile profileFor(Party party);
 	
-	/** All Individual contacts that you have and all Groups you are a member of ordered alphabetically. 
-	 * <p>
-	 * The first element pushed is the list of all current contacts. See {@link BehaviorSubject}*/
+	/** All Individual contacts that you have and all Groups you are a member of ordered alphabetically.*/
 	Observable<List<Contact>> contacts();
 	/** @return null if party is not a contact. */
 	Contact findContact(Party party);
