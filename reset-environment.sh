@@ -8,4 +8,6 @@ git pull --rebase
 
 ./gradlew cleanEclipse eclipse
 
-cp -f android-api/bin/*.jar ../rockpaperscissors/libs/
+if [ -d "../rockpaperscissors" ]; then
+  cp -f android-api/bin/*.jar ../rockpaperscissors/libs/
+fi
