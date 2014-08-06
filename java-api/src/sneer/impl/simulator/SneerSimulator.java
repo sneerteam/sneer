@@ -21,7 +21,7 @@ public class SneerSimulator extends SneerBase {
 	private final TupleSpace tupleSpace;
 	private final PrivateKey privateKey;
 
-	private final Map<PublicKey, Party> partiesByPuk = new ConcurrentHashMap<PublicKey, Party>();
+	private final Map<PublicKey, PartySimulator> partiesByPuk = new ConcurrentHashMap<PublicKey, PartySimulator>();
 
 	private final Map<Party, ContactSimulator> contactsByParty = new ConcurrentHashMap<Party, ContactSimulator>();
 	private final BehaviorSubject<List<Contact>> contacts = BehaviorSubject.create(contactsSorted());
@@ -60,12 +60,12 @@ public class SneerSimulator extends SneerBase {
 	
 	
 	@Override
-	public Party produceParty(PublicKey puk) {
+	public PartySimulator produceParty(PublicKey puk) {
 		synchronized (partiesByPuk) {
-			Party existing = partiesByPuk.get(puk);
+			PartySimulator existing = partiesByPuk.get(puk);
 			if (existing != null) return existing;
 			
-			Party newParty = new PartySimulator(puk);
+			PartySimulator newParty = new PartySimulator(puk);
 			partiesByPuk.put(puk, newParty);
 			return newParty;
 		}
@@ -152,12 +152,12 @@ public class SneerSimulator extends SneerBase {
 	
 	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city, byte[] selfie) {
 		PrivateKey prik = Keys.createPrivateKey(name);
-		Party party = produceParty(prik.publicKey());
-		((PartySimulator)party).simulateSetName(name);
-		((PartySimulator)party).simulateSetPreferredNickname(preferredNicknane);
-		((PartySimulator)party).simulateSetCountry(coutry);
-		((PartySimulator)party).simulateSetCity(city);
-		((PartySimulator)party).simulateSetSelfie(selfie);
+		PartySimulator party = produceParty(prik.publicKey());
+		party.simulateSetName(name);
+		party.simulateSetPreferredNickname(preferredNicknane);
+		party.simulateSetCountry(coutry);
+		party.simulateSetCity(city);
+		party.simulateSetSelfie(selfie);
 		setContact(name, party);
 		return prik;
 	}
