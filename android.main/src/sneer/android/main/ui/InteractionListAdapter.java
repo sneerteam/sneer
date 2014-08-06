@@ -1,12 +1,14 @@
 package sneer.android.main.ui;
 
-import static sneer.android.ui.UIUtils.*;
 import static sneer.android.main.ui.utils.DateUtils.*;
+import static sneer.android.ui.UIUtils.*;
 import rx.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import android.app.*;
+import android.graphics.*;
+import android.graphics.Shader.TileMode;
 import android.view.*;
 import android.widget.*;
 
@@ -39,6 +41,11 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
             holder.interactionSummary = findView(row, R.id.interactionSummary);
             holder.interactionDate = findView(row, R.id.interactionDate);
             holder.interactionPicture = findView(row, R.id.interactionPicture);
+            
+            Shader textShader = new LinearGradient(200, 0, 650, 0, 
+            		new int[] {Color.DKGRAY, Color.LTGRAY},
+            		new float[] {0, 1}, TileMode.CLAMP);
+            holder.interactionSummary.getPaint().setShader(textShader);
             
             row.setTag(holder);
         } else {

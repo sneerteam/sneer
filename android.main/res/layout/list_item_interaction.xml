@@ -33,8 +33,8 @@
         android:divider="@null"
         android:paddingRight="5dp"
         android:paddingTop="5dp"
-        android:textSize="12sp"
-        android:text="@string/dummy_date" />
+        android:text="@string/dummy_date"
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/interactionSummary"
@@ -42,12 +42,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/interactionParty"
         android:layout_toRightOf="@+id/interactionPicture"
+        android:lines="1"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
+        android:paddingRight="35dp"
         android:paddingTop="5dp"
-        android:lines="1"
-        android:text="@string/string_dummy_interaction_text"
-        android:textColor="#6f6f6f" >
+        android:text="@string/string_dummy_interaction_text" >
     </TextView>
+
+    <ImageView
+        android:id="@+id/interactionUnread"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignBottom="@+id/interactionSummary"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/interactionDate"
+        android:contentDescription="@string/interaction_summary_picture"
+        android:paddingRight="5dp"
+        android:src="@drawable/unread" />
 
 </RelativeLayout>
