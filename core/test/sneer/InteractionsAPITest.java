@@ -3,6 +3,8 @@ package sneer;
 import static org.junit.Assert.*;
 import static sneer.ObservableTestUtils.*;
 
+import java.util.*;
+
 import org.junit.*;
 
 import rx.subjects.*;
@@ -90,6 +92,24 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 		assertEqualsUntilNow(nicknames, "Party Boy", "Party Man");
 
 		assertEqualsUntilNow(contactB.nickname().observable(), "Party Man");
+	}
+	
+	@Test
+	public void contactListSequence() throws FriendlyException {
+
+		Party partyB = sneerA.produceParty(prikB.publicKey());
+		Party partyC = sneerA.produceParty(prikC.publicKey());
+		
+		assertEqualsUntilNow(sneerA.contacts());
+		
+		sneerA.setContact("Party Boy", partyB);
+
+		assertEqualsUntilNow(sneerA.contacts(), Arrays.asList(sneerA.findContact(partyB)));
+		
+		sneerA.setContact("Party Boy", partyC);
+
+		assertEqualsUntilNow(sneerA.contacts(), Arrays.asList(sneerA.findContact(partyB), sneerA.findContact(partyC)));
+		
 	}
 
 }

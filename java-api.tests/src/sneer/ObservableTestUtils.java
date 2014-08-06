@@ -10,6 +10,7 @@ import rx.schedulers.*;
 
 public class ObservableTestUtils {
 	
+	@SafeVarargs
 	public static <T> void assertEqualsUntilNow(Observable<T> seq, T... expecteds) {
 		List<T> list = takeAllUntilNow(seq);
 		if (expecteds.length != list.size())
