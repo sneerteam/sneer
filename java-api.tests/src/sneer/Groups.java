@@ -6,7 +6,7 @@ import org.junit.*;
 
 import sneer.impl.keys.*;
 
-public class Groups extends TestsBase {
+public class Groups extends TupleSpaceTestsBase {
 	
 	@Test
 	public void targetAudience() {

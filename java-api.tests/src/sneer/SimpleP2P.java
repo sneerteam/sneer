@@ -12,7 +12,7 @@ import rx.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
-public class SimpleP2P extends TestsBase {
+public class SimpleP2P extends TupleSpaceTestsBase {
 	
 	@Test
 	public void publisherFluentReturningNewInstance() {

@@ -9,7 +9,7 @@ import sneer.impl.keys.*;
 import sneer.refimpl.*;
 import sneer.tuples.*;
 
-public class TestsBase {
+public class TupleSpaceTestsBase {
 	
 	private final Object network = createNetwork();
 

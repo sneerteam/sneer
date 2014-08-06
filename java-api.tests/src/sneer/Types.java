@@ -1,7 +1,7 @@
 package sneer;
 
 
-public class Types extends TestsBase {
+public class Types extends TupleSpaceTestsBase {
 	
 //	@Test
 //	public void multipleSegmentsIntype() throws IOException {
