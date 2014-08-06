@@ -7,7 +7,6 @@ import rx.*;
 import rx.Observable;
 import sneer.admin.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 import sneer.rx.*;
 import sneer.tuples.*;
 
@@ -74,16 +73,11 @@ public class SneerAdminImpl implements SneerAdmin {
 				pukSubscription.unsubscribe();
 			}
 			
-			pukSubscription = tupleSpace.filter()
-				.author(puk)
+			tupleSpace.publisher()
+				.audience(prik.publicKey())
 				.type("sneer/publicKey")
-				.tuples()
-				.map(Tuple.TO_PAYLOAD)
-				.cast(PublicKey.class)
-				.subscribe(tupleSpace.publisher()
-						.audience(prik.publicKey())
-						.type("sneer/publicKey")
-						.field("party", key));
+				.field("party", key)
+				.pub(puk);
 			
 		}
 		

@@ -11,7 +11,9 @@ public class InteractionsAPITestsBase {
 	protected final SneerAdmin adminA = newSneerAdmin(prikA);
 
 	private SneerAdminImpl newSneerAdmin(PrivateKey prik) {
-		return new SneerAdminImpl(world.newTupleSpace(prik));
+		SneerAdminImpl admin = new SneerAdminImpl(world.newTupleSpace(prik));
+		admin.initialize(prik);
+		return admin;
 	}
 
 }

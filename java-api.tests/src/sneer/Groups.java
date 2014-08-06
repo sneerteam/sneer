@@ -1,6 +1,7 @@
 package sneer;
 
 import static sneer.ObservableTestUtils.*;
+import static sneer.TupleTestUtils.*;
 
 import org.junit.*;
 

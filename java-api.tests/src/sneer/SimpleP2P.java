@@ -2,6 +2,7 @@ package sneer;
 
 import static org.junit.Assert.*;
 import static sneer.ObservableTestUtils.*;
+import static sneer.TupleTestUtils.*;
 import static sneer.tuples.Tuple.*;
 
 import java.io.*;

@@ -1,8 +1,5 @@
 package sneer;
 
-import static sneer.ObservableTestUtils.*;
-import static sneer.tuples.Tuple.*;
-import rx.*;
 import sneer.admin.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
@@ -60,11 +57,6 @@ public class TupleSpaceTestsBase {
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-
-	protected void expectValues(Observable<Tuple> tuples, Object... expecteds) {
-		assertEqualsUntilNow(tuples.map(TO_PAYLOAD), expecteds);
 	}
 
 }
