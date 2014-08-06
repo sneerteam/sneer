@@ -65,6 +65,8 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
         return row;
     }
 
+    
+    
 	static class InteractiontHolder
     {
         TextView interactionParty;
@@ -72,4 +74,10 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
         TextView interactionDate;
         ImageView interactionPicture;
     }
+
+
+
+	public void dispose() {
+		subscriptions.unsubscribe();
+	}
 }

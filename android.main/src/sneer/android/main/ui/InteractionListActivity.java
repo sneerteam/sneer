@@ -27,7 +27,6 @@ import android.widget.AdapterView.OnItemClickListener;
 public class InteractionListActivity extends Activity {
 
 	
-	static final String PARTY_PUK = "partyPuk";
 	private InteractionListAdapter adapter;
 	private ListView listView;
 	private Interaction interaction;
@@ -211,8 +210,6 @@ public class InteractionListActivity extends Activity {
 	private void navigateToProfile() {
 		Intent intent = new Intent();
 		intent.setClass(this, ProfileActivity.class);
-		intent.putExtra("isOwn", true);
-		intent.putExtra(PARTY_PUK, sneer().self().publicKey().mostRecent());
 		startActivity(intent);
 	}
 
@@ -239,6 +236,13 @@ public class InteractionListActivity extends Activity {
 		intent.putExtra("embeddedOptions", embeddedOptions);
 		intent.putExtra("partyPuk", interaction.party().publicKey().mostRecent());
 		startActivity(intent);
+	}
+	
+	
+	@Override
+	protected void onDestroy() {
+		adapter.dispose();
+		super.onDestroy();
 	}
 
 }
