@@ -4,6 +4,7 @@ import static sneer.android.main.ui.utils.DateUtils.*;
 import static sneer.android.ui.UIUtils.*;
 import rx.*;
 import rx.functions.*;
+import rx.subscriptions.*;
 import sneer.*;
 import sneer.android.main.*;
 import android.app.*;
@@ -18,6 +19,7 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
     int layoutResourceId;
 	private final Func1<Party, Observable<String>> labelProvider;
 	private final Func1<Party, Observable<byte[]>> imageProvider;
+	private CompositeSubscription subscriptions;
     
     public InteractionListAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider, Func1<Party, Observable<byte[]>> imageProvider) {
         super(activity, layoutResourceId);
@@ -25,6 +27,7 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
         this.activity = activity;
 		this.labelProvider = labelProvider;
 		this.imageProvider = imageProvider;
+		this.subscriptions = new CompositeSubscription();
     }
 
     @Override
@@ -52,12 +55,13 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
             holder = (InteractiontHolder)row.getTag();
         }
         
-        Interaction interaction = getItem(position);
-        plug(holder.interactionParty, labelProvider.call(interaction.party()));
-        plug(holder.interactionSummary, interaction.mostRecentEventContent().observable());
-        plug(holder.interactionPicture, imageProvider.call(interaction.party()));
-        plugDate(holder.interactionDate, interaction.mostRecentEventTimestamp().observable());
-        
+		Interaction interaction = getItem(position);
+		Subscription subscription = Subscriptions.from(
+				plug(holder.interactionParty, labelProvider.call(interaction.party())),
+				plug(holder.interactionSummary, interaction.mostRecentEventContent().observable()),
+				plug(holder.interactionPicture, imageProvider.call(interaction.party())),
+				plugDate(holder.interactionDate, interaction.mostRecentEventTimestamp().observable()));
+		subscriptions.add(subscription);
         return row;
     }
 

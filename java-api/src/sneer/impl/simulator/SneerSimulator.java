@@ -4,6 +4,7 @@ import static sneer.Contact.*;
 import static sneer.Interaction.*;
 import static sneer.commons.utils.StreamUtils.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -176,7 +177,12 @@ public class SneerSimulator extends SneerBase {
 	
 	
 	private byte[] selfieFromFileSystem(String fileName) {
-		return readFully(getClass().getResourceAsStream(fileName));
+		try {
+			return readFully(getClass().getResourceAsStream(fileName));
+		} catch (IOException e) {
+//			TODO - não fazer nada quando der erro
+			throw new RuntimeException(e);
+		}
 	}
 
 }

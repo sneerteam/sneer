@@ -9,20 +9,20 @@ import android.widget.*;
 
 public class UIUtils {
 
-	public static void plug(final TextView textView, Observable<?> observable) {
-		observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
+	public static Subscription plug(final TextView textView, Observable<?> observable) {
+		return observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			textView.setText(obj.toString());
 		}});
 	}
 
-	public static void plug(final ImageView imageView, Observable<byte[]> observable) {
-		observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] obj) {
+	public static Subscription plug(final ImageView imageView, Observable<byte[]> observable) {
+		return observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] obj) {
 			imageView.setImageBitmap(BitmapFactory.decodeByteArray(obj, 0, obj.length));
 		}});
 	}
 	
-	public static void plugHeaderTitle(final ContextMenu menu, Observable<?> observable) {
-		observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
+	public static Subscription plugHeaderTitle(final ContextMenu menu, Observable<?> observable) {
+		return observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			menu.setHeaderTitle(obj.toString());
 		}});
 	}
