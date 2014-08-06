@@ -5,6 +5,7 @@ import static sneer.ObservableTestUtils.*;
 
 import org.junit.*;
 
+import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 
 public class InteractionsAPITest extends InteractionsAPITestsBase {
@@ -23,16 +24,16 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 	@Test
 	public void myOwnPublicKey() {
 		
-		assertEquals(prikA.publicKey(),  adminA.sneer().self().publicKey().mostRecent());
+		assertEquals(prikA.publicKey(),  sneerA.self().publicKey().mostRecent());
 		
-		assertEqualsUntilNow(adminA.sneer().self().publicKey().observable(), prikA.publicKey());
+		assertEqualsUntilNow(sneerA.self().publicKey().observable(), prikA.publicKey());
 		
 	}
 
 	@Test
 	public void pukOfParty() {
 		
-		Party someone = adminA.sneer().produceParty(prikB.publicKey());
+		Party someone = sneerA.produceParty(prikB.publicKey());
 		
 		assertEquals(prikB.publicKey(), someone.publicKey().mostRecent());
 		
@@ -41,10 +42,31 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 	@Test
 	public void alwaysReturnsSamePartyInstance() {
 		
-		Party someoneElse = adminA.sneer().produceParty(prikB.publicKey());
+		Party someoneElse = sneerA.produceParty(prikB.publicKey());
 		
-		assertSame(someoneElse, adminA.sneer().produceParty(prikB.publicKey()));
+		assertSame(someoneElse, sneerA.produceParty(prikB.publicKey()));
 		
+	}
+
+	@Test
+	public void addContact() throws FriendlyException {
+		
+		Party partyB = sneerA.produceParty(prikB.publicKey());
+		
+		assertNull(sneerA.findContact(partyB));
+		
+		sneerA.setContact("Party Boy", partyB);
+		
+		Contact contactB = sneerA.findContact(partyB);
+		assertNotNull(contactB);
+		assertSame(partyB, contactB.party());
+	}
+
+	@Test(expected=FriendlyException.class)
+	public void exceptionOnDuplicatedNickname() throws FriendlyException {
+		
+		sneerA.setContact("Party Boy", sneerA.produceParty(prikB.publicKey()));
+		sneerA.setContact("Party Boy", sneerA.produceParty(prikC.publicKey()));
 	}
 
 }
