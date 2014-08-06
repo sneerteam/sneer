@@ -142,8 +142,8 @@ public class SneerAdminImpl implements SneerAdmin {
 		return new WritableContact(party);
 	}});
 
-	public SneerAdminImpl(File secureFolder) {
-		this.tupleSpace = new TuplesFactoryInProcess().newTupleSpace(Keys.createPrivateKey());
+	public SneerAdminImpl(TupleSpace tupleSpace) {
+		this.tupleSpace = tupleSpace;
 	}
 
 	@Override
