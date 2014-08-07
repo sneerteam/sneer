@@ -59,6 +59,6 @@
         android:layout_below="@+id/interactionDate"
         android:contentDescription="@string/interaction_summary_picture"
         android:paddingRight="5dp"
-        android:src="@drawable/unread" />
+        android:src="@drawable/ic_action_unread" />
 
 </RelativeLayout>
