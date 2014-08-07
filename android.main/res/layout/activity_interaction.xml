@@ -23,7 +23,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#DDDDDD"
+        android:background="#CCCCCC"
         android:orientation="horizontal" >
 
         <EditText

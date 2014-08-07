@@ -35,7 +35,7 @@ public class InteractionActivity extends Activity {
 	private EmbeddedOptions embeddedOptions;
 	private Party party;
 
-	private ImageButton sendButton;
+	private ImageButton actionButton;
 
 	private ImageButton lastActionButton;
 	
@@ -82,32 +82,28 @@ public class InteractionActivity extends Activity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (editText.getText().toString().trim() != null && !editText.getText().toString().trim().isEmpty()) {
-					sendButtonIcon(R.drawable.ic_action_send_holo_light);
+					actionButtonIcon(R.drawable.ic_action_send);
 					lastActionButtonVisibility(View.GONE);
 				} else {
-					sendButtonIcon(R.drawable.ic_allapps);
+					actionButtonIcon(R.drawable.ic_allapps_new);
 					lastActionButtonVisibility(View.VISIBLE);
 				}
 			}			
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				// TODO Auto-generated method stub
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
 			@Override
-			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
-			}
+			public void afterTextChanged(Editable s) {}
 		});
 		
 		
 		
 		
-		sendButton = (ImageButton)findViewById(R.id.actionButton);
+		actionButton = (ImageButton)findViewById(R.id.actionButton);
 		lastActionButton = (ImageButton)findViewById(R.id.lastActionButton);
-		sendButtonIcon(R.drawable.ic_allapps);
-		sendButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+		actionButtonIcon(R.drawable.ic_allapps_new);
+		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			sendMessage(party, editText.getText().toString().trim());
 			editText.setText("");
 		}
@@ -118,8 +114,9 @@ public class InteractionActivity extends Activity {
 		}});		
 	}
 	
-	private void sendButtonIcon(int resource) {
-		sendButton.setImageResource(resource);
+	
+	private void actionButtonIcon(int resource) {
+		actionButton.setImageResource(resource);
 	}
 	
 	
