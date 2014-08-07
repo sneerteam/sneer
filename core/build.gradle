@@ -1,13 +1,16 @@
+version = "0.0.1"
+
 apply plugin: "clojure"
 apply plugin: "java"
 apply plugin: "eclipse"
+apply plugin: "maven"
 
 buildscript {
     repositories {
         mavenCentral()
         maven { url "https://clojars.org/repo" }
     }
-    
+
 
     dependencies {
         classpath "clojuresque:clojuresque:1.7.0"
@@ -20,18 +23,18 @@ repositories {
 }
 
 
-sourceSets { 
-    main { 
+sourceSets {
+    main {
         clojure {
             srcDir 'src'
             srcDir 'test'
-            aotCompile = true 
+            aotCompile = true
         }
         java {
             srcDir 'src'
             srcDir 'test'
         }
-    } 
+    }
 }
 
 eclipse.project {
@@ -45,7 +48,13 @@ dependencies {
     compile 'org.xerial:sqlite-jdbc:3.7.2'
     compile 'com.netflix.rxjava:rxjava-clojure:0.19.6'
     compile 'com.cognitect:transit-clj:0.8.229'
-	compile 'com.google.guava:guava:17.0'
     compile 'junit:junit:4.+'
+    compile 'com.google.guava:guava:17.0'
     compile project(':java-api')
+}
+
+uploadArchives {
+    repositories {
+        mavenLocal()
+    }
 }
