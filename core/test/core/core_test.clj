@@ -1,6 +1,5 @@
 (ns core.core-test
   (:require [clojure.test :refer :all]
-            [core.core :refer :all]
             [clojure.java.jdbc :as sql]))
 
 (def db {:classname "org.sqlite.JDBC"
