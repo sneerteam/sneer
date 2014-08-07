@@ -85,7 +85,7 @@ public class InteractionActivity extends Activity {
 					actionButtonIcon(R.drawable.ic_action_send);
 					lastActionButtonVisibility(View.GONE);
 				} else {
-					actionButtonIcon(R.drawable.testeste);
+					actionButtonIcon(R.drawable.ic_allapps);
 					lastActionButtonVisibility(View.VISIBLE);
 				}
 			}			
@@ -102,7 +102,7 @@ public class InteractionActivity extends Activity {
 		
 		actionButton = (ImageButton)findViewById(R.id.actionButton);
 		lastActionButton = (ImageButton)findViewById(R.id.lastActionButton);
-		actionButtonIcon(R.drawable.testeste);
+		actionButtonIcon(R.drawable.ic_allapps);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			sendMessage(party, editText.getText().toString().trim());
 			editText.setText("");
