@@ -28,8 +28,10 @@
     (transit/write writer value)
     (.toByteArray out)))
 
-(defn deserialize [bytes]
-  (let [in (ByteArrayInputStream. bytes)
-        reader (transit/reader in transit-format read-opts)]
-    ;(println (alength bytes) (String. bytes "utf8"))
-    (transit/read reader)))
+(defn deserialize
+  ([bytes]
+     (deserialize bytes (alength bytes)))
+  ([bytes length]
+     (let [in (ByteArrayInputStream. bytes 0 length)
+           reader (transit/reader in transit-format read-opts)]
+       (transit/read reader))))
