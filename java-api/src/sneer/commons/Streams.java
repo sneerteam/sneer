@@ -1,8 +1,8 @@
-package sneer.commons.utils;
+package sneer.commons;
 
 import java.io.*;
 
-public class StreamUtils {
+public class Streams {
 
 	public static byte[] readFully(InputStream in) throws IOException {
 		byte[] b = new byte[8192];

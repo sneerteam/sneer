@@ -2,7 +2,7 @@ package sneer.impl.simulator;
 
 import static sneer.Contact.*;
 import static sneer.Interaction.*;
-import static sneer.commons.utils.StreamUtils.*;
+import static sneer.commons.Streams.*;
 
 import java.io.*;
 import java.util.*;
