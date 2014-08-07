@@ -2,7 +2,6 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 
 version = '0.0.1'
-group = 'sneer'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6

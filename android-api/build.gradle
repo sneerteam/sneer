@@ -5,9 +5,8 @@ apply plugin: 'eclipse'
 
 def originalVersion = "0.1.2"
 
-group = 'me.sneer'
 version = originalVersion
-description = 'API for Sneer, the sovereign platform.' 
+description = 'API for Sneer, the sovereign platform.'
 ext.packaging = 'jar'
 
 sourceCompatibility = 1.6
@@ -56,7 +55,7 @@ dependencies {
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.3"
-    
+
     defaultConfig {
 	    minSdkVersion 15
 	    targetSdkVersion 19
@@ -80,26 +79,26 @@ task copyLibs(type: Copy) {
 
 android.libraryVariants.all { variant ->
 	if (!variant.name.equals("release")) return
-    
+
 	task jarNodeps(type: Jar) {
 		dependsOn build
-		
+
         from variant.javaCompile.destinationDir
         from variant.javaCompile.source
         from variant.processResources.resDir
-	
+
 	    appendix = "nodeps"
 	    baseName = "sneer-android-api"
 	    version = originalVersion
-	    
+
 	    if (project.hasProperty("addTimestamp")) {
 		    def x = new XmlSlurper().parse("${SONATYPE_SNAPSHOT_URL}/me/sneer/${project.name}/${originalVersion}-SNAPSHOT/maven-metadata.xml".toURL().openStream())
 	        classifier = "${x.versioning.snapshot.timestamp}-${x.versioning.snapshot.buildNumber}"
-	    } 
-	
+	    }
+
 	    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 	}
-	
+
     task javadocRelease(type: Javadoc) {
         description = "Generates javadoc for release"
         destinationDir = new File(destinationDir, variant.baseName)
@@ -122,7 +121,7 @@ android.libraryVariants.all { variant ->
 		from javadocRelease.destinationDir
 	    classifier = 'javadoc'
 	}
-	
+
 	task sourcesJar(type: Jar) {
         from variant.javaCompile.source
 	    classifier = 'sources'
@@ -130,11 +129,11 @@ android.libraryVariants.all { variant ->
 
 	artifacts {
 	    archives ourJar
-	    
+
 		archives javadocJar
 		archives sourcesJar
 	}
-		
+
 }
 
 
@@ -157,26 +156,26 @@ afterEvaluate {
 			    mavenLocal()
 			} else {
 		        mavenDeployer {
-				
-					if(shouldPublish) { 
+
+					if(shouldPublish) {
 					    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 					}
-					
+
 					repository(url: (isReleaseBuild ? SONATYPE_RELEASE_URL : SONATYPE_SNAPSHOT_URL)) {
 					  authentication(userName: nexusUsername, password: nexusPassword)
 					}
-			
+
 					pom.project {
 					    name project.name
 					    packaging 'jar'
 					    description project.description
 					    url 'http://sneer.me'
-			
+
 				        scm {
 				            url 'https://github.com/sneerteam/snapi'
 				            connection 'git@github.com:sneerteam/snapi.git'
 				        }
-			
+
 				        licenses {
 				            license {
 					            name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
@@ -184,7 +183,7 @@ afterEvaluate {
 				                distribution 'repo'
 				            }
 				        }
-			
+
 						developers {
 						    developer {
 							    id 'klauswuestefeld'
@@ -213,10 +212,10 @@ afterEvaluate {
 							}
 						}
 			        }
-			        
+
 			    }
 		    }
-	    }	    
+	    }
 	}
 }
 
