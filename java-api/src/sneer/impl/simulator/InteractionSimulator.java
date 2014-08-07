@@ -7,6 +7,7 @@ import java.util.*;
 
 import rx.Observable;
 import sneer.*;
+import sneer.commons.exceptions.*;
 import sneer.rx.*;
 
 public class InteractionSimulator implements Interaction {
@@ -82,6 +83,12 @@ public class InteractionSimulator implements Interaction {
 	
 	static private long now() {
 		return System.currentTimeMillis();
+	}
+
+
+	@Override
+	public Observable<List<InteractionMenuItem>> menu() {
+		throw new NotImplementedYet();
 	}
 
 }
