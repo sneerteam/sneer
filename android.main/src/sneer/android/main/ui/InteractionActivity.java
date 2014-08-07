@@ -9,7 +9,7 @@ import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.InteractionListActivity.EmbeddedOptions;
-import sneer.commons.*;
+import sneer.commons.Comparators;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;

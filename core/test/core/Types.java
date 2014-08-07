@@ -1,4 +1,4 @@
-package sneer;
+package core;
 
 
 public class Types extends TupleSpaceTestsBase {

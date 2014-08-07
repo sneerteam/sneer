@@ -1,9 +1,11 @@
-package sneer;
+package core;
 
+import org.junit.*;
+
+import sneer.*;
 import sneer.admin.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
-import sneer.refimpl.*;
 import sneer.tuples.*;
 
 public class TupleSpaceTestsBase {
@@ -23,6 +25,13 @@ public class TupleSpaceTestsBase {
 	protected final Sneer sneerC = init(userC);
 	protected final TupleSpace tuplesC = sneerC.tupleSpace();
 	
+	@Before
+	public void introductions() {
+		introduce(sneerA, sneerB);
+		introduce(sneerA, sneerC);
+		introduce(sneerC, sneerB);
+	}
+	
 	protected void introduce(Sneer a, Sneer b) {
 		try {
 			a.setContact(nameOf(b), a.produceParty(b.self().publicKey().mostRecent()));
@@ -41,12 +50,13 @@ public class TupleSpaceTestsBase {
 	}
 
 	
+	
 	protected SneerAdmin createSneerAdmin(Object session) {
-		return new SneerAdminInProcess((LocalTuplesFactory) session);
+		return Glue.newSneerAdmin(session);
 	}
 	
 	protected Object createNetwork() {
-		return new TuplesFactoryInProcess();
+		return Glue.newNetwork();
 	}
 	
 	private Sneer init(PrivateKey prik) {

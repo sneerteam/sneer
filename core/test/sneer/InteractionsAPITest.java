@@ -1,7 +1,7 @@
 package sneer;
 
+import static core.ObservableTestUtils.*;
 import static org.junit.Assert.*;
-import static sneer.ObservableTestUtils.*;
 
 import java.util.*;
 

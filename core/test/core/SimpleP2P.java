@@ -1,8 +1,8 @@
-package sneer;
+package core;
 
+import static core.ObservableTestUtils.*;
+import static core.TupleTestUtils.*;
 import static org.junit.Assert.*;
-import static sneer.ObservableTestUtils.*;
-import static sneer.TupleTestUtils.*;
 import static sneer.tuples.Tuple.*;
 
 import java.io.*;
@@ -10,6 +10,7 @@ import java.io.*;
 import org.junit.*;
 
 import rx.*;
+import sneer.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 

@@ -1,10 +1,11 @@
-package sneer;
+package core;
 
-import static sneer.ObservableTestUtils.*;
-import static sneer.TupleTestUtils.*;
+import static core.ObservableTestUtils.*;
+import static core.TupleTestUtils.*;
 
 import org.junit.*;
 
+import sneer.*;
 import sneer.impl.keys.*;
 
 public class Groups extends TupleSpaceTestsBase {

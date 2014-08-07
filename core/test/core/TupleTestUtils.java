@@ -1,6 +1,6 @@
-package sneer;
+package core;
 
-import static sneer.ObservableTestUtils.*;
+import static core.ObservableTestUtils.*;
 import static sneer.tuples.Tuple.*;
 import rx.*;
 import sneer.tuples.*;
