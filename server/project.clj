@@ -9,4 +9,5 @@
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
              :dev {:dependencies [[midje "1.6.3"]]
-                   :plugins [[lein-midje "3.1.3"]]}})
+                   :plugins [[cider/cider-nrepl "0.7.0"]
+                             [lein-midje "3.1.3"]]}})
