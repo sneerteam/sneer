@@ -15,6 +15,7 @@ import android.content.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.*;
+import android.text.*;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -33,6 +34,10 @@ public class InteractionActivity extends Activity {
 	private ActionBar actionBar;
 	private EmbeddedOptions embeddedOptions;
 	private Party party;
+
+	private ImageButton sendButton;
+
+	private ImageButton lastActionButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +77,37 @@ public class InteractionActivity extends Activity {
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
 
-		final Button b = (Button)findViewById(R.id.sendButton);
-		final TextView editText = (TextView)findViewById(R.id.editText);
-		b.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+		final TextView editText = (TextView) findViewById(R.id.editText);
+		editText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if (editText.getText().toString().trim() != null && !editText.getText().toString().trim().isEmpty()) {
+					sendButtonIcon(R.drawable.ic_action_send_holo_light);
+					lastActionButtonVisibility(View.GONE);
+				} else {
+					sendButtonIcon(R.drawable.ic_allapps);
+					lastActionButtonVisibility(View.VISIBLE);
+				}
+			}			
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+			}
+		});
+		
+		
+		
+		
+		sendButton = (ImageButton)findViewById(R.id.actionButton);
+		lastActionButton = (ImageButton)findViewById(R.id.lastActionButton);
+		sendButtonIcon(R.drawable.ic_allapps);
+		sendButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			sendMessage(party, editText.getText().toString().trim());
 			editText.setText("");
 		}
@@ -83,6 +116,15 @@ public class InteractionActivity extends Activity {
 			if (text != null && !text.isEmpty())
 				sneer().produceInteractionWith(party).sendMessage(text);
 		}});		
+	}
+	
+	private void sendButtonIcon(int resource) {
+		sendButton.setImageResource(resource);
+	}
+	
+	
+	private void lastActionButtonVisibility(int visible) {
+		lastActionButton.setVisibility(visible);
 	}
 	
 	
