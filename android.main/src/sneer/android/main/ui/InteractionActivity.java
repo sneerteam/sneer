@@ -82,13 +82,13 @@ public class InteractionActivity extends Activity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (editText.getText().toString().trim() != null && !editText.getText().toString().trim().isEmpty()) {
-					actionButtonIcon(R.drawable.ic_action_send);
-					lastActionButtonVisibility(View.GONE);
+					actionButton.setImageResource(R.drawable.ic_action_send);
+					lastActionButton.setVisibility(View.GONE);
 				} else {
-					actionButtonIcon(R.drawable.ic_allapps);
-					lastActionButtonVisibility(View.VISIBLE);
+					actionButton.setImageResource(R.drawable.ic_action_new);
+					lastActionButton.setVisibility(View.VISIBLE);
 				}
-			}			
+			}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -97,12 +97,9 @@ public class InteractionActivity extends Activity {
 			public void afterTextChanged(Editable s) {}
 		});
 		
-		
-		
-		
 		actionButton = (ImageButton)findViewById(R.id.actionButton);
 		lastActionButton = (ImageButton)findViewById(R.id.lastActionButton);
-		actionButtonIcon(R.drawable.ic_allapps);
+		actionButton.setImageResource(R.drawable.ic_action_new);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			sendMessage(party, editText.getText().toString().trim());
 			editText.setText("");
@@ -112,16 +109,6 @@ public class InteractionActivity extends Activity {
 			if (text != null && !text.isEmpty())
 				sneer().produceInteractionWith(party).sendMessage(text);
 		}});		
-	}
-	
-	
-	private void actionButtonIcon(int resource) {
-		actionButton.setImageResource(resource);
-	}
-	
-	
-	private void lastActionButtonVisibility(int visible) {
-		lastActionButton.setVisibility(visible);
 	}
 	
 	
@@ -180,6 +167,5 @@ public class InteractionActivity extends Activity {
 			adapter.notifyDataSetChanged();
 		}
 	}
-	
 	
 }
