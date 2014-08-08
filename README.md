@@ -22,7 +22,7 @@ Preparing Workspace for App Development
 
 To use Sneer you can either copy jar file that contains all its dependencies into your project's libs folder, or reference the android-api project in your workspace.
 
-Using the Jar
+Using the Jar in the Build Path
 ----
 
 The last version of the jar file can be downloaded from http://dynamic.sneer.me/dist/sneer-android-api-nodeps
@@ -34,7 +34,7 @@ If you prefer to generate the jar from the source codes, run in this repository:
 
 This will create the file android-api/build/libs/sneer-android-api-nodeps-X.X.X.jar. Copy it into your libs folder and you're good to go.
 
-Depend on the projects directly
+Using the Projects in the Build Path
 ----
 
 Referencing the Sneer projects directly in your workspace is specially useful if you're planning to change Sneer codes. Eclipse refactoring, call hierarchy and some of those facilities work better if you reference the project instead of the jar file.
