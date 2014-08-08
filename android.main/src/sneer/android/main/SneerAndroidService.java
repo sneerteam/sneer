@@ -26,6 +26,7 @@ public class SneerAndroidService extends Service {
 	private ConcurrentMap<PublicKey, PrivateKey> keys = new ConcurrentHashMap<PublicKey, PrivateKey>();
 	private InteractiveSerializer serializer = new InteractiveSerializer();
 
+	@SuppressWarnings("unused")
 	private String friendlyErrorMessage; //Return this to the callers. See how it is set, below.
 	
 	
