@@ -1,4 +1,4 @@
-package sneer.commons;
+package sneer.commons.tests;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,8 @@ import java.io.*;
 import java.util.*;
 
 import org.junit.*;
+
+import sneer.commons.*;
 
 public class InteractiveSerializerTests {
 
