@@ -13,8 +13,8 @@ public class SystemReport {
 		return report.asObservable();
 	}
 
-	/** Causes report() above to emit an updated report with the given info. */
-	public static void updateReport(String tag, String info) {
+	/** Causes report() above to emit an updated report with the given info.toString() associated with the given tag. */
+	public static void updateReport(String tag, Object info) {
 		//
 	}
 
