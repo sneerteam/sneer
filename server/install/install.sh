@@ -24,11 +24,7 @@ mv lein /usr/bin
 
 cd /root
 git clone git://github.com/klauswuestefeld/simploy.git
-git clone git://github.com/sneerteam/networker.git
-git clone git://github.com/sneerteam/server.git
-git clone git://github.com/sneerteam/snapi.git
-git clone git://github.com/sneerteam/android.main.git
-git clone git://github.com/sneerteam/android.chat.git
+git clone git://github.com/sneerteam/sneer.git
 
 cp /root/server/install/sneerServerBoot.sh /etc/init.d/
 chmod +x /etc/init.d/sneerServerBoot.sh
@@ -49,7 +45,7 @@ the artifacts to maven central.
 Do this by creating a /root/snapi/gradle.properties with the following content:
 
 ## properties begin
-signing.keyId=<key ID> 
+signing.keyId=<key ID>
 signing.password=<password>
 signing.secretKeyRingFile=<key ring file>
 
@@ -57,7 +53,7 @@ nexusUsername=KlausWuestefeld
 nexusPassword=<password to nexus/sonatype>
 ## properties end
 
-The key you use to sing the package must be registered at 
+The key you use to sing the package must be registered at
 pool.sks-keyservers.net so nexus server can verify it.
 
 Have a good day.
