@@ -1,14 +1,15 @@
 # Allow running lein as root
 export LEIN_ROOT=yes
 
-# Update networker
-cd ../networker && git pull && ./gradlew uploadArchives && cd -
+# Install necessary project dependencies to local maven cache
+./gradlew install
 
 # Build new server version
-lein do clean, test, uberjar || exit -1
+cd server
+lein do clean, midje, uberjar || exit -1
 
 echo REPLACE UBERJAR
-mv target/*standalone.jar . || exit -1
+mv target/uberjar/*standalone.jar . || exit -1
 
 echo MKDIR LOGS
 mkdir -p logs || exit -1
@@ -20,5 +21,6 @@ pkill -f sneer.server-0.1.0-SNAPSHOT-standalone.jar
 mv logs/log "logs/log-`date +%Y-%m-%d_%H-%M`"
 
 echo START NEW SERVER PROCESS
-java -jar ./sneer.server-0.1.0-SNAPSHOT-standalone.jar > logs/log&
+SERVER_PORT=5555
+java -jar ./sneer.server-0.1.0-SNAPSHOT-standalone.jar $SERVER_PORT  > logs/log&
 echo DONE
