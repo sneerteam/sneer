@@ -26,7 +26,7 @@ cd /root
 git clone git://github.com/klauswuestefeld/simploy.git
 git clone git://github.com/sneerteam/sneer.git
 
-cp /root/server/install/sneerServerBoot.sh /etc/init.d/
+cp /root/sneer/server/install/sneerServerBoot.sh /etc/init.d/
 chmod +x /etc/init.d/sneerServerBoot.sh
 update-rc.d sneerServerBoot.sh defaults 80
 
