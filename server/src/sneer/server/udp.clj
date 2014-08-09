@@ -66,13 +66,14 @@
 
 ;; Tests
 
-;;(send-ping 9999)
+;;(send-ping "localhost" 5555)
+;;(send-ping "dynamic.sneer.me" 5555)
 
-(defn send-ping [echo-port]
-  (with-open [socket (new DatagramSocket (+ 10000 echo-port))]
-    (let [addr (InetSocketAddress. "localhost" echo-port)]
+(defn send-ping [host port]
+  (with-open [socket (new DatagramSocket (+ 10000 port))]
+    (let [addr (InetSocketAddress. host port)]
       (send-value socket [addr {:intent :ping}])
-      (. socket setSoTimeout 100)
+      (. socket setSoTimeout 500)
       (let [[_ pong] (receive-value socket)]
         (println pong)))))
 
