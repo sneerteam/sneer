@@ -1,3 +1,5 @@
+source /root/.android-sdk-installer/env
+
 cd /root/simploy
 git pull
 rm *.class
