@@ -1,8 +1,7 @@
 (ns sneer.server.core
   (:require
    [clojure.core.async :as async :refer [chan >! <! >!! <!! alts!! timeout]]
-   [clojure.java.io :as io]
-   [clojure.edn :as edn]))
+   [clojure.java.io :as io]))
 
 
 (defmacro while-let
@@ -29,6 +28,8 @@
      (while-let ~binding
                 ~@forms)))
 
+
+
 (defn prefixes [path]
   "(1 2 3) -> ([1] [1 2] [1 2 3])"
   (map #(vec (take % path)) (range 1 (inc (count path)))))
@@ -51,7 +52,7 @@
   (java.io.File. dir "path.edn"))
 
 (defn slurp-edn [file]
-  (edn/read-string (slurp file)))
+  #_(edn/read-string (slurp file)))
 
 (defn spit-edn [file value]
   (spit file (pr-str value)))

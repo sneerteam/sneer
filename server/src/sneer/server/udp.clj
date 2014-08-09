@@ -34,31 +34,48 @@
     (. socket receive datagram)
     (data->value datagram)))
 
+(defn is-open [socket]
+  (not (.isClosed socket)))
 
 (defn serve-udp
   "Opens a UDP socket on port, putting received packets into packets-in, sending packets taken from packets-out.
   Server will stop when packets-out is closed."
   [port packets-in packets-out]
-  (println "Opening port " port)
-  (let [socket (new DatagramSocket port)]
 
-    (async/thread
-      (while true
-        (try
-          (let [packet (receive-value socket)]
-            (>!! packets-in packet))
-          (catch Exception e (. e printStackTrace)))))
+  (println "Opening port" port)
+
+  (let [socket (new DatagramSocket port)]
 
     (async/go
       (with-open [socket socket]
         (loop []
           (when-let [packet (<! packets-out)]
             (try
+              (println "<!" packet)
               (send-value socket packet)
               (catch Exception e (. e printStackTrace)))
-            (recur)))))))
+            (recur)))))
+
+    (async/thread
+      (while (is-open socket)
+        (try
+          (let [packet (receive-value socket)]
+            (println ">!!" packet)
+            (>!! packets-in packet))
+          (catch Exception e (. e printStackTrace)))))))
 
 ;; Tests
+
+;;(send-ping 9999)
+
+(defn send-ping [echo-port]
+  (with-open [socket (new DatagramSocket (+ 10000 echo-port))]
+    (let [addr (InetSocketAddress. "localhost" echo-port)]
+      (send-value socket [addr {:intent :ping}])
+      (. socket setSoTimeout 100)
+      (let [[_ pong] (receive-value socket)]
+        (println pong)))))
+
 
 (defn start-echo-server
   "Starts an echo UDP server that echoes whatever UDP packet it receives."
