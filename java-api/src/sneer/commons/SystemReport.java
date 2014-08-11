@@ -15,7 +15,8 @@ public class SystemReport {
 
 	/** Causes report() above to emit an updated report with the given info.toString() associated with the given tag. */
 	public static void updateReport(String tag, Object info) {
-		//
+		report.onNext(tag + ": " + info);
+		//TODO Multiple tags, not just the last one.
 	}
 
 }
