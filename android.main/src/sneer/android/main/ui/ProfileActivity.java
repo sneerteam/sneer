@@ -1,23 +1,31 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerSingleton.*;
+import static sneer.android.main.SneerSingleton.sneer;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.*;
-import sneer.android.main.*;
-import android.app.*;
-import android.content.*;
-import android.graphics.*;
-import android.media.*;
-import android.net.*;
-import android.os.*;
-import android.provider.*;
-import android.text.*;
-import android.view.*;
-import android.widget.*;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.Party;
+import sneer.Profile;
+import sneer.PublicKey;
+import sneer.android.main.R;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 public class ProfileActivity extends Activity {
 
@@ -86,9 +94,10 @@ public class ProfileActivity extends Activity {
 
 
 	private void afterTextChanged(final EditText textView) {
+				
 		textView.addTextChangedListener(new TextWatcher() {
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-	
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			
 			public void afterTextChanged(Editable s) {
 				checkMoreThanOneCharacter(textView);
 			}
@@ -103,8 +112,10 @@ public class ProfileActivity extends Activity {
 		profile.name().subscribe(new Action1<String>() { @Override public void call(String name) {
 			if (name != null && !name.trim().isEmpty()) {
 				firstNameEdit.setText(name);
+				firstNameEdit.setHint(R.string.profile_view_full_name);
 				lastNameEdit.setVisibility(View.GONE);
 			} else {
+				firstNameEdit.setHint(R.string.profile_view_first_name);
 				lastNameEdit.setVisibility(View.VISIBLE);
 			}
 		}});
@@ -224,5 +235,6 @@ public class ProfileActivity extends Activity {
 		if (edt.getText().toString().trim().length() <= 1)
 			edt.setError("Name too short");
 	}
+
 	
 }

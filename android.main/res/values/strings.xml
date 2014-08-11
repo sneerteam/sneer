@@ -39,9 +39,11 @@
     <string name="profile_view_content_description">Your Picture</string>
     <string name="profile_view_first_name">First name</string>
     <string name="profile_view_last_name">Last name</string>
+    <string name="profile_view_full_name">Full name</string>
     <string name="profile_view_preferred_nickname">Preferred nickname (optional)</string>
     <string name="profile_view_country">Country (optional)</string>
     <string name="profile_view_city">City (optional)</string>
+    <string name="profile_error_size_name">Name too short</string>
     <string name="action_save_profile">Save</string>
     <string name="profile_view_location">LOCATION</string>
     <!-- Profile View -->
