@@ -1,6 +1,7 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerSingleton.*;
+import clojure.java.api.*;
 import rx.*;
 import rx.functions.*;
 import sneer.android.main.*;
@@ -8,6 +9,7 @@ import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
 import android.os.*;
+import android.widget.*;
 
 public class MainActivity extends Activity {
 
@@ -22,6 +24,22 @@ public class MainActivity extends Activity {
 		if (!initializeSneerSingleton()) return;
 		
 		startActivity();
+		testCore();
+	}
+
+
+	private void testCore() {
+		try {
+			Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.core"));
+			toast(Clojure.var("sneer.core/new-network").call().toString());
+		} catch (Exception e) {
+			toast(Exceptions.asNiceMessage(e));
+		}
+	}
+	
+	
+	void toast(String message) {
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
 
