@@ -1,4 +1,4 @@
-(ns sneer.server.udp
+(ns sneer.networking.udp
   (:require [sneer.serialization :refer [serialize deserialize]]
             [clojure.core.async :as async :refer [>! <! >!! <!!]])
   (:import [java.net DatagramPacket DatagramSocket SocketAddress InetAddress InetSocketAddress SocketException]))
