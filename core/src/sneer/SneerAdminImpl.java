@@ -223,7 +223,7 @@ public class SneerAdminImpl implements SneerAdmin {
 					
 					@Override
 					public void setPreferredNickname(String newPreferredNickname) {
-						contact.setNickname(newPreferredNickname);
+						fields.pub("preferred-nickname", newPreferredNickname);
 					}
 					
 					@Override
