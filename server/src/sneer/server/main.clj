@@ -15,9 +15,9 @@
   (let [packets-in (async/chan)
         packets-out (async/chan)
         udp-server (udp/serve-udp
-                    port
                     packets-in
-                    (async/map (fn [packet] [(:to packet) (dissoc packet :to)]) [packets-out]))
+                    (async/map (fn [packet] [(:to packet) (dissoc packet :to)]) [packets-out])
+                    port)
         router (router/create-router
                 (async/map (fn [[address packet]] (assoc packet :from address)) [packets-in])
                  packets-out)]

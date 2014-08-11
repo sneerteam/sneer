@@ -40,11 +40,11 @@
 (defn serve-udp
   "Opens a UDP socket on port, putting received packets into packets-in, sending packets taken from packets-out.
   Server will stop when packets-out is closed."
-  [port packets-in packets-out]
+  [packets-in packets-out & [port]]
 
-  (println "Opening port" port)
+  (when port (println "Opening port" port))
 
-  (let [socket (new DatagramSocket port)]
+  (let [socket (if port (new DatagramSocket port) (new DatagramSocket))]
 
     (async/go
       (with-open [socket socket]
