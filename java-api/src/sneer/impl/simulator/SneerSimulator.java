@@ -185,4 +185,10 @@ public class SneerSimulator extends SneerBase {
 		}
 	}
 
+
+	@Override
+	public Contact findContact(String nickname) {
+		throw new UnsupportedOperationException("Not needed until now.");
+	}
+
 }

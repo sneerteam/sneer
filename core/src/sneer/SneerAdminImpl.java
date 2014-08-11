@@ -108,12 +108,27 @@ public class SneerAdminImpl implements SneerAdmin {
 					.field("party", party.key()));
 		}
 
-		public void setNickname(String newNickname) {
+		public void setNickname(String newNickname) throws FriendlyException {
+			newNickname = newNickname.trim();
+			if (newNickname.equals(nickname().mostRecent())) return;
+			
+			String veto = problemWithNewNickname(newNickname);
+			if (veto != null) throw new FriendlyException("Nickname " + veto + ".");
+			
 			tupleSpace.publisher()
 				.audience(prik.publicKey())
 				.type("sneer/profile.nickname")
 				.field("party", party.key())
 				.pub(newNickname);
+		}
+
+		@Override
+		public String problemWithNewNickname(String newNick) {
+			if (newNick.trim().isEmpty()) return "cannot be empty";
+			Contact existing = sneer().findContact(party);
+			if (existing == this) return null;
+			if (existing == null) return null;
+			return "already used for another contact";
 		}
 	}
 	
@@ -294,6 +309,12 @@ public class SneerAdminImpl implements SneerAdmin {
 			
 			@Override
 			public Observable<List<Contact>> contacts() {
+				return null;
+			}
+
+			@Override
+			public Contact findContact(String nickname) {
+				// TODO Auto-generated method stub
 				return null;
 			}
 		};
