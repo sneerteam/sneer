@@ -11,7 +11,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import android.widget.*;
 
-public class DateUtils {
+public class DateTime {
 	
 	public static Subscription plugDate(final TextView textView, Observable<Long> dates) {
 //		TODO Consider sharing a single timer for all interactions in the future if performance degrades

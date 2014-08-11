@@ -1,25 +1,36 @@
 package sneer.impl.simulator;
 
-import sneer.InteractionMenuItem;
+import sneer.*;
 
 public class InteractionMenuItemSimulator implements InteractionMenuItem {
-
+	
+	private String caption;
+	private byte[] icon;
+	
 	@Override
 	public void call() {
 		// TODO Auto-generated method stub
-
 	}
 
-	@Override
-	public byte[] icon() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	public String caption() {
-		// TODO Auto-generated method stub
-		return null;
+		return caption;
 	}
 
+	
+	@Override
+	public byte[] icon() {
+		return icon;
+	}
+
+
+	public void simulateSetCaption(String caption) {
+		this.caption = caption;
+	}
+
+	public void simulateSetIcon(byte[] icon) {
+		this.icon = icon;
+	}
+	
 }

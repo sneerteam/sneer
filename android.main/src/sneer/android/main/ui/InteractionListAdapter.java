@@ -1,6 +1,6 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.ui.utils.DateUtils.*;
+import static sneer.android.main.ui.utils.DateTime.*;
 import static sneer.android.ui.UIUtils.*;
 import rx.*;
 import rx.functions.*;

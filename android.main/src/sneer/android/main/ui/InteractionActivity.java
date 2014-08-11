@@ -9,7 +9,7 @@ import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.InteractionListActivity.EmbeddedOptions;
-import sneer.commons.Comparators;
+import sneer.commons.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -101,13 +101,28 @@ public class InteractionActivity extends Activity {
 		lastActionButton = (ImageButton)findViewById(R.id.lastActionButton);
 		actionButton.setImageResource(R.drawable.ic_action_new);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			sendMessage(party, editText.getText().toString().trim());
+			handleClick(party, editText.getText().toString().trim());
 			editText.setText("");
 		}
 
-		private void sendMessage(final Party party, final String text) {
+		private void handleClick(final Party party, final String text) {
 			if (text != null && !text.isEmpty())
 				sneer().produceInteractionWith(party).sendMessage(text);
+			else
+				openIteractionMenu();
+		}
+
+		private void openIteractionMenu() {
+			final PopupMenu menu = new PopupMenu(InteractionActivity.this, actionButton);
+	
+			sneer().produceInteractionWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionMenuItem>>() { @Override public void call(List<InteractionMenuItem> interactionMenuItems) {
+					for (InteractionMenuItem interactionMenuItem : interactionMenuItems) {
+						menu.getMenu().add(interactionMenuItem.caption());
+					}
+				}
+			});
+			
+			menu.show();
 		}});		
 	}
 	
