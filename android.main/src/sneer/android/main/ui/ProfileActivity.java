@@ -1,31 +1,23 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerSingleton.sneer;
+import static sneer.android.main.SneerSingleton.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import sneer.Party;
-import sneer.Profile;
-import sneer.PublicKey;
-import sneer.android.main.R;
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Toast;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import sneer.*;
+import sneer.android.main.*;
+import android.app.*;
+import android.content.*;
+import android.graphics.*;
+import android.media.*;
+import android.net.*;
+import android.os.*;
+import android.provider.*;
+import android.text.*;
+import android.view.*;
+import android.widget.*;
 
 public class ProfileActivity extends Activity {
 
