@@ -19,11 +19,16 @@ public class SystemReport {
 	}
 
 	
-	/** Causes report() above to emit an updated report with the given info.toString() associated with the given tag. */
-	synchronized
+	/** Causes report() above to emit an updated report with the given info.toString() associated with the given tag. */	
 	public static void updateReport(String tag, Object info) {
+		subject.onNext(updateReportAndGetLatest(tag, info));
+	}
+
+	
+	synchronized
+	private static String updateReportAndGetLatest(String tag, Object info) {
 		infosByTag.put(tag, info.toString());
-		subject.onNext(latestReport());
+		return latestReport();
 	}
 
 	
