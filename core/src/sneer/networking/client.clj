@@ -14,7 +14,7 @@
       (let [server-addr (InetSocketAddress. (or server-host "dynamic.sneer.me") (or server-port 5555))
             udp-server (udp/serve-udp packets-in packets-out)
             ping [server-addr {:intent :ping}]]
-                                        ; server ping loop
+        ; server ping loop
         (async/go-loop []
           (when  (>! packets-out ping)
             (<! (async/timeout 20000))
