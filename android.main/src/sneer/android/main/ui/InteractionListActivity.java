@@ -162,7 +162,7 @@ public class InteractionListActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			navigateToProfile();
+			navigateTo(ProfileActivity.class);
 			break;
 		case R.id.action_add_contact:
 			showContactAdd();
@@ -172,6 +172,9 @@ public class InteractionListActivity extends Activity {
 			break;
 		case R.id.action_copy_pk:
 			copyYoursPublicKey();
+			break;
+		case R.id.action_advanced:
+			navigateTo(SystemReportActivity.class);
 			break;
 		}
 
@@ -207,10 +210,8 @@ public class InteractionListActivity extends Activity {
 	}
 
 	
-	private void navigateToProfile() {
-		Intent intent = new Intent();
-		intent.setClass(this, ProfileActivity.class);
-		startActivity(intent);
+	private void navigateTo(Class<?> class1) {
+		startActivity(new Intent().setClass(this, class1));
 	}
 
 	

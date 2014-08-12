@@ -21,5 +21,9 @@
         android:id="@+id/action_copy_pk"
         android:orderInCategory="103"
         android:title="@string/action_copy_pk"/>
+    <item
+        android:id="@+id/action_advanced"
+        android:orderInCategory="104"
+        android:title="@string/action_advanced"/>
 
 </menu>
