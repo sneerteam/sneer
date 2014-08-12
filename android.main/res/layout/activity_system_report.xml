@@ -9,7 +9,7 @@
     tools:context="sneer.android.main.SystemReportActivity" >
 
     <ScrollView
-        android:id="@+id/scrollerView"
+        android:id="@+id/scrollView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:fillViewport="true"

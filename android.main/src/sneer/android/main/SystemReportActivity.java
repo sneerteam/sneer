@@ -10,14 +10,16 @@ import android.widget.*;
 
 public class SystemReportActivity extends Activity {
 
-	TextView reportView;
+	TextView mReportView;
+	ScrollView mScrollView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_system_report);
 		
-		reportView = (TextView)findViewById(R.id.reportView);
+		mReportView = (TextView)findViewById(R.id.reportView);
+		mScrollView = (ScrollView) findViewById(R.id.scrollView);
 		
 		report();
 	}
@@ -42,7 +44,8 @@ public class SystemReportActivity extends Activity {
 	
 	private void report() {
 		SystemReport.report().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {  @Override public void call(String reportMessage) {
-			reportView.setText(reportMessage);
+			mReportView.setText(reportMessage);
+			mScrollView.fullScroll(View.FOCUS_DOWN);
 		}});
 	}
 }
