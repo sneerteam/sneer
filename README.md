@@ -36,7 +36,7 @@ This will create the file android-api/build/libs/sneer-android-api-nodeps-X.X.X.
 
 Place the jar file in your app's libs folder and you're good to go.
 
-2) Using the Projects in the Build Path
+2) Referencing Sneer Code Projects
 ----
 
 Another option is referencing the Sneer projects directly in your workspace. This is specially useful if you're planning to edit Sneer code. Eclipse refactoring, call hierarchy and some of those facilities work better if you reference the project instead of the jar file.
