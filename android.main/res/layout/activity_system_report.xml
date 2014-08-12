@@ -9,6 +9,7 @@
     tools:context="sneer.android.main.SystemReportActivity" >
 
     <TextView
+        android:id="@+id/reportView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dummy_text" />
