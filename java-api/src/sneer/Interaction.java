@@ -21,7 +21,7 @@ public interface Interaction {
 	
 	
 	Comparator<Interaction> MOST_RECENT_FIRST = new Comparator<Interaction>() {  @Override public int compare(Interaction i1, Interaction i2) {
-		return Comparators.compare(i1.mostRecentEventTimestamp().mostRecent(), i2.mostRecentEventTimestamp().mostRecent());
+		return Comparators.compare(i1.mostRecentEventTimestamp().current(), i2.mostRecentEventTimestamp().current());
 	}};
 	
 }

@@ -35,7 +35,7 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 		
 		@Override
-		public T mostRecent() {
+		public T current() {
 			return filter.localTuples()
 					.map(Tuple.TO_PAYLOAD)
 					.cast(clazz)
@@ -110,7 +110,7 @@ public class SneerAdminImpl implements SneerAdmin {
 
 		public void setNickname(String newNickname) throws FriendlyException {
 			newNickname = newNickname.trim();
-			if (newNickname.equals(nickname().mostRecent())) return;
+			if (newNickname.equals(nickname().current())) return;
 			
 			String veto = problemWithNewNickname(newNickname);
 			if (veto != null) throw new FriendlyException("Nickname " + veto + ".");

@@ -116,7 +116,7 @@ public class InteractionActivity extends Activity {
 		private void openIteractionMenu() {
 			final PopupMenu menu = new PopupMenu(InteractionActivity.this, actionButton);
 	
-			List<InteractionMenuItem> menuItems = sneer().produceInteractionWith(party).menu().mostRecent();
+			List<InteractionMenuItem> menuItems = sneer().produceInteractionWith(party).menu().current();
 			for (final InteractionMenuItem item : menuItems)
 				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
 					item.call();
@@ -160,7 +160,7 @@ public class InteractionActivity extends Activity {
 	private void navigateToProfile() {
 		Intent intent = new Intent();
 		intent.setClass(this, ProfileActivity.class);
-		intent.putExtra("partyPuk", party.publicKey().mostRecent());
+		intent.putExtra("partyPuk", party.publicKey().current());
 		startActivity(intent);
 	}
 
@@ -168,9 +168,9 @@ public class InteractionActivity extends Activity {
 	private void launchNewInteraction() {
 		Intent intent = new Intent(embeddedOptions.interactionAction);
 		intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
-		intent.putExtra("myPrivateKey", new ClientPrivateKey(sneer().self().publicKey().mostRecent()));
-		intent.putExtra("contactNickname", sneer().findContact(party).nickname().mostRecent());
-		intent.putExtra("contactPuk", party.publicKey().mostRecent());
+		intent.putExtra("myPrivateKey", new ClientPrivateKey(sneer().self().publicKey().current()));
+		intent.putExtra("contactNickname", sneer().findContact(party).nickname().current());
+		intent.putExtra("contactPuk", party.publicKey().current());
 		startActivity(intent);
 	}
 	

@@ -31,7 +31,7 @@ public class ObservedSubject<T> {
 		return new Observed<T>() {
 
 			@Override
-			public T mostRecent() {
+			public T current() {
 				return mostRecent;
 			}
 

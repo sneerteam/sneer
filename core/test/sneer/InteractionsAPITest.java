@@ -27,7 +27,7 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 	@Test
 	public void myOwnPublicKey() {
 
-		assertEquals(prikA.publicKey(), sneerA.self().publicKey().mostRecent());
+		assertEquals(prikA.publicKey(), sneerA.self().publicKey().current());
 
 		assertEqualsUntilNow(sneerA.self().publicKey().observable(), prikA.publicKey());
 
@@ -38,7 +38,7 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 
 		Party someone = sneerA.produceParty(prikB.publicKey());
 
-		assertEquals(prikB.publicKey(), someone.publicKey().mostRecent());
+		assertEquals(prikB.publicKey(), someone.publicKey().current());
 
 	}
 
@@ -81,7 +81,7 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 
 		Contact contactB = sneerA.findContact(partyB);
 
-		assertEquals("Party Boy", contactB.nickname().mostRecent());
+		assertEquals("Party Boy", contactB.nickname().current());
 
 		ReplaySubject<String> nicknames = ReplaySubject.create();
 

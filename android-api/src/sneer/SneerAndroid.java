@@ -67,7 +67,7 @@ public class SneerAndroid {
 					}
 					
 					@Override
-					public String mostRecent() {
+					public String current() {
 						return (String) getExtra("contactNickname");
 					}
 				};

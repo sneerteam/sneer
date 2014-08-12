@@ -14,7 +14,7 @@ public interface Contact {
 	String problemWithNewNickname(String newNick);
 	
 	Comparator<Contact> BY_NICKNAME = new Comparator<Contact>() { @Override public int compare(Contact c1, Contact c2) {
-		return c1.nickname().mostRecent().compareToIgnoreCase(c2.nickname().mostRecent());
+		return c1.nickname().current().compareToIgnoreCase(c2.nickname().current());
 	}};
 
 	

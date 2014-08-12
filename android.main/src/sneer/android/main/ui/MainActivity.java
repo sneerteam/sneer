@@ -266,14 +266,14 @@ public class MainActivity extends Activity {
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "My Sneer public key");
 		sharingIntent.putExtra(Intent.EXTRA_TEXT, sneer().self().publicKey()
-				.mostRecent().toString());
+				.current().toString());
 		startActivity(sharingIntent);
 	}
 
 	private void copyYoursPublicKey() {
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 		ClipData clip = ClipData.newPlainText("Public Key", sneer().self()
-				.publicKey().mostRecent().toString());
+				.publicKey().current().toString());
 		clipboard.setPrimaryClip(clip);
 	}
 
@@ -282,7 +282,7 @@ public class MainActivity extends Activity {
 		intent.setClass(this, InteractionActivity.class);
 		intent.putExtra("embeddedOptions", embeddedOptions);
 		intent.putExtra("partyPuk", interaction.party().publicKey()
-				.mostRecent());
+				.current());
 		startActivity(intent);
 	}
 

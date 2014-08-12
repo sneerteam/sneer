@@ -78,7 +78,7 @@ public class InteractionSimulator implements Interaction {
 
 
 	private List<InteractionEvent> eventsWith(InteractionEvent event, Comparator<InteractionEvent> order) {
-		List<InteractionEvent> ret = new ArrayList<InteractionEvent>(events.observed().mostRecent());
+		List<InteractionEvent> ret = new ArrayList<InteractionEvent>(events.observed().current());
 		ret.add(event);
 		Collections.sort(ret, order);
 		return ret;
@@ -108,7 +108,7 @@ public class InteractionSimulator implements Interaction {
 	
 	
 	private List<InteractionMenuItem> menuItemsWith(InteractionMenuItem menuItem, Comparator<InteractionMenuItem> order) {
-		List<InteractionMenuItem> ret = new ArrayList<InteractionMenuItem>(menuItems.observed().mostRecent());
+		List<InteractionMenuItem> ret = new ArrayList<InteractionMenuItem>(menuItems.observed().current());
 		ret.add(menuItem);
 		Collections.sort(ret, order);
 		return ret;
