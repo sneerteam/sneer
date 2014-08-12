@@ -1,5 +1,6 @@
 package sneer.android.main;
 
+import rx.functions.*;
 import sneer.commons.*;
 import android.app.*;
 import android.os.*;
@@ -39,9 +40,8 @@ public class SystemReportActivity extends Activity {
 
 	
 	private void report() {
-		SystemReport.updateReport("Shields On", true);
-		SystemReport.updateReport("Phasers", "Stun");
-		String report = SystemReport.report().toBlockingObservable().first();
-		reportView.setText(report);
+		SystemReport.report().subscribe(new Action1<String>() {  @Override public void call(String reportMessage) {
+			reportView.setText(reportMessage);
+		}});
 	}
 }
