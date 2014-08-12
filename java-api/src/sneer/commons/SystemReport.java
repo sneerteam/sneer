@@ -10,12 +10,17 @@ import rx.subjects.*;
 public class SystemReport {
 
 	private static final BehaviorSubject<String> subject = BehaviorSubject.create("");
-	private static final SortedMap<String, String> infosByTag = new TreeMap<String, String>();
+	private static final SortedMap<String, Object> infosByTag = new TreeMap<String, Object>();
 
-	
 	/** @return An observable that emits up-to-date reports about the system. */
 	public static Observable<String> report() {
 		return subject.asObservable();
+	}
+
+	
+	/** Causes report() above to emit an updated report with the current time associated with the given event tag. */	
+	public static void updateReport(String tag) {
+		updateReport(tag, new Date());
 	}
 
 	
@@ -27,16 +32,24 @@ public class SystemReport {
 	
 	synchronized
 	private static String updateReportAndGetLatest(String tag, Object info) {
-		infosByTag.put(tag, info.toString());
+		infosByTag.put(tag, info);
 		return latestReport();
 	}
 
 	
 	private static String latestReport() {
 		StringBuilder ret = new StringBuilder();
-		for (Entry<String, String> entry : infosByTag.entrySet())
-			ret.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n\n");
+		for (Entry<String, Object> entry : infosByTag.entrySet())
+			ret.append(entry.getKey()).append(": ").append(pretty(entry.getValue())).append("\n\n");
 		return ret.toString();
+	}
+
+
+	private static String pretty(Object info) {
+		if (info instanceof Date) {
+			//return a prettydate.
+		}
+		return info.toString();
 	}
 
 }

@@ -3,6 +3,7 @@ package sneer.impl.simulator;
 import static sneer.commons.exceptions.Exceptions.*;
 import sneer.*;
 import sneer.admin.*;
+import sneer.commons.*;
 import sneer.impl.keys.*;
 
 public class SneerAdminSimulator implements SneerAdmin {
@@ -10,6 +11,9 @@ public class SneerAdminSimulator implements SneerAdmin {
 	private PrivateKey privateKey;
 	private SneerSimulator sneer;
 
+	{
+		SystemReport.updateReport("simulator.start");
+	}
 	
 	@Override
 	public void initialize(PrivateKey prik) {
