@@ -11,9 +11,25 @@ import android.os.*;
 
 public class SneerAndroid {
 
+// This is how one uses the startInteractionList() method to start Sneer with interactions filtered by tuple type:
+//
+//	@Override
+//	protected void onResume() {
+//		super.onResume();
+//		
+//		String title = "RPS Challenges";
+//		String type = "rock-paper-scissors/move";
+//		String newInteractionLabel = "Challenge!!";
+//		String newInteractionAction = "sneer.tutorial.rockpaperscissors.CHALLENGE";
+//		
+//		SneerAndroid.startInteractionList(this, title, type, newInteractionLabel, newInteractionAction);
+//	}
+
+	
+	public static final String TYPE = "type";
+
 	private static final String INTERACTION_LIST = "sneer.android.main.INTERACTION_LIST";
 	public static final String TITLE = "title";
-	public static final String TYPE = "type";
 	public static final String NEW_INTERACTION_LABEL = "newInteractionLabel";
 	public static final String NEW_INTERACTION_ACTION = "newInteractionAction";
 	public static final String DISABLE_MENUS = "disable-menus";
