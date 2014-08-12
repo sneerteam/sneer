@@ -46,8 +46,6 @@ To do so, import the Sneer projects into the workspace and:
 - Open your app project's properties
 - Go to Android Settings > Add...
 - Select the android-api project
-Still in the properties window:
-- Java Build Path > Projects > Add...
+- Still in the properties window: Java Build Path > Projects > Add...
 - Select the android-api project again
-Still in the Java Build Path:
-- Order and Export: make sure Sneer's android-api project comes before "Android Dependencies" in that list
+- Still in the Java Build Path: Order and Export. Make sure Sneer's android-api project comes before "Android Dependencies" in that list.
