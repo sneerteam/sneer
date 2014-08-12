@@ -6,7 +6,7 @@ import rx.*;
 public interface Observed<T> {
 	
 	/** @return The most recent item emitted by observable(). */
-	public T mostRecent();
+	public T current();
 	
 	/** @return An Observable that will emit the mostRecent() and future values. */
 	public Observable<T> observable();
