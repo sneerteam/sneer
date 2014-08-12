@@ -42,20 +42,6 @@ public class SneerSimulator extends SneerBase {
 		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("maicon.jpg")), "SCISSORS");
 		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("wesley.jpg")), "ROCK");
 		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("carla.jpg")), "PAPER");
-	
-		createInteractionMenuItems();
-	}
-
-
-	private void createInteractionMenuItems() {
-		InteractionMenuItemSimulator item = new InteractionMenuItemSimulator();
-		item.simulateSetCaption("Send Bitcoins");
-		item.simulateSetCaption("Play Toroidal Go");
-		item.simulateSetCaption("Send my location");
-		item.simulateSetCaption("Send photo");
-		item.simulateSetCaption("Send voice message");
-		item.simulateSetCaption("Play Rock Paper Scissors");
-		item.simulateSetCaption("Play Tic Tac Toe");
 	}
 
 

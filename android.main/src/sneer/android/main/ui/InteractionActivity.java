@@ -17,6 +17,7 @@ import android.graphics.drawable.*;
 import android.os.*;
 import android.text.*;
 import android.view.*;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
@@ -115,18 +116,19 @@ public class InteractionActivity extends Activity {
 		private void openIteractionMenu() {
 			final PopupMenu menu = new PopupMenu(InteractionActivity.this, actionButton);
 	
-			sneer().produceInteractionWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionMenuItem>>() { @Override public void call(List<InteractionMenuItem> interactionMenuItems) {
-					for (InteractionMenuItem interactionMenuItem : interactionMenuItems) {
-						menu.getMenu().add(interactionMenuItem.caption());
-					}
-				}
-			});
-			
+			List<InteractionMenuItem> menuItems = sneer().produceInteractionWith(party).menu().mostRecent();
+			for (final InteractionMenuItem item : menuItems)
+				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
+					item.call();
+					Toast.makeText(InteractionActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
+					return true;
+				}});
+
 			menu.show();
 		}});		
 	}
 	
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (embeddedOptions.interactionAction == null) {

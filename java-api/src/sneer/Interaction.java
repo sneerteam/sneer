@@ -17,7 +17,7 @@ public interface Interaction {
 	/** Publish a new message with isOwn() true, with party() as the audience and using System.currentTimeMillis() as the timestamp. */
 	void sendMessage(String content);
 
-	Observable<List<InteractionMenuItem>> menu();
+	Observed<List<InteractionMenuItem>> menu();
 	
 	
 	Comparator<Interaction> MOST_RECENT_FIRST = new Comparator<Interaction>() {  @Override public int compare(Interaction i1, Interaction i2) {

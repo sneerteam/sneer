@@ -7,9 +7,14 @@ public class InteractionMenuItemSimulator implements InteractionMenuItem {
 	private String caption;
 	private byte[] icon;
 	
+	InteractionMenuItemSimulator(String caption) {
+		this.caption = caption;
+	}
+
+
 	@Override
 	public void call() {
-		// TODO Auto-generated method stub
+		System.out.println(caption + " called");
 	}
 
 	
@@ -24,13 +29,4 @@ public class InteractionMenuItemSimulator implements InteractionMenuItem {
 		return icon;
 	}
 
-
-	public void simulateSetCaption(String caption) {
-		this.caption = caption;
-	}
-
-	public void simulateSetIcon(byte[] icon) {
-		this.icon = icon;
-	}
-	
 }

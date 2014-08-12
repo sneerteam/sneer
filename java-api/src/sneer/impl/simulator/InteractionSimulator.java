@@ -1,22 +1,23 @@
 package sneer.impl.simulator;
 
 import static sneer.InteractionEvent.*;
+import static sneer.InteractionMenuItem.*;
 import static sneer.commons.Lists.*;
 
 import java.util.*;
 
 import rx.Observable;
 import sneer.*;
-import sneer.commons.exceptions.*;
 import sneer.rx.*;
 
 public class InteractionSimulator implements Interaction {
 
-	@SuppressWarnings("unchecked")
-	private static final List<InteractionEvent> NO_EVENTS = Collections.EMPTY_LIST;
-
 	private final Party party;
-	private final ObservedSubject<List<InteractionEvent>> events = ObservedSubject.create(NO_EVENTS);
+	
+	@SuppressWarnings("unchecked")
+	private final ObservedSubject<List<InteractionEvent>> events = ObservedSubject.create((List<InteractionEvent>)Collections.EMPTY_LIST);
+	@SuppressWarnings("unchecked")
+	private final ObservedSubject<List<InteractionMenuItem>> menuItems = ObservedSubject.create((List<InteractionMenuItem>)Collections.EMPTY_LIST);
 	private final ObservedSubject<Long> mostRecentEventTimestamp = ObservedSubject.create(0L);
 	private final ObservedSubject<String> mostRecentEventContent = ObservedSubject.create("");
 	
@@ -25,6 +26,14 @@ public class InteractionSimulator implements Interaction {
 		this.party = party;
 		sendMessage("Vai ter festa!!!! Uhuu!!!");
 		simulateReceivedMessage("Onde? Onde?? o0");
+		
+		addMenuItem(new InteractionMenuItemSimulator("Send Bitcoins"));
+		addMenuItem(new InteractionMenuItemSimulator("Play Toroidal Go"));
+		addMenuItem(new InteractionMenuItemSimulator("Send my location"));
+		addMenuItem(new InteractionMenuItemSimulator("Send photo"));
+		addMenuItem(new InteractionMenuItemSimulator("Send voice message"));
+		addMenuItem(new InteractionMenuItemSimulator("Play Rock Paper Scissors"));
+		addMenuItem(new InteractionMenuItemSimulator("Play Tic Tac Toe"));
 	}
 
 
@@ -87,8 +96,22 @@ public class InteractionSimulator implements Interaction {
 
 
 	@Override
-	public Observable<List<InteractionMenuItem>> menu() {
-		throw new NotImplementedYet();
+	public Observed<List<InteractionMenuItem>> menu() {
+		return menuItems.observed();
+	}
+	
+	
+	private void addMenuItem(InteractionMenuItem menuItem) {
+		List<InteractionMenuItem> newMenuItems = menuItemsWith(menuItem, BY_ALPHABETICAL_ORDER);
+		menuItems.set(newMenuItems);
+	}
+	
+	
+	private List<InteractionMenuItem> menuItemsWith(InteractionMenuItem menuItem, Comparator<InteractionMenuItem> order) {
+		List<InteractionMenuItem> ret = new ArrayList<InteractionMenuItem>(menuItems.observed().mostRecent());
+		ret.add(menuItem);
+		Collections.sort(ret, order);
+		return ret;
 	}
 
 }

@@ -13,7 +13,7 @@ public class InteractionEvent {
 	public static final Comparator<InteractionEvent> BY_TIME_RECEIVED = new Comparator<InteractionEvent>() { @Override public int compare(InteractionEvent e1, InteractionEvent e2) {
 		return Comparators.compare(e1.timestampReceived(), e2.timestampReceived());
 	}};
-
+	
 	
 	private final String content;
 	
