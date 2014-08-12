@@ -3,6 +3,8 @@ package sneer.commons;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.ocpsoft.prettytime.*;
+
 import rx.Observable;
 import rx.subjects.*;
 
@@ -46,10 +48,11 @@ public class SystemReport {
 
 
 	private static String pretty(Object info) {
-		if (info instanceof Date) {
-			//return a prettydate.
-		}
-		return info.toString();
+		Object ret = info;
+		if (ret instanceof Date)  
+			ret = new PrettyTime().format((Date)ret);
+		
+		return ret.toString();
 	}
 
 }
