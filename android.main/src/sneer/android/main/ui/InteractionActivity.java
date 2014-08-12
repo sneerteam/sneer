@@ -8,7 +8,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
-import sneer.android.main.ui.InteractionListActivity.EmbeddedOptions;
+import sneer.android.main.ui.MainActivity.EmbeddedOptions;
 import sneer.commons.*;
 import android.app.*;
 import android.content.*;

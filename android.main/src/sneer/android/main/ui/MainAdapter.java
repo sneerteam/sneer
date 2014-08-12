@@ -13,7 +13,7 @@ import android.graphics.Shader.TileMode;
 import android.view.*;
 import android.widget.*;
 
-public class InteractionListAdapter extends ArrayAdapter<Interaction> {
+public class MainAdapter extends ArrayAdapter<Interaction> {
 
 	private Activity activity;
     int layoutResourceId;
@@ -21,7 +21,7 @@ public class InteractionListAdapter extends ArrayAdapter<Interaction> {
 	private final Func1<Party, Observable<byte[]>> imageProvider;
 	private CompositeSubscription subscriptions;
     
-    public InteractionListAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider, Func1<Party, Observable<byte[]>> imageProvider) {
+    public MainAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider, Func1<Party, Observable<byte[]>> imageProvider) {
         super(activity, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         this.activity = activity;

@@ -27,20 +27,11 @@
 
         <activity
             android:name=".ui.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_interaction_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.InteractionListActivity"
-            android:label="@string/title_interaction_list" >
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="sneer.android.main.INTERACTION_LIST" />
             </intent-filter>
         </activity>
         <activity
@@ -62,10 +53,10 @@
         <activity
             android:name=".SystemReportActivity"
             android:label="@string/title_activity_system_report"
-            android:parentActivityName=".ui.InteractionListActivity" >
+            android:parentActivityName=".ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.main.ui.InteractionListActivity" />
+                android:value="sneer.android.main.ui.MainActivity" />
         </activity>
     </application>
 
