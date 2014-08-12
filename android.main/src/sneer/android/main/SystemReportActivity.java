@@ -1,5 +1,6 @@
 package sneer.android.main;
 
+import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.commons.*;
 import android.app.*;
@@ -40,7 +41,7 @@ public class SystemReportActivity extends Activity {
 
 	
 	private void report() {
-		SystemReport.report().subscribe(new Action1<String>() {  @Override public void call(String reportMessage) {
+		SystemReport.report().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {  @Override public void call(String reportMessage) {
 			reportView.setText(reportMessage);
 		}});
 	}
