@@ -20,9 +20,9 @@ You can run the above every time you want a clean rebuild.
 Preparing Workspace for App Development
 ====
 
-To use Sneer you can either copy jar file that contains all its dependencies into your project's libs folder, or reference the android-api project in your workspace.
+Two options:
 
-Using the Jar in the Build Path
+1) Using the Sneer Android API Jar
 ----
 
 The last version of the jar file can be downloaded from http://dynamic.sneer.me/dist/sneer-android-api-nodeps
@@ -32,17 +32,22 @@ If you prefer to generate the jar from the source codes, run in this repository:
 ./gradlew jarNodeps
 ```
 
-This will create the file android-api/build/libs/sneer-android-api-nodeps-X.X.X.jar. Copy it into your libs folder and you're good to go.
+This will create the file android-api/build/libs/sneer-android-api-nodeps-X.X.X.jar.
 
-Using the Projects in the Build Path
+Place the jar file in your app's libs folder and you're good to go.
+
+2) Using the Projects in the Build Path
 ----
 
-Referencing the Sneer projects directly in your workspace is specially useful if you're planning to change Sneer codes. Eclipse refactoring, call hierarchy and some of those facilities work better if you reference the project instead of the jar file.
+Another option is referencing the Sneer projects directly in your workspace. This is specially useful if you're planning to edit Sneer code. Eclipse refactoring, call hierarchy and some of those facilities work better if you reference the project instead of the jar file.
 
 To do so, import the Sneer projects into the workspace and:
 
-- right click your project then Properties
-- go to Android settings
-- click Add... and select the android-api project
-- still in the settings window go to Java Build Path -> Projects -> Add... and select again the android-api project
-- and still in the Java Build Path -> Order and Export, make sure Sneer's android-api project comes before "Android Dependencies" in that list
+- Open your app project's properties
+- Go to Android Settings > Add...
+- Select the android-api project
+Still in the properties window:
+- Java Build Path > Projects > Add...
+- Select the android-api project again
+Still in the Java Build Path:
+- Order and Export: make sure Sneer's android-api project comes before "Android Dependencies" in that list
