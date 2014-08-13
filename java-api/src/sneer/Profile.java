@@ -4,8 +4,8 @@ import rx.*;
 
 public interface Profile {
 
-	Observable<String> name();
-	void setName(String string);
+	Observable<String> ownName();
+	void setOwnName(String newOwnName);
 	
 	Observable<String> preferredNickname();
 	void setPreferredNickname(String newPreferredNickname);

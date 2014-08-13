@@ -132,7 +132,7 @@ public class SneerSimulator extends SneerBase {
 
 
 	public void setOwnName(String newName) {
-		self.setName(newName);
+		self.setOwnName(newName);
 	}
 	
 	

@@ -25,7 +25,7 @@ public interface Sneer {
 	
 	Party produceParty(PublicKey publicKey);
 	/** @return One of the following, if available, in order of priority: Nickname (if party is a Contact); "? " + party's name, if name is available; "? PUK: " + publicKey. */
-	Observed<String> labelFor(Party party);
+	Observed<String> nameFor(Party party);
 
 	/** All Interactions you have had, ordered by most recent first. */
 	Observable<List<Interaction>> interactions();

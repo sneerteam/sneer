@@ -8,7 +8,7 @@ import sneer.rx.*;
 public abstract class SneerBase implements Sneer {
 
 	@Override
-	public Observed<String> labelFor(Party party) {
+	public Observed<String> nameFor(Party party) {
 		//TODO React party becoming a new contact or being deleted as a contact. Use party name before public key, if available.
 		Contact contact = findContact(party);
 		Observable<String> obs = contact == null

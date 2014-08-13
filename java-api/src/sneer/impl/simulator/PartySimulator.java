@@ -46,13 +46,13 @@ public class PartySimulator implements Party, Profile {
 	/////////////////////// Profile
 
 	@Override
-	public Observable<String> name() {
+	public Observable<String> ownName() {
 		return name.asObservable();
 	}
 
 	
 	@Override
-	public void setName(String newName) {
+	public void setOwnName(String newName) {
 		check(isSelf);
 		simulateSetName(newName);
 	}
