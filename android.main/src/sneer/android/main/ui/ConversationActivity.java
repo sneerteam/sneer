@@ -62,9 +62,9 @@ public class ConversationActivity extends Activity {
 			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
 		}});
 
-		sneer().produceConversationWith(party).messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> messages) {
+		sneer().produceConversationWith(party).messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
 			messages.clear();
-			messages.addAll(messages);
+			messages.addAll(msgs);
 			adapter.notifyDataSetChanged();
 		}});
 

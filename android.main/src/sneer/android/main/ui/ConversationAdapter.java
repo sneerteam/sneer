@@ -47,8 +47,8 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
         	parent,
         	false);
         
-        findTextView(ret, R.id.conversationContent).setText(message.content());
-        findTextView(ret, R.id.conversationTime).setText(message.timeSent());
+        findTextView(ret, R.id.messageContent).setText(message.content());
+        findTextView(ret, R.id.messageTime).setText(message.timeSent());
         
         if (!message.isOwn()) {
         	sneer.nameFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
