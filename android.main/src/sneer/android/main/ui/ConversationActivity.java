@@ -53,7 +53,7 @@ public class ConversationActivity extends Activity {
 		
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
-		sneer().labelFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
+		sneer().nameFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
 			actionBar.setTitle(label);
 		}});
 		

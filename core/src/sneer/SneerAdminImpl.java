@@ -222,12 +222,12 @@ public class SneerAdminImpl implements SneerAdmin {
 				return new Profile() {
 					
 					@Override
-					public Observable<String> name() {
+					public Observable<String> ownName() {
 						return fields.get(String.class, "name");
 					}
 					
 					@Override
-					public void setName(String name) {
+					public void setOwnName(String name) {
 						fields.pub("name", name);
 					}
 					
@@ -286,7 +286,7 @@ public class SneerAdminImpl implements SneerAdmin {
 			}
 			
 			@Override
-			public Observed<String> labelFor(Party party) {
+			public Observed<String> nameFor(Party party) {
 				// TODO Auto-generated method stub
 				return null;
 			}

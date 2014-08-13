@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
 			actionBar.setTitle(embeddedOptions.title);
 		}
 
-		sneer().profileFor(sneer().self()).name()
+		sneer().profileFor(sneer().self()).ownName()
 				.subscribe(new Action1<String>() {
 					@Override
 					public void call(String label) {
@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
 				new Func1<Party, Observable<String>>() {
 					@Override
 					public Observable<String> call(Party party) {
-						return sneer().labelFor(party).observable();
+						return sneer().nameFor(party).observable();
 					}
 				}, new Func1<Party, Observable<byte[]>>() {
 					@Override
@@ -154,7 +154,7 @@ public class MainActivity extends Activity {
 			ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		interaction = adapter.getItem(info.position);
-		plugHeaderTitle(menu, sneer().labelFor(interaction.party())
+		plugHeaderTitle(menu, sneer().nameFor(interaction.party())
 				.observable());
 		getMenuInflater().inflate(R.menu.long_click, menu);
 	}
@@ -339,7 +339,7 @@ public class MainActivity extends Activity {
 	}
 
 	private Observable<String> ownName() {
-		return sneer().profileFor(sneer().self()).name();
+		return sneer().profileFor(sneer().self()).ownName();
 	}
 
 }

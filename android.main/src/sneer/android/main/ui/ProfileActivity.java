@@ -101,7 +101,7 @@ public class ProfileActivity extends Activity {
 	
 	
 	private void loadProfile() {
-		profile.name().subscribe(new Action1<String>() { @Override public void call(String name) {
+		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) {
 			if (name != null && !name.trim().isEmpty()) {
 				firstNameEdit.setText(name);
 				firstNameEdit.setHint(R.string.profile_view_full_name);
@@ -139,7 +139,7 @@ public class ProfileActivity extends Activity {
 	
 	public void saveProfile() {
 		if (firstNameEdit.getText().toString().trim().length() > 1 && lastNameEdit.getText().toString().trim().length() > 1) 
-			profile.setName(firstNameEdit.getText() + " " + lastNameEdit.getText());
+			profile.setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
 		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
 		profile.setPreferredNickname(preferredNickname);
