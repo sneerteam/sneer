@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 		if (!initializeSneerSingleton()) return;
 
 		startActivity();
-		testCore();
+		startCore();
 
 		makeInteractionList();
 	}
@@ -292,11 +292,10 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 	}
 
-	/** MainActivity stuff */
-	private void testCore() {
+	private void startCore() {
 		try {
-			// Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.core"));
-			// toast(Clojure.var("sneer.core/new-network").call().toString());
+			// Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.networking.client"));
+			// toast(Clojure.var("sneer.networking.client/start").call().toString());
 		} catch (Exception e) {
 			toast(Exceptions.asNiceMessage(e));
 		}
