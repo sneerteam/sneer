@@ -168,7 +168,6 @@ public class ConversationActivity extends Activity {
 	private void launchNewInteraction() {
 		Intent intent = new Intent(embeddedOptions.interactionAction);
 		intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
-		intent.putExtra("myPrivateKey", new ClientPrivateKey(sneer().self().publicKey().current()));
 		intent.putExtra("contactNickname", sneer().findContact(party).nickname().current());
 		intent.putExtra(SneerAndroid.PARTY_PUK, party.publicKey().current());
 		startActivity(intent);

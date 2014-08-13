@@ -8,6 +8,7 @@ import rx.Observable;
 import rx.functions.*;
 import rx.schedulers.*;
 import sneer.*;
+import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 
 public abstract class LocalTuplesFactory {
@@ -60,7 +61,7 @@ public abstract class LocalTuplesFactory {
 	protected class TupleSpaceImpl implements TupleSpace {
 		
 		
-		private PrivateKey identity;
+		private PrivateKey identity; int isThisNecessary;
 
 		protected final class TupleSubscriberImpl implements TupleFilter {
 			
@@ -90,6 +91,11 @@ public abstract class LocalTuplesFactory {
 				return field("author", author);
 			}
 
+			@Override
+			public TupleFilter audienceMe() {
+				throw new NotImplementedYet();
+			}
+			
 			@Override
 			public TupleFilter audience(PrivateKey audience) {
 				return field("audience", audience.publicKey());
@@ -191,8 +197,8 @@ public abstract class LocalTuplesFactory {
 			}
 		}
 
-		public TupleSpaceImpl(PrivateKey identity) {
-			this.identity = identity;
+		public TupleSpaceImpl(PrivateKey prik) {
+			identity = prik;
 		}
 
 		@Override
@@ -210,8 +216,8 @@ public abstract class LocalTuplesFactory {
 	
 	abstract protected Observable<Tuple> query(PrivateKey identity, Map<String, Object> criteria);
 	
-	public TupleSpace newTupleSpace(PrivateKey identity) {
-		return new TupleSpaceImpl(identity);
+	public TupleSpace newTupleSpace(PrivateKey prik) {
+		return new TupleSpaceImpl(prik);
 	}
 
 }

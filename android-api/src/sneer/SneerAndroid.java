@@ -61,8 +61,13 @@ public class SneerAndroid {
 	}
 	
 	public Session session(final PublicKey peerPuk, final String type) {
-		final PrivateKey myPrivateKey = (PrivateKey) ((Activity)context).getIntent().getExtras().get("myPrivateKey");
-		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(myPrivateKey);
+		if (null == null)
+			throw new NotImplementedYet();
+		
+		PrivateKey thirdPartyAppShouldntNeedToKnowOwnPrivateKey = null; int letFixThis;
+		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(
+			thirdPartyAppShouldntNeedToKnowOwnPrivateKey
+		);
 		
 		return new Session() {
 			
@@ -88,7 +93,7 @@ public class SneerAndroid {
 			@Override
 			public Observable<Object> receivedMessages() {
 				return (Observable<Object>) tupleSpace.filter()
-						.audience(myPrivateKey)
+						.audienceMe()
 						.author(partyPuk())
 						.type(type())
 						.tuples()

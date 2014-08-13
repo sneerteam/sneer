@@ -1,7 +1,6 @@
 package sneer.android.main;
 
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.*;
-import static sneer.android.main.SneerSingleton.*;
 
 import java.io.*;
 import java.util.*;
@@ -23,37 +22,15 @@ public class SneerAndroidService extends Service {
 	
 	private AtomicInteger nextSubscriptionId = new AtomicInteger();
 	private ConcurrentMap<Integer, Subscription> subscriptions = new ConcurrentHashMap<Integer, Subscription>();
-	private ConcurrentMap<PublicKey, PrivateKey> keys = new ConcurrentHashMap<PublicKey, PrivateKey>();
-	private InteractiveSerializer serializer = new InteractiveSerializer();
 
 	@SuppressWarnings("unused")
 	private String friendlyErrorMessage; //Return this to the callers. See how it is set, below.
 	
+	private final InteractiveSerializer serializer = new InteractiveSerializer();
+	
 	
 	{
 		init();
-		
-		PrivateKey myPrik = admin().privateKey();
-		keys.put(myPrik.publicKey(), myPrik);
-
-		serializer.registerReplacer(PrivateKey.class, ClientPrivateKey.class, new ObjectReplacer<PrivateKey, ClientPrivateKey>() {
-
-			@Override
-			public ClientPrivateKey outgoing(PrivateKey prik) {
-				keys.put(prik.publicKey(), prik);
-				return new ClientPrivateKey(prik.publicKey());
-			}
-
-			@Override
-			public PrivateKey incoming(ClientPrivateKey prik) {
-				PrivateKey p = keys.get(prik.publicKey());
-				if (p == null) {
-					throw new IllegalStateException("Unknow publicKey: " + prik.publicKey());	
-				}
-				return p;
-			}
-			
-		});
 	}
 
 	
