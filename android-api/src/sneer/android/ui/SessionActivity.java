@@ -1,9 +1,12 @@
 package sneer.android.ui;
 
+import rx.*;
 import sneer.*;
+import sneer.commons.exceptions.*;
+import sneer.rx.*;
 import android.os.*;
 
-public class InteractionActivity extends SneerActivity {
+public class SessionActivity extends SneerActivity {
 
 	private Session session;
 
@@ -14,7 +17,7 @@ public class InteractionActivity extends SneerActivity {
 		session = SneerAndroid.sessionOnAndroidMainThread(this);
 	}
 
-	
+
 	@Override
 	protected void onDestroy() {
 		session.dispose();
@@ -22,10 +25,19 @@ public class InteractionActivity extends SneerActivity {
 		super.onDestroy();
 	}
 
-	
-	public Session session() {
-		return session;
+
+	protected Observed<String> peerName() {
+		throw new NotImplementedYet();
 	}
 
-	
+
+	protected void sendMessage(Object content) {
+		throw new NotImplementedYet();
+	}
+
+
+	protected Observable<Object> receivedMessages() {
+		throw new NotImplementedYet();
+	}
+
 }
