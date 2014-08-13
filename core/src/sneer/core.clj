@@ -191,7 +191,7 @@
           (reify Sneer
             (self [this] (reify-party puk))
             (produceParty [this puk] (reify-party puk))
-            (setContact [this nickname party]
+            (addContact [this nickname party]
               (let [contact (reify-contact nickname party)]
                 (rx/on-next contacts contact)))
             (tupleSpace [this] tuple-space)))))))
