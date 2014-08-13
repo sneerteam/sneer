@@ -279,7 +279,7 @@ public class MainActivity extends Activity {
 
 	protected void onContactClicked(Interaction interaction) {
 		Intent intent = new Intent();
-		intent.setClass(this, InteractionActivity.class);
+		intent.setClass(this, ConversationActivity.class);
 		intent.putExtra("embeddedOptions", embeddedOptions);
 		intent.putExtra("partyPuk", interaction.party().publicKey()
 				.current());

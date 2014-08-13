@@ -35,8 +35,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.InteractionActivity"
-            android:label="@string/title_interaction" >
+            android:name=".ui.ConversationActivity"
+            android:label="@string/title_conversation" >
         </activity>
         <activity
             android:name=".ui.ProfileActivity"

@@ -6,7 +6,7 @@
     android:background="#DDDDEE"
     android:padding="0dp"
     android:textIsSelectable="true"
-    tools:context=".InteractionActivity" >
+    tools:context=".ConversationActivity" >
 
     <ListView
         android:id="@+id/listView"

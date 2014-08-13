@@ -21,7 +21,7 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-public class InteractionActivity extends Activity {
+public class ConversationActivity extends Activity {
 
 	static final String PARTY_PUK = "partyPuk";
 
@@ -114,13 +114,13 @@ public class InteractionActivity extends Activity {
 		}
 
 		private void openIteractionMenu() {
-			final PopupMenu menu = new PopupMenu(InteractionActivity.this, actionButton);
+			final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
 	
 			List<InteractionMenuItem> menuItems = sneer().produceInteractionWith(party).menu().current();
 			for (final InteractionMenuItem item : menuItems)
 				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
 					item.call();
-					Toast.makeText(InteractionActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
+					Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
 					return true;
 				}});
 
