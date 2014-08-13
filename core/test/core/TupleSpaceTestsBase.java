@@ -34,8 +34,8 @@ public class TupleSpaceTestsBase {
 	
 	protected void introduce(Sneer a, Sneer b) {
 		try {
-			a.setContact(nameOf(b), a.produceParty(b.self().publicKey().current()));
-			b.setContact(nameOf(a), b.produceParty(a.self().publicKey().current()));
+			a.addContact(nameOf(b), a.produceParty(b.self().publicKey().current()));
+			b.addContact(nameOf(a), b.produceParty(a.self().publicKey().current()));
 		} catch (FriendlyException e) {
 			throw new RuntimeException(e);
 		}

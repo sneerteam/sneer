@@ -244,7 +244,7 @@ public class MainActivity extends Activity {
 								Party party = sneer().produceParty(
 										(PublicKey) puk);
 								try {
-									sneer().setContact(nickname, party);
+									sneer().addContact(nickname, party);
 								} catch (FriendlyException e) {
 									toast(e.getMessage());
 								}

@@ -18,8 +18,10 @@ public interface Sneer {
 	Contact findContact(Party party);
 	/** @return null if nickname not found. */
 	Contact findContact(String nickname);
-	/** Creates a new contact if party is not yet a contact. Updates the nickname if party is already a contact. @throws FriendlyException if nickname is already set for another contact. */
-	void setContact(String nickname, Party party) throws FriendlyException;
+	WritableContact writable(Contact contact);
+	/** @throws FriendlyException if nickname is already set for another contact or if party is already a contact. */
+	void addContact(String nickname, Party party) throws FriendlyException;
+	
 	
 	Party produceParty(PublicKey publicKey);
 	/** @return One of the following, if available, in order of priority: Nickname (if party is a Contact); "? " + party's name, if name is available; "? PUK: " + publicKey. */

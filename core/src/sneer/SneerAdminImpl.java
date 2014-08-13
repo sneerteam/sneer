@@ -86,11 +86,11 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 	}
 
-	class WritableContact implements Contact {
+	class WritableContactImpl implements WritableContact {
 		
 		private final WritableParty party;
 
-		public WritableContact(WritableParty party) {
+		public WritableContactImpl(WritableParty party) {
 			this.party = party;
 		}
 
@@ -108,6 +108,7 @@ public class SneerAdminImpl implements SneerAdmin {
 					.field("party", party.key()));
 		}
 
+		@Override
 		public void setNickname(String newNickname) throws FriendlyException {
 			newNickname = newNickname.trim();
 			if (newNickname.equals(nickname().current())) return;
@@ -148,7 +149,7 @@ public class SneerAdminImpl implements SneerAdmin {
 	}});
 	
 	private LoadingCache<WritableParty, WritableContact> contacts = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<WritableParty, WritableContact>() {  @Override public WritableContact load(final WritableParty party) throws Exception {
-		return new WritableContact(party);
+		return new WritableContactImpl(party);
 	}});
 
 	public SneerAdminImpl(TupleSpace tupleSpace) {
@@ -181,7 +182,7 @@ public class SneerAdminImpl implements SneerAdmin {
 			}
 			
 			@Override
-			public void setContact(String nickname, Party party) throws FriendlyException {
+			public void addContact(String nickname, Party party) throws FriendlyException {
 				findContact(party).setNickname(nickname);
 			}
 			
@@ -314,6 +315,12 @@ public class SneerAdminImpl implements SneerAdmin {
 
 			@Override
 			public Contact findContact(String nickname) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public WritableContact writable(Contact contact) {
 				// TODO Auto-generated method stub
 				return null;
 			}

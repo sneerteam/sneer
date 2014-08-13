@@ -58,7 +58,7 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 
 		assertNull(sneerA.findContact(partyB));
 
-		sneerA.setContact("Party Boy", partyB);
+		sneerA.addContact("Party Boy", partyB);
 
 		Contact contactB = sneerA.findContact(partyB);
 		assertNotNull(contactB);
@@ -68,8 +68,8 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 	@Test(expected = FriendlyException.class)
 	public void exceptionOnDuplicatedNickname() throws FriendlyException {
 
-		sneerA.setContact("Party Boy", sneerA.produceParty(prikB.publicKey()));
-		sneerA.setContact("Party Boy", sneerA.produceParty(prikC.publicKey()));
+		sneerA.addContact("Party Boy", sneerA.produceParty(prikB.publicKey()));
+		sneerA.addContact("Party Boy", sneerA.produceParty(prikC.publicKey()));
 	}
 
 	@Test
@@ -77,7 +77,7 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 
 		Party partyB = sneerA.produceParty(prikB.publicKey());
 
-		sneerA.setContact("Party Boy", partyB);
+		sneerA.addContact("Party Boy", partyB);
 
 		Contact contactB = sneerA.findContact(partyB);
 
@@ -87,7 +87,7 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 
 		contactB.nickname().observable().subscribe(nicknames);
 
-		sneerA.setContact("Party Man", partyB);
+		sneerA.addContact("Party Man", partyB);
 
 		assertEqualsUntilNow(nicknames, "Party Boy", "Party Man");
 
@@ -102,11 +102,11 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 		
 		assertEqualsUntilNow(sneerA.contacts());
 		
-		sneerA.setContact("Party Boy", partyB);
+		sneerA.addContact("Party Boy", partyB);
 
 		assertEqualsUntilNow(sneerA.contacts(), Arrays.asList(sneerA.findContact(partyB)));
 		
-		sneerA.setContact("Party Boy", partyC);
+		sneerA.addContact("Party Boy", partyC);
 
 		assertEqualsUntilNow(sneerA.contacts(), Arrays.asList(sneerA.findContact(partyB), sneerA.findContact(partyC)));
 		

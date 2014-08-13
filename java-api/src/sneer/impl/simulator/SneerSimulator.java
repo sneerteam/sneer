@@ -106,15 +106,14 @@ public class SneerSimulator extends SneerBase {
 
 
 	@Override
-	public void setContact(String nickname, Party party) {
+	public void addContact(String nickname, Party party) {
 		synchronized (contactsByParty) {
-			ContactSimulator c = contactsByParty.get(party);
-			if (c == null) {
-				c = new ContactSimulator(nickname, party);
-				contactsByParty.put(party, c);
-				produceInteractionWith(party).sendMessage("Hey " + nickname + "!");
-			}
-			c.setNickname(nickname);
+			if (contactsByParty.get(party) != null)
+				throw new RuntimeException("The party you tried to add was already a contact.");
+
+			ContactSimulator c = new ContactSimulator(nickname, party);
+			contactsByParty.put(party, c);
+			produceInteractionWith(party).sendMessage("Hey " + nickname + "!");
 			contacts.onNext(contactsSorted());
 		}
 	}
@@ -159,7 +158,7 @@ public class SneerSimulator extends SneerBase {
 		party.simulateSetCountry(coutry);
 		party.simulateSetCity(city);
 		party.simulateSetSelfie(selfie);
-		setContact(name, party);
+		addContact(name, party);
 		return prik;
 	}
 	
@@ -189,6 +188,12 @@ public class SneerSimulator extends SneerBase {
 	@Override
 	public Contact findContact(String nickname) {
 		throw new UnsupportedOperationException("Not needed until now.");
+	}
+
+
+	@Override
+	public WritableContact writable(Contact contact) {
+		return (WritableContact)contact;
 	}
 
 }

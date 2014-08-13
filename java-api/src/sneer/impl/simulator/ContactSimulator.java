@@ -3,7 +3,7 @@ package sneer.impl.simulator;
 import sneer.*;
 import sneer.rx.*;
 
-public class ContactSimulator implements Contact {
+public class ContactSimulator implements WritableContact {
 
 	private final Party party;
 	private final ObservedSubject<String> nickname;
@@ -27,7 +27,8 @@ public class ContactSimulator implements Contact {
 	}
 
 
-	void setNickname(String newNickname) {
+	@Override
+	public void setNickname(String newNickname) {
 		nickname.set(newNickname);
 	}
 
