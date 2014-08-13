@@ -1,6 +1,8 @@
 package sneer.android.ui;
 
+import static sneer.SneerAndroid.*;
 import rx.*;
+import rx.android.schedulers.*;
 import sneer.*;
 import sneer.commons.exceptions.*;
 import sneer.rx.*;
@@ -14,7 +16,10 @@ public class SessionActivity extends SneerActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		session = SneerAndroid.sessionOnAndroidMainThread(this);
+		session = new SneerAndroid(this).session(
+			(PublicKey)getExtra(PARTY_PUK),
+			(String)getExtra(TYPE)
+		);
 	}
 
 
@@ -27,17 +32,23 @@ public class SessionActivity extends SneerActivity {
 
 
 	protected Observed<String> peerName() {
+		//return sneer().nameFor(session.peer());
 		throw new NotImplementedYet();
 	}
 
 
 	protected void sendMessage(Object content) {
-		throw new NotImplementedYet();
+		session.sendMessage(content);
 	}
 
 
 	protected Observable<Object> receivedMessages() {
-		throw new NotImplementedYet();
+		return session.receivedMessages().observeOn(AndroidSchedulers.mainThread());
+	}
+	
+	
+	private Object getExtra(String extra) {
+		return getIntent().getExtras().get(extra);
 	}
 
 }

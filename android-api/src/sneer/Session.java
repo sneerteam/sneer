@@ -1,15 +1,13 @@
 package sneer;
 
 import rx.*;
-import sneer.rx.*;
 
 public interface Session {
 	
-	Observed<String> contactNickname();
+	Party peer();
 
-	void send(Object value);
-
-	Observable<Object> received();
+	void sendMessage(Object value);
+	Observable<Object> receivedMessages();
 	
 	void dispose();
 }

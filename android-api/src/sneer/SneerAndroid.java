@@ -2,7 +2,7 @@ package sneer;
 
 import rx.*;
 import rx.android.schedulers.*;
-import sneer.rx.*;
+import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 import sneer.utils.*;
 import android.app.*;
@@ -27,6 +27,7 @@ public class SneerAndroid {
 
 	
 	public static final String TYPE = "type";
+	public static final String PARTY_PUK = "partyPuk";
 
 	private static final String INTERACTION_LIST = "sneer.android.main.INTERACTION_LIST";
 	public static final String TITLE = "title";
@@ -34,6 +35,7 @@ public class SneerAndroid {
 	public static final String NEW_INTERACTION_ACTION = "newInteractionAction";
 	public static final String DISABLE_MENUS = "disable-menus";
 	static final String SNEER_SERVICE = "sneer.android.service.BACKEND";
+
 	
 	public static void startInteractionList(Activity activity, String title, String type, String newInteractionLabel, String newInteractionAction) {
 		try {
@@ -48,10 +50,6 @@ public class SneerAndroid {
 		}
 	}
 	
-	public static Session sessionOnAndroidMainThread(Activity activity) {
-		return new SneerAndroid(activity).session();
-	}
-	
 	private Context context;
 
 	static Object unbundle(Bundle resultData) {
@@ -62,49 +60,36 @@ public class SneerAndroid {
 		this.context = context;
 	}
 	
-	public Session session() {
-		if (!(context instanceof Activity)) {
-			throw new IllegalStateException("Context expected to be an Activity, found " + context.getClass().getName());
-		}
-		
-		final PrivateKey myPrivateKey = (PrivateKey) getExtra("myPrivateKey");
+	public Session session(final PublicKey peerPuk, final String type) {
+		final PrivateKey myPrivateKey = (PrivateKey) ((Activity)context).getIntent().getExtras().get("myPrivateKey");
 		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(myPrivateKey);
 		
 		return new Session() {
-
+			
 			@Override
-			public Observed<String> contactNickname() {
-				return new Observed<String>() {
-					
-					@Override
-					public Observable<String> observable() {
-						throw new RuntimeException("not implemented yet");
-					}
-					
-					@Override
-					public String current() {
-						return (String) getExtra("contactNickname");
-					}
-				};
+			public Party peer() {
+				// return sneer().produceParty(partyPuk());
+				throw new NotImplementedYet();
 			}
 
+
 			@Override
-			public void send(Object value) {
+			public void sendMessage(Object content) {
 				tupleSpace.publisher()
-					.audience(partyPublicKey())
+					.audience(partyPuk())
 					.type(type())
-					.pub(value);
+					.pub(content);
 			}
 
 			private String type() {
-				return (String) getExtra(TYPE);
+				return type;
 			}
 
 			@Override
-			public Observable<Object> received() {
+			public Observable<Object> receivedMessages() {
 				return (Observable<Object>) tupleSpace.filter()
 						.audience(myPrivateKey)
-						.author(partyPublicKey())
+						.author(partyPuk())
 						.type(type())
 						.tuples()
 						.observeOn(AndroidSchedulers.mainThread())
@@ -118,15 +103,11 @@ public class SneerAndroid {
 				// TODO
 			}
 			
-			private PublicKey partyPublicKey() {
-				return (PublicKey) getExtra("contactPuk");
+			private PublicKey partyPuk() {
+				return peerPuk;
 			}
 			
 		};
-	}
-	
-	private Object getExtra(String key) {
-		return ((Activity)context).getIntent().getExtras().get(key);
 	}
 
 }
