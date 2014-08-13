@@ -1,7 +1,7 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerSingleton.*;
-import static sneer.android.ui.UIUtils.*;
+import static sneer.android.ui.SneerActivity.*;
 
 import java.io.*;
 import java.util.*;

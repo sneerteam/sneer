@@ -2,7 +2,7 @@ package sneer.android.main.ui;
 
 import static android.os.Build.VERSION.*;
 import static android.os.Build.VERSION_CODES.*;
-import static sneer.android.ui.UIUtils.*;
+import static sneer.android.ui.SneerActivity.*;
 
 import java.util.*;
 
