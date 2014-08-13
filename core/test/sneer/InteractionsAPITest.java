@@ -111,5 +111,22 @@ public class InteractionsAPITest extends InteractionsAPITestsBase {
 		assertEqualsUntilNow(sneerA.contacts(), Arrays.asList(sneerA.findContact(partyB), sneerA.findContact(partyC)));
 		
 	}
+	
+	
+	@Test
+	public void preferredNickname() {
+		
+		Profile profileBFromB = sneerB.profileFor(sneerB.self());
+		Profile profileBFromA = sneerA.profileFor(sneerA.produceParty(prikB.publicKey()));
+		
+		profileBFromB.setPreferredNickname("Party Boy");
+		
+		assertEqualsUntilNow(profileBFromA.preferredNickname(), "Party Boy");
+		
+		profileBFromB.setPreferredNickname("Party Man");
+
+		assertEqualsUntilNow(profileBFromA.preferredNickname(), "Party Man");
+		
+	}
 
 }
