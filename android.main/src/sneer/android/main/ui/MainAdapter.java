@@ -12,7 +12,7 @@ import android.graphics.Shader.TileMode;
 import android.view.*;
 import android.widget.*;
 
-public class MainAdapter extends ArrayAdapter<Interaction> {
+public class MainAdapter extends ArrayAdapter<Conversation> {
 
 	private Activity activity;
     int layoutResourceId;
@@ -32,46 +32,46 @@ public class MainAdapter extends ArrayAdapter<Interaction> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        final InteractiontHolder holder;
+        final ConversationtHolder holder;
         
         if (row == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             
-            holder = new InteractiontHolder();
-            holder.interactionParty = findView(row, R.id.interactionParty);
-            holder.interactionSummary = findView(row, R.id.interactionSummary);
-            holder.interactionDate = findView(row, R.id.interactionDate);
-            holder.interactionPicture = findView(row, R.id.interactionPicture);
+            holder = new ConversationtHolder();
+            holder.conversationParty = findView(row, R.id.conversationParty);
+            holder.conversationSummary = findView(row, R.id.conversationSummary);
+            holder.conversationDate = findView(row, R.id.conversationDate);
+            holder.conversationPicture = findView(row, R.id.conversationPicture);
             
             Shader textShader = new LinearGradient(200, 0, 650, 0, 
             		new int[] {Color.DKGRAY, Color.LTGRAY},
             		new float[] {0, 1}, TileMode.CLAMP);
-            holder.interactionSummary.getPaint().setShader(textShader);
+            holder.conversationSummary.getPaint().setShader(textShader);
             
             row.setTag(holder);
         } else {
-            holder = (InteractiontHolder)row.getTag();
+            holder = (ConversationtHolder)row.getTag();
         }
         
-		Interaction interaction = getItem(position);
+		Conversation conversation = getItem(position);
 		Subscription subscription = Subscriptions.from(
-				plug(holder.interactionParty, labelProvider.call(interaction.party())),
-				plug(holder.interactionSummary, interaction.mostRecentEventContent().observable()),
-				plug(holder.interactionPicture, imageProvider.call(interaction.party())),
-				plugDate(holder.interactionDate, interaction.mostRecentEventTimestamp().observable()));
+				plug(holder.conversationParty, labelProvider.call(conversation.party())),
+				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
+				plug(holder.conversationPicture, imageProvider.call(conversation.party())),
+				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
 		subscriptions.add(subscription);
         return row;
     }
 
     
     
-	static class InteractiontHolder
+	static class ConversationtHolder
     {
-        TextView interactionParty;
-        TextView interactionSummary;
-        TextView interactionDate;
-        ImageView interactionPicture;
+        TextView conversationParty;
+        TextView conversationSummary;
+        TextView conversationDate;
+        ImageView conversationPicture;
     }
 
 

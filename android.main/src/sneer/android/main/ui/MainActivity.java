@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 	
 	private MainAdapter adapter;
 	private ListView listView;
-	private Interaction interaction;
+	private Conversation conversation;
 	private EmbeddedOptions embeddedOptions;
 
 	@Override
@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 		startActivity();
 		startCore();
 
-		makeInteractionList();
+		makeConversationList();
 	}
 
 	/**
@@ -55,20 +55,20 @@ public class MainActivity extends Activity {
 	 */
 	public static class EmbeddedOptions implements Serializable {
 		private static final long serialVersionUID = 1L;
-		public String interactionAction;
+		public String conversationAction;
 		public String type;
 		public String title;
-		public String interactionLabel;
+		public String conversationLabel;
 		public boolean disableMenus;
 
 		public EmbeddedOptions(Intent intent) {
 			if (intent == null || intent.getExtras() == null) {
 				return;
 			}
-			interactionAction = intent.getExtras().getString(
-					SneerAndroid.NEW_INTERACTION_ACTION);
-			interactionLabel = intent.getExtras().getString(
-					SneerAndroid.NEW_INTERACTION_LABEL);
+			conversationAction = intent.getExtras().getString(
+					SneerAndroid.NEW_CONVERSATION_ACTION);
+			conversationLabel = intent.getExtras().getString(
+					SneerAndroid.NEW_CONVERSATION_LABEL);
 			type = intent.getExtras().getString(SneerAndroid.TYPE);
 			title = intent.getExtras().getString(SneerAndroid.TITLE);
 			disableMenus = intent.getExtras().getBoolean(
@@ -76,11 +76,11 @@ public class MainActivity extends Activity {
 		}
 
 		public boolean wasEmbedded() {
-			return interactionAction != null;
+			return conversationAction != null;
 		}
 	}
 
-	private void makeInteractionList() {
+	private void makeConversationList() {
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
 
 		listView = (ListView) findViewById(R.id.listView);
 		adapter = new MainAdapter(this,
-				R.layout.list_item_interaction,
+				R.layout.list_item_conversation,
 				new Func1<Party, Observable<String>>() {
 					@Override
 					public Observable<String> call(Party party) {
@@ -132,18 +132,18 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id_ignored) {
-				Interaction interaction = adapter.getItem(position);
-				onContactClicked(interaction);
+				Conversation conversation = adapter.getItem(position);
+				onContactClicked(conversation);
 			}
 		});
 
-		sneer().interactionsContaining(embeddedOptions.type)
+		sneer().conversationsContaining(embeddedOptions.type)
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<Collection<Interaction>>() {
+				.subscribe(new Action1<Collection<Conversation>>() {
 					@Override
-					public void call(Collection<Interaction> interactions) {
+					public void call(Collection<Conversation> conversations) {
 						adapter.clear();
-						adapter.addAll(interactions);
+						adapter.addAll(conversations);
 						adapter.notifyDataSetChanged();
 					}
 				});
@@ -153,8 +153,8 @@ public class MainActivity extends Activity {
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-		interaction = adapter.getItem(info.position);
-		plugHeaderTitle(menu, sneer().nameFor(interaction.party())
+		conversation = adapter.getItem(info.position);
+		plugHeaderTitle(menu, sneer().nameFor(conversation.party())
 				.observable());
 		getMenuInflater().inflate(R.menu.long_click, menu);
 	}
@@ -166,15 +166,15 @@ public class MainActivity extends Activity {
 			// search action
 			break;
 		case R.id.chat_contact:
-			toast(interaction.toString()); // Do something useful with
-											// interaction here.
+			toast(conversation.toString()); // Do something useful with
+											// conversation here.
 			break;
 		case R.id.edit_contact:
-			interaction.toString(); // Do something useful with interaction
+			conversation.toString(); // Do something useful with conversation
 									// here.
 			break;
 		case R.id.remove_contact:
-			interaction.toString(); // Do something useful with interaction
+			conversation.toString(); // Do something useful with conversation
 									// here.
 			break;
 		}
@@ -187,7 +187,7 @@ public class MainActivity extends Activity {
 		if (embeddedOptions.disableMenus) {
 			return false;
 		}
-		getMenuInflater().inflate(R.menu.interaction_list, menu);
+		getMenuInflater().inflate(R.menu.main, menu);
 
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
@@ -277,11 +277,11 @@ public class MainActivity extends Activity {
 		clipboard.setPrimaryClip(clip);
 	}
 
-	protected void onContactClicked(Interaction interaction) {
+	protected void onContactClicked(Conversation conversation) {
 		Intent intent = new Intent();
 		intent.setClass(this, ConversationActivity.class);
 		intent.putExtra("embeddedOptions", embeddedOptions);
-		intent.putExtra("partyPuk", interaction.party().publicKey()
+		intent.putExtra("partyPuk", conversation.party().publicKey()
 				.current());
 		startActivity(intent);
 	}

@@ -21,17 +21,17 @@
 	    android:background="@drawable/user_speech_bubble">
 	    
 		<TextView
-			android:id="@+id/interactionEventContent" 
+			android:id="@+id/conversationContent" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/dummy_text" />
 		
 		<TextView
-			android:id="@+id/interactionEventTime"
+			android:id="@+id/conversationTime"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_below="@+id/interactionEventContent"
-			android:layout_alignLeft="@+id/interactionEventContent"
+			android:layout_below="@+id/conversationContent"
+			android:layout_alignLeft="@+id/conversationContent"
 			android:textSize="12sp"
 			android:textColor="#777"
 			android:text="@string/dummy_text" />

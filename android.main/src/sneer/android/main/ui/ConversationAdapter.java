@@ -17,7 +17,7 @@ import android.graphics.drawable.*;
 import android.view.*;
 import android.widget.*;
 
-public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
+public class ConversationAdapter extends ArrayAdapter<Message>{
 
     int layoutUserResourceId;    
     int listContactResourceId;
@@ -25,11 +25,11 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 	private Sneer sneer;
 	private Party party;
     
-    public InteractionAdapter(Context context,
+    public ConversationAdapter(Context context,
     		LayoutInflater inflater,
     		int layoutUserResourceId,
     		int listContactResourceId,
-    		List<InteractionEvent> data,
+    		List<Message> data,
     		Party party, Sneer sneer) {
         super(context, layoutUserResourceId, data);
 		this.inflater = inflater;
@@ -41,18 +41,18 @@ public class InteractionAdapter extends ArrayAdapter<InteractionEvent>{
 
 	@SuppressLint("ViewHolder") @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-		final InteractionEvent event = this.getItem(position);
+		final Message message = this.getItem(position);
         final View ret = inflater.inflate(
-        	event.isOwn() ? layoutUserResourceId : listContactResourceId,
+        	message.isOwn() ? layoutUserResourceId : listContactResourceId,
         	parent,
         	false);
         
-        findTextView(ret, R.id.interactionEventContent).setText(event.content());
-        findTextView(ret, R.id.interactionEventTime).setText(event.timeSent());
+        findTextView(ret, R.id.conversationContent).setText(message.content());
+        findTextView(ret, R.id.conversationTime).setText(message.timeSent());
         
-        if (!event.isOwn()) {
+        if (!message.isOwn()) {
         	sneer.nameFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
-        		setColors(ret, sender, event.isOwn());
+        		setColors(ret, sender, message.isOwn());
         	}});
         } else {
 			setColors(ret, null, true);

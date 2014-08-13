@@ -1,7 +1,7 @@
 package sneer.impl.simulator;
 
 import static sneer.Contact.*;
-import static sneer.Interaction.*;
+import static sneer.Conversation.*;
 import static sneer.commons.Streams.*;
 
 import java.io.*;
@@ -27,8 +27,8 @@ public class SneerSimulator extends SneerBase {
 	private final Map<Party, ContactSimulator> contactsByParty = new ConcurrentHashMap<Party, ContactSimulator>();
 	private final BehaviorSubject<List<Contact>> contacts = BehaviorSubject.create(contactsSorted());
 
-	private final Map<Party, Interaction> interactionsByParty = new ConcurrentHashMap<Party, Interaction>();
-	private final BehaviorSubject<List<Interaction>> interactions = BehaviorSubject.create(interactionsSorted());
+	private final Map<Party, Conversation> conversationsByParty = new ConcurrentHashMap<Party, Conversation>();
+	private final BehaviorSubject<List<Conversation>> conversations = BehaviorSubject.create(conversationsSorted());
 
 	
 	public SneerSimulator(PrivateKey privateKey) {
@@ -74,21 +74,21 @@ public class SneerSimulator extends SneerBase {
 
 
 	@Override
-	public Observable<List<Interaction>> interactions() {
-		return interactions;
+	public Observable<List<Conversation>> conversations() {
+		return conversations;
 	}
 
 	
 	@Override
-	public Interaction produceInteractionWith(Party party) {
-		synchronized (interactionsByParty) {
-			Interaction existing = interactionsByParty.get(party);
+	public Conversation produceConversationWith(Party party) {
+		synchronized (conversationsByParty) {
+			Conversation existing = conversationsByParty.get(party);
 			if (existing != null) return existing;
 			
-			InteractionSimulator newInteraction = new InteractionSimulator(party);
-			interactionsByParty.put(party, newInteraction);
-			interactions.onNext(interactionsSorted());
-			return newInteraction;
+			ConversationSimulator newConversation = new ConversationSimulator(party);
+			conversationsByParty.put(party, newConversation);
+			conversations.onNext(conversationsSorted());
+			return newConversation;
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class SneerSimulator extends SneerBase {
 
 			ContactSimulator c = new ContactSimulator(nickname, party);
 			contactsByParty.put(party, c);
-			produceInteractionWith(party).sendMessage("Hey " + nickname + "!");
+			produceConversationWith(party).sendMessage("Hey " + nickname + "!");
 			contacts.onNext(contactsSorted());
 		}
 	}
@@ -136,8 +136,8 @@ public class SneerSimulator extends SneerBase {
 	}
 	
 	
-	private List<Interaction> interactionsSorted() {
-		ArrayList<Interaction> ret = new ArrayList<Interaction>(interactionsByParty.values());
+	private List<Conversation> conversationsSorted() {
+		ArrayList<Conversation> ret = new ArrayList<Conversation>(conversationsByParty.values());
 		Collections.sort(ret, MOST_RECENT_FIRST);
 		return ret;
 	}
@@ -164,8 +164,8 @@ public class SneerSimulator extends SneerBase {
 	
 
 	@Override
-	public Observable<List<Interaction>> interactionsContaining(String eventType) {
-		return interactions();
+	public Observable<List<Conversation>> conversationsContaining(String messageType) {
+		return conversations();
 	}
 
 

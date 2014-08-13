@@ -7,6 +7,7 @@ import java.util.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
+import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
 import sneer.commons.*;
@@ -25,12 +26,12 @@ public class ConversationActivity extends Activity {
 
 	static final String PARTY_PUK = "partyPuk";
 
-	private static final Comparator<? super InteractionEvent> BY_TIMESTAMP = new Comparator<InteractionEvent>() { @Override public int compare(InteractionEvent lhs, InteractionEvent rhs) {
+	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
 		return Comparators.compare(lhs.timestampSent(), rhs.timestampSent());
 	}};
 
-	private final List<InteractionEvent> messages = new ArrayList<InteractionEvent>();
-	private InteractionAdapter adapter;
+	private final List<Message> messages = new ArrayList<Message>();
+	private ConversationAdapter adapter;
 
 	private ActionBar actionBar;
 	private EmbeddedOptions embeddedOptions;
@@ -43,7 +44,7 @@ public class ConversationActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_interaction);
+		setContentView(R.layout.activity_conversation);
 		
 		actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -61,13 +62,13 @@ public class ConversationActivity extends Activity {
 			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
 		}});
 
-		sneer().produceInteractionWith(party).events().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<InteractionEvent>>() { @Override public void call(List<InteractionEvent> events) {
+		sneer().produceConversationWith(party).messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> messages) {
 			messages.clear();
-			messages.addAll(events);
+			messages.addAll(messages);
 			adapter.notifyDataSetChanged();
 		}});
 
-		adapter = new InteractionAdapter(this,
+		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),
 			R.layout.list_item_user_message,
 			R.layout.list_item_party_message,
@@ -108,7 +109,7 @@ public class ConversationActivity extends Activity {
 
 		private void handleClick(final Party party, final String text) {
 			if (text != null && !text.isEmpty())
-				sneer().produceInteractionWith(party).sendMessage(text);
+				sneer().produceConversationWith(party).sendMessage(text);
 			else
 				openIteractionMenu();
 		}
@@ -116,8 +117,8 @@ public class ConversationActivity extends Activity {
 		private void openIteractionMenu() {
 			final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
 	
-			List<InteractionMenuItem> menuItems = sneer().produceInteractionWith(party).menu().current();
-			for (final InteractionMenuItem item : menuItems)
+			List<ConversationMenuItem> menuItems = sneer().produceConversationWith(party).menu().current();
+			for (final ConversationMenuItem item : menuItems)
 				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
 					item.call();
 					Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
@@ -131,13 +132,13 @@ public class ConversationActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (embeddedOptions.interactionAction == null) {
+		if (embeddedOptions.conversationAction == null) {
 			return false;
 		}
-		getMenuInflater().inflate(R.menu.interaction, menu);
-		if (embeddedOptions.interactionLabel != null) {
-			MenuItem item = menu.findItem(R.id.action_new_interaction);
-			item.setTitle(embeddedOptions.interactionLabel);
+		getMenuInflater().inflate(R.menu.conversation, menu);
+		if (embeddedOptions.conversationLabel != null) {
+			MenuItem item = menu.findItem(R.id.action_new_conversation);
+			item.setTitle(embeddedOptions.conversationLabel);
 		}
 		return true;
 	}
@@ -146,8 +147,8 @@ public class ConversationActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_new_interaction:
-			launchNewInteraction();
+		case R.id.action_new_conversation:
+			launchNewConversation();
 			return true;
 		case android.R.id.home:
 			navigateToProfile();
@@ -165,8 +166,8 @@ public class ConversationActivity extends Activity {
 	}
 
 
-	private void launchNewInteraction() {
-		Intent intent = new Intent(embeddedOptions.interactionAction);
+	private void launchNewConversation() {
+		Intent intent = new Intent(embeddedOptions.conversationAction);
 		intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
 		intent.putExtra("contactNickname", sneer().findContact(party).nickname().current());
 		intent.putExtra(SneerAndroid.PARTY_PUK, party.publicKey().current());
@@ -175,7 +176,7 @@ public class ConversationActivity extends Activity {
 	
 	
 	@SuppressWarnings("unused")
-	private void onInteractionEvent(InteractionEvent msg) {
+	private void onMessage(Message msg) {
 		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
 		if (insertionPointHint < 0) {
 			int insertionPoint = Math.abs(insertionPointHint) - 1;

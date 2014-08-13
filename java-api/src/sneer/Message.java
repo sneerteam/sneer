@@ -6,11 +6,11 @@ import java.util.*;
 import sneer.commons.*;
 
 
-public class InteractionEvent {
+public class Message {
 	
 	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm");
 
-	public static final Comparator<InteractionEvent> BY_TIME_RECEIVED = new Comparator<InteractionEvent>() { @Override public int compare(InteractionEvent e1, InteractionEvent e2) {
+	public static final Comparator<Message> BY_TIME_RECEIVED = new Comparator<Message>() { @Override public int compare(Message e1, Message e2) {
 		return Comparators.compare(e1.timestampReceived(), e2.timestampReceived());
 	}};
 	
@@ -23,17 +23,17 @@ public class InteractionEvent {
 	private final boolean isOwn;
 	
 	
-	public static InteractionEvent createFrom(long timeSent, long timeReceived, String content) {
-		return new InteractionEvent(timeSent, timeReceived, content, false);
+	public static Message createFrom(long timeSent, long timeReceived, String content) {
+		return new Message(timeSent, timeReceived, content, false);
 	}	
 
 	
-	public static InteractionEvent createOwn(long timeSent, String content) {
-		return new InteractionEvent(timeSent, timeSent, content, true);
+	public static Message createOwn(long timeSent, String content) {
+		return new Message(timeSent, timeSent, content, true);
 	}	
 
 	
-	private InteractionEvent(long timestampSent, long timestampReceived, String content, boolean isOwn) {
+	private Message(long timestampSent, long timestampReceived, String content, boolean isOwn) {
 		this.timestampSent = timestampSent;
 		this.timestampReceived = timestampReceived;
 		this.content = content;
@@ -51,13 +51,13 @@ public class InteractionEvent {
 	}
 	
 
-	/** When this event was sent. */
+	/** When this message was sent. */
 	public long timestampSent() {
 		return timestampSent;
 	}
 
 	
-	/** When this event was received. */
+	/** When this message was received. */
 	public long timestampReceived() {
 		return timestampReceived;
 	}
@@ -70,7 +70,7 @@ public class InteractionEvent {
 	
 	@Override
 	public String toString() {
-		return "InteractionEvent [" + timestampSent + ": " + content + "]";
+		return "Message [" + timestampSent + ": " + content + "]";
 	}
 
 	

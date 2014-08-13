@@ -1,0 +1,117 @@
+package sneer.impl.simulator;
+
+import static sneer.Message.*;
+import static sneer.ConversationMenuItem.*;
+import static sneer.commons.Lists.*;
+
+import java.util.*;
+
+import rx.Observable;
+import sneer.*;
+import sneer.rx.*;
+
+public class ConversationSimulator implements Conversation {
+
+	private final Party party;
+	
+	@SuppressWarnings("unchecked")
+	private final ObservedSubject<List<Message>> messages = ObservedSubject.create((List<Message>)Collections.EMPTY_LIST);
+	@SuppressWarnings("unchecked")
+	private final ObservedSubject<List<ConversationMenuItem>> menuItems = ObservedSubject.create((List<ConversationMenuItem>)Collections.EMPTY_LIST);
+	private final ObservedSubject<Long> mostRecentMessageTimestamp = ObservedSubject.create(0L);
+	private final ObservedSubject<String> mostRecentMessageContent = ObservedSubject.create("");
+	
+	
+	public ConversationSimulator(Party party) {
+		this.party = party;
+		sendMessage("Vai ter festa!!!! Uhuu!!!");
+		simulateReceivedMessage("Onde? Onde?? o0");
+		
+		addMenuItem(new ConversationMenuItemSimulator("Send Bitcoins"));
+		addMenuItem(new ConversationMenuItemSimulator("Play Toroidal Go"));
+		addMenuItem(new ConversationMenuItemSimulator("Send my location"));
+		addMenuItem(new ConversationMenuItemSimulator("Send photo"));
+		addMenuItem(new ConversationMenuItemSimulator("Send voice message"));
+		addMenuItem(new ConversationMenuItemSimulator("Play Rock Paper Scissors"));
+		addMenuItem(new ConversationMenuItemSimulator("Play Tic Tac Toe"));
+	}
+
+
+	@Override
+	public Party party() {
+		return party;
+	}
+
+	
+	@Override
+	public Observable<List<Message>> messages() {
+		return messages.observed().observable();
+	}
+
+	
+	@Override
+	public void sendMessage(String content) {
+		addMessage(createOwn(now(), content));
+		simulateReceivedMessage("Echo: " + content);
+	}
+
+
+	@Override
+	public Observed<Long> mostRecentMessageTimestamp() {
+		return mostRecentMessageTimestamp.observed();
+	}
+	
+	
+	@Override
+	public Observed<String> mostRecentMessageContent() {
+		return mostRecentMessageContent.observed();
+	}
+	
+	
+	private void addMessage(Message message) {
+		List<Message> newMessage = messagesWith(message, BY_TIME_RECEIVED);
+		messages.set(newMessage);
+		Message last = lastIn(newMessage);
+		mostRecentMessageTimestamp.set(last.timestampReceived());
+		mostRecentMessageContent.set(last.content());
+	}
+
+
+	private List<Message> messagesWith(Message message, Comparator<Message> order) {
+		List<Message> ret = new ArrayList<Message>(messages.observed().current());
+		ret.add(message);
+		Collections.sort(ret, order);
+		return ret;
+	}
+	
+	
+	private void simulateReceivedMessage(String content) {
+		addMessage(createFrom(now(), now(), content));
+	}
+	
+	
+	static private long now() {
+		return System.currentTimeMillis();
+	}
+
+
+	@Override
+	public Observed<List<ConversationMenuItem>> menu() {
+		return menuItems.observed();
+	}
+	
+	
+	private void addMenuItem(ConversationMenuItem menuItem) {
+		List<ConversationMenuItem> newMenuItems = menuItemsWith(menuItem, BY_ALPHABETICAL_ORDER);
+		menuItems.set(newMenuItems);
+	}
+	
+	
+	private List<ConversationMenuItem> menuItemsWith(ConversationMenuItem menuItem, Comparator<ConversationMenuItem> order) {
+		List<ConversationMenuItem> ret = new ArrayList<ConversationMenuItem>(menuItems.observed().current());
+		ret.add(menuItem);
+		Collections.sort(ret, order);
+		return ret;
+	}
+
+}

@@ -11,7 +11,7 @@ import android.os.*;
 
 public class SneerAndroid {
 
-// This is how one uses the startInteractionList() method to start Sneer with interactions filtered by tuple type:
+// This is how one uses the startConversationList() method to start Sneer with conversations filtered by tuple type:
 //
 //	@Override
 //	protected void onResume() {
@@ -19,31 +19,31 @@ public class SneerAndroid {
 //		
 //		String title = "RPS Challenges";
 //		String type = "rock-paper-scissors/move";
-//		String newInteractionLabel = "Challenge!!";
-//		String newInteractionAction = "sneer.tutorial.rockpaperscissors.CHALLENGE";
+//		String newConversationLabel = "Challenge!!";
+//		String newConversationAction = "sneer.tutorial.rockpaperscissors.CHALLENGE";
 //		
-//		SneerAndroid.startInteractionList(this, title, type, newInteractionLabel, newInteractionAction);
+//		SneerAndroid.startConversationList(this, title, type, newConversationLabel, newConversationAction);
 //	}
 
 	
 	public static final String TYPE = "type";
 	public static final String PARTY_PUK = "partyPuk";
 
-	private static final String INTERACTION_LIST = "sneer.android.main.INTERACTION_LIST";
+	private static final String CONVERSATION_LIST = "sneer.android.main.ui.MAIN";
 	public static final String TITLE = "title";
-	public static final String NEW_INTERACTION_LABEL = "newInteractionLabel";
-	public static final String NEW_INTERACTION_ACTION = "newInteractionAction";
+	public static final String NEW_CONVERSATION_LABEL = "newConversationLabel";
+	public static final String NEW_CONVERSATION_ACTION = "newConversationAction";
 	public static final String DISABLE_MENUS = "disable-menus";
 	static final String SNEER_SERVICE = "sneer.android.service.BACKEND";
 
 	
-	public static void startInteractionList(Activity activity, String title, String type, String newInteractionLabel, String newInteractionAction) {
+	public static void startMain(Activity activity, String title, String type, String newConversationLabel, String newConversationAction) {
 		try {
-			Intent intent = new Intent(INTERACTION_LIST);
+			Intent intent = new Intent(CONVERSATION_LIST);
 			intent.putExtra(TITLE, title);
 			intent.putExtra(TYPE, type);
-			intent.putExtra(NEW_INTERACTION_LABEL, newInteractionLabel);
-			intent.putExtra(NEW_INTERACTION_ACTION, newInteractionAction);
+			intent.putExtra(NEW_CONVERSATION_LABEL, newConversationLabel);
+			intent.putExtra(NEW_CONVERSATION_ACTION, newConversationAction);
 			activity.startActivity(intent);
 		} catch (ActivityNotFoundException e) {
 			SneerUtils.showInstallSneerDialog(activity);

@@ -2,12 +2,12 @@ package sneer.impl.simulator;
 
 import sneer.*;
 
-public class InteractionMenuItemSimulator implements InteractionMenuItem {
+public class ConversationMenuItemSimulator implements ConversationMenuItem {
 	
 	private String caption;
 	private byte[] icon;
 	
-	InteractionMenuItemSimulator(String caption) {
+	ConversationMenuItemSimulator(String caption) {
 		this.caption = caption;
 	}
 

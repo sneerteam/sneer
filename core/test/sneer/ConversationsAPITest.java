@@ -11,7 +11,7 @@ import rx.subjects.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 
-public class InteractionsAPITest extends InteractionsAPITestsBase {
+public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 	@Test
 	public void changesPrik() {

@@ -27,12 +27,12 @@ public interface Sneer {
 	/** @return One of the following, if available, in order of priority: Nickname (if party is a Contact); "? " + party's name, if name is available; "? PUK: " + publicKey. */
 	Observed<String> nameFor(Party party);
 
-	/** All Interactions you have had, ordered by most recent first. */
-	Observable<List<Interaction>> interactions();
-	/** All Interactions of eventType have had, ordered by most recent first. */
-	Observable<List<Interaction>> interactionsContaining(String eventType);
-	/** @return an existing Interaction with party or a new one if it doesn't exist. */
-	Interaction produceInteractionWith(Party party);
+	/** All Conversations you have had, ordered by most recent first. */
+	Observable<List<Conversation>> conversations();
+	/** All Conversations of messageType have had, ordered by most recent first. */
+	Observable<List<Conversation>> conversationsContaining(String messageType);
+	/** @return an existing Conversation with party or a new one if it doesn't exist. */
+	Conversation produceConversationWith(Party party);
 	
 	TupleSpace tupleSpace();
 

@@ -27,15 +27,15 @@
     <string name="title_activity_chat">SneerChat</string>
     <string name="title_chat_list">SneerChat</string>
     <string name="title_chat_detail">Chat Detail</string>
-    <string name="title_interaction_list">Recent Interactions</string>
+    <string name="title_conversation_list">Recent Conversation</string>
     <string name="title_conversation">Conversation</string>
     <string name="title_activity_profile">Public Profile</string>
-    <string name="action_new_interaction">New Event</string>
+    <string name="action_new_conversation">New Message</string>
 
-    <!-- Interaction View -->
-    <string name="interaction_activity_last_action_button">Last Action</string>
-    <string name="interaction_activity_action_button">Action</string>
-    <!-- Interaction View -->
+    <!-- Conversation View -->
+    <string name="conversation_activity_last_action_button">Last Action</string>
+    <string name="conversation_activity_action_button">Action</string>
+    <!-- Conversation View -->
 
 
     <!-- Profile View -->
@@ -53,13 +53,13 @@
 
 
     <!-- Search -->
-    <string name="search_hint">Search interactions</string>
+    <string name="search_hint">Search conversation</string>
     <string name="action_select">Complete action using</string>
     <string name="action_cancel">Cancel</string>
     <string name="pick_image_action_list_icon_description">Action Icon</string>
-    <string name="interaction_summary_picture">Interaction Summary Picture</string>
-    <string name="action_search">Search Interaction</string>
-    <string name="string_dummy_interaction_text">dummy interaction text</string>
+    <string name="conversation_summary_picture">Conversation Summary Picture</string>
+    <string name="action_search">Search Conversation</string>
+    <string name="string_dummy_conversation_text">dummy conversation text</string>
     <string name="dummy_date">94082374239147</string>
     <string name="title_activity_system_report">System Report</string>
 

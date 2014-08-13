@@ -20,7 +20,7 @@
 (defn next-packet-for [puk server])
 
 (facts
- "Facts about client/server interactions"
+ "Facts about client/server conversations"
 
  (fact "for each ping its pong"
        (let [client (create-puk "c")

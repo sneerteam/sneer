@@ -280,7 +280,7 @@ public class SneerAdminImpl implements SneerAdmin {
 			}
 			
 			@Override
-			public Interaction produceInteractionWith(Party party) {
+			public Conversation produceConversationWith(Party party) {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -292,13 +292,13 @@ public class SneerAdminImpl implements SneerAdmin {
 			}
 			
 			@Override
-			public Observable<List<Interaction>> interactionsContaining(String eventType) {
+			public Observable<List<Conversation>> conversationsContaining(String messageType) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
-			public Observable<List<Interaction>> interactions() {
+			public Observable<List<Conversation>> conversations() {
 				// TODO Auto-generated method stub
 				return null;
 			}

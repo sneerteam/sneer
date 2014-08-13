@@ -3,7 +3,7 @@ package sneer;
 import sneer.admin.*;
 import sneer.impl.keys.*;
 
-public class InteractionsAPITestsBase {
+public class ConversationsAPITestsBase {
 
 	private final TuplesFactoryInProcess world = new TuplesFactoryInProcess();
 	

@@ -4,21 +4,21 @@
     android:orientation="horizontal" >
 
     <ImageView
-        android:id="@+id/interactionPicture"
+        android:id="@+id/conversationPicture"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_centerVertical="true"
-        android:contentDescription="@string/interaction_summary_picture"
+        android:contentDescription="@string/conversation_summary_picture"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
         android:src="@drawable/neide" />
 
     <TextView
-        android:id="@+id/interactionParty"
+        android:id="@+id/conversationParty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/interactionPicture"
+        android:layout_toRightOf="@+id/conversationPicture"
         android:divider="@null"
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
@@ -26,7 +26,7 @@
         android:textStyle="normal|bold" />
 
     <TextView
-        android:id="@+id/interactionDate"
+        android:id="@+id/conversationDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -37,27 +37,27 @@
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/interactionSummary"
+        android:id="@+id/conversationSummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/interactionParty"
-        android:layout_toRightOf="@+id/interactionPicture"
+        android:layout_below="@+id/conversationParty"
+        android:layout_toRightOf="@+id/conversationPicture"
         android:lines="1"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingRight="35dp"
         android:paddingTop="5dp"
-        android:text="@string/string_dummy_interaction_text" >
+        android:text="@string/string_dummy_conversation_text" >
     </TextView>
 
     <ImageView
-        android:id="@+id/interactionUnread"
+        android:id="@+id/conversationUnread"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:layout_alignBottom="@+id/interactionSummary"
+        android:layout_alignBottom="@+id/conversationSummary"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/interactionDate"
-        android:contentDescription="@string/interaction_summary_picture"
+        android:layout_below="@+id/conversationDate"
+        android:contentDescription="@string/conversation_summary_picture"
         android:paddingRight="5dp"
         android:src="@drawable/ic_action_unread" />
 

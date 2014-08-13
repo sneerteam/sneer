@@ -4,9 +4,9 @@ import sneer.*;
 import android.content.*;
 import android.widget.*;
 
-public class InteractionMenuAdapter extends ArrayAdapter<InteractionMenuItem> {
+public class ConversationMenuAdapter extends ArrayAdapter<ConversationMenuItem> {
 
-	public InteractionMenuAdapter(Context context, int resource) {
+	public ConversationMenuAdapter(Context context, int resource) {
 		super(context, resource);
 		// TODO Auto-generated constructor stub
 	}
