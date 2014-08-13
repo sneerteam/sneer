@@ -48,7 +48,7 @@ public class SneerAndroid {
 		}
 	}
 	
-	public static <T> Session<T> sessionOnAndroidMainThread(Activity activity) {
+	public static Session sessionOnAndroidMainThread(Activity activity) {
 		return new SneerAndroid(activity).session();
 	}
 	
@@ -62,8 +62,7 @@ public class SneerAndroid {
 		this.context = context;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> Session<T> session() {
+	public Session session() {
 		if (!(context instanceof Activity)) {
 			throw new IllegalStateException("Context expected to be an Activity, found " + context.getClass().getName());
 		}
@@ -71,7 +70,7 @@ public class SneerAndroid {
 		final PrivateKey myPrivateKey = (PrivateKey) getExtra("myPrivateKey");
 		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(myPrivateKey);
 		
-		return new Session<T>() {
+		return new Session() {
 
 			@Override
 			public Observed<String> contactNickname() {
@@ -90,7 +89,7 @@ public class SneerAndroid {
 			}
 
 			@Override
-			public void send(T value) {
+			public void send(Object value) {
 				tupleSpace.publisher()
 					.audience(partyPublicKey())
 					.type(type())
@@ -102,8 +101,8 @@ public class SneerAndroid {
 			}
 
 			@Override
-			public Observable<T> received() {
-				return (Observable<T>) tupleSpace.filter()
+			public Observable<Object> received() {
+				return (Observable<Object>) tupleSpace.filter()
 						.audience(myPrivateKey)
 						.author(partyPublicKey())
 						.type(type())
