@@ -38,7 +38,7 @@ public class SneerActivity extends Activity {
 
 	
 	public static Subscription plugDate(final TextView textView, Observable<Long> dates) {
-//		TODO Consider sharing a single timer for all interactions in the future if performance degrades
+		//	Consider sharing a single timer in the future if performance degrades
 		return Observable.combineLatest(Observable.timer(0, 1, TimeUnit.MINUTES), dates, new Func2<Long, Long, Long>() { @Override public Long call(Long tick, Long date) {
 			return date;
 		}})
