@@ -3,7 +3,6 @@ package sneer;
 import java.util.*;
 
 import rx.*;
-import rx.Scheduler.Inner;
 import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
@@ -37,7 +36,7 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 
 	@Override
 	protected void publishTuple(final Tuple ret) {
-		AndroidSchedulers.mainThread().schedule(new Action1<Scheduler.Inner>() {  @Override public void call(Inner t1) {
+		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() {  @Override public void call() {
 			Intent intent = new Intent(SneerAndroid.SNEER_SERVICE);
 			intent.putExtra("op", TupleSpaceOp.PUBLISH);
 			intent.putExtra("tuple", serializer.serialize(ret));
