@@ -63,6 +63,7 @@ subprojects {
 		        }
 		    }
 	    }
+	    tasks.eclipse.dependsOn(cleanEclipse)
 	    tasks.eclipse.dependsOn(configureAndroidForEclipseTask)
     }
     }
