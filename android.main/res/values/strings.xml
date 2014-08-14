@@ -62,5 +62,6 @@
     <string name="string_dummy_conversation_text">dummy conversation text</string>
     <string name="dummy_date">94082374239147</string>
     <string name="title_activity_system_report">System Report</string>
+    <string name="title_activity_contact">ContactActivity</string>
 
 </resources>
