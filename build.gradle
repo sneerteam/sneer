@@ -15,6 +15,16 @@ allprojects {
 }
 
 subprojects {
+  afterEvaluate {
+    if (it.name.endsWith('.tests')) {
+      it.dependencies {
+        compile 'junit:junit:4.11'
+      }
+    }
+  }
+}
+
+subprojects {
     afterEvaluate {
 	if (plugins.hasPlugin('eclipse') && (plugins.hasPlugin('android-library') || plugins.hasPlugin('android'))) {
 	    task configureAndroidForEclipseTask << {
