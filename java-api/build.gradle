@@ -12,7 +12,7 @@ sourceSets {
 }
 
 dependencies {
-    compile 'com.netflix.rxjava:rxjava-core:0.17.5'
+    compile 'com.netflix.rxjava:rxjava-core:0.19.6'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
 }
 
