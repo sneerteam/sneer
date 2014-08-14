@@ -1,4 +1,4 @@
-package core;
+package sneer.core.tests;
 
 import static org.junit.Assert.*;
 

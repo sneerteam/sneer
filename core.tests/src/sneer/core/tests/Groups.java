@@ -1,7 +1,7 @@
-package core;
+package sneer.core.tests;
 
-import static core.ObservableTestUtils.*;
-import static core.TupleTestUtils.*;
+import static sneer.core.tests.ObservableTestUtils.*;
+import static sneer.core.tests.TupleTestUtils.*;
 
 import org.junit.*;
 

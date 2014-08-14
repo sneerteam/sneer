@@ -1,4 +1,4 @@
-(ns core.core-test
+(ns sneer.core.tests.core-test
   (:require [clojure.test :refer :all]
             [clojure.java.jdbc :as sql]))
 

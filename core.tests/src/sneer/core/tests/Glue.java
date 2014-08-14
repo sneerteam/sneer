@@ -1,4 +1,4 @@
-package core;
+package sneer.core.tests;
 
 import sneer.admin.*;
 import clojure.java.api.*;
@@ -16,14 +16,18 @@ class Glue {
 
 	public static Object newNetwork() {
 		try {
-			return var("core.network-simulator", "new-network").call();
+			return networkSimulator("new-network").call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 	
 	public static void tearDownNetwork(Object network) {
-		var("core.network-simulator", "stop-network").invoke(network);
+		networkSimulator("stop-network").invoke(network);
+	}
+
+	private static IFn networkSimulator(String var) {
+		return var("sneer.core.tests.network-simulator", var);
 	}
 	
 	private static IFn sneerCoreVar(String simpleName) {

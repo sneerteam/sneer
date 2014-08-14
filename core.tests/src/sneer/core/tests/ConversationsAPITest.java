@@ -1,13 +1,14 @@
-package sneer;
+package sneer.core.tests;
 
-import static core.ObservableTestUtils.*;
 import static org.junit.Assert.*;
+import static sneer.core.tests.ObservableTestUtils.*;
 
 import java.util.*;
 
 import org.junit.*;
 
 import rx.subjects.*;
+import sneer.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 

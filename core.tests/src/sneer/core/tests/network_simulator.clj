@@ -1,4 +1,4 @@
-(ns core.network-simulator
+(ns sneer.core.tests.network-simulator
   (:require [rx.lang.clojure.core :as rx])
   (:import [rx.subjects PublishSubject]))
 

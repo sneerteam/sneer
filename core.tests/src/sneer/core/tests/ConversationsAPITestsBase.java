@@ -1,5 +1,6 @@
-package sneer;
+package sneer.core.tests;
 
+import sneer.*;
 import sneer.admin.*;
 import sneer.impl.keys.*;
 

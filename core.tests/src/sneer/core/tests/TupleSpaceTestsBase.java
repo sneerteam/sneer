@@ -1,4 +1,4 @@
-package core;
+package sneer.core.tests;
 
 import org.junit.*;
 
