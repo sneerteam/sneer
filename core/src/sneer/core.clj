@@ -10,6 +10,8 @@
     [rx.schedulers TestScheduler]
     [rx.subjects ReplaySubject PublishSubject]))
 
+(defprotocol Network
+  (connect [network puk]))
 
 (defmacro reify+
   "expands to reify form after macro expanding the body"
@@ -51,11 +53,6 @@
         (pub [this]
            (rx/on-next tuples tuple)
            (reify-tuple tuple))))))
-
-(defn addressed-to [puk]
-  (fn [envelope]
-    (let [destination-address (:address envelope)]
-      (= destination-address puk))))
 
 (defn filter-by [criteria tuples]
   (reduce
@@ -108,11 +105,10 @@
 (defn reify-tuple-space [own-puk contacts network]
   
   (let [local-tuples (ReplaySubject/create)
-        envelopes-for-me (rx/filter (addressed-to own-puk) network)
         tuples-for-me (->>
-                        (payloads :tuple envelopes-for-me)
+                        (payloads :tuple network)
                         rx/distinct)
-        subscriptions-for-me (payloads :subscription envelopes-for-me)
+        subscriptions-for-me (payloads :subscription network)
         
         peers (->>
                 contacts
@@ -185,9 +181,10 @@
       (initialize [this new-prik]
         (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
       (sneer [this]
-        (let [puk (.publicKey @prik)              
+        (let [puk (.publicKey @prik)
+              connection (connect network puk)
               contacts (PublishSubject/create)
-              tuple-space (reify-tuple-space puk contacts network)]
+              tuple-space (reify-tuple-space puk contacts connection)]
           (reify Sneer
             (self [this] (reify-party puk))
             (produceParty [this puk] (reify-party puk))
