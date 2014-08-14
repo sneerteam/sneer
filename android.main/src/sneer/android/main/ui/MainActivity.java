@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
 		if (!initializeSneerSingleton()) return;
 
 		startActivity();
-		startCore();
+//		startCore();
 
 		makeConversationList();
 	}
