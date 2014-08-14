@@ -25,6 +25,7 @@ import android.widget.*;
 public class ConversationActivity extends Activity {
 
 	static final String PARTY_PUK = "partyPuk";
+	static final String ACTIVITY_TITLE = "activityTitle";
 
 	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
 		return Comparators.compare(lhs.timestampSent(), rhs.timestampSent());
@@ -160,8 +161,9 @@ public class ConversationActivity extends Activity {
 
 	private void navigateToProfile() {
 		Intent intent = new Intent();
-		intent.setClass(this, ProfileActivity.class);
-		intent.putExtra("partyPuk", party.publicKey().current());
+		intent.setClass(this, ContactActivity.class);
+		intent.putExtra(PARTY_PUK, party.publicKey().current());
+		intent.putExtra(ACTIVITY_TITLE, "Contact");
 		startActivity(intent);
 	}
 

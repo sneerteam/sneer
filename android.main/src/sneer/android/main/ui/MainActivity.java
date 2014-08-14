@@ -12,7 +12,6 @@ import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -26,7 +25,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import clojure.java.api.*;
 
 public class MainActivity extends Activity {
-
+	
 	private AlertDialog error;
 	
 	private MainAdapter adapter;
@@ -206,7 +205,7 @@ public class MainActivity extends Activity {
 			navigateTo(ProfileActivity.class);
 			break;
 		case R.id.action_add_contact:
-			showContactAdd();
+			navigateToProfile();
 			break;
 		case R.id.action_send_pk:
 			sendYourPublicKey();
@@ -221,39 +220,14 @@ public class MainActivity extends Activity {
 
 		return true;
 	}
-
-	private void showContactAdd() {
-		View addContactView = View.inflate(this, R.layout.activity_contact_add,
-				null);
-		final EditText publicKeyEdit = (EditText) addContactView
-				.findViewById(R.id.public_key);
-		final EditText nicknameEdit = (EditText) addContactView
-				.findViewById(R.id.nickname);
-		AlertDialog alertDialog = new AlertDialog.Builder(this)
-				.setView(addContactView)
-				.setTitle(R.string.action_add_contact)
-				.setNegativeButton("Cancel", null)
-				.setPositiveButton("Add",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								PublicKey puk = Keys
-										.createPublicKey(publicKeyEdit
-												.getText().toString()
-												.getBytes());
-								String nickname = nicknameEdit.getText()
-										.toString();
-								Party party = sneer().produceParty(
-										(PublicKey) puk);
-								try {
-									sneer().addContact(nickname, party);
-								} catch (FriendlyException e) {
-									toast(e.getMessage());
-								}
-							}
-						}).create();
-		alertDialog.show();
+	
+	private void navigateToProfile() {
+		Intent intent = new Intent();
+		intent.setClass(this, ContactActivity.class);
+		startActivity(intent);
 	}
 
+	
 	public static void log(String s) {
 		Log.d(MainActivity.class.getSimpleName(), s);
 	}

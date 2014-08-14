@@ -38,6 +38,13 @@
     <!-- Conversation View -->
 
 
+    <!-- Contact View -->
+    <string name="contact_view_nickname">Nickname</string>
+    <string name="contact_view_public_key">Public key</string>
+    <string name="profile_view_section_contact">CONTACT SECTION</string>
+    <string name="profile_view_section_profile">PROFILE SECTION</string>
+    <!-- Contact View -->
+    
     <!-- Profile View -->
     <string name="profile_view_content_description">Your Picture</string>
     <string name="profile_view_first_name">First name</string>
