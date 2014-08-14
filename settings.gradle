@@ -1,1 +1,3 @@
-include 'java-api', 'java-api.tests', 'android-api', 'android.main', 'core'
+include 'java-api', 'java-api.tests'
+include 'android-api', 'android.main'
+include 'core', 'core.tests'
