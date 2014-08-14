@@ -7,7 +7,8 @@
 (defn start [puk & [server-host server-port]]
 
   (let [packets-in (async/chan)
-        packets-out (async/chan)]
+        packets-out (async/chan)
+        to-server (async/chan 1)]
 
     (async/thread
       ; ensure no network activity takes place on caller thread to workaround android limitation
@@ -24,9 +25,12 @@
         (async/go-loop []
           (when-let [packet (<! packets-in)]
             (SystemReport/updateReport "packet" packet)
-            (recur)))))
+            (recur)))
 
-    {:packets-out packets-out}))
+        (async/pipe (async/map (fn [value] [server-addr value]) [to-server])
+                    packets-out)))
+
+    {:packets-out packets-out :to-server to-server}))
 
 (defn stop [client]
   (async/close! (:packets-out client)))
