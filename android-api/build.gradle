@@ -37,6 +37,7 @@ buildscript {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -49,7 +50,7 @@ dependencies {
     libs 'us.bpsm:edn-java:0.4.4'
     libs 'com.netflix.rxjava:rxjava-android:0.19.6'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
-    compile project(':java-api')
+	compile 'me.sneer:java-api:+'
 }
 
 android {

@@ -11,3 +11,4 @@ git pull --rebase
 if [ -d "../rockpaperscissors" ]; then
   cp -f android-api/bin/*.jar ../rockpaperscissors/libs/
 fi
+./gradlew install

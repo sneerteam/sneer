@@ -9,6 +9,7 @@ targetCompatibility = 1.6
 
 sourceSets {
     main.java.srcDir 'src'
+    main.resources.srcDir 'src'
 }
 
 dependencies {
