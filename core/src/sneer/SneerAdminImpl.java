@@ -39,7 +39,7 @@ public class SneerAdminImpl implements SneerAdmin {
 			return filter.localTuples()
 					.map(Tuple.TO_PAYLOAD)
 					.cast(clazz)
-					.toBlockingObservable()
+					.toBlocking()
 					.last();
 		}
 	}

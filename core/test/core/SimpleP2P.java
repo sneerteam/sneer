@@ -127,7 +127,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			tuplesA.filter()
 				.audience(userA)
 				.type("profile/name")
-				.localTuples().toBlockingObservable().last().payload());
+				.localTuples().toBlocking().last().payload());
 	}
 	
 	@Test

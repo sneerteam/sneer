@@ -12,7 +12,7 @@ public class SystemReportTests {
 	public void systemReport() {
 		SystemReport.updateReport("Shields On", true);
 		SystemReport.updateReport("Phasers", "Stun");
-		String report = SystemReport.report().toBlockingObservable().first();
+		String report = SystemReport.report().toBlocking().first();
 		assertEquals("Phasers: Stun\n\nShields On: true\n\n", report);
 	}
 
