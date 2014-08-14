@@ -11,10 +11,12 @@
         to-server (async/chan 1)]
 
     (async/thread
+
       ; ensure no network activity takes place on caller thread to workaround android limitation
       (let [server-addr (InetSocketAddress. (or server-host "dynamic.sneer.me") (or server-port 5555))
             udp-server (udp/serve-udp packets-in packets-out)
             ping [server-addr {:intent :ping :from puk}]]
+
         ; server ping loop
         (async/go-loop []
           (when  (>! packets-out ping)
