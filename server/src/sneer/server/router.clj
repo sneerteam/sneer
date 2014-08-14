@@ -55,4 +55,7 @@ a reply to sendTo(...) and when the receiver
   (go-while-let
    [packet (<! packets-in)]
    (println "router/<!" packet)
-   (>! packets-out {:intent :pong :to (:from packet)})))
+   (>! packets-out
+       (case (:intent packet)
+         :send (assoc packet :intent :receive)
+         {:intent :pong :to (:from packet)}))))

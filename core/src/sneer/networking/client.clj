@@ -4,7 +4,7 @@
   (:import [java.net InetSocketAddress]
            [sneer.commons SystemReport]))
 
-(defn start [& [server-host server-port]]
+(defn start [puk & [server-host server-port]]
 
   (let [packets-in (async/chan)
         packets-out (async/chan)]
@@ -13,7 +13,7 @@
       ; ensure no network activity takes place on caller thread to workaround android limitation
       (let [server-addr (InetSocketAddress. (or server-host "dynamic.sneer.me") (or server-port 5555))
             udp-server (udp/serve-udp packets-in packets-out)
-            ping [server-addr {:intent :ping}]]
+            ping [server-addr {:intent :ping :from puk}]]
         ; server ping loop
         (async/go-loop []
           (when  (>! packets-out ping)

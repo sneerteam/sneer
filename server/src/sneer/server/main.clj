@@ -11,16 +11,30 @@
     home-dir
     (first args)))
 
+(defn update-puk-address [puk->address [address payload]]
+  (let [puk (:from payload)]
+    (swap! puk->address assoc puk address))
+  payload)
+
+(defn with-address [puk->address payload]
+  (let [puk (:to payload)]
+    [(get @puk->address puk) (dissoc payload :to)]))
+
+(defn has-address? [[address payload]]
+  address)
+
 (defn start-server! [port]
-  (let [packets-in (async/chan)
+  (let [puk->address (atom {})
+        packets-in (async/chan)
         packets-out (async/chan)
         udp-server (udp/serve-udp
                     packets-in
-                    (async/map (fn [packet] [(:to packet) (dissoc packet :to)]) [packets-out])
+                    (async/filter< has-address?
+                     (async/map #(with-address puk->address %) [packets-out]))
                     port)
         router (router/create-router
-                (async/map (fn [[address packet]] (assoc packet :from address)) [packets-in])
-                 packets-out)]
+                (async/map #(update-puk-address puk->address %) [packets-in])
+                packets-out)]
     {:udp-server udp-server :packets-in packets-in :packets-out packets-out}))
 
 (defn -main [& [port]]

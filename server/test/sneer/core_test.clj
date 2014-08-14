@@ -28,4 +28,13 @@
              packets-out (async/chan)
              router (router/create-router packets-in packets-out)]
          (>!! packets-in {:intent :ping :from client})
-         (<?!! packets-out) => {:intent :pong :to client})))
+         (<?!! packets-out) => {:intent :pong :to client}))
+
+ (fact "sendTo(Puk receiver, byte[] payload) => receiveFrom(Puk sender, byte[] payload)"
+       (let [client-a (create-puk "ca")
+             client-b (create-puk "cb")
+             packets-in (async/chan 1)
+             packets-out (async/chan)
+             router (router/create-router packets-in packets-out)]
+         (>!! packets-in {:intent :send :to client-b :from client-a :payload "42"})
+         (<?!! packets-out) => {:intent :receive :from client-a :to client-b :payload "42"})))

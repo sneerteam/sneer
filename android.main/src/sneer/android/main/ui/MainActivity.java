@@ -295,7 +295,7 @@ public class MainActivity extends Activity {
 	private void startCore() {
 		try {
 			// Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.networking.client"));
-			// toast(Clojure.var("sneer.networking.client/start").call().toString());
+			// toast(Clojure.var("sneer.networking.client/start").invoke(ownPuk).toString());
 		} catch (Exception e) {
 			toast(Exceptions.asNiceMessage(e));
 		}
