@@ -23,6 +23,7 @@ import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
+import clojure.java.api.*;
 
 public class MainActivity extends Activity {
 
@@ -294,8 +295,8 @@ public class MainActivity extends Activity {
 
 	private void startCore() {
 		try {
-			// Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.networking.client"));
-			// toast(Clojure.var("sneer.networking.client/start").invoke(ownPuk).toString());
+			 Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.networking.client"));
+			 toast(Clojure.var("sneer.networking.client/start").invoke(sneer().self().publicKey().current()).toString());
 		} catch (Exception e) {
 			toast(Exceptions.asNiceMessage(e));
 		}
