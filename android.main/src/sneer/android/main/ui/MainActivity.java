@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
 
 		listView = (ListView) findViewById(R.id.listView);
 		adapter = new MainAdapter(this,
-				R.layout.list_item_conversation,
+				R.layout.list_item_main,
 				new Func1<Party, Observable<String>>() {
 					@Override
 					public Observable<String> call(Party party) {

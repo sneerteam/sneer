@@ -1,40 +1,40 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:gravity="left">
-         
+    android:gravity="left"
+    android:padding="10dp" >
+
     <View
-		android:id="@+id/speechBubbleArrowLeft"
-		android:layout_width="20dp"
-		android:layout_height="20dp"
-		android:layout_alignTop="@+id/speechBubble"
-		android:background="@drawable/drawble_dummy" />
-    
-	<RelativeLayout
+        android:id="@+id/speechBubbleArrowLeft"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignTop="@+id/speechBubble"
+        android:background="@drawable/drawble_dummy" />
+
+    <RelativeLayout
         android:id="@+id/speechBubble"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"	    
-	    android:padding="10dp"
-	    android:layout_toRightOf="@+id/speechBubbleArrowLeft"
-	    android:background="@drawable/contact_speech_bubble">
-	
-		<TextView
-			android:id="@+id/messageContent" 
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/dummy_text" />
-		
-		<TextView
-			android:id="@+id/messageTime"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_below="@+id/messageContent"
-			android:layout_alignLeft="@+id/messageContent"
-			android:textSize="12sp"
-			android:textColor="#777"
-			android:text="@string/dummy_text" />
-	
-	</RelativeLayout>
-    
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/speechBubbleArrowLeft"
+        android:background="@drawable/contact_speech_bubble"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/messageContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dummy_text"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/messageTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/messageContent"
+            android:layout_below="@+id/messageContent"
+            android:text="@string/dummy_text"
+            android:textColor="#777"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
 </RelativeLayout>
