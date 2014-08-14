@@ -302,7 +302,8 @@ public class MainActivity extends Activity {
 	}
 
 	void toast(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+		Log.d(MainActivity.class.getSimpleName(), "toast: " + message);
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
 	private void startActivity() {
