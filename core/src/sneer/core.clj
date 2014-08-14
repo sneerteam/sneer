@@ -196,6 +196,3 @@
                 (rx/on-next contacts contact)))
             (tupleSpace [this] tuple-space)))))))
 
-(defn new-network []
-  (PublishSubject/create))
-

@@ -32,6 +32,11 @@ public class TupleSpaceTestsBase {
 		introduce(sneerC, sneerB);
 	}
 	
+	@After
+	public void tearDownNetwork() {
+		Glue.tearDownNetwork(network);
+	}
+	
 	protected void introduce(Sneer a, Sneer b) {
 		try {
 			a.addContact(nameOf(b), a.produceParty(b.self().publicKey().current()));
