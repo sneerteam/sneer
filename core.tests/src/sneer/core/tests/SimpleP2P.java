@@ -95,6 +95,21 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	}
 	
 	@Test
+	public void newPeerCanSubscribeToPastTuples() {
+		
+		String name = "UserA McCloud";
+		tuplesA.publisher()
+			.type("profile/name")
+			.pub(name);
+		
+		PrivateKey userD = Keys.createPrivateKey();
+		TupleSpace tuplesD = newTupleSpace(userD.publicKey(), newPeers(userA));
+		
+		expecting(
+			payloads(tuplesD.filter().tuples(), name));
+	}
+	
+	@Test
 	public void byAuthor() {
 		tuplesA.publisher()
 			.pub("UserA McCloud");
