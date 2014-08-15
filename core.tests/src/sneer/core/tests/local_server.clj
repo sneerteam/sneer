@@ -1,19 +1,28 @@
 (ns sneer.core.tests.local-server
   (:require [rx.lang.clojure.core :as rx]
-            [clojure.core.async :as async]
+            [clojure.core.async :as async :refer [<! >!!]]
             [sneer.core :as core]
             [sneer.server.main :as server]
             [sneer.networking.client :as client]
             [sneer.rx :refer [subject*]]))
 
 (defn chan->observable [ch]
-  (rx.Observable/empty))
+  (let [subject (rx.subjects.PublishSubject/create)]
+    (async/go-loop []
+      (when-let [value (<! ch)]
+        (rx/on-next subject value)
+        (recur)))
+    subject))
 
 (defn chan->observer [ch]
   (reify rx.Observer
-    (onNext [this value])
-    (onError [this error])
-    (onCompleted [this])))
+    (onNext [this value]
+      (>!! ch value))
+    (onError [this error]
+      (.printStackTrace error)
+      (async/close! ch))
+    (onCompleted [this]
+      (async/close! ch))))
 
 (defn start []
   (let [port 4242
