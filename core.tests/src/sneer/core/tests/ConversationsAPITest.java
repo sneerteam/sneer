@@ -20,36 +20,27 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 
 	@Test
-	public void myOwnPublicKey() {
-
-		assertEquals(userA.publicKey(), sneerA.self().publicKey().current());
-
-		assertEqualsUntilNow(sneerA.self().publicKey().observable(), userA.publicKey());
-
-	}
-
-	@Test
 	public void pukOfParty() {
 
-		Party someone = sneerA.produceParty(userB.publicKey());
+		Party someone = sneerA.produceParty(userB);
 
-		assertEquals(userB.publicKey(), someone.publicKey().current());
+		assertEquals(userB, someone.publicKey().current());
 
 	}
 
 	@Test
 	public void alwaysReturnsSamePartyInstance() {
 
-		Party someoneElse = sneerA.produceParty(userB.publicKey());
+		Party someoneElse = sneerA.produceParty(userB);
 
-		assertSame(someoneElse, sneerA.produceParty(userB.publicKey()));
+		assertSame(someoneElse, sneerA.produceParty(userB));
 
 	}
 
 	@Test
 	public void addContact() throws FriendlyException {
 
-		Party partyB = sneerA.produceParty(userB.publicKey());
+		Party partyB = sneerA.produceParty(userB);
 
 		assertNull(sneerA.findContact(partyB));
 
@@ -63,14 +54,14 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 	@Test(expected = FriendlyException.class)
 	public void exceptionOnDuplicatedNickname() throws FriendlyException {
 
-		sneerA.addContact("Party Boy", sneerA.produceParty(userB.publicKey()));
-		sneerA.addContact("Party Boy", sneerA.produceParty(userC.publicKey()));
+		sneerA.addContact("Party Boy", sneerA.produceParty(userB));
+		sneerA.addContact("Party Boy", sneerA.produceParty(userC));
 	}
 
 	@Test
 	public void changeContactNickname() throws FriendlyException {
 
-		Party partyB = sneerA.produceParty(userB.publicKey());
+		Party partyB = sneerA.produceParty(userB);
 
 		sneerA.addContact("Party Boy", partyB);
 
@@ -92,8 +83,8 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 	@Test
 	public void contactListSequence() throws FriendlyException {
 
-		Party partyB = sneerA.produceParty(userB.publicKey());
-		Party partyC = sneerA.produceParty(userC.publicKey());
+		Party partyB = sneerA.produceParty(userB);
+		Party partyC = sneerA.produceParty(userC);
 		
 		assertEqualsUntilNow(sneerA.contacts());
 		
@@ -112,7 +103,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 	public void preferredNickname() {
 		
 		Profile profileBFromB = sneerB.profileFor(sneerB.self());
-		Profile profileBFromA = sneerA.profileFor(sneerA.produceParty(userB.publicKey()));
+		Profile profileBFromA = sneerA.profileFor(sneerA.produceParty(userB));
 		
 		profileBFromB.setPreferredNickname("Party Boy");
 		
