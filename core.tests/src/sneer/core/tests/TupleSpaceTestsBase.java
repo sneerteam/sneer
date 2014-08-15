@@ -16,15 +16,15 @@ public class TupleSpaceTestsBase {
 	protected final PrivateKey userB = Keys.createPrivateKey();
 	protected final PrivateKey userC = Keys.createPrivateKey();
 
-	protected final SneerAdmin adminA = newSneerAdmin(userA);
+	protected final SneerAdmin adminA = createAndInitSneerAdmin(userA);
 	protected final Sneer sneerA = adminA.sneer();
 	protected final TupleSpace tuplesA = sneerA.tupleSpace();
 
-	protected final SneerAdmin adminB = newSneerAdmin(userB);
+	protected final SneerAdmin adminB = createAndInitSneerAdmin(userB);
 	protected final Sneer sneerB = adminB.sneer();
 	protected final TupleSpace tuplesB = sneerB.tupleSpace();
 
-	protected final SneerAdmin adminC = newSneerAdmin(userC);
+	protected final SneerAdmin adminC = createAndInitSneerAdmin(userC);
 	protected final Sneer sneerC = adminC.sneer();
 	protected final TupleSpace tuplesC = sneerC.tupleSpace();
 	
@@ -67,7 +67,7 @@ public class TupleSpaceTestsBase {
 		return Glue.newNetwork();
 	}
 	
-	private SneerAdmin newSneerAdmin(PrivateKey prik) {
+	private SneerAdmin createAndInitSneerAdmin(PrivateKey prik) {
 		try {
 			SneerAdmin admin = createSneerAdmin(network);
 			admin.initialize(prik);
