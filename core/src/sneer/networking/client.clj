@@ -7,7 +7,7 @@
 (defn start
   
   ([puk]
-    (start puk (async/chan 1) (async/chan 1) "dynamic.sneer.me" 5555))
+    (start puk (async/chan (async/dropping-buffer 1)) (async/chan (async/dropping-buffer 1)) "dynamic.sneer.me" 5555))
   
   ([puk from-server to-server server-host server-port]
     (let [packets-in (async/chan)
