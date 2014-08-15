@@ -5,8 +5,6 @@ import static sneer.core.tests.ObservableTestUtils.*;
 import static sneer.core.tests.TupleTestUtils.*;
 import static sneer.tuples.Tuple.*;
 
-import java.io.*;
-
 import org.junit.*;
 
 import rx.*;
@@ -33,8 +31,8 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	}
 	
 	@Test
-	public void messagePassing() throws IOException {
-
+	public void messagePassing() {
+		
 		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userB.publicKey())
 			.type("rock-paper-scissor/move");
@@ -55,7 +53,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	}
 
 	@Test
-	public void tupleWithType() throws IOException {
+	public void tupleWithType() {
 
 		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userB.publicKey());
