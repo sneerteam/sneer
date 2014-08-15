@@ -11,13 +11,13 @@ public class ConversationsAPITestsBase {
 //	private final TuplesFactoryInProcess world = new TuplesFactoryInProcess();
 	private final Object network = Glue.newNetwork();
 	
-	protected final PrivateKey userA = newPrivateKey();
-	protected final PrivateKey userB = newPrivateKey();
-	protected final PrivateKey userC = newPrivateKey();
-	
-	protected final SneerAdmin adminA = newSneerAdmin(userA);
-	protected final SneerAdmin adminB = newSneerAdmin(userB);
-	protected final SneerAdmin adminC = newSneerAdmin(userC);
+	protected final SneerAdmin adminA = newSneerAdmin();
+	protected final SneerAdmin adminB = newSneerAdmin();
+	protected final SneerAdmin adminC = newSneerAdmin();
+
+	protected final PublicKey userA = adminA.sneer().self().publicKey().current();
+	protected final PublicKey userB = adminB.sneer().self().publicKey().current();
+	protected final PublicKey userC = adminC.sneer().self().publicKey().current();
 	
 	protected final Sneer sneerA = adminA.sneer();
 	protected final Sneer sneerB = adminB.sneer();
@@ -27,10 +27,10 @@ public class ConversationsAPITestsBase {
 		return Keys.createPrivateKey();
 	}
 
-	private SneerAdmin newSneerAdmin(PrivateKey prik) {
-		TupleSpace tupleSpace = (TupleSpace) Glue.sneerCoreVar("reify-tuple-space").invoke(prik.publicKey(), PublishSubject.create(), network);
+	private SneerAdmin newSneerAdmin() {
+		PublicKey puk = Keys.createPrivateKey().publicKey();
+		TupleSpace tupleSpace = (TupleSpace) Glue.sneerCoreVar("reify-tuple-space").invoke(puk, PublishSubject.create(), network);
 		SneerAdminImpl admin = new SneerAdminImpl(tupleSpace);
-		admin.initialize(prik);
 		return admin;
 	}
 
