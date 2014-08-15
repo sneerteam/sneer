@@ -30,9 +30,11 @@
           (async/go-loop []
             (when-let [packet (<! packets-in)]
               (SystemReport/updateReport "packet" packet)
+              (when-let [payload (-> packet second :payload)]
+                (>! from-server payload))
               (recur)))
 
-          (async/pipe (async/map (fn [value] [server-addr value]) [to-server])
+          (async/pipe (async/map (fn [payload] [server-addr {:intent :send :from puk :to (:address payload) :payload payload}]) [to-server])
                       packets-out)))
 
       {:packets-in packets-in :packets-out packets-out :from-server from-server :to-server to-server})))
