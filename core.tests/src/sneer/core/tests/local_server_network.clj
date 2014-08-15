@@ -1,4 +1,4 @@
-(ns sneer.core.tests.local-server
+(ns sneer.core.tests.local-server-network
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :as async :refer [<! >!!]]
             [sneer.core :as core]
