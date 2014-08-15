@@ -2,79 +2,35 @@ package sneer.core.tests;
 
 import org.junit.*;
 
+import rx.*;
 import sneer.*;
-import sneer.admin.*;
-import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
 public class TupleSpaceTestsBase {
 	
-	private final Object network = createNetwork();
+	private final Object network = Glue.newNetwork();
 
 	protected final PrivateKey userA = Keys.createPrivateKey();
 	protected final PrivateKey userB = Keys.createPrivateKey();
 	protected final PrivateKey userC = Keys.createPrivateKey();
 
-	protected final SneerAdmin adminA = createAndInitSneerAdmin(userA);
-	protected final Sneer sneerA = adminA.sneer();
-	protected final TupleSpace tuplesA = sneerA.tupleSpace();
-
-	protected final SneerAdmin adminB = createAndInitSneerAdmin(userB);
-	protected final Sneer sneerB = adminB.sneer();
-	protected final TupleSpace tuplesB = sneerB.tupleSpace();
-
-	protected final SneerAdmin adminC = createAndInitSneerAdmin(userC);
-	protected final Sneer sneerC = adminC.sneer();
-	protected final TupleSpace tuplesC = sneerC.tupleSpace();
+	protected final TupleSpace tuplesA = newTupleSpace(userA.publicKey(), newPeers(userB, userC));
+	protected final TupleSpace tuplesB = newTupleSpace(userB.publicKey(), newPeers(userA, userC));
+	protected final TupleSpace tuplesC = newTupleSpace(userC.publicKey(), newPeers(userA, userB));
 	
-	@Before
-	public void introductions() {
-		introduce(sneerA, sneerB);
-		introduce(sneerA, sneerC);
-		introduce(sneerC, sneerB);
+	private Observable<PublicKey> newPeers(PrivateKey... peers) {
+		return Observable.from(peers).map(PrivateKey.TO_PUBLIC_KEY);
 	}
-	
+
 	@After
 	public void tearDownNetwork() {
 		Glue.tearDownNetwork(network);
 	}
 	
-	protected void introduce(Sneer a, Sneer b) {
-		try {
-			a.addContact(nameOf(b), a.produceParty(b.self().publicKey().current()));
-			b.addContact(nameOf(a), b.produceParty(a.self().publicKey().current()));
-		} catch (FriendlyException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	private TupleSpace newTupleSpace(PublicKey ownPuk, Observable<PublicKey> peers) {
+		return (TupleSpace) Glue.sneerCoreVar("reify-tuple-space").invoke(ownPuk, peers, network);
 
-
-	private String nameOf(Sneer a) {
-		if (sneerA == a) return "a";
-		if (sneerB == a) return "b";
-		if (sneerC == a) return "c";
-		throw new IllegalStateException();
-	}
-
-	
-	
-	protected SneerAdmin createSneerAdmin(Object session) {
-		return Glue.newSneerAdmin(session);
 	}
 	
-	protected Object createNetwork() {
-		return Glue.newNetwork();
-	}
-	
-	private SneerAdmin createAndInitSneerAdmin(PrivateKey prik) {
-		try {
-			SneerAdmin admin = createSneerAdmin(network);
-			admin.initialize(prik);
-			return admin;
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
 }

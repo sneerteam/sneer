@@ -102,7 +102,7 @@
     (rx/filter (complement nil?))
     (rx/map deserialize)))
 
-(defn reify-tuple-space [own-puk contacts network]
+(defn reify-tuple-space [own-puk peers network]
   
   (let [local-tuples (ReplaySubject/create)
         tuples-for-me (->>
@@ -110,10 +110,6 @@
                         rx/distinct)
         subscriptions-for-me (payloads :subscription network)
         
-        peers (->>
-                contacts
-                (rx/mapcat #(.. % party publicKey observable))
-                rx/distinct)
         subscriptions-for-peers (ReplaySubject/create)]
     
     (rx/subscribe
@@ -160,38 +156,4 @@
         (new-tuple-publisher local-tuples {"author" own-puk}))
       (filter [this]
         (new-tuple-filter local-tuples subscriptions-for-peers)))))
-
-(defn ->observed [value]
-  (.observed (ObservedSubject/create value)))
-
-(defn reify-party [puk]
-  (let [observed-puk (->observed puk)]
-    (reify Party
-      (publicKey [this] observed-puk))))
-
-(defn reify-contact [nickname party]
-  (let [observed-name (->observed nickname)]
-    (reify Contact
-      (nickname [this] observed-name)
-      (party [this] party))))
-
-(defn new-sneer-admin [network]
-  (let [prik (atom nil)]
-    (reify SneerAdmin
-      (initialize [this new-prik]
-        (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
-      (privateKey [this]
-        @prik)
-      (sneer [this]
-        (let [puk (.publicKey @prik)
-              connection (connect network puk)
-              contacts (PublishSubject/create)
-              tuple-space (reify-tuple-space puk contacts connection)]
-          (reify Sneer
-            (self [this] (reify-party puk))
-            (produceParty [this puk] (reify-party puk))
-            (addContact [this nickname party]
-              (let [contact (reify-contact nickname party)]
-                (rx/on-next contacts contact)))
-            (tupleSpace [this] tuple-space)))))))
 
