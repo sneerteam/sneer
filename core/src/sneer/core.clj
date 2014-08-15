@@ -180,6 +180,8 @@
     (reify SneerAdmin
       (initialize [this new-prik]
         (swap! prik (fn [old] (do (assert (nil? old)) new-prik))))
+      (privateKey [this]
+        @prik)
       (sneer [this]
         (let [puk (.publicKey @prik)
               connection (connect network puk)
