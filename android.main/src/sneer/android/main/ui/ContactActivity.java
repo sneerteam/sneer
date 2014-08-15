@@ -5,6 +5,8 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 import android.app.*;
 import android.graphics.*;
 import android.os.*;
@@ -44,6 +46,7 @@ public class ContactActivity extends Activity {
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
+		publicKeyEdit = (EditText) findViewById(R.id.publicKey);
 		preferredNickNameView = (TextView) findViewById(R.id.preferredNickName);
 		selfieImage = (ImageView) findViewById(R.id.selfie);
 		countryView = (TextView) findViewById(R.id.country);
@@ -93,30 +96,17 @@ public class ContactActivity extends Activity {
 			}
 		});
 
-		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<String>() {
-					@Override
-					public void call(String preferredNickname) {
-						preferredNickNameView.setText("(" + preferredNickname
-								+ ")");
-					}
-				});
+		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
+			preferredNickNameView.setText("(" + preferredNickname+ ")");
+		}});
 
-		profile.country().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<String>() {
-					@Override
-					public void call(String country) {
-						countryView.setText(country);
-					}
-				});
+		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
+			countryView.setText(country);
+		}});
 
-		profile.city().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<String>() {
-					@Override
-					public void call(String city) {
-						cityView.setText(city);
-					}
-				});
+		profile.city().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String city) {
+			cityView.setText(city);
+		}});
 
 		profile.selfie().observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Action1<byte[]>() {
@@ -135,12 +125,25 @@ public class ContactActivity extends Activity {
 	}
 
 	public void saveContact() {
-		// Contact Section / Nickname
-		// Use WritableContact Sneer.writableContact(contact).
-		// Use WritableContact.problemWithNewNickname() for showing errors in
-		// the field as the user is typing.
 		
-		toast("contact nov saved...");
+		String contactPublicKey = publicKeyEdit.getText().toString();
+		String nickName = nicknameEdit.getText().toString();
+		
+		Party party = sneer().produceParty(Keys.createPublicKey(contactPublicKey.getBytes()));	
+		
+		try{
+			if(newContact){
+				sneer().addContact(nickName, party);				
+			}else{
+				WritableContact writableContact = sneer().writable(sneer().findContact(party));
+				writableContact.setNickname(nickName);	
+				//salvo o nickname
+			}
+		} catch (FriendlyException e) {
+			toast(Exceptions.asNiceMessage(e));
+		}
+		
+		toast("contact saved...");
 	}
 
 	@Override
