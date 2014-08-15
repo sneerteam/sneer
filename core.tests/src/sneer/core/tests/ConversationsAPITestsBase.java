@@ -8,13 +8,13 @@ public class ConversationsAPITestsBase {
 
 	private final TuplesFactoryInProcess world = new TuplesFactoryInProcess();
 	
-	protected final PrivateKey prikA = newPrivateKey();
-	protected final PrivateKey prikB = newPrivateKey();
-	protected final PrivateKey prikC = newPrivateKey();
+	protected final PrivateKey userA = newPrivateKey();
+	protected final PrivateKey userB = newPrivateKey();
+	protected final PrivateKey userC = newPrivateKey();
 	
-	protected final SneerAdmin adminA = newSneerAdmin(prikA);
-	protected final SneerAdmin adminB = newSneerAdmin(prikB);
-	protected final SneerAdmin adminC = newSneerAdmin(prikC);
+	protected final SneerAdmin adminA = newSneerAdmin(userA);
+	protected final SneerAdmin adminB = newSneerAdmin(userB);
+	protected final SneerAdmin adminC = newSneerAdmin(userC);
 	
 	protected final Sneer sneerA = adminA.sneer();
 	protected final Sneer sneerB = adminB.sneer();
