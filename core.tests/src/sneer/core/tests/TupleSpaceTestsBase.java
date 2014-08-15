@@ -29,8 +29,7 @@ public class TupleSpaceTestsBase {
 	}
 	
 	private TupleSpace newTupleSpace(PublicKey ownPuk, Observable<PublicKey> peers) {
-		return (TupleSpace) Glue.sneerCoreVar("reify-tuple-space").invoke(ownPuk, peers, network);
-
+		return Glue.newTupleSpace(ownPuk, peers, network);
 	}
 	
 }

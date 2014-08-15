@@ -1,17 +1,15 @@
 package sneer.core.tests;
 
-import sneer.admin.*;
+import rx.*;
+import sneer.*;
+import sneer.tuples.*;
 import clojure.java.api.*;
 import clojure.lang.*;
 
 class Glue {
 
-	public static SneerAdmin newSneerAdmin(Object network) {
-		try {
-			return (SneerAdmin) sneerCoreVar("new-sneer-admin").invoke(network);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+	public static TupleSpace newTupleSpace(PublicKey ownPuk, Observable<PublicKey> peers, Object network) {
+		return (TupleSpace) sneerCoreVar("reify-tuple-space").invoke(ownPuk, peers, network);
 	}
 
 	public static Object newNetwork() {
