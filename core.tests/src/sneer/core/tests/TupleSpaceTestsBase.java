@@ -9,7 +9,7 @@ import sneer.tuples.*;
 
 public class TupleSpaceTestsBase {
 	
-	private final Object network = Glue.newNetwork();
+	private final Object network = newNetwork();
 
 	protected final PrivateKey userA = Keys.createPrivateKey();
 	protected final PrivateKey userB = Keys.createPrivateKey();
@@ -23,6 +23,10 @@ public class TupleSpaceTestsBase {
 		return Observable.from(peers).map(PrivateKey.TO_PUBLIC_KEY);
 	}
 
+	protected Object newNetwork() {
+		return Glue.newNetwork();
+	}
+	
 	@After
 	public void tearDownNetwork() {
 		Glue.tearDownNetwork(network);

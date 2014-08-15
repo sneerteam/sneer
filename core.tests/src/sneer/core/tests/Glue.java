@@ -21,7 +21,7 @@ class Glue {
 	}
 	
 	public static void tearDownNetwork(Object network) {
-		networkSimulator("stop-network").invoke(network);
+		sneerCoreVar("dispose").invoke(network);
 	}
 
 	private static IFn networkSimulator(String var) {
@@ -32,7 +32,7 @@ class Glue {
 		return var("sneer.core", simpleName);
 	}
 
-	private static IFn var(String ns, String simpleName) {
+	public static IFn var(String ns, String simpleName) {
 		Clojure.var("clojure.core/require").invoke(Clojure.read(ns));
 		return Clojure.var(ns + "/" + simpleName);
 	}	

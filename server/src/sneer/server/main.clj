@@ -23,7 +23,7 @@
 (defn has-address? [[address payload]]
   address)
 
-(defn start-server! [port]
+(defn start [port]
   (let [puk->address (atom {})
         packets-in (async/chan)
         packets-out (async/chan)
@@ -37,6 +37,10 @@
                 packets-out)]
     {:udp-server udp-server :packets-in packets-in :packets-out packets-out}))
 
+(defn stop [server]
+  (async/close! (:packets-out server))
+  (async/alts!! [(:udp-server server) (async/timeout 500)]))
+
 (defn -main [& [port]]
-  (let [server (start-server! (or (Integer/parseInt port) 4242))]
+  (let [server (start (or (Integer/parseInt port) 4242))]
     (println "udp-server finished with" (async/<!! (:udp-server server)))))

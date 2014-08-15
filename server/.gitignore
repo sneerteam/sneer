@@ -10,3 +10,4 @@
 .nrepl-port
 logs
 *~
+/bin/
