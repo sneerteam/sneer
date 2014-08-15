@@ -49,7 +49,7 @@ public class SneerSingleton {
 	}
 
 
-	private static SneerAdmin initialize(Context context) {
+	private static SneerAdmin initialize(Context context) throws FriendlyException {
 		File secureFolder = new File(context.getFilesDir(), "admin");
 		return new SneerFactoryImpl().open(secureFolder);
 	}
