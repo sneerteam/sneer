@@ -30,7 +30,7 @@ class Glue {
 		return var("sneer.core.tests.network-simulator", var);
 	}
 	
-	private static IFn sneerCoreVar(String simpleName) {
+	public static IFn sneerCoreVar(String simpleName) {
 		return var("sneer.core", simpleName);
 	}
 

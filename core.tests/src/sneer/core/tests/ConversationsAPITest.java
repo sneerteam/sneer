@@ -12,7 +12,7 @@ import sneer.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 
-public class ConversationsAPITest extends TupleSpaceTestsBase {
+public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 	@Test
 	public void sameSneer() {
