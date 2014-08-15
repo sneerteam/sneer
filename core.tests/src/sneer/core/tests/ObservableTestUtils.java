@@ -1,14 +1,39 @@
 package sneer.core.tests;
 
 import static org.junit.Assert.*;
+import static sneer.tuples.Tuple.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import rx.Observable;
 import rx.functions.*;
 import rx.schedulers.*;
+import sneer.tuples.*;
 
 public class ObservableTestUtils {
+
+	public static void expecting(Observable<?>... expectations) {
+		Observable
+			.merge(expectations)
+			.buffer(expectations.length)
+			.timeout(1, TimeUnit.SECONDS)
+			.toBlocking()
+			.first();
+	}
+	
+	public static Observable<Void> payloads(Observable<Tuple> tuples, final Object... values) {
+		return values(tuples.map(TO_PAYLOAD), values);
+	}
+
+	public static Observable<Void> values(Observable<?> tuples, final Object... values) {
+		return tuples
+			.buffer(500, TimeUnit.MILLISECONDS, values.length)
+			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> t1) {
+				assertArrayEquals(values, t1.toArray());
+				return null;
+			}});
+	}
 	
 	@SafeVarargs
 	public static <T> void assertEqualsUntilNow(Observable<T> seq, T... expecteds) {

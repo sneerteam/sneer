@@ -7,7 +7,7 @@ import static sneer.tuples.Tuple.*;
 
 import org.junit.*;
 
-import rx.*;
+import rx.Observable;
 import sneer.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
@@ -43,12 +43,11 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		publisher.type("rock-paper-scissor/message")
 			.pub("hehehe");
 		
-		
-		TupleFilter subscriber = tuplesB.filter();
-
-		expectValues(subscriber.tuples(), "paper", "rock", "hehehe");
-		expectValues(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock");
-		expectValues(subscriber.type("rock-paper-scissor/message").tuples(), "hehehe");
+		TupleFilter subscriber = tuplesB.filter();		
+		expecting(
+			payloads(subscriber.tuples(), "paper", "rock", "hehehe"),
+			payloads(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock"),
+			payloads(subscriber.type("rock-paper-scissor/message").tuples(), "hehehe"));
 		
 	}
 
@@ -60,7 +59,8 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		publisher.type("rock-paper-scissor/move").pub("paper");
 		publisher.type("rock-paper-scissor/message").pub("hehehe");
 		
-		assertEqualsUntilNow(tuplesB.filter().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message");
+		expecting(
+			values(tuplesB.filter().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message"));
 		
 	}
 	
@@ -72,31 +72,38 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			.type("rock-paper-scissor/move")
 			.pub("paper");
 		
-		assertCount(0, tuplesB.filter().tuples());
-		assertCount(1, tuplesC.filter().tuples());
+		tuplesA.publisher()
+			.pub("end");
+		
+		expecting(
+			payloads(tuplesB.filter().tuples(), "end"),
+			payloads(tuplesC.filter().tuples(), "paper", "end"));
 	}
 	
 	@Test
 	public void publicTuples() {
 		
+		String name = "UserA McCloud";
 		tuplesA.publisher()
 			.type("profile/name")
-			.pub("UserA McCloud");
+			.pub(name);
 		
-		assertCount(1, tuplesB.filter().tuples());
-		assertCount(1, tuplesC.filter().tuples());
-		assertCount(1, tuplesA.filter().tuples());
-		
+		expecting(
+			payloads(tuplesB.filter().tuples(), name),
+			payloads(tuplesC.filter().tuples(), name),
+			payloads(tuplesA.filter().tuples(), name));
 	}
 	
 	@Test
 	public void byAuthor() {
 		tuplesA.publisher()
-			.type("profile/name")
 			.pub("UserA McCloud");
+		tuplesB.publisher()
+			.pub("UserB McCloud");
 		
-		assertCount(1, tuplesB.filter().author(userA.publicKey()).tuples());
-		assertCount(0, tuplesB.filter().author(userC.publicKey()).tuples());
+		expecting(
+			payloads(tuplesC.filter().author(userA.publicKey()).tuples(), "UserA McCloud"),
+			payloads(tuplesC.filter().author(userB.publicKey()).tuples(), "UserB McCloud"));
 	}
 	
 	@Test
