@@ -10,7 +10,6 @@ import org.junit.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 
 public class ConversationsAPITest extends ConversationsAPITestsBase {
 
@@ -19,16 +18,6 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		assertEquals(adminA.sneer(), adminA.sneer());
 	}
 
-	@Test
-	public void changesPrik() {
-
-		assertEquals(userA, adminA.privateKey());
-
-		PrivateKey anotherPrikInTheFireWall = Keys.createPrivateKey();
-		adminA.initialize(anotherPrikInTheFireWall);
-
-		assertEquals(anotherPrikInTheFireWall, adminA.privateKey());
-	}
 
 	@Test
 	public void myOwnPublicKey() {
