@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 
 		if (!initializeSneerSingleton()) return;
 
-		startActivity();
+		startProfileActivityIfFirstTime();
 //		startCore();
 
 		makeConversationList();
@@ -281,14 +281,11 @@ public class MainActivity extends Activity {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
-	private void startActivity() {
-		ownName().subscribe(new Action1<String>() {
-			@Override
-			public void call(String name) {
-				if (name.isEmpty())
-					startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-			}
-		});
+	private void startProfileActivityIfFirstTime() {
+		ownName().subscribe(new Action1<String>() { @Override public void call(String name) {
+			if (name.isEmpty())
+				startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+		}});
 	}
 
 	private boolean initializeSneerSingleton() {
