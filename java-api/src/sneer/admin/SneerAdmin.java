@@ -2,14 +2,11 @@ package sneer.admin;
 
 import sneer.*;
 
+/** This interface will evolve to handle things like multiple devices, public key change and old key repudiation. */
 public interface SneerAdmin {
 
-	/** @return The private key used to initialize this Sneer node. Null if this has not yet been initialized. */
-	PrivateKey privateKey();
+//	PrivateKey privateKey();
 	
-	void initialize(PrivateKey prik);
-	
-	/** This must have a privateKey(). */
 	Sneer sneer();
-	
+
 }

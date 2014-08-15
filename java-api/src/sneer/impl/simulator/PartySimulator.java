@@ -20,8 +20,8 @@ public class PartySimulator implements Party, Profile {
 	private ReplaySubject<byte[]> selfie = ReplaySubject.create();
 	
 	
-	public PartySimulator(String name, PrivateKey prik) {
-		this(name, prik.publicKey(), true);
+	public PartySimulator(String name, PublicKey puk) {
+		this(name, puk, true);
 	}
 	
 	

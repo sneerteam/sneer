@@ -20,7 +20,6 @@ public class SneerSimulator extends SneerBase {
 
 	private final PartySimulator self;
 	private final TupleSpace tupleSpace;
-	private final PrivateKey privateKey;
 
 	private final Map<PublicKey, PartySimulator> partiesByPuk = new ConcurrentHashMap<PublicKey, PartySimulator>();
 
@@ -31,22 +30,18 @@ public class SneerSimulator extends SneerBase {
 	private final BehaviorSubject<List<Conversation>> conversations = BehaviorSubject.create(conversationsSorted());
 
 	
-	public SneerSimulator(PrivateKey privateKey) {
-		this.privateKey = privateKey;
-		self = new PartySimulator("Neide da Silva", privateKey);
+	public SneerSimulator() {
+		PrivateKey prik = Keys.createPrivateKey("Neide");
+		
+		self = new PartySimulator("Neide da Silva", prik.publicKey());
 		self.setSelfie(selfieFromFileSystem("neide.png"));
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
-		tupleSpace = cloud.newTupleSpace(privateKey);
+		tupleSpace = cloud.newTupleSpace(prik);
 		
 		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("maicon.jpg")), "SCISSORS");
 		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("wesley.jpg")), "ROCK");
 		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("carla.jpg")), "PAPER");
-	}
-
-
-	public PrivateKey privateKey() {
-		return privateKey;
 	}
 
 

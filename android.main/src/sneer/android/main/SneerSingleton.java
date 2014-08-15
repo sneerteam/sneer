@@ -1,5 +1,7 @@
 package sneer.android.main;
 
+import java.io.*;
+
 import sneer.*;
 import sneer.admin.*;
 import sneer.commons.exceptions.*;
@@ -42,9 +44,8 @@ public class SneerSingleton {
 
 
 	private static SneerAdmin initialize(Context context) {
-//		File secureFolder = new File(context.getFilesDir(), "admin");
-//		return new SneerAdminImpl(secureFolder);
-		throw new NotImplementedYet();
+		File secureFolder = new File(context.getFilesDir(), "admin");
+		return new SneerFactoryImpl().open(secureFolder);
 	}
-	
+
 }

@@ -310,16 +310,6 @@ public class SneerAdminImpl implements SneerAdmin {
 		this.tupleSpace = tupleSpace;
 	}
 
-	@Override
-	public void initialize(PrivateKey prik) {
-		this.prik = prik;
-	}
-
-	@Override
-	public PrivateKey privateKey() {
-		return prik;
-	}
-
 	private WritableParty producePartyFromPuk(PublicKey puk) {
 		WritableParty party = parties.getUnchecked(keys.getUnchecked(puk));
 		party.setPublicKey(puk);
