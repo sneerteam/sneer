@@ -104,11 +104,12 @@
 
 (defn reify-tuple-space [own-puk peers network]
   
-  (let [local-tuples (ReplaySubject/create)
+  (let [connection (connect network own-puk)
+        local-tuples (ReplaySubject/create)
         tuples-for-me (->>
-                        (payloads :tuple network)
+                        (payloads :tuple connection)
                         rx/distinct)
-        subscriptions-for-me (payloads :subscription network)
+        subscriptions-for-me (payloads :subscription connection)
         
         subscriptions-for-peers (ReplaySubject/create)]
     
@@ -119,7 +120,7 @@
             (->> subscriptions-for-peers
               (rx/map #(assoc % "author" peer-puk))
               (rx/map #(->envelope peer-puk :subscription (assoc % :sender own-puk))))
-            #(rx/on-next network %))))
+            #(rx/on-next connection %))))
     
     (let [subscriptions-by-sender (atom {})]
       
@@ -144,7 +145,7 @@
                                            (or (nil? audience) (= sender audience))))
                              (filter-by criteria)
                              (rx/map #(->envelope sender :tuple %)))
-                           (partial rx/on-next network))]
+                           (partial rx/on-next connection))]
                      
                      (assoc cur sender {:criteria criteria :subscription subscription})))))))))
     

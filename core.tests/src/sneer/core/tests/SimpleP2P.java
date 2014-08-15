@@ -87,7 +87,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		
 		assertCount(1, tuplesB.filter().tuples());
 		assertCount(1, tuplesC.filter().tuples());
-		assertCount(1, tuplesA.filter().tuples()); // should I receive my own public tuples?
+		assertCount(1, tuplesA.filter().tuples());
 		
 	}
 	
