@@ -17,6 +17,157 @@ public class SneerAdminImpl implements SneerAdmin {
 	private TupleSpace tupleSpace;
 	private PrivateKey prik;
 	
+	private final class SneerImpl implements Sneer {
+		@Override
+		public TupleSpace tupleSpace() {
+			return tupleSpace;
+		}
+
+		@Override
+		public void addContact(String nickname, Party party) throws FriendlyException {
+			findContact(party).setNickname(nickname);
+		}
+
+		@Override
+		public Party self() {
+			return produceParty(prik.publicKey());
+		}
+
+		@Override
+		public Profile profileFor(Party party) {
+			if (party.publicKey() != prik.publicKey()) {
+				throw new IllegalArgumentException("Editing someone else's profile is unsupported.");
+			}
+			final WritableContact contact = contacts.getUnchecked((WritableParty) party);
+			class PublishableContact {
+				void pub(String field, Object value) {
+					tupleSpace.publisher()
+						.audience(prik.publicKey())
+						.type("sneer/profile." + field)
+						.field("party", contact.party())
+						.pub(value);
+				}
+
+				public <T> Observable<T> get(Class<T> clazz, String field) {
+					return tupleSpace.filter()
+							.author(prik.publicKey())
+							.audience(prik)
+							.type("sneer/profile."+field)
+							.field("party", contact.party())
+							.tuples()
+							.map(Tuple.TO_PAYLOAD)
+							.cast(clazz);
+				}
+				
+			}
+			final PublishableContact fields = new PublishableContact();
+			return new Profile() {
+				
+				@Override
+				public Observable<String> ownName() {
+					return fields.get(String.class, "name");
+				}
+				
+				@Override
+				public void setOwnName(String name) {
+					fields.pub("name", name);
+				}
+				
+				@Override
+				public void setSelfie(byte[] newSelfie) {
+					if (newSelfie.length > 1024 * 10) throw new IllegalArgumentException("Selfie must be less than 10 kBytes. Was " + newSelfie.length + " bytes.");
+					fields.pub("selfie", newSelfie);
+				}
+				
+				@Override
+				public void setPreferredNickname(String newPreferredNickname) {
+					fields.pub("preferred-nickname", newPreferredNickname);
+				}
+				
+				@Override
+				public void setCountry(String newCountry) {
+					fields.pub("country", newCountry);
+				}
+				
+				@Override
+				public void setCity(String newCity) {
+					fields.pub("city", newCity);
+				}
+				
+				@Override
+				public Observable<byte[]> selfie() {
+					return fields.get(byte[].class, "selfie");
+				}
+				
+				@Override
+				public Observable<String> preferredNickname() {
+					return contact.nickname().observable();
+				}
+				
+				@Override
+				public Observable<String> country() {
+					return fields.get(String.class, "country");
+				}
+				
+				@Override
+				public Observable<String> city() {
+					return fields.get(String.class, "city");
+				}
+			};
+		}
+
+		@Override
+		public Party produceParty(PublicKey publicKey) {
+			return producePartyFromPuk(publicKey);
+		}
+
+		@Override
+		public Conversation produceConversationWith(Party party) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Observed<String> nameFor(Party party) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Observable<List<Conversation>> conversationsContaining(String messageType) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Observable<List<Conversation>> conversations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public WritableContact findContact(Party party) {
+			return contacts.getUnchecked((WritableParty) party);
+		}
+
+		@Override
+		public Observable<List<Contact>> contacts() {
+			return null;
+		}
+
+		@Override
+		public Contact findContact(String nickname) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public WritableContact writable(Contact contact) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+
 	class ObservedImpl<T> implements Observed<T> {
 		
 		private TupleFilter filter;
@@ -151,6 +302,9 @@ public class SneerAdminImpl implements SneerAdmin {
 	private LoadingCache<WritableParty, WritableContact> contacts = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<WritableParty, WritableContact>() {  @Override public WritableContact load(final WritableParty party) throws Exception {
 		return new WritableContactImpl(party);
 	}});
+	
+	private SneerImpl sneer = new SneerImpl();
+
 
 	public SneerAdminImpl(TupleSpace tupleSpace) {
 		this.tupleSpace = tupleSpace;
@@ -173,158 +327,8 @@ public class SneerAdminImpl implements SneerAdmin {
 	}
 
 	@Override
-	public Sneer sneer() {
-		return new Sneer() {
-			
-			@Override
-			public TupleSpace tupleSpace() {
-				return tupleSpace;
-			}
-			
-			@Override
-			public void addContact(String nickname, Party party) throws FriendlyException {
-				findContact(party).setNickname(nickname);
-			}
-			
-			@Override
-			public Party self() {
-				return produceParty(prik.publicKey());
-			}
-			
-			@Override
-			public Profile profileFor(Party party) {
-				if (party.publicKey() != prik.publicKey()) {
-					throw new IllegalArgumentException("Editing someone else's profile is unsupported.");
-				}
-				final WritableContact contact = contacts.getUnchecked((WritableParty) party);
-				class PublishableContact {
-					void pub(String field, Object value) {
-						tupleSpace.publisher()
-							.audience(prik.publicKey())
-							.type("sneer/profile." + field)
-							.field("party", contact.party())
-							.pub(value);
-					}
-
-					public <T> Observable<T> get(Class<T> clazz, String field) {
-						return tupleSpace.filter()
-								.author(prik.publicKey())
-								.audience(prik)
-								.type("sneer/profile."+field)
-								.field("party", contact.party())
-								.tuples()
-								.map(Tuple.TO_PAYLOAD)
-								.cast(clazz);
-					}
-					
-				}
-				final PublishableContact fields = new PublishableContact();
-				return new Profile() {
-					
-					@Override
-					public Observable<String> ownName() {
-						return fields.get(String.class, "name");
-					}
-					
-					@Override
-					public void setOwnName(String name) {
-						fields.pub("name", name);
-					}
-					
-					@Override
-					public void setSelfie(byte[] newSelfie) {
-						if (newSelfie.length > 1024 * 10) throw new IllegalArgumentException("Selfie must be less than 10 kBytes. Was " + newSelfie.length + " bytes.");
-						fields.pub("selfie", newSelfie);
-					}
-					
-					@Override
-					public void setPreferredNickname(String newPreferredNickname) {
-						fields.pub("preferred-nickname", newPreferredNickname);
-					}
-					
-					@Override
-					public void setCountry(String newCountry) {
-						fields.pub("country", newCountry);
-					}
-					
-					@Override
-					public void setCity(String newCity) {
-						fields.pub("city", newCity);
-					}
-					
-					@Override
-					public Observable<byte[]> selfie() {
-						return fields.get(byte[].class, "selfie");
-					}
-					
-					@Override
-					public Observable<String> preferredNickname() {
-						return contact.nickname().observable();
-					}
-					
-					@Override
-					public Observable<String> country() {
-						return fields.get(String.class, "country");
-					}
-					
-					@Override
-					public Observable<String> city() {
-						return fields.get(String.class, "city");
-					}
-				};
-			}
-			
-			@Override
-			public Party produceParty(PublicKey publicKey) {
-				return producePartyFromPuk(publicKey);
-			}
-			
-			@Override
-			public Conversation produceConversationWith(Party party) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public Observed<String> nameFor(Party party) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public Observable<List<Conversation>> conversationsContaining(String messageType) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public Observable<List<Conversation>> conversations() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public WritableContact findContact(Party party) {
-				return contacts.getUnchecked((WritableParty) party);
-			}
-			
-			@Override
-			public Observable<List<Contact>> contacts() {
-				return null;
-			}
-
-			@Override
-			public Contact findContact(String nickname) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public WritableContact writable(Contact contact) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
+	public SneerImpl sneer() {
+		return sneer;
 	}
 
 }
