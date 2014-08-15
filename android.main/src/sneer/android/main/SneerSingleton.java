@@ -4,6 +4,7 @@ import java.io.*;
 
 import sneer.*;
 import sneer.admin.*;
+import sneer.admin.impl.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.simulator.*;
 import android.content.*;
@@ -38,8 +39,13 @@ public class SneerSingleton {
 	
 	private static SneerAdmin simulator() {
 		SneerAdminSimulator ret = new SneerAdminSimulator();
-		ret.populate(); //Comment this line to get an empty Sneer instance.
+		setOwnName(ret.sneer(), "Neide da Silva"); //Comment this line to get an empty name.
 		return ret;
+	}
+
+
+	private static void setOwnName(Sneer sneer, String name) {
+		sneer.profileFor(sneer.self()).setOwnName(name);
 	}
 
 
