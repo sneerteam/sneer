@@ -15,6 +15,11 @@ import sneer.impl.keys.*;
 public class ConversationsAPITest extends TupleSpaceTestsBase {
 
 	@Test
+	public void sameSneer() {
+		assertEquals(adminA.sneer(), adminA.sneer());
+	}
+
+	@Test
 	public void changesPrik() {
 
 		assertEquals(userA, adminA.privateKey());
