@@ -19,7 +19,7 @@ public class TupleSpaceTestsBase {
 	protected final TupleSpace tuplesB = newTupleSpace(userB.publicKey(), newPeers(userA, userC));
 	protected final TupleSpace tuplesC = newTupleSpace(userC.publicKey(), newPeers(userA, userB));
 	
-	private Observable<PublicKey> newPeers(PrivateKey... peers) {
+	protected Observable<PublicKey> newPeers(PrivateKey... peers) {
 		return Observable.from(peers).map(PrivateKey.TO_PUBLIC_KEY);
 	}
 
@@ -32,7 +32,7 @@ public class TupleSpaceTestsBase {
 		Glue.tearDownNetwork(network);
 	}
 	
-	private TupleSpace newTupleSpace(PublicKey ownPuk, Observable<PublicKey> peers) {
+	protected TupleSpace newTupleSpace(PublicKey ownPuk, Observable<PublicKey> peers) {
 		return Glue.newTupleSpace(ownPuk, peers, network);
 	}
 	
