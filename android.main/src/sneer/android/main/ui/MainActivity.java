@@ -268,12 +268,14 @@ public class MainActivity extends Activity {
 	}
 
 	private void startCore() {
+		Object result;
 		try {
-			 Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.networking.client"));
-			 toast(Clojure.var("sneer.networking.client/start").invoke(sneer().self().publicKey().current()).toString());
+			Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.networking.client"));
+			result = Clojure.var("sneer.networking.client/start").invoke(sneer().self().publicKey().current());
 		} catch (Exception e) {
-			toast(Exceptions.asNiceMessage(e));
+			result = Exceptions.asNiceMessage(e);
 		}
+		SystemReport.updateReport("networking.client", result);
 	}
 
 	void toast(String message) {
