@@ -4,35 +4,40 @@
   (:import [java.net InetSocketAddress]
            [sneer.commons SystemReport]))
 
-(defn start [puk & [server-host server-port]]
+(defn start
+  
+  ([puk]
+    (start puk (async/chan (async/dropping-buffer 1)) (async/chan (async/dropping-buffer 1)) "dynamic.sneer.me" 5555))
+  
+  ([puk from-server to-server server-host server-port]
+    (let [packets-in (async/chan)
+          packets-out (async/chan)]
 
-  (let [packets-in (async/chan)
-        packets-out (async/chan)
-        to-server (async/chan 1)]
+      (async/thread
 
-    (async/thread
+        ; ensure no network activity takes place on caller thread to workaround android limitation
+        (let [server-addr (InetSocketAddress. server-host server-port)
+              udp-server (udp/serve-udp packets-in packets-out)
+              ping [server-addr {:intent :ping :from puk}]]
 
-      ; ensure no network activity takes place on caller thread to workaround android limitation
-      (let [server-addr (InetSocketAddress. (or server-host "dynamic.sneer.me") (or server-port 5555))
-            udp-server (udp/serve-udp packets-in packets-out)
-            ping [server-addr {:intent :ping :from puk}]]
+          ; server ping loop
+          (async/go-loop []
+            (when  (>! packets-out ping)
+              (<! (async/timeout 20000))
+              (recur)))
 
-        ; server ping loop
-        (async/go-loop []
-          (when  (>! packets-out ping)
-            (<! (async/timeout 20000))
-            (recur)))
+          ; just report received packets for now
+          (async/go-loop []
+            (when-let [packet (<! packets-in)]
+              (SystemReport/updateReport "packet" packet)
+              (when-let [payload (-> packet second :payload)]
+                (>! from-server payload))
+              (recur)))
 
-        ; just report received packets for now
-        (async/go-loop []
-          (when-let [packet (<! packets-in)]
-            (SystemReport/updateReport "packet" packet)
-            (recur)))
+          (async/pipe (async/map (fn [payload] [server-addr {:intent :send :from puk :to (:address payload) :payload payload}]) [to-server])
+                      packets-out)))
 
-        (async/pipe (async/map (fn [value] [server-addr value]) [to-server])
-                    packets-out)))
-
-    {:packets-out packets-out :to-server to-server}))
+      {:packets-in packets-in :packets-out packets-out :from-server from-server :to-server to-server})))
 
 (defn stop [client]
   (async/close! (:packets-out client)))

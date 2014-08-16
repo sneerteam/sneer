@@ -1,4 +1,7 @@
-version = '0.0.1'
+version = "0.0.1"
+
+apply plugin: "clojure"
+apply plugin: "eclipse"
 
 buildscript {
     repositories {
@@ -17,20 +20,12 @@ repositories {
     maven { url "https://clojars.org/repo" }
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'clojure'
-
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
 
 sourceSets {
     main {
         clojure {
             srcDir 'src'
-        }
-        java {
-            srcDir 'src'
+            aotCompile = true
         }
     }
 }
@@ -43,9 +38,5 @@ eclipse.project {
 dependencies {
     compile 'org.clojure:clojure:1.6.0'
     compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
-    compile 'org.clojure:java.jdbc:0.3.4'
-    compile 'com.netflix.rxjava:rxjava-clojure:0.19.6'
-    compile project(':java-api')
     compile project(':core')
-    compile project(':server')
 }

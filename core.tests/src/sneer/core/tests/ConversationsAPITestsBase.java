@@ -29,7 +29,7 @@ public class ConversationsAPITestsBase {
 
 	private SneerAdmin newSneerAdmin() {
 		PublicKey puk = Keys.createPrivateKey().publicKey();
-		TupleSpace tupleSpace = (TupleSpace) Glue.sneerCoreVar("reify-tuple-space").invoke(puk, PublishSubject.create(), network);
+		TupleSpace tupleSpace = Glue.newTupleSpace(puk, PublishSubject.<PublicKey>create(), network);
 		SneerAdminImpl admin = new SneerAdminImpl(tupleSpace);
 		return admin;
 	}

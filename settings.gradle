@@ -1,3 +1,4 @@
 include 'java-api', 'java-api.tests'
 include 'android-api', 'android.main'
 include 'core', 'core.tests'
+include 'server'

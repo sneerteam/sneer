@@ -44,7 +44,8 @@
 
   (when port (println "Opening port" port))
 
-  (let [socket (if port (new DatagramSocket port) (new DatagramSocket))]
+  (let [socket (if port (new DatagramSocket port) (new DatagramSocket))
+        print-err-if-open #(when (is-open socket) (.printStackTrace %))]
 
     (async/go
       (with-open [socket socket]
@@ -53,7 +54,7 @@
             (try
               (println "<!" packet)
               (send-value socket packet)
-              (catch Exception e (. e printStackTrace)))
+              (catch Exception e (print-err-if-open e)))
             (recur)))))
 
     (async/thread
@@ -62,7 +63,7 @@
           (let [packet (receive-value socket)]
             (println ">!!" packet)
             (>!! packets-in packet))
-          (catch Exception e (. e printStackTrace)))))))
+          (catch Exception e (print-err-if-open e)))))))
 
 ;; Tests
 

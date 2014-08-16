@@ -1,17 +1,15 @@
 package sneer.core.tests;
 
-import sneer.admin.*;
+import rx.*;
+import sneer.*;
+import sneer.tuples.*;
 import clojure.java.api.*;
 import clojure.lang.*;
 
 class Glue {
 
-	public static SneerAdmin newSneerAdmin(Object network) {
-		try {
-			return (SneerAdmin) sneerCoreVar("new-sneer-admin").invoke(network);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+	public static TupleSpace newTupleSpace(PublicKey ownPuk, Observable<PublicKey> peers, Object network) {
+		return (TupleSpace) sneerCoreVar("reify-tuple-space").invoke(ownPuk, peers, network);
 	}
 
 	public static Object newNetwork() {
@@ -23,7 +21,7 @@ class Glue {
 	}
 	
 	public static void tearDownNetwork(Object network) {
-		networkSimulator("stop-network").invoke(network);
+		sneerCoreVar("dispose").invoke(network);
 	}
 
 	private static IFn networkSimulator(String var) {
@@ -34,7 +32,7 @@ class Glue {
 		return var("sneer.core", simpleName);
 	}
 
-	private static IFn var(String ns, String simpleName) {
+	public static IFn var(String ns, String simpleName) {
 		Clojure.var("clojure.core/require").invoke(Clojure.read(ns));
 		return Clojure.var(ns + "/" + simpleName);
 	}	
