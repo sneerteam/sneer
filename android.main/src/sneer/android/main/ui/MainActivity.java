@@ -11,6 +11,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.commons.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
