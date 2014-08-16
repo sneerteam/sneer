@@ -9,9 +9,11 @@
 (defn chan->observable [ch]
   (let [subject (rx.subjects.PublishSubject/create)]
     (async/go-loop []
-      (when-let [value (<! ch)]
-        (rx/on-next subject value)
-        (recur)))
+      (if-let [value (<! ch)]
+        (do
+          (rx/on-next subject value)
+          (recur))
+        (rx/on-completed subject)))
     subject))
 
 (defn chan->observer [ch]
