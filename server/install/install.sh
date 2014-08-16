@@ -53,7 +53,7 @@ nexusUsername=KlausWuestefeld
 nexusPassword=<password to nexus/sonatype>
 ## properties end
 
-The key you use to sing the package must be registered at
+The key you use to sign the package must be registered at
 pool.sks-keyservers.net so nexus server can verify it.
 
 Have a good day.
