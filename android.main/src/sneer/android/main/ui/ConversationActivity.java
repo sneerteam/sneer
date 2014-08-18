@@ -137,7 +137,7 @@ public class ConversationActivity extends Activity {
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setDisplayShowCustomEnabled(true);
-		actionBar.setCustomView(R.layout.action_bar_layout);
+		actionBar.setCustomView(R.layout.action_bar_title);
 
 		title = (TextView) findViewById(android.R.id.text1);
 		title.setOnClickListener(new OnClickListener() {  @Override public void onClick(View v) {
