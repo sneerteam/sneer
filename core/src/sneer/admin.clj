@@ -15,9 +15,11 @@
       (.observed (ObservedSubject/create puk)))))
 
 (defn new-sneer-admin [tuple-space own-prik]
-  (let [sneer 
+  (let [sneer
         (reify Sneer
-	        (self [this] 
-	          (new-party (.publicKey own-prik))))]
+          (self [this]
+            (new-party (.publicKey own-prik)))
+          (produceParty [this puk]
+            (new-party puk)))]
 	  (reify SneerAdmin
 	    (sneer [this] sneer))))
