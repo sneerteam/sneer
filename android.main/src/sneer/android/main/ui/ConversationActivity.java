@@ -4,14 +4,13 @@ import static sneer.android.main.SneerSingleton.*;
 
 import java.util.*;
 
-import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
-import sneer.commons.Comparators;
+import sneer.commons.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -56,7 +55,7 @@ public class ConversationActivity extends Activity {
 		
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
-		sneer().nameFor(party).subscribe(new Action1<String>() { @Override public void call(String label) {
+		party.name().subscribe(new Action1<String>() { @Override public void call(String label) {
 			actionBar.setTitle(label);
 		}});
 		
