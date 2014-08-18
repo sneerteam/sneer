@@ -14,7 +14,7 @@
     (publicKey [this] 
       (.observed (ObservedSubject/create puk)))))
 
-(defn new-sneer [own-prik]
+(defn new-sneer [tuple-space own-prik]
   (let [parties (atom {})]
 	  (reify Sneer
 	    (self [this]
@@ -28,6 +28,6 @@
          (get new-parties puk))))))
 
 (defn new-sneer-admin [tuple-space own-prik]
-  (let [sneer (new-sneer own-prik)]
+  (let [sneer (new-sneer tuple-space own-prik)]
 	  (reify SneerAdmin
 	    (sneer [this] sneer))))
