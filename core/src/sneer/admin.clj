@@ -14,12 +14,20 @@
     (publicKey [this] 
       (.observed (ObservedSubject/create puk)))))
 
+(defn new-sneer [own-prik]
+  (let [parties (atom {})]
+	  (reify Sneer
+	    (self [this]
+	      (new-party (.publicKey own-prik)))
+	    (produceParty [this puk]
+       (let [new-parties
+             (swap! parties (fn [cur] 
+                              (if (get cur puk)
+                                cur
+                                (assoc cur puk (new-party puk)))))]
+         (get new-parties puk))))))
+
 (defn new-sneer-admin [tuple-space own-prik]
-  (let [sneer
-        (reify Sneer
-          (self [this]
-            (new-party (.publicKey own-prik)))
-          (produceParty [this puk]
-            (new-party puk)))]
+  (let [sneer (new-sneer own-prik)]
 	  (reify SneerAdmin
 	    (sneer [this] sneer))))
