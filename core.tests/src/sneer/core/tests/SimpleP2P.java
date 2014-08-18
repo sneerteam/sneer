@@ -137,7 +137,9 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		
 		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userA.publicKey())
-			.type("profile/name");
+			.type("profile/name")
+			.field("custom", 42);
+			
 		publisher.pub("old name");
 		publisher.pub("new name");
 
@@ -147,6 +149,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			tuplesA.filter()
 				.audience(userA)
 				.type("profile/name")
+				.field("custom", 42)
 				.localTuples().toBlocking().last().payload());
 	}
 	

@@ -44,12 +44,12 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 		final Party partyB = sneerA.produceParty(userB);
 
-		assertNull(sneerA.findContact(partyB));
-
+		Observable<Contact> contactQuery = sneerA.findContact(partyB);
+		
 		sneerA.addContact("Party Boy", partyB);
 
 		expecting(
-				same(sneerA.findContact(partyB).map(Contact.TO_PARTY), partyB));
+				same(contactQuery.map(Contact.TO_PARTY), partyB));
 	}
 
 	@Test(expected = FriendlyException.class)
