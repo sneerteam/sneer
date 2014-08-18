@@ -6,7 +6,6 @@ import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 import android.app.*;
 import android.graphics.*;
 import android.os.*;
@@ -33,6 +32,7 @@ public class ContactActivity extends Activity {
 	TextView preferredNickNameView;
 	TextView countryView;
 	TextView cityView;
+	Party party;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,6 @@ public class ContactActivity extends Activity {
 		setContentView(R.layout.activity_contact);
 
 		PublicKey partyPuk;
-		Party party;
 
 		getActionBar().setTitle(activityTitle());
 
@@ -86,6 +85,7 @@ public class ContactActivity extends Activity {
 		selfieImage.setEnabled(false);
 		countryView.setEnabled(false);
 		cityView.setEnabled(false);
+		publicKeyEdit.setEnabled(false);
 	}
 
 	private void loadProfile() {
@@ -96,6 +96,11 @@ public class ContactActivity extends Activity {
 			}
 		});
 
+		sneer().findContact(party).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Contact>() { @Override public void call(Contact contact) { 
+			publicKeyEdit.setText(contact.party().publicKey().current().toString());
+		}});
+			
+		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
 			preferredNickNameView.setText("(" + preferredNickname+ ")");
 		}});
@@ -126,10 +131,7 @@ public class ContactActivity extends Activity {
 
 	public void saveContact() {
 		
-		String contactPublicKey = publicKeyEdit.getText().toString();
 		final String nickName = nicknameEdit.getText().toString();
-		
-		Party party = sneer().produceParty(Keys.createPublicKey(contactPublicKey.getBytes()));	
 		
 		if(newContact){
 			try{
