@@ -1,5 +1,7 @@
 package sneer.core.tests;
 
+import org.junit.*;
+
 import rx.subjects.*;
 import sneer.*;
 import sneer.admin.*;
@@ -26,12 +28,18 @@ public class ConversationsAPITestsBase {
 	protected PrivateKey newPrivateKey() {
 		return Keys.createPrivateKey();
 	}
+	
+	@After
+	public void closeNetwork() {
+		Glue.tearDownNetwork(network);
+	}
 
 	private SneerAdmin newSneerAdmin() {
-		PublicKey puk = Keys.createPrivateKey().publicKey();
-		TupleSpace tupleSpace = Glue.newTupleSpace(puk, PublishSubject.<PublicKey>create(), network);
-		SneerAdminImpl admin = new SneerAdminImpl(tupleSpace);
-		return admin;
+		PrivateKey prik = Keys.createPrivateKey();
+		TupleSpace tupleSpace = Glue.newTupleSpace(prik.publicKey(), PublishSubject.<PublicKey>create(), network);
+//		TupleSpace tupleSpace = world.newTupleSpace(prik);
+//		SneerAdminImpl admin = new SneerAdminImpl(tupleSpace, prik);
+		return (SneerAdmin) Glue.var("sneer.admin", "new-sneer-admin").invoke(tupleSpace, prik);
 	}
 
 }
