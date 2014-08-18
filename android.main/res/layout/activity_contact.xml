@@ -13,30 +13,10 @@
         android:background="#f6f6f6"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/lblContactSection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp"
-            android:text="@string/profile_view_section_contact" />
-
-        <View
-            android:id="@+id/view01"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/lblContactSection"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="3dp"
-            android:background="@android:color/black" />
-
         <EditText
             android:id="@+id/nickname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/view01"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_marginTop="15dp"
