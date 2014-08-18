@@ -17,7 +17,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginLeft="15dp"
-            android:background="#afafaf"
+            android:background="@android:color/transparent"
             android:clickable="true"
             android:layout_centerVertical="true"
             android:contentDescription="@string/profile_view_content_description"

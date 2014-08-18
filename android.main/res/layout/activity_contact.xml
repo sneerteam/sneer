@@ -92,7 +92,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="15dp"
-            android:background="#afafaf"
+            android:background="@android:color/transparent"
             android:clickable="true"
             android:contentDescription="@string/profile_view_content_description"
             android:onClick="selfieOnClick"
