@@ -15,7 +15,7 @@ import com.google.common.cache.*;
 public class SneerAdminImpl implements SneerAdmin {
 	
 	private TupleSpace tupleSpace;
-	private PrivateKey prik;
+	private final PrivateKey prik;
 	
 	private final class SneerImpl implements Sneer {
 		@Override
@@ -38,7 +38,7 @@ public class SneerAdminImpl implements SneerAdmin {
 			if (party.publicKey() != prik.publicKey()) {
 				throw new IllegalArgumentException("Editing someone else's profile is unsupported.");
 			}
-			final WritableContact contact = contacts.getUnchecked((WritableParty) party);
+			final WritableContact contact = contacts.getUnchecked((WritablePartyImpl) party);
 			class PublishableContact {
 				void pub(String field, Object value) {
 					tupleSpace.publisher()
@@ -147,7 +147,7 @@ public class SneerAdminImpl implements SneerAdmin {
 
 		@Override
 		public WritableContact findContact(Party party) {
-			return contacts.getUnchecked((WritableParty) party);
+			return contacts.getUnchecked((WritablePartyImpl) party);
 		}
 
 		@Override
@@ -195,13 +195,13 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 	}
 	
-	class WritableParty implements Party {
+	class WritablePartyImpl implements Party {
 		
 		private final PartyKey key;
 		private PublicKey puk;
 		private Subscription pukSubscription;
 
-		private WritableParty(PartyKey key) {
+		private WritablePartyImpl(PartyKey key) {
 			this.key = key;
 		}
 
@@ -239,14 +239,14 @@ public class SneerAdminImpl implements SneerAdmin {
 
 	class WritableContactImpl implements WritableContact {
 		
-		private final WritableParty party;
+		private final WritablePartyImpl party;
 
-		public WritableContactImpl(WritableParty party) {
+		public WritableContactImpl(WritablePartyImpl party) {
 			this.party = party;
 		}
 
 		@Override
-		public WritableParty party() {
+		public WritablePartyImpl party() {
 			return party;
 		}
 		
@@ -295,23 +295,24 @@ public class SneerAdminImpl implements SneerAdmin {
 		return new PartyKey();
 	}});
 	
-	private LoadingCache<PartyKey, WritableParty> parties = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<PartyKey, WritableParty>() {  @Override public WritableParty load(final PartyKey key) throws Exception {
-		return new WritableParty(key);
+	private LoadingCache<PartyKey, WritablePartyImpl> parties = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<PartyKey, WritablePartyImpl>() {  @Override public WritablePartyImpl load(final PartyKey key) throws Exception {
+		return new WritablePartyImpl(key);
 	}});
 	
-	private LoadingCache<WritableParty, WritableContact> contacts = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<WritableParty, WritableContact>() {  @Override public WritableContact load(final WritableParty party) throws Exception {
+	private LoadingCache<WritablePartyImpl, WritableContact> contacts = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<WritablePartyImpl, WritableContact>() {  @Override public WritableContact load(final WritablePartyImpl party) throws Exception {
 		return new WritableContactImpl(party);
 	}});
 	
 	private SneerImpl sneer = new SneerImpl();
 
 
-	public SneerAdminImpl(TupleSpace tupleSpace) {
+	public SneerAdminImpl(TupleSpace tupleSpace, PrivateKey ownPrik) {
 		this.tupleSpace = tupleSpace;
+		prik = ownPrik;
 	}
 
-	private WritableParty producePartyFromPuk(PublicKey puk) {
-		WritableParty party = parties.getUnchecked(keys.getUnchecked(puk));
+	private WritablePartyImpl producePartyFromPuk(PublicKey puk) {
+		WritablePartyImpl party = parties.getUnchecked(keys.getUnchecked(puk));
 		party.setPublicKey(puk);
 		return party;
 	}
