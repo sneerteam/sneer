@@ -3,7 +3,7 @@ package sneer.impl.simulator;
 import sneer.*;
 import sneer.rx.*;
 
-public class ContactSimulator implements WritableContact {
+public class ContactSimulator implements Contact {
 
 	private final Party party;
 	private final ObservedSubject<String> nickname;

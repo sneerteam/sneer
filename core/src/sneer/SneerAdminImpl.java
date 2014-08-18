@@ -40,7 +40,7 @@ public class SneerAdminImpl implements SneerAdmin {
 			if (party.publicKey() != prik.publicKey()) {
 				throw new IllegalArgumentException("Editing someone else's profile is unsupported.");
 			}
-			final WritableContact contact = contacts.getUnchecked((WritablePartyImpl) party);
+			final Contact contact = contacts.getUnchecked((WritablePartyImpl) party);
 			class PublishableContact {
 				void pub(String field, Object value) {
 					tupleSpace.publisher()
@@ -164,11 +164,6 @@ public class SneerAdminImpl implements SneerAdmin {
 			return null;
 		}
 
-		@Override
-		public WritableContact writable(Contact contact) {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 
 	class ObservedImpl<T> implements Observed<T> {
@@ -240,7 +235,7 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 	}
 
-	class WritableContactImpl implements WritableContact {
+	class WritableContactImpl implements Contact {
 		
 		private final WritablePartyImpl party;
 
@@ -303,7 +298,7 @@ public class SneerAdminImpl implements SneerAdmin {
 		return new WritablePartyImpl(key);
 	}});
 	
-	private LoadingCache<WritablePartyImpl, WritableContact> contacts = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<WritablePartyImpl, WritableContact>() {  @Override public WritableContact load(final WritablePartyImpl party) throws Exception {
+	private LoadingCache<WritablePartyImpl, Contact> contacts = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<WritablePartyImpl, Contact>() {  @Override public Contact load(final WritablePartyImpl party) throws Exception {
 		return new WritableContactImpl(party);
 	}});
 	

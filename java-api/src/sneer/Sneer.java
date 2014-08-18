@@ -17,7 +17,6 @@ public interface Sneer {
 	Observable<Contact> findContact(Party party); 
 	/** @return null if nickname not found. */
 	Contact findContact(String nickname);
-	WritableContact writable(Contact contact);
 	/** @throws FriendlyException if nickname is already set for another contact or if party is already a contact. */
 	void addContact(String nickname, Party party) throws FriendlyException;
 	

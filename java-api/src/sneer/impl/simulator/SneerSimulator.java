@@ -1,6 +1,5 @@
 package sneer.impl.simulator;
 
-import static sneer.Contact.*;
 import static sneer.Conversation.*;
 import static sneer.commons.Streams.*;
 
@@ -192,12 +191,6 @@ public class SneerSimulator extends SneerBase {
 	@Override
 	public Contact findContact(String nickname) {
 		throw new UnsupportedOperationException("Not needed until now.");
-	}
-
-
-	@Override
-	public WritableContact writable(Contact contact) {
-		return (WritableContact)contact;
 	}
 
 }

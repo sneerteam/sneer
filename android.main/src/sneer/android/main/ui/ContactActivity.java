@@ -141,21 +141,15 @@ public class ContactActivity extends Activity {
 			return;
 		}
 		
-		sneer().findContact(party).map(toWritableContact()).subscribe(new Action1<WritableContact>() {  @Override public void call(WritableContact writableContact) {
+		sneer().findContact(party).subscribe(new Action1<Contact>() {  @Override public void call(Contact contact) {
 			try {
-				writableContact.setNickname(nickName);
+				contact.setNickname(nickName);
 				toast("contact saved...");
 			} catch (FriendlyException e) {
 				toast(e.getMessage());
 			}	
 		} });
 		
-	}
-
-	private Func1<Contact, WritableContact> toWritableContact() {
-		return new Func1<Contact, WritableContact>() {  @Override public WritableContact call(Contact t1) {
-			return sneer().writable(t1);
-		}};
 	}
 
 	@Override
