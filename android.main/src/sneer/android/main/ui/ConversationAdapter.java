@@ -51,7 +51,7 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
         findTextView(ret, R.id.messageTime).setText(message.timeSent());
         
         if (!message.isOwn()) {
-        	sneer.nameFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String sender) { 
+        	sneer.nameFor(party).subscribe(new Action1<String>() { @Override public void call(String sender) { 
         		setColors(ret, sender, message.isOwn());
         	}});
         } else {

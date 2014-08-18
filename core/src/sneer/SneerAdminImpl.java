@@ -25,7 +25,9 @@ public class SneerAdminImpl implements SneerAdmin {
 
 		@Override
 		public void addContact(String nickname, Party party) throws FriendlyException {
-			findContact(party).setNickname(nickname);
+			throw new NotImplementedYet();
+
+//			findContact(party).setNickname(nickname);
 		}
 
 		@Override
@@ -128,7 +130,7 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 
 		@Override
-		public Observed<String> nameFor(Party party) {
+		public Observable<String> nameFor(Party party) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -146,8 +148,9 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 
 		@Override
-		public WritableContact findContact(Party party) {
-			return contacts.getUnchecked((WritablePartyImpl) party);
+		public Observable<Contact> findContact(Party party) {
+//			return contacts.getUnchecked((WritablePartyImpl) party);
+			throw new NotImplementedYet();
 		}
 
 		@Override
@@ -276,11 +279,12 @@ public class SneerAdminImpl implements SneerAdmin {
 
 		@Override
 		public String problemWithNewNickname(String newNick) {
-			if (newNick.trim().isEmpty()) return "cannot be empty";
-			Contact existing = sneer().findContact(party);
-			if (existing == this) return null;
-			if (existing == null) return null;
-			return "already used for another contact";
+			throw new NotImplementedYet();
+//			if (newNick.trim().isEmpty()) return "cannot be empty";
+//			Contact existing = sneer().findContact(party);
+//			if (existing == this) return null;
+//			if (existing == null) return null;
+//			return "already used for another contact";
 		}
 	}
 	

@@ -3,8 +3,8 @@ package sneer.commons.exceptions;
 
 public class Exceptions {
 
-	public static String asNiceMessage(Exception e) {
-		return e.getClass().getSimpleName() + ": " + e.getMessage();
+	public static String asNiceMessage(Throwable t) {
+		return t.getClass().getSimpleName() + ": " + t.getMessage();
 	}
 
 	

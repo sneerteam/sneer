@@ -7,6 +7,8 @@ import java.util.*;
 
 import org.junit.*;
 
+import rx.Observable;
+import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.commons.exceptions.*;
@@ -40,15 +42,14 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 	@Test
 	public void addContact() throws FriendlyException {
 
-		Party partyB = sneerA.produceParty(userB);
+		final Party partyB = sneerA.produceParty(userB);
 
 		assertNull(sneerA.findContact(partyB));
 
 		sneerA.addContact("Party Boy", partyB);
 
-		Contact contactB = sneerA.findContact(partyB);
-		assertNotNull(contactB);
-		assertSame(partyB, contactB.party());
+		expecting(
+				same(sneerA.findContact(partyB).map(Contact.TO_PARTY), partyB));
 	}
 
 	@Test(expected = FriendlyException.class)
@@ -64,20 +65,19 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		Party partyB = sneerA.produceParty(userB);
 
 		sneerA.addContact("Party Boy", partyB);
-
-		Contact contactB = sneerA.findContact(partyB);
-
-		assertEquals("Party Boy", contactB.nickname().current());
+		
+		expecting(
+				values(sneerA.findContact(partyB).flatMap(Contact.TO_NICKNAME), "Party Boy"));
 
 		ReplaySubject<String> nicknames = ReplaySubject.create();
 
-		contactB.nickname().observable().subscribe(nicknames);
+		sneerA.findContact(partyB).flatMap(Contact.TO_NICKNAME).subscribe(nicknames);
 
 		sneerA.addContact("Party Man", partyB);
 
-		assertEqualsUntilNow(nicknames, "Party Boy", "Party Man");
-
-		assertEqualsUntilNow(contactB.nickname().observable(), "Party Man");
+		expecting(
+				values(nicknames, "Party Boy", "Party Man"),
+				values(sneerA.findContact(partyB).flatMap(Contact.TO_NICKNAME), "Party Man"));
 	}
 	
 	@Test
@@ -86,16 +86,25 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		Party partyB = sneerA.produceParty(userB);
 		Party partyC = sneerA.produceParty(userC);
 		
-		assertEqualsUntilNow(sneerA.contacts());
+		expecting(
+				values(sneerA.contacts()));
 		
 		sneerA.addContact("Party Boy", partyB);
-
-		assertEqualsUntilNow(sneerA.contacts(), Arrays.asList(sneerA.findContact(partyB)));
+		
+		expecting(
+				Observable.zip(sneerA.contacts(), sneerA.findContact(partyB), new Func2<List<Contact>, Contact, Void>() {  @Override public Void call(List<Contact> t1, Contact t2) {
+					assertArrayEquals(new Contact[]{t2}, t1.toArray());
+					return null;
+				} }));
+		
 		
 		sneerA.addContact("Party Boy", partyC);
 
-		assertEqualsUntilNow(sneerA.contacts(), Arrays.asList(sneerA.findContact(partyB), sneerA.findContact(partyC)));
-		
+		expecting(
+				Observable.zip(sneerA.contacts(), sneerA.findContact(partyB), sneerA.findContact(partyC), new Func3<List<Contact>, Contact, Contact, Void>() {  @Override public Void call(List<Contact> t1, Contact t2, Contact t3) {
+					assertArrayEquals(new Contact[]{t2, t3}, t1.toArray());
+					return null;
+				} }));
 	}
 	
 	

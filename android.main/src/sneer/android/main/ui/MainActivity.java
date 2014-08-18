@@ -117,7 +117,7 @@ public class MainActivity extends Activity {
 				new Func1<Party, Observable<String>>() {
 					@Override
 					public Observable<String> call(Party party) {
-						return sneer().nameFor(party).observable();
+						return sneer().nameFor(party);
 					}
 				}, new Func1<Party, Observable<byte[]>>() {
 					@Override
@@ -155,8 +155,7 @@ public class MainActivity extends Activity {
 			ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		conversation = adapter.getItem(info.position);
-		plugHeaderTitle(menu, sneer().nameFor(conversation.party())
-				.observable());
+		plugHeaderTitle(menu, sneer().nameFor(conversation.party()));
 		getMenuInflater().inflate(R.menu.long_click, menu);
 	}
 

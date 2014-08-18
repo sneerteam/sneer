@@ -127,23 +127,35 @@ public class ContactActivity extends Activity {
 	public void saveContact() {
 		
 		String contactPublicKey = publicKeyEdit.getText().toString();
-		String nickName = nicknameEdit.getText().toString();
+		final String nickName = nicknameEdit.getText().toString();
 		
 		Party party = sneer().produceParty(Keys.createPublicKey(contactPublicKey.getBytes()));	
 		
-		try{
-			if(newContact){
+		if(newContact){
+			try{
 				sneer().addContact(nickName, party);				
-			}else{
-				WritableContact writableContact = sneer().writable(sneer().findContact(party));
-				writableContact.setNickname(nickName);	
-				//salvo o nickname
+				toast("contact saved...");
+			} catch (FriendlyException e) {
+				toast(e.getMessage());
 			}
-		} catch (FriendlyException e) {
-			toast(Exceptions.asNiceMessage(e));
+			return;
 		}
 		
-		toast("contact saved...");
+		sneer().findContact(party).map(toWritableContact()).subscribe(new Action1<WritableContact>() {  @Override public void call(WritableContact writableContact) {
+			try {
+				writableContact.setNickname(nickName);
+				toast("contact saved...");
+			} catch (FriendlyException e) {
+				toast(e.getMessage());
+			}	
+		} });
+		
+	}
+
+	private Func1<Contact, WritableContact> toWritableContact() {
+		return new Func1<Contact, WritableContact>() {  @Override public WritableContact call(Contact t1) {
+			return sneer().writable(t1);
+		}};
 	}
 
 	@Override

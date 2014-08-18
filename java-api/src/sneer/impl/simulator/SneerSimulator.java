@@ -99,8 +99,13 @@ public class SneerSimulator extends SneerBase {
 
 
 	@Override
-	public Contact findContact(Party party) {
-		return contactsByParty.get(party);
+	public Observable<Contact> findContact(Party party) {
+		Contact contact = contactsByParty.get(party);
+		if (contact == null) {
+			// TODO return a sequence that will emit an contact when the party becomes a contact (by calling addContact)
+			return Observable.never();
+		}
+		return Observable.from(contact);
 	}
 
 

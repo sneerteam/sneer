@@ -35,11 +35,24 @@ public class ObservableTestUtils {
 			}});
 	}
 	
+	public static Observable<Void> same(Observable<?> tuples, final Object... expecteds) {
+		return tuples
+			.buffer(500, TimeUnit.MILLISECONDS, expecteds.length)
+			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> list) {
+				assertListSize(list, expecteds);
+
+				Iterator<?> it = list.iterator();
+				for (Object expected : expecteds) {
+					assertSame(expected, it.next());
+				}
+				return null;
+			}});
+	}
+	
 	@SafeVarargs
 	public static <T> void assertEqualsUntilNow(Observable<T> seq, T... expecteds) {
 		List<T> list = takeAllUntilNow(seq);
-		if (expecteds.length != list.size())
-			fail("Expecting `" + Arrays.asList(expecteds) + "', got `" + list + "'");
+		assertListSize(list, expecteds);
 		Iterator<T> it = list.iterator();
 		for (Object expected : expecteds) {
 			if (expected.getClass().isArray()) {
@@ -62,6 +75,11 @@ public class ObservableTestUtils {
 		} });
 		scheduler.triggerActions();
 		return result;
+	}
+
+	private static void assertListSize(List<?> list, final Object... expecteds) {
+		if (expecteds.length != list.size())
+			fail("Expecting `" + Arrays.asList(expecteds) + "', got `" + list + "'");
 	}
 
 }

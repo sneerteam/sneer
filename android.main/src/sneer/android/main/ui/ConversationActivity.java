@@ -4,13 +4,14 @@ import static sneer.android.main.SneerSingleton.*;
 
 import java.util.*;
 
+import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
-import sneer.commons.*;
+import sneer.commons.Comparators;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -55,7 +56,7 @@ public class ConversationActivity extends Activity {
 		
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
-		sneer().nameFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
+		sneer().nameFor(party).subscribe(new Action1<String>() { @Override public void call(String label) {
 			actionBar.setTitle(label);
 		}});
 		
@@ -169,11 +170,16 @@ public class ConversationActivity extends Activity {
 
 
 	private void launchNewConversation() {
-		Intent intent = new Intent(embeddedOptions.conversationAction);
-		intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
-		intent.putExtra("contactNickname", sneer().findContact(party).nickname().current());
-		intent.putExtra(SneerAndroid.PARTY_PUK, party.publicKey().current());
-		startActivity(intent);
+		sneer().findContact(party)
+			.flatMap(Contact.TO_NICKNAME) 
+			.first()
+			.subscribe(new Action1<String>() {  @Override public void call(String nickname) {
+				Intent intent = new Intent(embeddedOptions.conversationAction);
+				intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
+				intent.putExtra("contactNickname", nickname);
+				intent.putExtra(SneerAndroid.PARTY_PUK, party.publicKey().current());
+				startActivity(intent);
+			} });
 	}
 	
 	
