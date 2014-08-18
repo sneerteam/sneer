@@ -158,12 +158,6 @@ public class SneerAdminImpl implements SneerAdmin {
 			return null;
 		}
 
-		@Override
-		public Contact findContact(String nickname) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
 	}
 
 	class ObservedImpl<T> implements Observed<T> {
@@ -232,6 +226,11 @@ public class SneerAdminImpl implements SneerAdmin {
 		
 		public PartyKey key() {
 			return key;
+		}
+
+		@Override
+		public Observable<String> name() {
+			throw new NotImplementedYet();
 		}
 	}
 

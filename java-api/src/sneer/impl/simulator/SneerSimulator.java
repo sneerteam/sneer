@@ -11,11 +11,10 @@ import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
-import sneer.impl.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
-public class SneerSimulator extends SneerBase {
+public class SneerSimulator implements Sneer {
 
 	private final PartySimulator self;
 	private final TupleSpace tupleSpace;
@@ -31,7 +30,6 @@ public class SneerSimulator extends SneerBase {
 	public static final Comparator<Contact> BY_NICKNAME = new Comparator<Contact>() { @Override public int compare(Contact c1, Contact c2) {
 		return c1.nickname().current().compareToIgnoreCase(c2.nickname().current());
 	}};
-
 	
 	public SneerSimulator() {
 		PrivateKey prik = Keys.createPrivateKey("Neide");
@@ -64,7 +62,7 @@ public class SneerSimulator extends SneerBase {
 			PartySimulator existing = partiesByPuk.get(puk);
 			if (existing != null) return existing;
 			
-			PartySimulator newParty = new PartySimulator(puk);
+			final PartySimulator newParty = new PartySimulator(puk, this);
 			partiesByPuk.put(puk, newParty);
 			return newParty;
 		}
@@ -189,8 +187,8 @@ public class SneerSimulator extends SneerBase {
 
 
 	@Override
-	public Contact findContact(String nickname) {
-		throw new UnsupportedOperationException("Not needed until now.");
+	public Observable<String> nameFor(Party party) {
+		throw new UnsupportedOperationException("deprecated, use party.name()");
 	}
 
 }

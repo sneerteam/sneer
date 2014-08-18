@@ -13,26 +13,28 @@ public class PartySimulator implements Party, Profile {
 	private final boolean isSelf;
 
 	/** Profile */
-	private final BehaviorSubject<String> name;
+	private final BehaviorSubject<String> ownName;
 	private Subject<String, String> preferredNickname = BehaviorSubject.create("neide");
 	private Subject<String, String> city = BehaviorSubject.create("Jundiaí");
 	private Subject<String, String> country = BehaviorSubject.create("Brasil");
 	private ReplaySubject<byte[]> selfie = ReplaySubject.create();
+	private Sneer sneer;
 	
 	
-	public PartySimulator(String name, PublicKey puk) {
+	PartySimulator(String name, PublicKey puk) {
 		this(name, puk, true);
 	}
-	
-	
-	PartySimulator(PublicKey puk) {
-		this("?", puk, false);
+
+
+	PartySimulator(PublicKey puk, Sneer sneer) {
+		this("? PublicKey: " + puk, puk, false);
+		this.sneer = sneer;
 	}
 
 
 	PartySimulator(String name, PublicKey puk, boolean isSelf) {
 		this.publicKey = ObservedSubject.create(puk);
-		this.name = BehaviorSubject.create(name);
+		this.ownName = BehaviorSubject.create(name);
 		this.isSelf = isSelf;
 	}
 
@@ -47,7 +49,7 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public Observable<String> ownName() {
-		return name.asObservable();
+		return ownName.asObservable();
 	}
 
 	
@@ -59,7 +61,7 @@ public class PartySimulator implements Party, Profile {
 	
 	
 	public void simulateSetName(String newName) {
-		name.onNext(newName);
+		ownName.onNext(newName);
 	}
 	
 	
@@ -131,6 +133,12 @@ public class PartySimulator implements Party, Profile {
 
 	protected void simulateSetCountry(String newCountry) {
 		country.onNext(newCountry);
+	}
+
+
+	@Override
+	public Observable<String> name() {
+		return ownName().concatWith(sneer.findContact(this).flatMap(Contact.TO_NICKNAME));
 	}
 
 
