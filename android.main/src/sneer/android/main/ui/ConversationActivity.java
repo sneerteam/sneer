@@ -41,14 +41,15 @@ public class ConversationActivity extends Activity {
 	private ImageButton actionButton;
 
 	private ImageButton lastActionButton;
-	private TextView title;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversation);
 		
-		setupActionBar();
+		actionBar = getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		actionBar.setHomeButtonEnabled(true);
 		
 		embeddedOptions = (EmbeddedOptions) getIntent().getExtras().getSerializable("embeddedOptions");
 		
@@ -56,7 +57,6 @@ public class ConversationActivity extends Activity {
 		
 		sneer().nameFor(party).observable().subscribe(new Action1<String>() { @Override public void call(String label) {
 			actionBar.setTitle(label);
-			title.setText(label);
 		}});
 		
 		sneer().profileFor(party).selfie().observeOn(AndroidSchedulers.mainThread()).cast(byte[].class).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
@@ -131,21 +131,6 @@ public class ConversationActivity extends Activity {
 	}
 
 
-	private void setupActionBar() {
-		actionBar = getActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setHomeButtonEnabled(true);
-		actionBar.setDisplayShowTitleEnabled(false);
-		actionBar.setDisplayShowCustomEnabled(true);
-		actionBar.setCustomView(R.layout.action_bar_title);
-
-		title = (TextView) findViewById(android.R.id.text1);
-		title.setOnClickListener(new OnClickListener() {  @Override public void onClick(View v) {
-			navigateToProfile();
-		}});
-	}
-	
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (embeddedOptions.conversationAction == null) {
