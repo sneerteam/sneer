@@ -9,6 +9,7 @@ import sneer.commons.exceptions.*;
 import android.app.*;
 import android.graphics.*;
 import android.os.*;
+import android.text.*;
 import android.widget.*;
 
 public class ContactActivity extends Activity {
@@ -59,6 +60,9 @@ public class ContactActivity extends Activity {
 			profile = sneer().profileFor(party);
 			loadProfile();
 		}
+		
+		validationOnTextChanged(nicknameEdit);
+		
 	}
 
 	private String activityTitle() {
@@ -68,7 +72,7 @@ public class ContactActivity extends Activity {
 			return "New Contact";
 		}
 
-		return (String) extras.getSerializable(ACTIVITY_TITLE);
+		return "Contact";
 	}
 
 	private PublicKey partyPuk() {
@@ -89,17 +93,14 @@ public class ContactActivity extends Activity {
 	}
 
 	private void loadProfile() {
-		profile.ownName().subscribe(new Action1<String>() {
-			@Override
-			public void call(String name) {
-				fullNameView.setText(name);
-			}
-		});
+		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) { 
+			fullNameView.setText(name);
+		}});
 
 		sneer().findContact(party).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Contact>() { @Override public void call(Contact contact) { 
 			publicKeyEdit.setText(contact.party().publicKey().current().toString());
 		}});
-			
+		
 		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
 			preferredNickNameView.setText("(" + preferredNickname+ ")");
@@ -113,15 +114,10 @@ public class ContactActivity extends Activity {
 			cityView.setText(city);
 		}});
 
-		profile.selfie().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<byte[]>() {
-					@Override
-					public void call(byte[] selfie) {
-						Bitmap bitmap = BitmapFactory.decodeByteArray(selfie,
-								0, selfie.length);
-						selfieImage.setImageBitmap(bitmap);
-					}
-				});
+		profile.selfie().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() {@Override public void call(byte[] selfie) {
+			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
+			selfieImage.setImageBitmap(bitmap);
+		}});
 	}
 
 	@Override
@@ -165,4 +161,21 @@ public class ContactActivity extends Activity {
 		toast.show();
 	}
 
+
+	private void validationOnTextChanged(final EditText textView) {
+		textView.addTextChangedListener(new TextWatcher() {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				sneer().findContact(party).subscribe(new Action1<Contact>() {  @Override public void call(Contact contact) {
+					 System.out.println("Teste: " + contact.problemWithNewNickname(textView.getText().toString()));
+					 nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
+				} });
+			}
+			
+			public void afterTextChanged(Editable s) {}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+		});
+	}
+	
 }
