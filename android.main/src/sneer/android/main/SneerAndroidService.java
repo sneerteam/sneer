@@ -12,7 +12,6 @@ import rx.Observable;
 import rx.functions.*;
 import sneer.*;
 import sneer.commons.*;
-import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
