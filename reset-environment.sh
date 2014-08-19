@@ -6,6 +6,8 @@ git reset --hard
 
 git pull --rebase
 
+rm -rf ~/.m2/repository/me/sneer
+
 ./gradlew cleanEclipse eclipse
 
 if [ -d "../rockpaperscissors" ]; then
