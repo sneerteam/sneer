@@ -19,7 +19,7 @@
 
 (defn tuple->contact [party tuple]
   (reify Contact 
-    ))
+    (party [this] party)))
 
 (defn new-sneer [tuple-space own-prik]
   (let [parties (atom {})]
