@@ -1,6 +1,6 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerSingleton.*;
+import static sneer.android.main.SneerApp.*;
 import static sneer.android.ui.SneerActivity.*;
 
 import java.io.*;
@@ -37,9 +37,11 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		if (!SneerApp.checkOnCreate(this)) return;
+		
 		setContentView(R.layout.activity_main);
 
-		if (!initializeSneerSingleton()) return;
 
 		startProfileActivityIfFirstTime();
 //		startCore();
@@ -63,17 +65,14 @@ public class MainActivity extends Activity {
 		public boolean disableMenus;
 
 		public EmbeddedOptions(Intent intent) {
-			if (intent == null || intent.getExtras() == null) {
+			if (intent == null || intent.getExtras() == null)
 				return;
-			}
-			conversationAction = intent.getExtras().getString(
-					SneerAndroid.NEW_CONVERSATION_ACTION);
-			conversationLabel = intent.getExtras().getString(
-					SneerAndroid.NEW_CONVERSATION_LABEL);
+
+			conversationAction = intent.getExtras().getString(SneerAndroid.NEW_CONVERSATION_ACTION);
+			conversationLabel = intent.getExtras().getString(SneerAndroid.NEW_CONVERSATION_LABEL);
 			type = intent.getExtras().getString(SneerAndroid.TYPE);
 			title = intent.getExtras().getString(SneerAndroid.TITLE);
-			disableMenus = intent.getExtras().getBoolean(
-					SneerAndroid.DISABLE_MENUS, false);
+			disableMenus = intent.getExtras().getBoolean(SneerAndroid.DISABLE_MENUS, false);
 		}
 
 		public boolean wasEmbedded() {
@@ -190,10 +189,8 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
-				.getActionView();
-		searchView.setSearchableInfo(searchManager
-				.getSearchableInfo(getComponentName()));
+		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -240,15 +237,13 @@ public class MainActivity extends Activity {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "My Sneer public key");
-		sharingIntent.putExtra(Intent.EXTRA_TEXT, sneer().self().publicKey()
-				.current().toString());
+		sharingIntent.putExtra(Intent.EXTRA_TEXT, buildSneerUri(sneer().self().publicKey().current().toString()));
 		startActivity(sharingIntent);
 	}
 
 	private void copyYoursPublicKey() {
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-		ClipData clip = ClipData.newPlainText("Public Key", sneer().self()
-				.publicKey().current().toString());
+		ClipData clip = ClipData.newPlainText("Public Key", buildSneerUri(sneer().self().publicKey().current().toString()));
 		clipboard.setPrimaryClip(clip);
 	}
 
@@ -256,9 +251,12 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent();
 		intent.setClass(this, ConversationActivity.class);
 		intent.putExtra("embeddedOptions", embeddedOptions);
-		intent.putExtra("partyPuk", conversation.party().publicKey()
-				.current());
+		intent.putExtra("partyPuk", conversation.party().publicKey().current());
 		startActivity(intent);
+	}
+
+	private String buildSneerUri(String puk) {
+		return "http://sneer.me/public-key?" + puk;
 	}
 
 	@Override
@@ -290,28 +288,6 @@ public class MainActivity extends Activity {
 		}});
 	}
 
-	private boolean initializeSneerSingleton() {
-		try {
-			SneerSingleton.initializeIfNecessary(getApplicationContext());
-			return true;
-		} catch (FriendlyException e) {
-			finishWith(e.getMessage());
-			return false;
-		}
-	}
-
-	private void finishWith(String message) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(message).setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						error.dismiss();
-						finish();
-					}
-				});
-		error = builder.create();
-		error.show();
-	}
 
 	private Observable<String> ownName() {
 		return sneer().profileFor(sneer().self()).ownName();

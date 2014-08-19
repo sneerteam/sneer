@@ -1,12 +1,13 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerSingleton.*;
+import static sneer.android.main.SneerApp.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
+import android.content.*;
 import android.graphics.*;
 import android.os.*;
 import android.text.*;
@@ -38,6 +39,9 @@ public class ContactActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (!SneerApp.checkOnCreate(this)) return;
+		
 		setContentView(R.layout.activity_contact);
 
 		PublicKey partyPuk;
@@ -54,6 +58,8 @@ public class ContactActivity extends Activity {
 
 		readonly();
 
+		newContactFromUrl();
+		
 		if (!(newContact)) {
 			partyPuk = partyPuk();
 			party = sneer().produceParty(partyPuk);
@@ -64,7 +70,19 @@ public class ContactActivity extends Activity {
 		validationOnTextChanged(nicknameEdit);
 		
 	}
+	
 
+	private void newContactFromUrl() {
+		final Intent intent = getIntent();
+		final String action = intent.getAction();
+		if (Intent.ACTION_VIEW.equals(action)) {
+			String puk = intent.getData().getQuery();
+			publicKeyEdit.setText(puk);
+			newContact = true;
+		}
+	}
+
+	
 	private String activityTitle() {
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
@@ -75,6 +93,7 @@ public class ContactActivity extends Activity {
 		return "Contact";
 	}
 
+	
 	private PublicKey partyPuk() {
 		Bundle extras = getIntent().getExtras();
 		if (extras == null)
@@ -92,6 +111,7 @@ public class ContactActivity extends Activity {
 		publicKeyEdit.setEnabled(false);
 	}
 
+	
 	private void loadProfile() {
 		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) { 
 			fullNameView.setText(name);
@@ -120,13 +140,14 @@ public class ContactActivity extends Activity {
 		}});
 	}
 
+	
 	@Override
 	public void onContentChanged() {
 		super.onContentChanged();
 	}
 
+	
 	public void saveContact() {
-		
 		final String nickName = nicknameEdit.getText().toString();
 		
 		if(newContact){
@@ -150,18 +171,21 @@ public class ContactActivity extends Activity {
 		
 	}
 
+
 	@Override
 	protected void onStop() {
 		saveContact();
 		super.onStop();
 	}
 
+	
 	private void toast(String message) {
 		Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
 		toast.show();
 	}
 
 
+	
 	private void validationOnTextChanged(final EditText textView) {
 		textView.addTextChangedListener(new TextWatcher() {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {

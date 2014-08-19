@@ -16,7 +16,7 @@ class PublicKeyImpl implements PublicKey {
 	
 	@Override
 	public String toString() {
-		return "PUK:" + bytes[0] + bytes[1] + bytes[2]; //TODO Use same string representation as bitcoin for public address.
+		return "" + bytes[0] + bytes[1] + bytes[2]; //TODO Use same string representation as bitcoin for public address.
 	}
 
 	

@@ -1,6 +1,6 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerSingleton.*;
+import static sneer.android.main.SneerApp.*;
 
 import java.util.*;
 

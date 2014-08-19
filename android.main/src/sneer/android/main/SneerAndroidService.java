@@ -29,21 +29,6 @@ public class SneerAndroidService extends Service {
 	private final InteractiveSerializer serializer = new InteractiveSerializer();
 	
 	
-	{
-		init();
-	}
-
-	
-	private void init() {
-		Context context = getApplicationContext();
-		try {
-			SneerSingleton.initializeIfNecessary(context);
-		} catch (FriendlyException e) {
-			friendlyErrorMessage = e.getMessage();
-		}
-	}
-
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -79,7 +64,7 @@ public class SneerAndroidService extends Service {
 	}
 
 	private void subscribe(Map<String, Object> criteria, final ResultReceiver resultReceiver) {
-		Observable<Tuple> tuples = SneerSingleton.sneer().tupleSpace().filter().putFields(criteria).tuples();
+		Observable<Tuple> tuples = SneerApp.sneer().tupleSpace().filter().putFields(criteria).tuples();
 		int id = nextSubscriptionId.getAndIncrement();
 		resultReceiver.send(TupleSpaceFactoryClient.SubscriptionOp.SUBSCRIPTION_ID.ordinal(), bundle(id));
 		
@@ -103,7 +88,7 @@ public class SneerAndroidService extends Service {
 	}
 
 	private void publish(Map<String, Object> tuple) {
-		SneerSingleton.sneer().tupleSpace().publisher().putFields(tuple).pub();
+		SneerApp.sneer().tupleSpace().publisher().putFields(tuple).pub();
 	}
 
 	@Override
