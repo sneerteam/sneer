@@ -11,56 +11,75 @@
 
 (defn new-party [puk]
   (reify Party
-    (publicKey [this] 
+    (publicKey [this]
       (.observed (ObservedSubject/create puk)))))
 
 (defn party-puk [party]
   (.. party publicKey current))
 
-(defn tuple->contact [party tuple]
-  (reify Contact 
-    (party [this] party)))
+(defn reify-contact [nickname party]
+  (let [nickname-subject (ObservedSubject/create nickname)]
+    (reify Contact
+      (party [this] party)
+      (nickname [this] (.observed nickname-subject)))))
 
 (defn new-sneer [tuple-space own-prik]
-  (let [parties (atom {})]
-	  (reify Sneer
-	    (self [this]
-	      (new-party (.publicKey own-prik)))
-     
-      (addContact [this nickname party]
-        (->>
-          (.. tuple-space filter
-	          (audience own-prik)
-	          (type "sneer/profile.nickname")
-            (payload nickname)
-	          localTuples 
-            (defaultIfEmpty :nothing)
-            )
-          )
-        (.. tuple-space publisher 
-          (audience (.publicKey own-prik))
-          (type "sneer/profile.nickname")
-          (field "party" (party-puk party))
-          (pub nickname)))
-      
-      (findContact [this party]
-        (->>
-	        (.. tuple-space filter
-	          (audience own-prik)
-	          (type "sneer/profile.nickname")
-	          (field "party" (party-puk party))
-	          localTuples)
-          (rx/map #(tuple->contact party %))))
-      
-	    (produceParty [this puk]
-       (let [new-parties
-             (swap! parties (fn [cur] 
-                              (if (get cur puk)
-                                cur
-                                (assoc cur puk (new-party puk)))))]
-         (get new-parties puk))))))
+  (let [parties (atom {})
+        puk->contact (atom {})
+        own-puk (.publicKey own-prik)]
+
+    (letfn [(produce-party [puk]
+              (->
+               (swap! parties update-in [puk] #(if (nil? %) (new-party puk) %))
+               (get puk)))
+
+            (restore-contact-from-tuple [tuple]
+              (let [party-puk (.get tuple "party")
+                    party (produce-party party-puk)
+                    nickname (.payload tuple)]
+                (swap! puk->contact assoc party-puk (reify-contact nickname party))))
+
+            (duplicate-contact? [nickname party contact]
+              (or (identical? party (.party contact))
+                  (= nickname (.. contact nickname current))))
+
+            (add-contact [nickname party]
+              (swap! puk->contact
+                     (fn [cur]
+                       (assert (->> cur vals (not-any? (partial duplicate-contact? nickname party)))
+                               "Duplicate contact!")
+                       (assoc cur (party-puk party)
+                         (reify-contact nickname party)))))]
+
+      (->
+       (.. tuple-space
+           filter
+           (author own-puk)
+           (type "sneer/contact")
+           localTuples)
+       (rx/subscribe restore-contact-from-tuple))
+
+      (reify Sneer
+
+        (self [this]
+          (new-party own-puk))
+
+        (addContact [this nickname party]
+          (add-contact nickname party)
+          (.. tuple-space
+              publisher
+              (audience own-puk)
+              (type "sneer/contact")
+              (field "party" (party-puk party))
+              (pub nickname)))
+
+        (findContact [this party]
+          (get @puk->contact (party-puk party)))
+
+        (produceParty [this puk]
+          (produce-party puk))))))
 
 (defn new-sneer-admin [tuple-space own-prik]
   (let [sneer (new-sneer tuple-space own-prik)]
-	  (reify SneerAdmin
-	    (sneer [this] sneer))))
+    (reify SneerAdmin
+      (sneer [this] sneer))))

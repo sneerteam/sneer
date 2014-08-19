@@ -117,10 +117,8 @@ public class ContactActivity extends Activity {
 			fullNameView.setText(name);
 		}});
 
-		sneer().findContact(party).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Contact>() { @Override public void call(Contact contact) { 
-			publicKeyEdit.setText(contact.party().publicKey().current().toString());
-		}});
-		
+		Contact contact = sneer().findContact(party);
+		publicKeyEdit.setText(contact.party().publicKey().current().toString());
 		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
 			preferredNickNameView.setText("(" + preferredNickname+ ")");
@@ -150,24 +148,15 @@ public class ContactActivity extends Activity {
 	public void saveContact() {
 		final String nickName = nicknameEdit.getText().toString();
 		
-		if(newContact){
-			try{
-				sneer().addContact(nickName, party);				
-				toast("contact saved...");
-			} catch (FriendlyException e) {
-				toast(e.getMessage());
-			}
-			return;
+		try {
+			if (newContact)
+				sneer().addContact(nickName, party);
+			else
+				sneer().findContact(party).setNickname(nickName);
+			toast("contact saved...");
+		} catch (FriendlyException e) {
+			toast(e.getMessage());
 		}
-		
-		sneer().findContact(party).subscribe(new Action1<Contact>() {  @Override public void call(Contact contact) {
-			try {
-				contact.setNickname(nickName);
-				toast("contact saved...");
-			} catch (FriendlyException e) {
-				toast(e.getMessage());
-			}	
-		} });
 		
 	}
 
@@ -184,15 +173,13 @@ public class ContactActivity extends Activity {
 		toast.show();
 	}
 
-
 	
 	private void validationOnTextChanged(final EditText textView) {
 		textView.addTextChangedListener(new TextWatcher() {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				sneer().findContact(party).subscribe(new Action1<Contact>() {  @Override public void call(Contact contact) {
-					 System.out.println("Teste: " + contact.problemWithNewNickname(textView.getText().toString()));
-					 nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
-				} });
+				Contact contact = sneer().findContact(party);
+				System.out.println("Teste: " + contact.problemWithNewNickname(textView.getText().toString()));
+				nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
 			}
 			
 			public void afterTextChanged(Editable s) {}

@@ -24,7 +24,7 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 
 		@Override
-		public Observable<Void> addContact(String nickname, Party party) {
+		public void addContact(String nickname, Party party) {
 			throw new NotImplementedYet();
 
 //			findContact(party).setNickname(nickname);
@@ -148,7 +148,7 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 
 		@Override
-		public Observable<Contact> findContact(Party party) {
+		public Contact findContact(Party party) {
 //			return contacts.getUnchecked((WritablePartyImpl) party);
 			throw new NotImplementedYet();
 		}

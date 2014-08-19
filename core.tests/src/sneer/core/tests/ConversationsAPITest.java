@@ -44,12 +44,11 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 		final Party partyB = sneerA.produceParty(userB);
 
-		Observable<Contact> contactQuery = sneerA.findContact(partyB);
+		Contact contact = sneerA.findContact(partyB);
+		assertNull(contact);
 		
 		sneerA.addContact("Party Boy", partyB);
-
-		expecting(
-				same(contactQuery.map(Contact.TO_PARTY), partyB));
+		assertSame(partyB, sneerA.findContact(partyB).party());
 	}
 
 	@Test(expected = FriendlyException.class)
@@ -66,45 +65,45 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 		sneerA.addContact("Party Boy", partyB);
 		
+		Observable<String> partyBNicks = sneerA.findContact(partyB).nickname().observable();
 		expecting(
-				values(sneerA.findContact(partyB).flatMap(Contact.TO_NICKNAME), "Party Boy"));
+			values(partyBNicks, "Party Boy"));
 
-		ReplaySubject<String> nicknames = ReplaySubject.create();
-
-		sneerA.findContact(partyB).flatMap(Contact.TO_NICKNAME).subscribe(nicknames);
+		ReplaySubject<String> nicknames = ReplaySubject.create();		
+		partyBNicks.subscribe(nicknames);
 
 		sneerA.addContact("Party Man", partyB);
 
 		expecting(
-				values(nicknames, "Party Boy", "Party Man"),
-				values(sneerA.findContact(partyB).flatMap(Contact.TO_NICKNAME), "Party Man"));
+			values(nicknames, "Party Boy", "Party Man"),
+			values(partyBNicks, "Party Man"));
 	}
 	
 	@Test
 	public void contactListSequence() throws FriendlyException {
 
-		Party partyB = sneerA.produceParty(userB);
-		Party partyC = sneerA.produceParty(userC);
+		final Party partyB = sneerA.produceParty(userB);
+		final Party partyC = sneerA.produceParty(userC);
 		
 		expecting(
-				values(sneerA.contacts()));
+			values(sneerA.contacts()));
 		
 		sneerA.addContact("Party Boy", partyB);
 		
 		expecting(
-				Observable.zip(sneerA.contacts(), sneerA.findContact(partyB), new Func2<List<Contact>, Contact, Void>() {  @Override public Void call(List<Contact> t1, Contact t2) {
-					assertArrayEquals(new Contact[]{t2}, t1.toArray());
-					return null;
-				} }));
+			sneerA.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
+				assertArrayEquals(new Contact[]{sneerA.findContact(partyB)}, t1.toArray());
+				return null;
+			} }));
 		
 		
 		sneerA.addContact("Party Boy", partyC);
 
 		expecting(
-				Observable.zip(sneerA.contacts(), sneerA.findContact(partyB), sneerA.findContact(partyC), new Func3<List<Contact>, Contact, Contact, Void>() {  @Override public Void call(List<Contact> t1, Contact t2, Contact t3) {
-					assertArrayEquals(new Contact[]{t2, t3}, t1.toArray());
-					return null;
-				} }));
+			sneerA.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
+				assertArrayEquals(new Contact[]{sneerA.findContact(partyB), sneerA.findContact(partyC)}, t1.toArray());
+				return null;
+			} }));
 	}
 	
 	

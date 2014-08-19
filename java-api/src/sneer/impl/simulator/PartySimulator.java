@@ -1,7 +1,11 @@
 package sneer.impl.simulator;
 
 import static sneer.commons.exceptions.Exceptions.*;
-import rx.*;
+
+import java.util.*;
+
+import rx.Observable;
+import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.rx.*;
@@ -138,8 +142,20 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public Observable<String> name() {
-		return ownName().concatWith(sneer.findContact(this).flatMap(Contact.TO_NICKNAME));
+		return ownName().concatWith(nickname());
 	}
+	
 
+	private Observable<String> nickname() {
+		return sneer.contacts().map(new Func1<List<Contact>, Contact>() { @Override public Contact call(List<Contact> t1) {
+			return findContact();
+		}}).filter(new Func1<Contact, Boolean>() { @Override public Boolean call(Contact t1) {
+			return t1 != null;
+		}}).flatMap(Contact.TO_NICKNAME);
+	}
+	
 
+	private Contact findContact() {
+		return sneer.findContact(this);
+	}
 }

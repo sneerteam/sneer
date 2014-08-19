@@ -8,10 +8,7 @@ import static sneer.tuples.Tuple.*;
 import org.junit.*;
 
 import rx.*;
-import rx.functions.*;
-import rx.observables.*;
 import sneer.*;
-import sneer.commons.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 

@@ -10,7 +10,6 @@ import java.util.concurrent.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
-import rx.util.async.*;
 import sneer.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
@@ -97,32 +96,24 @@ public class SneerSimulator implements Sneer {
 
 
 	@Override
-	public Observable<Contact> findContact(Party party) {
-		Contact contact = contactsByParty.get(party);
-		if (contact == null) {
-			// TODO return a sequence that will emit an contact when the party becomes a contact (by calling addContact)
-			return Observable.never();
-		}
-		return Observable.just(contact);
+	public Contact findContact(Party party) {
+		return contactsByParty.get(party);
 	}
 
 
 	@Override
-	public Observable<Void> addContact(final String nickname, final Party party) {
-		return Async.start(new Func0<Void>() {  @Override public Void call() {
-			synchronized (contactsByParty) {
-				if (contactsByParty.get(party) != null)
-					throw new RuntimeException("The party you tried to add was already a contact.");
-				
-				ContactSimulator c = new ContactSimulator(nickname, party);
-				contactsByParty.put(party, c);
-				produceConversationWith(party).sendMessage("Hey " + nickname + "!");
-				contacts.onNext(contactsSorted());
-			}
-			return null;
-		} });
+	public void addContact(final String nickname, final Party party) {		
+		synchronized (contactsByParty) {
+			if (contactsByParty.get(party) != null)
+				throw new RuntimeException("The party you tried to add was already a contact.");
+			
+			ContactSimulator c = new ContactSimulator(nickname, party);
+			contactsByParty.put(party, c);
+			produceConversationWith(party).sendMessage("Hey " + nickname + "!");
+			contacts.onNext(contactsSorted());
+		}
 	}
-
+	
 
 	@Override
 	public Observable<List<Contact>> contacts() {

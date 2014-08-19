@@ -169,16 +169,12 @@ public class ConversationActivity extends Activity {
 
 
 	private void launchNewConversation() {
-		sneer().findContact(party)
-			.flatMap(Contact.TO_NICKNAME) 
-			.first()
-			.subscribe(new Action1<String>() {  @Override public void call(String nickname) {
-				Intent intent = new Intent(embeddedOptions.conversationAction);
-				intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
-				intent.putExtra("contactNickname", nickname);
-				intent.putExtra(SneerAndroid.PARTY_PUK, party.publicKey().current());
-				startActivity(intent);
-			} });
+		Contact contact = sneer().findContact(party);
+		Intent intent = new Intent(embeddedOptions.conversationAction);
+		intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
+		intent.putExtra("contactNickname", contact.nickname().current());
+		intent.putExtra(SneerAndroid.PARTY_PUK, party.publicKey().current());
+		startActivity(intent);
 	}
 	
 	
