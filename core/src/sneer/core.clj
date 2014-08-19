@@ -1,7 +1,6 @@
 (ns sneer.core
   (:require
-    [rx.lang.clojure.core :as rx]
-    [sneer.serialization :refer :all])
+   [rx.lang.clojure.core :as rx])
   (:import
     [sneer.admin SneerAdmin]
     [sneer Sneer PrivateKey Party Contact]
@@ -39,7 +38,7 @@ an Observer part that will send packets over from puk.")
        (~'with ~(name a) ~a)))
 
 (defn ->envelope [destination type payload]
-  {:address destination type (serialize payload)})
+  {:address destination type payload})
 
 (defn new-tuple-publisher
   ([tuples tuple]
@@ -103,8 +102,7 @@ an Observer part that will send packets over from puk.")
 (defn payloads [type envelopes]
   (->> envelopes
     (rx/map type)
-    (rx/filter (complement nil?))
-    (rx/map deserialize)))
+    (rx/filter (complement nil?))))
 
 (defn reify-tuple-space [own-puk peers network]
   
