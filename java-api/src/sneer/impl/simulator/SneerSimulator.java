@@ -102,7 +102,7 @@ public class SneerSimulator implements Sneer {
 			// TODO return a sequence that will emit an contact when the party becomes a contact (by calling addContact)
 			return Observable.never();
 		}
-		return Observable.from(contact);
+		return Observable.just(contact);
 	}
 
 
