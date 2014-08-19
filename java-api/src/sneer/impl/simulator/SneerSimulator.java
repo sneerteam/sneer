@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
+import rx.util.async.*;
 import sneer.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
@@ -107,16 +108,19 @@ public class SneerSimulator implements Sneer {
 
 
 	@Override
-	public void addContact(String nickname, Party party) {
-		synchronized (contactsByParty) {
-			if (contactsByParty.get(party) != null)
-				throw new RuntimeException("The party you tried to add was already a contact.");
-
-			ContactSimulator c = new ContactSimulator(nickname, party);
-			contactsByParty.put(party, c);
-			produceConversationWith(party).sendMessage("Hey " + nickname + "!");
-			contacts.onNext(contactsSorted());
-		}
+	public Observable<Void> addContact(final String nickname, final Party party) {
+		return Async.start(new Func0<Void>() {  @Override public Void call() {
+			synchronized (contactsByParty) {
+				if (contactsByParty.get(party) != null)
+					throw new RuntimeException("The party you tried to add was already a contact.");
+				
+				ContactSimulator c = new ContactSimulator(nickname, party);
+				contactsByParty.put(party, c);
+				produceConversationWith(party).sendMessage("Hey " + nickname + "!");
+				contacts.onNext(contactsSorted());
+			}
+			return null;
+		} });
 	}
 
 

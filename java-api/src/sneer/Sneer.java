@@ -3,7 +3,6 @@ package sneer;
 import java.util.*;
 
 import rx.Observable;
-import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 
 public interface Sneer {
@@ -15,8 +14,8 @@ public interface Sneer {
 	Observable<List<Contact>> contacts();
 	/** @return null if party is not a contact. */
 	Observable<Contact> findContact(Party party); 
-	/** @throws FriendlyException if nickname is already set for another contact or if party is already a contact. */
-	void addContact(String nickname, Party party) throws FriendlyException;
+	/** if nickname is already set for another contact or if party is already a contact expect onError to be a FriendlyException. */
+	Observable<Void> addContact(String nickname, Party party);
 	
 	
 	Party produceParty(PublicKey publicKey);

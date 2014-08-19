@@ -24,7 +24,7 @@ public class SneerAdminImpl implements SneerAdmin {
 		}
 
 		@Override
-		public void addContact(String nickname, Party party) throws FriendlyException {
+		public Observable<Void> addContact(String nickname, Party party) {
 			throw new NotImplementedYet();
 
 //			findContact(party).setNickname(nickname);
