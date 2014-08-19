@@ -7,8 +7,11 @@ import static sneer.tuples.Tuple.*;
 
 import org.junit.*;
 
-import rx.Observable;
+import rx.*;
+import rx.functions.*;
+import rx.observables.*;
 import sneer.*;
+import sneer.commons.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
@@ -171,5 +174,95 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		
 		expectValues(actual, "userB is cool");
 	}
+	
+//	@Test
+//	public void pubIfEmpty() {
+//		
+//		TuplePublisher publisher = tuplesA.publisher()
+//			.audience(userA.publicKey())
+//			.type("sneer/profile.nickname");
+//		
+//		TupleFilter filter = tuplesA.filter()
+//			.audience(userA)
+//			.type("profile/profile.nickname");
+//		
+//		expecting(
+//				values(publisher.pubIfEmpty(filter, "a"), Pair.of(true, "a")),
+//				values(publisher.pubIfEmpty(filter, "b"), Pair.of(false, "a")));
+//		
+//	}
+//	
+//	interface PartyId {
+//		
+//	}
+//
+//	@Test
+//	public void pubIfEmptay() {
+//		
+//		tuplesA.filter()
+//			.author(userA.publicKey())
+//			.type("sneer/party")
+//			.localTuples()
+//			.flatMap(new Func1<Tuple, Observable<Tuple>>() {  @Override public Observable<Tuple> call(Tuple contact) {
+//				return tuplesA.filter()
+//						.author(userA.publicKey())
+//						.type("sneer/contact")
+//						.field("partyId", contact.get("partyId"))
+//						.localTuples()
+//						.last();
+//			} })
+//			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
+//				return !t1.containsKey("deleted");
+//			} })
+//			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+//				
+//				System.out.println("party id: " + t1.get("partyId") +  ", nickname: " + t1.payload());
+//			} });
+//		
+//		
+//		Observable<String> allNicknames = tuplesA.filter()
+//			.author(userA.publicKey())
+//			.type("sneer/contact")
+//			.localTuples()
+//			.groupBy(new Func1<Tuple, PartyId>() {  @Override public PartyId call(Tuple tuple) {
+//				return (PartyId) tuple.get("partyId");
+//			} })
+//			.flatMap(new Func1<GroupedObservable<PartyId, Tuple>, Observable<Tuple>>() {  @Override public Observable<Tuple> call(GroupedObservable<PartyId, Tuple> group) {
+//				return group.last();
+//			} })
+//			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
+//				return !t1.containsKey("deleted");
+//			} })
+//			.map(new Func1<Tuple, Object>() {  @Override public Object call(Tuple t1) {
+//				return t1.get("nickname");
+//			} })
+//			.cast(String.class);
+//		
+//		allNicknames
+//			.filter(new Func1<String, Boolean>() {  @Override public Boolean call(String t1) {
+//				return t1.equals("new nickname");
+//			} });
+//			
+//			
+////			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+////				System.out.println("party id: " + t1.get("partyId") +  ", last-known-puk: " + t1.get("puk") + ", nickname: " + t1.get("nickname"));
+////			} });
+//
+//		
+//		tuplesA.filter()
+//			.author(userA.publicKey())
+//			.type("sneer/party")
+//			.localTuples()
+//			.groupBy(new Func1<Tuple, PartyId>() {  @Override public PartyId call(Tuple tuple) {
+//				return (PartyId) tuple.get("partyId");
+//			}})
+//			.flatMap(new Func1<GroupedObservable<PartyId, Tuple>, Observable<Tuple>>() {  @Override public Observable<Tuple> call(GroupedObservable<PartyId, Tuple> group) {
+//				return group.last();
+//			} })
+//			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+//				System.out.println("party id: " + t1.get("partyId") +  ", last-known-puk: " + t1.get("puk") + ", nickname: " + t1.get("nickname"));
+//			} });
+//
+//	}
 
 }

@@ -195,6 +195,7 @@ public abstract class LocalTuplesFactory {
 				t.prototype.putAll(fields);
 				return t;
 			}
+
 		}
 
 		public TupleSpaceImpl(PrivateKey prik) {

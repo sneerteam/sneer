@@ -28,6 +28,15 @@
 	      (new-party (.publicKey own-prik)))
      
       (addContact [this nickname party]
+        (->>
+          (.. tuple-space filter
+	          (audience own-prik)
+	          (type "sneer/profile.nickname")
+            (payload nickname)
+	          localTuples 
+            (defaultIfEmpty :nothing)
+            )
+          )
         (.. tuple-space publisher 
           (audience (.publicKey own-prik))
           (type "sneer/profile.nickname")
