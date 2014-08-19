@@ -4,11 +4,14 @@
   (:import [java.net InetSocketAddress]
            [sneer.commons SystemReport]))
 
+(defn dropping-chan [size]
+  (async/chan (async/dropping-buffer size)))
+
 (defn start
-  
+
   ([puk]
-    (start puk (async/chan (async/dropping-buffer 1)) (async/chan (async/dropping-buffer 1)) "dynamic.sneer.me" 5555))
-  
+    (start puk (dropping-chan 1) (dropping-chan 1)  "dynamic.sneer.me" 5555))
+
   ([puk from-server to-server server-host server-port]
     (let [packets-in (async/chan)
           packets-out (async/chan)]
@@ -34,8 +37,11 @@
                 (>! from-server payload))
               (recur)))
 
-          (async/pipe (async/map (fn [payload] [server-addr {:intent :send :from puk :to (:address payload) :payload payload}]) [to-server])
-                      packets-out)))
+          (async/pipe
+           (async/map
+            (fn [payload] [server-addr {:intent :send :from puk :to (:address payload) :payload payload}])
+            [to-server])
+           packets-out)))
 
       {:packets-in packets-in :packets-out packets-out :from-server from-server :to-server to-server})))
 
