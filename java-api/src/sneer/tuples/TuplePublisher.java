@@ -2,10 +2,8 @@ package sneer.tuples;
 
 import java.util.*;
 
-import rx.Observable;
 import rx.functions.*;
 import sneer.*;
-import sneer.commons.*;
 
 public interface TuplePublisher extends Action1<Object>, Action0 {
 

@@ -1,6 +1,5 @@
 package sneer.tuples;
 
-import rx.*;
 
 public interface TupleSpace {
 
