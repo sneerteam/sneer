@@ -3,6 +3,7 @@
    [rx.lang.clojure.core :as rx])
   (:import
    [sneer.admin SneerAdmin]
+   [sneer.commons.exceptions FriendlyException]
    [sneer Sneer PrivateKey Party Contact]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
@@ -68,10 +69,11 @@
               (->>
                (swap! puk->contact
                       (fn [cur]
-                        (assert (->> cur vals (not-any? (partial duplicate-contact? nickname party)))
-                                "Duplicate contact!")
-                        (assoc cur (party-puk party)
-                               (reify-contact nickname party))))
+                        (when (->> cur vals (some (partial duplicate-contact? nickname party)))
+                          (throw (FriendlyException. "Duplicate contact!")))
+                        (assoc cur
+                          (party-puk party)
+                          (reify-contact nickname party))))
                ->contact-list
                (rx/on-next contacts-subject)))]
 
