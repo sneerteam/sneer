@@ -16,7 +16,7 @@ class PublicKeyImpl implements PublicKey {
 	
 	@Override
 	public String toString() {
-		return "" + bytes[0] + bytes[1] + bytes[2]; //TODO Use same string representation as bitcoin for public address.
+		return asBitcoinAddress().substring(0, 5);
 	}
 
 	
@@ -47,6 +47,16 @@ class PublicKeyImpl implements PublicKey {
 	@Override
 	public byte[] bytes() {
 		return bytes.clone();
+	}
+
+
+	@Override
+	public String asBitcoinAddress() {
+		//TODO Use same string representation as bitcoin for public address.
+		String ret = "";
+		for (int i = 0; i < bytes.length; i++)
+			ret += Math.abs(bytes[i]) % 10;
+		return ret;
 	}
 
 }
