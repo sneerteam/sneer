@@ -1,6 +1,7 @@
 (ns sneer.admin
   (:require
-   [rx.lang.clojure.core :as rx])
+   [rx.lang.clojure.core :as rx]
+   [sneer.core :as core])
   (:import
    [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
@@ -101,7 +102,8 @@
         (produceParty [this puk]
           (produce-party parties puk))))))
 
-(defn new-sneer-admin [tuple-space own-prik]
-  (let [sneer (new-sneer tuple-space own-prik)]
+(defn new-sneer-admin [own-prik network]
+  (let [tuple-space (core/reify-tuple-space (.publicKey own-prik) (rx.Observable/never) network)
+        sneer (new-sneer tuple-space own-prik)]
     (reify SneerAdmin
       (sneer [this] sneer))))

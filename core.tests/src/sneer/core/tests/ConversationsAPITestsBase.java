@@ -2,15 +2,12 @@ package sneer.core.tests;
 
 import org.junit.*;
 
-import rx.subjects.*;
 import sneer.*;
 import sneer.admin.*;
 import sneer.impl.keys.*;
-import sneer.tuples.*;
 
 public class ConversationsAPITestsBase {
 
-//	private final TuplesFactoryInProcess world = new TuplesFactoryInProcess();
 	private final Object network = Glue.newNetwork();
 	
 	protected final SneerAdmin adminA = newSneerAdmin();
@@ -35,11 +32,7 @@ public class ConversationsAPITestsBase {
 	}
 
 	private SneerAdmin newSneerAdmin() {
-		PrivateKey prik = Keys.createPrivateKey();
-		TupleSpace tupleSpace = Glue.newTupleSpace(prik.publicKey(), PublishSubject.<PublicKey>create(), network);
-//		TupleSpace tupleSpace = world.newTupleSpace(prik);
-//		SneerAdminImpl admin = new SneerAdminImpl(tupleSpace, prik);
-		return (SneerAdmin) Glue.var("sneer.admin", "new-sneer-admin").invoke(tupleSpace, prik);
+		return Glue.newSneerAdmin(Keys.createPrivateKey(), network);
 	}
 
 }
