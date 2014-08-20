@@ -8,6 +8,7 @@ import org.junit.*;
 import sneer.*;
 import sneer.impl.keys.*;
 
+@Ignore("wip")
 public class Groups extends TupleSpaceTestsBase {
 	
 	@Test
