@@ -1,13 +1,13 @@
 (ns sneer.admin
   (:require
-    [rx.lang.clojure.core :as rx])
+   [rx.lang.clojure.core :as rx])
   (:import
-    [sneer.admin SneerAdmin]
-    [sneer Sneer PrivateKey Party Contact]
-    [sneer.rx ObservedSubject]
-    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
-    [rx.schedulers TestScheduler]
-    [rx.subjects BehaviorSubject]))
+   [sneer.admin SneerAdmin]
+   [sneer Sneer PrivateKey Party Contact]
+   [sneer.rx ObservedSubject]
+   [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
+   [rx.schedulers TestScheduler]
+   [rx.subjects BehaviorSubject]))
 
 (defn new-party [puk]
   (reify Party
