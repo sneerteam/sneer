@@ -38,6 +38,7 @@ public class ContactActivity extends Activity {
 	TextView cityView;
 	Party party;
 	String partyPuk;
+	private Contact contact;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,6 @@ public class ContactActivity extends Activity {
 		
 		setContentView(R.layout.activity_contact);
 
-		getActionBar().setTitle(activityTitle());
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
@@ -63,6 +63,8 @@ public class ContactActivity extends Activity {
 		loadProfile();
 		
 		validationOnTextChanged(nicknameEdit);
+
+		getActionBar().setTitle(activityTitle());
 	}
 	
 	
@@ -92,7 +94,8 @@ public class ContactActivity extends Activity {
 			String puk = intent.getData().getQuery();
 			this.partyPuk = puk;
 			party = sneer().produceParty(Keys.createPublicKey(partyPuk));
-			if (party == null)
+			contact = sneer().findContact(party);
+			if (contact == null)
 				newContact = true;
 		}
 	}
@@ -136,8 +139,8 @@ public class ContactActivity extends Activity {
 				fullNameView.setText(name);
 			}});
 
-//			Contact contact = sneer().findContact(party);
-//			partyPuk = contact.party().publicKey().current().toString();
+			contact = sneer().findContact(party);
+			partyPuk = contact.party().publicKey().current().toString();
 
 			profile.preferredNickname() .observeOn(AndroidSchedulers.mainThread()) .subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 				preferredNickNameView.setText("(" + preferredNickname + ")");
