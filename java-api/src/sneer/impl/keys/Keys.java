@@ -19,6 +19,11 @@ public class Keys {
 	}
 
 	
+	public static PublicKey createPublicKey(String bitcoinStylePuk) {
+		return new PublicKeyImpl(bitcoinStylePuk.getBytes());
+	}
+
+	
 	public static PrivateKey createPrivateKey(String seed) {
 		return new PrivateKeyImpl(randomBytes(seed)); //TODO Use bitcoin keys.
 	}
