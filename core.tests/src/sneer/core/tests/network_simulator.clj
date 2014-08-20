@@ -9,11 +9,12 @@
     (let [destination-address (:address envelope)]
       (= destination-address puk))))
 
-(extend-protocol core/Network
-  PublishSubject
+(extend-type PublishSubject
+  core/Network
   (connect [network own-puk]
     (let [envelopes-for-me (rx/filter (addressed-to own-puk) network)]
       (subject* envelopes-for-me network)))
+  core/Disposable
   (dispose [network]
     (rx/on-completed network)))
 

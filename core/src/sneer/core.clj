@@ -9,12 +9,14 @@
    [rx.schedulers TestScheduler]
    [rx.subjects ReplaySubject PublishSubject]))
 
+(defprotocol Disposable
+  (dispose [o]))
+
 (defprotocol Network
   (connect
     [network puk]
     "Returns a `rx.subjects.Subject' with an Observable part for packets addressed to puk and
-an Observer part that will send packets over from puk.")
-  (dispose [network]))
+an Observer part that will send packets over from puk."))
 
 (defmacro reify+
   "expands to reify form after macro expanding the body"

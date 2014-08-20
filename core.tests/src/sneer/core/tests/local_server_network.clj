@@ -26,7 +26,7 @@
     (onCompleted [this]
       (async/close! ch))))
 
-(defn compromised [ch]  
+(defn compromised [ch]
   (async/filter> (fn [_] (> (rand) 0.7)) ch))
 
 (defn compromised-if [unreliable ch]
@@ -40,9 +40,10 @@
     (reify core/Network
       (connect [network puk]
         (let [to-server (compromised-if unreliable (async/chan 1))
-              from-server (compromised-if unreliable (async/chan 1))              
+              from-server (compromised-if unreliable (async/chan 1))
               connection (client/start puk from-server to-server "localhost" port)]
           (subject* (chan->observable from-server)
                     (chan->observer to-server))))
+      core/Disposable
       (dispose [network]
         (server/stop server)))))
