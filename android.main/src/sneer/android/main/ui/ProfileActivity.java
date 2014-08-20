@@ -8,6 +8,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.android.main.ui.utils.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -34,7 +35,9 @@ public class ProfileActivity extends Activity {
 	EditText preferredNickNameEdit;
 	EditText countryEdit;
 	EditText cityEdit;
+	String puk;
 	private byte[] selfieBytes;
+	private PublicKey partyPuk;
 	
 	
 	@Override
@@ -42,7 +45,7 @@ public class ProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		
-		PublicKey partyPuk = partyPuk();
+		partyPuk = partyPuk();
 		Party party = partyPuk == null
 			? sneer().self()
 			: sneer().produceParty(partyPuk);
@@ -66,6 +69,25 @@ public class ProfileActivity extends Activity {
 		
 		loadProfile();
 	}
+	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.profile, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_share:
+			Puk.sendYourPublicKey(ProfileActivity.this, puk);
+			break;
+		}
+
+		return true;
+	}
 
 
 	private PublicKey partyPuk() {
@@ -86,7 +108,6 @@ public class ProfileActivity extends Activity {
 
 
 	private void afterTextChanged(final EditText textView) {
-				
 		textView.addTextChangedListener(new TextWatcher() {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
@@ -115,6 +136,9 @@ public class ProfileActivity extends Activity {
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 			preferredNickNameEdit.setText(preferredNickname);
 		}});
+		
+		puk = "13T1QrVf2rdZVT9XXGLWRTN6WWQWH9os16";
+//		publicKeyEdit.setText(sneer().self().publicKey().current().toString());				
 		
 		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
 			countryEdit.setText(country);

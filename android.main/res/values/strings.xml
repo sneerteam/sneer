@@ -41,6 +41,7 @@
     <!-- Contact View -->
     <string name="contact_view_nickname">Nickname</string>
     <string name="contact_view_public_key">Public key</string>
+    <string name="contact_view_share_public_key">Share Public key</string>
     <string name="profile_view_section_profile">PROFILE</string>
     <!-- Contact View -->
     
@@ -54,6 +55,7 @@
     <string name="profile_view_city">City (optional)</string>
     <string name="profile_error_size_name">Name too short</string>
     <string name="action_save_profile">Save</string>
+    <string name="profile_view_share_public_key">Share my Public key</string>
     <string name="profile_view_location">LOCATION</string>
     <!-- Profile View -->
 
@@ -71,5 +73,6 @@
     
     <!-- This appears on the menu for url viewing -->
     <string name="title_activity_contact">Sneer Contact</string>
+    <string name="action_share">Share Public Key</string>
 
 </resources>

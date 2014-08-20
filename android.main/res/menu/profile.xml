@@ -3,9 +3,10 @@
     tools:context="sneer.android.main.ContactActivity" >
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_share"
+        android:icon="@android:drawable/ic_menu_share"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:showAsAction="always"
+        android:title="@string/action_share"/>
 
 </menu>

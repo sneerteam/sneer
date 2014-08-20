@@ -5,12 +5,14 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.android.main.ui.utils.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
 import android.os.*;
 import android.text.*;
+import android.view.*;
 import android.widget.*;
 
 public class ContactActivity extends Activity {
@@ -29,12 +31,12 @@ public class ContactActivity extends Activity {
 	byte[] selfieBytes;
 
 	EditText nicknameEdit;
-	EditText publicKeyEdit;
 	TextView fullNameView;
 	TextView preferredNickNameView;
 	TextView countryView;
 	TextView cityView;
 	Party party;
+	String puk;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,6 @@ public class ContactActivity extends Activity {
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
-		publicKeyEdit = (EditText) findViewById(R.id.publicKey);
 		preferredNickNameView = (TextView) findViewById(R.id.preferredNickName);
 		selfieImage = (ImageView) findViewById(R.id.selfie);
 		countryView = (TextView) findViewById(R.id.country);
@@ -71,13 +72,32 @@ public class ContactActivity extends Activity {
 		
 	}
 	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.profile, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_share:
+			Puk.sendYourPublicKey(ContactActivity.this, puk);
+			break;
+		}
+
+		return true;
+	}
+	
 
 	private void newContactFromUrl() {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 		if (Intent.ACTION_VIEW.equals(action)) {
 			String puk = intent.getData().getQuery();
-			publicKeyEdit.setText(puk);
+			this.puk = puk;
 			newContact = true;
 		}
 	}
@@ -108,7 +128,6 @@ public class ContactActivity extends Activity {
 		selfieImage.setEnabled(false);
 		countryView.setEnabled(false);
 		cityView.setEnabled(false);
-		publicKeyEdit.setEnabled(false);
 	}
 
 	
@@ -118,7 +137,7 @@ public class ContactActivity extends Activity {
 		}});
 
 		Contact contact = sneer().findContact(party);
-		publicKeyEdit.setText(contact.party().publicKey().current().toString());
+		puk = contact.party().publicKey().current().toString();
 		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
 			preferredNickNameView.setText("(" + preferredNickname+ ")");

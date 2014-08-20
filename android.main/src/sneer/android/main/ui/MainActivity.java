@@ -27,12 +27,11 @@ import clojure.java.api.*;
 
 public class MainActivity extends Activity {
 	
-	private AlertDialog error;
-	
 	private MainAdapter adapter;
 	private ListView listView;
 	private Conversation conversation;
 	private EmbeddedOptions embeddedOptions;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +47,7 @@ public class MainActivity extends Activity {
 
 		makeConversationList();
 	}
+
 
 	/**
 	 * Used when this activity is launched by another application with options
@@ -79,6 +79,7 @@ public class MainActivity extends Activity {
 			return conversationAction != null;
 		}
 	}
+	
 
 	private void makeConversationList() {
 		final ActionBar actionBar = getActionBar();
@@ -148,6 +149,7 @@ public class MainActivity extends Activity {
 					}
 				});
 	}
+	
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
@@ -157,6 +159,7 @@ public class MainActivity extends Activity {
 		plugHeaderTitle(menu, conversation.party().name());
 		getMenuInflater().inflate(R.menu.long_click, menu);
 	}
+	
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
@@ -179,7 +182,7 @@ public class MainActivity extends Activity {
 		}
 		return true;
 	}
-
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,6 +197,7 @@ public class MainActivity extends Activity {
 
 		return super.onCreateOptionsMenu(menu);
 	}
+	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -204,12 +208,6 @@ public class MainActivity extends Activity {
 		case R.id.action_add_contact:
 			navigateToProfile();
 			break;
-		case R.id.action_send_pk:
-			sendYourPublicKey();
-			break;
-		case R.id.action_copy_pk:
-			copyYoursPublicKey();
-			break;
 		case R.id.action_advanced:
 			navigateTo(SystemReportActivity.class);
 			break;
@@ -217,6 +215,7 @@ public class MainActivity extends Activity {
 
 		return true;
 	}
+	
 	
 	private void navigateToProfile() {
 		Intent intent = new Intent();
@@ -228,24 +227,12 @@ public class MainActivity extends Activity {
 	public static void log(String s) {
 		Log.d(MainActivity.class.getSimpleName(), s);
 	}
+	
 
 	private void navigateTo(Class<?> class1) {
 		startActivity(new Intent().setClass(this, class1));
 	}
-
-	private void sendYourPublicKey() {
-		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-		sharingIntent.setType("text/plain");
-		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "My Sneer public key");
-		sharingIntent.putExtra(Intent.EXTRA_TEXT, buildSneerUri(sneer().self().publicKey().current().toString()));
-		startActivity(sharingIntent);
-	}
-
-	private void copyYoursPublicKey() {
-		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-		ClipData clip = ClipData.newPlainText("Public Key", buildSneerUri(sneer().self().publicKey().current().toString()));
-		clipboard.setPrimaryClip(clip);
-	}
+	
 
 	protected void onContactClicked(Conversation conversation) {
 		Intent intent = new Intent();
@@ -255,16 +242,14 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
-	private String buildSneerUri(String puk) {
-		return "http://sneer.me/public-key?" + puk;
-	}
-
+	
 	@Override
 	protected void onDestroy() {
 		adapter.dispose();
 		super.onDestroy();
 	}
 
+	
 	private void startCore() {
 		Object result;
 		try {
@@ -276,11 +261,13 @@ public class MainActivity extends Activity {
 		SystemReport.updateReport("networking.client", result);
 	}
 
-	void toast(String message) {
+	
+	private void toast(String message) {
 		Log.d(MainActivity.class.getSimpleName(), "toast: " + message);
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
+	
 	private void startProfileActivityIfFirstTime() {
 		ownName().subscribe(new Action1<String>() { @Override public void call(String name) {
 			if (name.isEmpty())
