@@ -27,8 +27,12 @@
   (let [nickname-subject (ObservedSubject/create nickname)]
     (reify Contact
       (party [this] party)
-      (nickname [this] (.observed nickname-subject))
-      (toString [this] (str "#<Contact " nickname ">")))))
+      (nickname [this]
+        (.observed nickname-subject))
+      (setNickname [this new-nickname]
+        (.set nickname-subject new-nickname))
+      (toString [this]
+        (str "#<Contact " (.. nickname-subject observed current) ">")))))
 
 (defn tuple->contact [tuple parties]
   (reify-contact (.payload tuple)
