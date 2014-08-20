@@ -101,6 +101,18 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 			contactsOf(sneerA, partyB, partyC));
 	}
 	
+	@Test
+	public void contactListRestore() throws FriendlyException {
+
+		final Party partyB = sneerA.produceParty(userB);
+		final Party partyC = sneerA.produceParty(userC);
+		sneerA.addContact("Party Boy", partyB);
+		sneerA.addContact("Party Chick", partyC);
+
+		expecting(
+			contactsOf(restart(adminA).sneer(), partyB, partyC));
+	}
+
 
 	private Observable<Void> contactsOf(final Sneer sneer, final Party... parties) {
 		return sneer.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {

@@ -28,8 +28,8 @@ an Observer part that will send packets over from puk."))
        (get ~'tuple ~(name g))))
 
 (defn reify-tuple [tuple]
-  (reify+
-    Tuple
+  (reify+ Tuple
+    (get [this key] (get tuple key))
     (tuple-getter type)
     (tuple-getter audience)
     (tuple-getter author)
