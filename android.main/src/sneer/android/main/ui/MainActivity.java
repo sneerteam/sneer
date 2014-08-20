@@ -256,6 +256,7 @@ public class MainActivity extends Activity {
 			Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.networking.client"));
 			result = Clojure.var("sneer.networking.client/start").invoke(sneer().self().publicKey().current());
 		} catch (Exception e) {
+			Log.w(MainActivity.class.getSimpleName(), e);
 			result = Exceptions.asNiceMessage(e);
 		}
 		SystemReport.updateReport("networking.client", result);
