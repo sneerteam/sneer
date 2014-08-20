@@ -26,8 +26,6 @@ public class ProfileActivity extends Activity {
 	static final int TAKE_PICTURE = 1;
 	static final int THUMBNAIL_SIZE = 128;
 
-	ImageView selfieImage;
-	
 	Profile profile;
 	
 	EditText firstNameEdit;
@@ -35,22 +33,17 @@ public class ProfileActivity extends Activity {
 	EditText preferredNickNameEdit;
 	EditText countryEdit;
 	EditText cityEdit;
-	String puk;
-	private byte[] selfieBytes;
-	private PublicKey partyPuk;
+	ImageView selfieImage;
 	
+	byte[] selfieBytes;
 	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		
-		partyPuk = partyPuk();
-		Party party = partyPuk == null
-			? sneer().self()
-			: sneer().produceParty(partyPuk);
-		
-		profile = sneer().profileFor(party);
+		profile = sneer().profileFor(sneer().self());
 
 		firstNameEdit = (EditText) findViewById(R.id.firstName);
 		lastNameEdit = (EditText) findViewById(R.id.lastName);
@@ -58,11 +51,6 @@ public class ProfileActivity extends Activity {
 		selfieImage = (ImageView) findViewById(R.id.selfie);
 		countryEdit = (EditText) findViewById(R.id.country);
 		cityEdit = (EditText) findViewById(R.id.city);
-		
-		if (partyPuk != null) {
-			readonly();
-			preferredNickNameEdit.setHint("nickname");
-		}
 		
 		afterTextChanged(firstNameEdit);
 		afterTextChanged(lastNameEdit);
@@ -82,28 +70,11 @@ public class ProfileActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ProfileActivity.this, puk);
+			Puk.sendYourPublicKey(ProfileActivity.this, sneer().self().publicKey().current().toString());
 			break;
 		}
 
 		return true;
-	}
-
-
-	private PublicKey partyPuk() {
-		Bundle extras = getIntent().getExtras();
-		if (extras == null) return null;
-		
-		return (PublicKey)extras.getSerializable(PARTY_PUK);
-	}
-
-
-	private void readonly() {
-		firstNameEdit.setEnabled(false);
-		lastNameEdit.setEnabled(false);
-		selfieImage.setEnabled(false);
-		countryEdit.setEnabled(false);
-		cityEdit.setEnabled(false);
 	}
 
 
@@ -136,9 +107,6 @@ public class ProfileActivity extends Activity {
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 			preferredNickNameEdit.setText(preferredNickname);
 		}});
-		
-		puk = "13T1QrVf2rdZVT9XXGLWRTN6WWQWH9os16";
-//		publicKeyEdit.setText(sneer().self().publicKey().current().toString());				
 		
 		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
 			countryEdit.setText(country);
@@ -222,7 +190,6 @@ public class ProfileActivity extends Activity {
 				size = (int) (size * 0.9f);
 			} while (selfieBytes.length > 1024 * 10);
 	        
-	        toast("size: " + selfieBytes.length);	        
 	        selfieImage.setImageBitmap(BitmapFactory.decodeByteArray(selfieBytes, 0, selfieBytes.length));
 		}		
     }

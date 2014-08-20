@@ -7,6 +7,7 @@ import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.utils.*;
 import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -36,7 +37,7 @@ public class ContactActivity extends Activity {
 	TextView countryView;
 	TextView cityView;
 	Party party;
-	String puk;
+	String partyPuk;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +46,6 @@ public class ContactActivity extends Activity {
 		if (!SneerApp.checkOnCreate(this)) return;
 		
 		setContentView(R.layout.activity_contact);
-
-		PublicKey partyPuk;
 
 		getActionBar().setTitle(activityTitle());
 
@@ -59,17 +58,11 @@ public class ContactActivity extends Activity {
 
 		readonly();
 
-		newContactFromUrl();
+		contactFromUrl();
 		
-		if (!(newContact)) {
-			partyPuk = partyPuk();
-			party = sneer().produceParty(partyPuk);
-			profile = sneer().profileFor(party);
-			loadProfile();
-		}
+		loadProfile();
 		
 		validationOnTextChanged(nicknameEdit);
-		
 	}
 	
 	
@@ -84,7 +77,7 @@ public class ContactActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ContactActivity.this, puk);
+			Puk.sendYourPublicKey(ContactActivity.this, partyPuk);
 			break;
 		}
 
@@ -92,13 +85,15 @@ public class ContactActivity extends Activity {
 	}
 	
 
-	private void newContactFromUrl() {
+	private void contactFromUrl() {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 		if (Intent.ACTION_VIEW.equals(action)) {
 			String puk = intent.getData().getQuery();
-			this.puk = puk;
-			newContact = true;
+			this.partyPuk = puk;
+			party = sneer().produceParty(Keys.createPublicKey(partyPuk));
+			if (party == null)
+				newContact = true;
 		}
 	}
 
@@ -114,12 +109,12 @@ public class ContactActivity extends Activity {
 	}
 
 	
-	private PublicKey partyPuk() {
+	private String partyPuk() {
 		Bundle extras = getIntent().getExtras();
 		if (extras == null)
 			return null;
 
-		return (PublicKey) extras.getSerializable(PARTY_PUK);
+		return extras.getSerializable(PARTY_PUK).toString();
 	}
 
 	private void readonly() {
@@ -132,29 +127,35 @@ public class ContactActivity extends Activity {
 
 	
 	private void loadProfile() {
-		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) { 
-			fullNameView.setText(name);
-		}});
+		if (!newContact) {
+			partyPuk = partyPuk();
+			party = sneer().produceParty(Keys.createPublicKey(partyPuk));
+			profile = sneer().profileFor(party);
 
-		Contact contact = sneer().findContact(party);
-		puk = contact.party().publicKey().current().toString();
-		
-		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
-			preferredNickNameView.setText("(" + preferredNickname+ ")");
-		}});
+			profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) {
+				fullNameView.setText(name);
+			}});
 
-		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
-			countryView.setText(country);
-		}});
+//			Contact contact = sneer().findContact(party);
+//			partyPuk = contact.party().publicKey().current().toString();
 
-		profile.city().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String city) {
-			cityView.setText(city);
-		}});
+			profile.preferredNickname() .observeOn(AndroidSchedulers.mainThread()) .subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
+				preferredNickNameView.setText("(" + preferredNickname + ")");
+			}});
 
-		profile.selfie().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() {@Override public void call(byte[] selfie) {
-			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
-			selfieImage.setImageBitmap(bitmap);
-		}});
+			profile.country().observeOn(AndroidSchedulers.mainThread()) .subscribe(new Action1<String>() { @Override public void call(String country) {
+				countryView.setText(country);
+			}});
+
+			profile.city().observeOn(AndroidSchedulers.mainThread()) .subscribe(new Action1<String>() { @Override public void call(String city) {
+				cityView.setText(city);
+			}});
+
+			profile.selfie().observeOn(AndroidSchedulers.mainThread()) .subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
+				Bitmap bitmap = BitmapFactory.decodeByteArray( selfie, 0, selfie.length);
+				selfieImage.setImageBitmap(bitmap);
+			}});
+		}
 	}
 
 	
