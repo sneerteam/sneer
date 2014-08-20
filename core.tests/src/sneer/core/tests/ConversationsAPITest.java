@@ -11,6 +11,7 @@ import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
+import sneer.admin.*;
 import sneer.commons.exceptions.*;
 
 public class ConversationsAPITest extends ConversationsAPITestsBase {
@@ -125,6 +126,23 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		
 	}
 	
+	@Test
+	public void preferredNicknameForSelf() {
+		
+		Profile profileB = sneerB.profileFor(sneerB.self());
+		profileB.setPreferredNickname("Party Boy");		
+		expecting(
+			values(profileB.preferredNickname(), "Party Boy"));
+		
+		SneerAdmin adminB2 = Glue.restart(adminB);
+		Sneer sneerB2 = adminB2.sneer();
+		Profile profileB2 = sneerB2.profileFor(sneerB2.self());
+		expecting(
+			values(profileB2.preferredNickname(), "Party Boy"));
+		
+		profileB2.setPreferredNickname("Party Man");
+		expecting(
+			values(profileB2.preferredNickname(), "Party Man"));
 		
 	}
 

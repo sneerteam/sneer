@@ -106,55 +106,57 @@ an Observer part that will send packets over from puk."))
     (rx/map type)
     (rx/filter (complement nil?))))
 
-(defn reify-tuple-space [own-puk peers network]
+(defn reify-tuple-space
 
-  (let [connection (connect network own-puk)
-        local-tuples (ReplaySubject/create)
-        tuples-for-me (rx/distinct (payloads :tuple connection))
-        subscriptions-for-me (payloads :subscription connection)
-        subscriptions-for-peers (ReplaySubject/create)]
+  ([own-puk peers network]
+     (reify-tuple-space own-puk peers (connect network own-puk) (ReplaySubject/create)))
 
-    (rx/subscribe
-      peers
-      (fn [peer-puk]
-        (rx/subscribe
-            (->> subscriptions-for-peers
-              (rx/map #(assoc % "author" peer-puk))
-              (rx/map #(->envelope peer-puk :subscription (assoc % :sender own-puk))))
-            #(rx/on-next connection %))))
+  ([own-puk peers connection local-tuples]
 
-    (let [subscriptions-by-sender (atom {})]
+     (let [tuples-for-me (rx/distinct (payloads :tuple connection))
+           subscriptions-for-me (payloads :subscription connection)
+           subscriptions-for-peers (ReplaySubject/create)
+           subscriptions-by-sender (atom {})]
 
-      (rx/subscribe
+       (rx/subscribe
+        peers
+        (fn [peer-puk]
+          (rx/subscribe
+           (->> subscriptions-for-peers
+                (rx/map #(assoc % "author" peer-puk))
+                (rx/map #(->envelope peer-puk :subscription (assoc % :sender own-puk))))
+           #(rx/on-next connection %))))
+
+       (rx/subscribe
         subscriptions-for-me
         (fn [subscription]
           (let [sender (:sender subscription)
                 criteria (dissoc subscription :sender)]
             (swap!
-              subscriptions-by-sender
-              (fn [cur]
-                (let [existing (get cur sender)]
+             subscriptions-by-sender
+             (fn [cur]
+               (let [existing (get cur sender)]
 
-                  (when-let [{subscription :subscription} existing]
-                      (.unsubscribe subscription))
+                 (when-let [{subscription :subscription} existing]
+                   (.unsubscribe subscription))
 
-                   ; TODO: combine existing criteria with new one
-                   (let [subscription
-                         (rx/subscribe
-                           (->> local-tuples
+                 ; TODO: combine existing criteria with new one
+                 (let [subscription
+                       (rx/subscribe
+                        (->> local-tuples
                              (rx/filter #(let [audience (get % "audience")]
                                            (or (nil? audience) (= sender audience))))
                              (filter-by criteria)
                              (rx/map #(->envelope sender :tuple %)))
-                           (partial rx/on-next connection))]
+                        (partial rx/on-next connection))]
 
-                     (assoc cur sender {:criteria criteria :subscription subscription})))))))))
+                   (assoc cur sender {:criteria criteria :subscription subscription}))))))))
 
-    (rx/subscribe tuples-for-me
-                  (partial rx/on-next local-tuples))
+       (rx/subscribe tuples-for-me
+                     (partial rx/on-next local-tuples))
 
-    (reify TupleSpace
-      (publisher [this]
-        (new-tuple-publisher local-tuples {"author" own-puk}))
-      (filter [this]
-        (new-tuple-filter local-tuples subscriptions-for-peers)))))
+       (reify TupleSpace
+         (publisher [this]
+           (new-tuple-publisher local-tuples {"author" own-puk}))
+         (filter [this]
+           (new-tuple-filter local-tuples subscriptions-for-peers))))))

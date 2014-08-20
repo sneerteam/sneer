@@ -41,6 +41,10 @@ class Glue {
 	public static SneerAdmin newSneerAdmin(PrivateKey prik, Object network) {
 		return (SneerAdmin) adminVar("new-sneer-admin").invoke(prik, network);
 	}
+
+	public static SneerAdmin restart(SneerAdmin admin) {
+		return (SneerAdmin) adminVar("restart").invoke(admin);
+	}
 	
 	private static IFn adminVar(String simpleName) {
 		return var("sneer.admin", simpleName);
