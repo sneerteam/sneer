@@ -110,11 +110,8 @@ an Observer part that will send packets over from puk."))
 
   (let [connection (connect network own-puk)
         local-tuples (ReplaySubject/create)
-        tuples-for-me (->>
-                        (payloads :tuple connection)
-                        rx/distinct)
+        tuples-for-me (rx/distinct (payloads :tuple connection))
         subscriptions-for-me (payloads :subscription connection)
-
         subscriptions-for-peers (ReplaySubject/create)]
 
     (rx/subscribe

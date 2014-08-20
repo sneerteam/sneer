@@ -115,11 +115,16 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		
 		profileBFromB.setPreferredNickname("Party Boy");
 		
-		assertEqualsUntilNow(profileBFromA.preferredNickname(), "Party Boy");
+		expecting(
+			values(profileBFromA.preferredNickname(), "Party Boy"));
 		
 		profileBFromB.setPreferredNickname("Party Man");
 
-		assertEqualsUntilNow(profileBFromA.preferredNickname(), "Party Man");
+		expecting(
+			values(profileBFromA.preferredNickname(), "Party Man"));
+		
+	}
+	
 		
 	}
 
