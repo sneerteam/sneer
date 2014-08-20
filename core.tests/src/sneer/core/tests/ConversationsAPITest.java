@@ -72,7 +72,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		ReplaySubject<String> nicknames = ReplaySubject.create();		
 		partyBNicks.subscribe(nicknames);
 
-		sneerA.addContact("Party Man", partyB);
+		sneerA.findContact(partyB).setNickname("Party Man");
 
 		expecting(
 			values(nicknames, "Party Boy", "Party Man"),
@@ -86,7 +86,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		final Party partyC = sneerA.produceParty(userC);
 		
 		expecting(
-			values(sneerA.contacts()));
+			values(sneerA.contacts(), Collections.emptyList()));
 		
 		sneerA.addContact("Party Boy", partyB);
 		
@@ -97,7 +97,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 			} }));
 		
 		
-		sneerA.addContact("Party Boy", partyC);
+		sneerA.addContact("Party Chick", partyC);
 
 		expecting(
 			sneerA.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
