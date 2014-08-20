@@ -19,8 +19,9 @@ public class Keys {
 	}
 
 	
-	public static PublicKey createPublicKey(String bitcoinStylePuk) {
-		return new PublicKeyImpl(bitcoinStylePuk.getBytes());
+	public static PublicKey createPublicKey(String bitcoinAddress) {
+		//TODO Use the bitcoinj lib.
+		return new PublicKeyImpl(bitcoinAddress.getBytes());
 	}
 
 	
