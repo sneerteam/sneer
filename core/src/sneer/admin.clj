@@ -27,7 +27,7 @@
    (swap! parties update-in [puk] #(if (nil? %) (new-party puk) %))
    (get puk)))
 
-(defn reify-profile []
+(defn reify-profile [party tuple-space]
   ;; Observable<String> ownName();
   ;; void setOwnName(String newOwnName);
 
@@ -43,12 +43,28 @@
   ;; Observable<String> city();
   ;; void setCity(String newCity);
 
-  (let [nickname (behavior-subject)]
-    (reify Profile
-      (preferredNickname [this]
-        (.asObservable nickname))
-      (setPreferredNickname [this value]
-        (rx/on-next nickname value)))))
+  (letfn [(payloads-of [type]
+            (rx/map
+             #(.payload %)
+             (.. tuple-space
+                 filter
+                 (type type)
+                 (author (party-puk party))
+                 tuples)))]
+
+    (let [nickname (behavior-subject)]
+
+      (rx/subscribe (payloads-of "profile/preferred-nickname")
+                    (partial rx/on-next nickname))
+
+      (reify Profile
+        (preferredNickname [this]
+          (.asObservable nickname))
+        (setPreferredNickname [this value]
+          (.. tuple-space
+              publisher
+              (type "profile/preferred-nickname")
+              (pub value)))))))
 
 (defn reify-contact [nickname party]
   (let [nickname-subject (ObservedSubject/create nickname)]
@@ -110,7 +126,7 @@
           (new-party own-puk))
 
         (profileFor [this party]
-          (reify-profile))
+          (reify-profile party tuple-space))
 
         (contacts [this]
           (.asObservable contacts-subject))
