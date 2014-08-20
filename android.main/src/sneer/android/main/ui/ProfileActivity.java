@@ -70,7 +70,7 @@ public class ProfileActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ProfileActivity.this, sneer().self().publicKey().current().toString());
+			Puk.sendYourPublicKey(ProfileActivity.this, sneer().self());
 			break;
 		}
 
