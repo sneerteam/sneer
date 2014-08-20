@@ -12,6 +12,7 @@ import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.admin.*;
+import sneer.commons.Arrays;
 import sneer.commons.exceptions.*;
 
 public class ConversationsAPITest extends ConversationsAPITestsBase {
@@ -92,21 +93,25 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		sneerA.addContact("Party Boy", partyB);
 		
 		expecting(
-			sneerA.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
-				assertArrayEquals(new Contact[]{sneerA.findContact(partyB)}, t1.toArray());
-				return null;
-			} }));
-		
+			contactsOf(sneerA, partyB));
 		
 		sneerA.addContact("Party Chick", partyC);
 
 		expecting(
-			sneerA.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
-				assertArrayEquals(new Contact[]{sneerA.findContact(partyB), sneerA.findContact(partyC)}, t1.toArray());
-				return null;
-			} }));
+			contactsOf(sneerA, partyB, partyC));
 	}
 	
+
+	private Observable<Void> contactsOf(final Sneer sneer, final Party... parties) {
+		return sneer.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
+			assertArrayEquals(
+				Arrays.map(parties, new Func1<Party, Contact>() {  @Override public Contact call(Party t1) {
+					return sneer.findContact(t1);
+				}}),
+				t1.toArray());
+			return null;
+		} });
+	}
 	
 	@Test
 	public void preferredNickname() {
@@ -134,7 +139,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		expecting(
 			values(profileB.preferredNickname(), "Party Boy"));
 		
-		SneerAdmin adminB2 = Glue.restart(adminB);
+		SneerAdmin adminB2 = restart(adminB);
 		Sneer sneerB2 = adminB2.sneer();
 		Profile profileB2 = sneerB2.profileFor(sneerB2.self());
 		expecting(
@@ -144,6 +149,10 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		expecting(
 			values(profileB2.preferredNickname(), "Party Man"));
 		
+	}
+
+	private SneerAdmin restart(SneerAdmin admin) {
+		return Glue.restart(admin);
 	}
 
 }
