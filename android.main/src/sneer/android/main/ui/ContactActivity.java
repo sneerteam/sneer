@@ -82,7 +82,10 @@ public class ContactActivity extends Activity {
 		else
 			loadContact(null);
 		
-		loadProfile();
+		if (partyPuk.asBitcoinAddress().equals(sneer().self().publicKey().current().asBitcoinAddress()))
+			startActivity(new Intent().setClass(this, ProfileActivity.class));
+		else
+			loadProfile();
 	}
 
 	
@@ -134,7 +137,7 @@ public class ContactActivity extends Activity {
 	private void loadContact(PublicKey puk){
 		partyPuk = puk == null
 				? partyPuk()
-				: puk;
+				: puk;				
 		
 		party = sneer().produceParty(partyPuk);
 		profile = sneer().profileFor(party);
