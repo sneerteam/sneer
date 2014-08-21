@@ -10,7 +10,7 @@ git pull --rebase
 
 ./gradlew eclipse
 
-cd android && ./gradlew eclipse && cd -
+cd android && ./gradlew build eclipse && cd -
 
 if [ -d "../rockpaperscissors" ]; then
   rm ../rockpaperscissors/libs/*.jar
