@@ -52,14 +52,14 @@
                  (author (party-puk party))
                  tuples)))]
 
-    (let [nickname (behavior-subject)]
+    (let [preferred-nickname (behavior-subject)]
 
       (rx/subscribe (payloads-of "profile/preferred-nickname")
-                    (partial rx/on-next nickname))
+                    (partial rx/on-next preferred-nickname))
 
       (reify Profile
         (preferredNickname [this]
-          (.asObservable nickname))
+          (.asObservable preferred-nickname))
         (setPreferredNickname [this value]
           (.. tuple-space
               publisher
