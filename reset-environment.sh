@@ -13,5 +13,6 @@ git pull --rebase
 cd android && ./gradlew eclipse && cd -
 
 if [ -d "../rockpaperscissors" ]; then
+  rm ../rockpaperscissors/libs/*.jar
   cp -f android/android-api/bin/*.jar ../rockpaperscissors/libs/
 fi
