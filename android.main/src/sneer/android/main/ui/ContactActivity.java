@@ -69,7 +69,6 @@ public class ContactActivity extends Activity {
 			Puk.sendYourPublicKey(ContactActivity.this, party);
 			break;
 		}
-
 		return true;
 	}
 	
@@ -81,7 +80,9 @@ public class ContactActivity extends Activity {
 		if (Intent.ACTION_VIEW.equals(action)) 
 			loadContact(Keys.createPublicKey(intent.getData().getQuery()));
 		else
-			loadProfile();
+			loadContact(null);
+		
+		loadProfile();
 	}
 
 	
@@ -106,9 +107,6 @@ public class ContactActivity extends Activity {
 	}
 	
 	private void loadProfile() {
-		
-		loadContact(null);
-		
 		nicknameEdit.setText(contact.nickname().current());
 		
 		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) { 
@@ -134,25 +132,23 @@ public class ContactActivity extends Activity {
 	}
 
 	private void loadContact(PublicKey puk){
-		partyPuk = puk==null ? partyPuk() : puk;
+		partyPuk = puk == null
+				? partyPuk()
+				: puk;
 		
 		party = sneer().produceParty(partyPuk);
 		profile = sneer().profileFor(party);
 		contact = sneer().findContact(party);
 
-		newContact = contact==null ? true : false; 		
+		newContact = contact == null
+				? true
+				: false; 		
 	}
 	
-	
-	@Override
-	public void onContentChanged() {
-		super.onContentChanged();
-	}
-
 	
 	public void saveContact() {
 		final String nickName = nicknameEdit.getText().toString();
-		
+
 		try {
 			if (newContact)
 				sneer().addContact(nickName, party);
@@ -162,10 +158,15 @@ public class ContactActivity extends Activity {
 		} catch (FriendlyException e) {
 			toast(e.getMessage());
 		}
-		
 	}
 
+	
+	@Override
+	public void onContentChanged() {
+		super.onContentChanged();
+	}
 
+	
 	@Override
 	protected void onStop() {
 		saveContact();
