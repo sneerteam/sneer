@@ -24,7 +24,7 @@ public class Keys {
 
 	
 	public static PrivateKey createPrivateKey(String seed) {
-		return new PrivateKeyImpl(Codec.toUTF8(seed)); //TODO Use bitcoin keys.
+		return new PrivateKeyImpl(Codec.toUTF8(seed.replace(' ', '-'))); //TODO Use bitcoin keys.
 	}
 
 }
