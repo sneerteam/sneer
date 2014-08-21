@@ -45,6 +45,11 @@ dependencies {
 }
 
 android {
+
+	lintOptions {
+		abortOnError false
+	}
+
     compileSdkVersion 19
     buildToolsVersion "19.0.3"
 
