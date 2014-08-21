@@ -1,16 +1,12 @@
 apply plugin: 'android-library'
 apply plugin: 'maven'
 apply plugin: 'signing'
-apply plugin: 'eclipse'
 
-def originalVersion = "0.1.2"
+def originalVersion = '0.1.2'
 
 version = originalVersion
 description = 'API for Sneer, the sovereign platform.'
 ext.packaging = 'jar'
-
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
 
 def SONATYPE_RELEASE_URL = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 def SONATYPE_SNAPSHOT_URL = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -36,11 +32,6 @@ buildscript {
     }
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
 configurations {
   libs
   compile.extendsFrom libs
@@ -50,8 +41,7 @@ dependencies {
     libs 'us.bpsm:edn-java:0.4.4'
     libs 'com.netflix.rxjava:rxjava-android:' + external.rx.version
     compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
-    compile project(':java-api')
-    //compile 'me.sneer:java-api:+'
+    compile 'me.sneer:java-api:+'
 }
 
 android {

@@ -1,12 +1,6 @@
 apply plugin: 'android'
-apply plugin: 'eclipse'
 
-group = 'me.sneer'
-version = "0.0.1"
-
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
-
+version = '0.0.1'
 
 buildscript {
     repositories {
@@ -18,14 +12,8 @@ buildscript {
     }
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
 dependencies {
-//    compile 'me.sneer:core:0.0.1'
-    compile project(':core')
+    compile 'me.sneer:core:0.0.1'
     compile 'us.bpsm:edn-java:0.4.4'
     compile 'com.google.android:support-v4:r7'
     compile project(':android-api')
