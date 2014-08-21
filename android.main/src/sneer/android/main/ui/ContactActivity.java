@@ -19,16 +19,9 @@ import android.widget.*;
 public class ContactActivity extends Activity {
 
 	static final String PARTY_PUK = "partyPuk";
-	static final String ACTIVITY_TITLE = "activityTitle";
-	static final int TAKE_PICTURE = 1;
-	static final int THUMBNAIL_SIZE = 128;
-
 	boolean newContact = false;
-
 	Profile profile;
-
 	ImageView selfieImage;
-
 	byte[] selfieBytes;
 
 	EditText nicknameEdit;
@@ -38,7 +31,8 @@ public class ContactActivity extends Activity {
 	TextView cityView;
 	Party party;
 	PublicKey partyPuk;
-
+	private Contact contact;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,8 +41,6 @@ public class ContactActivity extends Activity {
 		
 		setContentView(R.layout.activity_contact);
 
-		getActionBar().setTitle(activityTitle());
-
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
 		preferredNickNameView = (TextView) findViewById(R.id.preferredNickName);
@@ -56,16 +48,8 @@ public class ContactActivity extends Activity {
 		countryView = (TextView) findViewById(R.id.country);
 		cityView = (TextView) findViewById(R.id.city);
 
-		readonly();
-
-		newContactFromUrl();
-		
-		if (!(newContact)) {
-			partyPuk = partyPuk();
-			party = sneer().produceParty(partyPuk);
-			profile = sneer().profileFor(party);
-			loadProfile();
-		}
+		load();
+		getActionBar().setTitle(activityTitle());
 		
 		validationOnTextChanged(nicknameEdit);
 	}
@@ -90,24 +74,20 @@ public class ContactActivity extends Activity {
 	}
 	
 
-	private void newContactFromUrl() {
+	private void load() {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
-		if (Intent.ACTION_VIEW.equals(action)) {
-			partyPuk = Keys.createPublicKey(intent.getData().getQuery());
-			party = sneer().produceParty(partyPuk);
-			Contact contact = sneer().findContact(party);
-			if (contact != null) {
-				nicknameEdit.setText(contact.party().publicKey().current().toString());
-			} else {
-				newContact = true;
-			}
-		}
+		
+		if (Intent.ACTION_VIEW.equals(action)) 
+			loadContact(Keys.createPublicKey(intent.getData().getQuery()));
+		else
+			loadProfile();
 	}
 
 	
 	private String activityTitle() {
 		Bundle extras = getIntent().getExtras();
+		
 		if (extras == null) {
 			newContact = true;
 			return "New Contact";
@@ -124,24 +104,15 @@ public class ContactActivity extends Activity {
 
 		return (PublicKey) extras.getSerializable(PARTY_PUK);
 	}
-
-	private void readonly() {
-		fullNameView.setEnabled(false);
-		preferredNickNameView.setEnabled(false);
-		selfieImage.setEnabled(false);
-		countryView.setEnabled(false);
-		cityView.setEnabled(false);
-	}
-
 	
 	private void loadProfile() {
+		
+		loadContact(null);
+		
 		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) { 
 			fullNameView.setText(name);
 		}});
 
-		//Contact contact = sneer().findContact(party);
-		//publicKeyEdit.setText(contact.party().publicKey().current().toString());
-		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
 			preferredNickNameView.setText("(" + preferredNickname+ ")");
 		}});
@@ -160,6 +131,16 @@ public class ContactActivity extends Activity {
 		}});
 	}
 
+	private void loadContact(PublicKey puk){
+		partyPuk = puk==null ? partyPuk() : puk;
+		
+		party = sneer().produceParty(partyPuk);
+		profile = sneer().profileFor(party);
+		contact = sneer().findContact(party);
+
+		newContact = contact==null ? true : false; 		
+	}
+	
 	
 	@Override
 	public void onContentChanged() {
@@ -199,9 +180,7 @@ public class ContactActivity extends Activity {
 	private void validationOnTextChanged(final EditText textView) {
 		textView.addTextChangedListener(new TextWatcher() {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-//				Contact contact = sneer().findContact(party);
-//				System.out.println("Teste: " + contact.problemWithNewNickname(textView.getText().toString()));
-//				nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
+				nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
 			}
 			
 			public void afterTextChanged(Editable s) {}
