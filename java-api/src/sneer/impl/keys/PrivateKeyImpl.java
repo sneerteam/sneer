@@ -1,8 +1,9 @@
 package sneer.impl.keys;
 
-import java.util.*;
+import java.util.Arrays;
 
 import sneer.*;
+import sneer.commons.*;
 
 class PrivateKeyImpl implements PrivateKey {
 
@@ -24,7 +25,7 @@ class PrivateKeyImpl implements PrivateKey {
 	
 	@Override
 	public String toString() {
-		return "PRIK:" + bytes[0] + bytes[1] + bytes[2]; //TODO Use same string representation as bitcoin for private keys.
+		return "PRIK:" + Codec.fromUTF8(bytes);
 	}
 
 	

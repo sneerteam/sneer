@@ -10,5 +10,8 @@ public class Codec {
 		return string.getBytes(UTF_8);
 	}
 
+	public static String fromUTF8(byte[] bytes) {
+		return new String(bytes, UTF_8);
+	}
 
 }

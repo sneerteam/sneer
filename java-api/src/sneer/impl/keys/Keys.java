@@ -1,10 +1,7 @@
 package sneer.impl.keys;
 
-import java.util.*;
-
 import sneer.*;
-
-import com.google.common.io.*;
+import sneer.commons.*;
 
 public class Keys {
 
@@ -22,20 +19,12 @@ public class Keys {
 	
 	public static PublicKey createPublicKey(String bitcoinAddress) {
 		//TODO Use the bitcoinj lib.
-		return new PublicKeyImpl(BaseEncoding.base64Url().omitPadding().decode(bitcoinAddress));
+		return new PublicKeyImpl(Codec.toUTF8(bitcoinAddress));
 	}
 
 	
 	public static PrivateKey createPrivateKey(String seed) {
-		return new PrivateKeyImpl(hash(seed)); //TODO Use bitcoin keys.
-	}
-
-	
-	protected static byte[] hash(String seed) {
-		byte[] ret = new byte[32]; //256bits
-		Random random = new Random(seed.hashCode());
-		random.nextBytes(ret);
-		return ret;
+		return new PrivateKeyImpl(Codec.toUTF8(seed)); //TODO Use bitcoin keys.
 	}
 
 }

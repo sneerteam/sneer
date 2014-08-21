@@ -1,10 +1,9 @@
 package sneer.impl.keys;
 
-import java.util.*;
-
-import com.google.common.io.*;
+import java.util.Arrays;
 
 import sneer.*;
+import sneer.commons.*;
 
 class PublicKeyImpl implements PublicKey {
 	
@@ -18,7 +17,7 @@ class PublicKeyImpl implements PublicKey {
 	
 	@Override
 	public String toString() {
-		return asBitcoinAddress();
+		return "PUK:" + asBitcoinAddress();
 	}
 
 	
@@ -55,7 +54,7 @@ class PublicKeyImpl implements PublicKey {
 	@Override
 	public String asBitcoinAddress() {
 		//TODO Use same string representation as bitcoin for public address.
-		return BaseEncoding.base64Url().omitPadding().encode(bytes);
+		return Codec.fromUTF8(bytes);
 	}
 
 }
