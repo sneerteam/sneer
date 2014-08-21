@@ -33,6 +33,7 @@ public class ContactActivity extends Activity {
 	PublicKey partyPuk;
 	private Contact contact;
 	private boolean isOwn;
+	private boolean isTouched;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,15 +79,16 @@ public class ContactActivity extends Activity {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 		
-		if (Intent.ACTION_VIEW.equals(action)){ 
-			isOwn = true;
+		if (Intent.ACTION_VIEW.equals(action))
 			loadContact(Keys.createPublicKey(intent.getData().getQuery()));
-		}else
+		else
 			loadContact(null);
 		
-		if (partyPuk.asBitcoinAddress().equals(sneer().self().publicKey().current().asBitcoinAddress()))
+		if (partyPuk.asBitcoinAddress().equals(sneer().self().publicKey().current().asBitcoinAddress())){
+			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
-		else
+			finish();
+		}else
 			loadProfile();
 	}
 
@@ -152,17 +154,17 @@ public class ContactActivity extends Activity {
 	
 	
 	public void saveContact() {
-		final String nickName = nicknameEdit.getText().toString();
-
-		try {
-			if (newContact)
-				sneer().addContact(nickName, party);
-			else
-				sneer().findContact(party).setNickname(nickName);
-			toast("contact saved...");
-		} catch (FriendlyException e) {
-			toast(e.getMessage());
-		}
+		if(isTouched) 
+			try {
+				final String nickName = nicknameEdit.getText().toString();
+				if (newContact)
+					sneer().addContact(nickName, party);
+				else
+					sneer().findContact(party).setNickname(nickName);
+				toast("contact saved...");
+			} catch (FriendlyException e) {
+				toast(e.getMessage());
+			}
 	}
 
 	
@@ -192,6 +194,7 @@ public class ContactActivity extends Activity {
 			
 			public void afterTextChanged(Editable s) {
 				nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
+				isTouched = true;
 			}
 
 			@Override
