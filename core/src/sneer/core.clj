@@ -119,13 +119,14 @@ an Observer part that will send packets over from puk."))
            subscriptions-by-sender (atom {})]
 
        (rx/subscribe
-        peers
-        (fn [peer-puk]
-          (rx/subscribe
-           (->> subscriptions-for-peers
-                (rx/map #(assoc % "author" peer-puk))
-                (rx/map #(->envelope peer-puk :subscription (assoc % :sender own-puk))))
-           #(rx/on-next connection %))))
+        (->> subscriptions-for-peers
+             (rx/flatmap
+              (fn [criteria]
+                (if (get criteria "author")
+                  (rx/return criteria)
+                  (rx/map #(assoc criteria "author" %) peers))))
+             (rx/map #(->envelope (get % "author") :subscription (assoc % :sender own-puk))))
+        #(rx/on-next connection %))
 
        (rx/subscribe
         subscriptions-for-me
