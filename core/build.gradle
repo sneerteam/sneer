@@ -49,6 +49,7 @@ dependencies {
     compile 'org.clojure:java.jdbc:0.3.4'
     compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
     compile 'com.cognitect:transit-clj:0.8.229'
+    compile 'com.google.guava:guava:17.0'
     compile project(':java-api')
 }
 
