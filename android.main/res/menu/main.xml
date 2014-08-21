@@ -8,12 +8,6 @@
         android:showAsAction="ifRoom"
         android:title="@string/action_search"/>
     <item
-        android:id="@+id/action_add_contact"
-        android:icon="@drawable/ic_add_contact_holo_dark"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_add_contact"/>
-    <item
         android:id="@+id/action_advanced"
         android:orderInCategory="104"
         android:title="@string/action_advanced"/>

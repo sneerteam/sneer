@@ -32,6 +32,7 @@ public class ContactActivity extends Activity {
 	Party party;
 	PublicKey partyPuk;
 	private Contact contact;
+	private boolean isOwn;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +78,10 @@ public class ContactActivity extends Activity {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 		
-		if (Intent.ACTION_VIEW.equals(action)) 
+		if (Intent.ACTION_VIEW.equals(action)){ 
+			isOwn = true;
 			loadContact(Keys.createPublicKey(intent.getData().getQuery()));
-		else
+		}else
 			loadContact(null);
 		
 		if (partyPuk.asBitcoinAddress().equals(sneer().self().publicKey().current().asBitcoinAddress()))
@@ -172,7 +174,8 @@ public class ContactActivity extends Activity {
 	
 	@Override
 	protected void onStop() {
-		saveContact();
+		if(!isOwn)
+			saveContact();
 		super.onStop();
 	}
 

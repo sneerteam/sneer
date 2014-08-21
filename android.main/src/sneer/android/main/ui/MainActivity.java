@@ -205,9 +205,6 @@ public class MainActivity extends Activity {
 		case android.R.id.home:
 			navigateTo(ProfileActivity.class);
 			break;
-		case R.id.action_add_contact:
-			navigateToProfile();
-			break;
 		case R.id.action_advanced:
 			navigateTo(SystemReportActivity.class);
 			break;
@@ -215,14 +212,6 @@ public class MainActivity extends Activity {
 
 		return true;
 	}
-	
-	
-	private void navigateToProfile() {
-		Intent intent = new Intent();
-		intent.setClass(this, ContactActivity.class);
-		startActivity(intent);
-	}
-
 	
 	public static void log(String s) {
 		Log.d(MainActivity.class.getSimpleName(), s);
