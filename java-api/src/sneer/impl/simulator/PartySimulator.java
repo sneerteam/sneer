@@ -140,7 +140,7 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public Observable<String> name() {
-		return ownName().concatWith(nickname());
+		return ownName().first().concatWith(nickname());
 	}
 	
 
