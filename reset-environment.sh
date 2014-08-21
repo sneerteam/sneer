@@ -6,10 +6,12 @@ git reset --hard
 
 git pull --rebase
 
-./gradlew eclipse
-
 if [ -d "../rockpaperscissors" ]; then
   cp -f android-api/bin/*.jar ../rockpaperscissors/libs/
 fi
 
 ./gradlew install
+
+./gradlew eclipse
+
+cd android && ./gradlew eclipse && cd -
