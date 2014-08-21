@@ -10,8 +10,9 @@ git pull --rebase
 
 ./gradlew eclipse
 
-cd android && ./gradlew build eclipse && cd -
+cd android && ./gradlew jarNodeps eclipse && cd -
 
 if [ -d "../rockpaperscissors" ]; then
-  cp -f android/android-api/bin/android-api.jar ../rockpaperscissors/libs/
+	rm -f ../rockpaperscissors/libs/sneer-android-api-nodeps-*.jar
+	cp -f android/android-api/build/libs/sneer-android-api-nodeps-0.1.2.jar ../rockpaperscissors/libs/
 fi
