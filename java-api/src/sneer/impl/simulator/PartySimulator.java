@@ -1,10 +1,8 @@
 package sneer.impl.simulator;
 
+import static sneer.Contact.*;
 import static sneer.commons.exceptions.Exceptions.*;
-
-import java.util.*;
-
-import rx.Observable;
+import rx.*;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
@@ -147,11 +145,11 @@ public class PartySimulator implements Party, Profile {
 	
 
 	private Observable<String> nickname() {
-		return sneer.contacts().map(new Func1<List<Contact>, Contact>() { @Override public Contact call(List<Contact> t1) {
+		return sneer.contacts().map(new Func1<Object, Contact>() { @Override public Contact call(Object ignored) {
 			return findContact();
-		}}).filter(new Func1<Contact, Boolean>() { @Override public Boolean call(Contact t1) {
-			return t1 != null;
-		}}).flatMap(Contact.TO_NICKNAME);
+		}}).filter(new Func1<Contact, Boolean>() { @Override public Boolean call(Contact found) {
+			return found != null;
+		}}).flatMap(TO_NICKNAME);
 	}
 	
 
