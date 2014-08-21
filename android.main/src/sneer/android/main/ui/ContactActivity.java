@@ -109,6 +109,8 @@ public class ContactActivity extends Activity {
 		
 		loadContact(null);
 		
+		nicknameEdit.setText(contact.nickname().current());
+		
 		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) { 
 			fullNameView.setText(name);
 		}});
@@ -179,11 +181,11 @@ public class ContactActivity extends Activity {
 	
 	private void validationOnTextChanged(final EditText textView) {
 		textView.addTextChangedListener(new TextWatcher() {
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			
+			public void afterTextChanged(Editable s) {
 				nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
 			}
-			
-			public void afterTextChanged(Editable s) {}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
