@@ -2,15 +2,13 @@
   (:require
    [rx.lang.clojure.core :as rx])
   (:import
-   [sneer.admin SneerAdmin]
-   [sneer Sneer PrivateKey Party Contact]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [rx.schedulers TestScheduler]
-   [rx.subjects ReplaySubject PublishSubject]))
+   [rx.subjects ReplaySubject]))
 
 (defprotocol Disposable
-  (dispose [o]))
+  (dispose [resource]))
 
 (defprotocol Network
   (connect
@@ -43,21 +41,21 @@ an Observer part that will send packets over from puk."))
   {:address destination type payload})
 
 (defn new-tuple-publisher
-  ([tuples tuple]
+  ([tuples-out proto-tuple]
     (letfn
       [(with [field value]
-          (new-tuple-publisher tuples (assoc tuple field value)))]
+          (new-tuple-publisher tuples-out (assoc proto-tuple field value)))]
       (reify+ TuplePublisher
         (with-field type)
         (with-field audience)
         (with-field payload)
         (field [this field value]
-             (with field value))
+           (with field value))
         (pub [this payload]
            (.. this (payload payload) pub))
         (pub [this]
-           (rx/on-next tuples tuple)
-           (reify-tuple tuple))))))
+           (rx/on-next tuples-out proto-tuple)
+           (reify-tuple proto-tuple))))))
 
 (defn filter-by [criteria tuples]
   (reduce
@@ -66,11 +64,11 @@ an Observer part that will send packets over from puk."))
     criteria))
 
 (defn new-tuple-filter
-  ([tuples-for-me subscriptions-for-peers] (new-tuple-filter tuples-for-me subscriptions-for-peers {}))
-  ([tuples-for-me subscriptions-for-peers criteria]
+  ([tuple-source subs-out] (new-tuple-filter tuple-source subs-out {}))
+  ([tuple-source subs-out criteria]
     (letfn
         [(with [field value]
-           (new-tuple-filter tuples-for-me  subscriptions-for-peers (assoc criteria field value)))]
+           (new-tuple-filter tuple-source subs-out (assoc criteria field value)))]
         (reify+ TupleFilter
           (with-field type)
           (with-field author)
@@ -81,7 +79,7 @@ an Observer part that will send packets over from puk."))
                          (fn [subscriber]
                            (let [scheduler (TestScheduler.)
                                  tuples (->>
-                                          tuples-for-me
+                                          tuple-source
                                           (filter-by criteria)
                                           (rx/map reify-tuple)
                                           (rx/subscribe-on scheduler))]
@@ -91,13 +89,13 @@ an Observer part that will send packets over from puk."))
           (tuples [this]
             (let [tuples
                   (->>
-                    tuples-for-me
+                    tuple-source
                     (filter-by criteria)
                     (rx/map reify-tuple))]
 
               (rx/observable*
                 (fn [subscriber]
-                  (rx/on-next subscriptions-for-peers criteria)
+                  (rx/on-next subs-out criteria)
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
 
@@ -108,28 +106,28 @@ an Observer part that will send packets over from puk."))
 
 (defn reify-tuple-space
 
-  ([own-puk peers network]
-     (reify-tuple-space own-puk peers (connect network own-puk) (ReplaySubject/create)))
+  ([own-puk followees network]
+     (reify-tuple-space own-puk followees (connect network own-puk) (ReplaySubject/create)))
 
-  ([own-puk peers connection local-tuples]
+  ([own-puk followees connection tuple-base]
 
-     (let [tuples-for-me (rx/distinct (payloads :tuple connection))
-           subscriptions-for-me (payloads :subscription connection)
-           subscriptions-for-peers (ReplaySubject/create)
+     (let [tuples-in (rx/distinct (payloads :tuple connection))
+           subs-in (payloads :subscription connection)
+           subs-out (ReplaySubject/create)
            subscriptions-by-sender (atom {})]
 
        (rx/subscribe
-        (->> subscriptions-for-peers
+        (->> subs-out
              (rx/flatmap
               (fn [criteria]
                 (if (get criteria "author")
                   (rx/return criteria)
-                  (rx/map #(assoc criteria "author" %) peers))))
+                  (rx/map #(assoc criteria "author" %) followees))))
              (rx/map #(->envelope (get % "author") :subscription (assoc % :sender own-puk))))
         #(rx/on-next connection %))
 
        (rx/subscribe
-        subscriptions-for-me
+        subs-in
         (fn [subscription]
           (let [sender (:sender subscription)
                 criteria (dissoc subscription :sender)]
@@ -144,7 +142,7 @@ an Observer part that will send packets over from puk."))
                  ; TODO: combine existing criteria with new one
                  (let [subscription
                        (rx/subscribe
-                        (->> local-tuples
+                        (->> tuple-base
                              (rx/filter #(let [audience (get % "audience")]
                                            (or (nil? audience) (= sender audience))))
                              (filter-by criteria)
@@ -153,11 +151,11 @@ an Observer part that will send packets over from puk."))
 
                    (assoc cur sender {:criteria criteria :subscription subscription}))))))))
 
-       (rx/subscribe tuples-for-me
-                     (partial rx/on-next local-tuples))
+       (rx/subscribe tuples-in
+                     (partial rx/on-next tuple-base))
 
        (reify TupleSpace
          (publisher [this]
-           (new-tuple-publisher local-tuples {"author" own-puk}))
+           (new-tuple-publisher tuple-base {"author" own-puk}))
          (filter [this]
-           (new-tuple-filter local-tuples subscriptions-for-peers))))))
+           (new-tuple-filter tuple-base subs-out))))))

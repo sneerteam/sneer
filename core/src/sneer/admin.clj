@@ -161,10 +161,11 @@
   ([own-prik network]
      (new-sneer-admin own-prik network (ReplaySubject/create)))
 
-  ([own-prik network local-tuples]
+  ([own-prik network tuple-base]
      (let [puk (.publicKey own-prik)
            connection (connect network puk)
-           tuple-space (core/reify-tuple-space puk (rx.Observable/never) connection local-tuples)
+           followees (rx.Observable/never)
+           tuple-space (core/reify-tuple-space puk followees connection tuple-base)
            sneer (new-sneer tuple-space own-prik)]
        (reify
          SneerAdmin
@@ -172,5 +173,5 @@
          Restartable
          (restart [this]
            (rx/on-completed connection)
-           (rx/on-completed local-tuples)
-           (new-sneer-admin own-prik network (copy-of local-tuples)))))))
+           (rx/on-completed tuple-base)
+           (new-sneer-admin own-prik network (copy-of tuple-base)))))))
