@@ -1,12 +1,10 @@
 package sneer.impl.keys;
 
-import java.security.SecureRandom;
 import java.util.*;
 
-import com.google.common.io.*;
-
 import sneer.*;
-import sneer.commons.*;
+
+import com.google.common.io.*;
 
 public class Keys {
 

@@ -74,8 +74,7 @@ public class ConversationActivity extends Activity {
 			R.layout.list_item_user_message,
 			R.layout.list_item_party_message,
 			messages,
-			party,
-			sneer());
+			party);
 
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);

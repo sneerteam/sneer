@@ -22,7 +22,6 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
     int layoutUserResourceId;    
     int listContactResourceId;
 	private LayoutInflater inflater;
-	private Sneer sneer;
 	private Party party;
     
     public ConversationAdapter(Context context,
@@ -30,13 +29,12 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
     		int layoutUserResourceId,
     		int listContactResourceId,
     		List<Message> data,
-    		Party party, Sneer sneer) {
+    		Party party) {
         super(context, layoutUserResourceId, data);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
         this.listContactResourceId = listContactResourceId;
 		this.party = party;
-		this.sneer = sneer;
     }
 
 	@SuppressLint("ViewHolder") @Override
