@@ -16,6 +16,7 @@ dependencies {
     compile 'com.netflix.rxjava:rxjava-core:' + external.rx.version
     compile 'com.netflix.rxjava:rxjava-async-util:' + external.rx.version
     compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
+    compile 'com.google.guava:guava:17.0'
 }
 
 uploadArchives {

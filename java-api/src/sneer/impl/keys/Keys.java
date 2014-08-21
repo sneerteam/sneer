@@ -1,6 +1,9 @@
 package sneer.impl.keys;
 
 import java.security.SecureRandom;
+import java.util.*;
+
+import com.google.common.io.*;
 
 import sneer.*;
 import sneer.commons.*;
@@ -21,19 +24,18 @@ public class Keys {
 	
 	public static PublicKey createPublicKey(String bitcoinAddress) {
 		//TODO Use the bitcoinj lib.
-		return new PublicKeyImpl(bitcoinAddress.getBytes());
+		return new PublicKeyImpl(BaseEncoding.base64Url().omitPadding().decode(bitcoinAddress));
 	}
 
 	
 	public static PrivateKey createPrivateKey(String seed) {
-		return new PrivateKeyImpl(randomBytes(seed)); //TODO Use bitcoin keys.
+		return new PrivateKeyImpl(hash(seed)); //TODO Use bitcoin keys.
 	}
 
 	
-	protected static byte[] randomBytes(String seed) {
+	protected static byte[] hash(String seed) {
 		byte[] ret = new byte[32]; //256bits
-		SecureRandom random = new SecureRandom();
-		random.setSeed(Codec.toUTF8(seed));
+		Random random = new Random(seed.hashCode());
 		random.nextBytes(ret);
 		return ret;
 	}
