@@ -1,3 +1,15 @@
+apply plugin: 'android'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.10.0+'
+    }
+}
+
 repositories {
   mavenCentral()
   maven {
@@ -10,8 +22,8 @@ configurations {
 }
 
 dependencies {
-  libs 'me.sneer:sneer-api:0.1.1-SNAPSHOT'
   libs 'org.easymock:easymock:3.2'
+  compile project(':android-api')
 }
 
 task copyLibs(type: Copy) {
@@ -20,3 +32,34 @@ task copyLibs(type: Copy) {
 }
 
 defaultTasks 'copyLibs'
+
+android {
+
+	lintOptions {
+		abortOnError false
+	}
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    defaultConfig {
+	    minSdkVersion 15
+	    targetSdkVersion 19
+	 }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+}
