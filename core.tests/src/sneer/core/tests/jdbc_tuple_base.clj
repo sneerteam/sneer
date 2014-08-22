@@ -38,11 +38,14 @@
 
 (def deserialize-entry (partial apply-serializer :deserialize))
 
+(defn apply-serializers [f row]
+  (reduce-kv f row serializers))
+
 (defn serialize-entries [row]
-  (reduce-kv serialize-entry row serializers))
+  (apply-serializers serialize-entry row))
 
 (defn deserialize-entries [row]
-  (reduce-kv deserialize-entry row serializers))
+  (apply-serializers deserialize-entry row))
 
 (defn ->custom-field-map [tuple]
   (->> tuple
