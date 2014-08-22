@@ -6,6 +6,7 @@ import static sneer.tuples.Tuple.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import rx.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.schedulers.*;
@@ -25,11 +26,16 @@ public class ObservableTestUtils {
 	public static Observable<Void> payloads(Observable<Tuple> tuples, final Object... values) {
 		return values(tuples.map(TO_PAYLOAD), values);
 	}
+	
+	public static Observable<Void> notifications(Observable<?> source, @SuppressWarnings("rawtypes") final Notification... values) {
+		return values(source.materialize(), (Object[])values);
+	}
 
 	public static Observable<Void> values(Observable<?> tuples, final Object... values) {
 		return tuples
 			.buffer(500, TimeUnit.MILLISECONDS, values.length)
 			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> t1) {
+				assertListSize(values, t1);
 				assertArrayEquals(values, t1.toArray());
 				return null;
 			}});
@@ -39,7 +45,7 @@ public class ObservableTestUtils {
 		return tuples
 			.buffer(500, TimeUnit.MILLISECONDS, expecteds.length)
 			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> list) {
-				assertListSize(list, expecteds);
+				assertListSize(expecteds, list);
 
 				Iterator<?> it = list.iterator();
 				for (Object expected : expecteds) {
@@ -52,7 +58,7 @@ public class ObservableTestUtils {
 	@SafeVarargs
 	public static <T> void assertEqualsUntilNow(Observable<T> seq, T... expecteds) {
 		List<T> list = takeAllUntilNow(seq);
-		assertListSize(list, expecteds);
+		assertListSize(expecteds, list);
 		Iterator<T> it = list.iterator();
 		for (Object expected : expecteds) {
 			if (expected.getClass().isArray()) {
@@ -77,9 +83,9 @@ public class ObservableTestUtils {
 		return result;
 	}
 
-	private static void assertListSize(List<?> list, final Object... expecteds) {
-		if (expecteds.length != list.size())
-			fail("Expecting `" + Arrays.asList(expecteds) + "', got `" + list + "'");
+	private static void assertListSize(Object[] expecteds, List<?> actual) {
+		if (expecteds.length != actual.size())
+			fail("Expecting `" + Arrays.asList(expecteds) + "', got `" + actual + "'");
 	}
 
 }

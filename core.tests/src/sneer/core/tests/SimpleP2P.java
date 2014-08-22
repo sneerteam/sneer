@@ -1,6 +1,5 @@
 package sneer.core.tests;
 
-import static org.junit.Assert.*;
 import static sneer.core.tests.ObservableTestUtils.*;
 import static sneer.core.tests.TupleTestUtils.*;
 import static sneer.tuples.Tuple.*;
@@ -112,8 +111,12 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			.type("chat/message")
 			.pub("hey people!");
 		
-		PrivateKey neide = Keys.createPrivateKey();
-		assertCount(0, tuplesB.filter().audience(neide).tuples());
+		tuplesA.publisher()
+			.audience(userB.publicKey())
+			.pub("eof");
+		
+		expecting(
+			payloads(tuplesB.filter().audience(userB).tuples(), "eof"));
 	}
 	
 	@Test
@@ -126,15 +129,18 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			
 		publisher.pub("old name");
 		publisher.pub("new name");
-
 		
-		assertEquals(
-			"new name",
-			tuplesA.filter()
-				.audience(userA)
-				.type("profile/name")
-				.field("custom", 42)
-				.localTuples().toBlocking().last().payload());
+		expecting(
+			notifications(
+				tuplesA.filter()
+					.audience(userA)
+					.type("profile/name")
+					.field("custom", 42)
+					.localTuples()
+					.map(Tuple.TO_PAYLOAD),
+				Notification.createOnNext("old name"),
+				Notification.createOnNext("new name"),
+				Notification.createOnCompleted()));
 	}
 	
 	@Test
