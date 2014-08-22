@@ -1,16 +1,12 @@
 package sneer.core.tests;
 
-import org.junit.*;
-
 import rx.*;
 import sneer.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
-public class TupleSpaceTestsBase {
+public class TupleSpaceTestsBase extends TestWithNetwork {
 	
-	private final Object network = newNetwork();
-
 	protected final PrivateKey userA = Keys.createPrivateKey();
 	protected final PrivateKey userB = Keys.createPrivateKey();
 	protected final PrivateKey userC = Keys.createPrivateKey();
@@ -23,15 +19,6 @@ public class TupleSpaceTestsBase {
 		return Observable.from(peers).map(PrivateKey.TO_PUBLIC_KEY);
 	}
 
-	protected Object newNetwork() {
-		return Glue.newNetwork();
-	}
-	
-	@After
-	public void tearDownNetwork() {
-		Glue.tearDownNetwork(network);
-	}
-	
 	protected TupleSpace newTupleSpace(PrivateKey ownPrik, Observable<PublicKey> peers) {
 		return Glue.newTupleSpace(ownPrik.publicKey(), peers, network);
 	}

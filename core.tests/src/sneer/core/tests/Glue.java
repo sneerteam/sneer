@@ -13,12 +13,8 @@ class Glue {
 		return (TupleSpace) sneerCoreVar("reify-tuple-space").invoke(ownPuk, peers, network);
 	}
 
-	public static Object newNetwork() {
-		try {
-			return networkSimulator("new-network").call();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+	public static Object newNetworkSimulator() {
+		return networkSimulator("new-network").invoke();
 	}
 	
 	public static void tearDownNetwork(Object network) {

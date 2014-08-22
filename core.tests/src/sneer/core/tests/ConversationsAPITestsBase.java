@@ -1,15 +1,11 @@
 package sneer.core.tests;
 
-import org.junit.*;
-
 import sneer.*;
 import sneer.admin.*;
 import sneer.impl.keys.*;
 
-public class ConversationsAPITestsBase {
+public class ConversationsAPITestsBase extends TestWithNetwork {
 
-	private final Object network = Glue.newNetwork();
-	
 	protected final SneerAdmin adminA = newSneerAdmin();
 	protected final SneerAdmin adminB = newSneerAdmin();
 	protected final SneerAdmin adminC = newSneerAdmin();
@@ -26,11 +22,6 @@ public class ConversationsAPITestsBase {
 		return Keys.createPrivateKey();
 	}
 	
-	@After
-	public void closeNetwork() {
-		Glue.tearDownNetwork(network);
-	}
-
 	private SneerAdmin newSneerAdmin() {
 		return Glue.newSneerAdmin(Keys.createPrivateKey(), network);
 	}
