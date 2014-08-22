@@ -15,12 +15,34 @@
           [:author :blob "NOT NULL"]
           [:custom :varchar]
           ;[:device :blob "NOT NULL"]
-          ;[:sequence :integer "NOT NULL"]          
+          ;[:sequence :integer "NOT NULL"]
           ;[:signature :blob "NOT NULL"]
           [:audience :blob])]
     (sql/execute! db [tuple-ddl])))
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
+
+(def puk-serializer {:serialize #(.bytes %)
+                     :deserialize #(sneer.impl.keys.Keys/createPublicKey %)})
+
+(def serializers {"author" puk-serializer
+                  "audience" puk-serializer})
+
+(defn apply-serializer [op row field serializer]
+  (let [v (get row field)]
+    (if (nil? v)
+      row
+      (assoc row field ((op serializer) v)))))
+
+(def serialize-entry (partial apply-serializer :serialize))
+
+(def deserialize-entry (partial apply-serializer :deserialize))
+
+(defn serialize-entries [row]
+  (reduce-kv serialize-entry row serializers))
+
+(defn deserialize-entries [row]
+  (reduce-kv deserialize-entry row serializers))
 
 (defn ->custom-field-map [tuple]
   (->> tuple
@@ -39,16 +61,18 @@
         db {:connection connection}]
     (create-table! db)
     (reify core/TupleBase
-      
+
       (store-tuple [this tuple]
         (let [custom (->custom-field-map tuple)
               row (select-keys tuple builtin-field?)]
-          (sql/insert! db :tuple (assoc row :custom custom))
-          (dump-tuples db)))
-      
+          (sql/insert! db :tuple (serialize-entries (assoc row :custom custom)))
+          ;(dump-tuples db)
+          ))
+
       (query-tuples [this criteria keep-alive]
         (let [r (sql/query db ["SELECT * FROM tuple"] :result-set-fn doall :as-arrays? true)
               field-names (mapv name (first r))
-              ^java.lang.Iterable tuples (map #(apply hash-map (interleave field-names %)) (next r))
+              ^java.lang.Iterable tuples (map #(deserialize-entries (zipmap field-names %)) (next r))
               r nil]
+          ;(println "query-tuples [" criteria keep-alive "] -> \n\t" (apply str (interpose "\n\t" tuples)))
           (rx.Observable/from tuples))))))
