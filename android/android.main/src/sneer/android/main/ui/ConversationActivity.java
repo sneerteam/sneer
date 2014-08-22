@@ -4,6 +4,7 @@ import static sneer.android.main.SneerApp.*;
 
 import java.util.*;
 
+import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -11,6 +12,8 @@ import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
 import sneer.commons.*;
+import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -110,10 +113,23 @@ public class ConversationActivity extends Activity {
 		}
 
 		private void handleClick(final Party party, final String text) {
-			if (text != null && !text.isEmpty())
-				sneer().produceConversationWith(party).sendMessage(text);
-			else
+			if (text != null && !text.isEmpty()) {
+				
+				
+				final Conversation conversation = sneer().produceConversationWith(party);
+				Observable.range(0, 500).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() { @Override public void call(Integer i) {
+					conversation.sendMessage(text + i);
+				}});
+				
+//				sneer().produceConversationWith(party).sendMessage(text);
+				
+				
+				
+				
+				
+			} else {
 				openIteractionMenu();
+			}
 		}
 
 		private void openIteractionMenu() {
