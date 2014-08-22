@@ -17,6 +17,42 @@
 addressed to puk and an Observer part that will send packets over from
 puk." ))
 
+(defprotocol TupleBase
+  "A backing store for tuples (represented as maps)."
+
+  (store-tuple ^Void [this tuple]
+    "Stores the tuple represented as map.")
+
+  (query-tuples ^rx.Observable [this criteria keep-alive]
+    "Filters tuples by the criteria represented as a map of
+field/value. When keep-alive is true the observable will keep emitting
+new tuples as they are stored otherwise it will complete." ))
+
+(defn filter-by [criteria tuples]
+  (reduce
+    (fn [tuples [f v]] (rx/filter #(= (get % f) v) tuples))
+    tuples
+    criteria))
+
+(extend-protocol TupleBase
+  rx.subjects.Subject
+  (store-tuple [subject tuple]
+    (rx/on-next subject tuple))
+  (query-tuples [subject criteria keep-alive]
+    (if keep-alive
+      (filter-by criteria subject)
+      (rx/observable*
+       (fn [subscriber]
+         (let [scheduler (TestScheduler.)
+               tuples (->>
+                       subject
+                       (filter-by criteria)
+                       (rx/subscribe-on scheduler))]
+           (rx/subscribe tuples #(rx/on-next subscriber %))
+           (. scheduler triggerActions)
+           (rx/on-completed subscriber)))))))
+
+
 (defmacro reify+
   "expands to reify form after macro expanding the body"
   [& body]
@@ -55,14 +91,8 @@ puk." ))
         (pub [this payload]
            (.. this (payload payload) pub))
         (pub [this]
-           (rx/on-next tuples-out proto-tuple)
+           (store-tuple tuples-out proto-tuple)
            (reify-tuple proto-tuple))))))
-
-(defn filter-by [criteria tuples]
-  (reduce
-    (fn [tuples [f v]] (rx/filter #(= (get % f) v) tuples))
-    tuples
-    criteria))
 
 (defn new-tuple-filter
   ([tuple-source subs-out] (new-tuple-filter tuple-source subs-out {}))
@@ -76,29 +106,16 @@ puk." ))
           (audience [this prik] (with "audience" (.publicKey prik)))
           (field [this field value] (with field value))
           (localTuples [this]
-                       (rx/observable*
-                         (fn [subscriber]
-                           (let [scheduler (TestScheduler.)
-                                 tuples (->>
-                                          tuple-source
-                                          (filter-by criteria)
-                                          (rx/map reify-tuple)
-                                          (rx/subscribe-on scheduler))]
-                             (rx/subscribe tuples #(rx/on-next subscriber %))
-                             (. scheduler triggerActions)
-                             (rx/on-completed subscriber)))))
-          (tuples [this]
-            (let [tuples
-                  (->>
-                    tuple-source
-                    (filter-by criteria)
-                    (rx/map reify-tuple))]
+             (rx/map reify-tuple (query-tuples tuple-source criteria false)))
 
-              (rx/observable*
-                (fn [subscriber]
-                  (rx/on-next subs-out criteria)
-                  (. subscriber add
-                    (. tuples subscribe subscriber))))))))))
+          (tuples [this]
+             (let [tuples(rx/map reify-tuple (query-tuples tuple-source criteria true))]
+
+             (rx/observable*
+               (fn [subscriber]
+                 (rx/on-next subs-out criteria)
+                 (. subscriber add
+                   (. tuples subscribe subscriber))))))))))
 
 (defn payloads [type envelopes]
   (->> envelopes
