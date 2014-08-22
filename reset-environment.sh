@@ -18,7 +18,7 @@ if [ "$hash_before_pull" != "$hash_after_pull" ] then
 	exit 0
 fi
 
-echo "-------------------> Preparing workspace"
+echo "-------------------> Preparing the workspace"
 
 ./gradlew install eclipse
 
