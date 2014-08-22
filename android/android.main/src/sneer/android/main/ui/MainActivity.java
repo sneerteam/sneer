@@ -110,7 +110,11 @@ public class MainActivity extends Activity {
 				R.layout.list_item_main,
 				new Func1<Party, Observable<String>>() { @Override public Observable<String> call(Party party) {
 					return party.name();
+				}},
+				new Func1<Party, Observable<byte[]>>() { @Override public Observable<byte[]> call(Party party) {
+					return sneer().profileFor(party).selfie();
 				}});
+
 		listView.setAdapter(adapter);
 
 		registerForContextMenu(listView);

@@ -8,6 +8,7 @@ import sneer.impl.keys.*;
 
 public class PublicKeyTests {
 	
+	
 	@Test
 	public void recreate() {
 		PublicKey puk = Keys.createPrivateKey().publicKey();

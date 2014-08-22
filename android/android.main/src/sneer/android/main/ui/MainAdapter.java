@@ -17,11 +17,13 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 	private Activity activity;
     int layoutResourceId;
 	private final Func1<Party, Observable<String>> labelProvider;
+	private final Func1<Party, Observable<byte[]>> imageProvider;
 	private CompositeSubscription subscriptions;
     
-    public MainAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider) {
+	public MainAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider, Func1<Party, Observable<byte[]>> imageProvider) {
         super(activity, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
+        this.imageProvider = imageProvider;
         this.activity = activity;
 		this.labelProvider = labelProvider;
 		this.subscriptions = new CompositeSubscription();
@@ -40,6 +42,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
             holder.conversationParty = findView(row, R.id.conversationParty);
             holder.conversationSummary = findView(row, R.id.conversationSummary);
             holder.conversationDate = findView(row, R.id.conversationDate);
+            holder.conversationPicture = findView(row, R.id.conversationPicture);
             holder.conversationUnread = findView(row, R.id.conversationUnread);
             
             Shader textShader = new LinearGradient(200, 0, 650, 0, 
@@ -56,6 +59,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		Subscription subscription = Subscriptions.from(
 				plug(holder.conversationParty, labelProvider.call(conversation.party())),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
+				plug(holder.conversationPicture, imageProvider.call(conversation.party())),
 				plug(holder.conversationUnread, conversation.unreadMessageCount()),
 				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
 		subscriptions.add(subscription);
@@ -68,6 +72,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		TextView conversationSummary;
 		TextView conversationDate;
 		TextView conversationUnread;
+		ImageView conversationPicture;
 	}
 
 

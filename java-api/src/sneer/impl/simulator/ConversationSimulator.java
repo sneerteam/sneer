@@ -124,7 +124,7 @@ public class ConversationSimulator implements Conversation {
 
 	@Override
 	public void unreadMessageCountReset() {
-		// TODO Auto-generated method stub
+		unreadMessageCount.set(0L);
 	}
 
 }
