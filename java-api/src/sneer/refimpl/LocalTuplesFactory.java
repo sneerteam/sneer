@@ -130,10 +130,6 @@ public abstract class LocalTuplesFactory {
 		private final class TuplePublisherImpl implements TuplePublisher {
 			private TupleImpl prototype = new TupleImpl();
 			
-			{
-				prototype.put("author", identity.publicKey());
-			}
-
 			public TuplePublisherImpl() {
 			}
 
@@ -160,6 +156,7 @@ public abstract class LocalTuplesFactory {
 			@Override
 			public Tuple pub() {
 				TupleImpl ret = prototype.clone();
+				ret.put("author", identity.publicKey());
 				publishTuple(ret);
 				return ret;
 			}
