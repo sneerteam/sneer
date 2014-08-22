@@ -148,6 +148,9 @@ if(shouldPublish) {
 
 afterEvaluate {
 	uploadArchives {
+	
+		onlyIf { ourJar.didWork }
+		
 		repositories {
 			if (!shouldPublish) {
 			    mavenLocal()
