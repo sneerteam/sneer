@@ -9,8 +9,12 @@ import clojure.lang.*;
 
 class Glue {
 
-	public static TupleSpace newTupleSpace(PublicKey ownPuk, Observable<PublicKey> peers, Object network) {
-		return (TupleSpace) sneerCoreVar("reify-tuple-space").invoke(ownPuk, peers, network);
+	public static TupleSpace newTupleSpace(PublicKey ownPuk, Object tupleBase, Object network, Observable<PublicKey> followees) {
+		return (TupleSpace) sneerCoreVar("reify-tuple-space").invoke(ownPuk, tupleBase, connect(network, ownPuk), followees);
+	}
+
+	public static Object connect(Object network, PublicKey ownPuk) {
+		return sneerCoreVar("connect").invoke(network, ownPuk);
 	}
 
 	public static Object newNetworkSimulator() {

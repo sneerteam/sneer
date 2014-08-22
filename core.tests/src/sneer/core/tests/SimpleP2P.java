@@ -103,7 +103,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			.pub(name);
 		
 		PrivateKey userD = Keys.createPrivateKey();
-		TupleSpace tuplesD = newTupleSpace(userD, newPeers(userA));
+		TupleSpace tuplesD = newTupleSpace(userD, followees(userA));
 		
 		expecting(
 			payloads(tuplesD.filter().tuples(), name));

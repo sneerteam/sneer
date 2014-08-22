@@ -165,7 +165,7 @@
      (let [puk (.publicKey own-prik)
            connection (connect network puk)
            followees (rx.Observable/never)
-           tuple-space (core/reify-tuple-space puk followees connection tuple-base)
+           tuple-space (core/reify-tuple-space puk tuple-base connection followees)
            sneer (new-sneer tuple-space own-prik)]
        (reify
          SneerAdmin
