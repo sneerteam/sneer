@@ -20,8 +20,7 @@ public class ConversationSimulator implements Conversation {
 	private final ObservedSubject<List<ConversationMenuItem>> menuItems = ObservedSubject.create((List<ConversationMenuItem>)Collections.EMPTY_LIST);
 	private final ObservedSubject<Long> mostRecentMessageTimestamp = ObservedSubject.create(0L);
 	private final ObservedSubject<String> mostRecentMessageContent = ObservedSubject.create("");
-	
-	private final ObservedSubject<Long> unreadMessageCount = ObservedSubject.create((long) new Random().nextInt(11));
+	private final ObservedSubject<Long> unreadMessageCount = ObservedSubject.create(4L);
 	
 	public ConversationSimulator(Party party) {
 		this.party = party;
