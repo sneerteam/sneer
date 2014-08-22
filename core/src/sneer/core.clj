@@ -163,7 +163,7 @@ new tuples as they are stored otherwise it will complete." ))
                 (assoc cur sender {:criteria criteria :subscription subscription}))))))))
 
     (rx/subscribe tuples-in
-                  (partial rx/on-next tuple-base))
+                  (partial store-tuple tuple-base))
 
     (reify TupleSpace
       (publisher [this]
