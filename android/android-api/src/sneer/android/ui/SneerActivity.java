@@ -23,6 +23,17 @@ public class SneerActivity extends Activity {
 	}
 
 	
+	public static Subscription plugUnreadMessage(final TextView textView, Observable<Long> observable) {
+		return observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Long>() { @Override public void call(Long obj) {
+			if (obj == 0)
+				textView.setVisibility(View.GONE);
+			else
+				textView.setVisibility(View.VISIBLE);
+			textView.setText(obj.toString());
+		}});
+	}
+	
+	
 	public static Subscription plug(final ImageView imageView, Observable<byte[]> observable) {
 		return observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] obj) {
 			imageView.setImageBitmap(BitmapFactory.decodeByteArray(obj, 0, obj.length));

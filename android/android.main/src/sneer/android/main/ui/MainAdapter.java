@@ -60,7 +60,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 				plug(holder.conversationParty, labelProvider.call(conversation.party())),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
 				plug(holder.conversationPicture, imageProvider.call(conversation.party())),
-				plug(holder.conversationUnread, conversation.unreadMessageCount()),
+				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
 				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
 		subscriptions.add(subscription);
         return row;

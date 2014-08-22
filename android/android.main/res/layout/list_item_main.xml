@@ -59,11 +59,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/conversationDate"
         android:layout_margin="5dp"
-        android:background="#a43234"
-        android:paddingBottom="3dip"
-        android:paddingLeft="6dip"
-        android:paddingRight="6dip"
-        android:paddingTop="3dip" >
+        android:background="#a43234" >
 
         <TextView
             android:id="@+id/conversationUnread"
@@ -71,6 +67,10 @@
             android:layout_height="fill_parent"
             android:gravity="center"
             android:lines="1"
+            android:paddingBottom="3dip"
+            android:paddingLeft="6dip"
+            android:paddingRight="6dip"
+            android:paddingTop="3dip"
             android:text="@string/string_dummy_conversation_unread_messages"
             android:textAppearance="@android:style/TextAppearance.Small"
             android:textColor="#ffffff"
