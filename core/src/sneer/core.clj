@@ -13,8 +13,9 @@
 (defprotocol Network
   (connect
     [network puk]
-    "Returns a `rx.subjects.Subject' with an Observable part for packets addressed to puk and
-an Observer part that will send packets over from puk."))
+    "Returns a `rx.subjects.Subject' with an Observable part for packets
+addressed to puk and an Observer part that will send packets over from
+puk." ))
 
 (defmacro reify+
   "expands to reify form after macro expanding the body"
