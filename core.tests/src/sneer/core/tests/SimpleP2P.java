@@ -56,6 +56,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			.pub("paper");
 		
 		tuplesA.publisher()
+			.type("sentinel")
 			.pub("end");
 		
 		expecting(
@@ -95,8 +96,10 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	@Test
 	public void byAuthor() {
 		tuplesA.publisher()
+			.type("user/name")
 			.pub("UserA McCloud");
 		tuplesB.publisher()
+			.type("user/name")
 			.pub("UserB McCloud");
 		
 		expecting(
@@ -113,6 +116,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		
 		tuplesA.publisher()
 			.audience(userB.publicKey())
+			.type("sentinel")
 			.pub("eof");
 		
 		expecting(
