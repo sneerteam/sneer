@@ -23,17 +23,17 @@ public class Message {
 	private final boolean isOwn;
 	
 	
-	public static Message createFrom(long timeSent, long timeReceived, String content) {
+	public static Message createFrom(long timeSent, long timeReceived, Object content) {
 		return new Message(timeSent, timeReceived, content, false);
 	}	
 
 	
-	public static Message createOwn(long timeSent, String content) {
+	public static Message createOwn(long timeSent, Object content) {
 		return new Message(timeSent, timeSent, content, true);
 	}	
 
 	
-	private Message(long timestampSent, long timestampReceived, String content, boolean isOwn) {
+	private Message(long timestampSent, long timestampReceived, Object content, boolean isOwn) {
 		this.timestampSent = timestampSent;
 		this.timestampReceived = timestampReceived;
 		this.content = content;
