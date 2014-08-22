@@ -8,6 +8,7 @@
     <string name="action_send_pk">Send your public key…</string>
     <string name="action_copy_pk">Copy your public key</string>
     <string name="action_advanced">Advanced</string>
+    <string name="action_search_for_apps">Search for Apps</string>    
     <string name="action_advanced_report">System Report</string>
     <string name="action_add_contact">Add contact</string>
     <string name="action_settings">Settings</string>

@@ -17,6 +17,7 @@ import android.app.*;
 import android.content.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import android.net.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -147,9 +148,6 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_search:
-			// search action
-			break;
 		case R.id.chat_contact:
 			toast(conversation.toString()); // Do something useful with
 											// conversation here.
@@ -174,9 +172,9 @@ public class MainActivity extends Activity {
 		}
 		getMenuInflater().inflate(R.menu.main, menu);
 
-		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+//		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -187,6 +185,12 @@ public class MainActivity extends Activity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			navigateTo(ProfileActivity.class);
+			break;
+		case R.id.action_search_for_apps:
+			Intent viewIntent =
+	          new Intent("android.intent.action.VIEW",
+	            Uri.parse("https://play.google.com/store/search?q=SneerApp"));
+	          startActivity(viewIntent);
 			break;
 		case R.id.action_advanced:
 			navigateTo(SystemReportActivity.class);
