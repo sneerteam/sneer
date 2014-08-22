@@ -20,6 +20,7 @@ buildscript {
     }
 }
 
+
 repositories {
     mavenCentral()
     maven { url "https://clojars.org/repo" }
@@ -46,7 +47,6 @@ eclipse.project {
 dependencies {
     compile 'org.clojure:clojure:1.6.0'
     compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
-    compile 'org.clojure:java.jdbc:0.3.4'
     compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
     compile 'com.cognitect:transit-clj:0.8.229'
     compile 'com.google.guava:guava:17.0'

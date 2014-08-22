@@ -44,6 +44,7 @@ dependencies {
     compile 'org.clojure:clojure:1.6.0'
     compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
     compile 'org.clojure:java.jdbc:0.3.4'
+    runtime 'org.xerial:sqlite-jdbc:3.7.15-M1'
     compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
     compile project(':java-api')
     compile project(':core')

@@ -4,7 +4,7 @@ public class SimpleP2POverPersistentTupleSpace extends SimpleP2P {
 	
 	@Override
 	protected Object newTupleBase() {
-		return Glue.var("sneer.persistent-tuple-base", "create").invoke();
+		return Glue.var("sneer.core.tests.jdbc-tuple-base", "create").invoke();
 	}
 
 }
