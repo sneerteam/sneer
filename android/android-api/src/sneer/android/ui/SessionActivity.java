@@ -1,14 +1,13 @@
 package sneer.android.ui;
 
 import static sneer.SneerAndroid.*;
-import rx.*;
 import rx.android.schedulers.*;
+import rx.functions.*;
 import sneer.*;
-import sneer.commons.exceptions.*;
-import sneer.rx.*;
+import sneer.Message;
 import android.os.*;
 
-public class SessionActivity extends SneerActivity {
+public abstract class SessionActivity extends SneerActivity {
 
 	private Session session;
 
@@ -17,23 +16,35 @@ public class SessionActivity extends SneerActivity {
 		super.onCreate(savedInstanceState);
 
 		session = new SneerAndroid(this).session(
-			(PublicKey)getExtra(PARTY_PUK),
-			(String)getExtra(TYPE)
+			(Long)getExtra(SESSION_ID)
 		);
+		
+		session.previousMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() { public void call(Message message) {
+			onMessage(message);
+		};});
+		session.newMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() { public void call(Message message) {
+			onMessage(message);
+			afterNewMessage();
+		};});
+		
+		session.peerName().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { public void call(String name) {
+			onPeerName(name);
+		};});
+	}
+
+
+	private void onMessage(Message message) {
+		if (message.isOwn())
+			messageReceived(message.content());
+		else
+			messageSent(message.content());
 	}
 
 
 	@Override
 	protected void onDestroy() {
 		session.dispose();
-		session = null;
 		super.onDestroy();
-	}
-
-
-	protected Observed<String> peerName() {
-		//return sneer().nameFor(session.peer());
-		throw new NotImplementedYet();
 	}
 
 
@@ -42,13 +53,24 @@ public class SessionActivity extends SneerActivity {
 	}
 
 
-	protected Observable<Object> receivedMessages() {
-		return session.receivedMessages().observeOn(AndroidSchedulers.mainThread());
-	}
+	/** @param name The current name of the peer on the other side of this session. */
+	protected abstract void onPeerName(String name);
+
+	
+	/** Called when old sent messages are being replayed or when new messages are sent. */
+	protected abstract void messageSent(Object content);
+	
+	
+	/** Called when old received messages are being replayed or when new messages are received. */
+	protected abstract void messageReceived(Object content);
+	
+	
+	/** Called after messageSent() and messageReceived() for new messages, not for messages being replayed. */
+	protected abstract void afterNewMessage();
 	
 	
 	private Object getExtra(String extra) {
 		return getIntent().getExtras().get(extra);
 	}
-
 }
+

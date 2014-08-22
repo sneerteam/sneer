@@ -15,7 +15,7 @@ public class Message {
 	}};
 	
 	
-	private final String content;
+	private final Object content;
 	
 	private final long timestampSent;
 	private final long timestampReceived;
@@ -46,7 +46,7 @@ public class Message {
 	}
 	
 	
-	public String content() {
+	public Object content() {
 		return content;
 	}
 	

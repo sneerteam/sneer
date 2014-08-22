@@ -1,7 +1,7 @@
 package sneer.impl.simulator;
 
-import static sneer.Message.*;
 import static sneer.ConversationMenuItem.*;
+import static sneer.Message.*;
 import static sneer.commons.Lists.*;
 
 import java.util.*;
@@ -73,7 +73,7 @@ public class ConversationSimulator implements Conversation {
 		messages.set(newMessage);
 		Message last = lastIn(newMessage);
 		mostRecentMessageTimestamp.set(last.timestampReceived());
-		mostRecentMessageContent.set(last.content());
+		mostRecentMessageContent.set(last.content().toString());
 	}
 
 

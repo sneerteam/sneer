@@ -1,7 +1,6 @@
 package sneer;
 
 import rx.*;
-import rx.android.schedulers.*;
 import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 import sneer.utils.*;
@@ -28,13 +27,15 @@ public class SneerAndroid {
 	
 	public static final String TYPE = "type";
 	public static final String PARTY_PUK = "partyPuk";
-
+	
 	private static final String CONVERSATION_LIST = "sneer.android.main.ui.MAIN";
 	public static final String TITLE = "title";
 	public static final String NEW_CONVERSATION_LABEL = "newConversationLabel";
 	public static final String NEW_CONVERSATION_ACTION = "newConversationAction";
 	public static final String DISABLE_MENUS = "disable-menus";
 	static final String SNEER_SERVICE = "sneer.android.service.BACKEND";
+
+	public static final String SESSION_ID = "sessionId";
 
 	
 	public static void startMain(Activity activity, String title, String type, String newConversationLabel, String newConversationAction) {
@@ -60,9 +61,14 @@ public class SneerAndroid {
 		this.context = context;
 	}
 	
-	public Session session(final PublicKey peerPuk, final String type) {
+	public Session session(long id) {
+		
+		//These were the old args:
+		final PublicKey peerPuk = null; final String type = null;
+
 		if (null == null)
 			throw new NotImplementedYet();
+
 		
 		PrivateKey thirdPartyAppShouldntNeedToKnowOwnPrivateKey = null; int letFixThis;
 		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(
@@ -70,13 +76,6 @@ public class SneerAndroid {
 		);
 		
 		return new Session() {
-			
-			@Override
-			public Party peer() {
-				// return sneer().produceParty(partyPuk());
-				throw new NotImplementedYet();
-			}
-
 
 			@Override
 			public void sendMessage(Object content) {
@@ -91,25 +90,30 @@ public class SneerAndroid {
 			}
 
 			@Override
-			public Observable<Object> receivedMessages() {
-				return (Observable<Object>) tupleSpace.filter()
-						.audienceMe()
-						.author(partyPuk())
-						.type(type())
-						.tuples()
-						.observeOn(AndroidSchedulers.mainThread())
-						.subscribeOn(AndroidSchedulers.mainThread())
-						.map(Tuple.TO_PAYLOAD);
-						
-			}
-
-			@Override
 			public void dispose() {
 				// TODO
 			}
 			
 			private PublicKey partyPuk() {
 				return peerPuk;
+			}
+
+			@Override
+			public Observable<String> peerName() {
+				// TODO Auto-generated method stub
+				throw new NotImplementedYet();
+			}
+
+			@Override
+			public Observable<Message> previousMessages() {
+				// TODO Auto-generated method stub
+				throw new NotImplementedYet();
+			}
+
+			@Override
+			public Observable<Message> newMessages() {
+				// TODO Auto-generated method stub
+				throw new NotImplementedYet();
 			}
 			
 		};
