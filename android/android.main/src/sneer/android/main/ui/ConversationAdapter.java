@@ -45,7 +45,7 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
         	parent,
         	false);
         
-        findTextView(ret, R.id.messageContent).setText(message.content());
+        findTextView(ret, R.id.messageContent).setText(message.content().toString());
         findTextView(ret, R.id.messageTime).setText(message.timeSent());
     
         if (!message.isOwn()) {
