@@ -1,12 +1,13 @@
 package sneer.core.tests;
 
+import static org.junit.Assert.*;
 import static sneer.core.tests.ObservableTestUtils.*;
-import static sneer.core.tests.TupleTestUtils.*;
 import static sneer.tuples.Tuple.*;
 
 import org.junit.*;
 
 import rx.*;
+import rx.functions.*;
 import sneer.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
@@ -124,6 +125,23 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	}
 	
 	@Test
+	public void customField() {
+		TuplePublisher publisher = tuplesA.publisher()
+				.type("custom")
+				.field("custom", 42);
+		publisher.pub();
+		
+		expecting(
+			values(tuplesA.filter().tuples().map(field("custom")), 42));
+	}
+
+	private Func1<Tuple, Object> field(final String field) {
+		return new Func1<Tuple, Object>() {  @Override public Object call(Tuple t1) {
+			return t1.get(field);
+		}};
+	}
+	
+	@Test
 	public void completedLocalTuples() {
 		
 		TuplePublisher publisher = tuplesA.publisher()
@@ -149,7 +167,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	
 	@Test
 	public void subscriberCriteriaWithArray() {
-		Object[] array = {"notes", userB.publicKey()};
+		final Object[] array = {"notes", userB.publicKey()};
 		
 		tuplesA.publisher()
 			.audience(userA.publicKey())
@@ -163,7 +181,12 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 				.field("path", array)
 				.tuples();
 		
-		expectValues(actual, "userB is cool");
+		expecting(
+			actual.map(new Func1<Tuple, Void>() {  @Override public Void call(Tuple t1) {
+				assertArrayEquals(array, (Object[])t1.get("path"));				
+				assertEquals("userB is cool", t1.payload());
+				return null;
+			}}));
 	}
 	
 //	@Test
