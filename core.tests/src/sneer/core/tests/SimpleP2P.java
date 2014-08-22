@@ -15,22 +15,6 @@ import sneer.tuples.*;
 public class SimpleP2P extends TupleSpaceTestsBase {
 	
 	@Test
-	public void publisherFluentReturningNewInstance() {
-		assertNotSame(tuplesA.publisher(), tuplesA.publisher());
-		TuplePublisher publisher = tuplesA.publisher();
-		assertNotSame(publisher, publisher.audience(userA.publicKey()));
-		assertNotSame(publisher, publisher.pub());
-	}
-	
-	@Test
-	public void subscriberFluentReturningNewInstance() {
-		assertNotSame(tuplesA.filter(), tuplesA.filter());
-		TupleFilter subscriber = tuplesA.filter();
-		assertNotSame(subscriber, subscriber.audience(userA));
-		assertNotSame(subscriber, subscriber.type("bla"));
-	}
-	
-	@Test
 	public void messagePassing() {
 		
 		TuplePublisher publisher = tuplesA.publisher()
