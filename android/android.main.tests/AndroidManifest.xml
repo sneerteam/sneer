@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="sneerteam.android.main.test"
+    package="sneer.android.main.tests"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -8,7 +8,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="sneerteam.android.main" />
+        android:targetPackage="sneer.android.main" />
 
     <application
         android:icon="@drawable/ic_launcher"

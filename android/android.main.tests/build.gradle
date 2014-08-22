@@ -10,37 +10,19 @@ buildscript {
     }
 }
 
-repositories {
-  mavenCentral()
-  maven {
-    url = "https://oss.sonatype.org/content/repositories/snapshots/"
-  }
-}
-
-configurations {
-  libs
-}
-
 dependencies {
-  libs 'org.easymock:easymock:3.2'
   compile project(':android-api')
 }
 
-task copyLibs(type: Copy) {
-  into "libs"
-  from configurations.libs
-}
-
-defaultTasks 'copyLibs'
-
 android {
 
-	lintOptions {
-		abortOnError false
-	}
+    lintOptions {
+        abortOnError false
+    }
+
     packagingOptions {
-		exclude 'LICENSE.txt'
-		exclude 'META-INF/LICENSE'
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
 
@@ -48,9 +30,9 @@ android {
     buildToolsVersion "19.0.3"
 
     defaultConfig {
-	    minSdkVersion 15
-	    targetSdkVersion 19
-	 }
+        minSdkVersion 15
+        targetSdkVersion 19
+    }
 
     sourceSets {
         main {
