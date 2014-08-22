@@ -12,7 +12,7 @@ git pull --rebase
 
 hash_after_pull=`git hash-object $0`
 
-if [ "$hash_before_pull" != "$hash_after_pull" ] then
+if [ "$hash_before_pull" != "$hash_after_pull" ]; then
 	echo "-------------------> This script changed, rerunning it"
 	trap "$0" 0
 	exit 0
