@@ -35,13 +35,13 @@ android {
 		abortOnError false
 	}
 
-    compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    compileSdkVersion external.android.sdkVersion
+    buildToolsVersion external.android.buildToolsVersion
 
     defaultConfig {
-	    minSdkVersion 15
-	    targetSdkVersion 19
-	 }
+        minSdkVersion 15
+        targetSdkVersion external.android.sdkVersion
+    }
 
     sourceSets {
         main {

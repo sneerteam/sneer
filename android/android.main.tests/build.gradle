@@ -26,12 +26,12 @@ android {
         exclude 'META-INF/NOTICE'
     }
 
-    compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    compileSdkVersion external.android.sdkVersion
+    buildToolsVersion external.android.buildToolsVersion
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 19
+        targetSdkVersion external.android.sdkVersion
     }
 
     sourceSets {
