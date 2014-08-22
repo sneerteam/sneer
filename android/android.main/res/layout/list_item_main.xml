@@ -48,19 +48,25 @@
         android:paddingLeft="5dp"
         android:paddingRight="35dp"
         android:paddingTop="5dp"
-        android:textSize="15sp"
-        android:text="@string/string_dummy_conversation_text" >
+        android:text="@string/string_dummy_conversation_text"
+        android:textSize="15sp" >
     </TextView>
 
-    <ImageView
+    <TextView
         android:id="@+id/conversationUnread"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/conversationSummary"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/conversationDate"
-        android:contentDescription="@string/conversation_summary_picture"
+        android:lines="1"
         android:paddingRight="5dp"
-        android:src="@drawable/ic_action_unread" />
+        android:paddingTop="5dp"
+        android:text="@string/string_dummy_conversation_unread_messages"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textColor="#00bb00"
+        android:textSize="15sp"
+        android:textStyle="bold" >
+    </TextView>
 
 </RelativeLayout>

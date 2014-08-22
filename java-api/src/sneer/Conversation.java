@@ -19,6 +19,8 @@ public interface Conversation {
 
 	Observed<List<ConversationMenuItem>> menu();
 	
+	Observable<Long> unreadMessageCount();
+	void unreadMessageCountReset();
 	
 	Comparator<Conversation> MOST_RECENT_FIRST = new Comparator<Conversation>() {  @Override public int compare(Conversation i1, Conversation i2) {
 		return Comparators.compare(i1.mostRecentMessageTimestamp().current(), i2.mostRecentMessageTimestamp().current());

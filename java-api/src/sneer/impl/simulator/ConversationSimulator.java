@@ -21,6 +21,7 @@ public class ConversationSimulator implements Conversation {
 	private final ObservedSubject<Long> mostRecentMessageTimestamp = ObservedSubject.create(0L);
 	private final ObservedSubject<String> mostRecentMessageContent = ObservedSubject.create("");
 	
+	private final ObservedSubject<Long> unreadMessageCount = ObservedSubject.create((long) new Random().nextInt(11));
 	
 	public ConversationSimulator(Party party) {
 		this.party = party;
@@ -112,6 +113,18 @@ public class ConversationSimulator implements Conversation {
 		ret.add(menuItem);
 		Collections.sort(ret, order);
 		return ret;
+	}
+
+
+	@Override
+	public Observable<Long> unreadMessageCount() {
+		return unreadMessageCount.observed().observable();
+	}
+
+
+	@Override
+	public void unreadMessageCountReset() {
+		// TODO Auto-generated method stub
 	}
 
 }

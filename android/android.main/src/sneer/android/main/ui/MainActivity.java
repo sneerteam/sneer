@@ -93,61 +93,40 @@ public class MainActivity extends Activity {
 		}
 
 		sneer().profileFor(sneer().self()).ownName()
-				.subscribe(new Action1<String>() {
-					@Override
-					public void call(String label) {
-						actionBar.setTitle(label);
-					}
-				});
+				.subscribe(new Action1<String>() { @Override public void call(String label) {
+					actionBar.setTitle(label);
+				}});
 
 		sneer().profileFor(sneer().self()).selfie()
 				.observeOn(AndroidSchedulers.mainThread()).cast(byte[].class)
-				.subscribe(new Action1<byte[]>() {
-					@Override
-					public void call(byte[] selfie) {
-						actionBar.setIcon((Drawable) new BitmapDrawable(
-								getResources(), BitmapFactory.decodeByteArray(
-										selfie, 0, selfie.length)));
-					}
-				});
+				.subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
+					actionBar.setIcon((Drawable) new BitmapDrawable(
+							getResources(), BitmapFactory.decodeByteArray(
+									selfie, 0, selfie.length)));
+				}});
 
 		listView = (ListView) findViewById(R.id.listView);
 		adapter = new MainAdapter(this,
 				R.layout.list_item_main,
-				new Func1<Party, Observable<String>>() {
-					@Override
-					public Observable<String> call(Party party) {
-						return party.name();
-					}
-				}, new Func1<Party, Observable<byte[]>>() {
-					@Override
-					public Observable<byte[]> call(Party party) {
-						return sneer().profileFor(party).selfie();
-					}
-				});
+				new Func1<Party, Observable<String>>() { @Override public Observable<String> call(Party party) {
+					return party.name();
+				}});
 		listView.setAdapter(adapter);
 
 		registerForContextMenu(listView);
 
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id_ignored) {
-				Conversation conversation = adapter.getItem(position);
-				onContactClicked(conversation);
-			}
-		});
+		listView.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
+			Conversation conversation = adapter.getItem(position);
+			onContactClicked(conversation);
+		}});
 
 		sneer().conversationsContaining(embeddedOptions.type)
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<Collection<Conversation>>() {
-					@Override
-					public void call(Collection<Conversation> conversations) {
-						adapter.clear();
-						adapter.addAll(conversations);
-						adapter.notifyDataSetChanged();
-					}
-				});
+				.subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
+					adapter.clear();
+					adapter.addAll(conversations);
+					adapter.notifyDataSetChanged();
+				}});
 	}
 	
 
