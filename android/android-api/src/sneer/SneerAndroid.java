@@ -1,7 +1,9 @@
 package sneer;
 
 import rx.*;
-import sneer.commons.exceptions.*;
+import rx.Observable.OnSubscribe;
+import rx.functions.*;
+import rx.subjects.*;
 import sneer.tuples.*;
 import sneer.utils.*;
 import android.app.*;
@@ -51,6 +53,11 @@ public class SneerAndroid {
 		}
 	}
 	
+	private static final PrivateKey EMPTY_KEY = new PrivateKey() {  @Override public PublicKey publicKey() {
+		return null;
+	} };
+
+	
 	private Context context;
 
 	static Object unbundle(Bundle resultData) {
@@ -61,32 +68,48 @@ public class SneerAndroid {
 		this.context = context;
 	}
 	
-	public Session session(long id) {
-		
-		//These were the old args:
-		final PublicKey peerPuk = null; final String type = null;
+	static class SessionInfo {
+		long id;
+		PublicKey partyPuk;
+		String type;
+		long lastMessageSeen;
+		public SessionInfo(long id, PublicKey partyPuk, String type, long lastMessageSeen) {
+			this.partyPuk = partyPuk;
+			this.type = type;
+			this.lastMessageSeen = lastMessageSeen;
+		}
+	}
+	
+	public static Observable<String> partyLabel(TupleSpace tupleSpace, PublicKey partyPuk) {
+		return null;
+	};
 
-		if (null == null)
-			throw new NotImplementedYet();
-
+	public Session session(final long id) {
 		
-		PrivateKey thirdPartyAppShouldntNeedToKnowOwnPrivateKey = null; int letFixThis;
-		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(
-			thirdPartyAppShouldntNeedToKnowOwnPrivateKey
-		);
+		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(EMPTY_KEY);
+		
+		final ReplaySubject<SessionInfo> sessionInfo = ReplaySubject.create();
+		tupleSpace.filter()
+			.type("sneer/session")
+			.field("session", id)
+			.localTuples()
+			.last()
+			.map(new Func1<Tuple, SessionInfo>() {  @Override public SessionInfo call(Tuple t1) {
+				return new SessionInfo(id, (PublicKey)t1.get("partyPuk"), (String)t1.get("sessionType"), (Long)t1.get("lastMessageSeen"));
+			} })
+			.subscribe(sessionInfo);
+
 		
 		return new Session() {
 
 			@Override
-			public void sendMessage(Object content) {
-				tupleSpace.publisher()
-					.audience(partyPuk())
-					.type(type())
+			public void sendMessage(final Object content) {
+				sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(SessionInfo t1) {
+					tupleSpace.publisher()
+					.audience(t1.partyPuk)
+					.type(t1.type)
 					.pub(content);
-			}
-
-			private String type() {
-				return type;
+				} });
 			}
 
 			@Override
@@ -94,26 +117,44 @@ public class SneerAndroid {
 				// TODO
 			}
 			
-			private PublicKey partyPuk() {
-				return peerPuk;
-			}
-
 			@Override
 			public Observable<String> peerName() {
-				// TODO Auto-generated method stub
-				throw new NotImplementedYet();
+				return Observable.create(new OnSubscribe<String>() {  @Override public void call(final Subscriber<? super String> subscriber) {
+					sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(SessionInfo session) {
+						subscriber.add(partyLabel(tupleSpace, session.partyPuk).subscribe(subscriber));
+					}});
+				}});
 			}
-
+			
 			@Override
 			public Observable<Message> previousMessages() {
-				// TODO Auto-generated method stub
-				throw new NotImplementedYet();
+				return messages(new Func2<SneerAndroid.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
+					return msg.timestampReceived() <= session.lastMessageSeen;
+				} });
 			}
-
+			
 			@Override
 			public Observable<Message> newMessages() {
-				// TODO Auto-generated method stub
-				throw new NotImplementedYet();
+				return messages(new Func2<SneerAndroid.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
+					return msg.timestampReceived() > session.lastMessageSeen;
+				} });
+			}
+
+			private Observable<Message> messages(final Func2<SessionInfo, Message, Boolean> predicate) {
+				return Observable.create(new OnSubscribe<Message>() {  @Override public void call(final Subscriber<? super Message> subscriber) {
+					sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(final SessionInfo session) {
+						subscriber.add(tupleSpace.filter()
+							.type(session.type)
+							.field("session", session.id)
+							.tuples()
+							.map(Tuple.TO_PAYLOAD)
+							.cast(Message.class)
+							.filter(new Func1<Message, Boolean>() {  @Override public Boolean call(Message msg) {
+								return predicate.call(session, msg);
+							}})
+							.subscribe(subscriber));
+					}});
+				}});
 			}
 			
 		};
