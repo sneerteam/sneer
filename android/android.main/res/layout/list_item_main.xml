@@ -52,21 +52,30 @@
         android:textSize="15sp" >
     </TextView>
 
-    <TextView
-        android:id="@+id/conversationUnread"
+    <TableRow
+        android:id="@+id/rowName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/conversationSummary"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/conversationDate"
-        android:lines="1"
-        android:paddingRight="5dp"
-        android:paddingTop="5dp"
-        android:text="@string/string_dummy_conversation_unread_messages"
-        android:textAppearance="@android:style/TextAppearance.Large"
-        android:textColor="#00bb00"
-        android:textSize="15sp"
-        android:textStyle="bold" >
-    </TextView>
+        android:layout_margin="5dp"
+        android:background="#a43234"
+        android:paddingBottom="3dip"
+        android:paddingLeft="6dip"
+        android:paddingRight="6dip"
+        android:paddingTop="3dip" >
+
+        <TextView
+            android:id="@+id/conversationUnread"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:lines="1"
+            android:text="@string/string_dummy_conversation_unread_messages"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:textColor="#ffffff"
+            android:textStyle="bold" >
+        </TextView>
+    </TableRow>
 
 </RelativeLayout>
