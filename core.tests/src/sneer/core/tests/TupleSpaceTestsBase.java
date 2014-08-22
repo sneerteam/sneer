@@ -21,7 +21,7 @@ public class TupleSpaceTestsBase extends TestWithNetwork {
 	}
 
 	protected TupleSpace newTupleSpace(PrivateKey ownPrik, Observable<PublicKey> followees) {
-		return Glue.newTupleSpace(ownPrik.publicKey(), newTupleBase(), network, followees);
+		return Glue.newTupleSpace(ownPrik.publicKey(), newTupleBase(), Glue.connect(network, ownPrik.publicKey()), followees);
 	}
 
 	protected Object newTupleBase() {
