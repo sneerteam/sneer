@@ -68,7 +68,7 @@ public class ContactActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ContactActivity.this, party);
+			Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
 			break;
 		}
 		return true;
@@ -116,12 +116,20 @@ public class ContactActivity extends Activity {
 	private void loadProfile() {
 		nicknameEdit.setText(contact.nickname().current());
 		
-		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) { 
-			fullNameView.setText(name);
+		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String ownName) { 
+			fullNameView.setText(ownName);
+			
 		}});
 
+		//Is preferrednickname is the same as the ownname or the same as the nickname, don't show the preferrednickname field.
+//		rx.Observable.zip(profile.ownName(), profile.preferredNickname(), new Func2<String, String, Boolean>() { @Override public Boolean call(String ownName, String preferredNickname) {
+//				if(ownName.equalsIgnoreCase(preferredNickname))System.out.println();
+//					//preferredNickNameView.;
+//				return isOwn;
+//			}});
+		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
-			preferredNickNameView.setText("(" + preferredNickname+ ")");
+			preferredNickNameView.setText("(" + preferredNickname+ ")");			
 		}});
 
 		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
