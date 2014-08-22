@@ -1,6 +1,6 @@
 echo "-------------------> Resetting workspace and pulling changes"
 
-md5_before_pull=`md5sum $0`
+hash_before_pull=`git hash-object $0`
 
 #Delete all untracked files and directories (-d), even ignored ones (-x).
 git clean -x -d --force --quiet
@@ -10,9 +10,9 @@ git reset --hard
 
 git pull --rebase
 
-md5_after_pull=`md5sum $0`
+hash_after_pull=`git hash-object $0`
 
-if [ "$md5_before_pull" != "$md5_after_pull" ] then
+if [ "$hash_before_pull" != "$hash_after_pull" ] then
 	echo "-------------------> This script changed, rerunning it"
 	trap "$0" 0
 	exit 0
