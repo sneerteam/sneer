@@ -7,21 +7,37 @@
             [rx.lang.clojure.interop :as rx-interop])
   (:import [java.sql DriverManager]))
 
-(defn create-table! [db]
-  (let [tuple-ddl
-        (sql/create-table-ddl
-          :tuple
-          [:id :integer "PRIMARY KEY AUTOINCREMENT"]
-          [:type :varchar "NOT NULL"]
-          [:payload :varchar]
-          [:timestamp :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]
-          [:author :blob "NOT NULL"]
-          [:audience :blob]
-          ;[:device :blob "NOT NULL"]
-          ;[:sequence :integer "NOT NULL"]
-          ;[:signature :blob "NOT NULL"]
-          [:custom :blob])]
-    (sql/execute! db [tuple-ddl])))
+(defprotocol Database
+  (db-create-table [this table columns])
+  (db-insert [this table row])
+  (db-query [this sql-and-params]))
+
+(defn create-sqlite-db [db]
+  (reify Database
+    (db-create-table [this table columns]
+      (let [tuple-ddl (apply sql/create-table-ddl table columns)]
+        (sql/execute! db [tuple-ddl])))
+    
+    (db-insert [this table row]
+      (sql/insert! db table row))
+    
+    (db-query [this sql-and-params]
+      (sql/query db sql-and-params :result-set-fn doall :as-arrays? true))))
+
+(defn create-tuple-table [db]
+  (db-create-table
+    db :tuple
+    [
+     [:id :integer "PRIMARY KEY AUTOINCREMENT"]
+     [:type :varchar "NOT NULL"]
+     [:payload :varchar]
+     [:timestamp :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]
+     [:author :blob "NOT NULL"]
+     [:audience :blob]
+     ;[:device :blob "NOT NULL"]
+     ;[:sequence :integer "NOT NULL"]
+     ;[:signature :blob "NOT NULL"]
+     [:custom :varchar]]))
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
 
@@ -64,7 +80,7 @@
     tuple))
 
 (defn query-all [db]
-  (sql/query db ["SELECT * FROM tuple"] :as-arrays? true))
+  (db-query db ["SELECT * FROM tuple"]))
 
 (defn dump-tuples [db]
   (->> (query-all db) (map println) doall))
@@ -73,7 +89,7 @@
   (rx.Observable/from iterable))
 
 (defn query-tuples-from-db [db criteria]
-  (let [rs (sql/query db ["SELECT * FROM tuple"] :result-set-fn doall :as-arrays? true)
+  (let [rs (db-query db ["SELECT * FROM tuple"])
         field-names (mapv name (first rs))]
     (->>
       (next rs)
@@ -83,7 +99,7 @@
 (defn insert-tuple [db tuple]
   (let [custom (->custom-field-map tuple)
         row (select-keys tuple builtin-field?)]
-    (sql/insert! db :tuple (serialize-entries (assoc row "custom" custom)))))
+    (db-insert db :tuple (serialize-entries (assoc row "custom" custom)))))
 
 (defmacro rx-defer [& body]
   `(rx.Observable/defer
@@ -110,6 +126,6 @@
 
 (defn create []
   (let [connection (DriverManager/getConnection "jdbc:sqlite::memory:")
-        db {:connection connection}]
-    (create-table! db)
+        db (create-sqlite-db {:connection connection})]
+    (create-tuple-table db)
     (reify-tuple-base db)))
