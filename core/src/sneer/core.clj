@@ -96,13 +96,13 @@ new tuples as they are stored otherwise it will complete." ))
              (reify-tuple proto-tuple)))))))
 
 (defn new-tuple-filter
-  ([tuple-source subs-out] (new-tuple-filter tuple-source subs-out {}))
-  ([tuple-source subs-out criteria]
+  ([tuple-base subs-out] (new-tuple-filter tuple-base subs-out {}))
+  ([tuple-base subs-out criteria]
     (letfn
         [(with [field value]
-           (new-tuple-filter tuple-source subs-out (assoc criteria field value)))
-         (query-tuple-source [keep-alive]
-           (rx/map reify-tuple (query-tuples tuple-source criteria keep-alive)))]
+           (new-tuple-filter tuple-base subs-out (assoc criteria field value)))
+         (query-tuple-base [keep-alive]
+           (rx/map reify-tuple (query-tuples tuple-base criteria keep-alive)))]
         
         (reify+ TupleFilter
           (with-field type)
@@ -110,12 +110,12 @@ new tuples as they are stored otherwise it will complete." ))
           (audience [this prik] (with "audience" (.publicKey prik)))
           (field [this field value] (with field value))
           (localTuples [this]
-            (query-tuple-source false))
+            (query-tuple-base false))
           (tuples [this]
             (rx/observable*
               (fn [subscriber]
                 (rx/on-next subs-out criteria)
-                (let [tuples (query-tuple-source true)]
+                (let [tuples (query-tuple-base true)]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
 
