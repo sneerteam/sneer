@@ -96,7 +96,7 @@
 
       (store-tuple [this tuple]
         (insert-tuple db tuple)
-        (dump-tuples db)
+        ;(dump-tuples db)
         (rx/on-next new-tuples tuple))
 
       (query-tuples [this criteria keep-alive]
@@ -105,7 +105,7 @@
           (rx-defer
             (let [existing (seq->observable (query-tuples-from-db db criteria))]
               (if keep-alive
-                (rx/concat existing (rx/do #(println "[NEW]" %) new-tuples))
+                (rx/concat existing new-tuples)
                 existing))))))))
 
 (defn create []

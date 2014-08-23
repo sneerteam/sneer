@@ -156,8 +156,6 @@ new tuples as they are stored otherwise it will complete." ))
                     (rx/subscribe
                       (->>
                         (query-tuples tuple-base criteria true)
-                        (rx/do #(println criteria "->>" %))
-                        (rx/do #(println "(= sender audience) ->" (= sender (get % "audience"))))
                         ; TODO: extend query-tuples to support the condition below
                         (rx/filter #(let [audience (get % "audience")]
                                       (or (nil? audience) (= sender audience))))
