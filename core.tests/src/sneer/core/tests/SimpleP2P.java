@@ -163,6 +163,27 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	}
 	
 	@Test
+	public void localTupleQueriesAreDeferredUntilSubscribe() {
+		
+		TuplePublisher publisher = tuplesA.publisher().type("local");			
+		publisher.pub("before");
+		
+		Observable<Object> localPayloads = tuplesA.filter()
+				.type("local")
+				.localTuples()
+				.map(Tuple.TO_PAYLOAD);
+		
+		publisher.pub("after");
+		
+		expecting(
+			notifications(
+				localPayloads,
+				Notification.createOnNext("before"),
+				Notification.createOnNext("after"),
+				Notification.createOnCompleted()));
+	}
+	
+	@Test
 	public void subscriberCriteriaWithArray() {
 		final Object[] array = {"notes", userB.publicKey()};
 		
