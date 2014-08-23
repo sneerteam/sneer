@@ -61,6 +61,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			.pub("end");
 		
 		expecting(
+			payloads(tuplesA.filter().tuples(), "end"),
 			payloads(tuplesB.filter().tuples(), "end"),
 			payloads(tuplesC.filter().tuples(), "paper", "end"));
 	}

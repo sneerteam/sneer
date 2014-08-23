@@ -41,9 +41,9 @@ public abstract class SessionActivity extends SneerActivity {
 
 	private void onMessage(Message message) {
 		if (message.isOwn())
-			messageReceived(message.content());
-		else
 			messageSent(message.content());
+		else
+			messageReceived(message.content());
 	}
 
 
