@@ -59,6 +59,7 @@ public class SneerAndroid {
 
 	
 	private Context context;
+	private TupleSpace tupleSpace;
 
 	static Object unbundle(Bundle resultData) {
 		return resultData.get("value");
@@ -83,13 +84,19 @@ public class SneerAndroid {
 	public static Observable<String> partyLabel(TupleSpace tupleSpace, PublicKey partyPuk) {
 		return null;
 	};
+	
+	public TupleSpace tupleSpace() {
+		if (tupleSpace == null) {
+			tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(EMPTY_KEY);
+		}
+		return tupleSpace;
+	}
 
 	public Session session(final long id) {
 		
-		final TupleSpace tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(EMPTY_KEY);
-		
 		final ReplaySubject<SessionInfo> sessionInfo = ReplaySubject.create();
-		tupleSpace.filter()
+		
+		tupleSpace().filter()
 			.type("sneer/session")
 			.field("session", id)
 			.localTuples()
@@ -105,7 +112,7 @@ public class SneerAndroid {
 			@Override
 			public void sendMessage(final Object content) {
 				sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(SessionInfo t1) {
-					tupleSpace.publisher()
+					tupleSpace().publisher()
 					.audience(t1.partyPuk)
 					.type(t1.type)
 					.pub(content);
@@ -121,7 +128,7 @@ public class SneerAndroid {
 			public Observable<String> peerName() {
 				return Observable.create(new OnSubscribe<String>() {  @Override public void call(final Subscriber<? super String> subscriber) {
 					sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(SessionInfo session) {
-						subscriber.add(partyLabel(tupleSpace, session.partyPuk).subscribe(subscriber));
+						subscriber.add(partyLabel(tupleSpace(), session.partyPuk).subscribe(subscriber));
 					}});
 				}});
 			}
@@ -143,7 +150,7 @@ public class SneerAndroid {
 			private Observable<Message> messages(final Func2<SessionInfo, Message, Boolean> predicate) {
 				return Observable.create(new OnSubscribe<Message>() {  @Override public void call(final Subscriber<? super Message> subscriber) {
 					sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(final SessionInfo session) {
-						subscriber.add(tupleSpace.filter()
+						subscriber.add(tupleSpace().filter()
 							.type(session.type)
 							.field("session", session.id)
 							.tuples()
