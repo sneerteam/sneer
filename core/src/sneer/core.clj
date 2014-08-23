@@ -1,6 +1,7 @@
 (ns sneer.core
   (:require
-   [rx.lang.clojure.core :as rx])
+   [rx.lang.clojure.core :as rx]
+   [sneer.rx :refer [filter-by]])
   (:import
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
@@ -27,12 +28,6 @@ puk." ))
     "Filters tuples by the criteria represented as a map of
 field/value. When keep-alive is true the observable will keep emitting
 new tuples as they are stored otherwise it will complete." ))
-
-(defn filter-by [criteria tuples]
-  (reduce
-    (fn [tuples [f v]] (rx/filter #(= (get % f) v) tuples))
-    tuples
-    criteria))
 
 (extend-protocol TupleBase
   rx.subjects.Subject

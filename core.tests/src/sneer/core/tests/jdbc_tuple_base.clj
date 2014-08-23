@@ -1,5 +1,6 @@
 (ns sneer.core.tests.jdbc-tuple-base
   (:require [sneer.core :as core]
+            [sneer.rx :refer [filter-by]]
             [clojure.java.jdbc :as sql]
             [rx.lang.clojure.core :as rx]
             [rx.lang.clojure.interop :as rx-interop])
@@ -90,11 +91,13 @@
           (dump-tuples db)))
 
       (query-tuples [this criteria keep-alive]
-        (rx-defer
-          (let [existing (seq->observable (query-tuples-from-db db criteria))]
-            (if keep-alive
-              (rx/concat existing (rx/do #(println "[NEW]" %) new-tuples))
-              existing)))))))
+        (filter-by
+          criteria
+          (rx-defer
+            (let [existing (seq->observable (query-tuples-from-db db criteria))]
+              (if keep-alive
+                (rx/concat existing (rx/do #(println "[NEW]" %) new-tuples))
+                existing))))))))
 
 (defn create []
   (let [connection (DriverManager/getConnection "jdbc:sqlite::memory:")

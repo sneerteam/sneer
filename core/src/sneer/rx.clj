@@ -21,4 +21,14 @@
       (onError [error] (.onError observer error))
       (onCompleted [] (.onCompleted observer)))))
 
+(defn filter-by [criteria observable]
+  "Filters an `observable' of maps by `criteria' represented as a map.
+Only maps containing all key/value pairs in criteria are kept."
+  (let [ks (keys criteria)]
+    (if ks
+      (rx/filter #(= criteria (select-keys % ks)) observable)
+      observable)))
+
+
+
 
