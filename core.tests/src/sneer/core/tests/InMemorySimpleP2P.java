@@ -20,7 +20,7 @@ public class InMemorySimpleP2P extends SimpleP2P {
 	}
 
 	protected Object newTupleBase() {
-		return world();
+		throw new IllegalStateException();
 	}	
 
 
