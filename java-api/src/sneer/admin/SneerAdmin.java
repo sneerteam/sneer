@@ -5,7 +5,7 @@ import sneer.*;
 /** This interface will evolve to handle things like multiple devices, public key change and old key repudiation. */
 public interface SneerAdmin {
 
-//	PrivateKey privateKey();
+	PrivateKey privateKey();
 	
 	Sneer sneer();
 

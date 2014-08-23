@@ -100,8 +100,8 @@ public class ConversationSimulator implements Conversation {
 
 	@Override
 	public Observable<List<ConversationMenuItem>> menu() {
-		return menuItems.observed().observable();
-//		return menu;
+//		return menuItems.observed().observable();
+		return menu;
 	}
 	
 	

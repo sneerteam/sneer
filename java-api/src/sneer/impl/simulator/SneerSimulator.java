@@ -31,8 +31,7 @@ public class SneerSimulator implements Sneer {
 		return c1.nickname().current().compareToIgnoreCase(c2.nickname().current());
 	}};
 	
-	public SneerSimulator() {
-		PrivateKey prik = Keys.createPrivateKey("Neide");
+	public SneerSimulator(PrivateKey prik) {
 		
 		self = new PartySimulator("Neide da Silva", prik.publicKey());
 		self.setSelfie(selfieFromFileSystem("neide.png"));
@@ -184,6 +183,12 @@ public class SneerSimulator implements Sneer {
 	@Override
 	public Observable<String> nameFor(Party party) {
 		throw new UnsupportedOperationException("deprecated, use party.name()");
+	}
+
+
+	@Override
+	public void setConversationMenuItems(List<ConversationMenuItem> menuItems) {
+		ConversationSimulator.menu.onNext(menuItems);
 	}
 
 }

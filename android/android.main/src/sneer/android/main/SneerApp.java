@@ -1,11 +1,15 @@
 package sneer.android.main;
 
+import static sneer.android.main.SneerApp.*;
+
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import rx.Observable;
 import rx.functions.*;
 import sneer.*;
+import sneer.SneerAndroid.*;
 import sneer.admin.*;
 import sneer.admin.impl.*;
 import sneer.commons.exceptions.*;
@@ -36,14 +40,14 @@ public class SneerApp extends Application {
 	@Override
 	public void onCreate() {
 
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-
-		if (settings.getInt("apps_searcher_version", 0) < APPS_SEARCHER_VERSION) {
-			SneerAppInfo.checkPackages(getApplicationContext());
-		    settings.edit()
-		    	.putInt("apps_searcher_version", APPS_SEARCHER_VERSION)
-		    	.commit(); 
-		}
+//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+//
+//		if (settings.getInt("apps_searcher_version", 0) < APPS_SEARCHER_VERSION) {
+			SneerAppInfo.initialDiscovery(getApplicationContext());
+//		    settings.edit()
+//		    	.putInt("apps_searcher_version", APPS_SEARCHER_VERSION)
+//		    	.commit(); 
+//		}
 		
 		try {
 			initialize();
@@ -52,6 +56,7 @@ public class SneerApp extends Application {
 		}
 		
 		sneer().tupleSpace().filter()
+			.audience(admin().privateKey())
 			.type("sneer/apps")
 			.tuples()
 			.map(Tuple.TO_PAYLOAD)
@@ -70,8 +75,7 @@ public class SneerApp extends Application {
 							
 							@Override
 							public void call() {
-								// TODO Auto-generated method stub
-								
+								createSession(t1);
 							}
 							
 							@Override
@@ -88,10 +92,34 @@ public class SneerApp extends Application {
 					} })
 					.toList();
 			} })
-			.subscribe(ConversationSimulator.menu);
+			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
+				sneer().setConversationMenuItems(menuItems);
+			} });
 		
 		super.onCreate();
 	}
+	
+	private AtomicLong nextSessionId = new AtomicLong(0);
+	
+	private void createSession(SneerAppInfo app) {
+		
+		long sessionId = nextSessionId.getAndIncrement();
+		
+		sneer().tupleSpace().publisher()
+			.type("sneer/session")
+			.field("session", sessionId)
+			.field("partyPuk", null)
+			.field("sessionType", app.type)
+			.field("lastMessageSeen", 0)
+			.pub();
+
+		Intent intent = new Intent();
+		intent.setClassName(app.packageName, app.activityName);
+		intent.putExtra(SneerAndroid.SESSION_ID, sessionId);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+
 	
 	public static Sneer sneer() {
 		return admin().sneer();

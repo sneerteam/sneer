@@ -4,6 +4,7 @@ import static sneer.android.main.SneerApp.*;
 
 import java.util.*;
 
+import rx.*;
 import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
@@ -24,6 +25,7 @@ import android.view.*;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnClickListener;
 import android.widget.*;
+import android.widget.PopupMenu.OnDismissListener;
 
 public class ConversationActivity extends Activity {
 
@@ -134,16 +136,22 @@ public class ConversationActivity extends Activity {
 
 		private void openIteractionMenu() {
 			final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
+			
 	
-			sneer().produceConversationWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
-				for (final ConversationMenuItem item : menuItems)
+			final Subscription s = sneer().produceConversationWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
+				menu.getMenu().close();
+				menu.getMenu().clear();
+				for (final ConversationMenuItem item : menuItems) {
 					menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
-						item.call();
 						Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
+						item.call();
 						return true;
 					}});
-				
+				}
 				menu.show();
+			} });
+			menu.setOnDismissListener(new OnDismissListener() {  @Override public void onDismiss(PopupMenu menu) {
+				s.unsubscribe();
 			} });
 		}});		
 	}

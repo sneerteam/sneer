@@ -158,6 +158,12 @@ public class SneerAdminImpl implements SneerAdmin {
 			return null;
 		}
 
+		@Override
+		public void setConversationMenuItems(List<ConversationMenuItem> menuItems) {
+			// TODO Auto-generated method stub
+			
+		}
+
 	}
 
 	class ObservedImpl<T> implements Observed<T> {
@@ -318,6 +324,11 @@ public class SneerAdminImpl implements SneerAdmin {
 	@Override
 	public SneerImpl sneer() {
 		return sneer;
+	}
+
+	@Override
+	public PrivateKey privateKey() {
+		return prik;
 	}
 
 }

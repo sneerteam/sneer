@@ -33,7 +33,7 @@ public class SneerAndroidService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 		
-		if (!intent.hasExtra("op")) {
+		if (intent == null || !intent.hasExtra("op")) {
 			return START_STICKY;
 		}
 		
