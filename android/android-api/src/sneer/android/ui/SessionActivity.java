@@ -19,9 +19,14 @@ public abstract class SessionActivity extends SneerActivity {
 			(Long)getExtra(SESSION_ID)
 		);
 		
-		session.previousMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() { public void call(Message message) {
-			onMessage(message);
-		};});
+		session.previousMessages().observeOn(AndroidSchedulers.mainThread())
+			.doOnCompleted(new Action0() {  @Override public void call() {
+				afterNewMessage();
+			} })
+			.subscribe(new Action1<Message>() { public void call(Message message) {
+				onMessage(message);
+			};});
+		
 		session.newMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() { public void call(Message message) {
 			onMessage(message);
 			afterNewMessage();
