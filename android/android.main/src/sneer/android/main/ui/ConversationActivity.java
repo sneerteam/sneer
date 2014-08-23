@@ -31,7 +31,7 @@ public class ConversationActivity extends Activity {
 	static final String ACTIVITY_TITLE = "activityTitle";
 
 	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
-		return Comparators.compare(lhs.timestampSent(), rhs.timestampSent());
+		return Comparators.compare(lhs.timestampCreated(), rhs.timestampCreated());
 	}};
 
 	private final List<Message> messages = new ArrayList<Message>();
@@ -141,7 +141,8 @@ public class ConversationActivity extends Activity {
 				menu.getMenu().clear();
 				for (final ConversationMenuItem item : menuItems) {
 					menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
-						Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
+//						Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
+						menu.getMenu().close();
 						item.call(party.publicKey().current());
 						return true;
 					}});

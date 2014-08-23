@@ -46,7 +46,7 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
         	false);
         
         findTextView(ret, R.id.messageContent).setText(message.content().toString());
-        findTextView(ret, R.id.messageTime).setText(message.timeSent());
+        findTextView(ret, R.id.messageTime).setText(message.timeCreated());
     
         if (!message.isOwn()) {
         	party.name().subscribe(new Action1<String>() { @Override public void call(String sender) { 

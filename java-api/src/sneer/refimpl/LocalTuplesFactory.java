@@ -1,15 +1,9 @@
 package sneer.refimpl;
 
 import java.util.*;
-import java.util.concurrent.*;
 
-import rx.*;
-import rx.Observable.OnSubscribe;
 import rx.Observable;
-import rx.functions.*;
-import rx.schedulers.*;
 import sneer.*;
-import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 
 public abstract class LocalTuplesFactory {
@@ -50,6 +44,16 @@ public abstract class LocalTuplesFactory {
 		@Override
 		public String toString() {
 			return "TupleImpl ["+super.toString()+"]";
+		}
+
+		@Override
+		public long timestampCreated() {
+			return (Long) get("timestampCreated");
+		}
+
+		@Override
+		public long timestampReceived() {
+			return (Long) get("timestampReceived");
 		}
 	}
 	
@@ -151,6 +155,9 @@ public abstract class LocalTuplesFactory {
 			public Observable<Tuple> pub() {
 				TupleImpl ret = prototype.clone();
 				ret.put("author", identity.publicKey());
+				long now = System.currentTimeMillis();
+				ret.put("timestampCreated", now);
+				ret.put("timestampReceived", now);
 				publishTuple(ret);
 				return Observable.just((Tuple)ret);
 			}

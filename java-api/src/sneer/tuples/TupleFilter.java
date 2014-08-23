@@ -11,7 +11,6 @@ public interface TupleFilter {
 	TupleFilter audience(PrivateKey audience);
 	TupleFilter audienceMe();
 	TupleFilter type(String type);
-//	TupleFilter payload(Object payload);
 	TupleFilter field(String field, Object value);
 	TupleFilter putFields(Map<String, Object> fields);
 

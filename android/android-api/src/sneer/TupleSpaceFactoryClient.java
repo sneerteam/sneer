@@ -12,6 +12,7 @@ import sneer.refimpl.*;
 import sneer.tuples.*;
 import android.content.*;
 import android.os.*;
+import android.util.*;
 
 public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 	
@@ -63,13 +64,18 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 			intent.putExtra("resultReceiver", new ResultReceiver(null) {  @SuppressWarnings("unchecked") @Override protected void onReceiveResult(int resultCode, Bundle resultData) {
 				switch (TupleSpaceFactoryClient.SubscriptionOp.values()[resultCode]) {
 				case ON_COMPLETED:
+					log("tupleSpace: completed");
 					subscriber.onCompleted();
 					break;
-				case ON_NEXT:
-					subscriber.onNext(newTupleFromMap((Map<String, Object>) serializer.deserialize((byte[]) SneerAndroid.unbundle(resultData))));
+				case ON_NEXT: {
+					Tuple tuple = newTupleFromMap((Map<String, Object>) serializer.deserialize((byte[]) SneerAndroid.unbundle(resultData)));
+					log("tupleSpace: tuple: " + tuple);
+					subscriber.onNext(tuple);
 					break;
+				}
 				case SUBSCRIPTION_ID: {
 					final int subscriptionId = (Integer) SneerAndroid.unbundle(resultData);
+					log("tupleSpace: subscriptionId: " + subscriptionId);
 					subscriber.add(Subscriptions.create(new Action0() { @Override public void call() {
 						Intent intent = new Intent(SneerAndroid.SNEER_SERVICE);
 						intent.putExtra("op", TupleSpaceFactoryClient.TupleSpaceOp.UNSUBSCRIBE.ordinal());
@@ -84,6 +90,10 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 			}});
 			context.startService(intent);
 		}}).observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread());
+	}
+
+	private void log(String message) {
+		Log.i(TuplesFactoryInProcess.class.getSimpleName(), message);
 	}
 
 }

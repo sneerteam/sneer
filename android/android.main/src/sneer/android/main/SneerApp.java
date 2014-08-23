@@ -1,6 +1,6 @@
 package sneer.android.main;
 
-import static sneer.android.main.SneerApp.*;
+import static sneer.SneerAndroid.*;
 
 import java.io.*;
 import java.util.*;
@@ -9,17 +9,12 @@ import java.util.concurrent.atomic.*;
 import rx.Observable;
 import rx.functions.*;
 import sneer.*;
-import sneer.SneerAndroid.*;
 import sneer.admin.*;
 import sneer.admin.impl.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.simulator.*;
-import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
-import android.content.pm.*;
-import android.os.*;
-import android.util.*;
 
 public class SneerApp extends Application {
 	
@@ -33,21 +28,11 @@ public class SneerApp extends Application {
 
 	private static String error;
 	
-	private static final String PREFS_NAME = "SneerApp";
-
-	private static final int APPS_SEARCHER_VERSION = 2;
-	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void onCreate() {
 
-//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-//
-//		if (settings.getInt("apps_searcher_version", 0) < APPS_SEARCHER_VERSION) {
-			SneerAppInfo.initialDiscovery(getApplicationContext());
-//		    settings.edit()
-//		    	.putInt("apps_searcher_version", APPS_SEARCHER_VERSION)
-//		    	.commit(); 
-//		}
+		SneerAppInfo.initialDiscovery(getApplicationContext());
 		
 		try {
 			initialize();
@@ -57,12 +42,8 @@ public class SneerApp extends Application {
 		
 		SneerAppInfo.apps()
 			.flatMap(new Func1<List, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List t1) {
+				@SuppressWarnings("unchecked")
 				List<SneerAppInfo> apps = t1;
-				Log.i(SneerAppInfo.class.getSimpleName(), "Updating menu...");
-				for (SneerAppInfo info : apps) {
-					Log.i(SneerAppInfo.class.getSimpleName(), "-------------> " + info.label + " ("+info.type+")");
-				}
-				Log.i(SneerAppInfo.class.getSimpleName(), "Done.");
 
 				return Observable.from(apps)
 					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo t1) {
@@ -96,21 +77,23 @@ public class SneerApp extends Application {
 	
 	private AtomicLong nextSessionId = new AtomicLong(0);
 	
-	private void createSession(SneerAppInfo app, PublicKey partyPuk) {
+	private void createSession(SneerAppInfo app, PublicKey peer) {
 		
 		long sessionId = nextSessionId.getAndIncrement();
 		
 		sneer().tupleSpace().publisher()
+			.audience(sneer().self().publicKey().current())
 			.type("sneer/session")
 			.field("session", sessionId)
-			.field("partyPuk", partyPuk)
+			.field("partyPuk", peer)
 			.field("sessionType", app.type)
 			.field("lastMessageSeen", (long)0)
 			.pub();
 
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
-		intent.putExtra(SneerAndroid.SESSION_ID, sessionId);
+		intent.putExtra(SESSION_ID, sessionId);
+		intent.putExtra(OWN_PRIK, admin().privateKey());
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
 	}

@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
 		makeConversationList();
 		
 		
-		uiStress();
+//		uiStress();
 	}
 
 

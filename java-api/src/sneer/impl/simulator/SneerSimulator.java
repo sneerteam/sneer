@@ -30,9 +30,11 @@ public class SneerSimulator implements Sneer {
 	public static final Comparator<Contact> BY_NICKNAME = new Comparator<Contact>() { @Override public int compare(Contact c1, Contact c2) {
 		return c1.nickname().current().compareToIgnoreCase(c2.nickname().current());
 	}};
+	private PrivateKey prik;
 	
 	public SneerSimulator(PrivateKey prik) {
 		
+		this.prik = prik;
 		self = new PartySimulator("Neide da Silva", prik.publicKey());
 		self.setSelfie(selfieFromFileSystem("neide.png"));
 
@@ -47,10 +49,15 @@ public class SneerSimulator implements Sneer {
 
 	private void setupMockupRPSPlayer(TuplesFactoryInProcess cloud, PrivateKey playerPrik, final String move) {
 		final TupleSpace tupleSpace = cloud.newTupleSpace(playerPrik);
+		
 		tupleSpace.filter().type("rock-paper-scissors/move").audience(playerPrik).tuples()
-			.delay(2, TimeUnit.SECONDS)
+			.delay(1, TimeUnit.SECONDS)
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
-				tupleSpace.publisher().type("rock-paper-scissors/move").audience(t1.author()).pub(move);
+				tupleSpace.publisher()
+					.type("rock-paper-scissors/move")
+					.audience(t1.author())
+					.field("session", t1.get("session"))
+					.pub(move);
 			}});
 	}
 	
@@ -111,6 +118,12 @@ public class SneerSimulator implements Sneer {
 			produceConversationWith(party).sendMessage("Hey " + nickname + "!");
 			contacts.onNext(contactsSorted());
 		}
+		
+		tupleSpace.publisher()
+			.audience(prik.publicKey())
+			.type("sneer/contact")
+			.field("party", party.publicKey().current())
+			.pub(nickname);
 	}
 	
 

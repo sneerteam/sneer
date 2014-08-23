@@ -2,6 +2,7 @@ package sneer.android.main;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import rx.Observable;
 import rx.functions.*;
@@ -90,13 +91,9 @@ public class SneerAppInfo implements Serializable {
 			filterSneerApps(Observable.just(packageInfo))
 				.map(FROM_ACTIVITY)
 				.concatWith(currentKnownApps())
-				.distinct(new Func1<SneerAppInfo, String>() {  @Override public String call(SneerAppInfo t1) {
-					return t1.packageName + ":"+t1.activityName;
-				}})
-				.toList()
+				.buffer(100, TimeUnit.MILLISECONDS)
+				.first()
 				.subscribe(appsListPublisher());
-
-			// TODO: dispose sneer
 
 		} catch (NameNotFoundException e) {
 			throw new RuntimeException(e);
@@ -116,13 +113,11 @@ public class SneerAppInfo implements Serializable {
 			.filter(new Func1<SneerAppInfo, Boolean>() {  @Override public Boolean call(SneerAppInfo t1) {
 				return !t1.packageName.equals(packageName);
 			} })
-			.toList()
+			.buffer(100, TimeUnit.MILLISECONDS)
+			.first()
 			.subscribe(appsListPublisher());
 	}
 
-	private static Sneer sneer() {
-		return SneerApp.sneer();
-	}
 
 	private static Action1<List<SneerAppInfo>> appsListPublisher() {
 		return new Action1<List<SneerAppInfo>>() {  @Override public void call(List<SneerAppInfo> t1) {

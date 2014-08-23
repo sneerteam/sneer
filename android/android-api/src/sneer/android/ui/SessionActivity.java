@@ -16,12 +16,13 @@ public abstract class SessionActivity extends SneerActivity {
 		super.onCreate(savedInstanceState);
 
 		session = new SneerAndroid(this).session(
-			(Long)getExtra(SESSION_ID)
+			(Long)getExtra(SESSION_ID),
+			(PrivateKey)getExtra(OWN_PRIK)
 		);
 		
 		session.previousMessages().observeOn(AndroidSchedulers.mainThread())
 			.doOnCompleted(new Action0() {  @Override public void call() {
-				afterNewMessage();
+				react();
 			} })
 			.subscribe(new Action1<Message>() { public void call(Message message) {
 				onMessage(message);
@@ -29,7 +30,7 @@ public abstract class SessionActivity extends SneerActivity {
 		
 		session.newMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() { public void call(Message message) {
 			onMessage(message);
-			afterNewMessage();
+			react();
 		};});
 		
 		session.peerName().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { public void call(String name) {
@@ -71,7 +72,7 @@ public abstract class SessionActivity extends SneerActivity {
 	
 	
 	/** Called after messageSent() and messageReceived() for new messages, not for messages being replayed. */
-	protected abstract void afterNewMessage();
+	protected abstract void react();
 	
 	
 	private Object getExtra(String extra) {

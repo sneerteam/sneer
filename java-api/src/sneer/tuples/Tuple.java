@@ -21,5 +21,9 @@ public interface Tuple extends Map<String, Object> {
 	PublicKey audience();
 
 	PublicKey author();
+	
+	long timestampCreated();
+
+	long timestampReceived();
 
 }

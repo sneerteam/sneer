@@ -38,6 +38,7 @@ public class SneerAndroid {
 	static final String SNEER_SERVICE = "sneer.android.service.BACKEND";
 
 	public static final String SESSION_ID = "sessionId";
+	public static final String OWN_PRIK = "ownPrik";
 
 	
 	public static void startMain(Activity activity, String title, String type, String newConversationLabel, String newConversationAction) {
@@ -53,10 +54,13 @@ public class SneerAndroid {
 		}
 	}
 	
-	private static final PrivateKey EMPTY_KEY = new PrivateKey() {  @Override public PublicKey publicKey() {
-		return null;
-	} };
+	private static final PrivateKey EMPTY_KEY = new PrivateKey() {
+		private static final long serialVersionUID = 1L;
 
+		@Override public PublicKey publicKey() {
+			return null;
+		}
+	};
 	
 	private Context context;
 	private TupleSpace tupleSpace;
@@ -81,8 +85,9 @@ public class SneerAndroid {
 		}
 	}
 	
-	public static Observable<String> partyName(TupleSpace tupleSpace, PublicKey partyPuk) {
+	public static Observable<String> partyName(TupleSpace tupleSpace, PublicKey partyPuk, PrivateKey ownPrik) {
 		return tupleSpace.filter()
+			.audience(ownPrik)
 			.type("sneer/contact")
 			.field("party", partyPuk)
 			.tuples()
@@ -97,11 +102,12 @@ public class SneerAndroid {
 		return tupleSpace;
 	}
 
-	public Session session(final long id) {
+	public Session session(final long id, final PrivateKey ownPrik) {
 		
 		final ReplaySubject<SessionInfo> sessionInfo = ReplaySubject.create();
 		
 		tupleSpace().filter()
+			.audience(ownPrik)
 			.type("sneer/session")
 			.field("session", id)
 			.localTuples()
@@ -120,6 +126,7 @@ public class SneerAndroid {
 					tupleSpace().publisher()
 						.audience(t1.partyPuk)
 						.type(t1.type)
+						.field("session", t1.id)
 						.pub(content);
 				} });
 			}
@@ -133,7 +140,7 @@ public class SneerAndroid {
 			public Observable<String> peerName() {
 				return Observable.create(new OnSubscribe<String>() {  @Override public void call(final Subscriber<? super String> subscriber) {
 					sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(SessionInfo session) {
-						subscriber.add(partyName(tupleSpace(), session.partyPuk).subscribe(subscriber));
+						subscriber.add(partyName(tupleSpace(), session.partyPuk, ownPrik).subscribe(subscriber));
 					}});
 				}});
 			}
@@ -155,21 +162,23 @@ public class SneerAndroid {
 					return t1.tuples();
 				} });
 			}
-
+			
 			private Observable<Message> messages(final Func2<SessionInfo, Message, Boolean> predicate, final Func1<TupleFilter, Observable<Tuple>> tuples) {
 				return Observable.create(new OnSubscribe<Message>() {  @Override public void call(final Subscriber<? super Message> subscriber) {
 					sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(final SessionInfo session) {
-						subscriber.add(
-							tuples.call(
-								tupleSpace().filter()
+						
+						Subscription subscription = 
+							tuples.call(tupleSpace()
+								.filter()
 								.type(session.type)
 								.field("session", session.id))
-							.map(Tuple.TO_PAYLOAD)
-							.cast(Message.class)
+							.map(Message.fromTuple(ownPrik.publicKey()))
 							.filter(new Func1<Message, Boolean>() {  @Override public Boolean call(Message msg) {
 								return predicate.call(session, msg);
 							}})
-							.subscribe(subscriber));
+						.subscribe(subscriber);
+						
+						subscriber.add(subscription);
 					}});
 				}});
 			}
