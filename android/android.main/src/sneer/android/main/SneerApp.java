@@ -3,6 +3,8 @@ package sneer.android.main;
 import java.io.*;
 import java.util.*;
 
+import rx.Observable;
+import rx.functions.*;
 import sneer.*;
 import sneer.admin.*;
 import sneer.admin.impl.*;
@@ -29,7 +31,7 @@ public class SneerApp extends Application {
 	
 	private static final String PREFS_NAME = "SneerApp";
 
-	private static final int APPS_SEARCHER_VERSION = 1;
+	private static final int APPS_SEARCHER_VERSION = 2;
 	
 	@Override
 	public void onCreate() {
@@ -48,6 +50,40 @@ public class SneerApp extends Application {
 		} catch (FriendlyException e) {
 			error = e.getMessage();
 		}
+		
+		sneer().tupleSpace().filter()
+			.type("sneer/apps")
+			.tuples()
+			.map(Tuple.TO_PAYLOAD)
+			.cast(List.class)
+			.flatMap(new Func1<List, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List t1) {
+				List<SneerAppInfo> apps = t1;
+				return Observable.from(apps)
+					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo t1) {
+						return new ConversationMenuItem() {
+							
+							@Override
+							public void call() {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							@Override
+							public byte[] icon() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+							
+							@Override
+							public String caption() {
+								return t1.label;
+							}
+						};
+					} })
+					.toList();
+			} })
+			.subscribe(ConversationSimulator.menu);
+		
 		super.onCreate();
 	}
 	
