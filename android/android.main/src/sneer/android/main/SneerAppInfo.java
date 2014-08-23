@@ -3,8 +3,10 @@ package sneer.android.main;
 import java.io.*;
 import java.util.*;
 
+import rx.*;
 import rx.Observable;
 import rx.functions.*;
+import rx.observers.*;
 import sneer.*;
 import sneer.tuples.*;
 import android.content.*;
@@ -39,6 +41,11 @@ public class SneerAppInfo implements Serializable {
 		this.icon = icon;
 	}
 
+	@Override
+	public String toString() {
+		return "SneerAppInfo [" + label + ", " + type + "]";
+	}
+
 	public static Func1<ActivityInfo, SneerAppInfo> FROM_ACTIVITY = new Func1<ActivityInfo, SneerAppInfo>() {  @Override public SneerAppInfo call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
 		return new SneerAppInfo(
@@ -67,39 +74,39 @@ public class SneerAppInfo implements Serializable {
 		
 		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
 		
-		SneerAndroid sneer = new SneerAndroid(context);
+		final SneerAndroid sneer = new SneerAndroid(context);
 		
 		filterSneerApps(Observable.from(packages))
 			.map(FROM_ACTIVITY)
 			.toList()
-			.subscribe(sneer
+			.subscribe(new Action1<List<SneerAppInfo>>() {  @Override public void call(List<SneerAppInfo> t1) {
+				sneer
 					.tupleSpace()
 					.publisher()
-					.type("sneer/apps"));
+					.type("sneer/apps")
+					.pub(t1);
+			} });
 		
 		// TODO: dispose sneer
 		
 		Log.i(SneerAppInfo.class.getSimpleName(), "Done.");
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void packageAdded(Context context, String packageName) {
 		try {
+			log("Package added: " + packageName);
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PACKAGE_INFO_FLAGS);
 			
-			SneerAndroid sneer = new SneerAndroid(context);
-
+			final SneerAndroid sneer = new SneerAndroid(context);
+			
 			filterSneerApps(Observable.just(packageInfo))
 				.map(FROM_ACTIVITY)
-				.concatWith(Observable.from((List<SneerAppInfo>)sneer.tupleSpace().filter().type("sneer/apps").tuples().map(Tuple.TO_PAYLOAD)))
+				.concatWith(currentKnownApps(sneer))
 				.distinct(new Func1<SneerAppInfo, String>() {  @Override public String call(SneerAppInfo t1) {
 					return t1.packageName + ":"+t1.activityName;
 				}})
 				.toList()
-				.subscribe(sneer
-					.tupleSpace()
-					.publisher()
-					.type("sneer/apps"));
+				.subscribe(appsListPublisher(sneer));
 
 			// TODO: dispose sneer
 
@@ -109,25 +116,47 @@ public class SneerAppInfo implements Serializable {
 		
 	}
 
-	@SuppressWarnings("rawtypes")
+	private static void log(String message) {
+		Log.i(SneerAppInfo.class.getSimpleName(), message);
+	}
+
 	public static void packageRemoved(Context context, final String packageName) {
 			
-		SneerAndroid sneer = new SneerAndroid(context);
-		sneer.tupleSpace().filter().type("sneer/apps").tuples()
-			.map(Tuple.TO_PAYLOAD)
-			.cast(List.class)
-			.flatMap(new Func1<List, Observable<SneerAppInfo>>() {  @SuppressWarnings("unchecked") @Override public Observable<SneerAppInfo> call(List t1) {
-				return Observable.from((List<SneerAppInfo>)t1);
-			} })
+		log("Package removed: " + packageName);
+		
+		final SneerAndroid sneer = new SneerAndroid(context);
+		
+		currentKnownApps(sneer)
 			.filter(new Func1<SneerAppInfo, Boolean>() {  @Override public Boolean call(SneerAppInfo t1) {
+				log("---> " + t1.packageName + " - " + packageName + " - " + !t1.packageName.equals(packageName));
 				return !t1.packageName.equals(packageName);
 			} })
 			.toList()
-			.subscribe(sneer
-				.tupleSpace()
-				.publisher()
-				.type("sneer/apps"));
+			.subscribe(appsListPublisher(sneer));
 
 		// TODO: dispose sneer
+	}
+
+	private static Action1<List<SneerAppInfo>> appsListPublisher(final SneerAndroid sneer) {
+		return new Action1<List<SneerAppInfo>>() {  @Override public void call(List<SneerAppInfo> t1) {
+			log("Pushing new app list: " + t1);
+			sneer
+				.tupleSpace()
+				.publisher()
+				.type("sneer/apps")
+				.pub(t1);
+		} };
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static Observable<SneerAppInfo> currentKnownApps(SneerAndroid sneer) {
+		return sneer.tupleSpace().filter().type("sneer/apps").localTuples()
+			.map(Tuple.TO_PAYLOAD)
+			.cast(List.class)
+			.lastOrDefault(new ArrayList())
+			.flatMap(new Func1<List, Observable<SneerAppInfo>>() {  @SuppressWarnings("unchecked") @Override public Observable<SneerAppInfo> call(List t1) {
+				log("Current sneer apps: " + t1);
+				return Observable.from(t1);
+			} });
 	}
 }

@@ -58,6 +58,12 @@ public class SneerApp extends Application {
 			.cast(List.class)
 			.flatMap(new Func1<List, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List t1) {
 				List<SneerAppInfo> apps = t1;
+				Log.i(SneerAppInfo.class.getSimpleName(), "Updating menu...");
+				for (SneerAppInfo info : apps) {
+					Log.i(SneerAppInfo.class.getSimpleName(), "-------------> " + info.label + " ("+info.type+")");
+				}
+				Log.i(SneerAppInfo.class.getSimpleName(), "Done.");
+
 				return Observable.from(apps)
 					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo t1) {
 						return new ConversationMenuItem() {
