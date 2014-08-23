@@ -37,12 +37,15 @@ public class SneerAndroidService extends Service {
 			return START_STICKY;
 		}
 		
-		switch((TupleSpaceFactoryClient.TupleSpaceOp)intent.getSerializableExtra("op")) {
+		switch(TupleSpaceFactoryClient.TupleSpaceOp.values()[intent.getIntExtra("op", -1)]) {
 		case PUBLISH:
 			publish((Map<String, Object>)serializer.deserialize(intent.getByteArrayExtra("tuple")));
 			break;
 		case SUBSCRIBE:
 			subscribe((Map<String, Object>)serializer.deserialize(intent.getByteArrayExtra("criteria")), (ResultReceiver)intent.getParcelableExtra("resultReceiver"));
+			break;
+		case SUBSCRIBE_LOCAL:
+			subscribeLocal((Map<String, Object>)serializer.deserialize(intent.getByteArrayExtra("criteria")), (ResultReceiver)intent.getParcelableExtra("resultReceiver"));
 			break;
 		case UNSUBSCRIBE:
 			unsubscribe(intent.getIntExtra("subscription", -1));
@@ -66,8 +69,15 @@ public class SneerAndroidService extends Service {
 		}
 	}
 
-	private void subscribe(Map<String, Object> criteria, final ResultReceiver resultReceiver) {
-		Observable<Tuple> tuples = SneerApp.sneer().tupleSpace().filter().putFields(criteria).tuples();
+	private void subscribe(Map<String, Object> criteria, ResultReceiver resultReceiver) {
+		subscribe(resultReceiver, SneerApp.sneer().tupleSpace().filter().putFields(criteria).tuples());
+	}
+
+	private void subscribeLocal(Map<String, Object> criteria, ResultReceiver resultReceiver) {
+		subscribe(resultReceiver, SneerApp.sneer().tupleSpace().filter().putFields(criteria).localTuples());
+	}
+
+	private void subscribe(final ResultReceiver resultReceiver, Observable<Tuple> tuples) {
 		int id = nextSubscriptionId.getAndIncrement();
 		resultReceiver.send(TupleSpaceFactoryClient.SubscriptionOp.SUBSCRIPTION_ID.ordinal(), bundle(id));
 		
