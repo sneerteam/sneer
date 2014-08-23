@@ -137,6 +137,8 @@ public class SneerAndroid {
 			public Observable<Message> previousMessages() {
 				return messages(new Func2<SneerAndroid.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
 					return msg.timestampReceived() <= session.lastMessageSeen;
+				} }, new Func1<TupleFilter, Observable<Tuple>>() {  @Override public Observable<Tuple> call(TupleFilter t1) {
+					return t1.localTuples();
 				} });
 			}
 			
@@ -144,16 +146,19 @@ public class SneerAndroid {
 			public Observable<Message> newMessages() {
 				return messages(new Func2<SneerAndroid.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
 					return msg.timestampReceived() > session.lastMessageSeen;
+				} }, new Func1<TupleFilter, Observable<Tuple>>() {  @Override public Observable<Tuple> call(TupleFilter t1) {
+					return t1.tuples();
 				} });
 			}
 
-			private Observable<Message> messages(final Func2<SessionInfo, Message, Boolean> predicate) {
+			private Observable<Message> messages(final Func2<SessionInfo, Message, Boolean> predicate, final Func1<TupleFilter, Observable<Tuple>> tuples) {
 				return Observable.create(new OnSubscribe<Message>() {  @Override public void call(final Subscriber<? super Message> subscriber) {
 					sessionInfo.subscribe(new Action1<SessionInfo>() {  @Override public void call(final SessionInfo session) {
-						subscriber.add(tupleSpace().filter()
-							.type(session.type)
-							.field("session", session.id)
-							.tuples()
+						subscriber.add(
+							tuples.call(
+								tupleSpace().filter()
+								.type(session.type)
+								.field("session", session.id))
 							.map(Tuple.TO_PAYLOAD)
 							.cast(Message.class)
 							.filter(new Func1<Message, Boolean>() {  @Override public Boolean call(Message msg) {
