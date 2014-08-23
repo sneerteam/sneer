@@ -74,4 +74,8 @@ public class SneerActivity extends Activity {
 		return (TextView)view.findViewById(id);
 	}
 
+	
+	protected void toast(CharSequence text) {
+		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+	}
 }
