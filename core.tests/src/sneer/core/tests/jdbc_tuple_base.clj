@@ -62,23 +62,33 @@
 (defn dump-tuples [db]
   (->> (query-all db) (map println) doall))
 
-(defn create []
-  (let [connection (DriverManager/getConnection "jdbc:sqlite::memory:")
-        db {:connection connection}]
-    (create-table! db)
+(defn seq->observable [^java.lang.Iterable iterable]
+  (rx.Observable/from iterable))
+
+(defn reify-tuple-base [db]
+  (let [new-tuples (rx.subjects.PublishSubject/create)]
+    
     (reify core/TupleBase
 
       (store-tuple [this tuple]
         (let [custom (->custom-field-map tuple)
               row (select-keys tuple builtin-field?)]
           (sql/insert! db :tuple (serialize-entries (assoc row :custom custom)))
-          ;(dump-tuples db)
-          ))
+          (rx/on-next new-tuples tuple)
+          (dump-tuples db)))
 
       (query-tuples [this criteria keep-alive]
         (let [r (sql/query db ["SELECT * FROM tuple"] :result-set-fn doall :as-arrays? true)
               field-names (mapv name (first r))
-              ^java.lang.Iterable tuples (map #(deserialize-entries (zipmap field-names %)) (next r))
+              tuples (map #(deserialize-entries (zipmap field-names %)) (next r))
+              observable (seq->observable tuples)
               r nil]
-          ;(println "query-tuples [" criteria keep-alive "] -> \n\t" (apply str (interpose "\n\t" tuples)))
-          (rx.Observable/from tuples))))))
+          (if keep-alive
+            (rx/concat observable new-tuples)
+            observable))))))
+
+(defn create []
+  (let [connection (DriverManager/getConnection "jdbc:sqlite::memory:")
+        db {:connection connection}]
+    (create-table! db)
+    (reify-tuple-base db)))
