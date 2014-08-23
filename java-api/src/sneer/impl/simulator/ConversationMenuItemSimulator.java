@@ -13,7 +13,7 @@ public class ConversationMenuItemSimulator implements ConversationMenuItem {
 
 
 	@Override
-	public void call() {
+	public void call(PublicKey partyPuk) {
 		System.out.println(caption + " called");
 	}
 

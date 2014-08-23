@@ -12,9 +12,7 @@ import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
-import sneer.commons.*;
-import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
+import sneer.commons.Comparators;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -144,7 +142,7 @@ public class ConversationActivity extends Activity {
 				for (final ConversationMenuItem item : menuItems) {
 					menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
 						Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
-						item.call();
+						item.call(party.publicKey().current());
 						return true;
 					}});
 				}

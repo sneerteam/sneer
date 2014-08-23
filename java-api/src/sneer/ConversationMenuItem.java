@@ -4,7 +4,7 @@ import java.util.*;
 
 import rx.functions.*;
 
-public interface ConversationMenuItem extends Action0 {
+public interface ConversationMenuItem extends Action1<PublicKey> {
 
 	byte[] icon();
 	String caption();

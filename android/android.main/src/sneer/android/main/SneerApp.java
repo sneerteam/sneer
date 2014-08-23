@@ -69,8 +69,8 @@ public class SneerApp extends Application {
 						return new ConversationMenuItem() {
 							
 							@Override
-							public void call() {
-								createSession(t1);
+							public void call(PublicKey partyPuk) {
+								createSession(t1, partyPuk);
 							}
 							
 							@Override
@@ -96,16 +96,16 @@ public class SneerApp extends Application {
 	
 	private AtomicLong nextSessionId = new AtomicLong(0);
 	
-	private void createSession(SneerAppInfo app) {
+	private void createSession(SneerAppInfo app, PublicKey partyPuk) {
 		
 		long sessionId = nextSessionId.getAndIncrement();
 		
 		sneer().tupleSpace().publisher()
 			.type("sneer/session")
 			.field("session", sessionId)
-			.field("partyPuk", null)
+			.field("partyPuk", partyPuk)
 			.field("sessionType", app.type)
-			.field("lastMessageSeen", 0)
+			.field("lastMessageSeen", (long)0)
 			.pub();
 
 		Intent intent = new Intent();
