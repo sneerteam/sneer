@@ -92,7 +92,8 @@ new tuples as they are stored otherwise it will complete." ))
            (.. this (payload payload) pub))
         (pub [this]
            (store-tuple tuples-out proto-tuple)
-           (reify-tuple proto-tuple))))))
+           (rx/return
+             (reify-tuple proto-tuple)))))))
 
 (defn new-tuple-filter
   ([tuple-source subs-out] (new-tuple-filter tuple-source subs-out {}))
