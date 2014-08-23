@@ -1,14 +1,19 @@
 package sneer.android.main;
 
 import java.io.*;
+import java.util.*;
 
 import sneer.*;
 import sneer.admin.*;
 import sneer.admin.impl.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.simulator.*;
+import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
+import android.content.pm.*;
+import android.os.*;
+import android.util.*;
 
 public class SneerApp extends Application {
 	
@@ -22,9 +27,22 @@ public class SneerApp extends Application {
 
 	private static String error;
 	
+	private static final String PREFS_NAME = "SneerApp";
+
+	private static final int APPS_SEARCHER_VERSION = 1;
 	
 	@Override
 	public void onCreate() {
+
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+		if (settings.getInt("apps_searcher_version", 0) < APPS_SEARCHER_VERSION) {
+			SneerAppInfo.checkPackages(getApplicationContext());
+		    settings.edit()
+		    	.putInt("apps_searcher_version", APPS_SEARCHER_VERSION)
+		    	.commit(); 
+		}
+		
 		try {
 			initialize();
 		} catch (FriendlyException e) {
@@ -32,7 +50,6 @@ public class SneerApp extends Application {
 		}
 		super.onCreate();
 	}
-	
 	
 	public static Sneer sneer() {
 		return admin().sneer();
