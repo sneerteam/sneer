@@ -2,6 +2,7 @@ package sneer.tuples;
 
 import java.util.*;
 
+import rx.Observable;
 import rx.functions.*;
 import sneer.*;
 
@@ -15,11 +16,11 @@ public interface TuplePublisher extends Action1<Object>, Action0 {
 	
 	/** Publishes a tuple with the given payload. Equivalent to calling {@link #payload(Object)} and {@link #pub()}.
 	 * @return The published tuple. */
-	Tuple pub(Object payload);
+	Observable<Tuple> pub(Object payload);
 
 	/** Publishes a tuple with the values set in this publisher.
 	 * @return The published tuple. */
-	Tuple pub();
+	Observable<Tuple> pub();
 
 //	/**
 //	 * Atomic publication of local tuples.

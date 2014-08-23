@@ -154,15 +154,15 @@ public abstract class LocalTuplesFactory {
 			}
 
 			@Override
-			public Tuple pub() {
+			public Observable<Tuple> pub() {
 				TupleImpl ret = prototype.clone();
 				ret.put("author", identity.publicKey());
 				publishTuple(ret);
-				return ret;
+				return Observable.just((Tuple)ret);
 			}
 
 			@Override
-			public Tuple pub(Object value) {
+			public Observable<Tuple> pub(Object value) {
 				return payload(value).pub();
 			}
 
