@@ -7,10 +7,13 @@ import static sneer.commons.Lists.*;
 import java.util.*;
 
 import rx.Observable;
+import rx.subjects.*;
 import sneer.*;
 import sneer.rx.*;
 
 public class ConversationSimulator implements Conversation {
+	
+	public static final ReplaySubject<List<ConversationMenuItem>> menu = ReplaySubject.create();
 
 	private final Party party;
 	
@@ -98,6 +101,7 @@ public class ConversationSimulator implements Conversation {
 	@Override
 	public Observable<List<ConversationMenuItem>> menu() {
 		return menuItems.observed().observable();
+//		return menu;
 	}
 	
 	
