@@ -4,9 +4,12 @@ import static org.junit.Assert.*;
 import static sneer.core.tests.ObservableTestUtils.*;
 import static sneer.tuples.Tuple.*;
 
+import java.util.*;
+
 import org.junit.*;
 
 import rx.*;
+import rx.Observable;
 import rx.functions.*;
 import sneer.*;
 import sneer.impl.keys.*;
@@ -138,7 +141,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 					.field("custom", 42)
 					.tuples()
 					.map(field("custom")),
-				42));
+				42L));
 	}
 
 	@Test
@@ -212,7 +215,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		
 		expecting(
 			actual.map(new Func1<Tuple, Void>() {  @Override public Void call(Tuple t1) {
-				assertArrayEquals(array, (Object[])t1.get("path"));				
+				assertList(array, ((List<Object>)t1.get("path")));				
 				assertEquals("userB is cool", t1.payload());
 				return null;
 			}}));

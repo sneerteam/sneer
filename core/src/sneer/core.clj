@@ -1,7 +1,8 @@
 (ns sneer.core
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [filter-by]])
+   [sneer.rx :refer [filter-by]]
+   [sneer.serialization :refer [roundtrip]])
   (:import
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
@@ -86,9 +87,10 @@ new tuples as they are stored otherwise it will complete." ))
         (pub [this payload]
            (.. this (payload payload) pub))
         (pub [this]
-           (store-tuple tuples-out proto-tuple)
-           (rx/return
-             (reify-tuple proto-tuple)))))))
+           (let [tuple (roundtrip proto-tuple)]
+             (store-tuple tuples-out tuple)
+             (rx/return
+               (reify-tuple tuple))))))))
 
 (defn new-tuple-filter
   ([tuple-base subs-out] (new-tuple-filter tuple-base subs-out {}))

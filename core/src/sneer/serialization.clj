@@ -35,3 +35,6 @@
      (let [in (ByteArrayInputStream. bytes 0 length)
            reader (transit/reader in transit-format read-opts)]
        (transit/read reader))))
+
+(defn roundtrip [value]
+  (-> value serialize deserialize))

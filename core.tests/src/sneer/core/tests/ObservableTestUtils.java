@@ -58,13 +58,17 @@ public class ObservableTestUtils {
 	@SafeVarargs
 	public static <T> void assertEqualsUntilNow(Observable<T> seq, T... expecteds) {
 		List<T> list = takeAllUntilNow(seq);
-		assertListSize(expecteds, list);
+		assertList(expecteds, list);
+	}
+
+	public static <T> void assertList(T[] expected, List<T> list) {
+		assertListSize(expected, list);
 		Iterator<T> it = list.iterator();
-		for (Object expected : expecteds) {
-			if (expected.getClass().isArray()) {
-				assertArrayEquals((Object[])expected, (Object[])it.next());
+		for (Object e : expected) {
+			if (e.getClass().isArray()) {
+				assertArrayEquals((Object[])e, (Object[])it.next());
 			} else {
-				assertEquals(expected, it.next());
+				assertEquals(e, it.next());
 			}
 		}
 	}
