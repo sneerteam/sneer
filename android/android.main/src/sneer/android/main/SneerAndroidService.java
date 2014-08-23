@@ -33,6 +33,10 @@ public class SneerAndroidService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 		
+		if (!intent.hasExtra("op")) {
+			return START_STICKY;
+		}
+		
 		switch((TupleSpaceFactoryClient.TupleSpaceOp)intent.getSerializableExtra("op")) {
 		case PUBLISH:
 			publish((Map<String, Object>)serializer.deserialize(intent.getByteArrayExtra("tuple")));
