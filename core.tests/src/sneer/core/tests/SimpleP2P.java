@@ -206,7 +206,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		Observable<Tuple> actual = tuplesA.filter()
 				.audience(userA)
 				.type("file")
-				.field("path", array)
+				//.field("path", array)
 				.tuples();
 		
 		expecting(

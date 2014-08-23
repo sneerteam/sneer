@@ -1,6 +1,7 @@
 (ns sneer.core.tests.jdbc-tuple-base
   (:require [sneer.core :as core]
             [sneer.rx :refer [filter-by]]
+            [sneer.serialization :as serialization]
             [clojure.java.jdbc :as sql]
             [rx.lang.clojure.core :as rx]
             [rx.lang.clojure.interop :as rx-interop])
@@ -19,7 +20,7 @@
           ;[:device :blob "NOT NULL"]
           ;[:sequence :integer "NOT NULL"]
           ;[:signature :blob "NOT NULL"]
-          [:custom :varchar])]
+          [:custom :blob])]
     (sql/execute! db [tuple-ddl])))
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
@@ -27,8 +28,12 @@
 (def puk-serializer {:serialize #(.bytes %)
                      :deserialize #(sneer.impl.keys.Keys/createPublicKey %)})
 
+(def core-serializer {:serialize serialization/serialize
+                      :deserialize serialization/deserialize})
+
 (def serializers {"author" puk-serializer
-                  "audience" puk-serializer})
+                  "audience" puk-serializer
+                  "custom" core-serializer})
 
 (defn apply-serializer [op row field serializer]
   (let [v (get row field)]
@@ -72,7 +77,13 @@
         field-names (mapv name (first rs))]
     (->>
       (next rs)
-      (map #(deserialize-entries (zipmap field-names %))))))
+      (map #(deserialize-entries (zipmap field-names %)))
+      (map #(merge (get % "custom") (dissoc % "custom"))))))
+
+(defn insert-tuple [db tuple]
+  (let [custom (->custom-field-map tuple)
+        row (select-keys tuple builtin-field?)]
+    (sql/insert! db :tuple (serialize-entries (assoc row "custom" custom)))))
 
 (defmacro rx-defer [& body]
   `(rx.Observable/defer
@@ -84,11 +95,9 @@
     (reify core/TupleBase
 
       (store-tuple [this tuple]
-        (let [custom (->custom-field-map tuple)
-              row (select-keys tuple builtin-field?)]
-          (sql/insert! db :tuple (serialize-entries (assoc row :custom custom)))
-          (rx/on-next new-tuples tuple)
-          (dump-tuples db)))
+        (insert-tuple db tuple)
+        (dump-tuples db)
+        (rx/on-next new-tuples tuple))
 
       (query-tuples [this criteria keep-alive]
         (filter-by
