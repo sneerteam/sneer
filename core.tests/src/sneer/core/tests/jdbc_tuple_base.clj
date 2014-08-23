@@ -13,11 +13,11 @@
           [:payload :varchar]
           [:timestamp :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]
           [:author :blob "NOT NULL"]
-          [:custom :varchar]
+          [:audience :blob]
           ;[:device :blob "NOT NULL"]
           ;[:sequence :integer "NOT NULL"]
           ;[:signature :blob "NOT NULL"]
-          [:audience :blob])]
+          [:custom :varchar])]
     (sql/execute! db [tuple-ddl])))
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
