@@ -9,7 +9,12 @@ public class AppInstallationMonitor extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Log.i(AppInstallationMonitor.class.getSimpleName(), "--------> " + intent.getAction() + " - " + intent.getDataString());
 		
-		SneerAppInfo.checkPackages(context);
+		String packageName = intent.getDataString().substring(intent.getDataString().indexOf(':')+1);
+		if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
+			SneerAppInfo.packageAdded(context, packageName);
+		} else {
+			SneerAppInfo.packageRemoved(context, packageName);
+		}
 		
 	}
 
