@@ -72,7 +72,7 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 					final int subscriptionId = (Integer) SneerAndroid.unbundle(resultData);
 					subscriber.add(Subscriptions.create(new Action0() { @Override public void call() {
 						Intent intent = new Intent(SneerAndroid.SNEER_SERVICE);
-						intent.putExtra("op", TupleSpaceFactoryClient.TupleSpaceOp.UNSUBSCRIBE);
+						intent.putExtra("op", TupleSpaceFactoryClient.TupleSpaceOp.UNSUBSCRIBE.ordinal());
 						intent.putExtra("subscription", subscriptionId);
 						context.startService(intent);
 					}}));
