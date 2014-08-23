@@ -126,13 +126,18 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 	
 	@Test
 	public void customField() {
-		TuplePublisher publisher = tuplesA.publisher()
-				.type("custom")
-				.field("custom", 42);
-		publisher.pub();
+		TuplePublisher customPublisher = tuplesA.publisher().type("custom");
+		customPublisher.field("custom", 42).pub();
+		customPublisher.field("custom", 23).pub();
 		
 		expecting(
-			values(tuplesA.filter().tuples().map(field("custom")), 42));
+			values(
+				tuplesA
+					.filter()
+					.field("custom", 42)
+					.tuples()
+					.map(field("custom")),
+				42));
 	}
 
 	@Test
@@ -140,8 +145,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 		
 		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userA.publicKey())
-			.type("profile/name")
-			.field("custom", 42);
+			.type("profile/name");
 			
 		publisher.pub("old name");
 		publisher.pub("new name");
@@ -151,7 +155,6 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 				tuplesA.filter()
 					.audience(userA)
 					.type("profile/name")
-					.field("custom", 42)
 					.localTuples()
 					.map(Tuple.TO_PAYLOAD),
 				Notification.createOnNext("old name"),
