@@ -2,8 +2,11 @@ package sneer;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
 
+import rx.*;
 import rx.Observable;
+import rx.Observable.*;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.refimpl.*;
@@ -36,5 +39,18 @@ public class TuplesFactoryInProcess extends LocalTuplesFactory {
 		}
 		return t;
 	}
+	
+	@Override
+	protected Observable<Tuple> queryLocal(final PrivateKey identity, final Map<String, Object> criteria) {
+		return Observable.create(new OnSubscribe<Tuple>() { @Override public void call(final Subscriber<? super Tuple> t1) {
+			query(identity, criteria)
+				.buffer(100, TimeUnit.MILLISECONDS)
+				.subscribe(new Action1<List<Tuple>>() { @Override public void call(List<Tuple> list) {
+					t1.add(Observable.from(list).subscribe(t1));
+				} });
+		}});
+	}
+	
+	
 	
 }

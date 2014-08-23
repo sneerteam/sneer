@@ -1,6 +1,7 @@
 package sneer.refimpl;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import rx.*;
 import rx.Observable.OnSubscribe;
@@ -108,12 +109,7 @@ public abstract class LocalTuplesFactory {
 
 			@Override
 			public Observable<Tuple> localTuples() {
-				return Observable.create(new OnSubscribe<Tuple>() { @Override public void call(final Subscriber<? super Tuple> t1) {
-					TestScheduler scheduler = new TestScheduler();
-					t1.add(tuples().subscribeOn(scheduler).subscribe(t1));
-					scheduler.triggerActions();
-					t1.onCompleted();
-				}});
+				return queryLocal(identity, where);
 			}
 
 			@Override
@@ -211,6 +207,8 @@ public abstract class LocalTuplesFactory {
 	abstract protected void publishTuple(Tuple ret);
 	
 	abstract protected Observable<Tuple> query(PrivateKey identity, Map<String, Object> criteria);
+	
+	abstract protected Observable<Tuple> queryLocal(PrivateKey identity, Map<String, Object> criteria);
 	
 	public TupleSpace newTupleSpace(PrivateKey prik) {
 		return new TupleSpaceImpl(prik);
