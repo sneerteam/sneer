@@ -64,7 +64,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.pub("end");
 		
 		expecting(
-			payloads(tuplesA.filter().tuples(), "end"),
+			payloads(tuplesA.filter().tuples(), "paper", "end"),
 			payloads(tuplesB.filter().tuples(), "end"),
 			payloads(tuplesC.filter().tuples(), "paper", "end"));
 	}
