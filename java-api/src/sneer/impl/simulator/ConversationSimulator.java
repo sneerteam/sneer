@@ -96,8 +96,8 @@ public class ConversationSimulator implements Conversation {
 
 
 	@Override
-	public Observed<List<ConversationMenuItem>> menu() {
-		return menuItems.observed();
+	public Observable<List<ConversationMenuItem>> menu() {
+		return menuItems.observed().observable();
 	}
 	
 	

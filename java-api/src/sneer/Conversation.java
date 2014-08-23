@@ -17,7 +17,7 @@ public interface Conversation {
 	/** Publish a new message with isOwn() true, with party() as the audience and using System.currentTimeMillis() as the timestamp. */
 	void sendMessage(String content);
 
-	Observed<List<ConversationMenuItem>> menu();
+	Observable<List<ConversationMenuItem>> menu();
 	
 	Observable<Long> unreadMessageCount();
 	void unreadMessageCountReset();
