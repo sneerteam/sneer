@@ -88,4 +88,10 @@ public class ObservableTestUtils {
 			fail("Expecting `" + Arrays.asList(expecteds) + "', got `" + actual + "'");
 	}
 
+	public static Func1<Tuple, Object> field(final String field) {
+		return new Func1<Tuple, Object>() {  @Override public Object call(Tuple t1) {
+			return t1.get(field);
+		}};
+	}
+
 }

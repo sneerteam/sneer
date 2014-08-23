@@ -135,12 +135,6 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 			values(tuplesA.filter().tuples().map(field("custom")), 42));
 	}
 
-	private Func1<Tuple, Object> field(final String field) {
-		return new Func1<Tuple, Object>() {  @Override public Object call(Tuple t1) {
-			return t1.get(field);
-		}};
-	}
-	
 	@Test
 	public void completedLocalTuples() {
 		
