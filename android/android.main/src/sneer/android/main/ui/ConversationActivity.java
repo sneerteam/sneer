@@ -135,15 +135,16 @@ public class ConversationActivity extends Activity {
 		private void openIteractionMenu() {
 			final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
 	
-			List<ConversationMenuItem> menuItems = sneer().produceConversationWith(party).menu().current();
-			for (final ConversationMenuItem item : menuItems)
-				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
-					item.call();
-					Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
-					return true;
-				}});
-
-			menu.show();
+			sneer().produceConversationWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
+				for (final ConversationMenuItem item : menuItems)
+					menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
+						item.call();
+						Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
+						return true;
+					}});
+				
+				menu.show();
+			} });
 		}});		
 	}
 
