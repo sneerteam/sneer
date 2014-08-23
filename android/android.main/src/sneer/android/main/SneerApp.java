@@ -55,12 +55,7 @@ public class SneerApp extends Application {
 			error = e.getMessage();
 		}
 		
-		sneer().tupleSpace().filter()
-			.audience(admin().privateKey())
-			.type("sneer/apps")
-			.tuples()
-			.map(Tuple.TO_PAYLOAD)
-			.cast(List.class)
+		SneerAppInfo.apps()
 			.flatMap(new Func1<List, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List t1) {
 				List<SneerAppInfo> apps = t1;
 				Log.i(SneerAppInfo.class.getSimpleName(), "Updating menu...");

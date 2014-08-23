@@ -5,8 +5,8 @@ import java.util.*;
 
 import rx.Observable;
 import rx.functions.*;
+import rx.subjects.*;
 import sneer.*;
-import sneer.tuples.*;
 import android.content.*;
 import android.content.pm.*;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -30,6 +30,8 @@ public class SneerAppInfo implements Serializable {
 	String label;
 	int icon;
 
+	protected static BehaviorSubject<List<SneerAppInfo>> apps = BehaviorSubject.create();
+
 	public SneerAppInfo(String packageName, String activityName, SneerAppInfo.HandlerType handler, String type, String label, int icon) {
 		this.packageName = packageName;
 		this.activityName = activityName;
@@ -43,7 +45,7 @@ public class SneerAppInfo implements Serializable {
 	public String toString() {
 		return "SneerAppInfo [" + label + ", " + type + "]";
 	}
-
+	
 	public static Func1<ActivityInfo, SneerAppInfo> FROM_ACTIVITY = new Func1<ActivityInfo, SneerAppInfo>() {  @Override public SneerAppInfo call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
 		return new SneerAppInfo(
@@ -75,7 +77,7 @@ public class SneerAppInfo implements Serializable {
 		filterSneerApps(Observable.from(packages))
 			.map(FROM_ACTIVITY)
 			.toList()
-			.subscribe(appsListPublisher(tupleSpace()));
+			.subscribe(appsListPublisher());
 		
 		log("Done.");
 	}
@@ -87,12 +89,12 @@ public class SneerAppInfo implements Serializable {
 			
 			filterSneerApps(Observable.just(packageInfo))
 				.map(FROM_ACTIVITY)
-				.concatWith(currentKnownApps(tupleSpace()))
+				.concatWith(currentKnownApps())
 				.distinct(new Func1<SneerAppInfo, String>() {  @Override public String call(SneerAppInfo t1) {
 					return t1.packageName + ":"+t1.activityName;
 				}})
 				.toList()
-				.subscribe(appsListPublisher(tupleSpace()));
+				.subscribe(appsListPublisher());
 
 			// TODO: dispose sneer
 
@@ -110,54 +112,34 @@ public class SneerAppInfo implements Serializable {
 			
 		log("Package removed: " + packageName);
 		
-		currentKnownApps(tupleSpace())
+		currentKnownApps()
 			.filter(new Func1<SneerAppInfo, Boolean>() {  @Override public Boolean call(SneerAppInfo t1) {
 				return !t1.packageName.equals(packageName);
 			} })
 			.toList()
-			.subscribe(appsListPublisher(tupleSpace()));
-	}
-
-	private static TupleSpace tupleSpace() {
-		return sneer().tupleSpace();
+			.subscribe(appsListPublisher());
 	}
 
 	private static Sneer sneer() {
 		return SneerApp.sneer();
 	}
 
-	private static Action1<List<SneerAppInfo>> appsListPublisher(final TupleSpace tupleSpace) {
+	private static Action1<List<SneerAppInfo>> appsListPublisher() {
 		return new Action1<List<SneerAppInfo>>() {  @Override public void call(List<SneerAppInfo> t1) {
 			log("Pushing new app list: " + t1);
-			if (t1.isEmpty()) return;
-			tupleSpace
-				.publisher()
-				.audience(ownPuk())
-				.type("sneer/apps")
-				.pub(t1);
-		}
-
-		private PublicKey ownPuk() {
-			return sneer().self().publicKey().current();
-		} };
+			apps.onNext(t1);
+		}};
 	}
 
-	@SuppressWarnings("rawtypes")
-	private static Observable<SneerAppInfo> currentKnownApps(TupleSpace tupleSpace) {
-		return tupleSpace.filter()
-			.type("sneer/apps")
-			.audience(ownPrik())
-			.localTuples()
-			.map(Tuple.TO_PAYLOAD)
-			.cast(List.class)
-			.lastOrDefault(new ArrayList())
-			.flatMap(new Func1<List, Observable<SneerAppInfo>>() {  @SuppressWarnings("unchecked") @Override public Observable<SneerAppInfo> call(List t1) {
+	private static Observable<SneerAppInfo> currentKnownApps() {
+		return apps
+			.flatMap(new Func1<List<SneerAppInfo>, Observable<SneerAppInfo>>() {  @Override public Observable<SneerAppInfo> call(List<SneerAppInfo> t1) {
 				log("Current sneer apps: " + t1);
 				return Observable.from(t1);
 			} });
 	}
 
-	private static PrivateKey ownPrik() {
-		return SneerApp.admin().privateKey();
+	public static Observable<List<SneerAppInfo>> apps() {
+		return apps.asObservable();
 	}
 }
