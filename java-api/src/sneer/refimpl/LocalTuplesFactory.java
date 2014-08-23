@@ -93,7 +93,7 @@ public abstract class LocalTuplesFactory {
 
 			@Override
 			public TupleFilter audienceMe() {
-				throw new NotImplementedYet();
+				return audience(identity);
 			}
 			
 			@Override
@@ -110,9 +110,7 @@ public abstract class LocalTuplesFactory {
 			public Observable<Tuple> localTuples() {
 				return Observable.create(new OnSubscribe<Tuple>() { @Override public void call(final Subscriber<? super Tuple> t1) {
 					TestScheduler scheduler = new TestScheduler();
-					tuples().subscribeOn(scheduler).subscribe(new Action1<Tuple>() {  @Override public void call(Tuple item) {
-						t1.onNext(item);
-					} });
+					t1.add(tuples().subscribeOn(scheduler).subscribe(t1));
 					scheduler.triggerActions();
 					t1.onCompleted();
 				}});
