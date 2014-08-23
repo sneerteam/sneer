@@ -48,10 +48,13 @@
   (apply-serializers deserialize-entry row))
 
 (defn ->custom-field-map [tuple]
-  (->> tuple
-    (filter (fn [[key value]] (not (builtin-field? key))))
-    (apply concat)
-    (apply hash-map)))
+  (reduce-kv
+    (fn [map k v]
+      (if (or (builtin-field? k) (nil? v))
+        map
+        (assoc map k v)))
+    nil
+    tuple))
 
 (defn query-all [db]
   (sql/query db ["SELECT * FROM tuple"] :as-arrays? true))
