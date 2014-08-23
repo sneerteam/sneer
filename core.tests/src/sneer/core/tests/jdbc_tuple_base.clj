@@ -1,7 +1,8 @@
 (ns sneer.core.tests.jdbc-tuple-base
   (:require [sneer.core :as core]
             [clojure.java.jdbc :as sql]
-            [rx.lang.clojure.core :as rx])
+            [rx.lang.clojure.core :as rx]
+            [rx.lang.clojure.interop :as rx-interop])
   (:import [java.sql DriverManager]))
 
 (defn create-table! [db]
@@ -72,6 +73,10 @@
       (next rs)
       (map #(deserialize-entries (zipmap field-names %))))))
 
+(defmacro rx-defer [& body]
+  `(rx.Observable/defer
+     (rx-interop/fn [] ~@body)))
+
 (defn reify-tuple-base [db]
   (let [new-tuples (rx.subjects.PublishSubject/create)]
     
@@ -85,10 +90,11 @@
           (dump-tuples db)))
 
       (query-tuples [this criteria keep-alive]
-        (let [existing (seq->observable (query-tuples-from-db db criteria))]
-          (if keep-alive
-            (rx/concat existing (rx/do #(println "[NEW]" %) new-tuples))
-            existing))))))
+        (rx-defer
+          (let [existing (seq->observable (query-tuples-from-db db criteria))]
+            (if keep-alive
+              (rx/concat existing (rx/do #(println "[NEW]" %) new-tuples))
+              existing)))))))
 
 (defn create []
   (let [connection (DriverManager/getConnection "jdbc:sqlite::memory:")

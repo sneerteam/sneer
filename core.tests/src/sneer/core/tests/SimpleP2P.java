@@ -181,6 +181,16 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 				Notification.createOnNext("before"),
 				Notification.createOnNext("after"),
 				Notification.createOnCompleted()));
+		
+		publisher.pub("later");
+		
+		expecting(
+			notifications(
+				localPayloads,
+				Notification.createOnNext("before"),
+				Notification.createOnNext("after"),
+				Notification.createOnNext("later"),
+				Notification.createOnCompleted()));
 	}
 	
 	@Test
