@@ -65,6 +65,13 @@
 (defn seq->observable [^java.lang.Iterable iterable]
   (rx.Observable/from iterable))
 
+(defn query-tuples-from-db [db criteria]
+  (let [rs (sql/query db ["SELECT * FROM tuple"] :result-set-fn doall :as-arrays? true)
+        field-names (mapv name (first rs))]
+    (->>
+      (next rs)
+      (map #(deserialize-entries (zipmap field-names %))))))
+
 (defn reify-tuple-base [db]
   (let [new-tuples (rx.subjects.PublishSubject/create)]
     
@@ -78,14 +85,10 @@
           (dump-tuples db)))
 
       (query-tuples [this criteria keep-alive]
-        (let [r (sql/query db ["SELECT * FROM tuple"] :result-set-fn doall :as-arrays? true)
-              field-names (mapv name (first r))
-              tuples (map #(deserialize-entries (zipmap field-names %)) (next r))
-              observable (seq->observable tuples)
-              r nil]
+        (let [existing (seq->observable (query-tuples-from-db db criteria))]
           (if keep-alive
-            (rx/concat observable new-tuples)
-            observable))))))
+            (rx/concat existing (rx/do #(println "[NEW]" %) new-tuples))
+            existing))))))
 
 (defn create []
   (let [connection (DriverManager/getConnection "jdbc:sqlite::memory:")

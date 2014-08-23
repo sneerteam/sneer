@@ -100,21 +100,24 @@ new tuples as they are stored otherwise it will complete." ))
   ([tuple-source subs-out criteria]
     (letfn
         [(with [field value]
-           (new-tuple-filter tuple-source subs-out (assoc criteria field value)))]
+           (new-tuple-filter tuple-source subs-out (assoc criteria field value)))
+         (query-tuple-source [keep-alive]
+           (rx/map reify-tuple (query-tuples tuple-source criteria keep-alive)))]
+        
         (reify+ TupleFilter
           (with-field type)
           (with-field author)
           (audience [this prik] (with "audience" (.publicKey prik)))
           (field [this field value] (with field value))
           (localTuples [this]
-             (rx/map reify-tuple (query-tuples tuple-source criteria false)))
+            (query-tuple-source false))
           (tuples [this]
-             (let [tuples (rx/map reify-tuple (query-tuples tuple-source criteria true))]
-               (rx/observable*
-                 (fn [subscriber]
-                   (rx/on-next subs-out criteria)
-                   (. subscriber add
-                     (. tuples subscribe subscriber))))))))))
+            (rx/observable*
+              (fn [subscriber]
+                (rx/on-next subs-out criteria)
+                (let [tuples (query-tuple-source true)]
+                  (. subscriber add
+                    (. tuples subscribe subscriber))))))))))
 
 (defn payloads [type envelopes]
   (->> envelopes
@@ -154,12 +157,15 @@ new tuples as they are stored otherwise it will complete." ))
               ; TODO: combine existing criteria with new one
               (let [subscription
                     (rx/subscribe
-                     (->> (query-tuples tuple-base criteria true)
-                          ; TODO: extend query-tuples to support the condition below
-                          (rx/filter #(let [audience (get % "audience")]
-                                        (or (nil? audience) (= sender audience))))
-                          (rx/map #(->envelope sender :tuple %)))
-                     (partial rx/on-next connection))]
+                      (->>
+                        (query-tuples tuple-base criteria true)
+                        (rx/do #(println criteria "->>" %))
+                        (rx/do #(println "(= sender audience) ->" (= sender (get % "audience"))))
+                        ; TODO: extend query-tuples to support the condition below
+                        (rx/filter #(let [audience (get % "audience")]
+                                      (or (nil? audience) (= sender audience))))
+                        (rx/map #(->envelope sender :tuple %)))
+                      (partial rx/on-next connection))]
 
                 (assoc cur sender {:criteria criteria :subscription subscription}))))))))
 
