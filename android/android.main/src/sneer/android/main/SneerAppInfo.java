@@ -44,10 +44,10 @@ public class SneerAppInfo implements Serializable {
 		return new SneerAppInfo(
 				activityInfo.packageName, 
 				activityInfo.name, 
-				HandlerType.valueOf(meta.getString("handler")), 
-				meta.getString("type"),
-				meta.getString("label"),
-				meta.getInt("icon"));
+				HandlerType.valueOf(meta.getString("sneer:handler")), 
+				meta.getString("sneer:type"),
+				meta.getString("sneer:label"),
+				meta.getInt("sneer:icon"));
 	} };
 	
 	public static Observable<ActivityInfo> filterSneerApps(Observable<PackageInfo> packageInfos) {
@@ -63,7 +63,7 @@ public class SneerAppInfo implements Serializable {
 	}
 	
 	public static void checkPackages(Context context) {
-		Log.i(SneerApp.class.getSimpleName(), "Searching for Sneer apps...");
+		Log.i(SneerAppInfo.class.getSimpleName(), "Searching for Sneer apps...");
 		
 		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
 		
@@ -79,7 +79,7 @@ public class SneerAppInfo implements Serializable {
 		
 		// TODO: dispose sneer
 		
-		Log.i(SneerApp.class.getSimpleName(), "Done.");
+		Log.i(SneerAppInfo.class.getSimpleName(), "Done.");
 	}
 
 	@SuppressWarnings("unchecked")
