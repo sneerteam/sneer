@@ -4,7 +4,7 @@ import rx.*;
 import sneer.*;
 import sneer.tuples.*;
 
-public class InMemorySimpleP2P extends SimpleP2P {
+public class PubSubOverSimulator extends PubSubTest {
 	
 	TuplesFactoryInProcess world;
 

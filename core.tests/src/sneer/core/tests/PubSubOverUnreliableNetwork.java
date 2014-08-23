@@ -3,7 +3,7 @@ package sneer.core.tests;
 import org.junit.*;
 
 @Ignore("wip")
-public class SimpleP2POverUnreliableNetwork extends SimpleP2P {
+public class PubSubOverUnreliableNetwork extends PubSubTest {
 	
 	@Override
 	protected Object newNetwork() {

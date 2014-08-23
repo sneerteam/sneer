@@ -1,6 +1,6 @@
 package sneer.core.tests;
 
-public class SimpleP2POverPersistentTupleSpace extends SimpleP2P {
+public class PubSubOverPersistentTupleSpace extends PubSubTest {
 	
 	@Override
 	protected Object newTupleBase() {

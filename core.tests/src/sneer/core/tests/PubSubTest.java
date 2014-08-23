@@ -15,7 +15,7 @@ import sneer.*;
 import sneer.impl.keys.*;
 import sneer.tuples.*;
 
-public class SimpleP2P extends TupleSpaceTestsBase {
+public class PubSubTest extends TupleSpaceTestsBase {
 	
 	@Test
 	public void messagePassing() {
@@ -214,7 +214,7 @@ public class SimpleP2P extends TupleSpaceTestsBase {
 				.tuples();
 		
 		expecting(
-			actual.map(new Func1<Tuple, Void>() {  @Override public Void call(Tuple t1) {
+			actual.map(new Func1<Tuple, Void>() { @SuppressWarnings("unchecked") @Override public Void call(Tuple t1) {
 				assertList(array, ((List<Object>)t1.get("path")));				
 				assertEquals("userB is cool", t1.payload());
 				return null;

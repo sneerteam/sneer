@@ -1,6 +1,6 @@
 package sneer.core.tests;
 
-public class SimpleP2POverServerNetwork extends SimpleP2P {
+public class PubSubOverServerNetwork extends PubSubTest {
 	
 	@Override
 	protected Object newNetwork() {
