@@ -12,6 +12,7 @@ buildscript {
 
 dependencies {
   compile project(':android-api')
+  compile 'me.sneer:core.tests:0.0.1'
 }
 
 android {
