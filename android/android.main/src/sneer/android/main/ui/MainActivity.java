@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
 
 		startProfileActivityIfFirstTime();
 //		startCore();
-		AndroidSqliteDatabase.selfTest();
+		SneerSqliteDatabase.selfTest();
 		
 		makeConversationList();
 		

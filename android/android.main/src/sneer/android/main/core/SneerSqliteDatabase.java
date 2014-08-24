@@ -18,7 +18,7 @@ import clojure.java.api.*;
 import clojure.lang.*;
 
 
-public class AndroidSqliteDatabase implements Database {
+public class SneerSqliteDatabase implements Database {
 	
 	private SQLiteDatabase sqlite;
 
@@ -32,13 +32,10 @@ public class AndroidSqliteDatabase implements Database {
 
 	
 	private static void trySelfTest() throws IOException {
-		SQLiteDatabase sqlite = SQLiteDatabase.openOrCreateDatabase(File.createTempFile("self-test", ""), null);
-		
-		AndroidSqliteDatabase db = new AndroidSqliteDatabase(sqlite);
 		Object network = networkSimulator("new-network").invoke();
 		PublicKey puk = Keys.createPrivateKey("selfTest").publicKey();
 		
-		Object tupleBase = prepareTupleBase(db);
+		Object tupleBase = tmpTupleBase();
 		
 		Object connection = core("connect").invoke(network, puk);
 		Object followees = Observable.never();
@@ -53,6 +50,17 @@ public class AndroidSqliteDatabase implements Database {
 			report(th);	
 		}});
 	}
+
+
+	public static Object tmpTupleBase() throws IOException {
+		return prepareTupleBase(tmpDatabase());
+	}
+
+
+	public static SneerSqliteDatabase tmpDatabase() throws IOException {
+		return new SneerSqliteDatabase(
+			SQLiteDatabase.openOrCreateDatabase(File.createTempFile("self-test", ""),null));
+	}
 	
 
 	static private void report(Throwable th) {
@@ -66,7 +74,7 @@ public class AndroidSqliteDatabase implements Database {
 	}
 	
 	
-	private static Object prepareTupleBase(AndroidSqliteDatabase db) {
+	private static Object prepareTupleBase(SneerSqliteDatabase db) {
 		tupleBase("create-tuple-table").invoke(db);
 		return tupleBase("create").invoke(db);
 	}
@@ -85,7 +93,7 @@ public class AndroidSqliteDatabase implements Database {
 	}
 	
 	
-	public AndroidSqliteDatabase(SQLiteDatabase sqlite) {
+	public SneerSqliteDatabase(SQLiteDatabase sqlite) {
 		this.sqlite = sqlite;
 	}
 
