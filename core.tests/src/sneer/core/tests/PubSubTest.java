@@ -1,6 +1,6 @@
 package sneer.core.tests;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 import static sneer.core.tests.ObservableTestUtils.*;
 import static sneer.tuples.Tuple.*;
 

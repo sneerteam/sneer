@@ -1,6 +1,6 @@
 package sneer.core.tests;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 import static sneer.tuples.Tuple.*;
 
 import java.util.*;
@@ -12,6 +12,7 @@ import rx.functions.*;
 import rx.schedulers.*;
 import sneer.tuples.*;
 
+@SuppressWarnings("deprecation")
 public class ObservableTestUtils {
 
 	public static void expecting(Observable<?>... expectations) {
@@ -60,7 +61,7 @@ public class ObservableTestUtils {
 		List<T> list = takeAllUntilNow(seq);
 		assertList(expecteds, list);
 	}
-
+	
 	public static <T> void assertList(T[] expected, List<T> list) {
 		assertListSize(expected, list);
 		Iterator<T> it = list.iterator();
@@ -73,6 +74,10 @@ public class ObservableTestUtils {
 		}
 	}
 	
+	private static void assertArrayEquals(Object[] expected, Object[] actual) {
+		assertList(expected, Arrays.asList(actual));
+	}
+
 	public static <T> void assertCount(int expected, Observable<T> seq) {
 		assertEquals(expected, takeAllUntilNow(seq).size());
 	}
