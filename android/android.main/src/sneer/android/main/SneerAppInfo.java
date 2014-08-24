@@ -7,7 +7,6 @@ import java.util.concurrent.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
-import sneer.*;
 import android.content.*;
 import android.content.pm.*;
 import android.content.pm.PackageManager.NameNotFoundException;
