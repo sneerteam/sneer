@@ -3,12 +3,13 @@ version = '0.0.1'
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "https://clojars.org/repo" }
+        maven { url 'https://clojars.org/repo' }
+        maven { url 'https://repo.spring.io/plugins-release' }
     }
 
-
     dependencies {
-        classpath "clojuresque:clojuresque:1.7.0"
+        classpath 'clojuresque:clojuresque:1.7.0'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
     }
 }
 
@@ -21,13 +22,18 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'clojure'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-eclipse'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 sourceSets {
     main {
         clojure {
             srcDir 'src'
+            aotCompile = true
         }
         java {
             srcDir 'src'
@@ -44,8 +50,9 @@ dependencies {
     compile 'org.clojure:clojure:1.6.0'
     compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
     compile 'org.clojure:java.jdbc:0.3.4'
-    runtime 'org.xerial:sqlite-jdbc:3.7.15-M1'
     compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
+    provided 'junit:junit:4.11'
+    optional 'org.xerial:sqlite-jdbc:3.7.15-M1'
     compile project(':java-api')
     compile project(':core')
     compile project(':server')
