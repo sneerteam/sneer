@@ -5,7 +5,7 @@ import java.util.Arrays;
 import sneer.*;
 import sneer.commons.*;
 
-class PrivateKeyImpl implements PrivateKey {
+class PrivateKeyImpl implements PrivateKey { private static final long serialVersionUID = 1L;
 
 	private final byte[] bytes;
 	private PublicKeyImpl publicKeyImpl;
