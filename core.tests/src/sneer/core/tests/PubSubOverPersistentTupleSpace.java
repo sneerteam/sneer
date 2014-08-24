@@ -4,21 +4,18 @@ import rx.functions.*;
 
 public class PubSubOverPersistentTupleSpace extends PubSubTest {
 	
-	private final Func0<Object> tupleBaseFactory;
-
+	public static PubSubTest create(Func0<Object> tupleBaseFactory) {
+		return new PubSubOverPersistentTupleSpace(tupleBaseFactory);
+	}
+	
 	PubSubOverPersistentTupleSpace(Func0<Object> tupleBaseFactory) {
-		this.tupleBaseFactory = tupleBaseFactory;
+		super(tupleBaseFactory);
 	}
 	
 	public PubSubOverPersistentTupleSpace() {
-		this(new Func0<Object>() {  @Override public Object call() {
+		this(new Func0<Object>() { @Override public Object call() {
 			return Glue.var("sneer.core.tests.jdbc-tuple-base", "create").invoke();
 		}});
-	}
-	
-	@Override
-	protected Object newTupleBase() {
-		return tupleBaseFactory.call();
 	}
 
 }
