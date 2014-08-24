@@ -64,7 +64,8 @@ new tuples as they are stored otherwise it will complete." ))
     (tuple-getter type)
     (tuple-getter audience)
     (tuple-getter author)
-    (tuple-getter payload)))
+    (tuple-getter payload)
+    (toString [this] (str "#<Tuple " tuple ">"))))
 
 (defmacro with-field [a]
   `(~a [~'this ~a]
