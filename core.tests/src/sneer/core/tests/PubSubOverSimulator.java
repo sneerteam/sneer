@@ -1,9 +1,12 @@
 package sneer.core.tests;
 
+import org.junit.*;
+
 import rx.*;
 import sneer.*;
 import sneer.tuples.*;
 
+@Ignore
 public class PubSubOverSimulator extends PubSubTest {
 	
 	TuplesFactoryInProcess world;

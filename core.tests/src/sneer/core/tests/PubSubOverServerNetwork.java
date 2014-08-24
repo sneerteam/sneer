@@ -1,5 +1,8 @@
 package sneer.core.tests;
 
+import org.junit.*;
+
+@Ignore
 public class PubSubOverServerNetwork extends PubSubTest {
 	
 	@Override
