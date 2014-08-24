@@ -11,6 +11,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.android.main.core.*;
 import sneer.commons.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
@@ -46,7 +47,8 @@ public class MainActivity extends Activity {
 
 		startProfileActivityIfFirstTime();
 //		startCore();
-
+		AndroidSqliteDatabase.selfTest();
+		
 		makeConversationList();
 		
 		
