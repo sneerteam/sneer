@@ -4,12 +4,10 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url 'https://clojars.org/repo' }
-        maven { url 'https://repo.spring.io/plugins-release' }
     }
 
     dependencies {
         classpath 'clojuresque:clojuresque:1.7.0'
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
     }
 }
 
@@ -21,6 +19,16 @@ repositories {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'clojure'
+
+buildscript {
+    repositories {
+        maven { url 'https://repo.spring.io/plugins-release' }
+    }
+
+    dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
+    }
+}
 
 apply plugin: 'propdeps'
 apply plugin: 'propdeps-maven'
