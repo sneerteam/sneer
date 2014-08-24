@@ -11,7 +11,7 @@ buildscript {
 }
 
 dependencies {
-  compile project(':android-api')
+  compile project(':android.main')
   compile 'me.sneer:core.tests:0.0.1'
 }
 
