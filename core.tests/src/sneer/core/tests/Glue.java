@@ -26,7 +26,7 @@ class Glue {
 	}
 
 	private static IFn networkSimulator(String var) {
-		return var("sneer.core.tests.network-simulator", var);
+		return var("sneer.networking.simulator", var);
 	}
 	
 	public static IFn sneerCoreVar(String simpleName) {

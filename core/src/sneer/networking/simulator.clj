@@ -1,4 +1,4 @@
-(ns sneer.core.tests.network-simulator
+(ns sneer.networking.simulator
   (:require [rx.lang.clojure.core :as rx]
             [sneer.core :as core]
             [sneer.rx :refer [subject*]])
