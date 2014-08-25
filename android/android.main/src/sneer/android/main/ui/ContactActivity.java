@@ -84,7 +84,7 @@ public class ContactActivity extends Activity {
 		else
 			loadContact(null);
 		
-		if (partyPuk.asBitcoinAddress().equals(sneer().self().publicKey().current().asBitcoinAddress())){
+		if (partyPuk.bytesAsString().equals(sneer().self().publicKey().current().bytesAsString())){
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
 			finish();

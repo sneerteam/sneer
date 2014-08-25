@@ -14,7 +14,7 @@ public class Puk {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "My Sneer public key");
-		sharingIntent.putExtra(Intent.EXTRA_TEXT, buildSneerUri(party.publicKey().current().asBitcoinAddress()));
+		sharingIntent.putExtra(Intent.EXTRA_TEXT, buildSneerUri(party.publicKey().current().bytesAsString()));
 	
 		String title;
 		if(self)
