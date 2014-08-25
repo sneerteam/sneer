@@ -123,7 +123,8 @@ public class ConversationActivity extends Activity {
 			final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
 			
 	
-			final Subscription s = sneer().produceConversationWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
+			final Subscription s = sneer().produceConversationWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")
+			@Override public void call(List<ConversationMenuItem> menuItems) {
 				menu.getMenu().close();
 				menu.getMenu().clear();
 				for (final ConversationMenuItem item : menuItems) {

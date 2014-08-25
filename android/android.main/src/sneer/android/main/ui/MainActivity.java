@@ -11,9 +11,6 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
-import sneer.android.main.core.*;
-import sneer.commons.*;
-import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -25,7 +22,6 @@ import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import clojure.java.api.*;
 
 public class MainActivity extends Activity {
 	
