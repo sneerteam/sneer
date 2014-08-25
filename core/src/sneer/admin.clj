@@ -52,12 +52,16 @@
                  (author (party-puk party))
                  tuples)))]
 
-    (let [preferred-nickname (behavior-subject)]
+    (let [preferred-nickname (behavior-subject "(noname)")]
 
       (rx/subscribe (payloads-of "profile/preferred-nickname")
                     (partial rx/on-next preferred-nickname))
 
       (reify Profile
+        (selfie [this]
+          (rx/never))
+        (ownName [this]
+          (.asObservable preferred-nickname))
         (preferredNickname [this]
           (.asObservable preferred-nickname))
         (setPreferredNickname [this value]
@@ -142,6 +146,9 @@
 
         (findContact [this party]
           (get @puk->contact (party-puk party)))
+        
+        (conversationsContaining [this type]
+          (rx/never))
 
         (produceParty [this puk]
           (produce-party parties puk))))))
