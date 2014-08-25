@@ -101,7 +101,7 @@ new tuples as they are stored otherwise it will complete." ))
            (new-tuple-filter tuple-base subs-out (assoc criteria field value)))
          (query-tuple-base [keep-alive]
            (rx/map reify-tuple (query-tuples tuple-base criteria keep-alive)))]
-        
+
         (reify+ TupleFilter
           (with-field type)
           (with-field author)
@@ -148,10 +148,7 @@ new tuples as they are stored otherwise it will complete." ))
           subscriptions-by-sender
           (fn [cur]
             (let [existing (get cur sender)]
-
-              (when-let [{subscription :subscription} existing]
-                (.unsubscribe subscription))
-
+              ; TODO: unsubscribe
               ; TODO: combine existing criteria with new one
               (let [subscription
                     (rx/subscribe
@@ -163,7 +160,7 @@ new tuples as they are stored otherwise it will complete." ))
                         (rx/map #(->envelope sender :tuple %)))
                       (partial rx/on-next connection))]
 
-                (assoc cur sender {:criteria criteria :subscription subscription}))))))))
+                (assoc cur sender (conj existing {:criteria criteria :subscription subscription})))))))))
 
     (rx/subscribe tuples-in
                   (partial store-tuple tuple-base))

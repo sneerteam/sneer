@@ -56,11 +56,11 @@
                  (onNext [this value]
                    (publish value))))))]
 
-    (let [own-name (payload-subject "profile/own-name")
+    (let [preferred-nickname (payload-subject "profile/preferred-nickname")
+          own-name (payload-subject "profile/own-name")
           selfie (payload-subject "profile/selfie")
           city (payload-subject "profile/city")
-          country (payload-subject "profile/country")
-          preferred-nickname (payload-subject "profile/preferred-nickname")]
+          country (payload-subject "profile/country")]
 
       (reify Profile
         (ownName [this]
