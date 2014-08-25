@@ -95,7 +95,7 @@ public class ContactActivity extends Activity {
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
 			finish();
-		} else {
+		} else if (!newContact){
 			loadProfile();
 		}
 	}
@@ -204,7 +204,7 @@ public class ContactActivity extends Activity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
 			public void afterTextChanged(Editable s) {
-				nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
+				if (!newContact) nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
 				isTouched = true;
 			}
 
