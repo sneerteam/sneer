@@ -97,11 +97,6 @@ public abstract class LocalTuplesFactory {
 			}
 
 			@Override
-			public TupleFilter audienceMe() {
-				return audience(identity);
-			}
-			
-			@Override
 			public TupleFilter audience(PrivateKey audience) {
 				return field("audience", audience.publicKey());
 			}
