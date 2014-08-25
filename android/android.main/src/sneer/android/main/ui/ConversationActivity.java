@@ -2,6 +2,7 @@ package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
 
+import java.io.*;
 import java.util.*;
 
 import rx.*;
@@ -130,7 +131,7 @@ public class ConversationActivity extends Activity {
 						menu.getMenu().close();
 						item.call(party.publicKey().current());
 						return true;
-					}});
+					}}).setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
 				}
 				menu.show();
 			} });
