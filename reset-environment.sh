@@ -22,6 +22,7 @@ echo "-------------------> Preparing the workspace"
 cd android && ./gradlew jarNodeps eclipse && cd - || echo "Error preparing android projects, aborting." && exit -1
 
 if [ -d "../rockpaperscissors" ]; then
+	echo COPYING NODEPS JAR...
 	rm -f ../rockpaperscissors/libs/sneer-android-api-nodeps-*.jar
-	cp -f android/android-api/build/libs/sneer-android-api-nodeps-0.1.2.jar ../rockpaperscissors/libs/
+	cp -f android/android-api/build/libs/sneer-android-api-nodeps-*.jar ../rockpaperscissors/libs/
 fi
