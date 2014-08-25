@@ -49,7 +49,6 @@ dependencies {
     compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
     compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
     compile 'com.cognitect:transit-clj:0.8.229'
-    compile 'com.google.guava:guava:17.0'
     compile project(':java-api')
 }
 
