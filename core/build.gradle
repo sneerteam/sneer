@@ -50,6 +50,7 @@ dependencies {
     compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
     compile('com.cognitect:transit-clj:0.8.229') {
     	exclude group: 'org.msgpack', module: 'msgpack'
+    	exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
     }
     compile project(':java-api')
 }
