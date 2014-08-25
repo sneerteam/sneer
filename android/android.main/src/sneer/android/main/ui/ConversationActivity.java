@@ -5,14 +5,13 @@ import static sneer.android.main.SneerApp.*;
 import java.util.*;
 
 import rx.*;
-import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
-import sneer.commons.Comparators;
+import sneer.commons.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -113,23 +112,10 @@ public class ConversationActivity extends Activity {
 		}
 
 		private void handleClick(final Party party, final String text) {
-			if (text != null && !text.isEmpty()) {
-				
-				
-				final Conversation conversation = sneer().produceConversationWith(party);
-				Observable.range(0, 500).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() { @Override public void call(Integer i) {
-					conversation.sendMessage(text + i);
-				}});
-				
-//				sneer().produceConversationWith(party).sendMessage(text);
-				
-				
-				
-				
-				
-			} else {
+			if (text != null && !text.isEmpty())
+				sneer().produceConversationWith(party).sendMessage(text);
+			else
 				openIteractionMenu();
-			}
 		}
 
 		private void openIteractionMenu() {
@@ -141,7 +127,6 @@ public class ConversationActivity extends Activity {
 				menu.getMenu().clear();
 				for (final ConversationMenuItem item : menuItems) {
 					menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
-//						Toast.makeText(ConversationActivity.this, "You clicked " + item.caption(), Toast.LENGTH_SHORT).show();
 						menu.getMenu().close();
 						item.call(party.publicKey().current());
 						return true;
@@ -155,7 +140,7 @@ public class ConversationActivity extends Activity {
 		}});		
 	}
 
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (embeddedOptions.conversationAction == null) {

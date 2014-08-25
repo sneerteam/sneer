@@ -14,7 +14,6 @@ import sneer.android.main.*;
 import sneer.android.main.core.*;
 import sneer.commons.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -44,15 +43,11 @@ public class MainActivity extends Activity {
 		
 		setContentView(R.layout.activity_main);
 
-
 		startProfileActivityIfFirstTime();
 //		startCore();
 		SneerSqliteDatabase.selfTest();
 		
 		makeConversationList();
-		
-		
-//		uiStress();
 	}
 
 
@@ -155,8 +150,8 @@ public class MainActivity extends Activity {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.chat_contact:
-			toast(conversation.toString()); // Do something useful with
-											// conversation here.
+			toast(conversation.toString()); // Do something useful with conversation
+											// here.
 			break;
 		case R.id.edit_contact:
 			conversation.toString(); // Do something useful with conversation
@@ -178,10 +173,6 @@ public class MainActivity extends Activity {
 		}
 		getMenuInflater().inflate(R.menu.main, menu);
 
-//		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
 		return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -194,8 +185,7 @@ public class MainActivity extends Activity {
 			break;
 		case R.id.action_search_for_apps:
 			Intent viewIntent =
-	          new Intent("android.intent.action.VIEW",
-	            Uri.parse("https://play.google.com/store/search?q=SneerApp"));
+	          new Intent("android.intent.action.VIEW", Uri.parse("https://play.google.com/store/search?q=SneerApp"));
 	          startActivity(viewIntent);
 			break;
 		case R.id.action_advanced:
@@ -206,11 +196,7 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	public static void log(String s) {
-		Log.d(MainActivity.class.getSimpleName(), s);
-	}
 	
-
 	private void navigateTo(Class<?> class1) {
 		startActivity(new Intent().setClass(this, class1));
 	}
@@ -245,12 +231,6 @@ public class MainActivity extends Activity {
 	}
 
 	
-	private void toast(String message) {
-		Log.d(MainActivity.class.getSimpleName(), "toast: " + message);
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-
-	
 	private void startProfileActivityIfFirstTime() {
 		ownName().subscribe(new Action1<String>() { @Override public void call(String name) {
 			if (name.isEmpty())
@@ -262,29 +242,16 @@ public class MainActivity extends Activity {
 	private Observable<String> ownName() {
 		return sneer().profileFor(sneer().self()).ownName();
 	}
+
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	private void uiStress() {
-		Observable.range(0, 1000).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() { @Override public void call(Integer i) {
-			try {
-				sneer().addContact("Maicon " + i, sneer().produceParty(Keys.createPublicKey("" + i)));
-			} catch (FriendlyException e) {
-				toast(e.getMessage());
-			}
-		}});
+	private void toast(String message) {
+		Log.d(MainActivity.class.getSimpleName(), "toast: " + message);
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 	
 	
+	public static void log(String s) {
+		Log.d(MainActivity.class.getSimpleName(), s);
+	}
 	
-	
-	
-	
-
 }
