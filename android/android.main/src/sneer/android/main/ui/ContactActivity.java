@@ -51,6 +51,7 @@ public class ContactActivity extends Activity {
 		cityView = (TextView) findViewById(R.id.city);
 
 		load();
+		
 		getActionBar().setTitle(activityTitle());
 		
 		validationOnTextChanged(nicknameEdit);
@@ -84,12 +85,13 @@ public class ContactActivity extends Activity {
 		else
 			loadContact(null);
 		
-		if (partyPuk.bytesAsString().equals(sneer().self().publicKey().current().bytesAsString())){
+		if (partyPuk.bytesAsString().equals(sneer().self().publicKey().current().bytesAsString())) {
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
 			finish();
-		}else
+		} else {
 			loadProfile();
+		}
 	}
 
 	
@@ -121,13 +123,6 @@ public class ContactActivity extends Activity {
 			
 		}});
 
-		//Is preferrednickname is the same as the ownname or the same as the nickname, don't show the preferrednickname field.
-//		rx.Observable.zip(profile.ownName(), profile.preferredNickname(), new Func2<String, String, Boolean>() { @Override public Boolean call(String ownName, String preferredNickname) {
-//				if(ownName.equalsIgnoreCase(preferredNickname))System.out.println();
-//					//preferredNickNameView.;
-//				return isOwn;
-//			}});
-		
 		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
 			preferredNickNameView.setText("(" + preferredNickname+ ")");			
 		}});
@@ -162,7 +157,7 @@ public class ContactActivity extends Activity {
 	
 	
 	public void saveContact() {
-		if(isTouched) 
+		if (isTouched) {
 			try {
 				final String nickName = nicknameEdit.getText().toString();
 				if (newContact)
@@ -173,6 +168,7 @@ public class ContactActivity extends Activity {
 			} catch (FriendlyException e) {
 				toast(e.getMessage());
 			}
+		}
 	}
 
 	
