@@ -12,10 +12,12 @@ sourceSets {
     main.resources.srcDir 'src'
 }
 
+
 dependencies {
     compile 'com.netflix.rxjava:rxjava-core:' + external.rx.version
     compile 'com.netflix.rxjava:rxjava-async-util:' + external.rx.version
     compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
+    compile 'com.google:bitcoinj:0.11.3'
 }
 
 uploadArchives {
