@@ -51,6 +51,7 @@ public class ContactActivity extends Activity {
 		cityView = (TextView) findViewById(R.id.city);
 
 		load();
+		
 		getActionBar().setTitle(activityTitle());
 		
 		validationOnTextChanged(nicknameEdit);
@@ -68,7 +69,7 @@ public class ContactActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
+			Puk.sendYourPublicKey(ContactActivity.this, party, false, contact.nickname().current());
 			break;
 		}
 		return true;
@@ -83,23 +84,20 @@ public class ContactActivity extends Activity {
 			loadContact(Keys.createPublicKey(intent.getData().getQuery()));
 		else
 			loadContact(null);
-		
-		if (partyPuk.asBitcoinAddress().equals(sneer().self().publicKey().current().asBitcoinAddress())){
+
+		if (partyPuk.asBitcoinAddress().equals(sneer().self().publicKey().current().asBitcoinAddress())) {
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
 			finish();
-		}else
+		} else {
 			loadProfile();
+		}
 	}
 
 	
 	private String activityTitle() {
-		Bundle extras = getIntent().getExtras();
-		
-		if (extras == null) {
-			newContact = true;
+		if (newContact)
 			return "New Contact";
-		}
 
 		return "Contact";
 	}
@@ -118,7 +116,6 @@ public class ContactActivity extends Activity {
 		
 		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String ownName) { 
 			fullNameView.setText(ownName);
-			
 		}});
 
 		//Is preferrednickname is the same as the ownname or the same as the nickname, don't show the preferrednickname field.
@@ -155,9 +152,15 @@ public class ContactActivity extends Activity {
 		profile = sneer().profileFor(party);
 		contact = sneer().findContact(party);
 
-		newContact = contact == null
-				? true
-				: false; 		
+		if (contact == null) {
+			newContact = true;
+			try {
+				sneer().addContact("new", party);
+				contact = sneer().findContact(party);
+			} catch (FriendlyException e) {
+				toast(e.getMessage());
+			}
+		}
 	}
 	
 	
@@ -165,10 +168,7 @@ public class ContactActivity extends Activity {
 		if(isTouched) 
 			try {
 				final String nickName = nicknameEdit.getText().toString();
-				if (newContact)
-					sneer().addContact(nickName, party);
-				else
-					sneer().findContact(party).setNickname(nickName);
+				contact.setNickname(nickName);
 				toast("contact saved...");
 			} catch (FriendlyException e) {
 				toast(e.getMessage());

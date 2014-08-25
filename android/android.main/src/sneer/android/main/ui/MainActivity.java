@@ -14,7 +14,6 @@ import sneer.android.main.*;
 import sneer.android.main.core.*;
 import sneer.commons.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -50,9 +49,12 @@ public class MainActivity extends Activity {
 		SneerSqliteDatabase.selfTest();
 		
 		makeConversationList();
+<<<<<<< HEAD
 		
 		
 //		uiStress();
+=======
+>>>>>>> Some refactoring and remove UI stress test.
 	}
 
 
@@ -262,29 +264,5 @@ public class MainActivity extends Activity {
 	private Observable<String> ownName() {
 		return sneer().profileFor(sneer().self()).ownName();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	private void uiStress() {
-		Observable.range(0, 1000).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() { @Override public void call(Integer i) {
-			try {
-				sneer().addContact("Maicon " + i, sneer().produceParty(Keys.createPublicKey("" + i)));
-			} catch (FriendlyException e) {
-				toast(e.getMessage());
-			}
-		}});
-	}
-	
-	
-	
-	
-	
-	
 
 }
