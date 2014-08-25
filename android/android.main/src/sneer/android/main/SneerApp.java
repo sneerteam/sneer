@@ -1,6 +1,7 @@
 package sneer.android.main;
 
 import static sneer.SneerAndroid.*;
+import static sneer.android.main.core.SneerSqliteDatabase.*;
 
 import java.io.*;
 import java.util.*;
@@ -10,11 +11,17 @@ import rx.Observable;
 import rx.functions.*;
 import sneer.*;
 import sneer.admin.*;
-import sneer.admin.impl.*;
+import sneer.android.main.core.*;
 import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 import sneer.impl.simulator.*;
 import android.app.*;
 import android.content.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.util.*;
+import clojure.java.api.*;
+import clojure.lang.*;
 
 public class SneerApp extends Application {
 	
@@ -32,7 +39,9 @@ public class SneerApp extends Application {
 	@Override
 	public void onCreate() {
 
-		SneerAppInfo.initialDiscovery(getApplicationContext());
+		context = getApplicationContext();
+
+		SneerAppInfo.initialDiscovery(context);
 		
 		try {
 			initialize();
@@ -142,10 +151,35 @@ public class SneerApp extends Application {
 		sneer.profileFor(sneer.self()).setOwnName(name);
 	}
 
+	public static IFn var(String ns, String simpleName) {
+		Clojure.var("clojure.core/require").invoke(Clojure.read(ns));
+		return Clojure.var(ns + "/" + simpleName);
+	}
+
+	public static SneerAdmin newSneerAdmin(PrivateKey prik, Object network, Object tupleBase) {
+		return (SneerAdmin) adminVar("new-sneer-admin").invoke(prik, network, tupleBase);
+	}
+
+	private static IFn adminVar(String simpleName) {
+		return var("sneer.admin", simpleName);
+	}
+	
+
 
 	private static SneerAdmin initialize(Context context) throws FriendlyException {
-		File secureFolder = new File(context.getFilesDir(), "admin");
-		return new SneerFactoryImpl().open(secureFolder);
+		
+		SneerSqliteDatabase.selfTest();
+		
+		File admin = new File(context.getFilesDir(), "admin");
+		admin.mkdirs();
+		File secureFile = new File(admin, "tupleSpace.sqlite");
+		try {
+			Object network = networkSimulator("new-network").invoke();
+			Object tupleBase = SneerSqliteDatabase.openTupleBase(secureFile);
+			return newSneerAdmin(Keys.createPrivateKey(), network, tupleBase);
+		} catch (IOException e) {
+			throw new FriendlyException("Problem preparing Sneer ("+e.getMessage()+")");
+		}
 	}
 	
 	

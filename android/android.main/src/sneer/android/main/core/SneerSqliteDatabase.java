@@ -32,14 +32,8 @@ public class SneerSqliteDatabase implements Database {
 
 	
 	private static void trySelfTest() throws IOException {
-		Object network = networkSimulator("new-network").invoke();
-		PublicKey puk = Keys.createPrivateKey("selfTest").publicKey();
-		
-		Object tupleBase = tmpTupleBase();
-		
-		Object connection = core("connect").invoke(network, puk);
-		Object followees = Observable.never();
-		TupleSpace ts = (TupleSpace)core("reify-tuple-space").invoke(puk, tupleBase, connection, followees);
+		File databaseFile = createTempFile();
+		TupleSpace ts = createTupleSpace(networkSimulator("new-network").invoke(), databaseFile);
 		
 		ts.publisher().type("self-test").pub("42");
 		ts.filter().type("self-test").tuples().subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
@@ -52,14 +46,31 @@ public class SneerSqliteDatabase implements Database {
 	}
 
 
-	public static Object tmpTupleBase() throws IOException {
-		return prepareTupleBase(tmpDatabase());
+	private static File createTempFile() throws IOException {
+		return File.createTempFile("self-test", "");
 	}
 
 
-	public static SneerSqliteDatabase tmpDatabase() throws IOException {
+	public static TupleSpace createTupleSpace(Object network, File databaseFile) throws IOException {
+		PublicKey puk = Keys.createPrivateKey("selfTest").publicKey();
+		
+		Object tupleBase = openTupleBase(databaseFile);
+		
+		Object connection = core("connect").invoke(network, puk);
+		Object followees = Observable.never();
+		TupleSpace ts = (TupleSpace)core("reify-tuple-space").invoke(puk, tupleBase, connection, followees);
+		return ts;
+	}
+
+
+	public static Object openTupleBase(File file) throws IOException {
+		return prepareTupleBase(openDatabase(file), !file.exists());
+	}
+
+
+	public static SneerSqliteDatabase openDatabase(File file) throws IOException {
 		return new SneerSqliteDatabase(
-			SQLiteDatabase.openOrCreateDatabase(File.createTempFile("self-test", ""),null));
+			SQLiteDatabase.openOrCreateDatabase(file,null));
 	}
 	
 
@@ -69,13 +80,13 @@ public class SneerSqliteDatabase implements Database {
 	}
 	
 	
-	private static IFn networkSimulator(String var) {
+	public static IFn networkSimulator(String var) {
 		return var("sneer.networking.simulator", var);
 	}
 	
 	
-	private static Object prepareTupleBase(SneerSqliteDatabase db) {
-		tupleBase("create-tuple-table").invoke(db);
+	private static Object prepareTupleBase(SneerSqliteDatabase db, boolean create) {
+		if (create) tupleBase("create-tuple-table").invoke(db);
 		return tupleBase("create").invoke(db);
 	}
 
@@ -196,6 +207,11 @@ public class SneerSqliteDatabase implements Database {
 
 	private String name(Object keyword) {
 		return keyword.toString().substring(1);
+	}
+
+
+	public static Object tmpTupleBase() throws IOException {
+		return openTupleBase(createTempFile());
 	}
 
 }
