@@ -16,14 +16,14 @@
     [
      [:id :integer "PRIMARY KEY AUTOINCREMENT"]
      [:type :varchar "NOT NULL"]
-     [:payload :varchar]
+     [:payload :blob]
      [:timestamp :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]
      [:author :blob "NOT NULL"]
      [:audience :blob]
      ;[:device :blob "NOT NULL"]
      ;[:sequence :integer "NOT NULL"]
      ;[:signature :blob "NOT NULL"]
-     [:custom :varchar]]))
+     [:custom :blob]]))
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
 
@@ -35,6 +35,7 @@
 
 (def serializers {"author" puk-serializer
                   "audience" puk-serializer
+                  "payload" core-serializer
                   "custom" core-serializer})
 
 (defn apply-serializer [op row field serializer]

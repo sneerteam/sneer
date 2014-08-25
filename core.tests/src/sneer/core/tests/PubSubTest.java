@@ -135,8 +135,8 @@ public class PubSubTest extends TupleSpaceTestsBase {
 	}
 	
 	@Test
-	public void customField() {
-		TuplePublisher customPublisher = tuplesA.publisher().type("custom");
+	public void customFieldTypeRepresentation() {
+		TuplePublisher customPublisher = tuplesA.publisher().type("banana-type");
 		customPublisher.field("custom", 42).pub();
 		customPublisher.field("custom", 23).pub();
 		
@@ -147,6 +147,19 @@ public class PubSubTest extends TupleSpaceTestsBase {
 					.field("custom", 42)
 					.tuples()
 					.map(field("custom")),
+				42L));
+	}
+
+	@Test
+	public void payloadTypeRepresentation() {
+		tuplesA.publisher().type("banana-type")
+			.pub(42);
+		
+		expecting(
+			payloads(
+				tuplesA
+					.filter()
+					.tuples(),
 				42L));
 	}
 
