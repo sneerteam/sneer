@@ -220,7 +220,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 				.tuples();
 		
 		expecting(
-			actual.map(new Func1<Tuple, Void>() { @SuppressWarnings("unchecked") @Override public Void call(Tuple t1) {
+			actual.map(new Func1<Tuple, Void>() { @SuppressWarnings({ "unchecked", "deprecation" }) @Override public Void call(Tuple t1) {
 				assertList(array, ((List<Object>)t1.get("path")));				
 				assertEquals("userB is cool", t1.payload());
 				return null;
