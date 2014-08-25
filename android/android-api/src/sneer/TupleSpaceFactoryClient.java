@@ -60,6 +60,7 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 		return Observable.create(new Observable.OnSubscribe<Tuple>() {  @Override public void call(final Subscriber<? super Tuple> subscriber) {
 			Intent intent = new Intent(SneerAndroid.SNEER_SERVICE);
 			intent.putExtra("op", op.ordinal());
+			log("tupleSpace: subscribe: " + criteria);
 			intent.putExtra("criteria", serializer.serialize(criteria));
 			intent.putExtra("resultReceiver", new ResultReceiver(null) {  @SuppressWarnings("unchecked") @Override protected void onReceiveResult(int resultCode, Bundle resultData) {
 				switch (TupleSpaceFactoryClient.SubscriptionOp.values()[resultCode]) {

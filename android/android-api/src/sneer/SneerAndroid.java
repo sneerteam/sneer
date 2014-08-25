@@ -89,6 +89,7 @@ public class SneerAndroid {
 		String type;
 		long lastMessageSeen;
 		public SessionInfo(long id, PublicKey partyPuk, String type, long lastMessageSeen) {
+			this.id = id;
 			this.partyPuk = partyPuk;
 			this.type = type;
 			this.lastMessageSeen = lastMessageSeen;
