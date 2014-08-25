@@ -14,7 +14,7 @@ public class Keys {
 	}
 	
 	
-	public static Object createPrivateKey(String bytesAsString) {
+	public static PrivateKey createPrivateKey(String bytesAsString) {
 		return new PrivateKeyImpl(bytesAsString);
 	}
 	
