@@ -1,6 +1,7 @@
 (ns sneer.admin
   (:require
    [rx.lang.clojure.core :as rx]
+   [sneer.rx :refer [subject*]]
    [sneer.core :as core :refer [connect dispose]])
   (:import
    [sneer.admin SneerAdmin]
@@ -13,6 +14,9 @@
 
 (defn behavior-subject [& [initial-value]]
   (BehaviorSubject/create initial-value))
+
+(defn replay-last-subject []
+  (ReplaySubject/createWithSize 1))
 
 (defn new-party [puk]
   (reify Party
@@ -28,20 +32,6 @@
    (get puk)))
 
 (defn reify-profile [party tuple-space]
-  ;; Observable<String> ownName();
-  ;; void setOwnName(String newOwnName);
-
-  ;; Observable<String> preferredNickname();
-  ;; void setPreferredNickname(String newPreferredNickname);
-
-  ;; Observable<byte[]> selfie();
-  ;; void setSelfie(byte[] newSelfie);
-
-  ;; Observable<String> country();
-  ;; void setCountry(String newCountry);
-
-  ;; Observable<String> city();
-  ;; void setCity(String newCity);
 
   (letfn [(payloads-of [type]
             (rx/map
@@ -50,25 +40,49 @@
                  filter
                  (type type)
                  (author (party-puk party))
-                 tuples)))]
+                 tuples)))
 
-    (let [preferred-nickname (behavior-subject "(noname)")]
+          (payload-subject [tuple-type]
+            (let [subject (replay-last-subject)
+                  publish #(.. tuple-space
+                               publisher
+                               (type tuple-type)
+                               (pub %))]
+              (rx/subscribe (payloads-of tuple-type)
+                            (partial rx/on-next subject))
+              (subject*
+               (.asObservable subject)
+               (reify rx.Observer
+                 (onNext [this value]
+                   (publish value))))))]
 
-      (rx/subscribe (payloads-of "profile/preferred-nickname")
-                    (partial rx/on-next preferred-nickname))
+    (let [own-name (payload-subject "profile/own-name")
+          selfie (payload-subject "profile/selfie")
+          city (payload-subject "profile/city")
+          country (payload-subject "profile/country")
+          preferred-nickname (payload-subject "profile/preferred-nickname")]
 
       (reify Profile
-        (selfie [this]
-          (rx/never))
         (ownName [this]
-          (.asObservable preferred-nickname))
+          (.asObservable own-name))
+        (setOwnName [this value]
+          (rx/on-next own-name value))
+        (selfie [this]
+          (.asObservable selfie))
+        (setSelfie [this value]
+          (rx/on-next selfie value))
         (preferredNickname [this]
           (.asObservable preferred-nickname))
         (setPreferredNickname [this value]
-          (.. tuple-space
-              publisher
-              (type "profile/preferred-nickname")
-              (pub value)))))))
+          (rx/on-next preferred-nickname value))
+        (city [this]
+          (.asObservable city))
+        (setCity [this value]
+          (rx/on-next city value))
+        (country [this]
+          (.asObservable country))
+        (setCountry [this value]
+          (rx/on-next country value))))))
 
 (defn reify-contact [nickname party]
   (let [nickname-subject (ObservedSubject/create nickname)]
@@ -146,7 +160,7 @@
 
         (findContact [this party]
           (get @puk->contact (party-puk party)))
-        
+
         (conversationsContaining [this type]
           (rx/never))
 
