@@ -56,7 +56,19 @@ public class SneerApp extends Application {
 							
 							@Override
 							public byte[] icon() {
-								// TODO Auto-generated method stub
+								Drawable icon;
+								try {
+									icon = getPackageManager().getResourcesForApplication(t1.packageName).getDrawable(t1.icon);
+									Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
+									ByteArrayOutputStream stream = new ByteArrayOutputStream();
+									bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+									byte[] bitmapdata = stream.toByteArray();
+									return bitmapdata;
+								} catch (Exception e) {
+									Log.w(SneerApp.class.getSimpleName(), "Error loading bitmap", e);
+									e.printStackTrace();
+								}
+
 								return null;
 							}
 							
