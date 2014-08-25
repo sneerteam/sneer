@@ -7,7 +7,7 @@ import sneer.impl.keys.*;
 
 public class SneerAdminSimulator implements SneerAdmin {
 	
-	private final PrivateKey neidePrik = Keys.createPrivateKey("Neide");
+	private final PrivateKey neidePrik = Keys.createPrivateKey();
 
 	private final SneerSimulator sneer = new SneerSimulator(neidePrik);
 
