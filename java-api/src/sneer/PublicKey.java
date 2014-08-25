@@ -3,8 +3,10 @@ package sneer;
 import java.io.*;
 
 public interface PublicKey extends Serializable {
-
-	String asBitcoinAddress();
-	byte[] bytes();
 	
+	/** This byte[] representation of this public key. */
+	byte[] bytes();
+
+	/** This representation of this public key as a hexadecimal string. */
+	String bytesAsString();
 }

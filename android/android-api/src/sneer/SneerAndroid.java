@@ -60,6 +60,16 @@ public class SneerAndroid {
 		@Override public PublicKey publicKey() {
 			return null;
 		}
+
+		@Override
+		public byte[] bytes() {
+			return null;
+		}
+
+		@Override
+		public String bytesAsString() {
+			return null;
+		}
 	};
 	
 	private Context context;

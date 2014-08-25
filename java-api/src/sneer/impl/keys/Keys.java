@@ -1,14 +1,21 @@
 package sneer.impl.keys;
 
 import sneer.*;
-import sneer.commons.*;
 
 public class Keys {
 
-	private static int nextSeed = 1;
-
 	public static PrivateKey createPrivateKey() {
-		return createPrivateKey("" + nextSeed++);
+		return new PrivateKeyImpl();
+	}
+
+	
+	public static PrivateKey createPrivateKey(byte[] bytes) {
+		return new PrivateKeyImpl(bytes);
+	}
+	
+	
+	public static Object createPrivateKey(String bytesAsString) {
+		return new PrivateKeyImpl(bytesAsString);
 	}
 	
 	
@@ -17,14 +24,8 @@ public class Keys {
 	}
 
 	
-	public static PublicKey createPublicKey(String bitcoinAddress) {
-		//TODO Use the bitcoinj lib.
-		return new PublicKeyImpl(Codec.toUTF8(bitcoinAddress));
-	}
-
-	
-	public static PrivateKey createPrivateKey(String seed) {
-		return new PrivateKeyImpl(Codec.toUTF8(seed.replace(' ', '-'))); //TODO Use bitcoin keys.
+	public static PublicKey createPublicKey(String bytesAsString) {
+		return new PublicKeyImpl(bytesAsString);
 	}
 
 }
