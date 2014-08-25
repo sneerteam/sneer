@@ -2,7 +2,7 @@ package sneer.utils;
 
 import java.util.*;
 
-import us.bpsm.edn.*;
+import sneer.commons.exceptions.*;
 
 public class Encoder {
 	
@@ -22,8 +22,9 @@ public class Encoder {
 	}
 	
 	static Object toKeywordOrString(String s) {
-		return s.startsWith(":")
-			? Keyword.newKeyword(s.substring(1))
-			: s;
+		if (s.startsWith(":"))
+			throw new NotImplementedYet();
+		else
+			return s;
 	}
 }

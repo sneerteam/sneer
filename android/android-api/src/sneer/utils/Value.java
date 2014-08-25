@@ -1,12 +1,9 @@
 package sneer.utils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import us.bpsm.edn.*;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+import sneer.commons.exceptions.*;
+import android.os.*;
 
 public class Value implements Parcelable {
 
@@ -87,12 +84,12 @@ public class Value implements Parcelable {
 		KEYWORD {
 			@Override
 			public Object createFromParcel(Parcel in) {
-				return Keyword.newKeyword(in.readString());
+				throw new NotImplementedYet();
 			}
 
 			@Override
 			public void writeToParcel(Parcel dest, Object value) {
-				dest.writeString(((Keyword)value).getName());
+				throw new NotImplementedYet();
 			}
 		},
 		LONG {
@@ -135,8 +132,8 @@ public class Value implements Parcelable {
 				return LONG;
 			if (o instanceof Map)
 				return MAP;
-			if (o instanceof Keyword)
-				return KEYWORD;
+//			if (o instanceof Keyword)
+//				return KEYWORD;
 			return NULL;
 		}
 

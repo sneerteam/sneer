@@ -1,12 +1,10 @@
 package sneerteam.snapi.tests;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import junit.framework.*;
 import sneer.utils.*;
-import us.bpsm.edn.*;
-import android.os.Parcel;
-import junit.framework.TestCase;
+import android.os.*;
 
 public class ValueTest extends TestCase {
 	
@@ -27,11 +25,11 @@ public class ValueTest extends TestCase {
 		assertMapEquals(map, actual);
 	}
 	
-	public void testKeyword() {
-		Keyword keyword = Keyword.newKeyword("me");
-		Value v = roundtrip(Value.of(keyword));
-		assertEquals(keyword, v.get());
-	}
+//	public void testKeyword() {
+//		Keyword keyword = Keyword.newKeyword("me");
+//		Value v = roundtrip(Value.of(keyword));
+//		assertEquals(keyword, v.get());
+//	}
 
 	private Map<?, ?> hash_map(Object... kvs) {
 		HashMap<Object, Object> result = new HashMap<Object, Object>(kvs.length / 2);
