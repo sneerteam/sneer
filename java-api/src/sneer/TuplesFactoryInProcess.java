@@ -1,12 +1,13 @@
 package sneer;
 
+import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 
 import rx.*;
+import rx.Observable.OnSubscribe;
 import rx.Observable;
-import rx.Observable.*;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.refimpl.*;
@@ -17,8 +18,8 @@ public class TuplesFactoryInProcess extends LocalTuplesFactory {
 	Subject<Tuple, Tuple> tuples = ReplaySubject.create();
 
 	@Override
-	protected void publishTuple(Tuple ret) {
-		tuples.onNext(ret);
+	protected void publishTuple(Tuple tuple) {
+		tuples.onNext(tuple);
 	}
 
 	@Override
@@ -29,8 +30,8 @@ public class TuplesFactoryInProcess extends LocalTuplesFactory {
 				String key = criterion.getKey();
 				Object tupleValue = t1.get(key);
 				Object value = criterion.getValue();
-				if (key.equals("audience") && value == null) {
-					return tupleValue == null || tupleValue.equals(identity.publicKey());
+				if (key.equals("audience")) {
+					return tupleValue == null || tupleValue.equals(identity.publicKey()) || t1.author().equals(identity.publicKey());
 				}
 				return tupleValue == null
 					? value == null
