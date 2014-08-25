@@ -1,6 +1,9 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
+
+import java.math.*;
+
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -80,9 +83,16 @@ public class ContactActivity extends Activity {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 		
-		if (Intent.ACTION_VIEW.equals(action))
-			loadContact(Keys.createPublicKey(intent.getData().getQuery()));
-		else
+		if (Intent.ACTION_VIEW.equals(action)){
+			try{
+				BigInteger puk = new BigInteger(intent.getData().getQuery(), 16);
+				loadContact(Keys.createPublicKey(puk.toString()));		
+			}catch(NumberFormatException e){
+				toast("Puk invalid format.");
+				finish();
+			}
+			
+		} else
 			loadContact(null);
 		
 		if (partyPuk.bytesAsString().equals(sneer().self().publicKey().current().bytesAsString())) {
@@ -139,6 +149,13 @@ public class ContactActivity extends Activity {
 			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
 			selfieImage.setImageBitmap(bitmap);
 		}});
+		
+		
+		if(profile.preferredNickname().toBlocking().first().equalsIgnoreCase(profile.ownName().toBlocking().first()) ||
+				profile.preferredNickname().toBlocking().first().equalsIgnoreCase(contact.nickname().current()))
+			preferredNickNameView.setVisibility(View.GONE);
+		
+		
 	}
 
 	private void loadContact(PublicKey puk){
