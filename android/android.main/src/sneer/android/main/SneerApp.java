@@ -71,8 +71,7 @@ public class SneerApp extends Application {
 									Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 									ByteArrayOutputStream stream = new ByteArrayOutputStream();
 									bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-									byte[] bitmapdata = stream.toByteArray();
-									return bitmapdata;
+									return stream.toByteArray();
 								} catch (Exception e) {
 									Log.w(SneerApp.class.getSimpleName(), "Error loading bitmap", e);
 									e.printStackTrace();
