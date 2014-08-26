@@ -130,8 +130,13 @@ public class ProfileActivity extends Activity {
 	
 	
 	public void saveProfile() {
-		if (firstNameEdit.getText().toString().trim().length() > 1 && lastNameEdit.getText().toString().trim().length() > 1) 
-			profile.setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
+		if (lastNameEdit.getVisibility() == View.GONE) {
+			if (firstNameEdit.getText().toString().trim().length() > 1)
+				profile.setOwnName(firstNameEdit.getText().toString());
+		} else {
+			if (firstNameEdit.getText().toString().trim().length() > 1 && lastNameEdit.getText().toString().trim().length() > 1) 
+				profile.setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
+		}
 		
 		String preferredNickname = preferredNickNameEdit.getText().toString();
 		profile.setPreferredNickname(preferredNickname);
