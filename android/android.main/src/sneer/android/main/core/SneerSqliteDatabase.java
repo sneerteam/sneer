@@ -209,9 +209,12 @@ public class SneerSqliteDatabase implements Database {
 		return keyword.toString().substring(1);
 	}
 
-
-	public static Object tmpTupleBase() throws IOException {
-		return openTupleBase(createTempFile());
+	public static Object tmpTupleBase() {
+		try {
+			return prepareTupleBase(openDatabase(createTempFile()), true);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 }

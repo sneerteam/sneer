@@ -12,13 +12,17 @@ public class PubSubOverSqliteAndroid extends TestCase {
 		pubSubTest().messagePassing();
 	}
 
+	public void testPayloadTypeRepresentation() throws IOException {
+		pubSubTest().payloadTypeRepresentation();
+	}
+
+	public void testCustomFieldTypeRepresentation() throws IOException {
+		pubSubTest().customFieldTypeRepresentation();
+	}
+	
 	private PubSubTest pubSubTest() {
 		return PubSubOverPersistentTupleSpace.create(new Func0<Object>() {  @Override public Object call() {
-			try {
-				return SneerSqliteDatabase.tmpTupleBase();
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
+			return SneerSqliteDatabase.tmpTupleBase();
 		}});
 	}
 	

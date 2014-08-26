@@ -1,12 +1,10 @@
 package sneer.core.tests;
 
-import static org.junit.Assert.*;
 import static sneer.core.tests.ObservableTestUtils.*;
 
 import java.util.*;
 
-import org.junit.*;
-
+import junit.framework.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
@@ -14,17 +12,54 @@ import sneer.*;
 import sneer.admin.*;
 import sneer.commons.Arrays;
 import sneer.commons.exceptions.*;
+import sneer.impl.keys.*;
 
-public class ConversationsAPITest extends ConversationsAPITestsBase {
+public class ConversationsAPITest extends TestCase {
+	
+	protected final Object network = newNetwork();
 
-	@Test
-	public void sameSneer() {
+	protected Object newNetwork() {
+		return Glue.newNetworkSimulator();
+	}
+
+	@Override
+	public void tearDown() {
+		Glue.tearDownNetwork(network);
+	}
+	
+	
+	protected final SneerAdmin adminA = newSneerAdmin();
+	protected final SneerAdmin adminB = newSneerAdmin();
+	protected final SneerAdmin adminC = newSneerAdmin();
+
+	protected final PublicKey userA = adminA.sneer().self().publicKey().current();
+	protected final PublicKey userB = adminB.sneer().self().publicKey().current();
+	protected final PublicKey userC = adminC.sneer().self().publicKey().current();
+	
+	protected final Sneer sneerA = adminA.sneer();
+	protected final Sneer sneerB = adminB.sneer();
+	protected final Sneer sneerC = adminC.sneer();
+
+	protected PrivateKey newPrivateKey() {
+		return Keys.createPrivateKey();
+	}
+	
+	private SneerAdmin newSneerAdmin() {
+		return Glue.newSneerAdmin(Keys.createPrivateKey(), network, newTupleBase());
+	}
+
+	protected Object newTupleBase() {
+		return ReplaySubject.create();
+	}
+
+
+
+	public void testSameSneer() {
 		assertEquals(adminA.sneer(), adminA.sneer());
 	}
 
 
-	@Test
-	public void pukOfParty() {
+	public void testPukOfParty() {
 
 		Party someone = sneerA.produceParty(userB);
 
@@ -32,8 +67,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 	}
 
-	@Test
-	public void alwaysReturnsSamePartyInstance() {
+	public void testAlwaysReturnsSamePartyInstance() {
 
 		Party someoneElse = sneerA.produceParty(userB);
 
@@ -41,8 +75,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 	}
 
-	@Test
-	public void addContact() throws FriendlyException {
+	public void testAddContact() throws FriendlyException {
 
 		final Party partyB = sneerA.produceParty(userB);
 
@@ -53,15 +86,18 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		assertSame(partyB, sneerA.findContact(partyB).party());
 	}
 
-	@Test(expected = FriendlyException.class)
-	public void exceptionOnDuplicatedNickname() throws FriendlyException {
+	public void testExceptionOnDuplicatedNickname() throws FriendlyException {
 
 		sneerA.addContact("Party Boy", sneerA.produceParty(userB));
-		sneerA.addContact("Party Boy", sneerA.produceParty(userC));
+		try {
+			sneerA.addContact("Party Boy", sneerA.produceParty(userC));
+			fail("should have failed with "+FriendlyException.class.getSimpleName());
+		} catch (FriendlyException expected) {
+			
+		}
 	}
 
-	@Test
-	public void changeContactNickname() throws FriendlyException {
+	public void testChangeContactNickname() throws FriendlyException {
 
 		Party partyB = sneerA.produceParty(userB);
 
@@ -81,8 +117,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 			values(partyBNicks, "Party Man"));
 	}
 	
-	@Test
-	public void contactListSequence() throws FriendlyException {
+	public void testContactListSequence() throws FriendlyException {
 
 		final Party partyB = sneerA.produceParty(userB);
 		final Party partyC = sneerA.produceParty(userC);
@@ -101,8 +136,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 			contactsOf(sneerA, partyB, partyC));
 	}
 	
-	@Test
-	public void contactListRestore() throws FriendlyException {
+	public void testContactListRestore() throws FriendlyException {
 
 		final Party partyB = sneerA.produceParty(userB);
 		final Party partyC = sneerA.produceParty(userC);
@@ -116,7 +150,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 
 	private Observable<Void> contactsOf(final Sneer sneer, final Party... parties) {
 		return sneer.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
-			assertArrayEquals(
+			ObservableTestUtils.assertArrayEquals(
 				Arrays.map(parties, new Func1<Party, Contact>() {  @Override public Contact call(Party t1) {
 					return sneer.findContact(t1);
 				}}),
@@ -125,8 +159,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		} });
 	}
 	
-	@Test
-	public void preferredNickname() {
+	public void testPreferredNickname() {
 		
 		Profile profileBFromB = sneerB.profileFor(sneerB.self());
 		Profile profileBFromA = sneerA.profileFor(sneerA.produceParty(userB));
@@ -143,8 +176,7 @@ public class ConversationsAPITest extends ConversationsAPITestsBase {
 		
 	}
 	
-	@Test
-	public void preferredNicknameForSelf() {
+	public void testPreferredNicknameForSelf() {
 		
 		Profile profileB = sneerB.profileFor(sneerB.self());
 		profileB.setPreferredNickname("Party Boy");		

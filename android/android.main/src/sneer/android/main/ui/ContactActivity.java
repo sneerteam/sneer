@@ -1,6 +1,7 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
+import rx.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -145,6 +146,18 @@ public class ContactActivity extends Activity {
 			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
 			selfieImage.setImageBitmap(bitmap);
 		}});
+		
+		
+		Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>(){ @Override public Boolean call(String preferredNickname, String ownName) {
+			if(preferredNickname.equalsIgnoreCase(ownName) ||
+					preferredNickname.equalsIgnoreCase(contact.nickname().current()))
+				return true;
+			else
+				return false;
+			}}).subscribe(new Action1<Boolean>(){ @Override public void call(Boolean validation) {
+				if(validation)
+					preferredNickNameView.setVisibility(View.GONE);
+			}});
 		
 	}
 

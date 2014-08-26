@@ -74,7 +74,7 @@ public class ObservableTestUtils {
 		}
 	}
 	
-	private static void assertArrayEquals(Object[] expected, Object[] actual) {
+	public static void assertArrayEquals(Object[] expected, Object[] actual) {
 		assertList(expected, Arrays.asList(actual));
 	}
 

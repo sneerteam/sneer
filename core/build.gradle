@@ -51,6 +51,7 @@ dependencies {
     compile('com.cognitect:transit-clj:0.8.229') {
     	exclude group: 'org.msgpack', module: 'msgpack'
     	exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+    	exclude group: 'org.apache.directory.studio', module: 'org.apache.commons.codec'
     }
     compile project(':java-api')
 }
