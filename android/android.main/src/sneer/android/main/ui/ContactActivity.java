@@ -106,6 +106,7 @@ public class ContactActivity extends Activity {
 	private String activityTitle() {
 		Bundle extras = getIntent().getExtras();
 		
+		//TODO Fix this verification
 		if (extras == null) {
 			newContact = true;
 			return "New Contact";

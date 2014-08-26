@@ -44,6 +44,9 @@ public class SneerSimulator implements Sneer {
 		setupMockupRPSPlayer(cloud, addContact("Maicon Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("maicon.jpg")), "SCISSORS");
 		setupMockupRPSPlayer(cloud, addContact("Wesley Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("wesley.jpg")), "ROCK");
 		setupMockupRPSPlayer(cloud, addContact("Carla Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("carla.jpg")), "PAPER");
+		
+		addUnknownContact("Ze Ninguem", "dude", "World", "Unknown", selfieFromFileSystem("wesley.jpg"));
+		
 	}
 
 
@@ -126,6 +129,7 @@ public class SneerSimulator implements Sneer {
 			.pub(nickname);
 	}
 	
+	
 
 	@Override
 	public Observable<List<Contact>> contacts() {
@@ -158,6 +162,7 @@ public class SneerSimulator implements Sneer {
 	}
 
 	
+	
 	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city, byte[] selfie) {
 		PrivateKey prik = Keys.createPrivateKey();
 		PartySimulator party = produceParty(prik.publicKey());
@@ -170,6 +175,38 @@ public class SneerSimulator implements Sneer {
 		return prik;
 	}
 	
+	private PrivateKey addUnknownContact(String name, String preferredNicknane, String coutry, String city, byte[] selfie) {
+		PrivateKey prik = Keys.createPrivateKey();
+		PartySimulator party = produceParty(prik.publicKey());
+		System.out.println("==============================");
+		System.out.println("Misterious puk: " + party.publicKey().current().bytesAsString());
+		System.out.println("==============================");
+		party.simulateSetName(name);
+		party.simulateSetPreferredNickname(preferredNicknane);
+		party.simulateSetCountry(coutry);
+		party.simulateSetCity(city);
+		party.simulateSetSelfie(selfie);
+		addUnknownContact(name, party);
+		return prik;
+	}
+	
+	public void addUnknownContact(final String nickname, final Party party) {		
+		synchronized (contactsByParty) {
+			if (contactsByParty.get(party) != null)
+				throw new RuntimeException("The party you tried to add was already a contact.");
+			
+			ContactSimulator c = new ContactSimulator(nickname, party);
+			contactsByParty.put(party, c);
+			//produceConversationWith(party).sendMessage("Hey " + nickname + "!");
+			//contacts.onNext(contactsSorted());
+		}
+		
+		tupleSpace.publisher()
+			.audience(prik.publicKey())
+			.type("sneer/contact")
+			.field("party", party.publicKey().current())
+			.pub(nickname);
+	}
 
 	@Override
 	public Observable<List<Conversation>> conversationsContaining(String messageType) {
