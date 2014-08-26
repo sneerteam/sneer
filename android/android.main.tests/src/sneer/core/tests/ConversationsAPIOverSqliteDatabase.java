@@ -6,6 +6,6 @@ public class ConversationsAPIOverSqliteDatabase extends ConversationsAPITest {
 
 	@Override
 	protected Object newTupleBase() {
-		return SneerSqliteDatabase.tmpTupleBase();
+		return SneerTestUtils.tmpTupleBase();
 	}
 }

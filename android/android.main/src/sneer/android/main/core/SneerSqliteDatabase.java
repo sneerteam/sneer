@@ -3,107 +3,23 @@ import java.io.*;
 import java.util.*;
 import java.util.Arrays;
 
-import rx.Observable;
-import rx.functions.*;
-import sneer.*;
 import sneer.commons.*;
-import sneer.impl.keys.*;
 import sneer.persistent_tuple_base.*;
-import sneer.tuples.*;
 import android.annotation.*;
 import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
-import clojure.java.api.*;
-import clojure.lang.*;
 
 
 public class SneerSqliteDatabase implements Database {
 	
-	private SQLiteDatabase sqlite;
-
-	public static void selfTest() {
-		try {
-			trySelfTest();
-		} catch (Throwable e) {
-			report(e);
-		}
-	}
-
-	
-	private static void trySelfTest() throws IOException {
-		File databaseFile = createTempFile();
-		TupleSpace ts = createTupleSpace(networkSimulator("new-network").invoke(), databaseFile);
-		
-		ts.publisher().type("self-test").pub("42");
-		ts.filter().type("self-test").tuples().subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
-			System.out.println(tuple);
-			SystemReport.updateReport("self-test.tuple", tuple);
-		}},
-		new Action1<Throwable>() {  @Override public void call(Throwable th) {
-			report(th);	
-		}});
-	}
-
-
-	private static File createTempFile() throws IOException {
-		return File.createTempFile("self-test", "");
-	}
-
-
-	public static TupleSpace createTupleSpace(Object network, File databaseFile) throws IOException {
-		PublicKey puk = Keys.createPrivateKey().publicKey();
-		
-		Object tupleBase = openTupleBase(databaseFile);
-		
-		Object connection = core("connect").invoke(network, puk);
-		Object followees = Observable.never();
-		TupleSpace ts = (TupleSpace)core("reify-tuple-space").invoke(puk, tupleBase, connection, followees);
-		return ts;
-	}
-
-
-	public static Object openTupleBase(File file) throws IOException {
-		return prepareTupleBase(openDatabase(file), !file.exists());
-	}
-
-
 	public static SneerSqliteDatabase openDatabase(File file) throws IOException {
 		return new SneerSqliteDatabase(
 			SQLiteDatabase.openOrCreateDatabase(file,null));
 	}
-	
 
-	static private void report(Throwable th) {
-		th.printStackTrace();
-		SystemReport.updateReport("self-test.error", th);
-	}
-	
-	
-	public static IFn networkSimulator(String var) {
-		return var("sneer.networking.simulator", var);
-	}
-	
-	
-	private static Object prepareTupleBase(SneerSqliteDatabase db, boolean create) {
-		if (create) tupleBase("create-tuple-table").invoke(db);
-		return tupleBase("create").invoke(db);
-	}
+	private SQLiteDatabase sqlite;
 
-	private static IFn tupleBase(String varName) {
-		return var("sneer.persistent-tuple-base", varName);
-	}
-
-	private static IFn core(String varName) {
-		return var("sneer.core", varName);
-	}
-
-	private static IFn var(String namespace, String varName) {
-		Clojure.var("clojure.core/require").invoke(Clojure.read(namespace));
-		return Clojure.var(namespace, varName);
-	}
-	
-	
 	public SneerSqliteDatabase(SQLiteDatabase sqlite) {
 		this.sqlite = sqlite;
 	}
@@ -209,12 +125,5 @@ public class SneerSqliteDatabase implements Database {
 		return keyword.toString().substring(1);
 	}
 
-	public static Object tmpTupleBase() {
-		try {
-			return prepareTupleBase(openDatabase(createTempFile()), true);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
 
 }

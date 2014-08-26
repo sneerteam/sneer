@@ -22,7 +22,7 @@ public class PubSubOverSqliteAndroid extends TestCase {
 	
 	private PubSubTest pubSubTest() {
 		return PubSubOverPersistentTupleSpace.create(new Func0<Object>() {  @Override public Object call() {
-			return SneerSqliteDatabase.tmpTupleBase();
+			return SneerTestUtils.tmpTupleBase();
 		}});
 	}
 	
