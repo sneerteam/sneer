@@ -11,19 +11,12 @@
   {PublicKey
    (transit/write-handler
      (fn [_] "puk")
-     (fn [puk] (.bytes puk)))
-   (java.lang.Class/forName "[B") ; byte-array
-   (transit/write-handler
-     (fn [_] "base64")
-     (fn [bytes] (String. (org.spongycastle.util.encoders.Base64/encode bytes))))})
+     (fn [puk] (.bytes puk)))})
 
 (def ^:private read-handlers
   {"puk"
    (transit/read-handler
-     (fn [rep] (Keys/createPublicKey rep)))
-   "base64"
-   (transit/read-handler
-     (fn [rep] (org.spongycastle.util.encoders.Base64/decode rep)))})
+     (fn [rep] (Keys/createPublicKey rep)))})
 
 (def ^:private write-opts {:handlers write-handlers})
 
