@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject*]]
-   [sneer.core :as core :refer [connect dispose]])
+   [sneer.core :as core :refer [connect dispose restarted]])
   (:import
    [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
@@ -172,11 +172,6 @@
   (restart [this]))
 
 
-(defn copy-of [observable]
-  (let [copy (ReplaySubject/create)]
-    (rx/subscribe observable #(rx/on-next copy %))
-    copy))
-
 (defn new-sneer-admin
 
   ([own-prik network]
@@ -194,5 +189,4 @@
          Restartable
          (restart [this]
            (rx/on-completed connection)
-           (rx/on-completed tuple-base)
-           (new-sneer-admin own-prik network (copy-of tuple-base)))))))
+           (new-sneer-admin own-prik network (restarted tuple-base)))))))

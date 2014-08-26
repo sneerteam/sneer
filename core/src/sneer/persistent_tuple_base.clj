@@ -109,5 +109,8 @@
             (let [existing (seq->observable (query-tuples-from-db db criteria))]
               (if keep-alive
                 (rx/concat existing new-tuples)
-                existing))))))))
-
+                existing)))))
+      
+      (restarted [this]
+        (rx/on-completed new-tuples)
+        (create db)))))

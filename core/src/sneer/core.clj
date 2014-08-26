@@ -28,7 +28,16 @@ puk." ))
   (query-tuples ^rx.Observable [this criteria keep-alive]
     "Filters tuples by the criteria represented as a map of
 field/value. When keep-alive is true the observable will keep emitting
-new tuples as they are stored otherwise it will complete." ))
+new tuples as they are stored otherwise it will complete." )
+  
+  (restarted ^TupleBase [this]))
+
+
+(defn copy-of [observable]
+  (let [copy (ReplaySubject/create)]
+    (rx/subscribe observable #(rx/on-next copy %))
+    copy))
+
 
 (extend-protocol TupleBase
   rx.subjects.Subject
@@ -46,7 +55,10 @@ new tuples as they are stored otherwise it will complete." ))
                        (rx/subscribe-on scheduler))]
            (rx/subscribe tuples #(rx/on-next subscriber %))
            (. scheduler triggerActions)
-           (rx/on-completed subscriber)))))))
+           (rx/on-completed subscriber))))))
+  (restarted [this]
+    (rx/on-completed this)
+    (copy-of this)))
 
 
 (defmacro reify+
