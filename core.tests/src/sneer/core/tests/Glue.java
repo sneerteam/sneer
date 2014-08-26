@@ -38,8 +38,8 @@ class Glue {
 		return Clojure.var(ns + "/" + simpleName);
 	}
 
-	public static SneerAdmin newSneerAdmin(PrivateKey prik, Object network) {
-		return (SneerAdmin) adminVar("new-sneer-admin").invoke(prik, network);
+	public static SneerAdmin newSneerAdmin(PrivateKey prik, Object network, Object tupleBase) {
+		return (SneerAdmin) adminVar("new-sneer-admin").invoke(prik, network, tupleBase);
 	}
 
 	public static SneerAdmin restart(SneerAdmin admin) {
