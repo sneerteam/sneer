@@ -1,11 +1,10 @@
 package sneer.core.tests;
 
+import static sneer.ClojureUtils.*;
 import rx.*;
 import sneer.*;
 import sneer.admin.*;
 import sneer.tuples.*;
-import clojure.java.api.*;
-import clojure.lang.*;
 
 class Glue {
 
@@ -25,25 +24,12 @@ class Glue {
 		sneerCoreVar("dispose").invoke(network);
 	}
 
-	public static IFn sneerCoreVar(String simpleName) {
-		return var("sneer.core", simpleName);
-	}
-
-	public static IFn var(String ns, String simpleName) {
-		Clojure.var("clojure.core/require").invoke(Clojure.read(ns));
-		return Clojure.var(ns + "/" + simpleName);
-	}
-
 	public static SneerAdmin newSneerAdmin(PrivateKey prik, Object network, Object tupleBase) {
 		return (SneerAdmin) adminVar("new-sneer-admin").invoke(prik, network, tupleBase);
 	}
 
 	public static SneerAdmin restart(SneerAdmin admin) {
 		return (SneerAdmin) adminVar("restart").invoke(admin);
-	}
-	
-	private static IFn adminVar(String simpleName) {
-		return var("sneer.admin", simpleName);
 	}
 	
 }

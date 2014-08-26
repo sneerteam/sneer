@@ -1,5 +1,6 @@
 package sneer.android.main;
 
+import static sneer.ClojureUtils.*;
 import static sneer.SneerAndroid.*;
 import static sneer.android.main.core.SneerSqliteDatabase.*;
 
@@ -150,20 +151,9 @@ public class SneerApp extends Application {
 		sneer.profileFor(sneer.self()).setOwnName(name);
 	}
 
-	public static IFn var(String ns, String simpleName) {
-		Clojure.var("clojure.core/require").invoke(Clojure.read(ns));
-		return Clojure.var(ns + "/" + simpleName);
-	}
-
-	public static SneerAdmin newSneerAdmin(PrivateKey prik, Object network, Object tupleBase) {
+	private static SneerAdmin newSneerAdmin(PrivateKey prik, Object network, Object tupleBase) {
 		return (SneerAdmin) adminVar("new-sneer-admin").invoke(prik, network, tupleBase);
 	}
-
-	private static IFn adminVar(String simpleName) {
-		return var("sneer.admin", simpleName);
-	}
-	
-
 
 	private static SneerAdmin initialize(Context context) throws FriendlyException {
 		

@@ -1,6 +1,7 @@
 package sneer.core.tests;
 
 import rx.functions.*;
+import sneer.*;
 
 public class PubSubOverPersistentTupleSpace extends PubSubTest {
 	
@@ -14,7 +15,7 @@ public class PubSubOverPersistentTupleSpace extends PubSubTest {
 	
 	public PubSubOverPersistentTupleSpace() {
 		this(new Func0<Object>() { @Override public Object call() {
-			return Glue.var("sneer.core.tests.jdbc-tuple-base", "create").invoke();
+			return ClojureUtils.var("sneer.core.tests.jdbc-tuple-base", "create").invoke();
 		}});
 	}
 
