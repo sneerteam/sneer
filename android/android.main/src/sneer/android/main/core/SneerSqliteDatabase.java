@@ -211,7 +211,7 @@ public class SneerSqliteDatabase implements Database {
 
 	public static Object tmpTupleBase() {
 		try {
-			return openTupleBase(createTempFile());
+			return prepareTupleBase(openDatabase(createTempFile()), true);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
