@@ -85,8 +85,9 @@ public class ContactActivity extends Activity {
 			try{
 				loadContact(Keys.createPublicKey(intent.getData().getQuery()));		
 			}catch(RuntimeException e){
-				toast("Puk invalid format.");
+				toast("Invalid public key.");
 				finish();
+				return;
 			}
 			
 		} else
@@ -123,7 +124,17 @@ public class ContactActivity extends Activity {
 	}
 	
 	private void loadProfile() {
-		nicknameEdit.setText(contact.nickname().current());
+		
+		if(newContact){
+			profile.ownName().subscribe(new Action1<String>() { @Override public void call(String ownName) { 
+				nicknameEdit.setText(ownName);			
+			}});	
+			profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
+				if(nicknameEdit.getText().toString().isEmpty())
+					nicknameEdit.setText(preferredNickname);			
+			}});
+		}else
+			nicknameEdit.setText(contact.nickname().current());
 		
 		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String ownName) { 
 			fullNameView.setText(ownName);
