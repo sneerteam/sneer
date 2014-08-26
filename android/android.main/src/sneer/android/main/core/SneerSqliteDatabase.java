@@ -52,7 +52,7 @@ public class SneerSqliteDatabase implements Database {
 
 
 	public static TupleSpace createTupleSpace(Object network, File databaseFile) throws IOException {
-		PublicKey puk = Keys.createPrivateKey("selfTest").publicKey();
+		PublicKey puk = Keys.createPrivateKey().publicKey();
 		
 		Object tupleBase = openTupleBase(databaseFile);
 		
