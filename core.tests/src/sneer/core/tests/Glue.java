@@ -18,17 +18,13 @@ class Glue {
 	}
 
 	public static Object newNetworkSimulator() {
-		return networkSimulator("new-network").invoke();
+		return var("sneer.networking.simulator", "new-network").invoke();
 	}
 	
 	public static void tearDownNetwork(Object network) {
 		sneerCoreVar("dispose").invoke(network);
 	}
 
-	private static IFn networkSimulator(String var) {
-		return var("sneer.networking.simulator", var);
-	}
-	
 	public static IFn sneerCoreVar(String simpleName) {
 		return var("sneer.core", simpleName);
 	}
