@@ -134,6 +134,9 @@ new tuples as they are stored otherwise it will complete." )
     (rx/map type)
     (rx/filter (complement nil?))))
 
+(defn get-author [criteria]
+  (get criteria "author"))
+
 (defn reify-tuple-space [own-puk tuple-base connection followees]
 
   (let [tuples-in (rx/distinct (payloads :tuple connection))
@@ -147,13 +150,16 @@ new tuples as they are stored otherwise it will complete." )
       (partial rx/on-next distinct-followees))
     
     (rx/subscribe
-     (->> subs-out
-          (rx/flatmap
-           (fn [criteria]
-             (if (get criteria "author")
-               (rx/return criteria)
-               (rx/map #(assoc criteria "author" %) distinct-followees))))
-          (rx/map #(->envelope (get % "author") :subscription (assoc % :sender own-puk))))
+     (->>
+       subs-out
+       (rx/filter #(not= (get-author %) own-puk))
+       (rx/flatmap
+        (fn [criteria]
+          (if (get-author criteria)
+            (rx/return criteria)
+            (rx/map #(assoc criteria "author" %) distinct-followees))))
+       (rx/map #(->envelope (get-author %) :subscription (assoc % :sender own-puk)))
+       (rx/do #(println "[SUBS-OUT(" own-puk ")]" %)))
      #(rx/on-next connection %))
 
     (rx/subscribe
