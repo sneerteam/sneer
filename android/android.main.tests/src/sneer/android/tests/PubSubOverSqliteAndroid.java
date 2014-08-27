@@ -1,10 +1,11 @@
-package sneer.core.tests;
+package sneer.android.tests;
 
 import java.io.*;
 
 import junit.framework.*;
 import rx.functions.*;
 import sneer.android.main.core.*;
+import sneer.core.tests.*;
 
 public class PubSubOverSqliteAndroid extends TestCase {
 

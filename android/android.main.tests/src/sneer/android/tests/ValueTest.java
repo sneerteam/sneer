@@ -1,4 +1,4 @@
-package sneerteam.snapi.tests;
+package sneer.android.tests;
 
 import java.util.*;
 
