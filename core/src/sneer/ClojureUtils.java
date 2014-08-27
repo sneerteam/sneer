@@ -18,4 +18,8 @@ public class ClojureUtils {
 		return var("sneer.admin", simpleName);
 	}
 
+	public static void dispose(Object disposable) {
+		sneerCoreVar("dispose").invoke(disposable);
+	}
+
 }

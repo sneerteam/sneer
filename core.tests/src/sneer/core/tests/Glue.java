@@ -21,7 +21,7 @@ class Glue {
 	}
 	
 	public static void tearDownNetwork(Object network) {
-		sneerCoreVar("dispose").invoke(network);
+		dispose(network);
 	}
 
 	public static SneerAdmin newSneerAdmin(PrivateKey prik, Object network, Object tupleBase) {

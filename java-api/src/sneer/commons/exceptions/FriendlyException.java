@@ -7,6 +7,10 @@ public class FriendlyException extends Exception {
 		super(veryUserFriendlyMessage);
 	}
 
+	public FriendlyException(String veryUserFriendlyMessage, Throwable cause) {
+		super(veryUserFriendlyMessage, cause);
+	}
+
 	private static final long serialVersionUID = 1L;
 
 }
