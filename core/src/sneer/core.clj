@@ -163,27 +163,29 @@ new tuples as they are stored otherwise it will complete." )
      #(rx/on-next connection %))
 
     (rx/subscribe
-     subs-in
-     (fn [subscription]
-       (let [sender (:sender subscription)
-             criteria (dissoc subscription :sender)]
-         (swap!
-          subscriptions-by-sender
-          (fn [cur]
-            (let [existing (get cur sender)]
-              ; TODO: unsubscribe
-              ; TODO: combine existing criteria with new one
-              (let [subscription
-                    (rx/subscribe
-                      (->>
-                        (query-tuples tuple-base criteria true)
-                        ; TODO: extend query-tuples to support the condition below
-                        (rx/filter #(let [audience (get % "audience")]
-                                      (or (nil? audience) (= sender audience))))
-                        (rx/map #(->envelope sender :tuple %)))
-                      (partial rx/on-next connection))]
+      (->>
+        subs-in
+        (rx/do #(println "[SUBS-IN(" own-puk ")]" %)))
+      (fn [subscription]
+        (let [sender (:sender subscription)
+              criteria (dissoc subscription :sender)]
+          (swap!
+           subscriptions-by-sender
+           (fn [cur]
+             (let [existing (get cur sender)]
+               ; TODO: unsubscribe
+               ; TODO: combine existing criteria with new one
+               (let [subscription
+                     (rx/subscribe
+                       (->>
+                         (query-tuples tuple-base criteria true)
+                         ; TODO: extend query-tuples to support the condition below
+                         (rx/filter #(let [audience (get % "audience")]
+                                       (or (nil? audience) (= sender audience))))
+                         (rx/map #(->envelope sender :tuple %)))
+                       (partial rx/on-next connection))]
 
-                (assoc cur sender (conj existing {:criteria criteria :subscription subscription})))))))))
+                 (assoc cur sender (conj existing {:criteria criteria :subscription subscription})))))))))
 
     (rx/subscribe tuples-in
                   (partial store-tuple tuple-base))
