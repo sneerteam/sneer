@@ -2,7 +2,9 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject*]]
-   [sneer.core :as core :refer [connect dispose restarted]])
+   [sneer.core :as core :refer [connect dispose restarted]]
+   [sneer.persistent-tuple-base :as persistence]
+   [clojure.java.io :as io])
   (:import
    [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
@@ -172,6 +174,15 @@
   (restart [this]))
 
 
+(defn prepare-tuple-base [db]
+  (try
+		(persistence/create-tuple-table db)
+    (catch Exception e))
+  (try
+		(persistence/create-prik-table db)
+    (catch Exception e))
+  (persistence/create db))
+
 (defn new-sneer-admin
 
   ([own-prik network]
@@ -186,7 +197,15 @@
        (reify
          SneerAdmin
          (sneer [this] sneer)
+         (privateKey [this] own-prik)
          Restartable
          (restart [this]
            (rx/on-completed connection)
            (new-sneer-admin own-prik network (restarted tuple-base)))))))
+
+(defn new-sneer-admin-over-db
+  ([network db]
+    (let [tuple-base (prepare-tuple-base db)
+          own-prik (sneer.impl.keys.Keys/createPrivateKey)]
+      (new-sneer-admin own-prik network tuple-base))))
+
