@@ -59,6 +59,11 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
+	public void testSameProfile() {
+		assertEquals(sneerA.profileFor(sneerA.self()), sneerA.profileFor(sneerA.self()));
+	}
+
+
 	public void testPukOfParty() {
 
 		Party someone = sneerA.produceParty(userB);

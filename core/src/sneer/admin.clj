@@ -86,6 +86,13 @@
         (setCountry [this value]
           (rx/on-next country value))))))
 
+(defn produce-profile [tuple-space profiles party]
+  (let [puk (party-puk party)]
+	  (->
+	   (swap! profiles update-in [puk] #(if (nil? %) (reify-profile party tuple-space) %))
+	   (get puk))))
+
+
 (defn reify-contact [nickname party]
   (let [nickname-subject (ObservedSubject/create nickname)]
     (reify Contact
@@ -119,6 +126,7 @@
 (defn new-sneer [tuple-space own-prik]
   (let [own-puk (.publicKey own-prik)
         parties (atom {})
+        profiles (atom {})
         puk->contact (atom (restore-contact-list tuple-space own-puk parties))
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by nickname) vec))
         contacts-subject (behavior-subject (->contact-list @puk->contact))]
@@ -146,7 +154,7 @@
           (new-party own-puk))
 
         (profileFor [this party]
-          (reify-profile party tuple-space))
+          (produce-profile tuple-space profiles party))
 
         (contacts [this]
           (.asObservable contacts-subject))
