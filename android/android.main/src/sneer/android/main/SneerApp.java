@@ -14,9 +14,11 @@ import rx.functions.*;
 import sneer.*;
 import sneer.admin.*;
 import sneer.android.main.core.*;
+import sneer.commons.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 import sneer.impl.simulator.*;
+import sneer.persistent_tuple_base.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -150,8 +152,8 @@ public class SneerApp extends Application {
 		sneer.profileFor(sneer.self()).setOwnName(name);
 	}
 
-	private static SneerAdmin newSneerAdmin(PrivateKey prik, Object network, Object tupleBase) {
-		return (SneerAdmin) adminVar("new-sneer-admin").invoke(prik, network, tupleBase);
+	private static SneerAdmin newSneerAdmin(Object network, Database db) {
+		return (SneerAdmin) adminVar("new-sneer-admin-over-db").invoke(network, db);
 	}
 	
 	private static IFn networkSimulator(String var) {
@@ -165,12 +167,12 @@ public class SneerApp extends Application {
 		File admin = new File(context.getFilesDir(), "admin");
 		admin.mkdirs();
 		File secureFile = new File(admin, "tupleSpace.sqlite");
+		Object network = networkSimulator("new-network").invoke();
 		try {
-			Object network = networkSimulator("new-network").invoke();
-			Object tupleBase = openTupleBase(secureFile);
-			return newSneerAdmin(Keys.createPrivateKey(), network, tupleBase);
+			return newSneerAdmin(network, SneerSqliteDatabase.openDatabase(secureFile));
 		} catch (IOException e) {
-			throw new FriendlyException("Problem preparing Sneer ("+e.getMessage()+")");
+			SystemReport.updateReport("Error starting Sneer", e);
+			throw new FriendlyException("Error starting Sneer", e);
 		}
 	}
 	
