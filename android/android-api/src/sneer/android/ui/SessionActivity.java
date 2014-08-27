@@ -22,15 +22,14 @@ public abstract class SessionActivity extends SneerActivity {
 		
 		session.previousMessages().observeOn(AndroidSchedulers.mainThread())
 			.doOnCompleted(new Action0() {  @Override public void call() {
-				react();
-			} })
+				onMessageReplayCompleted();
+			}})
 			.subscribe(new Action1<Message>() { public void call(Message message) {
-				onMessage(message);
+				replayMessage(message);
 			};});
 		
 		session.newMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() { public void call(Message message) {
-			onMessage(message);
-			react();
+			newMessage(message);
 		};});
 		
 		session.peerName().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { public void call(String name) {
@@ -39,15 +38,22 @@ public abstract class SessionActivity extends SneerActivity {
 	}
 
 
-	private void onMessage(Message message) {
+	private void newMessage(Message message) {
 		if (message.isOwn())
-			messageSent(message.content());
+			newMessageSent(message.content());
 		else
-			messageReceived(message.content());
+			newMessageReceived(message.content());
 	}
 
 
-	@Override
+	private void replayMessage(Message message) {
+		if (message.isOwn())
+			replayMessageSent(message.content());
+		else
+			replayMessageReceived(message.content());
+	}
+
+
 	protected void onDestroy() {
 		session.dispose();
 		super.onDestroy();
@@ -63,16 +69,24 @@ public abstract class SessionActivity extends SneerActivity {
 	protected abstract void onPeerName(String name);
 
 	
-	/** Called when old sent messages are being replayed or when new messages are sent. */
-	protected abstract void messageSent(Object content);
+	/** Called for each old sent message, when old messages are being replayed. */
+	protected abstract void replayMessageSent(Object message);
 	
 	
-	/** Called when old received messages are being replayed or when new messages are received. */
-	protected abstract void messageReceived(Object content);
+	/** Called for each old received message, when old messages are being replayed. */
+	protected abstract void replayMessageReceived(Object message);
 	
 	
-	/** Called after messageSent() and messageReceived() for new messages, not for messages being replayed. */
-	protected abstract void react();
+	/** Called for each new message that was sent using the send() method. */
+	protected abstract void newMessageSent(Object message);
+	
+	
+	/** Called for each new message as it is received. */
+	protected abstract void newMessageReceived(Object message);
+	
+	
+	/** Called after the replay of old messages, so this activity can know its time to update its display. */
+	protected abstract void onMessageReplayCompleted();
 	
 	
 	private Object getExtra(String extra) {
