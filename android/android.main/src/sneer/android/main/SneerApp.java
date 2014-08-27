@@ -7,8 +7,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+import rx.*;
 import rx.Observable;
 import rx.functions.*;
+import rx.schedulers.*;
 import sneer.*;
 import sneer.admin.*;
 import sneer.android.main.core.*;
@@ -16,6 +18,7 @@ import sneer.commons.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.simulator.*;
 import sneer.persistent_tuple_base.*;
+import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -161,15 +164,39 @@ public class SneerApp extends Application {
 		
 		SneerTestUtils.selfTest();
 		
-		File admin = new File(context.getFilesDir(), "admin");
-		admin.mkdirs();
-		File secureFile = new File(admin, "tupleSpace.sqlite");
+		File adminDir = new File(context.getFilesDir(), "admin");
+		adminDir.mkdirs();
+		File secureFile = new File(adminDir, "tupleSpace.sqlite");
 		try {
-			return newSneerAdmin(networkSimulator(), SneerSqliteDatabase.openDatabase(secureFile));
+			Object network = networkSimulator();
+			
+			SneerAdmin admin = newSneerAdmin(network, SneerSqliteDatabase.openDatabase(secureFile));
+			createBots("bot", network, admin.sneer());
+			
+			return admin;
 		} catch (IOException e) {
 			SystemReport.updateReport("Error starting Sneer", e);
 			throw new FriendlyException("Error starting Sneer", e);
 		}
+	}
+
+
+	private static void createBots(final String name, Object network, final Sneer masterSneer) {
+		Observable.just(network)
+			.observeOn(Schedulers.newThread())
+			.subscribe(new Action1<Object>() {  @Override public void call(Object network) {
+				try {
+					SneerAdmin admin = newSneerAdmin(network, SneerSqliteDatabase.openDatabase(File.createTempFile(name, ".sqlite")));
+					
+					masterSneer.addContact(name, masterSneer.produceParty(admin.privateKey().publicKey()));
+					admin.sneer().addContact("master", admin.sneer().produceParty(masterSneer.self().publicKey().current()));
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (FriendlyException e) {
+					e.printStackTrace();
+				}
+			} });
 	}
 	
 	
