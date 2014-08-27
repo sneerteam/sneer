@@ -1,7 +1,7 @@
 (ns sneer.admin
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [subject*]]
+   [sneer.rx :refer [subject* seq->observable]]
    [sneer.core :as core :refer [connect dispose restarted]]
    [sneer.persistent-tuple-base :as persistence]
    [clojure.java.io :as io])
@@ -12,7 +12,7 @@
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [rx.schedulers TestScheduler]
-   [rx.subjects BehaviorSubject ReplaySubject]))
+   [rx.subjects BehaviorSubject ReplaySubject PublishSubject]))
 
 (defn behavior-subject [& [initial-value]]
   (BehaviorSubject/create initial-value))
@@ -123,7 +123,7 @@
 (defn nickname [contact]
   (.. contact nickname current))
 
-(defn new-sneer [tuple-space own-prik]
+(defn new-sneer [tuple-space own-prik followees]
   (let [own-puk (.publicKey own-prik)
         parties (atom {})
         profiles (atom {})
@@ -131,6 +131,13 @@
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by nickname) vec))
         contacts-subject (behavior-subject (->contact-list @puk->contact))]
 
+    (rx/subscribe
+      (->> 
+        contacts-subject
+        (rx/flatmap seq->observable)
+        (rx/flatmap #(.. % party publicKey observable)))
+      (partial rx/on-next followees))
+    
     (letfn [(duplicate-contact? [nickname party contact]
               (or (identical? party (.party contact))
                   (= nickname (.. contact nickname current))))
@@ -175,7 +182,10 @@
           (rx/never))
 
         (produceParty [this puk]
-          (produce-party parties puk))))))
+          (produce-party parties puk))
+        
+        (tupleSpace [this]
+          tuple-space)))))
 
 
 (defprotocol Restartable
@@ -199,9 +209,9 @@
   ([own-prik network tuple-base]
      (let [puk (.publicKey own-prik)
            connection (connect network puk)
-           followees (rx.Observable/never)
+           followees (PublishSubject/create)
            tuple-space (core/reify-tuple-space puk tuple-base connection followees)
-           sneer (new-sneer tuple-space own-prik)]
+           sneer (new-sneer tuple-space own-prik followees)]
        (reify
          SneerAdmin
          (sneer [this] sneer)

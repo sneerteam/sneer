@@ -139,15 +139,20 @@ new tuples as they are stored otherwise it will complete." )
   (let [tuples-in (rx/distinct (payloads :tuple connection))
         subs-in (payloads :subscription connection)
         subs-out (ReplaySubject/create)
-        subscriptions-by-sender (atom {})]
+        subscriptions-by-sender (atom {})
+        distinct-followees (ReplaySubject/create)]
 
+    (rx/subscribe 
+      (rx/distinct followees) 
+      (partial rx/on-next distinct-followees))
+    
     (rx/subscribe
      (->> subs-out
           (rx/flatmap
            (fn [criteria]
              (if (get criteria "author")
                (rx/return criteria)
-               (rx/map #(assoc criteria "author" %) followees))))
+               (rx/map #(assoc criteria "author" %) distinct-followees))))
           (rx/map #(->envelope (get % "author") :subscription (assoc % :sender own-puk))))
      #(rx/on-next connection %))
 

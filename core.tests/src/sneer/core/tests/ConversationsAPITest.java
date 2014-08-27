@@ -203,5 +203,18 @@ public class ConversationsAPITest extends TestCase {
 	private SneerAdmin restart(SneerAdmin admin) {
 		return Glue.restart(admin);
 	}
-
+	
+	
+	public void testMessageFromContactsAreVisible() throws FriendlyException {
+		
+		sneerA.addContact("little b", sneerA.produceParty(sneerB.self().publicKey().current()));
+		
+		sneerB.tupleSpace().publisher()
+			.type("tweet")
+			.pub("hello");
+		
+		expecting(payloads(sneerA.tupleSpace().filter().type("tweet").tuples(), "hello"));
+		
+	}
+	
 }
