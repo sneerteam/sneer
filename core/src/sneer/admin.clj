@@ -1,7 +1,7 @@
 (ns sneer.admin
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [subject* seq->observable]]
+   [sneer.rx :refer [subject* seq->observable observe-for-computation]]
    [sneer.core :as core :refer [connect dispose restarted]]
    [sneer.persistent-tuple-base :as persistence]
    [clojure.java.io :as io])
@@ -134,6 +134,7 @@
     (rx/subscribe
       (->> 
         contacts-subject
+        ;observe-for-computation
         (rx/flatmap seq->observable)
         (rx/flatmap #(.. % party publicKey observable)))
       (partial rx/on-next followees))
