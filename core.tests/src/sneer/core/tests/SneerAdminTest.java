@@ -27,7 +27,7 @@ public class SneerAdminTest extends TestCase {
 		
 	}
 
-	private Object produceDatabase(File databaseFile) throws IOException {
+	protected Object produceDatabase(File databaseFile) throws IOException {
 		return ClojureUtils.var("sneer.core.tests.jdbc-tuple-base", "create-sqlite-db").invoke(databaseFile);
 	}
 
