@@ -1,6 +1,7 @@
 (ns sneer.rx
   (:require [rx.lang.clojure.core :as rx])
-  (:import [rx.subjects Subject]))
+  (:import [rx.subjects Subject]
+           [rx.schedulers Schedulers]))
 
 (defn on-subscribe [f]
   "Reifies a rx.Observable.OnSubscribe instance from a regular clojure function `f'."
@@ -31,3 +32,6 @@ Only maps containing all key/value pairs in criteria are kept."
 
 (defn seq->observable [^java.lang.Iterable iterable]
   (rx.Observable/from iterable))
+
+(defn observe-for-computation [o]
+  (.observeOn o (Schedulers/computation)))

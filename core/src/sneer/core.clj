@@ -1,7 +1,7 @@
 (ns sneer.core
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [filter-by]]
+   [sneer.rx :refer [filter-by observe-for-computation]]
    [sneer.serialization :refer [roundtrip]])
   (:import
    [sneer.rx ObservedSubject]
@@ -152,6 +152,7 @@ new tuples as they are stored otherwise it will complete." )
     (rx/subscribe
      (->>
        subs-out
+       observe-for-computation
        (rx/filter #(not= (get-author %) own-puk))
        (rx/flatmap
         (fn [criteria]
