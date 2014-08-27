@@ -1,6 +1,6 @@
 (ns sneer.persistent-tuple-base
   (:require [sneer.core :as core]
-            [sneer.rx :refer [filter-by]]
+            [sneer.rx :refer [filter-by seq->observable]]
             [sneer.serialization :as serialization]
             [rx.lang.clojure.core :as rx]
             [rx.lang.clojure.interop :as rx-interop]))
@@ -77,9 +77,6 @@
 
 (defn dump-tuples [db]
   (->> (query-all db) (map println) doall))
-
-(defn seq->observable [^java.lang.Iterable iterable]
-  (rx.Observable/from iterable))
 
 (defn query-tuples-from-db [db criteria]
   (let [rs (db-query db ["SELECT * FROM tuple"])

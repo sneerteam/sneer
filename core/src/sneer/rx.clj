@@ -29,6 +29,5 @@ Only maps containing all key/value pairs in criteria are kept."
       (rx/filter #(= criteria (select-keys % ks)) observable)
       observable)))
 
-
-
-
+(defn seq->observable [^java.lang.Iterable iterable]
+  (rx.Observable/from iterable))
