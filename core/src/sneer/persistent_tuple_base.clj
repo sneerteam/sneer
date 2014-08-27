@@ -29,8 +29,7 @@
   (db-create-table
     db :keys
     [
-     [:prik :blob]
-     [:puk :blob]]))
+     [:prik :blob]]))
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
 
