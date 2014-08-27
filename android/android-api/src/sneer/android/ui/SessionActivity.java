@@ -85,7 +85,7 @@ public abstract class SessionActivity extends SneerActivity {
 	protected abstract void newMessageReceived(Object message);
 	
 	
-	/** Called after the replay of old messages, so this activity can know its time to update its display. */
+	/** Called after the replay of old messages has finished, so this activity can know its time to update its display. */
 	protected abstract void onMessageReplayCompleted();
 	
 	
