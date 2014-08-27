@@ -25,6 +25,13 @@
      ;[:signature :blob "NOT NULL"]
      [:custom :blob]]))
 
+(defn create-prik-table [db]
+  (db-create-table
+    db :keys
+    [
+     [:prik :blob]
+     [:puk :blob]]))
+
 (def builtin-field? #{"type" "payload" "author" "audience"})
 
 (def puk-serializer {:serialize #(.bytes %)
