@@ -2,13 +2,11 @@ package sneer.android.main;
 
 import static sneer.ClojureUtils.*;
 import static sneer.SneerAndroid.*;
-import static sneer.android.main.core.TupleBaseFactory.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
-import clojure.lang.*;
 import rx.Observable;
 import rx.functions.*;
 import sneer.*;
@@ -16,7 +14,6 @@ import sneer.admin.*;
 import sneer.android.main.core.*;
 import sneer.commons.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 import sneer.impl.simulator.*;
 import sneer.persistent_tuple_base.*;
 import android.app.*;
@@ -156,8 +153,8 @@ public class SneerApp extends Application {
 		return (SneerAdmin) adminVar("new-sneer-admin-over-db").invoke(network, db);
 	}
 	
-	private static IFn networkSimulator(String var) {
-		return var("sneer.networking.simulator", var);
+	private static Object networkSimulator() {
+		return var("sneer.networking.simulator", "new-network").invoke();
 	}
 
 	private static SneerAdmin initialize(Context context) throws FriendlyException {
@@ -167,9 +164,8 @@ public class SneerApp extends Application {
 		File admin = new File(context.getFilesDir(), "admin");
 		admin.mkdirs();
 		File secureFile = new File(admin, "tupleSpace.sqlite");
-		Object network = networkSimulator("new-network").invoke();
 		try {
-			return newSneerAdmin(network, SneerSqliteDatabase.openDatabase(secureFile));
+			return newSneerAdmin(networkSimulator(), SneerSqliteDatabase.openDatabase(secureFile));
 		} catch (IOException e) {
 			SystemReport.updateReport("Error starting Sneer", e);
 			throw new FriendlyException("Error starting Sneer", e);
