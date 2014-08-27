@@ -43,8 +43,6 @@ public class ConversationActivity extends Activity {
 
 	private ImageButton actionButton;
 
-	private ImageButton lastActionButton;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,13 +86,10 @@ public class ConversationActivity extends Activity {
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (editText.getText().toString().trim() != null && !editText.getText().toString().trim().isEmpty()) {
+				if (editText.getText().toString().trim() != null && !editText.getText().toString().trim().isEmpty())
 					actionButton.setImageResource(R.drawable.ic_action_send);
-					lastActionButton.setVisibility(View.GONE);
-				} else {
+				else
 					actionButton.setImageResource(R.drawable.ic_action_new);
-					lastActionButton.setVisibility(View.VISIBLE);
-				}
 			}
 
 			@Override
@@ -105,7 +100,6 @@ public class ConversationActivity extends Activity {
 		});
 		
 		actionButton = (ImageButton)findViewById(R.id.actionButton);
-		lastActionButton = (ImageButton)findViewById(R.id.lastActionButton);
 		actionButton.setImageResource(R.drawable.ic_action_new);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			handleClick(party, editText.getText().toString().trim());
