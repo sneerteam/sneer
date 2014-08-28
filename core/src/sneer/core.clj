@@ -158,6 +158,7 @@ new tuples as they are stored otherwise it will complete." )
        subs-out
        observe-for-computation
        (rx/filter #(not= (get-author %) own-puk))
+       (rx/distinct)
        (rx/flatmap
         (fn [criteria]
           (if (get-author criteria)
@@ -170,6 +171,7 @@ new tuples as they are stored otherwise it will complete." )
     (rx/subscribe
       (->>
         subs-in
+        (rx/distinct)
         (rx/do #(println "[SUBS-IN(" own-puk ")]" %)))
       (fn [subscription]
         (let [sender (:sender subscription)
