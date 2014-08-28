@@ -55,7 +55,6 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
-
 	public void testSameSneer() {
 		assertEquals(adminA.sneer(), adminA.sneer());
 	}
@@ -200,16 +199,11 @@ public class ConversationsAPITest extends TestCase {
 		expecting(
 			values(profileB2.preferredNickname(), "Party Man"));
 		
-	}
-
-	private SneerAdmin restart(SneerAdmin admin) {
-		return Glue.restart(admin);
-	}
+	}	
 	
-	
-	public void testMessageFromContactsAreVisible() throws FriendlyException {
+	public void testTuplesFromContactsAreVisible() throws FriendlyException {
 		
-		sneerA.addContact("little b", sneerA.produceParty(sneerB.self().publicKey().current()));
+		sneerA.addContact("little b", sneerA.produceParty(userB));
 		
 		sneerB.tupleSpace().publisher()
 			.type("tweet")
@@ -218,8 +212,8 @@ public class ConversationsAPITest extends TestCase {
 		expecting(payloads(sneerA.tupleSpace().filter().type("tweet").tuples(), "hello"));
 		
 	}
-	
-	public void testMessageFromNewContactsAreVisible() throws FriendlyException {
+
+	public void testTuplesFromNewContactsAreVisible() throws FriendlyException {
 		
 		// open twitter client
 		ConnectableObservable<Tuple> tweets = sneerA.tupleSpace().filter().type("tweet").tuples().replay();
@@ -232,7 +226,7 @@ public class ConversationsAPITest extends TestCase {
 			.pub("hello");
 		
 		// it becomes a contact
-		sneerA.addContact("little b", sneerA.produceParty(sneerB.self().publicKey().current()));
+		sneerA.addContact("little b", sneerA.produceParty(userB));
 		
 		// tweets should be visible
 		expecting(payloads(tweets, "hello"));
