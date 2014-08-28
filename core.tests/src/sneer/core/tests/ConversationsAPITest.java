@@ -7,12 +7,14 @@ import java.util.*;
 import junit.framework.*;
 import rx.Observable;
 import rx.functions.*;
+import rx.observables.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.admin.*;
 import sneer.commons.Arrays;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
+import sneer.tuples.*;
 
 public class ConversationsAPITest extends TestCase {
 	
@@ -214,6 +216,26 @@ public class ConversationsAPITest extends TestCase {
 			.pub("hello");
 		
 		expecting(payloads(sneerA.tupleSpace().filter().type("tweet").tuples(), "hello"));
+		
+	}
+	
+	public void testMessageFromNewContactsAreVisible() throws FriendlyException {
+		
+		// open twitter client
+		ConnectableObservable<Tuple> tweets = sneerA.tupleSpace().filter().type("tweet").tuples().replay();
+		tweets.connect();
+		
+		// future contact publishes a tweet
+		sneerB.tupleSpace()
+			.publisher()
+			.type("tweet")
+			.pub("hello");
+		
+		// it becomes a contact
+		sneerA.addContact("little b", sneerA.produceParty(sneerB.self().publicKey().current()));
+		
+		// tweets should be visible
+		expecting(payloads(tweets, "hello"));
 		
 	}
 	
