@@ -1,7 +1,7 @@
 (ns sneer.admin
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [subject* observe-for-computation flatmapseq]]
+   [sneer.rx :refer [subject* observe-for-computation atom->observable flatmapseq]]
    [sneer.core :as core :refer [connect dispose restarted]]
    [sneer.persistent-tuple-base :as persistence]
    [clojure.java.io :as io])
@@ -158,11 +158,11 @@
         profiles (atom {})
         puk->contact (atom (restore-contact-list tuple-space own-puk parties))
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by nickname) vec))
-        contacts-subject (behavior-subject (->contact-list @puk->contact))]
+        observable-contacts (atom->observable puk->contact ->contact-list)]
 
     (rx/subscribe
       (->> 
-        contacts-subject
+        observable-contacts
         ;observe-for-computation
         flatmapseq
         (rx/flatmap #(.. % party publicKey observable)))
@@ -173,16 +173,16 @@
                   (= nickname (.. contact nickname current))))
 
             (add-contact [nickname party]
-              (->>
-               (swap! puk->contact
-                      (fn [cur]
-                        (when (->> cur vals (some (partial duplicate-contact? nickname party)))
-                          (throw (FriendlyException. "Duplicate contact!")))
-                        (assoc cur
-                          (party-puk party)
-                          (reify-contact nickname party))))
-               ->contact-list
-               (rx/on-next contacts-subject)))]
+              (swap! puk->contact
+                     (fn [cur]
+                       (when (->> cur vals (some (partial duplicate-contact? nickname party)))
+                         (throw (FriendlyException. "Duplicate contact!")))
+                       (assoc cur
+                         (party-puk party)
+                         (reify-contact nickname party)))))
+            
+            (produce-conversation [party]
+              (reify-conversation tuple-space own-puk party))]
 
 
       (reify Sneer
@@ -194,7 +194,7 @@
           (produce-profile tuple-space profiles party))
 
         (contacts [this]
-          (.asObservable contacts-subject))
+          observable-contacts)
 
         (addContact [this nickname party]
           (add-contact nickname party)
@@ -213,8 +213,9 @@
 
         (conversations [this]
           (->>
-            contacts-subject
-            (rx/map (partial map #(reify-conversation (.party %))))))
+            observable-contacts
+            (rx/map
+              (partial map #(produce-conversation (.party %))))))
 
         (produceParty [this puk]
           (produce-party parties puk))
@@ -223,7 +224,7 @@
           tuple-space)
         
         (produceConversationWith [this party] 
-          (reify-conversation party))))))
+          (produce-conversation party))))))
 
 
 (defprotocol Restartable

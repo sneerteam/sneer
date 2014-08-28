@@ -2,7 +2,7 @@
   (:require 
     [rx.lang.clojure.core :as rx]
     [rx.lang.clojure.interop :as interop])
-  (:import [rx.subjects Subject]
+  (:import [rx.subjects Subject BehaviorSubject]
            [rx.schedulers Schedulers]))
 
 (defn on-subscribe [f]
@@ -34,6 +34,15 @@ Only maps containing all key/value pairs in criteria are kept."
 
 (defn seq->observable [^java.lang.Iterable iterable]
   (rx.Observable/from iterable))
+
+(defn atom->observable
+  ([atom]
+    (atom->observable atom identity))
+  ([atom map-fn]
+    (let [subject (BehaviorSubject/create (map-fn @atom))]
+      (add-watch atom nil (fn [_key _ref old-value new-value]
+                            (rx/on-next subject (map-fn new-value))))
+      (.asObservable subject))))
 
 (defn flatmapseq [^rx.Observable o]
   (.flatMapIterable o (interop/fn [seq] seq)))
