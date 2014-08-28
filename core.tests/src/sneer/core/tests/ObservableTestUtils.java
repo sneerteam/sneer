@@ -31,6 +31,14 @@ public class ObservableTestUtils {
 	public static Observable<Void> notifications(Observable<?> source, @SuppressWarnings("rawtypes") final Notification... values) {
 		return values(source.materialize(), (Object[])values);
 	}
+	
+	public static Observable<Void> eventually(Observable<?> source, final Object... values) {
+		return values(
+			source.skipWhile(new Func1<Object, Boolean>() { @Override public Boolean call(Object t1) {
+				return !t1.equals(values[0]);
+			}}),
+			values);
+	}
 
 	public static Observable<Void> values(Observable<?> tuples, final Object... values) {
 		return tuples
