@@ -4,6 +4,7 @@
    [sneer.rx :refer [filter-by observe-for-computation]]
    [sneer.serialization :refer [roundtrip]])
   (:import
+   [sneer PrivateKey PublicKey]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [rx.schedulers TestScheduler]
@@ -117,7 +118,10 @@ new tuples as they are stored otherwise it will complete." )
         (reify+ TupleFilter
           (with-field type)
           (with-field author)
-          (audience [this prik] (with "audience" (.publicKey prik)))
+          (^TupleFilter audience [this ^PrivateKey prik]
+            (with "audience" (.publicKey prik)))
+          (^TupleFilter audience [this ^PublicKey puk]
+            (with "audience" puk))
           (field [this field value] (with field value))
           (localTuples [this]
             (query-tuple-base false))

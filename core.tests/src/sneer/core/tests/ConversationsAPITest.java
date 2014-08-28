@@ -263,9 +263,12 @@ public class ConversationsAPITest extends TestCase {
 		final Party partyB = sneerA.produceParty(userB);
 		sneerA.addContact("b", partyB);
 		
+		final Party partyC = sneerA.produceParty(userC);
+		sneerA.addContact("c", partyC);
+		
 		expecting(
 			values(
-				Observable.zip(flatMapConversationsOf(sneerA).first(), flatMapConversationsOf(sneerB).first(), new Func2<Conversation, Conversation, Pair<Conversation, Conversation>>() {  @Override public Pair<Conversation, Conversation> call(Conversation ca, Conversation cb) {
+				Observable.zip(conversationOf(sneerA, partyB), conversationOf(sneerB, partyA), new Func2<Conversation, Conversation, Pair<Conversation, Conversation>>() {  @Override public Pair<Conversation, Conversation> call(Conversation ca, Conversation cb) {
 					
 					assertSame(partyB, ca.party());
 					assertSame(partyA, cb.party());
@@ -279,13 +282,13 @@ public class ConversationsAPITest extends TestCase {
 					final ConnectableObservable<List<Message>> ma = ca.messages().replay();
 					ma.connect();
 					
-					ca.sendMessage("ping");
+					ca.sendMessage("ping to b");
 					return cb.messages().skipWhile(isEmpty()).take(1).flatMap(new Func1<List<Message>, Observable<Pair<Party, List<Object>>>>() {  @Override public Observable<Pair<Party, List<Object>>> call(List<Message> t1) {
 						
 						final ConnectableObservable<List<Message>> mb = cb.messages().replay();
 						mb.connect();
 						
-						cb.sendMessage("pong");
+						cb.sendMessage("pong from b");
 						return pairedWith(partyA, ma.take(3).map(toMessageContentList()))
 								.concatWith(
 									pairedWith(partyB, mb.take(2).map(toMessageContentList())));
@@ -293,10 +296,23 @@ public class ConversationsAPITest extends TestCase {
 					}});
 				}}),				
 				Pair.of(partyA, Arrays.asList()),
-				Pair.of(partyA, Arrays.asList("ping")),
-				Pair.of(partyA, Arrays.asList("ping", "pong")),
-				Pair.of(partyB, Arrays.asList("ping")),
-				Pair.of(partyB, Arrays.asList("ping", "pong"))));
+				Pair.of(partyA, Arrays.asList("ping to b")),
+				Pair.of(partyA, Arrays.asList("ping to b", "pong from b")),
+				Pair.of(partyB, Arrays.asList("ping to b")),
+				Pair.of(partyB, Arrays.asList("ping to b", "pong from b"))));
+		
+		expecting(
+			values(
+				conversationOf(sneerA, partyC).flatMap(new Func1<Conversation, Observable<Pair<Party, List<Object>>>>() { @Override public Observable<Pair<Party, List<Object>>> call(Conversation c) {
+					return pairedWith(partyC, c.messages().map(toMessageContentList()));
+				}}),
+				Pair.of(partyC, Arrays.asList())));
+	}
+
+	private Observable<Conversation> conversationOf(Sneer sneer, final Party party) {
+		return flatMapConversationsOf(sneer).first(new Func1<Conversation, Boolean>() {  @Override public Boolean call(Conversation c) {
+			return c.party() == party;
+		}});
 	}
 
 	public void testPartyName() throws FriendlyException {

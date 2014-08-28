@@ -8,7 +8,7 @@
   (:import
    [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
-   [sneer Sneer PrivateKey Party Contact Profile Conversation Message]
+   [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation Message]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [rx.schedulers TestScheduler]
@@ -145,15 +145,16 @@
         own? (= own-puk (.author tuple))]
     (Message. created received content own?)))
 
-(defn reify-conversation [tuple-space own-puk party]
-  (let [messages (atom [])
+(defn reify-conversation [^TupleSpace tuple-space ^PublicKey own-puk ^Party party]
+  (let [party-puk (party-puk party)
+        messages (atom [])
         observable-messages (atom->observable messages)
         message-filter (.. tuple-space filter (type "message"))]
     
     (rx/subscribe
       (rx/merge
-        (.. message-filter (author own-puk) tuples)
-        (.. message-filter (author (party-puk party)) tuples))
+        (.. message-filter (author own-puk) (audience party-puk) tuples)
+        (.. message-filter (author party-puk) (audience own-puk) tuples))
       #(swap! messages conj (tuple->message own-puk %)))
     
     (reify
@@ -167,7 +168,7 @@
         (..
           tuple-space
           publisher
-          (audience (party-puk party))
+          (audience party-puk)
           (type "message")
           (pub content)))
       

@@ -4,6 +4,7 @@ import java.util.*;
 
 import rx.Observable;
 import sneer.*;
+import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 
 public abstract class LocalTuplesFactory {
@@ -116,6 +117,11 @@ public abstract class LocalTuplesFactory {
 				TupleSubscriberImpl s = new TupleSubscriberImpl();
 				s.where.putAll(fields);
 				return s;
+			}
+
+			@Override
+			public TupleFilter audience(PublicKey audience) {
+				throw new NotImplementedYet();
 			}
 
 		}
