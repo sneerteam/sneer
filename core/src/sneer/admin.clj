@@ -109,6 +109,9 @@
     (rx/on-next party-name-subject nickname)
     (reify Contact
       (party [this] party)
+      (problemWithNewNickname [this new-nick]
+        ;TODO
+        )
       (nickname [this]
         (.observed nickname-subject))
       (setNickname [this new-nickname]
