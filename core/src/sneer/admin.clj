@@ -1,14 +1,14 @@
 (ns sneer.admin
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [subject* seq->observable observe-for-computation]]
+   [sneer.rx :refer [subject* observe-for-computation flatmapseq]]
    [sneer.core :as core :refer [connect dispose restarted]]
    [sneer.persistent-tuple-base :as persistence]
    [clojure.java.io :as io])
   (:import
    [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
-   [sneer Sneer PrivateKey Party Contact Profile]
+   [sneer Sneer PrivateKey Party Contact Profile Conversation]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [rx.schedulers TestScheduler]
@@ -123,6 +123,12 @@
 (defn nickname [contact]
   (.. contact nickname current))
 
+(defn reify-conversation [contact]
+  (reify
+    Conversation
+    (party [this]
+      (.party contact))))
+
 (defn new-sneer [tuple-space own-prik followees]
   (let [own-puk (.publicKey own-prik)
         parties (atom {})
@@ -135,7 +141,7 @@
       (->> 
         contacts-subject
         ;observe-for-computation
-        (rx/flatmap seq->observable)
+        flatmapseq
         (rx/flatmap #(.. % party publicKey observable)))
       (partial rx/on-next followees))
     
@@ -181,6 +187,11 @@
 
         (conversationsContaining [this type]
           (rx/never))
+
+        (conversations [this]
+          (->>
+            contacts-subject
+            (rx/map (partial map reify-conversation))))
 
         (produceParty [this puk]
           (produce-party parties puk))

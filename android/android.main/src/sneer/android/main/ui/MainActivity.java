@@ -119,8 +119,17 @@ public class MainActivity extends Activity {
 			Conversation conversation = adapter.getItem(position);
 			onContactClicked(conversation);
 		}});
+		
+		sneer().contacts()
+			.flatMap(new Func1<List<Contact>, Observable<? extends Contact>>() {  @Override public Observable<? extends Contact> call(List<Contact> t1) {
+				return Observable.from(t1);
+			} })
+			.distinct()
+			.subscribe(new Action1<Contact>() {  @Override public void call(Contact t1) {
+				toast("Here comes a new challenger: "+ t1.nickname().current());
+			} });
 
-		sneer().conversationsContaining(embeddedOptions.type)
+		sneer().conversations()
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
 					adapter.clear();

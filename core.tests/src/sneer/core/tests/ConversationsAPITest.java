@@ -239,4 +239,23 @@ public class ConversationsAPITest extends TestCase {
 		
 	}
 	
+	public void testEmitConversationForEveryContact() throws FriendlyException {
+
+		Party partyBOfA = sneerA.produceParty(userB);
+		sneerA.addContact("little b", partyBOfA);
+
+		expecting(
+			same(
+				sneerA.conversations()
+					.flatMapIterable(new Func1<List<Conversation>, Iterable<? extends Conversation>>() {  @Override public Iterable<? extends Conversation> call(List<Conversation> t1) {
+						return t1;
+					} })
+					.map(new Func1<Conversation, Party>() {  @Override public Party call(Conversation t1) {
+						return t1.party();
+					} }), 
+				partyBOfA));
+			
+		
+	}
+	
 }

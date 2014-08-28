@@ -40,8 +40,8 @@ public class ObservableTestUtils {
 			values);
 	}
 
-	public static Observable<Void> values(Observable<?> tuples, final Object... values) {
-		return tuples
+	public static Observable<Void> values(Observable<?> source, final Object... values) {
+		return source
 			.buffer(500, TimeUnit.MILLISECONDS, values.length)
 			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> t1) {
 				assertListSize(values, t1);

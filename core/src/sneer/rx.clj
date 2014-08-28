@@ -1,5 +1,7 @@
 (ns sneer.rx
-  (:require [rx.lang.clojure.core :as rx])
+  (:require 
+    [rx.lang.clojure.core :as rx]
+    [rx.lang.clojure.interop :as interop])
   (:import [rx.subjects Subject]
            [rx.schedulers Schedulers]))
 
@@ -32,6 +34,9 @@ Only maps containing all key/value pairs in criteria are kept."
 
 (defn seq->observable [^java.lang.Iterable iterable]
   (rx.Observable/from iterable))
+
+(defn flatmapseq [^rx.Observable o]
+  (.flatMapIterable o (interop/fn [seq] seq)))
 
 (defn observe-for-computation [o]
   (.observeOn o (Schedulers/computation)))
