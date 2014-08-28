@@ -166,12 +166,12 @@ public class SneerApp extends Application {
 		File adminDir = new File(context.getFilesDir(), "admin");
 		adminDir.mkdirs();
 		File secureFile = new File(adminDir, "tupleSpace.sqlite");
-		secureFile.delete();
+		//secureFile.delete();
 		try {
 			Object network = networkSimulator();
 			
 			SneerAdmin admin = newSneerAdmin(network, SneerSqliteDatabase.openDatabase(secureFile));
-			createBot("bot", network, admin.sneer());
+			//createBot("bot", network, admin.sneer());
 			
 			return admin;
 		} catch (IOException e) {
