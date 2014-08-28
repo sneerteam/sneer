@@ -8,7 +8,7 @@
   (:import
    [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
-   [sneer Sneer PrivateKey Party Contact Profile Conversation]
+   [sneer Sneer PrivateKey Party Contact Profile Conversation Message]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [rx.schedulers TestScheduler]
@@ -25,13 +25,15 @@
 
 (defn new-party [puk]
   (let [name (replay-last-subject)]
-	  (reify
+    (reify
       Party
-	    (name [this] name)
-	    (publicKey [this]
-	      (.observed (ObservedSubject/create puk)))
+      (name [this] name)
+      (publicKey [this]
+        (.observed (ObservedSubject/create puk)))
       PartyImpl
-      (party-name-subject [this] name))))
+      (party-name-subject [this] name)
+      (toString [this]
+        (str "#<Party " puk ">")))))
 
 (defn party-puk [party]
   (.. party publicKey current))
@@ -133,24 +135,53 @@
 (defn nickname [contact]
   (.. contact nickname current))
 
-(defn reify-conversation [party]
-  
-  (reify
-    Conversation
-    (party [this] party)
+(defn now []
+  (.getTime (java.util.Date.)))
+
+(defn tuple->message [own-puk tuple]
+  (let [created (now)
+        received (now)
+        content (.payload tuple)
+        own? (= own-puk (.author tuple))]
+    (Message. created received content own?)))
+
+(defn reify-conversation [tuple-space own-puk party]
+  (let [messages (atom [])
+        observable-messages (atom->observable messages)
+        message-filter (.. tuple-space filter (type "message"))]
     
-    (mostRecentMessageContent [this]
-      (.observed (ObservedSubject/create "hello")))
+    (rx/subscribe
+      (rx/merge
+        (.. message-filter (author own-puk) tuples)
+        (.. message-filter (author (party-puk party)) tuples))
+      #(swap! messages conj (tuple->message own-puk %)))
     
-    (mostRecentMessageTimestamp [this]
-      (.observed (ObservedSubject/create (.getTime (java.util.Date.)))))
+    (reify
+      Conversation      
+      (party [this] party)
+      
+      (messages [this]
+        observable-messages)
+      
+      (sendMessage [this content]
+        (..
+          tuple-space
+          publisher
+          (audience (party-puk party))
+          (type "message")
+          (pub content)))
+      
+      (mostRecentMessageContent [this]
+        (.observed (ObservedSubject/create "hello")))
+      
+      (mostRecentMessageTimestamp [this]
+        (.observed (ObservedSubject/create (now))))
     
-    (messages [this] (rx/never))
-    (menu [this] (rx/never))
-    (unreadMessageCount [this] (rx.Observable/just 1))
-    (unreadMessageCountReset [this])
+      (menu [this] (rx/never))
     
-    ))
+      (unreadMessageCount [this] (rx.Observable/just 1))
+    
+      (unreadMessageCountReset [this]))))
 
 (defn new-sneer [tuple-space own-prik followees]
   (let [own-puk (.publicKey own-prik)

@@ -49,6 +49,11 @@ public class Pair<A, B> {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "Pair.of(" + a + ", " + b + ")";
+	}
 
 	
 }

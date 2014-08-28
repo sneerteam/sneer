@@ -11,6 +11,7 @@ import rx.observables.*;
 import rx.subjects.*;
 import sneer.*;
 import sneer.admin.*;
+import sneer.commons.*;
 import sneer.commons.Arrays;
 import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
@@ -240,18 +241,64 @@ public class ConversationsAPITest extends TestCase {
 
 		expecting(
 			same(
-				sneerA.conversations()
-					.flatMapIterable(new Func1<List<Conversation>, Iterable<? extends Conversation>>() {  @Override public Iterable<? extends Conversation> call(List<Conversation> t1) {
-						return t1;
-					} })
-					.map(new Func1<Conversation, Party>() {  @Override public Party call(Conversation t1) {
-						return t1.party();
-					} }), 
+				flatMapConversationsOf(sneerA).map(new Func1<Conversation, Party>() {  @Override public Party call(Conversation t1) {
+					return t1.party();
+				}}), 
 				partyBOfA));
-			
 		
 	}
+
+	private Observable<Conversation> flatMapConversationsOf(Sneer sneer) {
+		return sneer.conversations()
+			.flatMapIterable(new Func1<List<Conversation>, Iterable<? extends Conversation>>() {  @Override public Iterable<? extends Conversation> call(List<Conversation> t1) {
+				return t1;
+			} });
+	}
 	
+	public void testConversationMessageSequence() throws FriendlyException {
+		
+		final Party partyA = sneerB.produceParty(userA);
+		sneerB.addContact("a", partyA);
+		
+		final Party partyB = sneerA.produceParty(userB);
+		sneerA.addContact("b", partyB);
+		
+		expecting(
+			values(
+				Observable.zip(flatMapConversationsOf(sneerA).first(), flatMapConversationsOf(sneerB).first(), new Func2<Conversation, Conversation, Pair<Conversation, Conversation>>() {  @Override public Pair<Conversation, Conversation> call(Conversation ca, Conversation cb) {
+					
+					assertSame(partyB, ca.party());
+					assertSame(partyA, cb.party());
+					return Pair.of(ca, cb);
+					
+				}}).flatMap(new Func1<Pair<Conversation, Conversation>, Observable<Pair<Party, List<Object>>>>() {  @Override public Observable<Pair<Party, List<Object>>> call(Pair<Conversation, Conversation> t1) {
+					
+					final Conversation ca = t1.a;
+					final Conversation cb = t1.b;
+					
+					final ConnectableObservable<List<Message>> ma = ca.messages().replay();
+					ma.connect();
+					
+					ca.sendMessage("ping");
+					return cb.messages().skipWhile(isEmpty()).take(1).flatMap(new Func1<List<Message>, Observable<Pair<Party, List<Object>>>>() {  @Override public Observable<Pair<Party, List<Object>>> call(List<Message> t1) {
+						
+						final ConnectableObservable<List<Message>> mb = cb.messages().replay();
+						mb.connect();
+						
+						cb.sendMessage("pong");
+						return pairedWith(partyA, ma.take(3).map(toMessageContentList()))
+								.concatWith(
+									pairedWith(partyB, mb.take(2).map(toMessageContentList())));
+						
+					}});
+				}}),				
+				Pair.of(partyA, Arrays.asList()),
+				Pair.of(partyA, Arrays.asList("ping")),
+				Pair.of(partyA, Arrays.asList("ping", "pong")),
+				Pair.of(partyB, Arrays.asList("ping")),
+				Pair.of(partyB, Arrays.asList("ping", "pong"))));
+	}
+
 	public void testPartyName() throws FriendlyException {
 		
 		// 1 - type=sneer/contact party=puk
@@ -267,7 +314,30 @@ public class ConversationsAPITest extends TestCase {
 		expecting(
 			values(partyBOfA.name(), "little b"));
 		
-		
 	}
+
+	private <A, B> Observable<Pair<A, B>> pairedWith(final A a, Observable<B> o) {
+		return o.map(new Func1<B, Pair<A, B>>() {  @Override public Pair<A, B> call(B b) {
+			return Pair.of(a, b);
+		}});
+	}
+
+	private Func1<? super List<Message>, ? extends List<Object>> toMessageContentList() {
+		return new Func1<List<Message>, List<Object>>() {  @Override public List<Object> call(List<Message> t1) {
+			ArrayList<Object> r = new ArrayList<Object>(t1.size());
+			for (Message m : t1) r.add(m.content());
+			return r;
+		}};
+	}
+
+	protected Func1<List<?>,Boolean> isEmpty() {
+		return new Func1<List<?>, Boolean>() { @Override public Boolean call(List<?> t1) {
+			return t1.isEmpty();
+		}};
+	}
+
 	
+	private SneerAdmin restart(SneerAdmin admin) {
+		return Glue.restart(admin);
+	}	
 }
