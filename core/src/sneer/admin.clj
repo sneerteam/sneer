@@ -134,10 +134,38 @@
   (.. contact nickname current))
 
 (defn reify-conversation [contact]
+  
+  
+;  	Observable<List<Message>> messages();
+;	Observed<Long> mostRecentMessageTimestamp();
+;	Observed<String> mostRecentMessageContent();
+;	
+;	/** Publish a new message with isOwn() true, with party() as the audience and using System.currentTimeMillis() as the timestamp. */
+;	void sendMessage(String content);
+;
+;	Observable<List<ConversationMenuItem>> menu();
+;	
+;	Observable<Long> unreadMessageCount();
+;	void unreadMessageCountReset();
+
+  
   (reify
     Conversation
     (party [this]
-      (.party contact))))
+      (.party contact))
+    
+    (mostRecentMessageContent [this]
+      (.observed (ObservedSubject/create "hello")))
+    
+    (mostRecentMessageTimestamp [this]
+      (.observed (ObservedSubject/create (.getTime (java.util.Date.)))))
+    
+    (messages [this] (rx/never))
+    (menu [this] (rx/never))
+    (unreadMessageCount [this] (rx.Observable/just 1))
+    (unreadMessageCountReset [this])
+    
+    ))
 
 (defn new-sneer [tuple-space own-prik followees]
   (let [own-puk (.publicKey own-prik)

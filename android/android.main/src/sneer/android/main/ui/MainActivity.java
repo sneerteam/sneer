@@ -88,12 +88,14 @@ public class MainActivity extends Activity {
 			actionBar.setTitle(embeddedOptions.title);
 		}
 
-		sneer().profileFor(sneer().self()).ownName()
+		Profile ownProfile = sneer().profileFor(sneer().self());
+		
+		ownProfile.ownName()
 				.subscribe(new Action1<String>() { @Override public void call(String label) {
 					actionBar.setTitle(label);
 				}});
 
-		sneer().profileFor(sneer().self()).selfie()
+		ownProfile.selfie()
 				.observeOn(AndroidSchedulers.mainThread()).cast(byte[].class)
 				.subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
 					actionBar.setIcon((Drawable) new BitmapDrawable(
@@ -125,6 +127,7 @@ public class MainActivity extends Activity {
 				return Observable.from(t1);
 			} })
 			.distinct()
+			.observeOn(AndroidSchedulers.mainThread())
 			.subscribe(new Action1<Contact>() {  @Override public void call(Contact t1) {
 				toast("Here comes a new challenger: "+ t1.nickname().current());
 			} });
