@@ -133,26 +133,11 @@
 (defn nickname [contact]
   (.. contact nickname current))
 
-(defn reify-conversation [contact]
-  
-  
-;  	Observable<List<Message>> messages();
-;	Observed<Long> mostRecentMessageTimestamp();
-;	Observed<String> mostRecentMessageContent();
-;	
-;	/** Publish a new message with isOwn() true, with party() as the audience and using System.currentTimeMillis() as the timestamp. */
-;	void sendMessage(String content);
-;
-;	Observable<List<ConversationMenuItem>> menu();
-;	
-;	Observable<Long> unreadMessageCount();
-;	void unreadMessageCountReset();
-
+(defn reify-conversation [party]
   
   (reify
     Conversation
-    (party [this]
-      (.party contact))
+    (party [this] party)
     
     (mostRecentMessageContent [this]
       (.observed (ObservedSubject/create "hello")))
@@ -229,13 +214,16 @@
         (conversations [this]
           (->>
             contacts-subject
-            (rx/map (partial map reify-conversation))))
+            (rx/map (partial map #(reify-conversation (.party %))))))
 
         (produceParty [this puk]
           (produce-party parties puk))
         
         (tupleSpace [this]
-          tuple-space)))))
+          tuple-space)
+        
+        (produceConversationWith [this party] 
+          (reify-conversation party))))))
 
 
 (defprotocol Restartable
