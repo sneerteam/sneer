@@ -28,7 +28,7 @@ public class SneerApp extends Application {
 	
 	private static AlertDialog errorDialog;
 	
-	private static final boolean USE_SIMULATOR = true;
+	private static final boolean USE_SIMULATOR = false;
 	
 	private static SneerAdmin ADMIN = null;
 
