@@ -5,9 +5,9 @@ import static sneer.SneerAndroid.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import rx.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.schedulers.*;
@@ -18,7 +18,6 @@ import sneer.commons.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.simulator.*;
 import sneer.persistent_tuple_base.*;
-import sneer.tuples.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -167,11 +166,12 @@ public class SneerApp extends Application {
 		File adminDir = new File(context.getFilesDir(), "admin");
 		adminDir.mkdirs();
 		File secureFile = new File(adminDir, "tupleSpace.sqlite");
+		secureFile.delete();
 		try {
 			Object network = networkSimulator();
 			
 			SneerAdmin admin = newSneerAdmin(network, SneerSqliteDatabase.openDatabase(secureFile));
-			createBots("bot", network, admin.sneer());
+			createBot("bot", network, admin.sneer());
 			
 			return admin;
 		} catch (IOException e) {
@@ -181,15 +181,21 @@ public class SneerApp extends Application {
 	}
 
 
-	private static void createBots(final String name, Object network, final Sneer masterSneer) {
-		Observable.just(network)
+	private static void createBot(final String baseName, final Object network, final Sneer masterSneer) {
+		Observable.range(1, 10)
+			.delay(1, TimeUnit.SECONDS)
 			.observeOn(Schedulers.newThread())
-			.subscribe(new Action1<Object>() {  @Override public void call(Object network) {
+			.subscribe(new Action1<Integer>() {  @Override public void call(Integer id) {
 				try {
-					SneerAdmin admin = newSneerAdmin(network, SneerSqliteDatabase.openDatabase(File.createTempFile(name, ".sqlite")));
 					
-					masterSneer.addContact(name, masterSneer.produceParty(admin.privateKey().publicKey()));
-					admin.sneer().addContact("master", admin.sneer().produceParty(masterSneer.self().publicKey().current()));
+					String name = baseName +":"+id;
+					
+					File dbFile = File.createTempFile(name, ".sqlite");
+					dbFile.deleteOnExit();
+					SneerAdmin botAdmin = newSneerAdmin(network, SneerSqliteDatabase.openDatabase(dbFile));
+					
+					masterSneer.addContact(name, masterSneer.produceParty(botAdmin.privateKey().publicKey()));
+					botAdmin.sneer().addContact("master", botAdmin.sneer().produceParty(masterSneer.self().publicKey().current()));
 					
 				} catch (IOException e) {
 					e.printStackTrace();
