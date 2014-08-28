@@ -7,6 +7,13 @@ import rx.subjects.*;
 
 public class ObservedSubject<T> {
 
+	/**
+	 * It is expected that the subject will emit a value before the first call to current.
+	 */
+	public static <T> ObservedSubject<T> createWithSubject(Subject<T, T> subject) {
+		return new ObservedSubject<T>(subject);
+	}
+
 	public static <T> ObservedSubject<T> create(T initialValue) {
 		return new ObservedSubject<T>(initialValue);
 	}
@@ -15,18 +22,20 @@ public class ObservedSubject<T> {
 	volatile
 	private T mostRecent;
 	
-	private final BehaviorSubject<T> subject;
+	private final Subject<T, T> subject;
 	
 
 	private ObservedSubject(T initialValue) {
-		mostRecent = initialValue;
-		subject = BehaviorSubject.create(initialValue);
+		this(BehaviorSubject.create(initialValue));
+	}
+	
+	public ObservedSubject(Subject<T, T> subject) {
+		this.subject = subject;
 		subject.subscribe(new Action1<T>() { @Override public void call(T newValue) {
 			mostRecent = newValue;
 		}});
 	}
 
-	
 	public Observed<T> observed() {
 		return new Observed<T>() {
 

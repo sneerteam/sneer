@@ -20,10 +20,18 @@
 (defn replay-last-subject []
   (ReplaySubject/createWithSize 1))
 
+(defprotocol PartyImpl
+  (party-name-subject [this]))
+
 (defn new-party [puk]
-  (reify Party
-    (publicKey [this]
-      (.observed (ObservedSubject/create puk)))))
+  (let [name (replay-last-subject)]
+	  (reify
+      Party
+	    (name [this] name)
+	    (publicKey [this]
+	      (.observed (ObservedSubject/create puk)))
+      PartyImpl
+      (party-name-subject [this] name))))
 
 (defn party-puk [party]
   (.. party publicKey current))
@@ -94,7 +102,9 @@
 
 
 (defn reify-contact [nickname party]
-  (let [nickname-subject (ObservedSubject/create nickname)]
+  (let [party-name-subject (party-name-subject party)
+        nickname-subject (ObservedSubject/createWithSubject party-name-subject)]
+    (rx/on-next party-name-subject nickname)
     (reify Contact
       (party [this] party)
       (nickname [this]
