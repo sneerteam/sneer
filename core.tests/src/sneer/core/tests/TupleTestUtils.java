@@ -8,7 +8,7 @@ import sneer.tuples.*;
 public class TupleTestUtils {
 
 	public static void expectValues(Observable<Tuple> tuples, Object... expecteds) {
-		assertEqualsUntilNow(tuples.map(TO_PAYLOAD), expecteds);
+		expecting(values(tuples.map(TO_PAYLOAD), expecteds));
 	}
 
 }

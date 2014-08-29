@@ -64,12 +64,6 @@ public class ObservableTestUtils {
 			}});
 	}
 	
-	@SafeVarargs
-	public static <T> void assertEqualsUntilNow(Observable<T> seq, T... expecteds) {
-		List<T> list = takeAllUntilNow(seq);
-		assertList(expecteds, list);
-	}
-	
 	public static <T> void assertList(T[] expected, List<T> list) {
 		assertListSize(expected, list);
 		Iterator<T> it = list.iterator();
