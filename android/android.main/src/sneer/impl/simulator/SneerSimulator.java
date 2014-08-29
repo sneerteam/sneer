@@ -11,7 +11,6 @@ import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.*;
-import sneer.impl.keys.*;
 import sneer.tuples.*;
 
 public class SneerSimulator implements Sneer {

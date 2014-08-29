@@ -8,7 +8,6 @@ import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.utils.*;
 import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
 import android.os.*;
@@ -82,7 +81,7 @@ public class ContactActivity extends Activity {
 		
 		if (Intent.ACTION_VIEW.equals(action)){
 			try{
-				loadContact(Keys.createPublicKey(intent.getData().getQuery()));		
+				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));		
 			}catch(RuntimeException e){
 				toast("Invalid public key.");
 				finish();

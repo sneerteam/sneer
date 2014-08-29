@@ -3,9 +3,8 @@ package sneer.impl.simulator;
 import sneer.*;
 import sneer.admin.*;
 import sneer.commons.*;
-import sneer.impl.keys.*;
 
-public class SneerAdminSimulator implements SneerAdmin {
+public class SneerAdminSimulator implements SneerAdmin, sneer.keys.Keys {
 	
 	private final PrivateKey neidePrik = Keys.createPrivateKey();
 
@@ -25,6 +24,18 @@ public class SneerAdminSimulator implements SneerAdmin {
 	@Override
 	public PrivateKey privateKey() {
 		return neidePrik;
+	}
+
+
+	@Override
+	public sneer.keys.Keys keys() {
+		return this;
+	}
+
+
+	@Override
+	public PublicKey createPublicKey(String bytesAsString) {
+		return Keys.createPublicKey(bytesAsString);
 	}
 
 }
