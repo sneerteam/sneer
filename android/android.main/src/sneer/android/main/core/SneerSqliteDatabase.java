@@ -1,21 +1,21 @@
 package sneer.android.main.core;
+
 import java.io.*;
 import java.util.*;
 import java.util.Arrays;
 
+import sneer.admin.*;
 import sneer.commons.*;
-import sneer.persistent_tuple_base.*;
 import android.annotation.*;
 import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
 
 
-public class SneerSqliteDatabase implements Database, Closeable {
+public class SneerSqliteDatabase implements Closeable, Database {
 	
 	public static SneerSqliteDatabase openDatabase(File file) throws IOException {
-		return new SneerSqliteDatabase(
-			SQLiteDatabase.openOrCreateDatabase(file,null));
+		return new SneerSqliteDatabase(SQLiteDatabase.openOrCreateDatabase(file,null));
 	}
 
 	private SQLiteDatabase sqlite;
@@ -26,17 +26,15 @@ public class SneerSqliteDatabase implements Database, Closeable {
 
 	
 	@Override
-	public Object db_create_table(Object tableName, Object columns) {
-		String sql = "CREATE TABLE " + name(tableName) + " (" + columnsString((List<?>)columns) + ")";
+	public void createTable(String tableName, List<List<Object>> columns) {
+		String sql = "CREATE TABLE " + tableName + " (" + columnsString((List<?>)columns) + ")";
 		sqlite.execSQL(sql);
-		return null;
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Object db_insert(Object tableName, Object values) {
-		return sqlite.insert(name(tableName), null, toContentValues((Map<String, Object>)values));
+	public long insert(String tableName, Map<String, Object> values) {
+		return sqlite.insert(tableName, null, toContentValues(values));
 	}
 
 	
@@ -55,8 +53,7 @@ public class SneerSqliteDatabase implements Database, Closeable {
 
 
 	@Override
-	public Object db_query(Object sqlAndParams) {
-		String sql = (String)((List<?>)sqlAndParams).get(0);
+	public Iterable<List<?>> query(String sql, List<Object> params) {
 		Cursor cursor = sqlite.rawQuery(sql, null);
 		ArrayList<List<?>> ret = new ArrayList<List<?>>(cursor.getCount() + 1);
 		ret.add(Arrays.asList(cursor.getColumnNames()));

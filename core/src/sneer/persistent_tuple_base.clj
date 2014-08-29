@@ -10,6 +10,15 @@
   (db-insert [this table row])
   (db-query [this sql-and-params]))
 
+(extend-protocol Database
+  sneer.admin.Database
+  (db-create-table [this table columns]
+    (.createTable this (name table) columns))
+  (db-insert [this table row]
+    (.insert this (name table) row))  
+  (db-query [this sql-and-params]
+    (.query this (first sql-and-params) (subvec sql-and-params 1))))
+
 (defn create-tuple-table [db]
   (db-create-table
     db :tuple
