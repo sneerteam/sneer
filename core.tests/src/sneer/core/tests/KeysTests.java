@@ -1,9 +1,10 @@
-package sneer;
+package sneer.core.tests;
 
 import static org.junit.Assert.*;
 
 import org.junit.*;
 
+import sneer.*;
 import sneer.impl.keys.*;
 
 public class KeysTests {

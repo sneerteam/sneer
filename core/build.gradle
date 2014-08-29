@@ -53,6 +53,10 @@ dependencies {
     	exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
     	exclude group: 'org.apache.directory.studio', module: 'org.apache.commons.codec'
     }
+    compile('com.google:bitcoinj:0.11.3') {
+    	exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    	exclude group: 'com.lambdaworks', module: 'scrypt'
+    }
     compile project(':java-api')
 }
 
