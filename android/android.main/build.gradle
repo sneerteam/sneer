@@ -13,9 +13,7 @@ buildscript {
 }
 
 dependencies {
-    compile('me.sneer:core:0.0.1') {
-    	exclude group: 'org.ow2.asm', module: 'asm-all'
-    }
+    compile('me.sneer:core:0.0.1')
     compile 'com.google.android:support-v4:r7'
     compile project(':android-api')
 }
