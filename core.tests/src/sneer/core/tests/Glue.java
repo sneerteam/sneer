@@ -17,7 +17,7 @@ class Glue {
 	}
 
 	public static Object newNetworkSimulator() {
-		return var("sneer.networking.simulator", "new-network").invoke();
+		return var("sneer.networking.simulator", "create-network").invoke();
 	}
 	
 	public static void tearDownNetwork(Object network) {

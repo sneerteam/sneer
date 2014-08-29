@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import clojure.lang.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.schedulers.*;
@@ -162,8 +163,12 @@ public class SneerApp extends Application {
 		return (SneerAdmin) adminVar("new-sneer-admin-over-db").invoke(network, db);
 	}
 	
-	private static Object networkSimulator() {
-		return var("sneer.networking.simulator", "new-network").invoke();
+	private static Object createNetwork() {
+		final boolean serverNetwork = true;
+		IFn networkFactory = serverNetwork 
+			? var("sneer.networking.client", "create-network")
+			: var("sneer.networking.simulator", "create-network");
+		return networkFactory.invoke();
 	}
 
 	private static SneerAdmin initialize(Context context) throws FriendlyException {
@@ -175,7 +180,7 @@ public class SneerApp extends Application {
 		File secureFile = new File(adminDir, "tupleSpace.sqlite");
 		//secureFile.delete();
 		try {
-			Object network = networkSimulator();
+			Object network = createNetwork();
 			
 			SneerAdmin admin = newSneerAdmin(network, SneerSqliteDatabase.openDatabase(secureFile));
 			//createBot("bot", network, admin.sneer());

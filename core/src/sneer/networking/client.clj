@@ -1,6 +1,7 @@
 (ns sneer.networking.client
   (:require [clojure.core.async :as async :refer [<! >! >!!]]
             [rx.lang.clojure.core :as rx]
+            [sneer.core :as core]
             [sneer.rx :refer [subject*]]
             [sneer.networking.udp :as udp])
   (:import [java.net InetSocketAddress]
@@ -30,10 +31,6 @@
       (async/close! ch))))
 
 (defn start
-
-  ([puk]
-     (start puk (dropping-chan 1) (dropping-chan 1) "dynamic.sneer.me" 5555))
-
   ([puk from-server to-server server-host server-port]
      (let [packets-in (async/chan)
            packets-out (async/chan)]
@@ -73,3 +70,17 @@
   (start puk from-server to-server host port)
   (subject* (chan->observable from-server)
             (chan->observer to-server)))
+
+(defn create-network []
+  (let [open-channels (atom [])]
+    (reify
+      core/Network
+      (connect [network puk]
+        (let [to-server (dropping-chan 1)
+              from-server (dropping-chan 1)
+              connection (create-connection puk from-server to-server "dynamic.sneer.me" 5555)]
+          (swap! open-channels conj to-server)
+          connection))
+      core/Disposable
+      (dispose [network]
+        (doall (map @open-channels async/close!))))))

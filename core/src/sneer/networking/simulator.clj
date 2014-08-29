@@ -18,5 +18,5 @@
   (dispose [network]
     (rx/on-completed network)))
 
-(defn new-network []
+(defn create-network []
   (PublishSubject/create))
