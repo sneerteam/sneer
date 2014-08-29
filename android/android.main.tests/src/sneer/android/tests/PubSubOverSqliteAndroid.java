@@ -4,7 +4,6 @@ import java.io.*;
 
 import junit.framework.*;
 import rx.functions.*;
-import sneer.android.main.core.*;
 import sneer.core.tests.*;
 
 public class PubSubOverSqliteAndroid extends TestCase {
@@ -23,7 +22,7 @@ public class PubSubOverSqliteAndroid extends TestCase {
 	
 	private PubSubTest pubSubTest() {
 		return PubSubOverPersistentTupleSpace.create(new Func0<Object>() {  @Override public Object call() {
-			return SneerTestUtils.tmpTupleBase();
+			return TupleBaseFactory.tempTupleBase();
 		}});
 	}
 	

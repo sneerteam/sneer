@@ -3,6 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject* observe-for-computation atom->observable flatmapseq]]
    [sneer.core :as core :refer [connect dispose restarted]]
+   [sneer.networking.client :as client]
    [sneer.persistent-tuple-base :as persistence]
    [clojure.java.io :as io])
   (:import
@@ -311,4 +312,7 @@
     (let [tuple-base (prepare-tuple-base db)
           own-prik (produce-private-key db)]
       (new-sneer-admin own-prik network tuple-base))))
+
+(defn create [db]
+  (new-sneer-admin-over-db (client/create-network) db))
 
