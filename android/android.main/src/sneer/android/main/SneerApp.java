@@ -54,18 +54,18 @@ public class SneerApp extends Application {
 		SneerAppInfo.apps()
 			.flatMap(new Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerAppInfo> apps) {
 				return Observable.from(apps)
-					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo t1) {
+					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo app) {
 						return new ConversationMenuItem() {
 							
 							@Override
 							public void call(PublicKey partyPuk) {
-								createSession(t1, partyPuk);
+								createSession(app, partyPuk);
 							}
 							
 							@Override
 							public byte[] icon() {								
 								try {
-									Drawable icon = resourceForPackage(t1.packageName).getDrawable(t1.icon);
+									Drawable icon = resourceForPackage(app.packageName).getDrawable(app.icon);
 									return bitmapFor(icon);
 								} catch (Exception e) {
 									Log.w(SneerApp.class.getSimpleName(), "Error loading bitmap", e);
@@ -77,7 +77,7 @@ public class SneerApp extends Application {
 							
 							@Override
 							public String caption() {
-								return t1.label;
+								return app.label;
 							}
 						};
 					} })
