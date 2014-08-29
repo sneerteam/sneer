@@ -20,6 +20,8 @@ import sneer.impl.simulator.*;
 import sneer.persistent_tuple_base.*;
 import android.app.*;
 import android.content.*;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.util.*;
@@ -36,7 +38,6 @@ public class SneerApp extends Application {
 
 	private static String error;
 	
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void onCreate() {
 
@@ -51,10 +52,7 @@ public class SneerApp extends Application {
 		}
 		
 		SneerAppInfo.apps()
-			.flatMap(new Func1<List, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List t1) {
-				@SuppressWarnings("unchecked")
-				List<SneerAppInfo> apps = t1;
-
+			.flatMap(new Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerAppInfo> apps) {
 				return Observable.from(apps)
 					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo t1) {
 						return new ConversationMenuItem() {
@@ -65,14 +63,10 @@ public class SneerApp extends Application {
 							}
 							
 							@Override
-							public byte[] icon() {
-								Drawable icon;
+							public byte[] icon() {								
 								try {
-									icon = getPackageManager().getResourcesForApplication(t1.packageName).getDrawable(t1.icon);
-									Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
-									ByteArrayOutputStream stream = new ByteArrayOutputStream();
-									bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-									return stream.toByteArray();
+									Drawable icon = resourceForPackage(t1.packageName).getDrawable(t1.icon);
+									return bitmapFor(icon);
 								} catch (Exception e) {
 									Log.w(SneerApp.class.getSimpleName(), "Error loading bitmap", e);
 									e.printStackTrace();
@@ -120,6 +114,19 @@ public class SneerApp extends Application {
 	}
 
 	
+	private byte[] bitmapFor(Drawable icon) {
+		Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+		return stream.toByteArray();
+	}
+
+
+	private Resources resourceForPackage(String packageName) throws NameNotFoundException {
+		return getPackageManager().getResourcesForApplication(packageName);
+	}
+
+
 	public static Sneer sneer() {
 		return admin().sneer();
 	}
