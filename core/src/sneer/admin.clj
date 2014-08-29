@@ -148,7 +148,7 @@
         own? (= own-puk (.author tuple))]
     (Message. created received content own?)))
 
-(defn reify-conversation [^TupleSpace tuple-space ^PublicKey own-puk ^Party party]
+(defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [party-puk (party-puk party)
         messages (atom [])
         observable-messages (atom->observable messages)
@@ -181,7 +181,7 @@
       (mostRecentMessageTimestamp [this]
         (.observed (ObservedSubject/create (now))))
     
-      (menu [this] (rx/never))
+      (menu [this] conversation-menu-items)
     
       (unreadMessageCount [this] (rx.Observable/just 1))
     
@@ -191,6 +191,7 @@
   (let [own-puk (.publicKey own-prik)
         parties (atom {})
         profiles (atom {})
+        conversation-menu-items (behavior-subject [])
         puk->contact (atom (restore-contact-list tuple-space own-puk parties))
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by nickname) vec))
         observable-contacts (atom->observable puk->contact ->contact-list)]
@@ -217,7 +218,7 @@
                          (reify-contact nickname party)))))
             
             (produce-conversation [party]
-              (reify-conversation tuple-space own-puk party))]
+              (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))]
 
 
       (reify Sneer
@@ -251,6 +252,9 @@
             observable-contacts
             (rx/map
               (partial map #(produce-conversation (.party %))))))
+        
+        (setConversationMenuItems [this menu-item-list]
+          (rx/on-next conversation-menu-items menu-item-list))
 
         (produceParty [this puk]
           (produce-party parties puk))
