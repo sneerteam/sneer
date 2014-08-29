@@ -97,17 +97,15 @@ public class ContactActivity extends Activity {
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
 			finish();
-		} else if (!newContact){
+		} else {
 			loadProfile();
 		}
 	}
 
 	
 	private String activityTitle() {
-		Bundle extras = getIntent().getExtras();
 		
-		//TODO Fix this verification
-		if (extras == null) {
+		if (getIntent().getExtras().get(PARTY_PUK)==null) {
 			newContact = true;
 			return "New Contact";
 		}
@@ -159,17 +157,17 @@ public class ContactActivity extends Activity {
 			selfieImage.setImageBitmap(bitmap);
 		}});
 		
-		
-		Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>(){ @Override public Boolean call(String preferredNickname, String ownName) {
-			if(preferredNickname.equalsIgnoreCase(ownName) ||
-					preferredNickname.equalsIgnoreCase(contact.nickname().current()))
-				return true;
-			else
-				return false;
-			}}).subscribe(new Action1<Boolean>(){ @Override public void call(Boolean validation) {
-				if(validation)
-					preferredNickNameView.setVisibility(View.GONE);
-			}});
+		if(!newContact)
+			Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>(){ @Override public Boolean call(String preferredNickname, String ownName) {
+				if(preferredNickname.equalsIgnoreCase(ownName) ||
+						preferredNickname.equalsIgnoreCase(contact.nickname().current()))
+					return true;
+				else
+					return false;
+				}}).subscribe(new Action1<Boolean>(){ @Override public void call(Boolean validation) {
+					if(validation)
+						preferredNickNameView.setVisibility(View.GONE);
+				}});
 		
 	}
 
@@ -179,7 +177,7 @@ public class ContactActivity extends Activity {
 				: puk;				
 		
 		party = sneer().produceParty(partyPuk);
-		profile = sneer().profileFor(party);
+		profile = sneer().profileFor(party);	
 		contact = sneer().findContact(party);
 
 		newContact = contact == null
@@ -189,12 +187,12 @@ public class ContactActivity extends Activity {
 	
 	
 	public void saveContact() {
-		if (isTouched) {
+		if (isTouched  || newContact) {
 			try {
 				final String nickName = nicknameEdit.getText().toString();
 				if (newContact)
 					sneer().addContact(nickName, party);
-				else
+				else if(isTouched)
 					sneer().findContact(party).setNickname(nickName);
 				toast("contact saved...");
 			} catch (FriendlyException e) {

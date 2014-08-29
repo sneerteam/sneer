@@ -23,7 +23,8 @@ public class SneerSimulator implements Sneer {
 
 	private final Map<Party, ContactSimulator> contactsByParty = new ConcurrentHashMap<Party, ContactSimulator>();
 	private final BehaviorSubject<List<Contact>> contacts = BehaviorSubject.create(contactsSorted());
-
+	private final Map<Party, ContactSimulator> contactsSneer = new ConcurrentHashMap<Party, ContactSimulator>();
+	
 	private final Map<Party, Conversation> conversationsByParty = new ConcurrentHashMap<Party, Conversation>();
 	private final BehaviorSubject<List<Conversation>> conversations = BehaviorSubject.create(conversationsSorted());
 	
@@ -45,7 +46,7 @@ public class SneerSimulator implements Sneer {
 		setupMockupRPSPlayer(cloud, addContact("Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("wesley.jpg")), "ROCK");
 		setupMockupRPSPlayer(cloud, addContact("Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("carla.jpg")), "PAPER");
 		
-		addUnknownContact("Ze Ninguem", "dude", "World", "Unknown", selfieFromFileSystem("wesley.jpg"));
+		addUnknownContact("Ze Ninguem", "dude", "World", "Unknown", selfieFromFileSystem("dude.jpg"));
 		
 	}
 
@@ -76,7 +77,7 @@ public class SneerSimulator implements Sneer {
 			return newParty;
 		}
 	}
-
+	
 
 	@Override
 	public Observable<List<Conversation>> conversations() {
@@ -179,7 +180,7 @@ public class SneerSimulator implements Sneer {
 		PrivateKey prik = Keys.createPrivateKey();
 		PartySimulator party = produceParty(prik.publicKey());
 		System.out.println("==============================");
-		System.out.println("Misterious puk: " + party.publicKey().current().bytesAsString());
+		System.out.println("http://sneer.me/public-key?" + party.publicKey().current().bytesAsString());
 		System.out.println("==============================");
 		party.simulateSetName(name);
 		party.simulateSetPreferredNickname(preferredNicknane);
@@ -191,21 +192,14 @@ public class SneerSimulator implements Sneer {
 	}
 	
 	public void addUnknownContact(final String nickname, final Party party) {		
-		synchronized (contactsByParty) {
-			if (contactsByParty.get(party) != null)
+		synchronized (contactsSneer) {
+			if (contactsSneer.get(party) != null)
 				throw new RuntimeException("The party you tried to add was already a contact.");
 			
 			ContactSimulator c = new ContactSimulator(nickname, party);
-			contactsByParty.put(party, c);
-			//produceConversationWith(party).sendMessage("Hey " + nickname + "!");
-			//contacts.onNext(contactsSorted());
+			contactsSneer.put(party, c);
 		}
 		
-		tupleSpace.publisher()
-			.audience(prik.publicKey())
-			.type("sneer/contact")
-			.field("party", party.publicKey().current())
-			.pub(nickname);
 	}
 
 	@Override
