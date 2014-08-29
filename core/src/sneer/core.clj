@@ -13,6 +13,11 @@
 (defprotocol Disposable
   (dispose [resource]))
 
+(extend-protocol Disposable
+  java.io.Closeable
+  (dispose [closeable]
+    (.close closeable)))
+
 (defprotocol Network
   (connect
     [network puk]

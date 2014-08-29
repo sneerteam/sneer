@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.Arrays;
 
 import sneer.commons.*;
-import sneer.core.*;
 import sneer.persistent_tuple_base.*;
 import android.annotation.*;
 import android.content.*;
@@ -12,7 +11,7 @@ import android.database.*;
 import android.database.sqlite.*;
 
 
-public class SneerSqliteDatabase implements Database, Disposable {
+public class SneerSqliteDatabase implements Database, Closeable {
 	
 	public static SneerSqliteDatabase openDatabase(File file) throws IOException {
 		return new SneerSqliteDatabase(
@@ -128,9 +127,8 @@ public class SneerSqliteDatabase implements Database, Disposable {
 
 
 	@Override
-	public Object dispose() {
+	public void close() throws IOException {
 		sqlite.close();
-		return null;
 	}
 
 
