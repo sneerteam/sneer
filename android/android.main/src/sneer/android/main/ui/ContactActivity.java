@@ -1,8 +1,8 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
+import static sneer.android.ui.SneerActivity.*;
 import rx.*;
-import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
@@ -11,7 +11,6 @@ import sneer.commons.exceptions.*;
 import sneer.impl.keys.*;
 import android.app.*;
 import android.content.*;
-import android.graphics.*;
 import android.os.*;
 import android.text.*;
 import android.view.*;
@@ -122,50 +121,28 @@ public class ContactActivity extends Activity {
 		return (PublicKey) extras.getSerializable(PARTY_PUK);
 	}
 	
-	private void loadProfile() {
-		
-		if(newContact){
-			profile.ownName().subscribe(new Action1<String>() { @Override public void call(String ownName) { 
-				nicknameEdit.setText(ownName);			
-			}});	
-			profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
-				if(nicknameEdit.getText().toString().isEmpty())
-					nicknameEdit.setText(preferredNickname);			
-			}});
-		}else
-			nicknameEdit.setText(contact.nickname().current());
-		
-		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String ownName) { 
-			fullNameView.setText(ownName);
-			
-		}});
+	private void loadProfile() {		
+		if (newContact) {
+			plug(nicknameEdit, profile.ownName());
+			if (nicknameEdit.getText().toString().isEmpty())
+				plug(nicknameEdit, profile.preferredNickname());
+		} else
+			plug(nicknameEdit, contact.nickname().observable());
 
-		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) { 
-			preferredNickNameView.setText("(" + preferredNickname+ ")");			
-		}});
-
-		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
-			countryView.setText(country);
-		}});
-
-		profile.city().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String city) {
-			cityView.setText(city);
-		}});
-
-		profile.selfie().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() {@Override public void call(byte[] selfie) {
-			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
-			selfieImage.setImageBitmap(bitmap);
-		}});
+		plug(fullNameView, profile.ownName());
+		plugPreferredNickName(preferredNickNameView, profile.preferredNickname());
+		plug(countryView, profile.country());
+		plug(cityView, profile.city());
+		plug(selfieImage, profile.selfie());
 		
 		if(!newContact)
 			Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>(){ @Override public Boolean call(String preferredNickname, String ownName) {
-				if(preferredNickname.equalsIgnoreCase(ownName) ||
-						preferredNickname.equalsIgnoreCase(contact.nickname().current()))
+				if(preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current()))
 					return true;
 				else
 					return false;
 				}}).subscribe(new Action1<Boolean>(){ @Override public void call(Boolean validation) {
-					if(validation)
+					if (validation)
 						preferredNickNameView.setVisibility(View.GONE);
 				}});
 		

@@ -1,6 +1,7 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
+import static sneer.android.ui.SneerActivity.*;
 
 import java.io.*;
 import java.util.*;
@@ -56,9 +57,7 @@ public class ConversationActivity extends Activity {
 		
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
-		party.name().subscribe(new Action1<String>() { @Override public void call(String label) {
-			actionBar.setTitle(label);
-		}});
+		plugActionBarTitle(actionBar, party.name());
 		
 		sneer().profileFor(party).selfie().observeOn(AndroidSchedulers.mainThread()).cast(byte[].class).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
 			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));

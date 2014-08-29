@@ -1,11 +1,10 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
+import static sneer.android.ui.SneerActivity.*;
 
 import java.io.*;
 
-import rx.android.schedulers.*;
-import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.utils.*;
@@ -93,33 +92,11 @@ public class ProfileActivity extends Activity {
 	
 	
 	private void loadProfile() {
-		profile.ownName().subscribe(new Action1<String>() { @Override public void call(String name) {
-			if (name != null && !name.trim().isEmpty()) {
-				firstNameEdit.setText(name);
-				firstNameEdit.setHint(R.string.profile_view_full_name);
-				lastNameEdit.setVisibility(View.GONE);
-			} else {
-				firstNameEdit.setHint(R.string.profile_view_first_name);
-				lastNameEdit.setVisibility(View.VISIBLE);
-			}
-		}});
-		
-		profile.preferredNickname().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
-			preferredNickNameEdit.setText(preferredNickname);
-		}});
-		
-		profile.country().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String country) {
-			countryEdit.setText(country);
-		}});
-		
-		profile.city().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() { @Override public void call(String city) {
-			cityEdit.setText(city);
-		}});
-		
-		profile.selfie().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
-			Bitmap bitmap = BitmapFactory.decodeByteArray(selfie, 0, selfie.length);
-			selfieImage.setImageBitmap(bitmap);
-		}});
+		plugOwnName(firstNameEdit, lastNameEdit, profile.ownName());
+		plug(preferredNickNameEdit, profile.preferredNickname());
+		plug(countryEdit, profile.country());
+		plug(cityEdit, profile.city());
+		plug(selfieImage, profile.selfie());
 	}
 
 

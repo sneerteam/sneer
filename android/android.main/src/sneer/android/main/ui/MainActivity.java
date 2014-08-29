@@ -13,8 +13,6 @@ import sneer.*;
 import sneer.android.main.*;
 import android.app.*;
 import android.content.*;
-import android.graphics.*;
-import android.graphics.drawable.*;
 import android.net.*;
 import android.os.*;
 import android.util.*;
@@ -90,18 +88,8 @@ public class MainActivity extends Activity {
 
 		Profile ownProfile = sneer().profileFor(sneer().self());
 		
-		ownProfile.ownName()
-				.subscribe(new Action1<String>() { @Override public void call(String label) {
-					actionBar.setTitle(label);
-				}});
-
-		ownProfile.selfie()
-				.observeOn(AndroidSchedulers.mainThread()).cast(byte[].class)
-				.subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
-					actionBar.setIcon((Drawable) new BitmapDrawable(
-							getResources(), BitmapFactory.decodeByteArray(
-									selfie, 0, selfie.length)));
-				}});
+		plugActionBarTitle(actionBar, ownProfile.ownName());
+		plugActionBarSelfie(actionBar, ownProfile.selfie());
 
 		listView = (ListView) findViewById(R.id.listView);
 		adapter = new MainAdapter(this,

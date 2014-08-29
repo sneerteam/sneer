@@ -1,7 +1,12 @@
 package sneer.impl.simulator;
 
 import static sneer.Contact.*;
+import static sneer.commons.Streams.*;
 import static sneer.commons.exceptions.Exceptions.*;
+
+import java.io.*;
+import java.util.concurrent.*;
+
 import rx.*;
 import rx.functions.*;
 import rx.subjects.*;
@@ -16,10 +21,6 @@ public class PartySimulator implements Party, Profile {
 
 	/** Profile */
 	private final BehaviorSubject<String> ownName;
-	private Subject<String, String> preferredNickname = BehaviorSubject.create("neide");
-	private Subject<String, String> city = BehaviorSubject.create("Jundiaí");
-	private Subject<String, String> country = BehaviorSubject.create("Brasil");
-	private ReplaySubject<byte[]> selfie = ReplaySubject.create();
 	private Sneer sneer;
 	
 	
@@ -51,90 +52,82 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public Observable<String> ownName() {
-		return ownName.asObservable();
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
+			return "ownName " + t1;
+		}});
 	}
 
 	
 	@Override
 	public void setOwnName(String newName) {
 		check(isSelf);
-		simulateSetName(newName);
+		System.out.println("setOwnName() called");
 	}
-	
-	
-	public void simulateSetName(String newName) {
-		ownName.onNext(newName);
-	}
-	
+
 	
 	@Override
-	public Observable<String> preferredNickname() {	
-		return preferredNickname;
+	public Observable<String> preferredNickname() {
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
+			return "preferredNickname " + t1;
+		}});
 	}
 
 	@Override
 	public void setPreferredNickname(String newPreferredNickname) {
 		check(isSelf);
-		simulateSetPreferredNickname(newPreferredNickname);
-	}
-
-
-	protected void simulateSetPreferredNickname(String newPreferredNickname) {
-		preferredNickname.onNext(newPreferredNickname);
+		System.out.println("setPreferredNickname() called");
 	}
 
 
 	@Override
 	public Observable<byte[]> selfie() {
-		return selfie;
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, byte[]>() { @Override public byte[] call(Long t1) {
+			boolean isEven = (t1 % 2 == 0);
+			String file;
+			if (isEven)
+				file = "neide.png";
+			else
+				file = "carla.jpg";
+					
+			return selfieFromFileSystem(file);
+		}});
 	}
-
+	
 
 	@Override
 	public void setSelfie(byte[] newSelfie) {
 		check(isSelf);
-		simulateSetSelfie(newSelfie);
-	}
-
-
-	protected void simulateSetSelfie(byte[] newSelfie) {
-		selfie.onNext(newSelfie);
+		System.out.println("setSelfie() called");
 	}
 
 
 	@Override
 	public Observable<String> city() {
-		return city;
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
+			return "city " + t1;
+		}});
 	}
 
 
 	@Override
 	public void setCity(String newCity) {
 		check(isSelf);
-		simulateSetCity(newCity);
+		System.out.println("setCity() called");
 	}
 
-
-	protected void simulateSetCity(String newCity) {
-		city.onNext(newCity);
-	}
-	
 	
 	@Override
 	public Observable<String> country() {
-		return country;
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
+			return "country " + t1;
+		}});
 	}
 	
 	
 	@Override
 	public void setCountry(String newCountry) {
 		check(isSelf);
-		simulateSetCountry(newCountry);
-	}
-
-
-	protected void simulateSetCountry(String newCountry) {
-		country.onNext(newCountry);
+		System.out.println("setCoutry() called");
 	}
 
 
@@ -155,5 +148,14 @@ public class PartySimulator implements Party, Profile {
 
 	private Contact findContact() {
 		return sneer.findContact(this);
+	}
+	
+	
+	private byte[] selfieFromFileSystem(String fileName) {
+		byte[] ret = null;
+		try {
+			ret = readFully(getClass().getResourceAsStream(fileName));
+		} catch (IOException e) {}
+		return ret;
 	}
 }

@@ -47,7 +47,6 @@ public class SneerSimulator implements Sneer {
 		setupMockupRPSPlayer(cloud, addContact("Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("carla.jpg")), "PAPER");
 		
 		addUnknownContact("Ze Ninguem", "dude", "World", "Unknown", selfieFromFileSystem("dude.jpg"));
-		
 	}
 
 
@@ -161,17 +160,11 @@ public class SneerSimulator implements Sneer {
 		Collections.sort(ret, BY_NICKNAME);
 		return ret;
 	}
-
 	
 	
 	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city, byte[] selfie) {
 		PrivateKey prik = Keys.createPrivateKey();
 		PartySimulator party = produceParty(prik.publicKey());
-		party.simulateSetName(name);
-		party.simulateSetPreferredNickname(preferredNicknane);
-		party.simulateSetCountry(coutry);
-		party.simulateSetCity(city);
-		party.simulateSetSelfie(selfie);
 		addContact(name, party);
 		return prik;
 	}
@@ -182,11 +175,6 @@ public class SneerSimulator implements Sneer {
 		System.out.println("==============================");
 		System.out.println("http://sneer.me/public-key?" + party.publicKey().current().bytesAsString());
 		System.out.println("==============================");
-		party.simulateSetName(name);
-		party.simulateSetPreferredNickname(preferredNicknane);
-		party.simulateSetCountry(coutry);
-		party.simulateSetCity(city);
-		party.simulateSetSelfie(selfie);
 		addUnknownContact(name, party);
 		return prik;
 	}
@@ -215,12 +203,11 @@ public class SneerSimulator implements Sneer {
 	
 	
 	private byte[] selfieFromFileSystem(String fileName) {
+		byte[] ret = null;
 		try {
-			return readFully(getClass().getResourceAsStream(fileName));
-		} catch (IOException e) {
-//			TODO - não fazer nada quando der erro
-			throw new RuntimeException(e);
-		}
+			ret = readFully(getClass().getResourceAsStream(fileName));
+		} catch (IOException e) {}
+		return ret;
 	}
 
 
