@@ -1,11 +1,33 @@
 (ns sneer.networking.client
-  (:require [sneer.networking.udp :as udp]
-            [clojure.core.async :as async :refer [<! >!]])
+  (:require [clojure.core.async :as async :refer [<! >! >!!]]
+            [rx.lang.clojure.core :as rx]
+            [sneer.rx :refer [subject*]]
+            [sneer.networking.udp :as udp])
   (:import [java.net InetSocketAddress]
            [sneer.commons SystemReport]))
 
 (defn dropping-chan [size]
   (async/chan (async/dropping-buffer size)))
+
+(defn chan->observable [ch]
+  (let [subject (rx.subjects.PublishSubject/create)]
+    (async/go-loop []
+      (if-let [value (<! ch)]
+        (do
+          (rx/on-next subject value)
+          (recur))
+        (rx/on-completed subject)))
+    subject))
+
+(defn chan->observer [ch]
+  (reify rx.Observer
+    (onNext [this value]
+      (>!! ch value))
+    (onError [this error]
+      (.printStackTrace error)
+      (async/close! ch))
+    (onCompleted [this]
+      (async/close! ch))))
 
 (defn start
 
@@ -46,3 +68,8 @@
 
 (defn stop [client]
   (async/close! (:packets-out client)))
+
+(defn create-connection [puk from-server to-server host port]
+  (start puk from-server to-server host port)
+  (subject* (chan->observable from-server)
+            (chan->observer to-server)))
