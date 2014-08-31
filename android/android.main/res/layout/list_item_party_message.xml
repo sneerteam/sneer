@@ -23,7 +23,6 @@
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dummy_text"
             android:textSize="15sp" />
 
         <TextView
@@ -32,7 +31,6 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/messageContent"
             android:layout_below="@+id/messageContent"
-            android:text="@string/dummy_text"
             android:textColor="#777"
             android:textSize="12sp" />
     </RelativeLayout>

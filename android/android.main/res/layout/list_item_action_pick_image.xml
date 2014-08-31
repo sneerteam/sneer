@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@null"
-        android:padding="10dp"
-        android:text="@string/dummy_text" />
+        android:padding="10dp" />
     
 </RelativeLayout>

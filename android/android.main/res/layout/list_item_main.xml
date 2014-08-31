@@ -11,8 +11,7 @@
         android:contentDescription="@string/conversation_summary_picture"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:src="@drawable/neide" />
+        android:paddingTop="5dp" />
 
     <TextView
         android:id="@+id/conversationParty"
@@ -22,7 +21,6 @@
         android:divider="@null"
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
-        android:text="@string/dummy_text"
         android:textSize="16sp"
         android:textStyle="normal|bold" />
 
@@ -34,7 +32,6 @@
         android:divider="@null"
         android:paddingRight="5dp"
         android:paddingTop="5dp"
-        android:text="@string/dummy_date"
         android:textSize="14sp" />
 
     <TextView
@@ -48,7 +45,6 @@
         android:paddingLeft="5dp"
         android:paddingRight="35dp"
         android:paddingTop="5dp"
-        android:text="@string/string_dummy_conversation_text"
         android:textSize="15sp" >
     </TextView>
 
@@ -71,7 +67,6 @@
             android:paddingLeft="6dip"
             android:paddingRight="6dip"
             android:paddingTop="3dip"
-            android:text="@string/string_dummy_conversation_unread_messages"
             android:textAppearance="@android:style/TextAppearance.Small"
             android:textColor="#ffffff"
             android:textStyle="bold" >
