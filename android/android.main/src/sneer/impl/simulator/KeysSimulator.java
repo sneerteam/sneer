@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.*;
 
 import sneer.*;
 
-public class Keys {
+public class KeysSimulator {
 	
 	private static final AtomicInteger counter = new AtomicInteger();
 
@@ -12,7 +12,6 @@ public class Keys {
 		
 		final int key = counter.incrementAndGet();
 		
-		final PublicKey puk = createPublicKey("PUK-" + key);
 		
 		return new PrivateKey() {
 			
@@ -30,7 +29,7 @@ public class Keys {
 
 			@Override
 			public PublicKey publicKey() {
-				return puk;
+				return createPublicKey("PUK-" + key);
 			}
 			
 			@Override
@@ -42,10 +41,18 @@ public class Keys {
 			@Override
 			public int hashCode() {
 				return bytesAsString().hashCode();
-			}};
+			}
+			
+			@Override
+			public String toString() {
+				return bytesAsString();
+			}
+		};
 	}
 
+	
 	public static PublicKey createPublicKey(final String bytesAsString) {
+	
 		return new PublicKey() {
 			
 			private static final long serialVersionUID = 1L;
@@ -69,7 +76,13 @@ public class Keys {
 			@Override
 			public int hashCode() {
 				return bytesAsString().hashCode();
-			}};
+			}
+
+			@Override
+			public String toString() {
+				return bytesAsString();
+			}
+		};
 	}
 
 }

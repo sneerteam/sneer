@@ -6,7 +6,7 @@ import sneer.commons.*;
 
 public class SneerAdminSimulator implements SneerAdmin, sneer.keys.Keys {
 	
-	private final PrivateKey neidePrik = Keys.createPrivateKey();
+	private final PrivateKey neidePrik = KeysSimulator.createPrivateKey();
 
 	private final SneerSimulator sneer = new SneerSimulator(neidePrik);
 
@@ -35,7 +35,7 @@ public class SneerAdminSimulator implements SneerAdmin, sneer.keys.Keys {
 
 	@Override
 	public PublicKey createPublicKey(String bytesAsString) {
-		return Keys.createPublicKey(bytesAsString);
+		return KeysSimulator.createPublicKey(bytesAsString);
 	}
 
 }
