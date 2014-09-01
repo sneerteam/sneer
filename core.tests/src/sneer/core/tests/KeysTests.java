@@ -12,13 +12,13 @@ public class KeysTests {
 	
 	@Test
 	public void recreate() {
-		PrivateKey prik = Keys.createPrivateKey();
-		assertEquals(prik, Keys.createPrivateKey(prik.bytes()));
-		assertEquals(prik, Keys.createPrivateKey(prik.bytesAsString()));
+		PrivateKey prik = KeysImpl.createPrivateKey();
+		assertEquals(prik, KeysImpl.createPrivateKey(prik.bytes()));
+		assertEquals(prik, KeysImpl.createPrivateKey(prik.bytesAsString()));
 		
 		PublicKey puk = prik.publicKey();
-		assertEquals(puk, Keys.createPublicKey(puk.bytes()));
-		assertEquals(puk, Keys.createPublicKey(puk.bytesAsString()));
+		assertEquals(puk, KeysImpl.createPublicKey(puk.bytes()));
+		assertEquals(puk, KeysImpl.createPublicKey(puk.bytesAsString()));
 	}
 	
 	

@@ -12,7 +12,7 @@
    [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation Message]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
-   [sneer.impl.keys Keys]
+   [sneer.impl.keys KeysImpl]
    [rx.schedulers TestScheduler]
    [rx.subjects BehaviorSubject ReplaySubject PublishSubject]))
 
@@ -299,7 +299,7 @@
          (keys [this] this)
          sneer.keys.Keys
          (createPublicKey [this bytes-as-string]
-           (Keys/createPublicKey bytes-as-string))
+           (KeysImpl/createPublicKey bytes-as-string))
          Restartable
          (restart [this]
            (rx/on-completed connection)
@@ -307,8 +307,8 @@
 
 (defn produce-private-key [db]
   (if-let [existing (second (persistence/db-query db ["SELECT * FROM keys"]))]
-    (Keys/createPrivateKey (first existing))
-    (let [new-key (Keys/createPrivateKey)]
+    (KeysImpl/createPrivateKey (first existing))
+    (let [new-key (KeysImpl/createPrivateKey)]
       (persistence/db-insert db :keys {"prik" (.bytes new-key)})
       new-key)))
 

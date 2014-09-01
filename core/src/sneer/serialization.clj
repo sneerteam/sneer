@@ -2,7 +2,7 @@
   (:import
     [java.io ByteArrayInputStream ByteArrayOutputStream]
     [sneer PublicKey]
-    [sneer.impl.keys Keys])
+    [sneer.impl.keys KeysImpl])
   (:require [cognitect.transit :as transit]))
 
 (def ^:private transit-format :json) ; other options are :json-verbose and :msgpack
@@ -16,7 +16,7 @@
 (def ^:private read-handlers
   {"puk"
    (transit/read-handler
-     (fn [rep] (Keys/createPublicKey rep)))})
+     (fn [rep] (KeysImpl/createPublicKey rep)))})
 
 (def ^:private write-opts {:handlers write-handlers})
 

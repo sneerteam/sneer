@@ -43,7 +43,7 @@
 (def builtin-field? #{"type" "payload" "author" "audience"})
 
 (def puk-serializer {:serialize #(.bytes %)
-                     :deserialize #(sneer.impl.keys.Keys/createPublicKey %)})
+                     :deserialize #(sneer.impl.keys.KeysImpl/createPublicKey %)})
 
 (def core-serializer {:serialize serialization/serialize
                       :deserialize serialization/deserialize})

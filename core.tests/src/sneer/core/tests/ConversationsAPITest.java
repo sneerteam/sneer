@@ -44,11 +44,11 @@ public class ConversationsAPITest extends TestCase {
 	protected final Sneer sneerC = adminC.sneer();
 
 	protected PrivateKey newPrivateKey() {
-		return Keys.createPrivateKey();
+		return KeysImpl.createPrivateKey();
 	}
 	
 	private SneerAdmin newSneerAdmin() {
-		return Glue.newSneerAdmin(Keys.createPrivateKey(), network, newTupleBase());
+		return Glue.newSneerAdmin(KeysImpl.createPrivateKey(), network, newTupleBase());
 	}
 
 	protected Object newTupleBase() {

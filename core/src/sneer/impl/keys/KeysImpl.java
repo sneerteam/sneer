@@ -2,7 +2,7 @@ package sneer.impl.keys;
 
 import sneer.*;
 
-public class Keys {
+public class KeysImpl {
 
 	public static PrivateKey createPrivateKey() {
 		return new PrivateKeyImpl();
