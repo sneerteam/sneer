@@ -6,6 +6,7 @@ ext {
         rx: [version: '0.20.0'],
         android: [
             sdkVersion: 19,
+            minSdkVersion: 16,
             buildToolsVersion: '19.0.3'
         ]
     ]
