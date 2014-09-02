@@ -6,7 +6,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="15"
+        android:minSdkVersion="16"
         android:targetSdkVersion="19" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -64,7 +64,7 @@
         
 
         <activity
-            android:name=".SystemReportActivity"
+            android:name=".ui.SystemReportActivity"
             android:label="@string/title_activity_system_report"
             android:parentActivityName=".ui.MainActivity" >
             <meta-data

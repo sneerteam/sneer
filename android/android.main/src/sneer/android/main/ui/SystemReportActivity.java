@@ -1,7 +1,8 @@
-package sneer.android.main;
+package sneer.android.main.ui;
 
 import rx.android.schedulers.*;
 import rx.functions.*;
+import sneer.android.main.*;
 import sneer.commons.*;
 import android.app.*;
 import android.os.*;
