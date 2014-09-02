@@ -27,6 +27,37 @@ import android.util.*;
 
 public class SneerApp extends Application {
 
+	private final class ConversationMenuItemImpl implements ConversationMenuItem {
+		private final SneerAppInfo app;
+
+		private ConversationMenuItemImpl(SneerAppInfo app) {
+			this.app = app;
+		}
+
+		@Override
+		public void call(PublicKey partyPuk) {
+			createSession(app, partyPuk);
+		}
+
+		@Override
+		public byte[] icon() {								
+			try {
+				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.icon);
+				return bitmapFor(icon);
+			} catch (Exception e) {
+				Log.w(SneerApp.class.getSimpleName(), "Error loading bitmap", e);
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		public String caption() {
+			return app.label;
+		}
+	}
+
+
 	private static AlertDialog errorDialog;
 
 	private static SneerAdmin ADMIN = null;
@@ -52,30 +83,7 @@ public class SneerApp extends Application {
 			.flatMap(new Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerAppInfo> apps) {
 				return Observable.from(apps)
 					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo app) {
-						return new ConversationMenuItem() {
-							
-							@Override
-							public void call(PublicKey partyPuk) {
-								createSession(app, partyPuk);
-							}
-							
-							@Override
-							public byte[] icon() {								
-								try {
-									Drawable icon = resourceForPackage(app.packageName).getDrawable(app.icon);
-									return bitmapFor(icon);
-								} catch (Exception e) {
-									Log.w(SneerApp.class.getSimpleName(), "Error loading bitmap", e);
-									e.printStackTrace();
-								}
-								return null;
-							}
-							
-							@Override
-							public String caption() {
-								return app.label;
-							}
-						};
+						return new ConversationMenuItemImpl(app);
 					} })
 					.toList();
 			} })
