@@ -123,7 +123,7 @@ public class SneerSimulator implements Sneer {
 		
 		tupleSpace.publisher()
 			.audience(prik.publicKey())
-			.type("sneer/contact")
+			.type("contact")
 			.field("party", party.publicKey().current())
 			.pub(nickname);
 	}

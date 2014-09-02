@@ -271,7 +271,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 //			.flatMap(new Func1<Tuple, Observable<Tuple>>() {  @Override public Observable<Tuple> call(Tuple contact) {
 //				return tuplesA.filter()
 //						.author(userA.publicKey())
-//						.type("sneer/contact")
+//						.type("contact")
 //						.field("partyId", contact.get("partyId"))
 //						.localTuples()
 //						.last();
@@ -287,7 +287,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 //		
 //		Observable<String> allNicknames = tuplesA.filter()
 //			.author(userA.publicKey())
-//			.type("sneer/contact")
+//			.type("contact")
 //			.localTuples()
 //			.groupBy(new Func1<Tuple, PartyId>() {  @Override public PartyId call(Tuple tuple) {
 //				return (PartyId) tuple.get("partyId");

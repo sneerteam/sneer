@@ -130,7 +130,7 @@
    (.. tuple-space
        filter
        (author own-puk)
-       (type "sneer/contact")
+       (type "contact")
        localTuples
        toBlocking
        toIterable)
@@ -239,7 +239,7 @@
           (.. tuple-space
               publisher
               (audience own-puk)
-              (type "sneer/contact")
+              (type "contact")
               (field "party" (party-puk party))
               (pub nickname)))
 

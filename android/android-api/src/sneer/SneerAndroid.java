@@ -99,7 +99,7 @@ public class SneerAndroid {
 	public static Observable<String> partyName(TupleSpace tupleSpace, PublicKey partyPuk, PrivateKey ownPrik) {
 		return tupleSpace.filter()
 			.audience(ownPrik)
-			.type("sneer/contact")
+			.type("contact")
 			.field("party", partyPuk)
 			.tuples()
 			.map(Tuple.TO_PAYLOAD)

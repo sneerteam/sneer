@@ -317,7 +317,7 @@ public class ConversationsAPITest extends TestCase {
 
 	public void testPartyName() throws FriendlyException {
 		
-		// 1 - type=sneer/contact party=puk
+		// 1 - type=contact party=puk
 		// 2 - ? profile/preferred-nickname author=puk
 		// 3 - ? profile/preferred-name author=puk
 		// 3 - puk
