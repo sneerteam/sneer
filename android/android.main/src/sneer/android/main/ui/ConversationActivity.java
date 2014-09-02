@@ -65,18 +65,18 @@ public class ConversationActivity extends Activity {
 
 		sneer().produceConversationWith(party).unreadMessageCountReset();
 
-		sneer().produceConversationWith(party).messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
-			messages.clear();
-			messages.addAll(msgs);
-			adapter.notifyDataSetChanged();
-		}});
-
 		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),
 			R.layout.list_item_user_message,
 			R.layout.list_item_party_message,
 			messages,
 			party);
+
+		sneer().produceConversationWith(party).messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
+			messages.clear();
+			messages.addAll(msgs);
+			adapter.notifyDataSetChanged();
+		}});
 
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
