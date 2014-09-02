@@ -26,8 +26,17 @@ import android.graphics.drawable.*;
 import android.util.*;
 
 public class SneerApp extends Application {
+	
+	Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>> fromSneerAppInfoList = new Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerAppInfo> apps) {
+		return Observable.from(apps)
+			.map(new Func1<SneerAppInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final SneerAppInfo app) {
+				return new ConversationMenuItemImpl(app);
+			} })
+			.toList();
+	} };
 
 	private final class ConversationMenuItemImpl implements ConversationMenuItem {
+		
 		private final SneerAppInfo app;
 
 		private ConversationMenuItemImpl(SneerAppInfo app) {
@@ -80,13 +89,7 @@ public class SneerApp extends Application {
 		}
 		
 		SneerAppInfo.apps()
-			.flatMap(new Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerAppInfo> apps) {
-				return Observable.from(apps)
-					.map(new Func1<SneerAppInfo, ConversationMenuItem>() {  @Override public ConversationMenuItem call(final SneerAppInfo app) {
-						return new ConversationMenuItemImpl(app);
-					} })
-					.toList();
-			} })
+			.flatMap(fromSneerAppInfoList)
 			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
 				sneer().setConversationMenuItems(menuItems);
 			} });
