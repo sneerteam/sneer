@@ -23,6 +23,12 @@
 (defn has-address? [[address payload]]
   address)
 
+(defn trace-changes [label atom]
+  (add-watch atom nil
+             (fn [_key _ref old-value new-value]
+               (when (not= old-value new-value)
+                 (println label new-value)))))
+
 (defn start [port]
   (let [puk->address (atom {})
         packets-in (async/chan)
@@ -35,6 +41,9 @@
         router (router/create-router
                 (async/map #(update-puk-address puk->address %) [packets-in])
                 packets-out)]
+    
+    (trace-changes "[PUK->ADDRESS]" puk->address)
+    
     {:udp-server udp-server :packets-in packets-in :packets-out packets-out}))
 
 (defn stop [server]
