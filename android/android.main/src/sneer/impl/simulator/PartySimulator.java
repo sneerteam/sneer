@@ -61,7 +61,7 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setOwnName(String newName) {
 		check(isSelf);
-		System.out.println("setOwnName() called");
+		System.out.println("================> setOwnName() called");
 	}
 
 	
@@ -75,19 +75,18 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setPreferredNickname(String newPreferredNickname) {
 		check(isSelf);
-		System.out.println("setPreferredNickname() called");
+		System.out.println("================> setPreferredNickname() called");
 	}
 
 
 	@Override
 	public Observable<byte[]> selfie() {
 		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, byte[]>() { @Override public byte[] call(Long t1) {
-			boolean isEven = (t1 % 2 == 0);
 			String file;
-			if (isEven)
-				file = "neide.png";
+			if (t1 % 2 == 0)
+				file = "dude.jpg";
 			else
-				file = "carla.jpg";
+				file = "wesley.jpg";
 					
 			return selfieFromFileSystem(file);
 		}});
@@ -97,7 +96,7 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setSelfie(byte[] newSelfie) {
 		check(isSelf);
-		System.out.println("setSelfie() called");
+		System.out.println("================> setSelfie() called");
 	}
 
 
@@ -112,7 +111,7 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setCity(String newCity) {
 		check(isSelf);
-		System.out.println("setCity() called");
+		System.out.println("================> setCity() called");
 	}
 
 	
@@ -127,7 +126,7 @@ public class PartySimulator implements Party, Profile {
 	@Override
 	public void setCountry(String newCountry) {
 		check(isSelf);
-		System.out.println("setCoutry() called");
+		System.out.println("================> setCoutry() called");
 	}
 
 
