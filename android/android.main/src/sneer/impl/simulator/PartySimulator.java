@@ -9,7 +9,6 @@ import java.util.concurrent.*;
 
 import rx.*;
 import rx.functions.*;
-import rx.subjects.*;
 import sneer.*;
 import sneer.rx.*;
 
@@ -20,24 +19,22 @@ public class PartySimulator implements Party, Profile {
 	private final boolean isSelf;
 
 	/** Profile */
-	private final BehaviorSubject<String> ownName;
 	private Sneer sneer;
 	
 	
-	PartySimulator(String name, PublicKey puk) {
-		this(name, puk, true);
+	PartySimulator(PublicKey puk) {
+		this(puk, true);
 	}
 
 
 	PartySimulator(PublicKey puk, Sneer sneer) {
-		this("? PublicKey: " + puk, puk, false);
+		this(puk, false);
 		this.sneer = sneer;
 	}
 
 
-	PartySimulator(String name, PublicKey puk, boolean isSelf) {
+	PartySimulator(PublicKey puk, boolean isSelf) {
 		this.publicKey = ObservedSubject.create(puk);
-		this.ownName = BehaviorSubject.create(name);
 		this.isSelf = isSelf;
 	}
 

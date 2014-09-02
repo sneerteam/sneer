@@ -68,7 +68,7 @@ public class SneerActivity extends Activity {
 	}
 	
 	public static Subscription plugActionBarSelfie(final ActionBar actionBar, Observable<byte[]> observable) {
-		return observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @Override public void call(byte[] obj) {
+		return observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<byte[]>() { @SuppressWarnings("deprecation") @Override public void call(byte[] obj) {
 			actionBar.setIcon((Drawable) new BitmapDrawable(BitmapFactory.decodeByteArray(obj, 0, obj.length)));			
 		}});
 	}

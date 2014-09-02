@@ -35,7 +35,7 @@ public class SneerSimulator implements Sneer {
 	public SneerSimulator(PrivateKey prik) {
 		
 		this.prik = prik;
-		self = new PartySimulator("Neide da Silva", prik.publicKey());
+		self = new PartySimulator(prik.publicKey());
 		self.setSelfie(selfieFromFileSystem("neide.png"));
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
