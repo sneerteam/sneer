@@ -39,7 +39,7 @@
                      (async/map #(with-address puk->address %) [packets-out]))
                     port)
         router (router/create-router
-                (async/map #(update-puk-address puk->address %) [packets-in])
+                (async/map #(update-puk-address puk->address %) [(async/filter> :from packets-in)])
                 packets-out)]
     
     (trace-changes "[PUK->ADDRESS]" puk->address)
