@@ -61,8 +61,9 @@
       (while (is-open socket)
         (try
           (let [packet (receive-value socket)]
-            (println ">!!" packet)
-            (>!! packets-in packet))
+            (when (some? packet)
+              (println ">!!" packet)
+              (>!! packets-in packet)))
           (catch Exception e (print-err-if-open e)))))))
 
 ;; Tests
