@@ -134,6 +134,12 @@ public class ConversationActivity extends Activity {
 			} });
 		}});		
 	}
+	
+	
+	public void messageOnClick(View v) {
+		CharSequence str = ((TextView) v).getText();
+		Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+	}
 
 	
 	@Override

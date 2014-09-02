@@ -1,7 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:clickable="true"
     android:gravity="right"
+    android:onClick="messageOnClick"
     android:padding="10dp" >
 
     <View
@@ -24,6 +26,8 @@
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:onClick="messageOnClick"
             android:textSize="15sp" />
 
         <TextView
