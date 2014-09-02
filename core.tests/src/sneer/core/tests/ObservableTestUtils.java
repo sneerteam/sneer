@@ -19,7 +19,7 @@ public class ObservableTestUtils {
 		Observable
 			.merge(expectations)
 			.buffer(expectations.length)
-			.timeout(1, TimeUnit.SECONDS)
+			.timeout(expectations.length, TimeUnit.SECONDS)
 			.toBlocking()
 			.first();
 	}
@@ -42,7 +42,7 @@ public class ObservableTestUtils {
 
 	public static Observable<Void> values(Observable<?> source, final Object... values) {
 		return source
-			.buffer(500, TimeUnit.MILLISECONDS, values.length)
+			.buffer(1, TimeUnit.SECONDS, values.length)
 			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> t1) {
 				assertListSize(values, t1);
 				assertArrayEquals(values, t1.toArray());

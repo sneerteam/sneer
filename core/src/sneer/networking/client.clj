@@ -83,4 +83,4 @@
           connection))
       core/Disposable
       (dispose [network]
-        (doall (map @open-channels async/close!))))))
+        (doall (map async/close! @open-channels))))))
