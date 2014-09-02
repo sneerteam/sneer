@@ -23,6 +23,9 @@
 (defn has-address? [[address payload]]
   address)
 
+(defn is-routable? [[address payload]]
+  (-> payload :from some?))
+
 (defn trace-changes [label atom]
   (add-watch atom nil
              (fn [_key _ref old-value new-value]
@@ -39,7 +42,7 @@
                      (async/map #(with-address puk->address %) [packets-out]))
                     port)
         router (router/create-router
-                (async/map #(update-puk-address puk->address %) [(async/filter> :from packets-in)])
+                (async/map #(update-puk-address puk->address %) [(async/filter< is-routable? packets-in)])
                 packets-out)]
     
     (trace-changes "[PUK->ADDRESS]" puk->address)
