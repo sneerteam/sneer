@@ -11,12 +11,12 @@
   {PublicKey
    (transit/write-handler
      (fn [_] "puk")
-     (fn [puk] (.bytes puk)))})
+     (fn [^PublicKey puk] (.bytes puk)))})
 
 (def ^:private read-handlers
   {"puk"
    (transit/read-handler
-     (fn [rep] (KeysImpl/createPublicKey rep)))})
+     (fn [^bytes rep] (KeysImpl/createPublicKey rep)))})
 
 (def ^:private write-opts {:handlers write-handlers})
 
@@ -29,7 +29,7 @@
     (.toByteArray out)))
 
 (defn deserialize
-  ([bytes]
+  ([^bytes bytes]
      (deserialize bytes (alength bytes)))
   ([bytes length]
      (let [in (ByteArrayInputStream. bytes 0 length)

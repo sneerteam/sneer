@@ -305,7 +305,7 @@
 
 (defn produce-private-key [db]
   (if-let [existing (second (persistence/db-query db ["SELECT * FROM keys"]))]
-    (KeysImpl/createPrivateKey (first existing))
+    (KeysImpl/createPrivateKey ^bytes (first existing))
     (let [new-key (KeysImpl/createPrivateKey)]
       (persistence/db-insert db :keys {"prik" (.bytes new-key)})
       new-key)))
