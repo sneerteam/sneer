@@ -198,7 +198,7 @@ public class ConversationsAPITest extends TestCase {
 		
 		profileB2.setPreferredNickname("Party Man");
 		expecting(
-			values(profileB2.preferredNickname(), "Party Man"));
+			eventually(profileB2.preferredNickname(), "Party Man"));
 		
 	}	
 	

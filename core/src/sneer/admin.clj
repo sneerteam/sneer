@@ -1,7 +1,7 @@
 (ns sneer.admin
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [subject* observe-for-computation atom->observable flatmapseq]]
+   [sneer.rx :refer [subject* observe-for-computation atom->observable flatmapseq shared-latest]]
    [sneer.core :as core :refer [connect dispose restarted]]
    [sneer.networking.client :as client]
    [sneer.persistent-tuple-base :as persistence]
@@ -57,15 +57,13 @@
                  tuples)))
 
           (payload-subject [tuple-type]
-            (let [subject (replay-last-subject)
+            (let [latest (shared-latest (payloads-of tuple-type))
                   publish #(.. tuple-space
                                publisher
                                (type tuple-type)
                                (pub %))]
-              (rx/subscribe (payloads-of tuple-type)
-                            (partial rx/on-next subject))
               (subject*
-               (.asObservable subject)
+               latest
                (reify rx.Observer
                  (onNext [this value]
                    (publish value))))))]
