@@ -1,6 +1,6 @@
 package sneer.impl.simulator;
 
-import static sneer.MessageImpl.*;
+import static sneer.Message.*;
 import static sneer.ConversationMenuItem.*;
 import static sneer.commons.Lists.*;
 
