@@ -131,8 +131,7 @@ public class MainActivity extends Activity {
 	
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		conversation = adapter.getItem(info.position);
 		plugHeaderTitle(menu, conversation.party().name());

@@ -1,7 +1,7 @@
 package sneer.impl.simulator;
 
+import static sneer.MessageImpl.*;
 import static sneer.ConversationMenuItem.*;
-import static sneer.Message.*;
 import static sneer.commons.Lists.*;
 
 import java.util.*;
@@ -53,7 +53,7 @@ public class ConversationSimulator implements Conversation {
 
 	
 	@Override
-	public void sendMessage(String content) {
+	public void sendMessage(String content) {		
 		addMessage(createOwn(now(), content));
 		simulateReceivedMessage("Echo: " + content);
 	}

@@ -80,7 +80,8 @@ public class PartySimulator implements Party, Profile {
 	public Observable<byte[]> selfie() {
 		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, byte[]>() { @Override public byte[] call(Long t1) {
 			String file;
-			if (t1 % 2 == 0)
+			boolean isEven = t1 % 2 == 0;
+			if (isEven)
 				file = "selfie_001.png";
 			else
 				file = "selfie_002.png";
