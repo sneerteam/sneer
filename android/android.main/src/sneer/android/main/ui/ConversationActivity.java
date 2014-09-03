@@ -107,9 +107,9 @@ public class ConversationActivity extends Activity {
 			editText.setText("");
 		}
 
-		private void handleClick(final Party party, final String text) {
-			if (text != null && !text.isEmpty())
-				sneer().produceConversationWith(party).sendMessage(text);
+		private void handleClick(String text) {
+			if (!text.isEmpty())
+				conversation.sendMessage(text);
 			else
 				openIteractionMenu();
 		}
