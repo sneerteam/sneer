@@ -51,10 +51,10 @@ public class SneerAppInfo implements Serializable {
 		return new SneerAppInfo(
 				activityInfo.packageName, 
 				activityInfo.name, 
-				HandlerType.valueOf(meta.getString("sneer:handler")), 
-				meta.getString("sneer:type"),
-				meta.getString("sneer:label"),
-				meta.getInt("sneer:icon"));
+				HandlerType.valueOf(meta.getString("sneer:interaction-type")), 
+				meta.getString("sneer:tuple-type"),
+				meta.getString("sneer:menu-caption"),
+				meta.getInt("sneer:menu-icon"));
 	} };
 	
 	public static Observable<ActivityInfo> filterSneerApps(Observable<PackageInfo> packageInfos) {
@@ -65,7 +65,7 @@ public class SneerAppInfo implements Serializable {
 			return Observable.from(packageInfo.activities);
 		} })
 		.filter(new Func1<ActivityInfo, Boolean>() {  @Override public Boolean call(ActivityInfo t1) {
-			return t1.metaData != null && t1.metaData.getString("sneer:type") != null;
+			return t1.metaData != null && t1.metaData.getString("sneer:interaction-type") != null;
 		} });
 	}
 	
