@@ -41,6 +41,7 @@ public class ConversationActivity extends Activity {
 	private ActionBar actionBar;
 	private EmbeddedOptions embeddedOptions;
 	private Party party;
+	private Conversation conversation;
 
 	private ImageButton actionButton;
 
@@ -63,7 +64,8 @@ public class ConversationActivity extends Activity {
 			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
 		}});
 
-		sneer().produceConversationWith(party).unreadMessageCountReset();
+		conversation = sneer().produceConversationWith(party);
+		conversation.unreadMessageCountReset();
 
 		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),
@@ -72,7 +74,7 @@ public class ConversationActivity extends Activity {
 			messages,
 			party);
 
-		sneer().produceConversationWith(party).messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
+		conversation.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
 			messages.clear();
 			messages.addAll(msgs);
 			adapter.notifyDataSetChanged();
@@ -101,7 +103,7 @@ public class ConversationActivity extends Activity {
 		actionButton = (ImageButton)findViewById(R.id.actionButton);
 		actionButton.setImageResource(R.drawable.ic_action_new);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			handleClick(party, editText.getText().toString().trim());
+			handleClick(editText.getText().toString().trim());
 			editText.setText("");
 		}
 
@@ -116,7 +118,7 @@ public class ConversationActivity extends Activity {
 			final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
 			
 	
-			final Subscription s = sneer().produceConversationWith(party).menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")
+			final Subscription s = conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")
 			@Override public void call(List<ConversationMenuItem> menuItems) {
 				menu.getMenu().close();
 				menu.getMenu().clear();
