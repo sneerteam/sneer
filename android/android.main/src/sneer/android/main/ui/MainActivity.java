@@ -7,10 +7,10 @@ import java.io.*;
 import java.util.*;
 
 import rx.Observable;
-import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
+import sneer.android.ui.*;
 import android.app.*;
 import android.content.*;
 import android.net.*;
@@ -92,15 +92,7 @@ public class MainActivity extends Activity {
 		plugActionBarIcon(actionBar, ownProfile.selfie());
 
 		listView = (ListView) findViewById(R.id.listView);
-		adapter = new MainAdapter(this,
-				R.layout.list_item_main,
-				new Func1<Party, Observable<String>>() { @Override public Observable<String> call(Party party) {
-					return party.name();
-				}},
-				new Func1<Party, Observable<byte[]>>() { @Override public Observable<byte[]> call(Party party) {
-					return sneer().profileFor(party).selfie();
-				}});
-
+		adapter = new MainAdapter(this);
 		listView.setAdapter(adapter);
 
 		registerForContextMenu(listView);
@@ -110,18 +102,7 @@ public class MainActivity extends Activity {
 			onContactClicked(conversation);
 		}});
 		
-		sneer().contacts()
-			.flatMap(new Func1<List<Contact>, Observable<? extends Contact>>() {  @Override public Observable<? extends Contact> call(List<Contact> t1) {
-				return Observable.from(t1);
-			} })
-			.distinct()
-			.observeOn(AndroidSchedulers.mainThread())
-			.subscribe(new Action1<Contact>() {  @Override public void call(Contact t1) {
-				toast("Here comes a new challenger: "+ t1.nickname().current());
-			} });
-
-		sneer().conversations()
-				.observeOn(AndroidSchedulers.mainThread())
+		SneerActivity.deferUI(sneer().conversations())
 				.subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
 					adapter.clear();
 					adapter.addAll(conversations);

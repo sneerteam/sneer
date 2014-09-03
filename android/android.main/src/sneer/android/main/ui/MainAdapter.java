@@ -15,17 +15,11 @@ import android.widget.*;
 public class MainAdapter extends ArrayAdapter<Conversation> {
 
 	private Activity activity;
-    int layoutResourceId;
-	private final Func1<Party, Observable<String>> labelProvider;
-	private final Func1<Party, Observable<byte[]>> imageProvider;
 	private CompositeSubscription subscriptions;
     
-	public MainAdapter(Activity activity, int layoutResourceId, Func1<Party, Observable<String>> labelProvider, Func1<Party, Observable<byte[]>> imageProvider) {
-        super(activity, layoutResourceId);
-        this.layoutResourceId = layoutResourceId;
-        this.imageProvider = imageProvider;
+	public MainAdapter(Activity activity) {
+        super(activity, R.layout.list_item_main);
         this.activity = activity;
-		this.labelProvider = labelProvider;
 		this.subscriptions = new CompositeSubscription();
     }
 
@@ -36,7 +30,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
         
         if (row == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
+            row = inflater.inflate(R.layout.list_item_main, parent, false);
             
             holder = new ConversationtHolder();
             holder.conversationParty = findView(row, R.id.conversationParty);
@@ -57,9 +51,9 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
         
 		Conversation conversation = getItem(position);
 		Subscription subscription = Subscriptions.from(
-				plug(holder.conversationParty, labelProvider.call(conversation.party())),
+				plug(holder.conversationParty, conversation.party().name()),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
-				plug(holder.conversationPicture, imageProvider.call(conversation.party())),
+				plug(holder.conversationPicture, SneerApp.sneer().profileFor(conversation.party()).selfie()),
 				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
 				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
 		subscriptions.add(subscription);
