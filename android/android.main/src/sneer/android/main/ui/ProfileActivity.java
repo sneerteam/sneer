@@ -5,6 +5,8 @@ import static sneer.android.ui.SneerActivity.*;
 
 import java.io.*;
 
+import rx.*;
+import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.utils.*;
@@ -200,6 +202,18 @@ public class ProfileActivity extends Activity {
 		if (edt.getText().toString().trim().length() <= 1)
 			edt.setError("Name too short");
 	}
+
+	public static Subscription plugOwnName(final TextView textView1, final TextView textView2, Observable<?> observable) {
+		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
+			if (obj.toString() != null && !obj.toString().trim().isEmpty()) {
+				textView1.setText(obj.toString());
+				textView2.setVisibility(View.GONE);
+			} else {
+				textView2.setVisibility(View.VISIBLE);
+			}
+		}});
+	}
+	
 
 	
 }

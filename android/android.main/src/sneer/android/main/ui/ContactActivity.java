@@ -129,7 +129,13 @@ public class ContactActivity extends Activity {
 			plug(nicknameEdit, contact.nickname().observable());
 
 		plug(fullNameView, profile.ownName());
-		plugPreferredNickName(preferredNickNameView, profile.preferredNickname());
+		plug(preferredNickNameView, profile.preferredNickname().map(new Func1<Object, String>() {
+		
+			@Override
+			public String call(Object obj) {
+				return "(" + obj.toString() + ")";
+			}
+		}));
 		plug(countryView, profile.country());
 		plug(cityView, profile.city());
 		plug(selfieImage, profile.selfie());

@@ -75,6 +75,17 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		ImageView conversationPicture;
 	}
 
+	
+	public static Subscription plugUnreadMessage(final TextView textView, Observable<Long> observable) {
+		return deferUI(observable).subscribe(new Action1<Long>() { @Override public void call(Long obj) {
+			if (obj == 0)
+				textView.setVisibility(View.GONE);
+			else
+				textView.setVisibility(View.VISIBLE);
+			textView.setText(obj.toString());
+		}});
+	}
+
 
 	public void dispose() {
 		subscriptions.unsubscribe();

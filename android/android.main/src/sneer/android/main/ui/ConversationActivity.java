@@ -13,6 +13,7 @@ import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
+import sneer.android.ui.*;
 import sneer.commons.*;
 import android.app.*;
 import android.content.*;
@@ -74,7 +75,7 @@ public class ConversationActivity extends Activity {
 			messages,
 			party);
 
-		conversation.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
+		deferUI(conversation.messages()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
 			messages.clear();
 			messages.addAll(msgs);
 			adapter.notifyDataSetChanged();

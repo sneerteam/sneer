@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
 		Profile ownProfile = sneer().profileFor(sneer().self());
 		
 		plugActionBarTitle(actionBar, ownProfile.ownName());
-		plugActionBarSelfie(actionBar, ownProfile.selfie());
+		plugActionBarIcon(actionBar, ownProfile.selfie());
 
 		listView = (ListView) findViewById(R.id.listView);
 		adapter = new MainAdapter(this,
