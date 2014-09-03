@@ -26,6 +26,7 @@ repositories {
     maven { url "https://clojars.org/repo" }
 }
 
+clojure.warnOnReflection = true
 
 sourceSets {
     main {
