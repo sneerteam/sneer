@@ -10,13 +10,13 @@
   (reify rx.Observable$OnSubscribe
     (call [this subscriber] (f subscriber))))
 
-(defn on-subscribe-for [observable]
+(defn on-subscribe-for [^rx.Observable observable]
   "Returns a rx.Observable.OnSubscribe instance that subscribes subscribers to `observable'."
   (on-subscribe
-    (fn [subscriber]
+    (fn [^rx.Subscriber subscriber]
       (.add subscriber (.subscribe observable subscriber)))))
 
-(defn subject* [observable observer]
+(defn subject* [^rx.Observable observable ^rx.Observer observer]
   "Creates a rx.Subject from an `observable' part and an `observer' part."
   (let [subscriber (on-subscribe-for observable)]
     (proxy [Subject] [subscriber]
@@ -47,7 +47,7 @@ Only maps containing all key/value pairs in criteria are kept."
 (defn flatmapseq [^rx.Observable o]
   (.flatMapIterable o (interop/fn [seq] seq)))
 
-(defn observe-for-computation [o]
+(defn observe-for-computation [^rx.Observable o]
   (.observeOn o (Schedulers/computation)))
 
 (defn shared-latest [^rx.Observable o]
