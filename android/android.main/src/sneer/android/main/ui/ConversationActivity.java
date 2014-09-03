@@ -13,7 +13,6 @@ import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
 import sneer.android.main.ui.MainActivity.EmbeddedOptions;
-import sneer.android.ui.*;
 import sneer.commons.*;
 import android.app.*;
 import android.content.*;
