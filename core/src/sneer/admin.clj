@@ -14,7 +14,7 @@
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [sneer.impl.keys KeysImpl]
    [rx.schedulers TestScheduler]
-   [rx.subjects BehaviorSubject ReplaySubject PublishSubject]))
+   [rx.subjects Subject BehaviorSubject ReplaySubject PublishSubject]))
 
 (defn behavior-subject [& [initial-value]]
   (BehaviorSubject/create initial-value))
@@ -37,7 +37,7 @@
       (toString [this]
         (str "#<Party " puk ">")))))
 
-(defn party-puk [party]
+(defn party-puk [^Party party]
   (.. party publicKey current))
 
 (defn produce-party [parties puk]
@@ -45,11 +45,11 @@
    (swap! parties update-in [puk] #(if (nil? %) (new-party puk) %))
    (get puk)))
 
-(defn reify-profile [party tuple-space]
+(defn reify-profile [party ^TupleSpace tuple-space]
 
   (letfn [(payloads-of [type]
             (rx/map
-             #(.payload %)
+             (fn [^Tuple tuple] (.payload tuple))
              (.. tuple-space
                  filter
                  (type type)
@@ -68,11 +68,11 @@
                  (onNext [this value]
                    (publish value))))))]
 
-    (let [preferred-nickname (payload-subject "profile/preferred-nickname")
-          own-name (payload-subject "profile/own-name")
-          selfie (payload-subject "profile/selfie")
-          city (payload-subject "profile/city")
-          country (payload-subject "profile/country")]
+    (let [^Subject preferred-nickname (payload-subject "profile/preferred-nickname")
+          ^Subject own-name (payload-subject "profile/own-name")
+          ^Subject selfie (payload-subject "profile/selfie")
+          ^Subject city (payload-subject "profile/city")
+          ^Subject country (payload-subject "profile/country")]
 
       (reify Profile
         (ownName [this]
@@ -119,11 +119,11 @@
       (toString [this]
         (str "#<Contact " (.. nickname-subject observed current) ">")))))
 
-(defn tuple->contact [tuple parties]
+(defn tuple->contact [^Tuple tuple parties]
   (reify-contact (.payload tuple)
                  (produce-party parties (.get tuple "party"))))
 
-(defn restore-contact-list [tuple-space own-puk parties]
+(defn restore-contact-list [^TupleSpace tuple-space own-puk parties]
   (->>
    (.. tuple-space
        filter
@@ -132,16 +132,16 @@
        localTuples
        toBlocking
        toIterable)
-   (mapcat (fn [tuple] [(.get tuple "party") (tuple->contact tuple parties)]))
+   (mapcat (fn [^Tuple tuple] [(.get tuple "party") (tuple->contact tuple parties)]))
    (apply hash-map)))
 
-(defn nickname [contact]
+(defn nickname [^Contact contact]
   (.. contact nickname current))
 
 (defn now []
   (.getTime (java.util.Date.)))
 
-(defn tuple->message [own-puk tuple]
+(defn tuple->message [own-puk ^Tuple tuple]
   (let [created (now)
         received (now)
         content (.payload tuple)
@@ -149,7 +149,7 @@
     (Message. created received content own?)))
 
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
-  (let [party-puk (party-puk party)
+  (let [^PublicKey party-puk (party-puk party)
         messages (atom [])
         observable-messages (atom->observable messages)
         message-filter (.. tuple-space filter (type "message"))]
@@ -187,11 +187,11 @@
     
       (unreadMessageCountReset [this]))))
 
-(defn new-sneer [tuple-space own-prik followees]
+(defn new-sneer [^TupleSpace tuple-space ^PrivateKey own-prik ^rx.Observable followees]
   (let [own-puk (.publicKey own-prik)
         parties (atom {})
         profiles (atom {})
-        conversation-menu-items (behavior-subject [])
+        conversation-menu-items (BehaviorSubject/create [])
         puk->contact (atom (restore-contact-list tuple-space own-puk parties))
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by nickname) vec))
         observable-contacts (atom->observable puk->contact ->contact-list)]
@@ -201,10 +201,10 @@
         observable-contacts
         ;observe-for-computation
         flatmapseq
-        (rx/flatmap #(.. % party publicKey observable)))
+        (rx/flatmap (fn [^Contact c] (.. c party publicKey observable))))
       (partial rx/on-next followees))
     
-    (letfn [(duplicate-contact? [nickname party contact]
+    (letfn [(duplicate-contact? [nickname party ^Contact contact]
               (or (identical? party (.party contact))
                   (= nickname (.. contact nickname current))))
 
@@ -251,7 +251,7 @@
           (->>
             observable-contacts
             (rx/map
-              (partial map #(produce-conversation (.party %))))))
+              (partial map (fn [^Contact c] (produce-conversation (.party c)))))))
         
         (setConversationMenuItems [this menu-item-list]
           (rx/on-next conversation-menu-items menu-item-list))
@@ -284,7 +284,7 @@
   ([own-prik network]
      (new-sneer-admin own-prik network (ReplaySubject/create)))
 
-  ([own-prik network tuple-base]
+  ([^PrivateKey own-prik network tuple-base]
      (let [puk (.publicKey own-prik)
            connection (connect network puk)
            followees (PublishSubject/create)

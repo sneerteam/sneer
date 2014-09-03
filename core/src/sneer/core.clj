@@ -132,9 +132,9 @@ new tuples as they are stored otherwise it will complete." )
             (query-tuple-base false))
           (tuples [this]
             (rx/observable*
-              (fn [subscriber]
+              (fn [^rx.Subscriber subscriber]
                 (rx/on-next subs-out criteria)
-                (let [tuples (query-tuple-base true)]
+                (let [^rx.Observable tuples (query-tuple-base true)]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
 
