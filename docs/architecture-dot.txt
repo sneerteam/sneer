@@ -26,8 +26,9 @@ digraph {
 	}
 
 	subgraph cluster_Main { label="Android Main";
-		SneerApp -> { Simulator UI SneerImpl "IPC Service" SneerSQLite };
-		UI -> { SneerActivity AndroidModel };
+		SneerApp -> { Simulator UI SneerImpl "IPC Service" SneerSQLite ModelSingleton };
+		ModelSingleton -> AndroidModel;
+		UI -> { SneerActivity AndroidModel ModelSingleton };
 		"IPC Service" -> AndroidModel [style=dashed, arrowhead=onormal];
 		AndroidModel -> SneerModel;
 		Simulator -> AndroidModel [style=dashed, arrowhead=onormal];
