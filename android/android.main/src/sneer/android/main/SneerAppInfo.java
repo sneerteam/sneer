@@ -4,9 +4,11 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import rx.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
+import sneer.rx.*;
 import android.content.*;
 import android.content.pm.*;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -31,7 +33,7 @@ public class SneerAppInfo implements Serializable {
 	String menuCaption;
 	int menuIcon;
 
-	protected static BehaviorSubject<List<SneerAppInfo>> apps = BehaviorSubject.create();
+	protected static ObservedSubject<List<SneerAppInfo>> apps = ObservedSubject.create((List<SneerAppInfo>)new ArrayList<SneerAppInfo>());
 
 	public SneerAppInfo(String packageName, String activityName, SneerAppInfo.InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
@@ -91,8 +93,7 @@ public class SneerAppInfo implements Serializable {
 			filterSneerApps(Observable.just(packageInfo))
 				.map(FROM_ACTIVITY)
 				.concatWith(currentKnownApps())
-				.buffer(100, TimeUnit.MILLISECONDS)
-				.first()
+				.toList()
 				.subscribe(appsListPublisher());
 
 		} catch (NameNotFoundException e) {
@@ -113,8 +114,7 @@ public class SneerAppInfo implements Serializable {
 			.filter(new Func1<SneerAppInfo, Boolean>() {  @Override public Boolean call(SneerAppInfo t1) {
 				return !t1.packageName.equals(packageName);
 			} })
-			.buffer(100, TimeUnit.MILLISECONDS)
-			.first()
+			.toList()
 			.subscribe(appsListPublisher());
 	}
 
@@ -122,19 +122,15 @@ public class SneerAppInfo implements Serializable {
 	private static Action1<List<SneerAppInfo>> appsListPublisher() {
 		return new Action1<List<SneerAppInfo>>() {  @Override public void call(List<SneerAppInfo> t1) {
 			log("Pushing new app list: " + t1);
-			apps.onNext(t1);
+			apps.subject().onNext(t1);
 		}};
 	}
 
 	private static Observable<SneerAppInfo> currentKnownApps() {
-		return apps
-			.flatMap(new Func1<List<SneerAppInfo>, Observable<SneerAppInfo>>() {  @Override public Observable<SneerAppInfo> call(List<SneerAppInfo> t1) {
-				log("Current sneer apps: " + t1);
-				return Observable.from(t1);
-			} });
+		return Observable.from(apps.observed().current());
 	}
 
 	public static Observable<List<SneerAppInfo>> apps() {
-		return apps.asObservable();
+		return apps.observed().observable();
 	}
 }
