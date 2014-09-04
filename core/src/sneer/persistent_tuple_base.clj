@@ -87,8 +87,13 @@
 (defn dump-tuples [db]
   (->> (query-all db) (map println) doall))
 
+(defn query-for [criteria]
+  (if-let [type (criteria "type")]
+    ["SELECT * FROM tuple WHERE type = ?" type]
+    ["SELECT * FROM tuple"]))
+
 (defn query-tuples-from-db [db criteria]
-  (let [rs (db-query db ["SELECT * FROM tuple"])
+  (let [rs (db-query db (query-for criteria))
         field-names (mapv name (first rs))]
     (->>
       (next rs)
