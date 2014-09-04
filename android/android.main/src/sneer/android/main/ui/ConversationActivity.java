@@ -12,8 +12,7 @@ import rx.functions.*;
 import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
-import sneer.android.main.ui.MainActivity.EmbeddedOptions;
-import sneer.commons.*;
+import sneer.commons.Comparators;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -39,7 +38,6 @@ public class ConversationActivity extends Activity {
 	private ConversationAdapter adapter;
 
 	private ActionBar actionBar;
-	private EmbeddedOptions embeddedOptions;
 	private Party party;
 	private Conversation conversation;
 
@@ -53,8 +51,6 @@ public class ConversationActivity extends Activity {
 		actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
-		
-		embeddedOptions = (EmbeddedOptions) getIntent().getExtras().getSerializable("embeddedOptions");
 		
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
@@ -139,25 +135,8 @@ public class ConversationActivity extends Activity {
 	
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		if (embeddedOptions.conversationAction == null) {
-			return false;
-		}
-		getMenuInflater().inflate(R.menu.conversation, menu);
-		if (embeddedOptions.conversationLabel != null) {
-			MenuItem item = menu.findItem(R.id.action_new_conversation);
-			item.setTitle(embeddedOptions.conversationLabel);
-		}
-		return true;
-	}
-
-	
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_new_conversation:
-			launchNewConversation();
-			return true;
 		case android.R.id.home:
 			navigateToProfile();
 			return true;
@@ -175,16 +154,6 @@ public class ConversationActivity extends Activity {
 	}
 
 
-	private void launchNewConversation() {
-		Contact contact = sneer().findContact(party);
-		Intent intent = new Intent(embeddedOptions.conversationAction);
-		intent.putExtra(SneerAndroid.TYPE, embeddedOptions.type);
-		intent.putExtra("contactNickname", contact.nickname().current());
-		intent.putExtra(SneerAndroid.PARTY_PUK, party.publicKey().current());
-		startActivity(intent);
-	}
-	
-	
 	@SuppressWarnings("unused")
 	private void onMessage(Message msg) {
 		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);

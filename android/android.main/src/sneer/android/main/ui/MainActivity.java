@@ -26,7 +26,6 @@ public class MainActivity extends Activity {
 	private MainAdapter adapter;
 	private ListView listView;
 	private Conversation conversation;
-	private EmbeddedOptions embeddedOptions;
 
 
 	@Override
@@ -43,48 +42,10 @@ public class MainActivity extends Activity {
 	}
 
 
-	/**
-	 * Used when this activity is launched by another application with options
-	 * to modify its behavior
-	 * 
-	 * @author fabio
-	 * 
-	 */
-	public static class EmbeddedOptions implements Serializable {
-		private static final long serialVersionUID = 1L;
-		public String conversationAction;
-		public String type;
-		public String title;
-		public String conversationLabel;
-		public boolean disableMenus;
-
-		public EmbeddedOptions(Intent intent) {
-			if (intent == null || intent.getExtras() == null)
-				return;
-
-			conversationAction = intent.getExtras().getString(SneerAndroid.NEW_CONVERSATION_ACTION);
-			conversationLabel = intent.getExtras().getString(SneerAndroid.NEW_CONVERSATION_LABEL);
-			type = intent.getExtras().getString(SneerAndroid.TYPE);
-			title = intent.getExtras().getString(SneerAndroid.TITLE);
-			disableMenus = intent.getExtras().getBoolean(SneerAndroid.DISABLE_MENUS, false);
-		}
-
-		public boolean wasEmbedded() {
-			return conversationAction != null;
-		}
-	}
-	
-
 	private void makeConversationList() {
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
-
-		embeddedOptions = new EmbeddedOptions(getIntent());
-
-		if (embeddedOptions.title != null) {
-			actionBar.setTitle(embeddedOptions.title);
-		}
 
 		Profile ownProfile = sneer().profileFor(sneer().self());
 		
@@ -99,7 +60,7 @@ public class MainActivity extends Activity {
 
 		listView.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
 			Conversation conversation = adapter.getItem(position);
-			onContactClicked(conversation);
+			onClicked(conversation);
 		}});
 		
 		SneerActivity.deferUI(sneer().conversations())
@@ -142,9 +103,6 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (embeddedOptions.disableMenus) {
-			return false;
-		}
 		getMenuInflater().inflate(R.menu.main, menu);
 
 		return super.onCreateOptionsMenu(menu);
@@ -176,10 +134,9 @@ public class MainActivity extends Activity {
 	}
 	
 
-	protected void onContactClicked(Conversation conversation) {
+	protected void onClicked(Conversation conversation) {
 		Intent intent = new Intent();
 		intent.setClass(this, ConversationActivity.class);
-		intent.putExtra("embeddedOptions", embeddedOptions);
 		intent.putExtra("partyPuk", conversation.party().publicKey().current());
 		startActivity(intent);
 	}

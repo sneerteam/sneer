@@ -13,28 +13,10 @@ import android.os.*;
 
 public class SneerAndroid {
 
-// This is how one uses the startConversationList() method to start Sneer with conversations filtered by tuple type:
-//
-//	@Override
-//	protected void onResume() {
-//		super.onResume();
-//		
-//		String title = "RPS Challenges";
-//		String type = "rock-paper-scissors/move";
-//		String newConversationLabel = "Challenge!!";
-//		String newConversationAction = "sneer.tutorial.rockpaperscissors.CHALLENGE";
-//		
-//		SneerAndroid.startConversationList(this, title, type, newConversationLabel, newConversationAction);
-//	}
-
-	
 	public static final String TYPE = "type";
 	public static final String PARTY_PUK = "partyPuk";
 	
-	private static final String CONVERSATION_LIST = "sneer.android.main.ui.MAIN";
 	public static final String TITLE = "title";
-	public static final String NEW_CONVERSATION_LABEL = "newConversationLabel";
-	public static final String NEW_CONVERSATION_ACTION = "newConversationAction";
 	public static final String DISABLE_MENUS = "disable-menus";
 	static final String SNEER_SERVICE = "sneer.android.service.BACKEND";
 
@@ -46,19 +28,6 @@ public class SneerAndroid {
 	public static final String SESSION_ID = "sessionId";
 	public static final String OWN_PRIK = "ownPrik";
 
-	
-	public static void startMain(Activity activity, String title, String type, String newConversationLabel, String newConversationAction) {
-		try {
-			Intent intent = new Intent(CONVERSATION_LIST);
-			intent.putExtra(TITLE, title);
-			intent.putExtra(TYPE, type);
-			intent.putExtra(NEW_CONVERSATION_LABEL, newConversationLabel);
-			intent.putExtra(NEW_CONVERSATION_ACTION, newConversationAction);
-			activity.startActivity(intent);
-		} catch (ActivityNotFoundException e) {
-			SneerUtils.showInstallSneerDialog(activity);
-		}
-	}
 	
 	private static final PrivateKey EMPTY_KEY = new PrivateKey() {
 		private static final long serialVersionUID = 1L;
@@ -205,7 +174,6 @@ public class SneerAndroid {
 
 	
 	public void sendMessagesIn(long conversationId, Object[] messages) throws FriendlyException {
-		// TODO Auto-generated method stub
 	}
 
 }
