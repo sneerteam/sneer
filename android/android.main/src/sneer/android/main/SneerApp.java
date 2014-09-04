@@ -147,7 +147,7 @@ public class SneerApp extends Application {
 	
 	public static void initialize() throws FriendlyException {
 		if (ADMIN != null)
-			throw new FriendlyException("Sneer is being initialized more than once.");
+			throw new IllegalStateException("Sneer is being initialized more than once.");
 
 		ADMIN = isCoreAvailable()
 			? initialize(context)
