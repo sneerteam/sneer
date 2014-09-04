@@ -16,7 +16,7 @@ digraph {
 		"TS Impl" -> "TS Model" [style=dashed, arrowhead=onormal];
 		"TS Impl" -> { Network Persistence };
 		SneerImpl -> SneerModel [style=dashed, arrowhead=onormal];
- 		SneerImpl -> "TS Impl";
+ 		SneerImpl -> { "TS Impl" BitcoinJ };
 	}
 
 	subgraph cluster_android_api { label="Android API";
