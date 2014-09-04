@@ -12,8 +12,8 @@ public abstract class MessageActivity extends SneerActivity {
 
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
 
 		message = getExtra(SneerAndroid.MESSAGE);
 		conversationId = getExtra(SneerAndroid.CONVERSATION_ID);
@@ -25,11 +25,11 @@ public abstract class MessageActivity extends SneerActivity {
 	}
 
 
-	/** Called by Sneer during onCreate() when the user taps the menu item for this activity. */
+	/** Called by Sneer after onCreate() when the user taps the menu item for this activity. */
 	protected abstract void composeMessage();
 	
 	
-	/** Called by Sneer during onCreate() when the user taps on a received or sent message of the type registered for this activity. */
+	/** Called by Sneer after onCreate() when the user taps on a received or sent message of the type registered for this activity. */
 	protected abstract void open(Object message);
 	
 	
