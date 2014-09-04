@@ -36,16 +36,16 @@ public class SneerSimulator implements Sneer {
 		
 		this.prik = prik;
 		self = new PartySimulator(prik.publicKey());
-		self.setSelfie(selfieFromFileSystem("neide.png"));
+		self.setSelfie(selfieFromFileSystem("selfie_001.png"));
 
 		TuplesFactoryInProcess cloud = new TuplesFactoryInProcess();
 		tupleSpace = cloud.newTupleSpace(prik);
 		
-		setupMockupRPSPlayer(cloud, addContact("Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("maicon.jpg")), "SCISSORS");
-		setupMockupRPSPlayer(cloud, addContact("Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("wesley.jpg")), "ROCK");
-		setupMockupRPSPlayer(cloud, addContact("Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("carla.jpg")), "PAPER");
+		setupMockupRPSPlayer(cloud, addContact("Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("selfie_002.png")), "SCISSORS");
+		setupMockupRPSPlayer(cloud, addContact("Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("selfie_002.png")), "ROCK");
+		setupMockupRPSPlayer(cloud, addContact("Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("selfie_002.png")), "PAPER");
 		
-		addUnknownContact("Ze Ninguem", "dude", "World", "Unknown", selfieFromFileSystem("dude.jpg"));
+		addUnknownContact("Ze Ninguem", "dude", "World", "Unknown", selfieFromFileSystem("selfie_002.png"));
 	}
 
 
