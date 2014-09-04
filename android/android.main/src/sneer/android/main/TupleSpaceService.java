@@ -17,7 +17,7 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 
-public class SneerAndroidService extends Service {
+public class TupleSpaceService extends Service {
 	
 	private AtomicInteger nextSubscriptionId = new AtomicInteger();
 	private ConcurrentMap<Integer, Subscription> subscriptions = new ConcurrentHashMap<Integer, Subscription>();
@@ -107,6 +107,13 @@ public class SneerAndroidService extends Service {
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
+	}
+
+
+
+	public static void startTupleSpaceService(Context context) {
+		Intent startServiceIntent = new Intent(context, TupleSpaceService.class);
+	    context.startService(startServiceIntent);
 	}
 
 }
