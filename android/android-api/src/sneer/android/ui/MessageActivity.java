@@ -6,16 +6,13 @@ import android.os.*;
 
 public abstract class MessageActivity extends SneerActivity {
 
-
-	private Object message;
 	private long conversationId;
-
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 
-		message = getExtra(SneerAndroid.MESSAGE);
+		Object message = getExtra(SneerAndroid.MESSAGE);
 		conversationId = getExtra(SneerAndroid.CONVERSATION_ID);
 		
 		if (message == null)
