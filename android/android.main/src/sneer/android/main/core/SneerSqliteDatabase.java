@@ -36,8 +36,29 @@ public class SneerSqliteDatabase implements Closeable, Database {
 	public long insert(String tableName, Map<String, Object> values) {
 		return sqlite.insert(tableName, null, toContentValues(values));
 	}
+	
+	@Override
+	public Iterable<List<?>> query(String sql, List<Object> args) {
+		Cursor cursor = sqlite.rawQuery(sql, toQueryArgs(args));
+		ArrayList<List<?>> ret = new ArrayList<List<?>>(cursor.getCount() + 1);
+		ret.add(Arrays.asList(cursor.getColumnNames()));
+		if (!cursor.moveToFirst()) return ret;
+		
+		do {
+			ret.add(row(cursor));
+		} while (cursor.moveToNext());
+
+		return ret;
+	}
 
 	
+	private String[] toQueryArgs(List<Object> args) {
+		return args.isEmpty()
+			? null
+			: args.toArray(new String[args.size()]);
+	}
+
+
 	private ContentValues toContentValues(Map<String, Object> values) {
 		ContentValues ret = new ContentValues(values.size());
 		for (Map.Entry<String, Object> entry : values.entrySet())
@@ -50,22 +71,6 @@ public class SneerSqliteDatabase implements Closeable, Database {
 		if (value instanceof String) cv.put(key, (String)value);
 		else cv.put(key, (byte[])value);
 	}
-
-
-	@Override
-	public Iterable<List<?>> query(String sql, List<Object> params) {
-		Cursor cursor = sqlite.rawQuery(sql, null);
-		ArrayList<List<?>> ret = new ArrayList<List<?>>(cursor.getCount() + 1);
-		ret.add(Arrays.asList(cursor.getColumnNames()));
-		if (!cursor.moveToFirst()) return ret;
-		
-		do {
-			ret.add(row(cursor));
-		} while (cursor.moveToNext());
-
-		return ret;
-	}
-
 	
 	private List<?> row(Cursor cursor) {
 		List<Object> ret = new ArrayList<Object>(cursor.getColumnCount());
