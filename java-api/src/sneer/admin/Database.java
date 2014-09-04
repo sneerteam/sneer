@@ -5,6 +5,8 @@ import java.util.*;
 public interface Database {
 
 	void createTable(String tableName, List<List<Object>> columns);
+	
+	void createIndex(String tableName, String indexName, List<String> columns);
 
 	/**
 	 * 

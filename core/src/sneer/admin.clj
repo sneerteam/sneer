@@ -269,16 +269,6 @@
 (defprotocol Restartable
   (restart [this]))
 
-
-(defn prepare-tuple-base [db]
-  (try
-		(persistence/create-tuple-table db)
-    (catch Exception e))
-  (try
-		(persistence/create-prik-table db)
-    (catch Exception e))
-  (persistence/create db))
-
 (defn new-sneer-admin
 
   ([own-prik network]
@@ -311,7 +301,7 @@
       new-key)))
 
 (defn new-sneer-admin-over-db [network db]
-  (let [tuple-base (prepare-tuple-base db)
+  (let [tuple-base (persistence/create db)
         own-prik (produce-private-key db)]
     (new-sneer-admin own-prik network tuple-base)))
 

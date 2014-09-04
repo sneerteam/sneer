@@ -7,6 +7,7 @@
 
 (defprotocol Database
   (db-create-table [this table columns])
+  (db-create-index [this table index-name column-names])
   (db-insert [this table row])
   (db-query [this sql-and-params]))
 
@@ -14,12 +15,14 @@
   sneer.admin.Database
   (db-create-table [this table columns]
     (.createTable this (name table) columns))
+  (db-create-index [this table index-name column-names]
+    (.createIndex this (name table) (name index-name) (mapv name column-names)))
   (db-insert [this table row]
-    (.insert this (name table) row))  
+    (.insert this (name table) row))
   (db-query [this sql-and-params]
     (.query this (first sql-and-params) (subvec sql-and-params 1))))
 
-(defn create-tuple-table [db]
+(defn- create-tuple-table [db]
   (db-create-table
     db :tuple
     [
@@ -34,11 +37,13 @@
      ;[:signature :blob "NOT NULL"]
      [:custom :blob]]))
 
-(defn create-prik-table [db]
+(defn- create-tuple-indices [db]
+  (db-create-index db :tuple "idx_tuple_type" [:type]))
+
+(defn- create-prik-table [db]
   (db-create-table
     db :keys
-    [
-     [:prik :blob]]))
+    [[:prik :blob]]))
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
 
@@ -109,8 +114,22 @@
   `(rx.Observable/defer
      (rx-interop/fn [] ~@body)))
 
+(defn setup [db]
+  (try
+		(create-tuple-table db)
+    (catch Exception e))
+  (try
+		(create-prik-table db)
+    (catch Exception e))
+  (try
+		(create-tuple-indices db)
+    (catch Exception e
+      (.printStackTrace e))))
+
 (defn create [db]
   (let [new-tuples (rx.subjects.PublishSubject/create)]
+    
+    (setup db)
     
     (reify core/TupleBase
 

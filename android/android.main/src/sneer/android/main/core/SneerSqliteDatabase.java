@@ -31,6 +31,13 @@ public class SneerSqliteDatabase implements Closeable, Database {
 		sqlite.execSQL(sql);
 	}
 
+
+	@Override
+	public void createIndex(String table, String indexName, List<String> columns) {
+		String sql = "CREATE INDEX " + indexName + " ON " + table + " (" + Lists.join(columns, ",") + ")";
+		sqlite.execSQL(sql);
+	}
+
 	
 	@Override
 	public long insert(String tableName, Map<String, Object> values) {
@@ -132,6 +139,5 @@ public class SneerSqliteDatabase implements Closeable, Database {
 	public void close() throws IOException {
 		sqlite.close();
 	}
-
 
 }

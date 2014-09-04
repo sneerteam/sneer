@@ -1,5 +1,6 @@
 (ns sneer.core.tests.jdbc-tuple-base
   (:require [clojure.java.jdbc :as sql]
+            [clojure.string :as string]
             [sneer.persistent-tuple-base :as tuple-base]
             [sneer.core :as core])
   (:import [java.sql DriverManager]))
@@ -13,6 +14,9 @@
       (let [tuple-ddl (apply sql/create-table-ddl table columns)]
          (sql/execute! db [tuple-ddl])))
     
+    (db-create-index [this table index-name columns-names]
+      (sql/execute! db [(str "CREATE INDEX " index-name " ON " (name table) "(" (string/join "," (map name columns-names)) ")" )]))
+    
     (db-insert [this table row]
       (sql/insert! db table row))
     
@@ -25,6 +29,5 @@
 
 (defn create [& [databaseFile]]
   (let [db (create-sqlite-db databaseFile)]
-    (tuple-base/create-tuple-table db)
     (tuple-base/create db)))
 
