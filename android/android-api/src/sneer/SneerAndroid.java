@@ -4,6 +4,7 @@ import rx.*;
 import rx.Observable.OnSubscribe;
 import rx.functions.*;
 import rx.subjects.*;
+import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 import sneer.utils.*;
 import android.app.*;
@@ -37,6 +38,11 @@ public class SneerAndroid {
 	public static final String DISABLE_MENUS = "disable-menus";
 	static final String SNEER_SERVICE = "sneer.android.service.BACKEND";
 
+	//Message
+	public static final String MESSAGE = "message";
+	public static final String CONVERSATION_ID = "message";
+
+	//Session
 	public static final String SESSION_ID = "sessionId";
 	public static final String OWN_PRIK = "ownPrik";
 
@@ -195,6 +201,11 @@ public class SneerAndroid {
 			}
 			
 		};
+	}
+
+	
+	public void sendMessagesIn(long conversationId, Object[] messages) throws FriendlyException {
+		// TODO Auto-generated method stub
 	}
 
 }
