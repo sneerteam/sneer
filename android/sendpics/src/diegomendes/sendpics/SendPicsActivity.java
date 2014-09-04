@@ -10,8 +10,7 @@ import android.widget.*;
 
 public class SendPicsActivity extends MessageActivity {
 
-	static final int TAKE_PICTURE = 1;
-	static final int THUMBNAIL_SIZE = 128;
+	private static final int TAKE_PICTURE = 1;
 	
 	ImageView image;
 	
