@@ -178,8 +178,7 @@ public class SneerApp extends Application {
 		sneer.profileFor(sneer.self()).setOwnName(name);
 	}
 
-	private static SneerAdmin initialize(Context context)
-			throws FriendlyException {
+	private static SneerAdmin initialize(Context context) throws FriendlyException {
 
 		File adminDir = new File(context.getFilesDir(), "admin");
 		adminDir.mkdirs();
