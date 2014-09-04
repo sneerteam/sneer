@@ -1,5 +1,7 @@
 package sneer.android.ui;
 
+import static android.widget.Toast.*;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +12,7 @@ import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import rx.schedulers.*;
+import sneer.commons.exceptions.*;
 import android.app.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
@@ -88,11 +91,15 @@ public class SneerActivity extends Activity {
 	}
 
 	
-	protected void toast(CharSequence text) {
-		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+	protected void toast(CharSequence text) { toast(text, LENGTH_SHORT); }
+	protected void toast(FriendlyException e) { toast(e.getMessage(), LENGTH_LONG); }
+	protected void toast(CharSequence text, int length) { Toast.makeText(this, text, length).show(); }
+
+	
+	@SuppressWarnings("unchecked")
+	protected <T> T getExtra(String extra) {
+		return (T)getIntent().getExtras().get(extra);
 	}
-
-
 	
 	
 	public static <T> Observable<T> deferUI(Observable<T> observable) {
