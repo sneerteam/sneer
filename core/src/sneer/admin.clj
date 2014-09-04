@@ -155,9 +155,11 @@
         message-filter (.. tuple-space filter (type "message"))]
     
     (rx/subscribe
-      (rx/merge
-        (.. message-filter (author own-puk) (audience party-puk) tuples)
-        (.. message-filter (author party-puk) (audience own-puk) tuples))
+      (rx/subscribe-on
+        (rx.schedulers.Schedulers/io)
+        (rx/merge
+          (.. message-filter (author own-puk) (audience party-puk) tuples)
+          (.. message-filter (author party-puk) (audience own-puk) tuples)))
       #(swap! messages conj (tuple->message own-puk %)))
     
     (reify
