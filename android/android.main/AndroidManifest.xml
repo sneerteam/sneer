@@ -54,11 +54,12 @@
             android:name=".ui.ProfileActivity"
             android:label="@string/title_activity_profile" />
 
+
         <service
-            android:name=".SneerAndroidService"
+            android:name=".TupleSpaceService"
             android:exported="true" >
             <intent-filter>
-                <action android:name="sneer.android.service.BACKEND" />
+                <action android:name="sneer.android.service.TUPLE_SPACE" />
             </intent-filter>
         </service>
         

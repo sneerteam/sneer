@@ -16,6 +16,8 @@ import android.util.*;
 
 public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 	
+	public static final String TUPLE_SPACE_SERVICE = "sneer.android.service.TUPLE_SPACE";
+
 	public enum TupleSpaceOp {
 		PUBLISH,
 		SUBSCRIBE,
@@ -39,7 +41,7 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 	@Override
 	protected void publishTuple(final Tuple ret) {
 		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() {  @Override public void call() {
-			Intent intent = new Intent(SneerAndroid.SNEER_SERVICE);
+			Intent intent = new Intent(TUPLE_SPACE_SERVICE);
 			intent.putExtra("op", TupleSpaceOp.PUBLISH.ordinal());
 			intent.putExtra("tuple", serializer.serialize(ret));
 			context.startService(intent);
@@ -58,7 +60,7 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 	
 	private Observable<Tuple> query(final TupleSpaceOp op, final Map<String, Object> criteria) {
 		return Observable.create(new Observable.OnSubscribe<Tuple>() {  @Override public void call(final Subscriber<? super Tuple> subscriber) {
-			Intent intent = new Intent(SneerAndroid.SNEER_SERVICE);
+			Intent intent = new Intent(TUPLE_SPACE_SERVICE);
 			intent.putExtra("op", op.ordinal());
 			log("tupleSpace: subscribe: " + criteria);
 			intent.putExtra("criteria", serializer.serialize(criteria));
@@ -78,7 +80,7 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 					final int subscriptionId = (Integer) SneerAndroid.unbundle(resultData);
 					log("tupleSpace: subscriptionId: " + subscriptionId);
 					subscriber.add(Subscriptions.create(new Action0() { @Override public void call() {
-						Intent intent = new Intent(SneerAndroid.SNEER_SERVICE);
+						Intent intent = new Intent(TUPLE_SPACE_SERVICE);
 						intent.putExtra("op", TupleSpaceFactoryClient.TupleSpaceOp.UNSUBSCRIBE.ordinal());
 						intent.putExtra("subscription", subscriptionId);
 						context.startService(intent);

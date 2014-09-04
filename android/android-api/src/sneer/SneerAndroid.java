@@ -18,7 +18,6 @@ public class SneerAndroid {
 	
 	public static final String TITLE = "title";
 	public static final String DISABLE_MENUS = "disable-menus";
-	static final String SNEER_SERVICE = "sneer.android.service.BACKEND";
 
 	//Message
 	public static final String MESSAGE = "message";
