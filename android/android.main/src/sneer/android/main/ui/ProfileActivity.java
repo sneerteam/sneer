@@ -1,31 +1,25 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
-import static sneer.android.ui.SneerActivity.*;
-
-import java.io.*;
-
 import rx.*;
 import rx.functions.*;
 import sneer.*;
 import sneer.android.main.*;
 import sneer.android.main.ui.utils.*;
-import android.app.*;
+import sneer.android.ui.*;
+import sneer.commons.exceptions.*;
 import android.content.*;
 import android.graphics.*;
-import android.media.*;
-import android.net.*;
 import android.os.*;
 import android.provider.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
 
-public class ProfileActivity extends Activity {
+public class ProfileActivity extends SneerActivity {
 
 	static final String PARTY_PUK = "partyPuk";
 	static final int TAKE_PICTURE = 1;
-	static final int THUMBNAIL_SIZE = 128;
 
 	Profile profile;
 	
@@ -146,40 +140,25 @@ public class ProfileActivity extends Activity {
 	
 	
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
-		if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK && data != null){
-	        int size = THUMBNAIL_SIZE;
-	        Bitmap bitMap;
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)  {
+		if (requestCode != TAKE_PICTURE) return;
+		if (resultCode != RESULT_OK) return;
+		if (intent == null) return;
+		
+        Bitmap bitmap;
+		try {
+			bitmap = loadBitmap(intent);
+		} catch (FriendlyException e) {
+			toast(e);
+			return;
+		}
 
-			if (data.getExtras() != null && data.getExtras().get("data") != null) {
-				bitMap = (Bitmap) data.getExtras().get("data");
-			} else if (data.getData() != null) {			
-				Uri selectedImage = data.getData();
-				try {
-					bitMap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage)), size, size);
-					
-				} catch (FileNotFoundException e) {
-					toast("Error loading " + selectedImage);
-					return;
-				}
-			} else {
-				toast("Error selecting image source.");
-				return;
-			}
-
-			do {
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				bitMap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-				selfieBytes = out.toByteArray();
-				size = (int) (size * 0.9f);
-			} while (selfieBytes.length > 1024 * 10);
-	        
-	        selfieImage.setImageBitmap(BitmapFactory.decodeByteArray(selfieBytes, 0, selfieBytes.length));
-		}		
+		selfieBytes = scaledDownTo(bitmap, 10 * 1024);
+        selfieImage.setImageBitmap(toBitmap(selfieBytes));
     }
-	
 
-    @Override
+
+	@Override
     protected void onStop() {
     	if (profile == self())
     		saveProfile();
@@ -191,12 +170,6 @@ public class ProfileActivity extends Activity {
 		return sneer().profileFor(sneer().self());
 	}
     
-    
-    private void toast(String message) {
-    	Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-    	toast.show();
-    }
-
     
 	public void checkMoreThanOneCharacter(EditText edt) {
 		if (edt.getText().toString().trim().length() <= 1)

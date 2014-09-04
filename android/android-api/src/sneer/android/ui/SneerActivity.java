@@ -2,6 +2,7 @@ package sneer.android.ui;
 
 import static android.widget.Toast.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -14,8 +15,12 @@ import rx.functions.*;
 import rx.schedulers.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
+import android.content.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import android.media.*;
+import android.net.*;
+import android.os.*;
 import android.view.*;
 import android.widget.*;
 
@@ -107,9 +112,41 @@ public class SneerActivity extends Activity {
 				.subscribeOn(Schedulers.computation())
 				.observeOn(AndroidSchedulers.mainThread());
 	}
-
-
+	
+	
 	public static Bitmap toBitmap(byte[] bytes) {
 		return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+	}
+	
+	
+	protected Bitmap loadBitmap(Intent intent) throws FriendlyException {
+		final Bundle extras = intent.getExtras();
+		if (extras != null && extras.get("data") != null)
+			return (Bitmap)extras.get("data");
+		
+		Uri uri = intent.getData();
+		if (uri == null)
+			throw new FriendlyException("No image found.");
+	
+		try {
+			return BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
+		} catch (FileNotFoundException e) {
+			throw new FriendlyException("Unable to load image: " + uri);
+		}
+	}
+
+
+	public static byte[] scaledDownTo(Bitmap original, int maximumLength) {
+		int side = Math.min(original.getHeight(), original.getWidth());
+		Bitmap reduced = original;
+		while (true) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			reduced.compress(Bitmap.CompressFormat.JPEG, 100, out);
+			final byte[] bytes = out.toByteArray();
+			if (bytes.length <= maximumLength)
+				return bytes;
+			side = (int) (side * 0.9f);
+			reduced = ThumbnailUtils.extractThumbnail(original, side, side);
+		}
 	}
 }
