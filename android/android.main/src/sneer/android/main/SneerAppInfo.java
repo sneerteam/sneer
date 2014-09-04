@@ -18,32 +18,32 @@ public class SneerAppInfo implements Serializable {
 	
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
 
-	enum HandlerType {
+	enum InteractionType {
 		SESSION
 	}
 	
 	String packageName;
 	String activityName;
 
-	SneerAppInfo.HandlerType handler;
-	String type;
-	String label;
-	int icon;
+	SneerAppInfo.InteractionType interactionType;
+	String tupleType;
+	String menuCaption;
+	int menuIcon;
 
 	protected static BehaviorSubject<List<SneerAppInfo>> apps = BehaviorSubject.create();
 
-	public SneerAppInfo(String packageName, String activityName, SneerAppInfo.HandlerType handler, String type, String label, int icon) {
+	public SneerAppInfo(String packageName, String activityName, SneerAppInfo.InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
 		this.activityName = activityName;
-		this.handler = handler;
-		this.type = type;
-		this.label = label;
-		this.icon = icon;
+		this.interactionType = interactionType;
+		this.tupleType = tupleType;
+		this.menuCaption = menuCaption;
+		this.menuIcon = menuIcon;
 	}
 
 	@Override
 	public String toString() {
-		return "SneerAppInfo [" + label + ", " + type + "]";
+		return "SneerAppInfo [" + menuCaption + ", " + tupleType + "]";
 	}
 	
 	public static Func1<ActivityInfo, SneerAppInfo> FROM_ACTIVITY = new Func1<ActivityInfo, SneerAppInfo>() {  @Override public SneerAppInfo call(ActivityInfo activityInfo) {
@@ -51,7 +51,7 @@ public class SneerAppInfo implements Serializable {
 		return new SneerAppInfo(
 				activityInfo.packageName, 
 				activityInfo.name, 
-				HandlerType.valueOf(meta.getString("sneer:interaction-type")), 
+				InteractionType.valueOf(meta.getString("sneer:interaction-type")), 
 				meta.getString("sneer:tuple-type"),
 				meta.getString("sneer:menu-caption"),
 				meta.getInt("sneer:menu-icon"));
