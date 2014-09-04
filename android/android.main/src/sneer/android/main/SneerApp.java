@@ -13,6 +13,7 @@ import rx.functions.*;
 import rx.schedulers.*;
 import sneer.*;
 import sneer.admin.*;
+import sneer.android.main.SneerAppInfo.*;
 import sneer.android.main.core.*;
 import sneer.commons.*;
 import sneer.commons.exceptions.*;
@@ -45,13 +46,13 @@ public class SneerApp extends Application {
 
 		@Override
 		public void call(PublicKey partyPuk) {
-			createSession(app, partyPuk);
+			startPlugin(app, partyPuk);
 		}
 
 		@Override
 		public byte[] icon() {								
 			try {
-				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.icon);
+				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.menuIcon);
 				return bitmapFor(icon);
 			} catch (Exception e) {
 				Log.w(SneerApp.class.getSimpleName(), "Error loading bitmap", e);
@@ -62,7 +63,7 @@ public class SneerApp extends Application {
 
 		@Override
 		public String caption() {
-			return app.label;
+			return app.menuCaption;
 		}
 	}
 
@@ -99,8 +100,34 @@ public class SneerApp extends Application {
 	
 	private AtomicLong nextSessionId = new AtomicLong(0);
 	
-	private void createSession(SneerAppInfo app, PublicKey peer) {
+	private void startPlugin(SneerAppInfo app, PublicKey peer) {
 		
+		switch (app.interactionType) {
+		case SESSION:
+			startSession(app, peer);
+			break;
+
+		case MESSAGE:
+			startMessage(app, peer);
+			break;
+
+		}
+		
+	}
+
+
+	private void startMessage(SneerAppInfo app, PublicKey peer) {
+		long id = nextSessionId.getAndIncrement();
+		
+		Intent intent = new Intent();
+		intent.setClassName(app.packageName, app.activityName);
+		intent.putExtra(CONVERSATION_ID, id);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+
+
+	private void startSession(SneerAppInfo app, PublicKey peer) {
 		long sessionId = nextSessionId.getAndIncrement();
 		
 		sneer().tupleSpace().publisher()
@@ -108,7 +135,7 @@ public class SneerApp extends Application {
 			.type("sneer/session")
 			.field("session", sessionId)
 			.field("partyPuk", peer)
-			.field("sessionType", app.type)
+			.field("sessionType", app.tupleType)
 			.field("lastMessageSeen", (long)0)
 			.pub();
 

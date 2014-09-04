@@ -19,7 +19,8 @@ public class SneerAppInfo implements Serializable {
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
 
 	enum InteractionType {
-		SESSION
+		SESSION,
+		MESSAGE
 	}
 	
 	String packageName;
