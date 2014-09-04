@@ -6,8 +6,6 @@ import rx.functions.*;
 import rx.subjects.*;
 import sneer.commons.exceptions.*;
 import sneer.tuples.*;
-import sneer.utils.*;
-import android.app.*;
 import android.content.*;
 import android.os.*;
 

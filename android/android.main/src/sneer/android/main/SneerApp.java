@@ -13,7 +13,6 @@ import rx.functions.*;
 import rx.schedulers.*;
 import sneer.*;
 import sneer.admin.*;
-import sneer.android.main.SneerAppInfo.*;
 import sneer.android.main.core.*;
 import sneer.commons.*;
 import sneer.commons.exceptions.*;

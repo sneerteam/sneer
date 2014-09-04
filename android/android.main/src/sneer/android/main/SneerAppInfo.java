@@ -2,12 +2,9 @@ package sneer.android.main;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.*;
 
-import rx.*;
 import rx.Observable;
 import rx.functions.*;
-import rx.subjects.*;
 import sneer.rx.*;
 import android.content.*;
 import android.content.pm.*;

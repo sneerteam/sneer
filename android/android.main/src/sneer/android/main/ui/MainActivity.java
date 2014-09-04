@@ -3,7 +3,6 @@ package sneer.android.main.ui;
 import static sneer.android.main.SneerApp.*;
 import static sneer.android.ui.SneerActivity.*;
 
-import java.io.*;
 import java.util.*;
 
 import rx.Observable;
