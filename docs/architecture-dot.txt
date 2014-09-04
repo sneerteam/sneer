@@ -1,0 +1,49 @@
+//To read this input file and produce an image called architecture.png:
+//apt-get install graphviz
+//dot -Tpng -oarchitecture.png architecture-dot.txt
+
+digraph {
+
+	splines=line;
+
+	subgraph cluster_java_api { label="Java API";
+		SneerModel -> { RX "TS Model" Keys };
+	}
+
+	subgraph cluster_Core { label="Core";
+		Network;
+		Persistence;
+		"TS Impl" -> "TS Model" [style=dashed, arrowhead=onormal];
+		"TS Impl" -> { Network Persistence };
+		SneerImpl -> SneerModel [style=dashed, arrowhead=onormal];
+ 		SneerImpl -> "TS Impl";
+	}
+
+	subgraph cluster_android_api { label="Android API";
+		SessionActivity -> { SneerActivity "IPC Client" };
+		MessageActivity -> { SneerActivity "IPC Client" };
+		SneerActivity -> "UI Utils";
+	}
+
+	subgraph cluster_Main { label="Android Main";
+		SneerApp -> { Simulator UI SneerImpl "IPC Service" SneerSQLite };
+		UI -> { SneerActivity AndroidModel };
+		"IPC Service" -> AndroidModel [style=dashed, arrowhead=onormal];
+		AndroidModel -> SneerModel;
+		Simulator -> AndroidModel [style=dashed, arrowhead=onormal];
+		SneerSQLite -> Persistence [style=dashed, arrowhead=onormal];
+	}
+	
+	subgraph cluster_Server { label="Server";
+		Server -> { Network Keys };
+	}
+
+	subgraph cluster_RPS { label="RPS";
+		RPSActivity -> SessionActivity;
+	}
+
+	subgraph cluster_Send_Pic { label="Send Picture App";
+		SendPictureActivity -> MessageActivity;
+	}
+
+}
