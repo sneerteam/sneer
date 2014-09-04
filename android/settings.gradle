@@ -1,1 +1,1 @@
-include 'android-api', 'android.main', 'android.main.tests'
+include 'android-api', 'android.main', 'android.main.tests', 'sendpics'
