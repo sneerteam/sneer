@@ -95,6 +95,8 @@ public class SneerApp extends Application {
 				sneer().setConversationMenuItems(menuItems);
 			} });
 		
+		TupleSpaceService.startTupleSpaceService(context);
+		
 		super.onCreate();
 	}
 	
