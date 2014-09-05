@@ -70,7 +70,7 @@ public class ConversationActivity extends Activity {
 			messages,
 			party);
 
-		deferUI(conversation.messages()).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
+		deferUI(conversation.messages().throttleLast(250, MILLISECONDS)).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
 			messages.clear();
 			messages.addAll(msgs);
 			adapter.notifyDataSetChanged();
