@@ -26,7 +26,6 @@ import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.*;
-import android.os.Message;
 import android.util.*;
 import android.widget.*;
 
@@ -126,12 +125,12 @@ public class SneerApp extends Application {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
-		final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		final ClassLoader classLoader = getClassLoader();
 		
 		SharedResultReceiver result = new SharedResultReceiver(new Action1<Bundle>() {  @Override public void call(Bundle t1) {
 			
 			try {
-				t1.setClassLoader(contextClassLoader);
+				t1.setClassLoader(classLoader);
 				Object[] ret = (Object[]) ((Value)t1.getParcelable("value")).get();
 				info("Receiving " + ret.length + " messages type '"+app.tupleType+"' from " + app.packageName + "." + app.activityName);
 				for (Object payload : ret) {
