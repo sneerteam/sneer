@@ -5,6 +5,8 @@ import java.util.*;
 
 import rx.Observable;
 import rx.functions.*;
+import sneer.commons.*;
+import sneer.commons.exceptions.*;
 import sneer.rx.*;
 import android.content.*;
 import android.content.pm.*;
@@ -46,16 +48,37 @@ public class SneerAppInfo implements Serializable {
 		return "SneerAppInfo [" + menuCaption + ", " + tupleType + "]";
 	}
 	
-	public static Func1<ActivityInfo, SneerAppInfo> FROM_ACTIVITY = new Func1<ActivityInfo, SneerAppInfo>() {  @Override public SneerAppInfo call(ActivityInfo activityInfo) {
+	public static Func1<ActivityInfo, Observable<SneerAppInfo>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<SneerAppInfo>>() {  @Override public Observable<SneerAppInfo> call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
-		return new SneerAppInfo(
-				activityInfo.packageName, 
-				activityInfo.name, 
-				InteractionType.valueOf(meta.getString("sneer:interaction-type")), 
-				meta.getString("sneer:tuple-type"),
-				meta.getString("sneer:menu-caption"),
-				meta.getInt("sneer:menu-icon"));
-	} };
+		try {
+			return Observable.just(
+				new SneerAppInfo(
+					activityInfo.packageName,
+					activityInfo.name,
+					InteractionType.valueOf(getString(meta, "sneer:interaction-type")),
+					getString(meta, "sneer:tuple-type"),
+					getString(meta, "sneer:menu-caption"),
+					getInt(meta, "sneer:menu-icon")));
+		} catch (FriendlyException e) {
+			SystemReport.updateReport(activityInfo.packageName, "Failed to read package information: " + e.getMessage());
+			return Observable.empty();
+		}
+	}
+
+	private String getString(Bundle bundle, String key) throws FriendlyException {
+		requiredMetadata(bundle, key);
+		return bundle.getString(key);
+	}
+	
+	private int getInt(Bundle bundle, String key) throws FriendlyException {
+		requiredMetadata(bundle, key);
+		return bundle.getInt(key);
+	}
+
+	private void requiredMetadata(Bundle bundle, String key) throws FriendlyException {
+		if (!bundle.containsKey(key))
+			throw new FriendlyException("Missing meta-data " + key);
+	}};
 	
 	public static Observable<ActivityInfo> filterSneerApps(Observable<PackageInfo> packageInfos) {
 		return packageInfos.filter(new Func1<PackageInfo, Boolean>() {  @Override public Boolean call(PackageInfo t1) {
@@ -75,7 +98,7 @@ public class SneerAppInfo implements Serializable {
 		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
 		
 		filterSneerApps(Observable.from(packages))
-			.map(FROM_ACTIVITY)
+			.flatMap(FROM_ACTIVITY)
 			.toList()
 			.subscribe(appsListPublisher());
 		
@@ -88,7 +111,7 @@ public class SneerAppInfo implements Serializable {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PACKAGE_INFO_FLAGS);
 			
 			filterSneerApps(Observable.just(packageInfo))
-				.map(FROM_ACTIVITY)
+				.flatMap(FROM_ACTIVITY)
 				.concatWith(currentKnownApps())
 				.toList()
 				.subscribe(appsListPublisher());
