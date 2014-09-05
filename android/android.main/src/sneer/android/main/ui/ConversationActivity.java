@@ -70,11 +70,12 @@ public class ConversationActivity extends Activity {
 			messages,
 			party);
 
-		deferUI(conversation.messages().throttleLast(250, MILLISECONDS)).subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
-			messages.clear();
-			messages.addAll(msgs);
-			adapter.notifyDataSetChanged();
-		}});
+		deferUI(conversation.messages().throttleLast(250, MILLISECONDS)) //Maybe the Android UI already does its own throttling? Try with and without this throttling and see if there is a difference.
+			.subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
+				messages.clear();
+				messages.addAll(msgs);
+				adapter.notifyDataSetChanged();
+			}});
 
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
