@@ -17,13 +17,17 @@ import sneer.android.main.core.*;
 import sneer.commons.*;
 import sneer.commons.exceptions.*;
 import sneer.impl.simulator.*;
+import sneer.utils.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import android.os.*;
+import android.os.Message;
 import android.util.*;
+import android.widget.*;
 
 public class SneerApp extends Application {
 	
@@ -117,12 +121,28 @@ public class SneerApp extends Application {
 	}
 
 
-	private void startMessage(SneerAppInfo app, PublicKey peer) {
-		long id = nextSessionId.getAndIncrement();
-		
+	private void startMessage(final SneerAppInfo app, final PublicKey peer) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
-		intent.putExtra(CONVERSATION_ID, id);
+		intent.putExtra(RESULT_RECEIVER, new ResultReceiver(new Handler() {
+			
+			@Override
+			public void handleMessage(Message msg) {
+				try {
+					Object[] ret = (Object[]) ((Value)msg.getData().getParcelable("value")).get();
+					for (Object payload : ret) {
+						sneer().tupleSpace().publisher()
+						.type(app.tupleType)
+						.audience(peer)
+						.pub(payload);
+					}
+				} catch (Throwable t) {
+					Toast.makeText(context, "Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG).show();
+					Log.w(SneerApp.class.getSimpleName(), "Error receiving message from plugin", t);
+				}
+			}
+			
+		}));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
 	}

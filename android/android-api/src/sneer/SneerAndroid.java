@@ -19,7 +19,7 @@ public class SneerAndroid {
 
 	//Message
 	public static final String MESSAGE = "message";
-	public static final String CONVERSATION_ID = "conversationId";
+	public static final String RESULT_RECEIVER = "result";
 
 	//Session
 	public static final String SESSION_ID = "sessionId";

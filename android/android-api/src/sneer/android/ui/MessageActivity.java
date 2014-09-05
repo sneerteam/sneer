@@ -1,19 +1,19 @@
 package sneer.android.ui;
 
 import sneer.*;
-import sneer.commons.exceptions.*;
+import sneer.utils.*;
 import android.os.*;
 
 public abstract class MessageActivity extends SneerActivity {
 
-	private long conversationId;
+	private ResultReceiver resultReceiver;
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 
 		Object message = getExtra(SneerAndroid.MESSAGE);
-		conversationId = getExtra(SneerAndroid.CONVERSATION_ID);
+		resultReceiver = getExtra(SneerAndroid.RESULT_RECEIVER);
 		
 		if (message == null)
 			composeMessage();
@@ -32,11 +32,9 @@ public abstract class MessageActivity extends SneerActivity {
 	
 	/** Sends message(s) and finishes this activity. Displays a toast if there was an error sending the message(s). */
 	protected void send(Object... messages) {
-		try {
-			new SneerAndroid(this).sendMessagesIn(conversationId, messages);
-		} catch (FriendlyException e) {
-			toast(e);
-		}
+		Bundle bundle = new Bundle();
+		bundle.putParcelable("value", Value.of(messages));
+		resultReceiver.send(RESULT_OK, bundle);
 		finish();
 	}
 
