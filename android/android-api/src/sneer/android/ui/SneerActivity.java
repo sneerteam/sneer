@@ -108,7 +108,8 @@ public class SneerActivity extends Activity {
 	
 	@SuppressWarnings("unchecked")
 	protected <T> T getExtra(String extra) {
-		return (T)getIntent().getExtras().get(extra);
+		Bundle extras = getIntent().getExtras();
+		return extras == null ? null : (T)extras.get(extra);
 	}
 	
 	
