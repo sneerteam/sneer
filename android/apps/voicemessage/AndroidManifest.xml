@@ -25,7 +25,7 @@
             </intent-filter>
 
             <meta-data android:name="sneer:interaction-type" android:value="MESSAGE" />
-		    <meta-data android:name="sneer:tuple-type" android:value="audio" />
+		    <meta-data android:name="sneer:tuple-type" android:value="audio/3gp" />
 		    <meta-data android:name="sneer:menu-caption" android:value="Send Voice Message" />
 		    <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />            
             
