@@ -32,6 +32,9 @@ subprojects {
 
     afterEvaluate {
 
+        if (!plugins.hasPlugin('android') && !plugins.hasPlugin('android-library'))
+           return
+
         sourceCompatibility = 1.6
         targetCompatibility = 1.6
 
