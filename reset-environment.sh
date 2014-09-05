@@ -21,6 +21,9 @@ echo "-------------------> Preparing the workspace"
 
 cd android && ./gradlew jarNodeps eclipse && cd - || echo "Error preparing android projects, aborting." && exit -1
 
+#Removing unnecessary .project file that makes eclipse mistakenly load "apps" as a project. Todo: tweak gradle build to not generate this file.
+rm android/apps/.project
+
 if [ -d "../rockpaperscissors" ]; then
 	echo COPYING NODEPS JAR...
 	rm -f ../rockpaperscissors/libs/sneer-android-api-nodeps-*.jar
