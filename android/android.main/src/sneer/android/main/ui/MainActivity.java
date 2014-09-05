@@ -1,7 +1,6 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.SneerApp.*;
-import static sneer.android.ui.SneerActivity.*;
 
 import java.util.*;
 
@@ -20,7 +19,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class MainActivity extends Activity {
+public class MainActivity extends SneerActivity {
 	
 	private MainAdapter adapter;
 	private ListView listView;
@@ -62,12 +61,12 @@ public class MainActivity extends Activity {
 			onClicked(conversation);
 		}});
 		
-		SneerActivity.deferUI(sneer().conversations())
-				.subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
-					adapter.clear();
-					adapter.addAll(conversations);
-					adapter.notifyDataSetChanged();
-				}});
+		deferUI(sneer().conversations())
+			.subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
+				adapter.clear();
+				adapter.addAll(conversations);
+				adapter.notifyDataSetChanged();
+			}});
 	}
 	
 
@@ -103,7 +102,6 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
-
 		return super.onCreateOptionsMenu(menu);
 	}
 	
