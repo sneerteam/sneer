@@ -1,6 +1,6 @@
 ext {
     external = [
-        'rx': [version: '0.20.0']
+        'rx': [version: '0.20.3']
     ]
 }
 

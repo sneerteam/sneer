@@ -3,7 +3,7 @@ import org.gradle.api.artifacts.*;
 
 ext {
     external = [
-        rx: [version: '0.20.0'],
+        rx: [version: '0.20.3'],
         android: [
             sdkVersion: 19,
             minSdkVersion: 16,
