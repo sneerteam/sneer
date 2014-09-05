@@ -4,9 +4,42 @@
     android:layout_height="match_parent"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <TextView
+    <ImageButton
+        android:id="@+id/mRecordButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_centerInParent="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="TODO"
+        android:src="@drawable/mic" >
+    </ImageButton>
+
+    <TextView
+        android:id="@+id/lblMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mRecordButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="Hold to record, release to send" />
+
+    <TextView
+        android:id="@+id/lblLength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lblMessage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="00:00" />
+
+    <Button
+        android:id="@+id/mPlayButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lblLength"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="TODO"
+        android:text="Start playing" >
+    </Button>
 
 </RelativeLayout>
