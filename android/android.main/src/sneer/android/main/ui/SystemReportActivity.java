@@ -27,13 +27,6 @@ public class SystemReportActivity extends Activity {
 
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.system_report, menu);
-		return true;
-	}
-
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
