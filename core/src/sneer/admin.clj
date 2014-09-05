@@ -144,7 +144,8 @@
 (defn tuple->message [own-puk ^Tuple tuple]
   (let [created (now)
         received (now)
-        content (.payload tuple)
+        type (.type tuple)
+        content (if (= type "message") (.payload tuple) type)
         own? (= own-puk (.author tuple))]
     (Message. created received content own?)))
 
@@ -152,7 +153,7 @@
   (let [^PublicKey party-puk (party-puk party)
         messages (atom [])
         observable-messages (atom->observable messages)
-        message-filter (.. tuple-space filter (type "message"))]
+        message-filter (.. tuple-space filter #_(type "message"))]
     
     (rx/subscribe
       (rx/subscribe-on
