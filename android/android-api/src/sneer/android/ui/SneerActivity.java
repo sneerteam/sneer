@@ -16,6 +16,7 @@ import rx.schedulers.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
+import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.media.*;
@@ -55,9 +56,12 @@ public class SneerActivity extends Activity {
 	}
 
 	
-	public static Subscription plugActionBarIcon(final ActionBar actionBar, Observable<byte[]> observable) {
-		return deferUI(observable.map(TO_BITMAP)).subscribe(new Action1<Bitmap>() { @SuppressWarnings("deprecation") @Override public void call(Bitmap bitmap) {
-			actionBar.setIcon((Drawable) new BitmapDrawable(bitmap));			
+	protected Subscription plugActionBarIcon(ActionBar actionBar, Observable<byte[]> observable) {
+		return plugActionBarIcon(actionBar, observable, getResources());
+	}
+	public static Subscription plugActionBarIcon(final ActionBar actionBar, Observable<byte[]> observable, Resources resources) {
+		return deferUI(observable.map(toDrawable(resources))).subscribe(new Action1<Drawable>() { @Override public void call(Drawable drawable) {
+			actionBar.setIcon(drawable);
 		}});
 	}
 	public static Subscription plugActionBarTitle(final ActionBar actionBar, Observable<?> observable) {
@@ -114,9 +118,18 @@ public class SneerActivity extends Activity {
 				.observeOn(AndroidSchedulers.mainThread());
 	}
 	
-	
 	public static Bitmap toBitmap(byte[] bytes) {
 		return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+	}
+	
+	
+	public static Func1<byte[], Drawable> toDrawable(final Resources resources) {
+		return new Func1<byte[], Drawable>() { @Override public Drawable call(byte[] bytes) {
+			return toDrawable(bytes, resources);
+		}};
+	}
+	public static Drawable toDrawable(byte[] bytes, Resources resources) {
+		return new BitmapDrawable(resources, toBitmap(bytes));
 	}
 	
 	
@@ -151,3 +164,4 @@ public class SneerActivity extends Activity {
 		}
 	}
 }
+
