@@ -2,7 +2,7 @@ package sneer.android.voicemessage;
 
 import java.io.*;
 
-import android.app.*;
+import sneer.android.ui.*;
 import android.media.*;
 import android.os.*;
 import android.util.*;
@@ -10,8 +10,7 @@ import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-
-public class MainActivity extends Activity {
+public class MainActivity extends MessageActivity {
 
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
     static String mFileName = null;
@@ -134,5 +133,19 @@ public class MainActivity extends Activity {
             mPlayer = null;
         }
     }
+
+
+	@Override
+	protected void composeMessage() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	protected void open(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

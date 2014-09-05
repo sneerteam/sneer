@@ -24,6 +24,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data android:name="sneer:handler" android:value="MESSAGE" />
+            <meta-data android:name="sneer:type" android:value="audio" />
+            <meta-data android:name="sneer:label" android:value="Send Voice Message" />
+            <meta-data android:name="sneer:icon" android:resource="@drawable/ic_launcher" />
         </activity>
     </application>
 
