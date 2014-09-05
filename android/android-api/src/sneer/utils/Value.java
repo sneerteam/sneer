@@ -123,18 +123,30 @@ public class Value implements Parcelable {
 					write(dest, entry.getValue());
 				}
 			}
-		};
+		},
+		PARCELABLE {
+			@Override
+			public Object createFromParcel(Parcel in) {
+				return in.readValue(null);
+			}
+
+			@Override
+			public void writeToParcel(Parcel dest, Object value) {
+				dest.writeValue(value);
+			}
+		},
+		;
 
 		public static Type of(Object o) {
+			if (o == null)
+				return NULL;
 			if (o instanceof String)
 				return STRING;
 			if (o instanceof Long)
 				return LONG;
 			if (o instanceof Map)
 				return MAP;
-//			if (o instanceof Keyword)
-//				return KEYWORD;
-			return NULL;
+			return PARCELABLE;
 		}
 
 		public abstract Object createFromParcel(Parcel in);
