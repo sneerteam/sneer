@@ -26,10 +26,11 @@ import android.widget.*;
 
 public class SneerActivity extends Activity {
 
-	public static final Func1<byte[], Bitmap> TO_BITMAP = new Func1<byte[], Bitmap>() {  @Override public Bitmap call(byte[] bytes) {
+	public static final Func1<byte[], Bitmap> TO_BITMAP = new Func1<byte[], Bitmap>() { @Override public Bitmap call(byte[] bytes) {
 		return toBitmap(bytes);
 	}};
-	
+
+
 	public static Observable<Long> EVERY_MINUTE = Observable.timer(0, 1, TimeUnit.MINUTES).share();
 
 
