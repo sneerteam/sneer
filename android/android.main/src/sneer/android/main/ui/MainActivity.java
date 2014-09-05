@@ -15,7 +15,6 @@ import android.net.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -23,8 +22,6 @@ public class MainActivity extends SneerActivity {
 	
 	private MainAdapter adapter;
 	private ListView listView;
-	private Conversation conversation;
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +51,6 @@ public class MainActivity extends SneerActivity {
 		adapter = new MainAdapter(this);
 		listView.setAdapter(adapter);
 
-		registerForContextMenu(listView);
-
 		listView.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
 			Conversation conversation = adapter.getItem(position);
 			onClicked(conversation);
@@ -67,35 +62,6 @@ public class MainActivity extends SneerActivity {
 				adapter.addAll(conversations);
 				adapter.notifyDataSetChanged();
 			}});
-	}
-	
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-		conversation = adapter.getItem(info.position);
-		plugHeaderTitle(menu, conversation.party().name());
-		getMenuInflater().inflate(R.menu.long_click, menu);
-	}
-	
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.chat_contact:
-			toast(conversation.toString()); // Do something useful with conversation
-											// here.
-			break;
-		case R.id.edit_contact:
-			conversation.toString(); // Do something useful with conversation
-									// here.
-			break;
-		case R.id.remove_contact:
-			conversation.toString(); // Do something useful with conversation
-									// here.
-			break;
-		}
-		return true;
 	}
 	
 
@@ -158,12 +124,6 @@ public class MainActivity extends SneerActivity {
 		return sneer().profileFor(sneer().self()).ownName();
 	}
 
-	
-	private void toast(String message) {
-		Log.d(MainActivity.class.getSimpleName(), "toast: " + message);
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-	
 	
 	public static void log(String s) {
 		Log.d(MainActivity.class.getSimpleName(), s);
