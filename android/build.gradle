@@ -36,7 +36,7 @@ subprojects {
         targetCompatibility = 1.6
 
         task configureAndroidForEclipseTask << {
-            new File("project.properties").withWriter { writer ->
+            new File(projectDir, "project.properties").withWriter { writer ->
                 writer << "target=${android.compileSdkVersion}\n"
                 if (plugins.hasPlugin('android-library')) {
                     writer << "android.library=true\n"
