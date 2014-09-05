@@ -2,7 +2,6 @@ package sneer.android.main.ui;
 
 import static java.util.concurrent.TimeUnit.*;
 import static sneer.android.main.SneerApp.*;
-import static sneer.android.ui.SneerActivity.*;
 
 import java.io.*;
 import java.util.*;
@@ -13,6 +12,7 @@ import rx.functions.*;
 import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
+import sneer.android.ui.*;
 import sneer.commons.*;
 import android.app.*;
 import android.content.*;
@@ -26,7 +26,7 @@ import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.PopupMenu.OnDismissListener;
 
-public class ConversationActivity extends Activity {
+public class ConversationActivity extends SneerActivity {
 
 	static final String PARTY_PUK = "partyPuk";
 	static final String ACTIVITY_TITLE = "activityTitle";
