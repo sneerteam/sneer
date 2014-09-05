@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import rx.Observable;
+import rx.android.schedulers.*;
 import rx.functions.*;
 import rx.schedulers.*;
 import sneer.*;
@@ -124,29 +125,38 @@ public class SneerApp extends Application {
 	private void startMessage(final SneerAppInfo app, final PublicKey peer) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
-		intent.putExtra(RESULT_RECEIVER, new ResultReceiver(new Handler() {
+		
+		final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		
+		SharedResultReceiver result = new SharedResultReceiver(new Action1<Bundle>() {  @Override public void call(Bundle t1) {
 			
-			@Override
-			public void handleMessage(Message msg) {
-				try {
-					Object[] ret = (Object[]) ((Value)msg.getData().getParcelable("value")).get();
-					for (Object payload : ret) {
-						sneer().tupleSpace().publisher()
+			try {
+				t1.setClassLoader(contextClassLoader);
+				Object[] ret = (Object[]) ((Value)t1.getParcelable("value")).get();
+				info("Receiving " + ret.length + " messages type '"+app.tupleType+"' from " + app.packageName + "." + app.activityName);
+				for (Object payload : ret) {
+					sneer().tupleSpace().publisher()
 						.type(app.tupleType)
 						.audience(peer)
 						.pub(payload);
-					}
-				} catch (Throwable t) {
-					Toast.makeText(context, "Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG).show();
-					Log.w(SneerApp.class.getSimpleName(), "Error receiving message from plugin", t);
 				}
+			} catch (final Throwable t) {
+				toastOnMainThread("Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
+				Log.w(SneerApp.class.getSimpleName(), "Error receiving message from plugin", t);
 			}
 			
-		}));
+		}});
+		
+		intent.putExtra(RESULT_RECEIVER, result);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
 	}
 
+	public static void toastOnMainThread(final String message, final int length) {
+		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() { @Override public void call() {
+			Toast.makeText(context, message, length).show();
+		} });
+	}
 
 	private void startSession(SneerAppInfo app, PublicKey peer) {
 		long sessionId = nextSessionId.getAndIncrement();
@@ -179,6 +189,11 @@ public class SneerApp extends Application {
 
 	private Resources resourceForPackage(String packageName) throws NameNotFoundException {
 		return getPackageManager().getResourcesForApplication(packageName);
+	}
+
+
+	private void info(String msg) {
+		Log.i(SneerApp.class.getSimpleName(), msg);
 	}
 
 

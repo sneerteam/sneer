@@ -4,7 +4,6 @@ import rx.*;
 import rx.Observable.OnSubscribe;
 import rx.functions.*;
 import rx.subjects.*;
-import sneer.commons.exceptions.*;
 import sneer.tuples.*;
 import android.content.*;
 import android.os.*;
@@ -168,9 +167,5 @@ public class SneerAndroid {
 			
 		};
 	}
-
 	
-	public void sendMessagesIn(long conversationId, Object[] messages) throws FriendlyException {
-	}
-
 }
