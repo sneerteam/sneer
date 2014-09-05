@@ -1,5 +1,6 @@
 package sneer.android.main.ui;
 
+import static java.util.concurrent.TimeUnit.*;
 import static sneer.android.main.SneerApp.*;
 import static sneer.android.ui.SneerActivity.*;
 
@@ -12,7 +13,7 @@ import rx.functions.*;
 import sneer.*;
 import sneer.Message;
 import sneer.android.main.*;
-import sneer.commons.Comparators;
+import sneer.commons.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -55,10 +56,11 @@ public class ConversationActivity extends Activity {
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
 		plugActionBarTitle(actionBar, party.name());
-		
-		sneer().profileFor(party).selfie().observeOn(AndroidSchedulers.mainThread()).cast(byte[].class).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
-			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
-		}});
+		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
+//		Observable<byte[]> selfie = sneer().profileFor(party).selfie();
+//		deferUI(selfie).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
+//			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
+//		}});
 
 		conversation = sneer().produceConversationWith(party);
 		conversation.unreadMessageCountReset();
