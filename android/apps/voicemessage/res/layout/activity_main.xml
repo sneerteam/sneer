@@ -2,44 +2,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/holo_blue_light"
     tools:context="${relativePackage}.${activityClass}" >
 
     <ImageButton
         android:id="@+id/mRecordButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="TODO"
         android:src="@drawable/mic" >
     </ImageButton>
 
     <TextView
-        android:id="@+id/lblMessage"
+        android:id="@+id/lblLength"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/mRecordButton"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="5dp"
-        android:text="Hold to record, release to send" />
+        android:layout_marginBottom="10dp"
+        android:text="00 : 00"
+        android:textColor="@android:color/primary_text_dark" />
 
-    <TextView
-        android:id="@+id/lblLength"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/lblMessage"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="5dp"
-        android:text="00:00" />
-
-    <Button
-        android:id="@+id/mPlayButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lblLength"
-        android:layout_centerHorizontal="true"
-        android:contentDescription="TODO"
-        android:text="Start playing" >
-    </Button>
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="0.0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:contentDescription="TODO"
+            android:text="Send" >
+        </Button>
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0.0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:contentDescription="TODO"
+            android:text="Cancel" >
+        </Button>
+    </LinearLayout>
 
 </RelativeLayout>

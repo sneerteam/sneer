@@ -16,8 +16,6 @@ public class MainActivity extends MessageActivity {
 	static String mFileName = null;
 
 	ImageButton mRecordButton;
-	Button mPlayButton;
-	TextView messageView;
 	TextView lengthView;
 
 	MediaRecorder mRecorder = null;
@@ -106,32 +104,10 @@ public class MainActivity extends MessageActivity {
 
 	@Override
 	protected void composeMessage() {
-		messageView = (TextView) findViewById(R.id.lblMessage);
 		lengthView = (TextView) findViewById(R.id.lblLength);
 
 		mRecordButton = (ImageButton) findViewById(R.id.mRecordButton);
-		mRecordButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			onRecord(mStartRecording);
-			if (mStartRecording) {
-				messageView.setText("Recording...");
-			} else {
-				messageView.setText("Hold to record, release to send");
-			}
-			mStartRecording = !mStartRecording;
-		}});
-
-		mPlayButton = (Button) findViewById(R.id.mPlayButton);
-		mPlayButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			send(recordingBytes());
-//				onPlay(mStartPlaying);
-//				if (mStartPlaying)
-//					((Button) v).setText("Stop playing");
-//				else
-//					((Button) v).setText("Start playing");
-
-//				mStartPlaying = !mStartPlaying;
-			}
-		});
+		onRecord(mStartRecording);
 	}
 
 	
