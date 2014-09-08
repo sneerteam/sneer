@@ -2,10 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_light"
+    android:background="@android:color/holo_blue_dark"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <ImageButton
+    <ImageView
         android:id="@+id/mRecordButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,10 +13,10 @@
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="TODO"
         android:src="@drawable/mic" >
-    </ImageButton>
+    </ImageView>
 
     <TextView
-        android:id="@+id/lblLength"
+        android:id="@+id/viewRecordingLength"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/mRecordButton"
@@ -26,27 +26,28 @@
         android:textColor="@android:color/primary_text_dark" />
 
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/lblLength"
+        android:layout_below="@+id/viewRecordingLength"
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/btnSend"
+            android:id="@+id/btnCancel"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0.0dip"
             android:layout_height="fill_parent"
             android:layout_weight="1.0"
-            android:contentDescription="TODO"
-            android:text="Send" >
+            android:text="Cancel" >
         </Button>
 
         <Button
-            android:id="@+id/btnCancel"
+            android:id="@+id/btnSend"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0.0dip"
             android:layout_height="fill_parent"
             android:layout_weight="1.0"
-            android:contentDescription="TODO"
-            android:text="Cancel" >
+            android:text="Send" >
         </Button>
     </LinearLayout>
 
