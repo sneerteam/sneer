@@ -24,12 +24,46 @@ public class MainActivity extends MessageActivity {
 	boolean mStartRecording = true;
 	boolean mStartPlaying = true;
 
+	int passedSenconds;
+	private Thread t;
+
+	
 	private void onRecord(boolean start) {
 		if (start) {
 			startRecording();
+			startTimer();
 		} else {
 			stopRecording();
+			stopTimer();
 		}
+	}
+
+	private void startTimer() {
+		t = new Thread() {  @Override public void run() {
+			passedSenconds = 0;
+			try {
+				while (!isInterrupted()) {
+					Thread.sleep(1000);
+					runOnUiThread(new Runnable() { @Override public void run() {
+						MainActivity.this.setTitle(MainActivity.this.getTitle().toString() + ".");
+						if (MainActivity.this.getTitle().toString().contains("...."))
+							MainActivity.this.setTitle(MainActivity.this.getTitle().toString().replace("....", ""));
+
+						int seconds = passedSenconds % 60;
+						int minutes = (passedSenconds / 60) % 60;
+						lengthView.setText(String.format("%02d : %02d", minutes, seconds));
+						passedSenconds++;
+					}});
+				}
+			} catch (InterruptedException e) {
+				t.interrupt();
+			}
+		}};
+		t.start();
+	}
+	
+	private void stopTimer() {
+		t.interrupt();
 	}
 
 	private void onPlay(boolean start) {
