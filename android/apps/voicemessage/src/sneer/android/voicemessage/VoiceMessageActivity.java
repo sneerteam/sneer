@@ -8,12 +8,11 @@ import android.os.*;
 import android.util.*;
 import android.widget.*;
 
-public class MainActivity extends MessageActivity {
+public class VoiceMessageActivity extends MessageActivity {
 
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
 	static String mFileName = null;
 
-	ImageView mRecordButton;
 	TextView recordingLengthView;
 
 	MediaRecorder mRecorder = null;
@@ -113,7 +112,7 @@ public class MainActivity extends MessageActivity {
 	}
 	
 
-	public MainActivity() {
+	public VoiceMessageActivity() {
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
 		mFileName += "/voicemessage.3gp";
 	}
@@ -122,7 +121,7 @@ public class MainActivity extends MessageActivity {
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_voice_message);
 	}
 	
 
@@ -144,8 +143,6 @@ public class MainActivity extends MessageActivity {
 	@Override
 	protected void composeMessage() {
 		recordingLengthView = (TextView) findViewById(R.id.viewRecordingLength);
-
-		mRecordButton = (ImageView) findViewById(R.id.mRecordButton);
 		onRecord(true);
 	}
 
@@ -179,9 +176,9 @@ public class MainActivity extends MessageActivity {
 
 
 	private void updateActivityTitle() {
-		MainActivity.this.setTitle(MainActivity.this.getTitle().toString() + ".");
-		if (MainActivity.this.getTitle().toString().contains("...."))
-			MainActivity.this.setTitle(MainActivity.this.getTitle().toString().replace("....", ""));
+		VoiceMessageActivity.this.setTitle(VoiceMessageActivity.this.getTitle().toString() + ".");
+		if (VoiceMessageActivity.this.getTitle().toString().contains("...."))
+			VoiceMessageActivity.this.setTitle(VoiceMessageActivity.this.getTitle().toString().replace("....", ""));
 	}
 
 
