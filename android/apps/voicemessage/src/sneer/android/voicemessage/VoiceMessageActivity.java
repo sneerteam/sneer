@@ -6,6 +6,8 @@ import sneer.android.ui.*;
 import android.media.*;
 import android.os.*;
 import android.util.*;
+import android.view.*;
+import android.view.View.OnClickListener;
 import android.widget.*;
 
 public class VoiceMessageActivity extends MessageActivity {
@@ -14,6 +16,7 @@ public class VoiceMessageActivity extends MessageActivity {
 	static String mFileName = null;
 
 	TextView recordingLengthView;
+	Button btnSend;
 
 	MediaRecorder mRecorder = null;
 	MediaPlayer mPlayer = null;
@@ -35,6 +38,14 @@ public class VoiceMessageActivity extends MessageActivity {
 			stopRecording();
 			stopTimer();
 		}
+	}
+	
+	
+	private void onPlay(boolean start) {
+		if (start)
+			startPlaying();
+		else
+			stopPlaying();
 	}
 	
 
@@ -61,15 +72,7 @@ public class VoiceMessageActivity extends MessageActivity {
 		t.interrupt();
 	}
 	
-
-	private void onPlay(boolean start) {
-		if (start)
-			startPlaying();
-		else
-			stopPlaying();
-	}
 	
-
 	private void startPlaying() {
 		mPlayer = new MediaPlayer();
 		try {
@@ -121,7 +124,6 @@ public class VoiceMessageActivity extends MessageActivity {
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		setContentView(R.layout.activity_voice_message);
 	}
 	
 
@@ -142,7 +144,15 @@ public class VoiceMessageActivity extends MessageActivity {
 
 	@Override
 	protected void composeMessage() {
-		recordingLengthView = (TextView) findViewById(R.id.viewRecordingLength);
+		setContentView(R.layout.activity_voice_message);
+		
+		recordingLengthView = (TextView)findViewById(R.id.viewRecordingLength);
+
+		btnSend = (Button)findViewById(R.id.btnSend);
+		btnSend.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			send(recordingBytes());	
+		}});
+		
 		onRecord(true);
 	}
 
@@ -150,7 +160,7 @@ public class VoiceMessageActivity extends MessageActivity {
 	protected byte[] recordingBytes() {
 		byte[] ret = null;
 		try {
-			ret = readFully(this.openFileInput(mFileName));
+			ret = readFully(new FileInputStream(mFileName));
 		} catch (IOException e) {
 			toast(e.getMessage());
 		}

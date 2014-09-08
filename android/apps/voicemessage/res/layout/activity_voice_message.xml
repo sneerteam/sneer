@@ -6,7 +6,7 @@
     tools:context="${relativePackage}.${activityClass}" >
 
     <ImageView
-        android:id="@+id/mRecordButton"
+        android:id="@+id/imgMic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -19,7 +19,7 @@
         android:id="@+id/viewRecordingLength"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mRecordButton"
+        android:layout_below="@+id/imgMic"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
         android:text="00 : 00"
