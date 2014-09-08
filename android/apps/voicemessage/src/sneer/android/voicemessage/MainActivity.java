@@ -6,8 +6,6 @@ import sneer.android.ui.*;
 import android.media.*;
 import android.os.*;
 import android.util.*;
-import android.view.*;
-import android.view.View.OnClickListener;
 import android.widget.*;
 
 public class MainActivity extends MessageActivity {
@@ -15,17 +13,19 @@ public class MainActivity extends MessageActivity {
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
 	static String mFileName = null;
 
-	ImageButton mRecordButton;
-	TextView lengthView;
+	ImageView mRecordButton;
+	TextView recordingLengthView;
 
 	MediaRecorder mRecorder = null;
 	MediaPlayer mPlayer = null;
 
-	boolean mStartRecording = true;
-	boolean mStartPlaying = true;
+	static boolean mStartRecording;
+	static boolean mStartPlaying;
 
-	int passedSenconds;
-	private Thread t;
+	Thread t;
+	static int passedSenconds;
+	static int seconds;
+	static int minutes;
 
 	
 	private void onRecord(boolean start) {
@@ -37,6 +37,7 @@ public class MainActivity extends MessageActivity {
 			stopTimer();
 		}
 	}
+	
 
 	private void startTimer() {
 		t = new Thread() {  @Override public void run() {
@@ -45,14 +46,8 @@ public class MainActivity extends MessageActivity {
 				while (!isInterrupted()) {
 					Thread.sleep(1000);
 					runOnUiThread(new Runnable() { @Override public void run() {
-						MainActivity.this.setTitle(MainActivity.this.getTitle().toString() + ".");
-						if (MainActivity.this.getTitle().toString().contains("...."))
-							MainActivity.this.setTitle(MainActivity.this.getTitle().toString().replace("....", ""));
-
-						int seconds = passedSenconds % 60;
-						int minutes = (passedSenconds / 60) % 60;
-						lengthView.setText(String.format("%02d : %02d", minutes, seconds));
-						passedSenconds++;
+						updateActivityTitle();
+						updateTextViewTimer();
 					}});
 				}
 			} catch (InterruptedException e) {
@@ -62,9 +57,11 @@ public class MainActivity extends MessageActivity {
 		t.start();
 	}
 	
+	
 	private void stopTimer() {
 		t.interrupt();
 	}
+	
 
 	private void onPlay(boolean start) {
 		if (start)
@@ -72,6 +69,7 @@ public class MainActivity extends MessageActivity {
 		else
 			stopPlaying();
 	}
+	
 
 	private void startPlaying() {
 		mPlayer = new MediaPlayer();
@@ -83,11 +81,13 @@ public class MainActivity extends MessageActivity {
 			Log.e(LOG_TAG, "prepare() failed");
 		}
 	}
+	
 
 	private void stopPlaying() {
 		mPlayer.release();
 		mPlayer = null;
 	}
+	
 
 	private void startRecording() {
 		mRecorder = new MediaRecorder();
@@ -104,23 +104,27 @@ public class MainActivity extends MessageActivity {
 
 		mRecorder.start();
 	}
+	
 
 	private void stopRecording() {
 		mRecorder.stop();
 		mRecorder.release();
 		mRecorder = null;
 	}
+	
 
 	public MainActivity() {
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
 		mFileName += "/voicemessage.3gp";
 	}
+	
 
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		setContentView(R.layout.activity_main);
 	}
+	
 
 	@Override
 	public void onPause() {
@@ -135,13 +139,14 @@ public class MainActivity extends MessageActivity {
 			mPlayer = null;
 		}
 	}
+	
 
 	@Override
 	protected void composeMessage() {
-		lengthView = (TextView) findViewById(R.id.lblLength);
+		recordingLengthView = (TextView) findViewById(R.id.viewRecordingLength);
 
-		mRecordButton = (ImageButton) findViewById(R.id.mRecordButton);
-		onRecord(mStartRecording);
+		mRecordButton = (ImageView) findViewById(R.id.mRecordButton);
+		onRecord(true);
 	}
 
 	
@@ -170,6 +175,21 @@ public class MainActivity extends MessageActivity {
 	@Override
 	protected void open(Object message) {
 
+	}
+
+
+	private void updateActivityTitle() {
+		MainActivity.this.setTitle(MainActivity.this.getTitle().toString() + ".");
+		if (MainActivity.this.getTitle().toString().contains("...."))
+			MainActivity.this.setTitle(MainActivity.this.getTitle().toString().replace("....", ""));
+	}
+
+
+	private void updateTextViewTimer() {
+		seconds = passedSenconds % 60;
+		minutes = (passedSenconds / 60) % 60;
+		recordingLengthView.setText(String.format("%02d : %02d", minutes, seconds));
+		passedSenconds++;
 	}
 
 }
