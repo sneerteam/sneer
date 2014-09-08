@@ -3,6 +3,7 @@ package sneer.android.voicemessage;
 import java.io.*;
 
 import sneer.android.ui.*;
+import sneer.commons.exceptions.*;
 import android.media.*;
 import android.os.*;
 import android.util.*;
@@ -16,7 +17,6 @@ public class VoiceMessageActivity extends MessageActivity {
 	static String mFileName = null;
 
 	TextView recordingLengthView;
-	Button btnSend;
 
 	MediaRecorder mRecorder = null;
 	MediaPlayer mPlayer = null;
@@ -148,21 +148,33 @@ public class VoiceMessageActivity extends MessageActivity {
 		
 		recordingLengthView = (TextView)findViewById(R.id.viewRecordingLength);
 
-		btnSend = (Button)findViewById(R.id.btnSend);
+		Button btnSend = (Button)findViewById(R.id.btnSend);
 		btnSend.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			send(recordingBytes());	
+			onRecord(false);
+			try {
+				send(recordingBytes());
+			} catch (FriendlyException e) {
+				toast(e);
+			}
+			finish();
+		}});
+		
+		Button btnCancel = (Button)findViewById(R.id.btnCancel);
+		btnCancel.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			onRecord(false);
+			finish();
 		}});
 		
 		onRecord(true);
 	}
 
 	
-	protected byte[] recordingBytes() {
+	protected byte[] recordingBytes() throws FriendlyException {
 		byte[] ret = null;
 		try {
 			ret = readFully(new FileInputStream(mFileName));
 		} catch (IOException e) {
-			toast(e.getMessage());
+			throw new FriendlyException("Unable to send recording");
 		}
 		return ret;
 	}
