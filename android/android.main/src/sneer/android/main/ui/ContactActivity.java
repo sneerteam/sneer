@@ -9,8 +9,10 @@ import sneer.android.main.*;
 import sneer.android.main.ui.utils.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
+import android.app.TaskStackBuilder;
 import android.content.*;
 import android.os.*;
+import android.support.v4.app.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
@@ -41,7 +43,7 @@ public class ContactActivity extends Activity {
 		if (!SneerApp.checkOnCreate(this)) return;
 		
 		setContentView(R.layout.activity_contact);
-
+		
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
 		preferredNickNameView = (TextView) findViewById(R.id.preferredNickName);
@@ -67,6 +69,10 @@ public class ContactActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+	    case android.R.id.home:
+            NavUtils.navigateUpFromSameTask(this);
+	        return true;
+
 		case R.id.action_share:
 			Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
 			break;
@@ -81,6 +87,7 @@ public class ContactActivity extends Activity {
 		
 		if (Intent.ACTION_VIEW.equals(action)){
 			try{
+				getActionBar().setDisplayHomeAsUpEnabled(true);
 				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));		
 			}catch(RuntimeException e){
 				toast("Invalid public key.");

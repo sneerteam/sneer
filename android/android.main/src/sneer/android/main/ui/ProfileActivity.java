@@ -12,6 +12,7 @@ import android.content.*;
 import android.graphics.*;
 import android.os.*;
 import android.provider.*;
+import android.support.v4.app.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
@@ -38,6 +39,8 @@ public class ProfileActivity extends SneerActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
 		profile = sneer().profileFor(sneer().self());
 
 		firstNameEdit = (EditText) findViewById(R.id.firstName);
@@ -64,6 +67,10 @@ public class ProfileActivity extends SneerActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case android.R.id.home:
+	        NavUtils.navigateUpFromSameTask(this);
+	        return true;
+
 		case R.id.action_share:
 			Puk.sendYourPublicKey(ProfileActivity.this, sneer().self(), true, null);
 			break;
