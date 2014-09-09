@@ -56,8 +56,10 @@ public class VoiceMessageActivity extends MessageActivity {
 				while (!isInterrupted()) {
 					Thread.sleep(1000);
 					runOnUiThread(new Runnable() { @Override public void run() {
-						updateActivityTitle();
-						updateTextViewTimer();
+						seconds = passedSenconds % 60;
+						minutes = (passedSenconds / 60) % 60;
+						recordingLengthView.setText(String.format("%02d : %02d", minutes, seconds));
+						passedSenconds++;
 					}});
 				}
 			} catch (InterruptedException e) {
@@ -194,14 +196,6 @@ public class VoiceMessageActivity extends MessageActivity {
 	@Override
 	protected void open(Object message) {
 
-	}
-
-
-	private void updateActivityTitle() {
-		String title = VoiceMessageActivity.this.getTitle().toString();
-		VoiceMessageActivity.this.setTitle(title + ".");
-		if (title.contains("...."))
-			VoiceMessageActivity.this.setTitle(title.replace("....", ""));
 	}
 
 
