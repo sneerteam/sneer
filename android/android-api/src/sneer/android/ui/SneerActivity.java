@@ -96,14 +96,13 @@ public class SneerActivity extends Activity {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
-	protected <V> V findView(int id) {
-		return (V)findViewById(id);
+	protected Button button(int id) {
+		return (Button)findViewById(id);
 	}
 	
 	
-	protected Button button(int id) {
-		return (Button)findViewById(id);
+	protected TextView textView(int id) {
+		return (TextView)findViewById(id);
 	}
 
 	
