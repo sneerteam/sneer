@@ -18,80 +18,11 @@ public class VoiceMessageActivity extends MessageActivity {
 
 	private volatile MediaRecorder recorder = null;
 	
-	private void startTimer() {
-		new Thread() { @Override public void run() {
-			final long t0 = now();
-			while (recorder != null) {
-				updateRecordingTimeSince(t0);
-				sleepOneSecond();
-			}
-		}}.start();
-	}
-	
-	
-	private void startRecording() {
-		startTimer();
-		
-		try {
-			initRecorder();
-		} catch (IOException e) {
-			toast("Voice recorder failed", Toast.LENGTH_LONG);
-			finish();
-			return;
-		}
-	}
-
-
-	private void initRecorder() throws IOException {
-		recorder = new MediaRecorder();
-		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		recorder.setOutputFile(audioFileName);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		recorder.prepare();
-		recorder.start();
-	}
-	
-
-	private void stopRecording() {
-		if (recorder == null) return;
-		try {
-			recorder.stop();
-		} catch (RuntimeException e) {
-			// This can happen if stop() is called immediately after start() but this doesn't affect us.
-		}
-		recorder.release();
-		recorder = null;
-	}
-	
-
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 	}
-	
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		finish();	
-	}
-	
-	
-	@Override
-	protected void onStop() {
-		super.onStop();
-		finish();
-	}
-	
-	
-	@Override
-	protected void onDestroy() {
-		stopRecording();
-		new File(audioFileName).delete();
-		super.onDestroy();
-	}
-	
 
 	@Override
 	protected void composeMessage() {
@@ -107,11 +38,68 @@ public class VoiceMessageActivity extends MessageActivity {
 		
 		startRecording();
 	}
-	
-	
+
+
 	@Override
 	protected void open(Object message) {
+	
+	}
 
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		finish();	
+	}
+
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		finish();
+	}
+
+
+	@Override
+	protected void onDestroy() {
+		stopRecording();
+		new File(audioFileName).delete();
+		super.onDestroy();
+	}
+
+
+	private void startRecording() {
+		startTimer();
+		
+		try {
+			initRecorder();
+		} catch (IOException e) {
+			toast("Voice recorder failed", Toast.LENGTH_LONG);
+			finish();
+			return;
+		}
+	}
+
+
+	private void startTimer() {
+		new Thread() { @Override public void run() {
+			final long t0 = now();
+			while (recorder != null) {
+				updateRecordingTimeSince(t0);
+				sleepOneSecond();
+			}
+		}}.start();
+	}
+	
+	
+	private void initRecorder() throws IOException {
+		recorder = new MediaRecorder();
+		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		recorder.setOutputFile(audioFileName);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		recorder.prepare();
+		recorder.start();
 	}
 	
 
@@ -128,8 +116,8 @@ public class VoiceMessageActivity extends MessageActivity {
 		if (bytes != null)
 			send(bytes);
 	}
-	
-	
+
+
 	private byte[] recordingBytes() throws FriendlyException {
 		try {
 			return readFully(new FileInputStream(audioFileName));
@@ -138,7 +126,19 @@ public class VoiceMessageActivity extends MessageActivity {
 		}
 	}
 
+
+	private void stopRecording() {
+		if (recorder == null) return;
+		try {
+			recorder.stop();
+		} catch (RuntimeException e) {
+			// This can happen if stop() is called immediately after start() but this doesn't affect us.
+		}
+		recorder.release();
+		recorder = null;
+	}
 	
+
 	private void updateRecordingTimeSince(final long t0) {
 		runOnUiThread(new Runnable() { @Override public void run() {
 			long seconds = (now() - t0) / 1000;
