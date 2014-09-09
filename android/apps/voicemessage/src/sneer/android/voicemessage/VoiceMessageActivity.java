@@ -6,7 +6,6 @@ import sneer.android.ui.*;
 import sneer.commons.exceptions.*;
 import android.media.*;
 import android.os.*;
-import android.util.*;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -15,19 +14,14 @@ public class VoiceMessageActivity extends MessageActivity {
 
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
 	
-	String audioFileName = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp").getAbsolutePath();
+	private final String audioFileName = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp").getAbsolutePath();
 
-	TextView recordingTime;
-
-	MediaRecorder recorder = null;
-	
-	private volatile boolean isRecording;
+	private volatile MediaRecorder recorder = null;
 	
 	private void startTimer() {
 		new Thread() { @Override public void run() {
 			final long t0 = now();
-			isRecording = true;
-			while (isRecording) {
+			while (recorder != null) {
 				updateRecordingTimeSince(t0);
 				sleepOneSecond();
 			}
@@ -41,9 +35,8 @@ public class VoiceMessageActivity extends MessageActivity {
 		try {
 			initRecorder();
 		} catch (IOException e) {
-			stopRecording();
-			int doSomethingAboutIt;
-			Log.e(LOG_TAG, "prepare() failed");
+			toast("Voice recorder failed", Toast.LENGTH_LONG);
+			finish();
 			return;
 		}
 	}
@@ -61,9 +54,12 @@ public class VoiceMessageActivity extends MessageActivity {
 	
 
 	private void stopRecording() {
-		isRecording = false;
 		if (recorder == null) return;
-		recorder.stop();
+		try {
+			recorder.stop();
+		} catch (RuntimeException e) {
+			// This can happen if stop() is called immediately after start() but this doesn't affect us.
+		}
 		recorder.release();
 		recorder = null;
 	}
@@ -101,8 +97,6 @@ public class VoiceMessageActivity extends MessageActivity {
 	protected void composeMessage() {
 		setContentView(R.layout.activity_voice_message);
 		
-		recordingTime = findView(R.id.recordingTime);
-
 		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			send();
 		}});
@@ -149,7 +143,7 @@ public class VoiceMessageActivity extends MessageActivity {
 		runOnUiThread(new Runnable() { @Override public void run() {
 			long seconds = (now() - t0) / 1000;
 			long minutes = seconds / 60;
-			recordingTime.setText(String.format("%02d : %02d", minutes, seconds % 60));
+			textView(R.id.recordingTime).setText(String.format("%02d : %02d", minutes, seconds % 60));
 		}});
 	}
 
