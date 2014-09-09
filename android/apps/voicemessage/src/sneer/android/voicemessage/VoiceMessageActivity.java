@@ -198,9 +198,10 @@ public class VoiceMessageActivity extends MessageActivity {
 
 
 	private void updateActivityTitle() {
-		VoiceMessageActivity.this.setTitle(VoiceMessageActivity.this.getTitle().toString() + ".");
-		if (VoiceMessageActivity.this.getTitle().toString().contains("...."))
-			VoiceMessageActivity.this.setTitle(VoiceMessageActivity.this.getTitle().toString().replace("....", ""));
+		String title = VoiceMessageActivity.this.getTitle().toString();
+		VoiceMessageActivity.this.setTitle(title + ".");
+		if (title.contains("...."))
+			VoiceMessageActivity.this.setTitle(title.replace("....", ""));
 	}
 
 
