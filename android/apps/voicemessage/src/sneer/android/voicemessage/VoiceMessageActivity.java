@@ -14,133 +14,86 @@ import android.widget.*;
 public class VoiceMessageActivity extends MessageActivity {
 
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
-	static String mFileName = null;
-
-	TextView recordingLengthView;
-
-	MediaRecorder mRecorder = null;
-	MediaPlayer mPlayer = null;
-
-	static boolean mStartRecording;
-	static boolean mStartPlaying;
-
-	Thread t;
-	static int passedSenconds;
-	static int seconds;
-	static int minutes;
-
 	
-	private void onRecord(boolean start) {
-		if (start) {
-			startRecording();
-			startTimer();
-		} else {
-			stopRecording();
-			stopTimer();
-		}
-	}
-	
-	
-	private void onPlay(boolean start) {
-		if (start)
-			startPlaying();
-		else
-			stopPlaying();
-	}
-	
+	String audioFileName = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp").getAbsolutePath();
 
+	TextView recordingTime;
+
+	MediaRecorder recorder = null;
+	
+	private volatile boolean isRecording;
+	
 	private void startTimer() {
-		t = new Thread() {  @Override public void run() {
-			passedSenconds = 0;
-			try {
-				while (!isInterrupted()) {
-					Thread.sleep(1000);
-					runOnUiThread(new Runnable() { @Override public void run() {
-						seconds = passedSenconds % 60;
-						minutes = (passedSenconds / 60) % 60;
-						recordingLengthView.setText(String.format("%02d : %02d", minutes, seconds));
-						passedSenconds++;
-					}});
-				}
-			} catch (InterruptedException e) {
-				t.interrupt();
+		new Thread() { @Override public void run() {
+			final long t0 = now();
+			isRecording = true;
+			while (isRecording) {
+				updateRecordingTimeSince(t0);
+				sleepOneSecond();
 			}
-		}};
-		t.start();
+		}}.start();
 	}
 	
 	
-	private void stopTimer() {
-		t.interrupt();
-	}
-	
-	
-	private void startPlaying() {
-		mPlayer = new MediaPlayer();
-		try {
-			mPlayer.setDataSource(mFileName);
-			mPlayer.prepare();
-			mPlayer.start();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "prepare() failed");
-		}
-	}
-	
-
-	private void stopPlaying() {
-		mPlayer.release();
-		mPlayer = null;
-	}
-	
-
 	private void startRecording() {
-		mRecorder = new MediaRecorder();
-		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		mRecorder.setOutputFile(mFileName);
-		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
+		startTimer();
+		
 		try {
-			mRecorder.prepare();
+			initRecorder();
 		} catch (IOException e) {
+			stopRecording();
+			int doSomethingAboutIt;
 			Log.e(LOG_TAG, "prepare() failed");
+			return;
 		}
+	}
 
-		mRecorder.start();
+
+	private void initRecorder() throws IOException {
+		recorder = new MediaRecorder();
+		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		recorder.setOutputFile(audioFileName);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		recorder.prepare();
+		recorder.start();
 	}
 	
 
 	private void stopRecording() {
-		mRecorder.stop();
-		mRecorder.release();
-		mRecorder = null;
-	}
-	
-
-	public VoiceMessageActivity() {
-		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-		mFileName += "/voicemessage.3gp";
+		isRecording = false;
+		if (recorder == null) return;
+		recorder.stop();
+		recorder.release();
+		recorder = null;
 	}
 	
 
 	@Override
-	public void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
+	public void onCreate(Bundle bundle) {
+		super.onCreate(bundle);
 	}
 	
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (mRecorder != null) {
-			mRecorder.release();
-			mRecorder = null;
-		}
-
-		if (mPlayer != null) {
-			mPlayer.release();
-			mPlayer = null;
-		}
+		finish();	
+	}
+	
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		finish();
+	}
+	
+	
+	@Override
+	protected void onDestroy() {
+		stopRecording();
+		new File(audioFileName).delete();
+		super.onDestroy();
 	}
 	
 
@@ -148,48 +101,17 @@ public class VoiceMessageActivity extends MessageActivity {
 	protected void composeMessage() {
 		setContentView(R.layout.activity_voice_message);
 		
-		recordingLengthView = (TextView)findViewById(R.id.viewRecordingLength);
+		recordingTime = findView(R.id.recordingTime);
 
-		Button btnSend = (Button)findViewById(R.id.btnSend);
-		btnSend.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			onRecord(false);
-			try {
-				send(recordingBytes());
-			} catch (FriendlyException e) {
-				toast(e);
-			}
+		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			send();
+		}});
+		
+		button(R.id.btnCancel).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			finish();
 		}});
 		
-		Button btnCancel = (Button)findViewById(R.id.btnCancel);
-		btnCancel.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			onRecord(false);
-			finish();
-		}});
-		
-		onRecord(true);
-	}
-
-	
-	protected byte[] recordingBytes() throws FriendlyException {
-		byte[] ret = null;
-		try {
-			ret = readFully(new FileInputStream(mFileName));
-		} catch (IOException e) {
-			throw new FriendlyException("Unable to send recording");
-		}
-		return ret;
-	}
-
-	
-	public static byte[] readFully(InputStream in) throws IOException {
-		byte[] b = new byte[8192];
-		int read;
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-			while ((read = in.read(b)) != -1) {
-				out.write(b, 0, read);
-		}
-		return out.toByteArray();
+		startRecording();
 	}
 	
 	
@@ -197,13 +119,63 @@ public class VoiceMessageActivity extends MessageActivity {
 	protected void open(Object message) {
 
 	}
+	
 
-
-	private void updateTextViewTimer() {
-		seconds = passedSenconds % 60;
-		minutes = (passedSenconds / 60) % 60;
-		recordingLengthView.setText(String.format("%02d : %02d", minutes, seconds));
-		passedSenconds++;
+	private void send() {
+		stopRecording();
+		
+		byte[] bytes = null;
+		try {
+			bytes = recordingBytes();
+		} catch (FriendlyException e) {
+			toast(e);
+			finish();
+		}
+		if (bytes != null)
+			send(bytes);
+	}
+	
+	
+	private byte[] recordingBytes() throws FriendlyException {
+		try {
+			return readFully(new FileInputStream(audioFileName));
+		} catch (IOException e) {
+			throw new FriendlyException("Problem with recording");
+		}
 	}
 
+	
+	private void updateRecordingTimeSince(final long t0) {
+		runOnUiThread(new Runnable() { @Override public void run() {
+			long seconds = (now() - t0) / 1000;
+			long minutes = seconds / 60;
+			recordingTime.setText(String.format("%02d : %02d", minutes, seconds % 60));
+		}});
+	}
+
+
+	static private void sleepOneSecond() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+
+	static private byte[] readFully(InputStream in) throws IOException {
+		byte[] b = new byte[8192];
+		int read;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		while ((read = in.read(b)) != -1) {
+			out.write(b, 0, read);
+		}
+		return out.toByteArray();
+	}
+
+
+	static private long now() {
+		return System.currentTimeMillis();
+	}
+	
 }

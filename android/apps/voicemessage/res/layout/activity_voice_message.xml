@@ -16,7 +16,7 @@
     </ImageView>
 
     <TextView
-        android:id="@+id/viewRecordingLength"
+        android:id="@+id/recordingTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imgMic"
@@ -29,7 +29,7 @@
         style="?android:attr/buttonBarStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/viewRecordingLength"
+        android:layout_below="@+id/recordingTime"
         android:orientation="horizontal" >
 
         <Button
