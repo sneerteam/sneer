@@ -21,7 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 public class MainActivity extends SneerActivity {
 	
 	private MainAdapter adapter;
-	private ListView listView;
+	private ListView conversations;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +47,11 @@ public class MainActivity extends SneerActivity {
 		plugActionBarTitle(actionBar, ownProfile.ownName());
 		plugActionBarIcon(actionBar, ownProfile.selfie());
 
-		listView = (ListView) findViewById(R.id.listView);
+		conversations = (ListView) findViewById(R.id.conversations);
 		adapter = new MainAdapter(this);
-		listView.setAdapter(adapter);
+		conversations.setAdapter(adapter);
 
-		listView.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
+		conversations.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
 			Conversation conversation = adapter.getItem(position);
 			onClicked(conversation);
 		}});
