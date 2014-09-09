@@ -1,6 +1,7 @@
 package sneer.android.main;
 
 import static sneer.SneerAndroid.*;
+import static sneer.android.main.SneerAppInfo.InteractionType.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -104,18 +105,8 @@ public class SneerApp extends Application {
 	private AtomicLong nextSessionId = new AtomicLong(0);
 	
 	private void startPlugin(SneerAppInfo app, PublicKey peer) {
-		
-		switch (app.interactionType) {
-		case SESSION:
-			startSession(app, peer);
-			break;
-
-		case MESSAGE:
-			startMessage(app, peer);
-			break;
-
-		}
-		
+		if (app.interactionType == SESSION) startSession(app, peer);
+		if (app.interactionType == MESSAGE) startMessage(app, peer);
 	}
 
 
