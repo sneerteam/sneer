@@ -9,7 +9,7 @@
     tools:context=".ConversationActivity" >
 
     <ListView
-        android:id="@+id/listView"
+        android:id="@+id/messageList"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/messageSender"

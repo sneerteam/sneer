@@ -79,8 +79,7 @@ public class ConversationActivity extends SneerActivity {
 				adapter.notifyDataSetChanged();
 			}});
 
-		ListView listView = (ListView) findViewById(R.id.listView);
-		listView.setAdapter(adapter);
+		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
 		final TextView editText = (TextView) findViewById(R.id.editText);
 		editText.addTextChangedListener(new TextWatcher() {

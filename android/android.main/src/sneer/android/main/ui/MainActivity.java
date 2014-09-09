@@ -47,7 +47,7 @@ public class MainActivity extends SneerActivity {
 		plugActionBarTitle(actionBar, ownProfile.ownName());
 		plugActionBarIcon(actionBar, ownProfile.selfie());
 
-		conversations = (ListView) findViewById(R.id.conversations);
+		conversations = (ListView) findViewById(R.id.conversationList);
 		adapter = new MainAdapter(this);
 		conversations.setAdapter(adapter);
 

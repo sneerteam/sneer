@@ -5,7 +5,7 @@
     tools:context=".MainActivity" >
 
     <ListView
-        android:id="@+id/conversations"
+        android:id="@+id/conversationList"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="5dp" />
