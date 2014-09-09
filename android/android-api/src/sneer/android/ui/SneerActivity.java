@@ -111,9 +111,9 @@ public class SneerActivity extends Activity {
 	}
 
 	
-	protected void toast(CharSequence text) { toast(text, LENGTH_SHORT); }
+	protected void toast(Object text) { toast(text, LENGTH_SHORT); }
 	protected void toast(FriendlyException e) { toast(e.getMessage(), LENGTH_LONG); }
-	protected void toast(CharSequence text, int length) { Toast.makeText(this, text, length).show(); }
+	protected void toast(Object text, int length) { Toast.makeText(this, text.toString(), length).show(); }
 
 	
 	@SuppressWarnings("unchecked")
