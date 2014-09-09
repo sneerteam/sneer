@@ -5,13 +5,11 @@ import static sneer.SneerAndroid.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
-import rx.schedulers.*;
 import sneer.*;
 import sneer.admin.*;
 import sneer.android.main.core.*;
@@ -73,7 +71,7 @@ public class SneerApp extends Application {
 
 	private static AlertDialog errorDialog;
 
-	private static SneerAdmin ADMIN = null;
+	private static SneerAdmin ADMIN;
 
 	private static Context context;
 
@@ -271,7 +269,7 @@ public class SneerApp extends Application {
 		}
 	}
 
-	private static void createBot(final String baseName, final Sneer masterSneer) {
+/*	private static void createBot(final String baseName, final Sneer masterSneer) {
 		Observable.range(1, 10).delay(1, TimeUnit.SECONDS)
 				.observeOn(Schedulers.newThread())
 				.subscribe(new Action1<Integer>() {
@@ -296,6 +294,7 @@ public class SneerApp extends Application {
 					}
 				});
 	}
+*/
 
 	private static void finishWith(String message, final Activity activity) {
 		if (errorDialog != null) {
