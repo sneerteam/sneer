@@ -1,32 +1,47 @@
 package sneer.android.main;
 
-import static sneer.SneerAndroid.*;
-import static sneer.android.main.SneerAppInfo.InteractionType.*;
+import static sneer.SneerAndroid.OWN_PRIK;
+import static sneer.SneerAndroid.RESULT_RECEIVER;
+import static sneer.SneerAndroid.SESSION_ID;
+import static sneer.android.main.SneerAppInfo.InteractionType.SESSION;
+import static sneer.android.main.SneerAppInfo.InteractionType.MESSAGE;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import rx.Observable;
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.*;
-import sneer.admin.*;
-import sneer.android.main.core.*;
-import sneer.commons.*;
-import sneer.commons.exceptions.*;
-import sneer.impl.simulator.*;
-import sneer.utils.*;
-import android.app.*;
-import android.content.*;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import sneer.ConversationMenuItem;
+import sneer.PublicKey;
+import sneer.Sneer;
+import sneer.admin.SneerAdmin;
+import sneer.android.main.core.SneerSqliteDatabase;
+import sneer.commons.SystemReport;
+import sneer.commons.exceptions.FriendlyException;
+import sneer.impl.simulator.SneerAdminSimulator;
+import sneer.utils.SharedResultReceiver;
+import sneer.utils.Value;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Application;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.*;
-import android.graphics.*;
-import android.graphics.drawable.*;
-import android.os.*;
-import android.util.*;
-import android.widget.*;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 public class SneerApp extends Application {
 	
