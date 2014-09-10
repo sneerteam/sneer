@@ -3,13 +3,13 @@ package sneer.android.main;
 import static sneer.SneerAndroid.OWN_PRIK;
 import static sneer.SneerAndroid.RESULT_RECEIVER;
 import static sneer.SneerAndroid.SESSION_ID;
-import static sneer.android.main.SneerAppInfo.InteractionType.SESSION;
 import static sneer.android.main.SneerAppInfo.InteractionType.MESSAGE;
+import static sneer.android.main.SneerAppInfo.InteractionType.SESSION;
+import static sneer.commons.exceptions.Exceptions.check;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -212,18 +212,19 @@ public class SneerApp extends Application {
 
 	
 	public static void initialize() throws FriendlyException {
-		if (ADMIN != null)
-			throw new IllegalStateException("Sneer is being initialized more than once.");
+		check(ADMIN == null);
 
 		ADMIN = isCoreAvailable()
 			? initialize(context)
 			: simulator();
 	}
 
+	
 	private static boolean isCoreAvailable() {
 		return sneerAdminFactory() != null;
 	}
 
+	
 	private static Class<?> sneerAdminFactory() {
 		try {
 			return Class.forName("sneer.admin.SneerAdminFactory");
@@ -244,6 +245,7 @@ public class SneerApp extends Application {
 		sneer.profileFor(sneer.self()).setOwnName(name);
 	}
 
+	
 	private static SneerAdmin initialize(Context context) throws FriendlyException {
 
 		File adminDir = new File(context.getFilesDir(), "admin");
@@ -261,20 +263,16 @@ public class SneerApp extends Application {
 		}
 	}
 
+	
 	private static SneerAdmin newSneerAdmin(SneerSqliteDatabase db) {
-		try {
-			return (SneerAdmin) sneerAdminFactory().getMethod("create", Object.class).invoke(null, db);
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException(e);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalStateException(e);
-		} catch (InvocationTargetException e) {
-			throw new IllegalStateException(e);
-		} catch (NoSuchMethodException e) {
-			throw new IllegalStateException(e);
-		}
+			try {
+				return (SneerAdmin) sneerAdminFactory().getMethod("create", Object.class).invoke(null, db);
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
 	}
 
+	
 /*	private static void createBot(final String baseName, final Sneer masterSneer) {
 		Observable.range(1, 10).delay(1, TimeUnit.SECONDS)
 				.observeOn(Schedulers.newThread())
@@ -299,9 +297,16 @@ public class SneerApp extends Application {
 						}
 					}
 				});
-	}
-*/
+	} */
 
+
+	public static boolean checkOnCreate(Activity activity) {
+		if (error == null) return true;
+		finishWith(error, activity);
+		return false;
+	}
+	
+	
 	private static void finishWith(String message, final Activity activity) {
 		if (errorDialog != null) {
 			activity.finish();
@@ -315,13 +320,6 @@ public class SneerApp extends Application {
 		}});
 		errorDialog = builder.create();
 		errorDialog.show();
-	}
-
-
-	public static boolean checkOnCreate(Activity activity) {
-		if (error == null) return true;
-		finishWith(error, activity);
-		return false;
 	}
 
 }
