@@ -51,12 +51,14 @@ public class SendPicsActivity extends MessageActivity {
 		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
 
 		startActivityForResult(chooser, TAKE_PICTURE);
+		
+		
 	}
 
 	@Override
 	protected void open(Object message) {
-		image.setImageBitmap(toBitmap((byte[]) message));
-		Intent it = new Intent(SendPicsActivity.this, ReceivePicsActivity.class);
+		Intent it = new Intent(this, ReceivePicsActivity.class);
+		it.putExtra("image", toBitmap((byte[])message));
 		startActivity(it);
 	}
 }
