@@ -3,11 +3,11 @@ package sneer.android.voicemessage;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class VoiceMessageOpenActivity extends Activity {
+public class OpenVoiceMessageActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_voice_message_open);
+		setContentView(R.layout.activity_open_voice_message);
 	}
 }

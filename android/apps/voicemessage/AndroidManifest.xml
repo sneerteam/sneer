@@ -30,7 +30,7 @@
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
         <activity
-            android:name=".VoiceMessageOpenActivity"
+            android:name=".OpenVoiceMessageActivity"
             android:label="@string/title_activity_voice_message_open" >
         </activity>
     </application>
