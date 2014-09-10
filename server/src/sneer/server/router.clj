@@ -3,7 +3,7 @@
    [clojure.core.async :as async :refer [>! <! >!! <!! alts!! timeout]]
    [sneer.server.core :as core :refer [go-while-let]]))
 
-(defn create-router [packets-in packets-out]
+(defn start [packets-in packets-out]
   "Store-and-Forward Server Protocol
 
 The purpose of the temporary central server is to store

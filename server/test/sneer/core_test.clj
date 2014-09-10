@@ -13,28 +13,30 @@
 (defn create-puk [seed]
   seed)
 
-(defn route-packet [server-map packet])
+(defn create-router []
+  (let [packets-in (async/chan 1)
+        packets-out (async/chan)]
+    (router/start packets-in packets-out)
+    {:packets-in packets-in :packets-out packets-out}))
 
-(defn route! [server packet])
+(defn send! [router packet]
+  (>!! (:packets-in router) packet))
 
-(defn next-packet-for [puk server])
+(defn take?! [router]
+  (<?!! (:packets-out router)))
 
 (facts
  "Facts about client/server conversations"
 
- (fact "for each ping its pong"
+ (fact "to each ping its pong"
        (let [client (create-puk "c")
-             packets-in (async/chan 1)
-             packets-out (async/chan)
-             router (router/create-router packets-in packets-out)]
-         (>!! packets-in {:intent :ping :from client})
-         (<?!! packets-out) => {:intent :pong :to client}))
+             router (create-router)]
+         (send! router {:intent :ping :from client})
+         (take?! router) => {:intent :pong :to client}))
 
  (fact "sendTo(Puk receiver, byte[] payload) => receiveFrom(Puk sender, byte[] payload)"
        (let [client-a (create-puk "ca")
              client-b (create-puk "cb")
-             packets-in (async/chan 1)
-             packets-out (async/chan)
-             router (router/create-router packets-in packets-out)]
-         (>!! packets-in {:intent :send :to client-b :from client-a :payload "42"})
-         (<?!! packets-out) => {:intent :receive :from client-a :to client-b :payload "42"})))
+             router (create-router)]
+         (send! router {:intent :send :to client-b :from client-a :payload "42"})
+         (take?! router) => {:intent :receive :from client-a :to client-b :payload "42"})))

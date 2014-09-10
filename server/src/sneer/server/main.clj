@@ -36,17 +36,20 @@
   (let [puk->address (atom {})
         packets-in (async/chan)
         packets-out (async/chan)
-        udp-server (udp/serve-udp
-                    packets-in
-                    (async/filter< has-address?
-                     (async/map #(with-address puk->address %) [packets-out]))
-                    port)
-        router (router/create-router
-                (async/map #(update-puk-address puk->address %) [(async/filter< is-routable? packets-in)])
-                packets-out)]
-    
+        routable-packets-in (async/filter<
+                             is-routable?
+                             packets-in)
+        routable-packets-out (async/filter<
+                              has-address?
+                              (async/map #(with-address puk->address %) [packets-out]))
+        udp-server (udp/serve-udp packets-in routable-packets-out port)]
+
+    (router/start
+     (async/map #(update-puk-address puk->address %) [routable-packets-in])
+     packets-out)
+
     (trace-changes "[PUK->ADDRESS]" puk->address)
-    
+
     {:udp-server udp-server :packets-in packets-in :packets-out packets-out}))
 
 (defn stop [server]
