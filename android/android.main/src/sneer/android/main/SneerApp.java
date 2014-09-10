@@ -3,8 +3,8 @@ package sneer.android.main;
 import static sneer.SneerAndroid.OWN_PRIK;
 import static sneer.SneerAndroid.RESULT_RECEIVER;
 import static sneer.SneerAndroid.SESSION_ID;
-import static sneer.android.main.SneerAppInfo.InteractionType.MESSAGE;
-import static sneer.android.main.SneerAppInfo.InteractionType.SESSION;
+import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE;
+import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION;
 import static sneer.commons.exceptions.Exceptions.check;
 
 import java.io.ByteArrayOutputStream;
@@ -45,9 +45,9 @@ import android.widget.Toast;
 
 public class SneerApp extends Application {
 	
-	Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>> fromSneerAppInfoList = new Func1<List<SneerAppInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerAppInfo> apps) {
+	Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerAppInfoList = new Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerPluginInfo> apps) {
 		return Observable.from(apps)
-			.map(new Func1<SneerAppInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final SneerAppInfo app) {
+			.map(new Func1<SneerPluginInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final SneerPluginInfo app) {
 				return new ConversationMenuItemImpl(app);
 			} })
 			.toList();
@@ -55,9 +55,9 @@ public class SneerApp extends Application {
 
 	private final class ConversationMenuItemImpl implements ConversationMenuItem {
 		
-		private final SneerAppInfo app;
+		private final SneerPluginInfo app;
 
-		private ConversationMenuItemImpl(SneerAppInfo app) {
+		private ConversationMenuItemImpl(SneerPluginInfo app) {
 			this.app = app;
 		}
 
@@ -98,7 +98,7 @@ public class SneerApp extends Application {
 
 		context = getApplicationContext();
 
-		SneerAppInfo.initialDiscovery(context);
+		SneerPluginInfo.initialDiscovery(context);
 		
 		try {
 			initialize();
@@ -106,7 +106,7 @@ public class SneerApp extends Application {
 			error = e.getMessage();
 		}
 		
-		SneerAppInfo.apps()
+		SneerPluginInfo.plugins()
 			.flatMap(fromSneerAppInfoList)
 			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
 				sneer().setConversationMenuItems(menuItems);
@@ -119,13 +119,13 @@ public class SneerApp extends Application {
 	
 	private AtomicLong nextSessionId = new AtomicLong(0);
 	
-	private void startPlugin(SneerAppInfo app, PublicKey peer) {
+	private void startPlugin(SneerPluginInfo app, PublicKey peer) {
 		if (app.interactionType == SESSION) startSession(app, peer);
 		if (app.interactionType == MESSAGE) startMessage(app, peer);
 	}
 
 
-	private void startMessage(final SneerAppInfo app, final PublicKey peer) {
+	private void startMessage(final SneerPluginInfo app, final PublicKey peer) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
@@ -161,7 +161,7 @@ public class SneerApp extends Application {
 		} });
 	}
 
-	private void startSession(SneerAppInfo app, PublicKey peer) {
+	private void startSession(SneerPluginInfo app, PublicKey peer) {
 		long sessionId = nextSessionId.getAndIncrement();
 		
 		sneer().tupleSpace().publisher()

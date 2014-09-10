@@ -14,7 +14,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.*;
 import android.util.*;
 
-public class SneerAppInfo implements Serializable {
+public class SneerPluginInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
@@ -27,14 +27,14 @@ public class SneerAppInfo implements Serializable {
 	String packageName;
 	String activityName;
 
-	SneerAppInfo.InteractionType interactionType;
+	SneerPluginInfo.InteractionType interactionType;
 	String tupleType;
 	String menuCaption;
 	int menuIcon;
 
-	protected static ObservedSubject<List<SneerAppInfo>> apps = ObservedSubject.create((List<SneerAppInfo>)new ArrayList<SneerAppInfo>());
+	protected static ObservedSubject<List<SneerPluginInfo>> plugins = ObservedSubject.create((List<SneerPluginInfo>)new ArrayList<SneerPluginInfo>());
 
-	public SneerAppInfo(String packageName, String activityName, SneerAppInfo.InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
+	public SneerPluginInfo(String packageName, String activityName, SneerPluginInfo.InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.interactionType = interactionType;
@@ -48,11 +48,11 @@ public class SneerAppInfo implements Serializable {
 		return "SneerAppInfo [" + menuCaption + ", " + tupleType + "]";
 	}
 	
-	public static Func1<ActivityInfo, Observable<SneerAppInfo>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<SneerAppInfo>>() {  @Override public Observable<SneerAppInfo> call(ActivityInfo activityInfo) {
+	public static Func1<ActivityInfo, Observable<SneerPluginInfo>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<SneerPluginInfo>>() {  @Override public Observable<SneerPluginInfo> call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
 		try {
 			return Observable.just(
-				new SneerAppInfo(
+				new SneerPluginInfo(
 					activityInfo.packageName,
 					activityInfo.name,
 					InteractionType.valueOf(getString(meta, "sneer:interaction-type")),
@@ -100,7 +100,7 @@ public class SneerAppInfo implements Serializable {
 		filterSneerApps(Observable.from(packages))
 			.flatMap(FROM_ACTIVITY)
 			.toList()
-			.subscribe(appsListPublisher());
+			.subscribe(pluginsListPublisher());
 		
 		log("Done.");
 	}
@@ -114,7 +114,7 @@ public class SneerAppInfo implements Serializable {
 				.flatMap(FROM_ACTIVITY)
 				.concatWith(currentKnownApps())
 				.toList()
-				.subscribe(appsListPublisher());
+				.subscribe(pluginsListPublisher());
 
 		} catch (NameNotFoundException e) {
 			throw new RuntimeException(e);
@@ -123,7 +123,7 @@ public class SneerAppInfo implements Serializable {
 	}
 
 	private static void log(String message) {
-		Log.i(SneerAppInfo.class.getSimpleName(), message);
+		Log.i(SneerPluginInfo.class.getSimpleName(), message);
 	}
 
 	public static void packageRemoved(Context context, final String packageName) {
@@ -131,26 +131,26 @@ public class SneerAppInfo implements Serializable {
 		log("Package removed: " + packageName);
 		
 		currentKnownApps()
-			.filter(new Func1<SneerAppInfo, Boolean>() {  @Override public Boolean call(SneerAppInfo t1) {
+			.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
 				return !t1.packageName.equals(packageName);
 			} })
 			.toList()
-			.subscribe(appsListPublisher());
+			.subscribe(pluginsListPublisher());
 	}
 
 
-	private static Action1<List<SneerAppInfo>> appsListPublisher() {
-		return new Action1<List<SneerAppInfo>>() {  @Override public void call(List<SneerAppInfo> t1) {
+	private static Action1<List<SneerPluginInfo>> pluginsListPublisher() {
+		return new Action1<List<SneerPluginInfo>>() {  @Override public void call(List<SneerPluginInfo> t1) {
 			log("Pushing new app list: " + t1);
-			apps.subject().onNext(t1);
+			plugins.subject().onNext(t1);
 		}};
 	}
 
-	private static Observable<SneerAppInfo> currentKnownApps() {
-		return Observable.from(apps.observed().current());
+	private static Observable<SneerPluginInfo> currentKnownApps() {
+		return Observable.from(plugins.observed().current());
 	}
 
-	public static Observable<List<SneerAppInfo>> apps() {
-		return apps.observed().observable();
+	public static Observable<List<SneerPluginInfo>> plugins() {
+		return plugins.observed().observable();
 	}
 }

@@ -11,9 +11,9 @@ public class AppInstallationMonitor extends BroadcastReceiver {
 		
 		String packageName = intent.getDataString().substring(intent.getDataString().indexOf(':')+1);
 		if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
-			SneerAppInfo.packageAdded(context, packageName);
+			SneerPluginInfo.packageAdded(context, packageName);
 		} else {
-			SneerAppInfo.packageRemoved(context, packageName);
+			SneerPluginInfo.packageRemoved(context, packageName);
 		}
 		
 	}
