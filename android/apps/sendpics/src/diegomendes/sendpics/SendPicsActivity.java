@@ -56,5 +56,7 @@ public class SendPicsActivity extends MessageActivity {
 	@Override
 	protected void open(Object message) {
 		image.setImageBitmap(toBitmap((byte[]) message));
+		Intent it = new Intent(SendPicsActivity.this, ReceivePicsActivity.class);
+		startActivity(it);
 	}
 }
