@@ -92,11 +92,6 @@ public class MainActivity extends SneerActivity {
 	}
 	
 	
-	private void navigateTo(Class<?> class1) {
-		startActivity(new Intent().setClass(this, class1));
-	}
-	
-
 	protected void onClicked(Conversation conversation) {
 		Intent intent = new Intent();
 		intent.setClass(this, ConversationActivity.class);

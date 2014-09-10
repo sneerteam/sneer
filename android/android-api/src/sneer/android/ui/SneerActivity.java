@@ -174,5 +174,10 @@ public class SneerActivity extends Activity {
 			reduced = ThumbnailUtils.extractThumbnail(original, side, side);
 		}
 	}
+	
+	
+	public void navigateTo(Class<?> class1) {
+		startActivity(new Intent().setClass(this, class1));
+	}
 }
 
