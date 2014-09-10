@@ -26,23 +26,26 @@ public class VoiceMessageActivity extends MessageActivity {
 
 	@Override
 	protected void composeMessage() {
-		setContentView(R.layout.activity_voice_message);
+//		setContentView(R.layout.activity_voice_message);
+//		
+//		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+//			send();
+//		}});
+//		
+//		button(R.id.btnCancel).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+//			finish();
+//		}});
+//		
+//		startRecording();
 		
-		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			send();
-		}});
-		
-		button(R.id.btnCancel).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			finish();
-		}});
-		
-		startRecording();
+		// Temporary solution
+		navigateTo(OpenVoiceMessageActivity.class);
 	}
 
 
 	@Override
 	protected void open(Object message) {
-	
+		// Deprecated - Use OpenVoiceMessageActivity.	
 	}
 
 
@@ -63,7 +66,7 @@ public class VoiceMessageActivity extends MessageActivity {
 	@Override
 	protected void onDestroy() {
 		stopRecording();
-		new File(audioFileName).delete();
+//		new File(audioFileName).delete();
 		super.onDestroy();
 	}
 

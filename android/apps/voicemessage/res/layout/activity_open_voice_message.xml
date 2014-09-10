@@ -2,11 +2,49 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/holo_blue_dark"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <TextView
+    <ImageView
+        android:id="@+id/img_mic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hi" />
+        android:layout_centerVertical="true"
+        android:contentDescription="TODO"
+        android:src="@drawable/mic_small" >
+    </ImageView>
+
+    <ImageButton
+        android:id="@+id/btn_play_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/img_mic"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="TODO"
+        android:src="@android:drawable/ic_media_play" >
+    </ImageButton>
+
+    <TextView
+        android:id="@+id/recording_current_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_margin="10dp"
+        android:layout_toRightOf="@+id/btn_play_pause"
+        android:text="00:00"
+        android:textAppearance="@android:style/TextAppearance.Small"
+        android:textColor="@android:color/primary_text_dark" />
+
+    <SeekBar
+        android:id="@+id/progress_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dip"
+        android:layout_toRightOf="@+id/recording_current_time"
+        android:max="100"
+        android:progress="0"
+        android:secondaryProgress="0" />
 
 </RelativeLayout>
