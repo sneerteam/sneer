@@ -1,0 +1,122 @@
+apply plugin: 'android-library'
+apply from: '../../sonatype.gradle'
+
+def originalVersion = '0.1.2'
+
+version = originalVersion
+description = 'API for Sneer, the sovereign platform.'
+ext.packaging = 'jar'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.10.0+'
+    }
+}
+
+configurations {
+  libs
+  compile.extendsFrom libs
+}
+
+dependencies {
+//    libs 'com.netflix.rxjava:rxjava-android:' + external.rx.version
+//    compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
+//    compile 'me.sneer:java-api:+'
+}
+
+android {
+
+	lintOptions {
+		abortOnError false
+	}
+
+    compileSdkVersion external.android.sdkVersion
+    buildToolsVersion external.android.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion external.android.minSdkVersion
+        targetSdkVersion external.android.sdkVersion
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            aidl.srcDir 'src'
+            java.srcDir 'src'
+            res.srcDir 'res'
+        }
+    }
+}
+
+task copyLibs(type: Copy) {
+  into "libs"
+  from configurations.libs
+}
+
+
+android.libraryVariants.all { variant ->
+	if (!variant.name.equals("release")) return
+
+	task jarNodeps(type: Jar) {
+		dependsOn build
+
+        from variant.javaCompile.destinationDir
+        from variant.javaCompile.source
+        from variant.processResources.resDir
+
+	    appendix = "nodeps"
+	    baseName = "sneer-android-api"
+	    version = originalVersion
+
+	    if (project.hasProperty("addTimestamp")) {
+		    def x = new XmlSlurper().parse("${SONATYPE_SNAPSHOT_URL}/me/sneer/${project.name}/${originalVersion}-SNAPSHOT/maven-metadata.xml".toURL().openStream())
+	        classifier = "${x.versioning.snapshot.timestamp}-${x.versioning.snapshot.buildNumber}"
+	    }
+
+	    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	}
+
+    task javadocRelease(type: Javadoc) {
+        description = "Generates javadoc for release"
+        destinationDir = new File(destinationDir, variant.baseName)
+		source = variant.javaCompile.source
+		ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+		classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+		options.links("http://docs.oracle.com/javase/7/docs/api/");
+		// options.links("http://d.android.com/reference/");
+		exclude '**/BuildConfig.java'
+		exclude '**/R.java'
+    }
+
+
+	task ourJar(type: Jar) {
+        from variant.javaCompile.destinationDir
+        from variant.processResources.resDir
+    }
+
+	task javadocJar(type: Jar, dependsOn: javadocRelease) {
+		from javadocRelease.destinationDir
+	    classifier = 'javadoc'
+	}
+
+	task sourcesJar(type: Jar) {
+        from variant.javaCompile.source
+	    classifier = 'sources'
+	}
+
+	artifacts {
+	    archives ourJar
+
+		archives javadocJar
+		archives sourcesJar
+	}
+
+}
+
+
+
+defaultTasks 'copyLibs'
