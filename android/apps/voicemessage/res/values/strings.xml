@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Voice Message</string>
-    <string name="title_activity_voice_message_open">VoiceMessageOpenActivity</string>
+    <string name="title_activity_voice_message">Recording Message</string>
+    <string name="title_activity_open_voice_message">Playing Message</string>
 
 </resources>
