@@ -43,15 +43,16 @@ public class SendPicsActivity extends MessageActivity {
 
 	@Override
 	protected void composeMessage() {
-		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-		galleryIntent.setType("image/*");
+//		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+//		galleryIntent.setType("image/*");
+//		
+//		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
+//		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
+//
+//		startActivityForResult(chooser, TAKE_PICTURE);
 		
-		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
-		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
-
-		startActivityForResult(chooser, TAKE_PICTURE);
-		
+		navigateTo(ReceivePicsActivity.class);
 		
 	}
 
