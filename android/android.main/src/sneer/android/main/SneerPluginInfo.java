@@ -21,7 +21,22 @@ public class SneerPluginInfo implements Serializable {
 
 	enum InteractionType {
 		SESSION,
-		MESSAGE
+		MESSAGE,
+		MESSAGE_VIEW(false, true),
+		MESSAGE_COMPOSE(true, false);
+		
+		public final boolean canCompose;
+		public final boolean canView;
+
+		InteractionType() {
+			this(true, true);
+		}
+		
+		InteractionType(boolean canCompose, boolean canView) {
+			this.canCompose = canCompose;
+			this.canView = canView;
+			
+		}
 	}
 	
 	String packageName;
@@ -55,9 +70,9 @@ public class SneerPluginInfo implements Serializable {
 				new SneerPluginInfo(
 					activityInfo.packageName,
 					activityInfo.name,
-					InteractionType.valueOf(getString(meta, "sneer:interaction-type")),
+					InteractionType.valueOf(getString(meta, "sneer:interaction-type").replace('/', '_')),
 					getString(meta, "sneer:tuple-type"),
-					getString(meta, "sneer:menu-caption"),
+					getString(meta, "sneer:menu-caption", null),
 					getInt(meta, "sneer:menu-icon")));
 		} catch (FriendlyException e) {
 			SystemReport.updateReport(activityInfo.packageName, "Failed to read package information: " + e.getMessage());
@@ -67,7 +82,11 @@ public class SneerPluginInfo implements Serializable {
 
 	private String getString(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
-		return bundle.getString(key);
+		return getString(bundle, key, null);
+	}
+	
+	private String getString(Bundle bundle, String key, String def) throws FriendlyException {
+		return bundle.getString(key, def);
 	}
 	
 	private int getInt(Bundle bundle, String key) throws FriendlyException {
@@ -152,5 +171,9 @@ public class SneerPluginInfo implements Serializable {
 
 	public static Observable<List<SneerPluginInfo>> plugins() {
 		return plugins.observed().observable();
+	}
+
+	public boolean canCompose() {
+		return interactionType.canCompose;
 	}
 }

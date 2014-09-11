@@ -3,7 +3,7 @@ package sneer.android.main;
 import static sneer.SneerAndroid.OWN_PRIK;
 import static sneer.SneerAndroid.RESULT_RECEIVER;
 import static sneer.SneerAndroid.SESSION_ID;
-import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE;
+import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
 import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION;
 import static sneer.commons.exceptions.Exceptions.check;
 
@@ -47,6 +47,9 @@ public class SneerApp extends Application {
 	
 	Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerAppInfoList = new Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerPluginInfo> apps) {
 		return Observable.from(apps)
+			.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
+				return t1.canCompose();
+			} })
 			.map(new Func1<SneerPluginInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final SneerPluginInfo app) {
 				return new ConversationMenuItemImpl(app);
 			} })
@@ -121,7 +124,7 @@ public class SneerApp extends Application {
 	
 	private void startPlugin(SneerPluginInfo app, PublicKey peer) {
 		if (app.interactionType == SESSION) startSession(app, peer);
-		if (app.interactionType == MESSAGE) startMessage(app, peer);
+		if (app.interactionType == MESSAGE_COMPOSE) startMessage(app, peer);
 	}
 
 

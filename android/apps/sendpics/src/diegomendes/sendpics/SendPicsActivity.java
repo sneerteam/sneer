@@ -5,7 +5,6 @@ import sneer.commons.exceptions.*;
 import android.content.*;
 import android.graphics.*;
 import android.os.*;
-import android.provider.*;
 import android.widget.*;
 
 public class SendPicsActivity extends MessageActivity {
@@ -20,6 +19,12 @@ public class SendPicsActivity extends MessageActivity {
         setContentView(R.layout.activity_send_pics);
         
         image = (ImageView) findViewById(R.id.picture);
+        
+        if (message() != null) {
+        	open(message());
+        } else {
+        	composeMessage();
+        }
     }
     
     @Override
@@ -41,8 +46,7 @@ public class SendPicsActivity extends MessageActivity {
     }
     
 
-	@Override
-	protected void composeMessage() {
+    private void composeMessage() {
 //		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 //		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
 //		galleryIntent.setType("image/*");
@@ -56,8 +60,7 @@ public class SendPicsActivity extends MessageActivity {
 		
 	}
 
-	@Override
-	protected void open(Object message) {
+    private void open(Object message) {
 		Intent it = new Intent(this, ReceivePicsActivity.class);
 		it.putExtra("image", toBitmap((byte[])message));
 		startActivity(it);

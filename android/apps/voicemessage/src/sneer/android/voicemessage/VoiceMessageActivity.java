@@ -6,8 +6,6 @@ import sneer.android.ui.*;
 import sneer.commons.exceptions.*;
 import android.media.*;
 import android.os.*;
-import android.view.*;
-import android.view.View.OnClickListener;
 import android.widget.*;
 
 public class VoiceMessageActivity extends MessageActivity {
@@ -21,11 +19,16 @@ public class VoiceMessageActivity extends MessageActivity {
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
+		
+		if (message() != null) {
+			open(message());
+		} else {
+			composeMessage();
+		}
 	}
 
 
-	@Override
-	protected void composeMessage() {
+	private void composeMessage() {
 //		setContentView(R.layout.activity_voice_message);
 //		
 //		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
@@ -43,8 +46,7 @@ public class VoiceMessageActivity extends MessageActivity {
 	}
 
 
-	@Override
-	protected void open(Object message) {
+	private void open(Object message) {
 		// Deprecated - Use OpenVoiceMessageActivity.	
 	}
 

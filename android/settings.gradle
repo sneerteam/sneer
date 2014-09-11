@@ -1,2 +1,2 @@
 include 'android-api', 'android.main', 'android.main.tests'
-include 'apps:sendpics', 'apps:voicemessage'
+include 'apps:sendpics', 'apps:voicemessage', 'apps:sendlocation'

@@ -16,6 +16,7 @@ import rx.schedulers.*;
 import sneer.commons.exceptions.*;
 import android.app.*;
 import android.content.*;
+import android.content.DialogInterface.*;
 import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
@@ -179,5 +180,16 @@ public class SneerActivity extends Activity {
 	public void navigateTo(Class<?> class1) {
 		startActivity(new Intent().setClass(this, class1));
 	}
+
+	protected void alert(String title, CharSequence[] items, DialogInterface.OnClickListener onClickListener) {
+		new AlertDialog.Builder(this)
+			.setTitle(title)
+			.setItems(items, onClickListener)
+			.show()
+			.setOnCancelListener(new OnCancelListener() {  @Override public void onCancel(DialogInterface dialog) {
+				finish();
+			} });;
+	}
+
 }
 
