@@ -21,95 +21,50 @@ public class OpenVoiceMessageActivity extends Activity {
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
 
 	private final String audioFileName = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp").getAbsolutePath();
-	private MediaPlayer mPlayer;
+	private volatile MediaPlayer player;
 
 	private TextView recordingTime;
+	private ImageButton btnPause;
+	private ImageButton btnPlay;
+
 	private SeekBar seekbar;
-	private Handler myHandler = new Handler();
+	private Handler handler = new Handler();
 
 	private int duration;
-	private int position;
-	private long countDown;	
+	
+	TimeUnit milliseconds = TimeUnit.MILLISECONDS;
+	TimeUnit minutes = TimeUnit.MINUTES;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_open_voice_message);
 
-		final ImageButton btnPlay = (ImageButton)findViewById(R.id.btn_play);
-		final ImageButton btnPause = (ImageButton)findViewById(R.id.btn_pause);
-
-		btnPlay.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			btnPlay.setVisibility(View.INVISIBLE);
-			btnPause.setVisibility(View.VISIBLE);
-			OpenVoiceMessageActivity.this.setTitle("Playing Message");
-			startPlaying(true);
-			Toast.makeText(OpenVoiceMessageActivity.this, "clicked play", Toast.LENGTH_SHORT).show();
-		}});
-		
-		btnPause.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			btnPause.setVisibility(View.INVISIBLE);
-			btnPlay.setVisibility(View.VISIBLE);
-			OpenVoiceMessageActivity.this.setTitle("Paused");
-			mPlayer.pause();
-			Toast.makeText(OpenVoiceMessageActivity.this, "clicked pause", Toast.LENGTH_SHORT).show();
-		}});
-		
+		btnPlay = (ImageButton)findViewById(R.id.btn_play);
+		btnPause = (ImageButton)findViewById(R.id.btn_pause);
 		seekbar = (SeekBar)findViewById(R.id.recording_progress_bar);
 		recordingTime = (TextView)findViewById(R.id.recording_time);
 		
-
-		startPlaying(false);
-	}
-
-
-	private void startPlaying(boolean resume) {
-		try {
-			if (!resume) {
-				mPlayer = new MediaPlayer();
-				mPlayer.setOnCompletionListener(new OnCompletionListener() { @Override public void onCompletion(MediaPlayer mp) {
-					Toast.makeText(OpenVoiceMessageActivity.this, "finish him", Toast.LENGTH_SHORT).show();
-				}});
-				mPlayer.setDataSource(audioFileName);
-				mPlayer.prepare();
-				duration = mPlayer.getDuration();
-				seekbar.setMax(duration);
-			
-				recordingTime.setText(String.format("%02d:%02d", 
-				         TimeUnit.MILLISECONDS.toMinutes((long) duration),
-				         TimeUnit.MILLISECONDS.toSeconds((long) duration)));
-			
-				myHandler.postDelayed(UpdateSongTime, 100);
-			}
-		} catch (IOException e) {
-			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-		}
-		mPlayer.start();
+		btnPlay.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			invisible(btnPlay);
+			visible(btnPause);
+			activityTitle("Playing Message");
+			start();
+		}});
+		
+		btnPause.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			invisible(btnPause);
+			visible(btnPlay);
+			activityTitle("Paused");
+			pause();
+		}});		
 	}
 
 	
-	private Runnable UpdateSongTime = new Runnable() { public void run() {
-		position = mPlayer.getCurrentPosition();
-
-		seekbar.setProgress((int) position);
-			
-		TimeUnit milliSeconds = TimeUnit.MILLISECONDS;
-		TimeUnit minutes = TimeUnit.MINUTES;
-			
-		long currentDuration = mPlayer.getCurrentPosition();
-		countDown = currentDuration - duration;
-			
-		recordingTime.setText(String.format("%02d:%02d", 
-				milliSeconds.toMinutes((long) countDown),
-				minutes.toSeconds(milliSeconds.toMinutes((long) countDown)) - milliSeconds.toSeconds((long) countDown)));
-
-		myHandler.postDelayed(this, 100);
-	}};
-
-	
-	private void stopPlaying() {		
-		mPlayer.release();
-		mPlayer = null;
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		play();
 	}
 
 	
@@ -119,18 +74,112 @@ public class OpenVoiceMessageActivity extends Activity {
 		finish();
 	}
 
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
 		finish();
 	}
 
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		stopPlaying();
+		stop();
+	}
+	
+	
+	private void activityTitle(String title) {
+		OpenVoiceMessageActivity.this.setTitle(title);
+	}
+
+
+	private void visible(View v) {
+		v.setVisibility(View.VISIBLE);
+	}
+	
+	
+	private void invisible(View v) {
+		v.setVisibility(View.INVISIBLE);
+	}
+
+
+	private void initPlayer() throws IOException {
+		player = new MediaPlayer();
+		player.setOnCompletionListener(new OnCompletionListener() { @Override public void onCompletion(MediaPlayer mp) {
+			finish();
+		}});
+		player.setDataSource(audioFileName);
+		player.prepare();
+	}
+
+		
+	private void play() {
+		try {
+			initPlayer();
+			duration = player.getDuration();
+			seekbar.setMax(duration);
+		
+			updateRecordingTime(duration, 0);
+			
+			postDelayed(update, 100);
+		} catch (IOException e) {
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+		start();
+	}
+
+
+	private void stop() {
+		player.reset();
+		player.release();
+		player = null;
+	}
+	
+	private void pause() {
+		player.pause();
+	}
+
+	
+	private void start() {
+		player.start();
+	}
+	
+	
+	private Runnable update = new Runnable() { public void run() {
+		if (player == null) return;
+		final long position = player.getCurrentPosition();
+		final long countDown = position - duration;
+		
+		seekbar.setProgress((int) position);
+			
+		updateRecordingTime(countDown, countDown);
+	
+		postDelayed(this, 100);
+	}};
+
+	private void updateRecordingTime(long v1, long v2) {
+		recordingTime.setText(String.format("%02d:%02d", toMinutes(v1), minutesToSeconds(toMinutes(v1)) - toSeconds(v2)));
+	}
+
+
+	private void postDelayed(Runnable r, int delay) {
+		handler.postDelayed(r, delay);
+	}
+
+
+	private long toSeconds(long v1) {
+		return milliseconds.toSeconds(v1);
+	}
+
+
+	private long minutesToSeconds(long v1) {
+		return minutes.toSeconds(v1);
+	}
+
+
+	private long toMinutes(long v1) {
+		return milliseconds.toMinutes(v1);
 	}
 	
 }
