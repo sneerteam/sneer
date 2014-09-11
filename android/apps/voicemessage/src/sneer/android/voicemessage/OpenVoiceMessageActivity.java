@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import sneer.android.ui.SneerActivity;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -21,7 +22,7 @@ public class OpenVoiceMessageActivity extends Activity {
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
 
 	private final String audioFileName = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp").getAbsolutePath();
-	private MediaPlayer mPlayer;
+	private volatile MediaPlayer player;
 
 	private TextView recordingTime;
 	private SeekBar seekbar;
@@ -36,28 +37,25 @@ public class OpenVoiceMessageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_open_voice_message);
 
-		final ImageButton btnPlay = (ImageButton)findViewById(R.id.btn_play);
-		final ImageButton btnPause = (ImageButton)findViewById(R.id.btn_pause);
+		btnPlay = (ImageButton)findViewById(R.id.btn_play);
+		btnPause = (ImageButton)findViewById(R.id.btn_pause);
 
 		btnPlay.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			btnPlay.setVisibility(View.INVISIBLE);
 			btnPause.setVisibility(View.VISIBLE);
 			OpenVoiceMessageActivity.this.setTitle("Playing Message");
 			startPlaying(true);
-			Toast.makeText(OpenVoiceMessageActivity.this, "clicked play", Toast.LENGTH_SHORT).show();
 		}});
 		
 		btnPause.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			btnPause.setVisibility(View.INVISIBLE);
 			btnPlay.setVisibility(View.VISIBLE);
 			OpenVoiceMessageActivity.this.setTitle("Paused");
-			mPlayer.pause();
-			Toast.makeText(OpenVoiceMessageActivity.this, "clicked pause", Toast.LENGTH_SHORT).show();
+			player.pause();
 		}});
 		
 		seekbar = (SeekBar)findViewById(R.id.recording_progress_bar);
 		recordingTime = (TextView)findViewById(R.id.recording_time);
-		
 
 		startPlaying(false);
 	}
@@ -66,13 +64,13 @@ public class OpenVoiceMessageActivity extends Activity {
 	private void startPlaying(boolean resume) {
 		try {
 			if (!resume) {
-				mPlayer = new MediaPlayer();
-				mPlayer.setOnCompletionListener(new OnCompletionListener() { @Override public void onCompletion(MediaPlayer mp) {
-					Toast.makeText(OpenVoiceMessageActivity.this, "finish him", Toast.LENGTH_SHORT).show();
+				player = new MediaPlayer();
+				player.setOnCompletionListener(new OnCompletionListener() { @Override public void onCompletion(MediaPlayer mp) {
+					finish();
 				}});
-				mPlayer.setDataSource(audioFileName);
-				mPlayer.prepare();
-				duration = mPlayer.getDuration();
+				player.setDataSource(audioFileName);
+				player.prepare();
+				duration = player.getDuration();
 				seekbar.setMax(duration);
 			
 				recordingTime.setText(String.format("%02d:%02d", 
@@ -84,32 +82,38 @@ public class OpenVoiceMessageActivity extends Activity {
 		} catch (IOException e) {
 			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
 		}
-		mPlayer.start();
+		player.start();
 	}
 
 	
 	private Runnable UpdateSongTime = new Runnable() { public void run() {
-		position = mPlayer.getCurrentPosition();
+		if (player == null) return;
+		position = player.getCurrentPosition();
 
 		seekbar.setProgress((int) position);
 			
-		TimeUnit milliSeconds = TimeUnit.MILLISECONDS;
-		TimeUnit minutes = TimeUnit.MINUTES;
+		TimeUnit msec = TimeUnit.MILLISECONDS;
+		TimeUnit min = TimeUnit.MINUTES;
 			
-		long currentDuration = mPlayer.getCurrentPosition();
+		long currentDuration = player.getCurrentPosition();
 		countDown = currentDuration - duration;
 			
 		recordingTime.setText(String.format("%02d:%02d", 
-				milliSeconds.toMinutes((long) countDown),
-				minutes.toSeconds(milliSeconds.toMinutes((long) countDown)) - milliSeconds.toSeconds((long) countDown)));
+				msec.toMinutes((long) countDown),
+				min.toSeconds(msec.toMinutes((long) countDown)) - msec.toSeconds((long) countDown)));
 
 		myHandler.postDelayed(this, 100);
 	}};
 
+	private ImageButton btnPause;
+
+	private ImageButton btnPlay;
+
 	
-	private void stopPlaying() {		
-		mPlayer.release();
-		mPlayer = null;
+	private void stopPlaying() {
+		player.reset();
+		player.release();
+		player = null;
 	}
 
 	
