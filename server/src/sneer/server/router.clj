@@ -76,12 +76,12 @@ a reply to sendTo(...) and when the receiver
 "
  (let [queues (atom {})]
    (letfn
-     [(ensure-queue [queues-map from]
-        (if-let [queue (queues-map from)]
-          queues-map
-          (assoc queues-map from (create-queue (async/chan (async/dropping-buffer 1)) packets-out))))
+     [(ensure-queue [queue]
+        (if queue
+          queue
+          (create-queue (async/chan (async/dropping-buffer 1)) packets-out)))
       (produce-queue [from]
-        (get (swap! queues ensure-queue from) from))]
+        (get (swap! queues update-in [from] ensure-queue) from))]
 
      (go-while-let
        [packet (<! packets-in)]
