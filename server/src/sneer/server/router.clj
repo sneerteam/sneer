@@ -22,6 +22,10 @@
     (go-while-let
       [packet (<! packets-in)]
       (match packet
+        {:intent :ack :sequence sequence}
+          (when (= sequence (-> @state :highest-sequence-delivered inc))
+            (swap! state assoc :highest-sequence-delivered sequence)
+            (>! packets-out (status-to (:to packet))))
         {:sequence sequence :reset true}
           (do
             (reset-to! sequence)

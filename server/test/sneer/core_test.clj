@@ -83,9 +83,8 @@ sequence number."
                              :full? false}
          (take?! router) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
          (send! router {:intent :ack :from client-b :to client-a :sequence 0})
-;         (take?! router) => {:intent :status-of-queues
-;                             :to client-a
-;                             :highest-sequence-delivered 0
-;                             :highest-sequence-to-send 0
-;                             :full? false}
-         )))
+         (take?! router) => {:intent :status-of-queues
+                             :to client-a
+                             :highest-sequence-delivered 0
+                             :highest-sequence-to-send 0
+                             :full? false})))
