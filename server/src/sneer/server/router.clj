@@ -11,19 +11,15 @@
          (merge {:intent :status-of-queues :to to :full? false}
                 @state))
        (reset-to! [sequence]
-          (swap! state merge {:highest-sequence-delivered (dec sequence) :highest-sequence-to-send sequence}))
-       (reply-to-send-with-sequence
-         [{:keys [from to sequence reset]}]
-         (when reset (reset-to! sequence))
-         (status-to from))
-       (reply-to-send
-         [packet]
-         (if (contains? packet :sequence)
-           (reply-to-send-with-sequence packet)
-           (assoc packet :intent :receive)))]
+          (swap! state merge {:highest-sequence-delivered (dec sequence) :highest-sequence-to-send sequence}))]
     (go-while-let
       [packet (<! packets-in)]
-      (>! packets-out (reply-to-send packet)))
+      (match packet
+             {:sequence sequence :from from :to to}
+             (do
+               (when (:reset packet) (reset-to! sequence))
+               (>! packets-out (status-to from))) 
+             :else (>! packets-out (assoc packet :intent :receive)))) ; Old-behavior
     packets-in)))
 
 
