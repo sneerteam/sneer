@@ -1,12 +1,14 @@
 (ns sneer.server.router
   (:require
    [clojure.core.async :as async :refer [>! <! >!! <!! alts!! timeout]]
+   [clojure.core.match :refer [match]]
    [sneer.server.core :as core :refer [go-while-let]]))
 
 (defn- create-queue [packets-in packets-out]
+  #_(let peer->queue)
   (letfn
     [(reply-to-send-with-sequence
-       [{:keys [from sequence reset]}]
+       [{:keys [from to sequence reset]}]
        {:intent :status-of-queues
         :to from
         :highest-sequence-to-send -1
@@ -19,15 +21,12 @@
          (assoc packet :intent :receive)))]
   (go-while-let
     [packet (<! packets-in)]
-    (>! packets-out
-      (case (:intent packet)
-        :send (reply-to-send packet)
-        {:intent :pong :to (:from packet)}))))
-          packets-in)
+    (>! packets-out (reply-to-send packet)))
+  packets-in))
+
 
 (defn start [packets-in packets-out]
  "Store-and-Forward Server Protocol
-
 The purpose of the temporary central server is to store
 payloads (byte[]s) being sent from one peer to another in a
 limited-size (100 elements?) FIFO queue and forward them as soon as
@@ -80,12 +79,12 @@ a reply to sendTo(...) and when the receiver
         (if queue
           queue
           (create-queue (async/chan (async/dropping-buffer 1)) packets-out)))
-      (produce-queue [from]
-        (get (swap! queues update-in [from] ensure-queue) from))]
+      (produce-queue [from to]
+        (get-in (swap! queues update-in [from to] ensure-queue) [from to]))]
 
      (go-while-let
        [packet (<! packets-in)]
        (println "router/<!" packet)
-       (let [from (:from packet)
-             queue (produce-queue from)]
-         (>! queue packet))))))
+       (match [packet]
+              [{:intent :ping :from from}] (>! packets-out {:intent :pong :to from})
+              [{:intent :send :from from :to to}] (>! (produce-queue from to) packet))))))

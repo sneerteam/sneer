@@ -4,6 +4,7 @@
                  [me.sneer/core "0.0.1"]
                  [com.taoensso/timbre "3.2.1"] ;Logging
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
+                 [org.clojure/core.match "0.2.1"]
                  [org.clojure/clojure "1.6.0"]]
   :main ^:skip-aot sneer.server.main
   :target-path "target/%s"
