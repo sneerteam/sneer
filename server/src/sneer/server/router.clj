@@ -3,8 +3,30 @@
    [clojure.core.async :as async :refer [>! <! >!! <!! alts!! timeout]]
    [sneer.server.core :as core :refer [go-while-let]]))
 
+(defn- create-queue [packets-in packets-out]
+  (letfn
+    [(reply-to-send-with-sequence
+       [{:keys [from sequence reset]}]
+       {:intent :status-of-queues
+        :to from
+        :highest-sequence-to-send -1
+        :highest-sequence-delivered -1
+        :full? false})
+     (reply-to-send
+       [packet]
+       (if (contains? packet :sequence)
+         (reply-to-send-with-sequence packet)
+         (assoc packet :intent :receive)))]
+  (go-while-let
+    [packet (<! packets-in)]
+    (>! packets-out
+      (case (:intent packet)
+        :send (reply-to-send packet)
+        {:intent :pong :to (:from packet)}))))
+          packets-in)
+
 (defn start [packets-in packets-out]
-  "Store-and-Forward Server Protocol
+ "Store-and-Forward Server Protocol
 
 The purpose of the temporary central server is to store
 payloads (byte[]s) being sent from one peer to another in a
@@ -52,10 +74,18 @@ server might crash and restart fresh) queued to be sent to
 receiver. This packet is sent as a reply to queryStatusOfQueues(...), as
 a reply to sendTo(...) and when the receiver
 "
-  (go-while-let
-   [packet (<! packets-in)]
-   (println "router/<!" packet)
-   (>! packets-out
-       (case (:intent packet)
-         :send (assoc packet :intent :receive)
-         {:intent :pong :to (:from packet)}))))
+ (let [queues (atom {})]
+   (letfn
+     [(ensure-queue [queues-map from]
+        (if-let [queue (queues-map from)]
+          queues-map
+          (assoc queues-map from (create-queue (async/chan (async/dropping-buffer 1)) packets-out))))
+      (produce-queue [from]
+        (get (swap! queues ensure-queue from) from))]
+
+     (go-while-let
+       [packet (<! packets-in)]
+       (println "router/<!" packet)
+       (let [from (:from packet)
+             queue (produce-queue from)]
+         (>! queue packet))))))
