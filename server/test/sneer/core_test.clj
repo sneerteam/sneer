@@ -52,7 +52,7 @@ payload to the queue of payloads to be sent from the sender to receiver,
 otherwise ignores the payload. Server replies with a statusOfQueues
 packet for receiver (see below), even if sequence was wrong."
  
- (fact "The server expects sequence number 0 when it starts."
+ (fact "The server expects sequence number 0 when it starts and rejects incorrect sequences."
        (let [router (create-router)]
          (send! router {:intent :send :to client-b :from client-a :payload "foo" :sequence 42})
          (take?! router) => {:intent :status-of-queues
@@ -71,4 +71,21 @@ sequence number."
                              :highest-sequence-delivered 41
                              :highest-sequence-to-send 42
                              :full? false}
-         (take?! router) => {:intent :receive :from client-a :to client-b :sequence 42 :payload "foo"})))
+         (take?! router) => {:intent :receive :from client-a :to client-b :sequence 42 :payload "foo"}))
+ 
+  (fact "Acknowledge from receiver causes an updated status-of-queues to be sent to sender."
+       (let [router (create-router)]
+         (send! router {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
+         (take?! router) => {:intent :status-of-queues
+                             :to client-a
+                             :highest-sequence-delivered -1
+                             :highest-sequence-to-send 0
+                             :full? false}
+         (take?! router) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
+         (send! router {:intent :ack :from client-b :to client-a :sequence 0})
+;         (take?! router) => {:intent :status-of-queues
+;                             :to client-a
+;                             :highest-sequence-delivered 0
+;                             :highest-sequence-to-send 0
+;                             :full? false}
+         )))

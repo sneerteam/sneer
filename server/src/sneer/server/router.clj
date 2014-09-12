@@ -11,16 +11,30 @@
          (merge {:intent :status-of-queues :to to :full? false}
                 @state))
        (reset-to! [sequence]
-          (swap! state merge {:highest-sequence-delivered (dec sequence) :highest-sequence-to-send sequence}))]
+         (swap! state merge {:highest-sequence-delivered (dec sequence) :highest-sequence-to-send (dec sequence)}))
+       (enqueue! [packet]
+         (swap! state update-in [:highest-sequence-to-send] inc)
+         (status-to (:from packet)))
+       (valid? [sequence]
+         (= sequence (-> @state :highest-sequence-to-send inc)))
+       (routed [packet]
+         (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
     (go-while-let
       [packet (<! packets-in)]
       (match packet
-             {:sequence sequence}
-             (do
-               (when (:reset packet) (reset-to! sequence))
-               (>! packets-out (status-to (:from packet)))
-               (>! packets-out (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive)))
-             :else (>! packets-out (assoc packet :intent :receive)))) ; Just route - Old-behavior
+        {:sequence sequence :reset true}
+          (do
+            (reset-to! sequence)
+            (>! packets-out (enqueue! packet))
+            (>! packets-out (routed packet)))
+        {:sequence (sequence :guard valid?)}
+          (do
+            (>! packets-out (enqueue! packet))
+            (>! packets-out (routed packet)))
+        {:sequence _}
+          (>! packets-out (status-to (:from packet)))
+        :else
+          (>! packets-out (assoc packet :intent :receive)))) ; Just route - Old-behavior
     packets-in)))
 
 
@@ -86,4 +100,5 @@ a reply to sendTo(...) and when the receiver
        (println "router/<!" packet)
        (match [packet]
               [{:intent :ping :from from}] (>! packets-out {:intent :pong :to from})
-              [{:intent :send :from from :to to}] (>! (produce-queue from to) packet))))))
+              [{:intent :send :from from :to to}] (>! (produce-queue from to) packet)
+              [{:intent :ack  :from from :to to}] (>! (produce-queue to from) packet))))))
