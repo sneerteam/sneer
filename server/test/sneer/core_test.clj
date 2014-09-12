@@ -61,13 +61,13 @@ packet for receiver (see below), even if sequence was wrong."
                              :highest-sequence-delivered -1
                              :full? false}))
 
- #_(fact "If reset is true, the server will discard the entire queue of packets to
+ (fact "If reset is true, the server will discard the entire queue of packets to
 be sent to receiver, if any, and use sequence as the next expected
 sequence number."
-        (let [router (create-router)]
-          (send! router {:intent :send :to client-b :from client-a :payload "foo" :reset true :sequence 42})
-          (take?! router) => {:intent :status-of-queues
-                              :to client-a
-                              :highest-sequence-delivered 41
-                              :highest-sequence-to-send 42
-                              :full? false})))
+       (let [router (create-router)]
+         (send! router {:intent :send :to client-b :from client-a :payload "foo" :reset true :sequence 42})
+         (take?! router) => {:intent :status-of-queues
+                             :to client-a
+                             :highest-sequence-delivered 41
+                             :highest-sequence-to-send 42
+                             :full? false})))
