@@ -15,11 +15,12 @@
     (go-while-let
       [packet (<! packets-in)]
       (match packet
-             {:sequence sequence :from from :to to}
+             {:sequence sequence}
              (do
                (when (:reset packet) (reset-to! sequence))
-               (>! packets-out (status-to from))) 
-             :else (>! packets-out (assoc packet :intent :receive)))) ; Old-behavior
+               (>! packets-out (status-to (:from packet)))
+               (>! packets-out (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive)))
+             :else (>! packets-out (assoc packet :intent :receive)))) ; Just route - Old-behavior
     packets-in)))
 
 

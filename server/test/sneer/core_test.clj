@@ -65,9 +65,10 @@ packet for receiver (see below), even if sequence was wrong."
 be sent to receiver, if any, and use sequence as the next expected
 sequence number."
        (let [router (create-router)]
-         (send! router {:intent :send :to client-b :from client-a :payload "foo" :reset true :sequence 42})
+         (send! router {:intent :send :from client-a :to client-b :payload "foo" :reset true :sequence 42})
          (take?! router) => {:intent :status-of-queues
                              :to client-a
                              :highest-sequence-delivered 41
                              :highest-sequence-to-send 42
-                             :full? false})))
+                             :full? false}
+         (take?! router) => {:intent :receive :from client-a :to client-b :sequence 42 :payload "foo"})))
