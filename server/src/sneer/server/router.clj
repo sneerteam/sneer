@@ -5,24 +5,26 @@
    [sneer.server.core :as core :refer [go-while-let]]))
 
 (defn- create-queue [packets-in packets-out]
-  #_(let peer->queue)
-  (letfn
-    [(reply-to-send-with-sequence
-       [{:keys [from to sequence reset]}]
-       {:intent :status-of-queues
-        :to from
-        :highest-sequence-to-send -1
-        :highest-sequence-delivered -1
-        :full? false})
-     (reply-to-send
-       [packet]
-       (if (contains? packet :sequence)
-         (reply-to-send-with-sequence packet)
-         (assoc packet :intent :receive)))]
-  (go-while-let
-    [packet (<! packets-in)]
-    (>! packets-out (reply-to-send packet)))
-  packets-in))
+  (let [state (atom {:highest-sequence-delivered -1 :highest-sequence-to-send -1})]
+    (letfn
+      [(status-to [to]
+         (merge {:intent :status-of-queues :to to :full? false}
+                @state))
+       (reset-to! [sequence]
+          (swap! state merge {:highest-sequence-delivered (dec sequence) :highest-sequence-to-send sequence}))
+       (reply-to-send-with-sequence
+         [{:keys [from to sequence reset]}]
+         (when reset (reset-to! sequence))
+         (status-to from))
+       (reply-to-send
+         [packet]
+         (if (contains? packet :sequence)
+           (reply-to-send-with-sequence packet)
+           (assoc packet :intent :receive)))]
+    (go-while-let
+      [packet (<! packets-in)]
+      (>! packets-out (reply-to-send packet)))
+    packets-in)))
 
 
 (defn start [packets-in packets-out]
