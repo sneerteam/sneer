@@ -102,8 +102,6 @@
                         (recur transitions))))))))
       packets-in)))
 
-(defn packets-from [client mult]
-  (async/filter< #(= client (:from %)) (async/tap mult (async/chan))))
 
 (defn start [packets-in packets-out]
   "Store-and-Forward Server Protocol
@@ -157,12 +155,16 @@ a reply to sendTo(...) and when the receiver
         mult-packets-in (async/mult packets-in)
         packets-in (async/tap mult-packets-in (async/chan))]
     (letfn
-        [(ensure-queue [to queue]
+        [(heart-beats-of [client]
+           (async/filter< #(= client (:from %))
+                          (async/tap mult-packets-in (async/chan))
+                          (async/dropping-buffer 1)))
+         (ensure-queue [to queue]
            (if queue
              queue
              (create-queue (async/chan (async/dropping-buffer 1))
                            packets-out
-                           (packets-from to mult-packets-in))))
+                           (heart-beats-of to))))
          (produce-queue [from to]
            (let [path [from to]]
              (get-in (swap! queues update-in path (partial ensure-queue to)) path)))]
