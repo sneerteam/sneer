@@ -57,9 +57,6 @@ last signal from `renewals-ch'"
        (routed [packet]
          (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
     
-    ; loop
-    ;   wait for receiver to become online
-    ;   keep sending packets until receiver becomes "offline"
     (async/go-loop
       [online receiver-heart-beats
        offline NEVER
