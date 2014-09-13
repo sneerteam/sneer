@@ -35,6 +35,8 @@
          (enqueue! [packet]
            (swap! state update-in [:packets] conj (routed packet))
            (status-to (:from packet)))
+         (next-packet []
+           (-> @state :packets peek))
          (ack! [sequence]
            (swap! state (fn [state]
                           (merge state {:highest-sequence-delivered sequence
@@ -71,7 +73,7 @@
                 (recur OFFLINE))
             retry
               ([_]
-                (when-let [packet (-> @state :packets peek)]
+                (when-let [packet (next-packet)]
                   (>! packets-out packet))
                 (recur (assoc transitions :retry (timeout-for :retry))))
             packets-in
