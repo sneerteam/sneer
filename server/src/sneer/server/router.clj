@@ -1,11 +1,11 @@
 (ns sneer.server.router
   (:require
-   [clojure.core.async :as async :refer [>! <! >!! <!! alts!! timeout]]
+   [clojure.core.async :as async :refer [>! <!]]
    [clojure.core.match :refer [match]]
    [sneer.server.core :as core :refer [go-while-let]]))
 
 (defn timeout-for [tag]
-  (async/timeout 
+  (async/timeout
     (case tag
       :lease 30000
       :retry 3000)))
@@ -20,38 +20,40 @@
 (def ^:private IMMEDIATELY (closed-chan))
 
 (defn- create-queue [packets-in packets-out receiver-heart-beats]
-  (let [state (atom {:highest-sequence-delivered -1 :packets clojure.lang.PersistentQueue/EMPTY})]
+  (let [state (atom {:highest-sequence-delivered -1
+                     :packets clojure.lang.PersistentQueue/EMPTY})]
     (letfn
-      [(status-to [to]
-         {:intent :status-of-queues
-          :to to
-          :highest-sequence-delivered (@state :highest-sequence-delivered)
-          :highest-sequence-to-send (highest-sequence-to-send)
-          :full? false})
-       (reset-to! [sequence]
-         (swap! state merge {:highest-sequence-delivered (dec sequence) :packets clojure.lang.PersistentQueue/EMPTY}))
-       (enqueue! [packet]
-         (swap! state update-in [:packets] conj (routed packet))
-         (status-to (:from packet)))
-       (ack! [sequence]
-          (swap! state (fn [state]
-                         (merge state {:highest-sequence-delivered sequence
-                                       :packets (pop (state :packets))}))))
-       (highest-sequence-to-send []
-         (let [{:keys [highest-sequence-delivered packets]} @state]
-           (+ highest-sequence-delivered (count packets))))
-       (valid? [sequence]
-         (= sequence (inc (highest-sequence-to-send))))
-       (routed [packet]
-         (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
-      
+        [(status-to [to]
+           {:intent :status-of-queues
+            :to to
+            :highest-sequence-delivered (@state :highest-sequence-delivered)
+            :highest-sequence-to-send (highest-sequence-to-send)
+            :full? false})
+         (reset-to! [sequence]
+           (swap! state merge {:highest-sequence-delivered (dec sequence)
+                               :packets clojure.lang.PersistentQueue/EMPTY}))
+         (enqueue! [packet]
+           (swap! state update-in [:packets] conj (routed packet))
+           (status-to (:from packet)))
+         (ack! [sequence]
+           (swap! state (fn [state]
+                          (merge state {:highest-sequence-delivered sequence
+                                        :packets (pop (state :packets))}))))
+         (highest-sequence-to-send []
+           (let [{:keys [highest-sequence-delivered packets]} @state]
+             (+ highest-sequence-delivered (count packets))))
+         (valid? [sequence]
+           (= sequence (inc (highest-sequence-to-send))))
+         (routed [packet]
+           (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
+
       (let [OFFLINE {:online receiver-heart-beats
                      :keep-alive NEVER
                      :offline NEVER
                      :retry NEVER}]
         (async/go-loop
           [{:keys [online keep-alive offline retry] :as channels} OFFLINE]
-      
+
           (async/alt!
             online
               ([_]
@@ -93,14 +95,14 @@
                             (>! packets-out (status-to (:from packet)))
                           :else
                             (>! packets-out (assoc packet :intent :receive)))
-                        (recur channels))))))))    
-    packets-in)))
+                        (recur channels))))))))
+      packets-in)))
 
-(defn packets-from [client mult]  
+(defn packets-from [client mult]
   (async/filter< #(= client (:from %)) (async/tap mult (async/chan))))
 
 (defn start [packets-in packets-out]
- "Store-and-Forward Server Protocol
+  "Store-and-Forward Server Protocol
 The purpose of the temporary central server is to store
 payloads (byte[]s) being sent from one peer to another in a
 limited-size (100 elements?) FIFO queue and forward them as soon as
@@ -147,21 +149,22 @@ server might crash and restart fresh) queued to be sent to
 receiver. This packet is sent as a reply to queryStatusOfQueues(...), as
 a reply to sendTo(...) and when the receiver
 "
- (let [queues (atom {})
-       mult-packets-in (async/mult packets-in)
-       packets-in (async/tap mult-packets-in (async/chan))]
-   (letfn
-     [(ensure-queue [to queue]
-        (if queue
-          queue
-          (create-queue (async/chan (async/dropping-buffer 1)) packets-out (packets-from to mult-packets-in))))
-      (produce-queue [from to]
-        (get-in (swap! queues update-in [from to] (partial ensure-queue to)) [from to]))]
+  (let [queues (atom {})
+        mult-packets-in (async/mult packets-in)
+        packets-in (async/tap mult-packets-in (async/chan))]
+    (letfn
+        [(ensure-queue [to queue]
+           (if queue
+             queue
+             (create-queue (async/chan (async/dropping-buffer 1)) packets-out (packets-from to mult-packets-in))))
+         (produce-queue [from to]
+           (let [path [from to]]
+             (get-in (swap! queues update-in path (partial ensure-queue to)) path)))]
 
-     (go-while-let
+      (go-while-let
        [packet (<! packets-in)]
        (println "router/<!" packet)
-       (match [packet]
-              [{:intent :ping :from from}] (>! packets-out {:intent :pong :to from})
-              [{:intent :send :from from :to to}] (>! (produce-queue from to) packet)
-              [{:intent :ack  :from from :to to}] (>! (produce-queue to from) packet))))))
+       (match packet
+              {:intent :ping :from from} (>! packets-out {:intent :pong :to from})
+              {:intent :send :from from :to to} (>! (produce-queue from to) packet)
+              {:intent :ack  :from from :to to} (>! (produce-queue to from) packet))))))
