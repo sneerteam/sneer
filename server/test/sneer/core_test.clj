@@ -136,5 +136,4 @@ sequence number."
                           :highest-sequence-delivered 0
                           :highest-sequence-to-send 1
                           :full? false}
-          (>!! (clocks :retry) :tick) ; TODO: must be removed, the :ack should be enough to trigger a new :receive attempt
           (<?!! to-b) => {:intent :receive :from client-a :to client-b :sequence 1 :payload "bar"})))))

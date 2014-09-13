@@ -85,21 +85,25 @@ last signal from `renewals-ch'"
           (when packet
             (match packet
               {:intent :ack :sequence sequence}
+              (do
                 (when (= sequence (-> @state :highest-sequence-delivered inc))
                   (ack! sequence)
                   (>! packets-out (status-to (:to packet))))
-              {:sequence sequence :reset true}
-                (do
-                  (reset-to! sequence)
-                  (>! packets-out (enqueue! packet)))
-              {:sequence (sequence :guard valid?)}
-                (>! packets-out (enqueue! packet))
-              {:sequence _}
-                (>! packets-out (status-to (:from packet)))
+                (recur online offline IMMEDIATELY))
               :else
-                (>! packets-out (assoc packet :intent :receive))))
-          (recur online offline retry))))
-    
+              (do
+                (match packet
+                  {:sequence sequence :reset true}
+                  (do
+                    (reset-to! sequence)
+                    (>! packets-out (enqueue! packet)))
+                  {:sequence (sequence :guard valid?)}
+                  (>! packets-out (enqueue! packet))
+                  {:sequence _}
+                  (>! packets-out (status-to (:from packet)))
+                  :else
+                  (>! packets-out (assoc packet :intent :receive)))
+                (recur online offline retry)))))))    
     packets-in)))
 
 (defn packets-from [client mult]  
