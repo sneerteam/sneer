@@ -10,7 +10,9 @@
       :lease 30000
       :retry 3000)))
 
-(defn- lease [renewals-ch]  
+(defn- lease [renewals-ch]
+  "Returns a channel that closes after lease timeout has passed since the
+last signal from `renewals-ch'"  
   (async/go-loop
     [timeout (timeout-for :lease)]
     (async/alt!
