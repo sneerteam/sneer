@@ -22,11 +22,14 @@ last signal from `renewals-ch'"
                       (recur (timeout-for :lease))
                       :cancelled)))))
 
+(defn- closed-chan []
+  (let [ch (async/chan)]
+    (async/close! ch)
+    ch))
+
 (def ^:private NEVER (async/chan))
 
-(def ^:private IMMEDIATELY (let [ch (async/chan)]
-                             (async/close! ch)
-                             ch))
+(def ^:private IMMEDIATELY (closed-chan))
 
 (defn- create-queue [packets-in packets-out receiver-heart-beats]
   (let [state (atom {:highest-sequence-delivered -1 :packets clojure.lang.PersistentQueue/EMPTY})]
