@@ -80,15 +80,16 @@ sequence number."
  
   (fact "Acknowledge from receiver causes an updated status-of-queues to be sent to sender."
        (let [router (create-router)
+             route! (partial send! router)
              packets-out (async/mult (:packets-out router))
              to-a (packets-to client-a packets-out)]
-         (send! router {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
+         (route! {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
          (<?!! to-a) => {:intent :status-of-queues
                          :to client-a
                          :highest-sequence-delivered -1
                          :highest-sequence-to-send 0
                          :full? false}
-         (send! router {:intent :ack :from client-b :to client-a :sequence 0})
+         (route! {:intent :ack :from client-b :to client-a :sequence 0})
          (<?!! to-a) => {:intent :status-of-queues
                          :to client-a
                          :highest-sequence-delivered 0
@@ -107,28 +108,29 @@ sequence number."
       (with-redefs [router/timeout-for (partial clocks)]
         
         (let [router (create-router)
+              route! (partial send! router)
               packets-out (async/mult (:packets-out router))
               to-a (packets-to client-a packets-out)              
               to-b (packets-to client-b packets-out)]
           
-          (send! router {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
+          (route! {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
           (<?!! to-a) => {:intent :status-of-queues
                           :to client-a
                           :highest-sequence-delivered -1
                           :highest-sequence-to-send 0
                           :full? false}
-          (send! router {:intent :send :from client-a :to client-b :payload "bar" :sequence 1})
+          (route! {:intent :send :from client-a :to client-b :payload "bar" :sequence 1})
           (<?!! to-a) => {:intent :status-of-queues
                           :to client-a
                           :highest-sequence-delivered -1
                           :highest-sequence-to-send 1
                           :full? false}
-          (send! router {:intent :ping :from client-b})
+          (route! {:intent :ping :from client-b})
           (<?!! to-b) => {:intent :pong :to client-b}
           (<?!! to-b) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
           (>!! (clocks :retry) :tick)
           (<?!! to-b) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
-          (send! router {:intent :ack :from client-b :to client-a :sequence 0})
+          (route! {:intent :ack :from client-b :to client-a :sequence 0})
           (<?!! to-a) => {:intent :status-of-queues
                           :to client-a
                           :highest-sequence-delivered 0
