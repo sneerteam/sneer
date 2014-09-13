@@ -57,7 +57,7 @@
 payload to the queue of payloads to be sent from the sender to receiver,
 otherwise ignores the payload. Server replies with a statusOfQueues
 packet for receiver (see below), even if sequence was wrong."
- 
+
   (fact "The server expects sequence number 0 when it starts and rejects incorrect sequences."
         (let [router (create-router)]
           (send! router {:intent :send :to client-b :from client-a :payload "foo" :sequence 42})
@@ -77,7 +77,7 @@ sequence number."
                               :highest-sequence-delivered 41
                               :highest-sequence-to-send 42
                               :full? false}))
- 
+
   (fact "Acknowledge from receiver causes an updated status-of-queues to be sent to sender."
        (let [router (create-router)
              route! (partial send! router)
@@ -98,21 +98,21 @@ sequence number."
 
 (facts
   "about receiveFrom(Puk sender, long sequence, byte[] payload)"
-  
+
   (fact
     "keeps retrying until receiver sends ack"
-       
-    (let [clocks {:lease (dropping-chan)
+
+    (let [clocks {:offline (dropping-chan)
                   :retry (dropping-chan)}]
-      
+
       (with-redefs [router/timeout-for (partial clocks)]
-        
+
         (let [router (create-router)
               route! (partial send! router)
               packets-out (async/mult (:packets-out router))
-              to-a (packets-to client-a packets-out)              
+              to-a (packets-to client-a packets-out)
               to-b (packets-to client-b packets-out)]
-          
+
           (route! {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
           (<?!! to-a) => {:intent :status-of-queues
                           :to client-a

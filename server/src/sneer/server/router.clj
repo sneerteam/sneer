@@ -7,7 +7,7 @@
 (defn timeout-for [tag]
   (async/timeout
     (case tag
-      :lease 30000
+      :offline 30000
       :retry 3000)))
 
 (defn- closed-chan []
@@ -52,18 +52,18 @@
                      :offline NEVER
                      :retry NEVER}]
         (async/go-loop
-          [{:keys [online keep-alive offline retry] :as channels} OFFLINE]
+          [{:keys [online keep-alive offline retry] :as transitions} OFFLINE]
 
           (async/alt!
             online
               ([_]
                 (recur {:online NEVER
                         :keep-alive receiver-heart-beats
-                        :offline (timeout-for :lease)
+                        :offline (timeout-for :offline)
                         :retry IMMEDIATELY}))
             keep-alive
               ([_]
-                (recur (assoc channels :offline (timeout-for :lease))))
+                (recur (assoc transitions :offline (timeout-for :offline))))
             offline
               ([_]
                 (recur OFFLINE))
@@ -71,7 +71,7 @@
               ([_]
                 (when-let [packet (-> @state :packets peek)]
                   (>! packets-out packet))
-                (recur (assoc channels :retry (timeout-for :retry))))
+                (recur (assoc transitions :retry (timeout-for :retry))))
             packets-in
               ([packet]
                 (when packet
@@ -81,7 +81,7 @@
                         (when (= sequence (-> @state :highest-sequence-delivered inc))
                           (ack! sequence)
                           (>! packets-out (status-to (:to packet))))
-                        (recur (assoc channels :retry IMMEDIATELY)))
+                        (recur (assoc transitions :retry IMMEDIATELY)))
                     :else
                       (do
                         (match packet
@@ -95,7 +95,7 @@
                             (>! packets-out (status-to (:from packet)))
                           :else
                             (>! packets-out (assoc packet :intent :receive)))
-                        (recur channels))))))))
+                        (recur transitions))))))))
       packets-in)))
 
 (defn packets-from [client mult]
@@ -156,7 +156,9 @@ a reply to sendTo(...) and when the receiver
         [(ensure-queue [to queue]
            (if queue
              queue
-             (create-queue (async/chan (async/dropping-buffer 1)) packets-out (packets-from to mult-packets-in))))
+             (create-queue (async/chan (async/dropping-buffer 1))
+                           packets-out
+                           (packets-from to mult-packets-in))))
          (produce-queue [from to]
            (let [path [from to]]
              (get-in (swap! queues update-in path (partial ensure-queue to)) path)))]
@@ -165,6 +167,6 @@ a reply to sendTo(...) and when the receiver
        [packet (<! packets-in)]
        (println "router/<!" packet)
        (match packet
-              {:intent :ping :from from} (>! packets-out {:intent :pong :to from})
-              {:intent :send :from from :to to} (>! (produce-queue from to) packet)
-              {:intent :ack  :from from :to to} (>! (produce-queue to from) packet))))))
+         {:intent :ping :from from} (>! packets-out {:intent :pong :to from})
+         {:intent :send :from from :to to} (>! (produce-queue from to) packet)
+         {:intent :ack  :from from :to to} (>! (produce-queue to from) packet))))))
