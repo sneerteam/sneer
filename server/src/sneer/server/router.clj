@@ -26,7 +26,7 @@
         [(status-to [to]
            {:intent :status-of-queues
             :to to
-            :highest-sequence-delivered (@state :highest-sequence-delivered)
+            :highest-sequence-delivered (highest-sequence-delivered)
             :highest-sequence-to-send (highest-sequence-to-send)
             :full? false})
          (reset-to! [sequence]
@@ -39,6 +39,8 @@
            (swap! state (fn [state]
                           (merge state {:highest-sequence-delivered sequence
                                         :packets (pop (state :packets))}))))
+         (highest-sequence-delivered []
+           (@state :highest-sequence-delivered))
          (highest-sequence-to-send []
            (let [{:keys [highest-sequence-delivered packets]} @state]
              (+ highest-sequence-delivered (count packets))))
@@ -78,7 +80,7 @@
                   (match packet
                     {:intent :ack :sequence sequence}
                       (do
-                        (when (= sequence (-> @state :highest-sequence-delivered inc))
+                        (when (= sequence (inc (highest-sequence-delivered)))
                           (ack! sequence)
                           (>! packets-out (status-to (:to packet))))
                         (recur (assoc transitions :retry IMMEDIATELY)))
