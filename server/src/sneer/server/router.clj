@@ -4,43 +4,84 @@
    [clojure.core.match :refer [match]]
    [sneer.server.core :as core :refer [go-while-let]]))
 
-(defn- create-queue [packets-in packets-out]
-  (let [state (atom {:highest-sequence-delivered -1 :highest-sequence-to-send -1})]
+(defn timeout-for [tag]
+  (async/timeout 
+    (case tag
+      :lease 30000
+      :retry 3000)))
+
+(defn- lease [renewals-ch]  
+  (async/go-loop
+    [timeout (timeout-for :lease)]
+    (async/alt!
+      timeout ([_] :expired)
+      renewals-ch ([v]
+                    (if (some? v)
+                      (recur (timeout-for :lease))
+                      :cancelled)))))
+
+(defn- retry-until [quit routine]
+  (async/go-loop 
+    [timeout (timeout-for :retry)]
+    (<! (routine))
+    (async/alt! 
+      timeout ([_] (recur (timeout-for :retry)))
+      quit ([_] _))))
+
+(defn- create-queue [packets-in packets-out receiver-heart-beats]
+  (let [state (atom {:highest-sequence-delivered -1 :packets clojure.lang.PersistentQueue/EMPTY})]
     (letfn
       [(status-to [to]
-         (merge {:intent :status-of-queues :to to :full? false}
-                @state))
+         {:intent :status-of-queues
+          :to to
+          :highest-sequence-delivered (@state :highest-sequence-delivered)
+          :highest-sequence-to-send (highest-sequence-to-send)
+          :full? false})
        (reset-to! [sequence]
-         (swap! state merge {:highest-sequence-delivered (dec sequence) :highest-sequence-to-send (dec sequence)}))
+         (swap! state merge {:highest-sequence-delivered (dec sequence) :packets clojure.lang.PersistentQueue/EMPTY}))
+       (send-packet []
+         (async/go
+           (when-let [packet (-> @state :packets peek)]
+             (>! packets-out packet))))
        (enqueue! [packet]
-         (swap! state update-in [:highest-sequence-to-send] inc)
+         (swap! state update-in [:packets] conj (routed packet))
          (status-to (:from packet)))
+       (highest-sequence-to-send []
+         (let [{:keys [highest-sequence-delivered packets]} @state]
+           (+ highest-sequence-delivered (count packets))))
        (valid? [sequence]
-         (= sequence (-> @state :highest-sequence-to-send inc)))
+         (= sequence (inc (highest-sequence-to-send))))
        (routed [packet]
          (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
-    (go-while-let
-      [packet (<! packets-in)]
+    
+    ; loop
+    ;   wait for receiver to become online
+    ;   keep sending packets until receiver becomes "offline"
+    (go-while-let [_ (<! receiver-heart-beats)]
+      (<! (retry-until (lease receiver-heart-beats) send-packet)))
+    
+    (go-while-let [packet (<! packets-in)]
       (match packet
         {:intent :ack :sequence sequence}
           (when (= sequence (-> @state :highest-sequence-delivered inc))
-            (swap! state assoc :highest-sequence-delivered sequence)
+            (swap! state (fn [state]
+                           (merge state {:highest-sequence-delivered sequence
+                                         :packets (pop (state :packets))})))
             (>! packets-out (status-to (:to packet))))
         {:sequence sequence :reset true}
           (do
             (reset-to! sequence)
-            (>! packets-out (enqueue! packet))
-            (>! packets-out (routed packet)))
+            (>! packets-out (enqueue! packet)))
         {:sequence (sequence :guard valid?)}
-          (do
-            (>! packets-out (enqueue! packet))
-            (>! packets-out (routed packet)))
+          (>! packets-out (enqueue! packet))
         {:sequence _}
           (>! packets-out (status-to (:from packet)))
         :else
           (>! packets-out (assoc packet :intent :receive)))) ; Just route - Old-behavior
     packets-in)))
 
+(defn packets-from [client mult]  
+  (async/filter< #(= client (:from %)) (async/tap mult (async/chan))))
 
 (defn start [packets-in packets-out]
  "Store-and-Forward Server Protocol
@@ -90,14 +131,16 @@ server might crash and restart fresh) queued to be sent to
 receiver. This packet is sent as a reply to queryStatusOfQueues(...), as
 a reply to sendTo(...) and when the receiver
 "
- (let [queues (atom {})]
+ (let [queues (atom {})
+       mult-packets-in (async/mult packets-in)
+       packets-in (async/tap mult-packets-in (async/chan))]
    (letfn
-     [(ensure-queue [queue]
+     [(ensure-queue [to queue]
         (if queue
           queue
-          (create-queue (async/chan (async/dropping-buffer 1)) packets-out)))
+          (create-queue (async/chan (async/dropping-buffer 1)) packets-out (packets-from to mult-packets-in))))
       (produce-queue [from to]
-        (get-in (swap! queues update-in [from to] ensure-queue) [from to]))]
+        (get-in (swap! queues update-in [from to] (partial ensure-queue to)) [from to]))]
 
      (go-while-let
        [packet (<! packets-in)]

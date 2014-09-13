@@ -15,7 +15,7 @@
 
 (defn create-router []
   (let [packets-in (async/chan 1)
-        packets-out (async/chan)]
+        packets-out (async/chan 1)]
     (router/start packets-in packets-out)
     {:packets-in packets-in :packets-out packets-out}))
 
@@ -30,6 +30,12 @@
 
 (def ^:private client-b
   (create-puk "cb"))
+
+(defn dropping-chan []
+  (async/chan (async/dropping-buffer 1)))
+
+(defn packets-to [client mult]
+  (async/filter< #(= client (:to %)) (async/tap mult (async/chan 1))))
 
 (facts
  "Facts about client/server conversations"
@@ -70,21 +76,63 @@ sequence number."
                               :to client-a
                               :highest-sequence-delivered 41
                               :highest-sequence-to-send 42
-                              :full? false}
-          (take?! router) => {:intent :receive :from client-a :to client-b :sequence 42 :payload "foo"}))
+                              :full? false}))
  
   (fact "Acknowledge from receiver causes an updated status-of-queues to be sent to sender."
-       (let [router (create-router)]
+       (let [router (create-router)
+             packets-out (async/mult (:packets-out router))
+             to-a (packets-to client-a packets-out)]
          (send! router {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
-         (take?! router) => {:intent :status-of-queues
-                             :to client-a
-                             :highest-sequence-delivered -1
-                             :highest-sequence-to-send 0
-                             :full? false}
-         (take?! router) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
+         (<?!! to-a) => {:intent :status-of-queues
+                         :to client-a
+                         :highest-sequence-delivered -1
+                         :highest-sequence-to-send 0
+                         :full? false}
          (send! router {:intent :ack :from client-b :to client-a :sequence 0})
-         (take?! router) => {:intent :status-of-queues
-                             :to client-a
-                             :highest-sequence-delivered 0
-                             :highest-sequence-to-send 0
-                             :full? false})))
+         (<?!! to-a) => {:intent :status-of-queues
+                         :to client-a
+                         :highest-sequence-delivered 0
+                         :highest-sequence-to-send 0
+                         :full? false})))
+
+(facts
+  "about receiveFrom(Puk sender, long sequence, byte[] payload)"
+  
+  (fact
+    "keeps retrying until receiver sends ack"
+       
+    (let [clocks {:lease (dropping-chan)
+                  :retry (dropping-chan)}]
+      
+      (with-redefs [router/timeout-for (partial clocks)]
+        
+        (let [router (create-router)
+              packets-out (async/mult (:packets-out router))
+              to-a (packets-to client-a packets-out)              
+              to-b (packets-to client-b packets-out)]
+          
+          (send! router {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
+          (<?!! to-a) => {:intent :status-of-queues
+                          :to client-a
+                          :highest-sequence-delivered -1
+                          :highest-sequence-to-send 0
+                          :full? false}
+          (send! router {:intent :send :from client-a :to client-b :payload "bar" :sequence 1})
+          (<?!! to-a) => {:intent :status-of-queues
+                          :to client-a
+                          :highest-sequence-delivered -1
+                          :highest-sequence-to-send 1
+                          :full? false}
+          (send! router {:intent :ping :from client-b})
+          (<?!! to-b) => {:intent :pong :to client-b}
+          (<?!! to-b) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
+          (>!! (clocks :retry) :tick)
+          (<?!! to-b) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
+          (send! router {:intent :ack :from client-b :to client-a :sequence 0})
+          (<?!! to-a) => {:intent :status-of-queues
+                          :to client-a
+                          :highest-sequence-delivered 0
+                          :highest-sequence-to-send 1
+                          :full? false}
+          (>!! (clocks :retry) :tick) ; TODO: must be removed, the :ack should be enough to trigger a new :receive attempt
+          (<?!! to-b) => {:intent :receive :from client-a :to client-b :sequence 1 :payload "bar"})))))
