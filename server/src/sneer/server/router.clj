@@ -10,18 +10,6 @@
       :lease 30000
       :retry 3000)))
 
-(defn- lease [renewals-ch]
-  "Returns a channel that closes after lease timeout has passed since the
-last signal from `renewals-ch'"  
-  (async/go-loop
-    [timeout (timeout-for :lease)]
-    (async/alt!
-      timeout ([_] :expired)
-      renewals-ch ([v]
-                    (if (some? v)
-                      (recur (timeout-for :lease))
-                      :cancelled)))))
-
 (defn- closed-chan []
   (let [ch (async/chan)]
     (async/close! ch)
@@ -59,23 +47,28 @@ last signal from `renewals-ch'"
     
     (async/go-loop
       [online receiver-heart-beats
-       offline NEVER
+       keep-alive NEVER
+       offline NEVER 
        retry NEVER]
       
       (async/alt!
         online
         ([_]
-          (recur NEVER (lease receiver-heart-beats) IMMEDIATELY))        
+          (recur NEVER receiver-heart-beats (timeout-for :lease) IMMEDIATELY))
+        
+        keep-alive
+        ([_]
+          (recur NEVER keep-alive (timeout-for :lease) retry))
         
         offline
         ([_]
-          (recur receiver-heart-beats NEVER NEVER))
+          (recur receiver-heart-beats NEVER NEVER NEVER))
         
         retry
         ([_]
           (when-let [packet (-> @state :packets peek)]
             (>! packets-out packet))
-          (recur online offline (timeout-for :retry)))
+          (recur online keep-alive offline (timeout-for :retry)))
         
         packets-in
         ([packet]
@@ -86,7 +79,7 @@ last signal from `renewals-ch'"
                 (when (= sequence (-> @state :highest-sequence-delivered inc))
                   (ack! sequence)
                   (>! packets-out (status-to (:to packet))))
-                (recur online offline IMMEDIATELY))
+                (recur online keep-alive offline IMMEDIATELY))
               :else
               (do
                 (match packet
@@ -100,7 +93,7 @@ last signal from `renewals-ch'"
                   (>! packets-out (status-to (:from packet)))
                   :else
                   (>! packets-out (assoc packet :intent :receive)))
-                (recur online offline retry)))))))    
+                (recur online keep-alive offline retry)))))))    
     packets-in)))
 
 (defn packets-from [client mult]  
