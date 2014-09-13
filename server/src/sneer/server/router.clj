@@ -4,9 +4,9 @@
    [clojure.core.match :refer [match]]
    [sneer.server.core :as core :refer [go-while-let]]))
 
-(defn timeout-for [tag]
+(defn timeout-for [transition]
   (async/timeout
-    (case tag
+    (case transition
       :offline 30000
       :retry 3000)))
 
