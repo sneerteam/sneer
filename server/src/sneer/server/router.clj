@@ -44,56 +44,56 @@
          (= sequence (inc (highest-sequence-to-send))))
        (routed [packet]
          (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
-    
-    (async/go-loop
-      [online receiver-heart-beats
-       keep-alive NEVER
-       offline NEVER 
-       retry NEVER]
       
-      (async/alt!
-        online
-        ([_]
-          (recur NEVER receiver-heart-beats (timeout-for :lease) IMMEDIATELY))
-        
-        keep-alive
-        ([_]
-          (recur NEVER keep-alive (timeout-for :lease) retry))
-        
-        offline
-        ([_]
-          (recur receiver-heart-beats NEVER NEVER NEVER))
-        
-        retry
-        ([_]
-          (when-let [packet (-> @state :packets peek)]
-            (>! packets-out packet))
-          (recur online keep-alive offline (timeout-for :retry)))
-        
-        packets-in
-        ([packet]
-          (when packet
-            (match packet
-              {:intent :ack :sequence sequence}
-              (do
-                (when (= sequence (-> @state :highest-sequence-delivered inc))
-                  (ack! sequence)
-                  (>! packets-out (status-to (:to packet))))
-                (recur online keep-alive offline IMMEDIATELY))
-              :else
-              (do
-                (match packet
-                  {:sequence sequence :reset true}
-                  (do
-                    (reset-to! sequence)
-                    (>! packets-out (enqueue! packet)))
-                  {:sequence (sequence :guard valid?)}
-                  (>! packets-out (enqueue! packet))
-                  {:sequence _}
-                  (>! packets-out (status-to (:from packet)))
-                  :else
-                  (>! packets-out (assoc packet :intent :receive)))
-                (recur online keep-alive offline retry)))))))    
+      (let [OFFLINE {:online receiver-heart-beats
+                     :keep-alive NEVER
+                     :offline NEVER
+                     :retry NEVER}]
+        (async/go-loop
+          [{:keys [online keep-alive offline retry] :as channels} OFFLINE]
+      
+          (async/alt!
+            online
+              ([_]
+                (recur {:online NEVER
+                        :keep-alive receiver-heart-beats
+                        :offline (timeout-for :lease)
+                        :retry IMMEDIATELY}))
+            keep-alive
+              ([_]
+                (recur (assoc channels :offline (timeout-for :lease))))
+            offline
+              ([_]
+                (recur OFFLINE))
+            retry
+              ([_]
+                (when-let [packet (-> @state :packets peek)]
+                  (>! packets-out packet))
+                (recur (assoc channels :retry (timeout-for :retry))))
+            packets-in
+              ([packet]
+                (when packet
+                  (match packet
+                    {:intent :ack :sequence sequence}
+                      (do
+                        (when (= sequence (-> @state :highest-sequence-delivered inc))
+                          (ack! sequence)
+                          (>! packets-out (status-to (:to packet))))
+                        (recur (assoc channels :retry IMMEDIATELY)))
+                    :else
+                      (do
+                        (match packet
+                          {:sequence sequence :reset true}
+                            (do
+                              (reset-to! sequence)
+                              (>! packets-out (enqueue! packet)))
+                          {:sequence (sequence :guard valid?)}
+                            (>! packets-out (enqueue! packet))
+                          {:sequence _}
+                            (>! packets-out (status-to (:from packet)))
+                          :else
+                            (>! packets-out (assoc packet :intent :receive)))
+                        (recur channels))))))))    
     packets-in)))
 
 (defn packets-from [client mult]  
