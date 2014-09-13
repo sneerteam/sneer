@@ -22,13 +22,11 @@ last signal from `renewals-ch'"
                       (recur (timeout-for :lease))
                       :cancelled)))))
 
-(defn- retry-until [quit routine]
-  (async/go-loop 
-    [timeout (timeout-for :retry)]
-    (<! (routine))
-    (async/alt! 
-      timeout ([_] (recur (timeout-for :retry)))
-      quit ([_] _))))
+(def ^:private NEVER (async/chan))
+
+(def ^:private IMMEDIATELY (let [ch (async/chan)]
+                             (async/close! ch)
+                             ch))
 
 (defn- create-queue [packets-in packets-out receiver-heart-beats]
   (let [state (atom {:highest-sequence-delivered -1 :packets clojure.lang.PersistentQueue/EMPTY})]
@@ -41,13 +39,13 @@ last signal from `renewals-ch'"
           :full? false})
        (reset-to! [sequence]
          (swap! state merge {:highest-sequence-delivered (dec sequence) :packets clojure.lang.PersistentQueue/EMPTY}))
-       (send-packet []
-         (async/go
-           (when-let [packet (-> @state :packets peek)]
-             (>! packets-out packet))))
        (enqueue! [packet]
          (swap! state update-in [:packets] conj (routed packet))
          (status-to (:from packet)))
+       (ack! [sequence]
+          (swap! state (fn [state]
+                         (merge state {:highest-sequence-delivered sequence
+                                       :packets (pop (state :packets))}))))
        (highest-sequence-to-send []
          (let [{:keys [highest-sequence-delivered packets]} @state]
            (+ highest-sequence-delivered (count packets))))
@@ -59,27 +57,46 @@ last signal from `renewals-ch'"
     ; loop
     ;   wait for receiver to become online
     ;   keep sending packets until receiver becomes "offline"
-    (go-while-let [_ (<! receiver-heart-beats)]
-      (<! (retry-until (lease receiver-heart-beats) send-packet)))
+    (async/go-loop
+      [online receiver-heart-beats
+       offline NEVER
+       retry NEVER]
+      
+      (async/alt!
+        online
+        ([_]
+          (recur NEVER (lease receiver-heart-beats) IMMEDIATELY))        
+        
+        offline
+        ([_]
+          (recur receiver-heart-beats NEVER NEVER))
+        
+        retry
+        ([_]
+          (when-let [packet (-> @state :packets peek)]
+            (>! packets-out packet))
+          (recur online offline (timeout-for :retry)))
+        
+        packets-in
+        ([packet]
+          (when packet
+            (match packet
+              {:intent :ack :sequence sequence}
+                (when (= sequence (-> @state :highest-sequence-delivered inc))
+                  (ack! sequence)
+                  (>! packets-out (status-to (:to packet))))
+              {:sequence sequence :reset true}
+                (do
+                  (reset-to! sequence)
+                  (>! packets-out (enqueue! packet)))
+              {:sequence (sequence :guard valid?)}
+                (>! packets-out (enqueue! packet))
+              {:sequence _}
+                (>! packets-out (status-to (:from packet)))
+              :else
+                (>! packets-out (assoc packet :intent :receive))))
+          (recur online offline retry))))
     
-    (go-while-let [packet (<! packets-in)]
-      (match packet
-        {:intent :ack :sequence sequence}
-          (when (= sequence (-> @state :highest-sequence-delivered inc))
-            (swap! state (fn [state]
-                           (merge state {:highest-sequence-delivered sequence
-                                         :packets (pop (state :packets))})))
-            (>! packets-out (status-to (:to packet))))
-        {:sequence sequence :reset true}
-          (do
-            (reset-to! sequence)
-            (>! packets-out (enqueue! packet)))
-        {:sequence (sequence :guard valid?)}
-          (>! packets-out (enqueue! packet))
-        {:sequence _}
-          (>! packets-out (status-to (:from packet)))
-        :else
-          (>! packets-out (assoc packet :intent :receive)))) ; Just route - Old-behavior
     packets-in)))
 
 (defn packets-from [client mult]  
