@@ -1,12 +1,18 @@
 package sneer.android.voicemessage;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import sneer.android.ui.*;
-import sneer.commons.exceptions.*;
-import android.media.*;
-import android.os.*;
-import android.widget.*;
+import sneer.android.ui.MessageActivity;
+import sneer.commons.exceptions.FriendlyException;
+import android.media.MediaRecorder;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 public class VoiceMessageActivity extends MessageActivity {
 
@@ -29,25 +35,22 @@ public class VoiceMessageActivity extends MessageActivity {
 
 
 	private void composeMessage() {
-//		setContentView(R.layout.activity_voice_message);
-//		
-//		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-//			send();
-//		}});
-//		
-//		button(R.id.btnCancel).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-//			finish();
-//		}});
-//		
-//		startRecording();
+		setContentView(R.layout.activity_voice_message);
 		
-		// Temporary solution
-		navigateTo(OpenVoiceMessageActivity.class);
+		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			send();
+		}});
+		
+		button(R.id.btnCancel).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			finish();
+		}});
+		
+		startRecording();
 	}
 
 
 	private void open(Object message) {
-		// Deprecated - Use OpenVoiceMessageActivity.	
+		navigateTo(OpenVoiceMessageActivity.class);
 	}
 
 
@@ -68,7 +71,7 @@ public class VoiceMessageActivity extends MessageActivity {
 	@Override
 	protected void onDestroy() {
 		stopRecording();
-//		new File(audioFileName).delete();
+		new File(audioFileName).delete();
 		super.onDestroy();
 	}
 
