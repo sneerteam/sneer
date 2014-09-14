@@ -22,17 +22,14 @@
   (assoc (select-keys packet [:from :to :sequence :payload])
          :intent :receive))
 
-(defn enqueue [packet state]
-  (update-in state [:packets] conj (routed packet)))
-
 (defn highest-sequence-to-send [state]
   (if-some [packet (-> state :packets last)]
     (:sequence packet)
     (:highest-sequence-delivered state)))
 
-(defn enqueue-next [packet state]
+(defn enqueue [packet state]
   (if (= (:sequence packet) (inc (highest-sequence-to-send state)))
-    (enqueue packet state)
+    (update-in state [:packets] conj (routed packet))
     state))
 
 (defn ack [sequence state]
@@ -59,7 +56,7 @@
           reply (status-to from state)]
       [reply state])
     {:sequence sequence :from from}
-    (let [state (->> state (enqueue-next packet))
+    (let [state (->> state (enqueue packet))
           reply (status-to from state)]
       [reply state])
     :else
