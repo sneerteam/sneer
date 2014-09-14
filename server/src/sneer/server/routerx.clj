@@ -1,6 +1,6 @@
 (ns sneer.server.routerx
   (:require
-   [clojure.core.async :as async :refer [>! <!]]
+   [clojure.core.async :as async :refer [>! <! go-loop alt!]]
    [clojure.core.match :refer [match]]))
 
 (defn timeout-for [transition]
@@ -28,8 +28,8 @@
 
 (defn highest-sequence-to-send [state]
   (if-some [packet (-> state :packets last)]
-           (:sequence packet)
-           (:highest-sequence-delivered state)))
+    (:sequence packet)
+    (:highest-sequence-delivered state)))
 
 (defn enqueue-next [packet state]
   (if (= (:sequence packet) (inc (highest-sequence-to-send state)))
@@ -74,49 +74,46 @@
 (def ^:private IMMEDIATELY (closed-chan))
 
 (defn- online-loop [state packets-in packets-out keep-alive]
-  (async/go-loop
-    [state state
-     offline (timeout-for :offline)
-     retry IMMEDIATELY]
-
-    (async/alt!
+  (go-loop [state state
+            offline (timeout-for :offline)
+            retry IMMEDIATELY]
+    (alt!
       offline
-        ([_] state)
+      ([_] state)
 
       keep-alive
-        ([_] (recur state (timeout-for :offline) retry))
+      ([_] (recur state (timeout-for :offline) retry))
 
       retry
-        ([_]
-          (when-some [packet (next-packet state)]
-            (>! packets-out packet))
-          (recur state offline (timeout-for :retry)))
+      ([_]
+         (when-some [packet (next-packet state)]
+           (>! packets-out packet))
+         (recur state offline (timeout-for :retry)))
 
       packets-in
-        ([packet]
-          (if (some? packet)
-            (let [[reply state] (handle-packet packet state)
-                  retry (if (= (packet :intent) :ack) IMMEDIATELY retry)]
-              (>! packets-out reply)
-              (recur state offline retry))
-            state)))))
+      ([packet]
+         (if (some? packet)
+           (let [[reply state] (handle-packet packet state)
+                 retry (if (= (packet :intent) :ack) IMMEDIATELY retry)]
+             (>! packets-out reply)
+             (recur state offline retry))
+           state)))))
 
 (defn- create-queue [packets-in packets-out receiver-heartbeats]
-  (async/go-loop [state EMPTY]
-
-    (async/alt!
+  (go-loop [state EMPTY]
+    (alt!
       packets-in
-        ([packet]
-          (when (some? packet)
-            (let [[reply state] (handle-packet packet state)]
-              (>! packets-out reply)
-              (recur state))))
+      ([packet]
+         (when (some? packet)
+           (let [[reply state] (handle-packet packet state)]
+             (>! packets-out reply)
+             (recur state))))
 
       receiver-heartbeats
-        ([heartbeat]
-          (when (some? heartbeat)
-            (recur
-              (<! (online-loop state packets-in packets-out receiver-heartbeats))))))))
+      ([heartbeat]
+         (when (some? heartbeat)
+           (recur
+            (<! (online-loop state packets-in packets-out receiver-heartbeats))))))))
 
 (defn start [packets-in packets-out]
   "Store-and-Forward Server Protocol
@@ -180,26 +177,25 @@ a reply to sendTo(...) and when the receiver
                                          packets-out
                                          (heartbeats-of to))
                            q-packets-in)))
-         produce-queue (fn [from to queues]
-                         (let [path [from to]
-                               queues (update-in queues path ensure-queue to)]
-                           [(get-in queues path) queues]))]
-    (async/go-loop
-      [queues {}]
+        produce-queue (fn [from to queues]
+                        (let [path [from to]
+                              queues (update-in queues path ensure-queue to)]
+                          [(get-in queues path) queues]))]
+    (go-loop [queues {}]
       (when-some [packet (<! packets-in)]
         (recur
           (match packet
             {:intent :ping :from from}
-              (do
-                (>! packets-out {:intent :pong :to from})
-                queues)
+            (do
+              (>! packets-out {:intent :pong :to from})
+              queues)
             {:intent :send :from from :to to}
-              (let [[q queues] (produce-queue from to queues)]
-                (>! q packet)
-                queues)
-            {:intent :ack  :from from :to to}
-              (let [[q queues] (produce-queue to from queues)]
-                (>! q packet)
-                queues)
+            (let [[q queues] (produce-queue from to queues)]
+              (>! q packet)
+              queues)
+            {:intent :ack :from from :to to}
+            (let [[q queues] (produce-queue to from queues)]
+              (>! q packet)
+              queues)
             :else
-              queues))))))
+            queues))))))
