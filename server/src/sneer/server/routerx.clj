@@ -171,7 +171,7 @@ a reply to sendTo(...) and when the receiver
         ensure-queue (fn [queue to]
                        (if queue
                          queue
-                         (let [q-packets-in (async/chan (async/dropping-buffer 1))]
+                         (let [q-packets-in (async/chan (async/sliding-buffer 1))]
                            (create-queue q-packets-in
                                          packets-out
                                          (heartbeats-of to))
