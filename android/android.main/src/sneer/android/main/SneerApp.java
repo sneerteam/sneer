@@ -70,7 +70,7 @@ public class SneerApp extends Application {
 		}
 
 		@Override
-		public byte[] icon() {								
+		public byte[] icon() {
 			try {
 				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.menuIcon);
 				return bitmapFor(icon);

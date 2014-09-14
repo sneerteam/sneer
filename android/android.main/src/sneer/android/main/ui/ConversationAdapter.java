@@ -15,9 +15,10 @@ import android.content.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.view.*;
+import android.view.View.OnClickListener;
 import android.widget.*;
 
-public class ConversationAdapter extends ArrayAdapter<Message>{
+public class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
 
     int layoutUserResourceId;    
     int listContactResourceId;
@@ -47,7 +48,11 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
         
         findTextView(ret, R.id.messageContent).setText(message.content().toString());
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
-    
+        
+        ret.setTag(message);
+        ret.setClickable(true);
+        ret.setOnClickListener(this);
+        
         if (!message.isOwn()) {
         	party.name().subscribe(new Action1<String>() { @Override public void call(String sender) { 
         		setColors(ret, sender, message.isOwn());
@@ -97,5 +102,10 @@ public class ConversationAdapter extends ArrayAdapter<Message>{
 		int g = strength + random.nextInt(86);
 		int b = strength + random.nextInt(86);
 		return Color.argb(255, r, g, b);
+	}
+
+	@Override
+	public void onClick(View v) {
+		((Message) v.getTag()).click();
 	}
 }
