@@ -103,36 +103,35 @@ public class ConversationActivity extends SneerActivity {
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			handleClick(editText.getText().toString().trim());
 			editText.setText("");
-		}
-
-		private void handleClick(String text) {
-			if (!text.isEmpty())
-				conversation.sendMessage(text);
-			else
-				openIteractionMenu();
-		}
-
-		private void openIteractionMenu() {
-			final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
-			
+		} });
+	}
 	
-			final Subscription s = conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")
-			@Override public void call(List<ConversationMenuItem> menuItems) {
-				menu.getMenu().close();
-				menu.getMenu().clear();
-				for (final ConversationMenuItem item : menuItems) {
-					menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
-						menu.getMenu().close();
-						item.call(party.publicKey().current());
-						return true;
-					}}).setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
-				}
-				menu.show();
-			} });
-			menu.setOnDismissListener(new OnDismissListener() {  @Override public void onDismiss(PopupMenu menu) {
-				s.unsubscribe();
-			} });
-		}});		
+	private void handleClick(String text) {
+		if (!text.isEmpty())
+			conversation.sendMessage(text);
+		else
+			openIteractionMenu();
+	}
+	
+	private void openIteractionMenu() {
+		final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
+		
+		final Subscription s = conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")
+		@Override public void call(List<ConversationMenuItem> menuItems) {
+			menu.getMenu().close();
+			menu.getMenu().clear();
+			for (final ConversationMenuItem item : menuItems) {
+				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
+					menu.getMenu().close();
+					item.call(party.publicKey().current());
+					return true;
+				}}).setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
+			}
+			menu.show();
+		} });
+		menu.setOnDismissListener(new OnDismissListener() {  @Override public void onDismiss(PopupMenu menu) {
+			s.unsubscribe();
+		} });
 	}
 	
 	
