@@ -9,12 +9,11 @@
       :offline 30000
       :retry 3000)))
 
-(def EMPTY {:highest-sequence-delivered -1
-            :packets clojure.lang.PersistentQueue/EMPTY})
-
 (defn reset-to [sequence state]
   (merge state {:highest-sequence-delivered (dec sequence)
                 :packets clojure.lang.PersistentQueue/EMPTY}))
+
+(def EMPTY (reset-to 0 {}))
 
 (defn next-packet [state]
   (-> state :packets peek))
