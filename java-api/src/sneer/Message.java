@@ -83,4 +83,9 @@ public class Message {
 	}
 	
 	
+	public void click() {
+		
+	}
+	
+	
 }

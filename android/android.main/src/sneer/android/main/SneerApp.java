@@ -70,7 +70,7 @@ public class SneerApp extends Application {
 		}
 
 		@Override
-		public byte[] icon() {								
+		public byte[] icon() {
 			try {
 				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.menuIcon);
 				return bitmapFor(icon);
@@ -254,11 +254,9 @@ public class SneerApp extends Application {
 		File adminDir = new File(context.getFilesDir(), "admin");
 		adminDir.mkdirs();
 		File secureFile = new File(adminDir, "tupleSpace.sqlite");
-		// secureFile.delete();
 		try {
 			SneerSqliteDatabase db = SneerSqliteDatabase.openDatabase(secureFile);
 			SneerAdmin admin = newSneerAdmin(db);
-			// createBot("bot", admin.sneer());
 			return admin;
 		} catch (IOException e) {
 			SystemReport.updateReport("Error starting Sneer", e);
@@ -276,33 +274,6 @@ public class SneerApp extends Application {
 	}
 
 	
-/*	private static void createBot(final String baseName, final Sneer masterSneer) {
-		Observable.range(1, 10).delay(1, TimeUnit.SECONDS)
-				.observeOn(Schedulers.newThread())
-				.subscribe(new Action1<Integer>() {
-					@Override
-					public void call(Integer id) {
-						try {
-
-							String name = baseName + ":" + id;
-
-							File dbFile = File.createTempFile(name, ".sqlite");
-							dbFile.deleteOnExit();
-							SneerAdmin botAdmin = newSneerAdmin(SneerSqliteDatabase.openDatabase(dbFile));
-
-							masterSneer.addContact(name, masterSneer.produceParty(botAdmin.privateKey().publicKey()));
-							botAdmin.sneer().addContact("master", botAdmin.sneer().produceParty(masterSneer.self().publicKey().current()));
-
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (FriendlyException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-	} */
-
-
 	public static boolean checkOnCreate(Activity activity) {
 		if (error == null) return true;
 		finishWith(error, activity);
