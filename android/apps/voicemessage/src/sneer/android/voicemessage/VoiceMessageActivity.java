@@ -39,6 +39,7 @@ public class VoiceMessageActivity extends MessageActivity {
 		
 		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			send();
+			finish();
 		}});
 		
 		button(R.id.btnCancel).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
