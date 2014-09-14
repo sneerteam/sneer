@@ -95,7 +95,8 @@
       packets-in
         ([packet]
           (if (some? packet)
-            (let [[reply state] (handle-packet packet state)]
+            (let [[reply state] (handle-packet packet state)
+                  retry (if (= (packet :intent) :ack) IMMEDIATELY retry)]
               (>! packets-out reply)
               (recur state offline retry))
             state)))))
