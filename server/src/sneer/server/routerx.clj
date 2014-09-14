@@ -1,8 +1,7 @@
 (ns sneer.server.routerx
   (:require
    [clojure.core.async :as async :refer [>! <!]]
-   [clojure.core.match :refer [match]]
-   [sneer.server.core :as core :refer [go-while-let]]))
+   [clojure.core.match :refer [match]]))
 
 (defn timeout-for [transition]
   (async/timeout
@@ -10,98 +9,113 @@
       :offline 30000
       :retry 3000)))
 
+(def EMPTY {:highest-sequence-delivered -1
+            :packets clojure.lang.PersistentQueue/EMPTY})
+
+(defn reset-to [sequence state]
+  (merge state {:highest-sequence-delivered (dec sequence)
+                :packets clojure.lang.PersistentQueue/EMPTY}))
+
+(defn next-packet [state]
+  (-> state :packets peek))
+
+(defn routed [packet]
+  (assoc (select-keys packet [:from :to :sequence :payload])
+         :intent :receive))
+
+(defn enqueue [packet state]
+  (update-in state [:packets] conj (routed packet)))
+
+(defn highest-sequence-to-send [state]
+  (if-some [packet (-> state :packets last)]
+           (:sequence packet)
+           (:highest-sequence-delivered state)))
+
+(defn enqueue-next [packet state]
+  (if (= (:sequence packet) (inc (highest-sequence-to-send state)))
+    (enqueue packet state)
+    state))
+
+(defn ack [sequence state]
+  (let [packet-to-ack (next-packet state)]
+    (if (and (some? packet-to-ack) (= sequence (:sequence packet-to-ack)))
+      (merge state {:highest-sequence-delivered sequence :packets (pop (state :packets))})
+      state)))
+
+(defn status-to [to state]
+  {:intent :status-of-queues
+   :to to
+   :highest-sequence-delivered (:highest-sequence-delivered state)
+   :highest-sequence-to-send (highest-sequence-to-send state)
+   :full? false})
+
+(defn handle-packet [packet state]
+  (match packet
+    {:intent :ack :sequence sequence :to to}
+    (let [state (ack sequence state)
+          reply (status-to to state)]
+      [reply state])
+    {:sequence sequence :reset true :from from}
+    (let [state (->> state (reset-to sequence) (enqueue packet))
+          reply (status-to from state)]
+      [reply state])
+    {:sequence sequence :from from}
+    (let [state (->> state (enqueue-next packet))
+          reply (status-to from state)]
+      [reply state])
+    :else
+      [(assoc packet :intent :receive) state]))
+
 (defn- closed-chan []
   (let [ch (async/chan)]
     (async/close! ch)
     ch))
 
-(def ^:private NEVER (async/chan))
-
 (def ^:private IMMEDIATELY (closed-chan))
 
-(defn- create-queue [packets-in packets-out receiver-heart-beats]
-  (let [state (atom {:highest-sequence-delivered -1
-                     :packets clojure.lang.PersistentQueue/EMPTY})]
-    (letfn
-        [(status-to [to]
-           {:intent :status-of-queues
-            :to to
-            :highest-sequence-delivered (highest-sequence-delivered)
-            :highest-sequence-to-send (highest-sequence-to-send)
-            :full? false})
-         (reset-to! [sequence]
-           (swap! state merge {:highest-sequence-delivered (dec sequence)
-                               :packets clojure.lang.PersistentQueue/EMPTY}))
-         (enqueue! [packet]
-           (swap! state update-in [:packets] conj (routed packet))
-           (status-to (:from packet)))
-         (next-packet []
-           (-> @state :packets peek))
-         (ack! [sequence]
-           (swap! state (fn [state]
-                          (merge state {:highest-sequence-delivered sequence
-                                        :packets (pop (state :packets))}))))
-         (highest-sequence-delivered []
-           (@state :highest-sequence-delivered))
-         (highest-sequence-to-send []
-           (let [{:keys [highest-sequence-delivered packets]} @state]
-             (+ highest-sequence-delivered (count packets))))
-         (valid? [sequence]
-           (= sequence (inc (highest-sequence-to-send))))
-         (routed [packet]
-           (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
+(defn- online-loop [state packets-in packets-out keep-alive]
+  (async/go-loop
+    [state state
+     offline (timeout-for :offline)
+     retry IMMEDIATELY]
 
-      (let [OFFLINE {:online receiver-heart-beats
-                     :keep-alive NEVER
-                     :offline NEVER
-                     :retry NEVER}]
-        (async/go-loop
-          [{:keys [online keep-alive offline retry] :as transitions} OFFLINE]
+    (async/alt!
+      offline
+        ([_] state)
 
-          (async/alt!
-            online
-              ([_]
-                (recur {:online NEVER
-                        :keep-alive receiver-heart-beats
-                        :offline (timeout-for :offline)
-                        :retry IMMEDIATELY}))
-            keep-alive
-              ([_]
-                (recur (assoc transitions :offline (timeout-for :offline))))
-            offline
-              ([_]
-                (recur OFFLINE))
-            retry
-              ([_]
-                (when-let [packet (next-packet)]
-                  (>! packets-out packet))
-                (recur (assoc transitions :retry (timeout-for :retry))))
-            packets-in
-              ([packet]
-                (when packet
-                  (match packet
-                    {:intent :ack :sequence sequence}
-                      (do
-                        (when (= sequence (inc (highest-sequence-delivered)))
-                          (ack! sequence)
-                          (>! packets-out (status-to (:to packet))))
-                        (recur (assoc transitions :retry IMMEDIATELY)))
-                    :else
-                      (do
-                        (match packet
-                          {:sequence sequence :reset true}
-                            (do
-                              (reset-to! sequence)
-                              (>! packets-out (enqueue! packet)))
-                          {:sequence (sequence :guard valid?)}
-                            (>! packets-out (enqueue! packet))
-                          {:sequence _}
-                            (>! packets-out (status-to (:from packet)))
-                          :else
-                            (>! packets-out (assoc packet :intent :receive)))
-                        (recur transitions))))))))
-      packets-in)))
+      keep-alive
+        ([_] (recur state (timeout-for :offline) retry))
 
+      retry
+        ([_]
+          (when-some [packet (next-packet state)]
+            (>! packets-out packet))
+          (recur state offline (timeout-for :retry)))
+
+      packets-in
+        ([packet]
+          (if (some? packet)
+            (let [[reply state] (handle-packet packet state)]
+              (>! packets-out reply)
+              (recur state offline retry))
+            state)))))
+
+(defn- create-queue [packets-in packets-out receiver-heartbeats]
+  (async/go-loop [state EMPTY]
+
+    (async/alt!
+      packets-in
+        ([packet]
+          (when (some? packet)
+            (let [[reply state] (handle-packet packet state)]
+              (>! packets-out reply)
+              (recur state))))
+
+      receiver-heartbeats
+        ([heartbeat]
+          (when (some? heartbeat)
+            (recur
+              (<! (online-loop state packets-in packets-out receiver-heartbeats))))))))
 
 (defn start [packets-in packets-out]
   "Store-and-Forward Server Protocol
@@ -169,17 +183,17 @@ a reply to sendTo(...) and when the receiver
                            [(get-in queues path) queues]))]
     (async/go-loop
       [queues {}]
-      (when-let [packet (<! packets-in)]
+      (when-some [packet (<! packets-in)]
         (recur
           (match packet
             {:intent :ping :from from}
-              (do 
+              (do
                 (>! packets-out {:intent :pong :to from})
                 queues)
             {:intent :send :from from :to to}
               (let [[q queues] (produce-queue from to queues)]
                 (>! q packet)
-                queues) 
+                queues)
             {:intent :ack  :from from :to to}
               (let [[q queues] (produce-queue to from queues)]
                 (>! q packet)
