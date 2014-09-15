@@ -1,11 +1,12 @@
 package diegomendes.sendpics;
 
-import sneer.android.ui.*;
-import sneer.commons.exceptions.*;
-import android.content.*;
-import android.graphics.*;
-import android.os.*;
-import android.widget.*;
+import sneer.android.ui.MessageActivity;
+import sneer.commons.exceptions.FriendlyException;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.widget.ImageView;
 
 public class SendPicsActivity extends MessageActivity {
 
@@ -47,16 +48,14 @@ public class SendPicsActivity extends MessageActivity {
     
 
     private void composeMessage() {
-//		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-//		galleryIntent.setType("image/*");
-//		
-//		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
-//		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
-//
-//		startActivityForResult(chooser, TAKE_PICTURE);
+		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+		galleryIntent.setType("image/*");
 		
-		navigateTo(ReceivePicsActivity.class);
+		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
+		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
+
+		startActivityForResult(chooser, TAKE_PICTURE);
 		
 	}
 
