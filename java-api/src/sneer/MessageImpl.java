@@ -81,5 +81,11 @@ public class MessageImpl implements Message {
 	public String toString() {
 		return "Message [" + timestampCreated + ": " + content + "]";
 	}
+
+
+	@Override
+	public Tuple tuple() {
+		return null;
+	}
 	
 }

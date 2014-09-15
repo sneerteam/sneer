@@ -11,6 +11,8 @@
    [sneer.commons.exceptions FriendlyException]
    [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation Message]
    [sneer.rx ObservedSubject]
+   [java.text SimpleDateFormat]
+   [java.util Date]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [sneer.impl.keys KeysImpl]
    [rx.schedulers TestScheduler]
@@ -141,13 +143,24 @@
 (defn now []
   (.getTime (java.util.Date.)))
 
+(def simple-date-format (SimpleDateFormat. "HH:mm"))
+
+(defn format-date [time] (.format simple-date-format (Date. time)))
+
 (defn tuple->message [own-puk ^Tuple tuple]
   (let [created (now)
         received (now)
         type (.type tuple)
         content (if (= type "message") (.payload tuple) type)
         own? (= own-puk (.author tuple))]
-    (Message. created received content own?)))
+    
+    (reify Message
+      (isOwn [this] own?)
+      (content [this] content)
+      (timestampCreated [this] created)
+      (timestampReceived [this] received)
+      (timeCreated [this] (format-date created))
+      (tuple [this] tuple))))
 
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [^PublicKey party-puk (party-puk party)

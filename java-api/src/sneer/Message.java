@@ -3,6 +3,7 @@ package sneer;
 import java.util.Comparator;
 
 import sneer.commons.Comparators;
+import sneer.tuples.Tuple;
 
 public interface Message {
 
@@ -24,5 +25,7 @@ public interface Message {
 	long timestampReceived();
 
 	String timeCreated();
+	
+	Tuple tuple();
 
 }
