@@ -1,6 +1,7 @@
 package sneer.android.main;
 
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.*;
+import static sneer.android.main.AndroidSneer.sneer;
 
 import java.io.*;
 import java.util.*;
@@ -70,11 +71,11 @@ public class TupleSpaceService extends Service {
 	}
 
 	private void subscribe(Map<String, Object> criteria, ResultReceiver resultReceiver) {
-		subscribe(resultReceiver, SneerApp.sneer().tupleSpace().filter().putFields(criteria).tuples());
+		subscribe(resultReceiver, sneer().tupleSpace().filter().putFields(criteria).tuples());
 	}
 
 	private void subscribeLocal(Map<String, Object> criteria, ResultReceiver resultReceiver) {
-		subscribe(resultReceiver, SneerApp.sneer().tupleSpace().filter().putFields(criteria).localTuples());
+		subscribe(resultReceiver, sneer().tupleSpace().filter().putFields(criteria).localTuples());
 	}
 
 	private void subscribe(final ResultReceiver resultReceiver, Observable<Tuple> tuples) {
@@ -101,7 +102,7 @@ public class TupleSpaceService extends Service {
 	}
 
 	private void publish(Map<String, Object> tuple) {
-		SneerApp.sneer().tupleSpace().publisher().putFields(tuple).pub();
+		sneer().tupleSpace().publisher().putFields(tuple).pub();
 	}
 
 	@Override

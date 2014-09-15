@@ -1,6 +1,6 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerApp.*;
+import static sneer.android.main.AndroidSneer.*;
 
 import java.util.*;
 
@@ -27,7 +27,7 @@ public class MainActivity extends SneerActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (!SneerApp.checkOnCreate(this)) return;
+		if (!checkOnCreate(this)) return;
 		
 		setContentView(R.layout.activity_main);
 

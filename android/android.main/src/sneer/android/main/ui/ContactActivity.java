@@ -1,20 +1,33 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerApp.*;
-import static sneer.android.ui.SneerActivity.*;
-import rx.*;
-import rx.functions.*;
-import sneer.*;
-import sneer.android.main.*;
-import sneer.android.main.ui.utils.*;
-import sneer.commons.exceptions.*;
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.support.v4.app.*;
-import android.text.*;
-import android.view.*;
-import android.widget.*;
+import static sneer.android.main.AndroidSneer.admin;
+import static sneer.android.main.AndroidSneer.checkOnCreate;
+import static sneer.android.main.AndroidSneer.sneer;
+import static sneer.android.ui.SneerActivity.plug;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import sneer.Contact;
+import sneer.Party;
+import sneer.Profile;
+import sneer.PublicKey;
+import sneer.android.main.R;
+import sneer.android.main.ui.utils.Puk;
+import sneer.commons.exceptions.FriendlyException;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class ContactActivity extends Activity {
 
@@ -39,7 +52,7 @@ public class ContactActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		if (!SneerApp.checkOnCreate(this)) return;
+		if (!checkOnCreate(this)) return;
 		
 		setContentView(R.layout.activity_contact);
 		
@@ -106,7 +119,6 @@ public class ContactActivity extends Activity {
 		}
 	}
 
-	
 	private String activityTitle() {
 		
 		if (getIntent().getExtras().get(PARTY_PUK)==null) {

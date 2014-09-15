@@ -1,21 +1,27 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerApp.*;
-import rx.*;
-import rx.functions.*;
-import sneer.*;
-import sneer.android.main.*;
-import sneer.android.main.ui.utils.*;
-import sneer.android.ui.*;
-import sneer.commons.exceptions.*;
-import android.content.*;
-import android.graphics.*;
-import android.os.*;
-import android.provider.*;
-import android.support.v4.app.*;
-import android.text.*;
-import android.view.*;
-import android.widget.*;
+import static sneer.android.main.AndroidSneer.sneer;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
+import sneer.Profile;
+import sneer.android.main.R;
+import sneer.android.main.ui.utils.Puk;
+import sneer.android.ui.SneerActivity;
+import sneer.commons.exceptions.FriendlyException;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v4.app.NavUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class ProfileActivity extends SneerActivity {
 
