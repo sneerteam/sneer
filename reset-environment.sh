@@ -17,6 +17,8 @@ fi
 
 echo "-------------------> Preparing the workspace"
 
+rm ~/.m2/repository/me/sneer/ -rf
+
 ./gradlew install eclipse
 
 cd android && ./gradlew jarNodeps eclipse && cd - || echo "Error preparing android projects, aborting." && exit -1
