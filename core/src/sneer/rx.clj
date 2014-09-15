@@ -50,6 +50,9 @@ Only maps containing all key/value pairs in criteria are kept."
 (defn observe-for-computation [^rx.Observable o]
   (.observeOn o (Schedulers/computation)))
 
+(defn observe-for-io [^rx.Observable o]
+  (.observeOn o (Schedulers/io)))
+
 (defn shared-latest [^rx.Observable o]
   "Returns a `rx.Observable' that publishes the latest value of the source sequence
 while sharing a single subscription as long as there are subscribers."
