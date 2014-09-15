@@ -154,7 +154,7 @@ public class SneerAndroid {
 								.filter()
 								.type(session.type)
 								.field("session", session.id))
-							.map(Message.fromTuple(ownPrik.publicKey()))
+							.map(MessageImpl.fromTuple(ownPrik.publicKey()))
 							.filter(new Func1<Message, Boolean>() {  @Override public Boolean call(Message msg) {
 								return predicate.call(session, msg);
 							}})

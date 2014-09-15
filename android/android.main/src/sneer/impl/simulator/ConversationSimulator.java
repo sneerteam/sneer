@@ -1,15 +1,24 @@
 package sneer.impl.simulator;
 
-import static sneer.Message.*;
-import static sneer.ConversationMenuItem.*;
-import static sneer.commons.Lists.*;
+import static sneer.ConversationMenuItem.BY_ALPHABETICAL_ORDER;
+import static sneer.Message.BY_TIME_RECEIVED;
+import static sneer.MessageImpl.createFrom;
+import static sneer.MessageImpl.createOwn;
+import static sneer.commons.Lists.lastIn;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import rx.Observable;
-import rx.subjects.*;
-import sneer.*;
-import sneer.rx.*;
+import rx.subjects.ReplaySubject;
+import sneer.Conversation;
+import sneer.ConversationMenuItem;
+import sneer.Message;
+import sneer.Party;
+import sneer.rx.Observed;
+import sneer.rx.ObservedSubject;
 
 public class ConversationSimulator implements Conversation {
 	
