@@ -71,13 +71,13 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 					subscriber.onCompleted();
 					break;
 				case ON_NEXT: {
-					Tuple tuple = newTupleFromMap((Map<String, Object>) serializer.deserialize((byte[]) SneerAndroid.unbundle(resultData)));
+					Tuple tuple = newTupleFromMap((Map<String, Object>) serializer.deserialize((byte[]) SneerAndroidClient.unbundle(resultData)));
 					log("tupleSpace: tuple: " + tuple);
 					subscriber.onNext(tuple);
 					break;
 				}
 				case SUBSCRIPTION_ID: {
-					final int subscriptionId = (Integer) SneerAndroid.unbundle(resultData);
+					final int subscriptionId = (Integer) SneerAndroidClient.unbundle(resultData);
 					log("tupleSpace: subscriptionId: " + subscriptionId);
 					subscriber.add(Subscriptions.create(new Action0() { @Override public void call() {
 						Intent intent = new Intent(TUPLE_SPACE_SERVICE);

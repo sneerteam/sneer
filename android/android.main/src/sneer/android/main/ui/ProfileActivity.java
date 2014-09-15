@@ -1,6 +1,6 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.AndroidSneer.sneer;
+import static sneer.android.main.SneerAndroid.sneer;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;

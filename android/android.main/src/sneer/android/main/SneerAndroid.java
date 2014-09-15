@@ -1,9 +1,9 @@
 package sneer.android.main;
 
-import static sneer.SneerAndroid.MESSAGE;
-import static sneer.SneerAndroid.OWN_PRIK;
-import static sneer.SneerAndroid.RESULT_RECEIVER;
-import static sneer.SneerAndroid.SESSION_ID;
+import static sneer.SneerAndroidClient.MESSAGE;
+import static sneer.SneerAndroidClient.OWN_PRIK;
+import static sneer.SneerAndroidClient.RESULT_RECEIVER;
+import static sneer.SneerAndroidClient.SESSION_ID;
 import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
 import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION;
 import static sneer.commons.exceptions.Exceptions.check;
@@ -46,7 +46,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-public class AndroidSneer {
+public class SneerAndroid {
 	
 	
 	static Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerPluginInfo> apps) {
@@ -79,7 +79,7 @@ public class AndroidSneer {
 				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.menuIcon);
 				return bitmapFor(icon);
 			} catch (Exception e) {
-				Log.w(AndroidSneer.class.getSimpleName(), "Error loading bitmap", e);
+				Log.w(SneerAndroid.class.getSimpleName(), "Error loading bitmap", e);
 				e.printStackTrace();
 			}
 			return null;
@@ -125,7 +125,7 @@ public class AndroidSneer {
 				}
 			} catch (final Throwable t) {
 				toastOnMainThread("Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
-				Log.w(AndroidSneer.class.getSimpleName(), "Error receiving message from plugin", t);
+				Log.w(SneerAndroid.class.getSimpleName(), "Error receiving message from plugin", t);
 			}
 			
 		}});
@@ -180,7 +180,7 @@ public class AndroidSneer {
 
 
 	private static void info(String msg) {
-		Log.i(AndroidSneer.class.getSimpleName(), msg);
+		Log.i(SneerAndroid.class.getSimpleName(), msg);
 	}
 
 
@@ -281,7 +281,7 @@ public class AndroidSneer {
 	private static Map<String, SneerPluginInfo> tupleViewers = new HashMap<String, SneerPluginInfo>();
 
 	public static void init(Context context) {
-		AndroidSneer.context = context;
+		SneerAndroid.context = context;
 		
 		SneerPluginInfo.initialDiscovery(context);
 		

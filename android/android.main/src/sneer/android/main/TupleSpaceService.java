@@ -1,7 +1,7 @@
 package sneer.android.main;
 
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.*;
-import static sneer.android.main.AndroidSneer.sneer;
+import static sneer.android.main.SneerAndroid.sneer;
 
 import java.io.*;
 import java.util.*;

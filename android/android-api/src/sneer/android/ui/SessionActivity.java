@@ -1,6 +1,6 @@
 package sneer.android.ui;
 
-import static sneer.SneerAndroid.*;
+import static sneer.SneerAndroidClient.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.*;
@@ -15,7 +15,7 @@ public abstract class SessionActivity extends SneerActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		session = new SneerAndroid(this).session(
+		session = new SneerAndroidClient(this).session(
 			(Long)getExtra(SESSION_ID),
 			(PrivateKey)getExtra(OWN_PRIK)
 		);

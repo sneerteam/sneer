@@ -7,11 +7,11 @@ import android.os.*;
 public abstract class MessageActivity extends SneerActivity {
 
 	protected Object message() {
-		return getExtra(SneerAndroid.MESSAGE);
+		return getExtra(SneerAndroidClient.MESSAGE);
 	}
 	
 	protected void send(Object... messages) {
-		ResultReceiver resultReceiver = getExtra(SneerAndroid.RESULT_RECEIVER);
+		ResultReceiver resultReceiver = getExtra(SneerAndroidClient.RESULT_RECEIVER);
 
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("value", Value.of(messages));

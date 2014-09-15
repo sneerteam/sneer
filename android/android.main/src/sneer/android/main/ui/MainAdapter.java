@@ -10,7 +10,7 @@ import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.Subscriptions;
 import sneer.Conversation;
-import sneer.android.main.AndroidSneer;
+import sneer.android.main.SneerAndroid;
 import sneer.android.main.R;
 import android.app.Activity;
 import android.graphics.Color;
@@ -65,7 +65,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		Subscription subscription = Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
-				plug(holder.conversationPicture, AndroidSneer.sneer().profileFor(conversation.party()).selfie()),
+				plug(holder.conversationPicture, SneerAndroid.sneer().profileFor(conversation.party()).selfie()),
 				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
 				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
 		subscriptions.add(subscription);

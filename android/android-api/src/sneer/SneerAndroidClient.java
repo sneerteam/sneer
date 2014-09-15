@@ -8,7 +8,7 @@ import sneer.tuples.*;
 import android.content.*;
 import android.os.*;
 
-public class SneerAndroid {
+public class SneerAndroidClient {
 
 	public static final String TYPE = "type";
 	public static final String PARTY_PUK = "partyPuk";
@@ -50,7 +50,7 @@ public class SneerAndroid {
 		return resultData.get("value");
 	}
 	
-	public SneerAndroid(Context context) {
+	public SneerAndroidClient(Context context) {
 		this.context = context;
 	}
 	
@@ -129,7 +129,7 @@ public class SneerAndroid {
 			
 			@Override
 			public Observable<Message> previousMessages() {
-				return messages(new Func2<SneerAndroid.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
+				return messages(new Func2<SneerAndroidClient.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
 					return msg.timestampReceived() <= session.lastMessageSeen;
 				} }, new Func1<TupleFilter, Observable<Tuple>>() {  @Override public Observable<Tuple> call(TupleFilter t1) {
 					return t1.localTuples();
@@ -138,7 +138,7 @@ public class SneerAndroid {
 			
 			@Override
 			public Observable<Message> newMessages() {
-				return messages(new Func2<SneerAndroid.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
+				return messages(new Func2<SneerAndroidClient.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
 					return msg.timestampReceived() > session.lastMessageSeen;
 				} }, new Func1<TupleFilter, Observable<Tuple>>() {  @Override public Observable<Tuple> call(TupleFilter t1) {
 					return t1.tuples();

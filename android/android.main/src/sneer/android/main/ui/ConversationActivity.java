@@ -1,7 +1,7 @@
 package sneer.android.main.ui;
 
 import static java.util.concurrent.TimeUnit.*;
-import static sneer.android.main.AndroidSneer.*;
+import static sneer.android.main.SneerAndroid.*;
 
 import java.io.*;
 import java.util.*;
