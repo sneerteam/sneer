@@ -82,10 +82,4 @@ public class Message {
 		return "Message [" + timestampCreated + ": " + content + "]";
 	}
 	
-	
-	public void click() {
-		
-	}
-	
-	
 }
