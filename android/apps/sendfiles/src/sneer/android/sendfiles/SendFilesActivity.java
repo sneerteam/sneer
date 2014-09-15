@@ -12,18 +12,18 @@ public class SendFilesActivity extends MessageActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (message() != null) {
-			open(message());
-		} else {
-			composeMessage();
-		}
+//		if (message() != null) {
+//			open(message());
+//		} else {
+//			composeMessage();
+//		}
+		open(message());
 	}
 
 	private void composeMessage() {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("file/*");
 		startActivityForResult(intent, PICKFILE_RESULT_CODE);
-
 	}
 
 	private void open(Object message) {
