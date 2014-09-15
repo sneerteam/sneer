@@ -1,7 +1,7 @@
 (ns sneer.core
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [filter-by observe-for-computation]]
+   [sneer.rx :refer [filter-by observe-for-io]]
    [sneer.serialization :refer [roundtrip]])
   (:import
    [sneer PrivateKey PublicKey]
@@ -159,19 +159,19 @@ new tuples as they are stored otherwise it will complete." )
       (partial rx/on-next distinct-followees))
     
     (rx/subscribe
-     (->>
-       subs-out
-       observe-for-computation
-       (rx/filter #(not= (get-author %) own-puk))
-       (rx/distinct)
-       (rx/flatmap
-        (fn [criteria]
-          (if (get-author criteria)
-            (rx/return criteria)
-            (rx/map #(assoc criteria "author" %) distinct-followees))))
-       (rx/map #(->envelope (get-author %) :subscription (assoc % :sender own-puk)))
-       (rx/do #(println "[SUBS-OUT(" own-puk ")]" %)))
-     #(rx/on-next connection %))
+      (->>
+        subs-out
+        observe-for-io
+        (rx/filter #(not= (get-author %) own-puk))
+        (rx/distinct)
+        (rx/flatmap
+         (fn [criteria]
+           (if (get-author criteria)
+             (rx/return criteria)
+             (rx/map #(assoc criteria "author" %) distinct-followees))))
+        (rx/map #(->envelope (get-author %) :subscription (assoc % :sender own-puk)))
+        (rx/do #(println "[SUBS-OUT(" own-puk ")]" %)))
+      #(rx/on-next connection %))
 
     (rx/subscribe
       (->>
@@ -191,6 +191,7 @@ new tuples as they are stored otherwise it will complete." )
                      (rx/subscribe
                        (->>
                          (query-tuples tuple-base criteria true)
+                         observe-for-io
                          ; TODO: extend query-tuples to support the condition below
                          (rx/filter #(let [audience (get % "audience")]
                                        (or (nil? audience) (= sender audience))))
