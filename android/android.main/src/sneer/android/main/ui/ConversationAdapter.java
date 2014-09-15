@@ -50,8 +50,10 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
         
         ret.setTag(message);
-        ret.setClickable(true);
-        ret.setOnClickListener(this);
+        if (AndroidSneer.isClickable(message)) {
+	        ret.setClickable(true);
+	        ret.setOnClickListener(this);
+        }
         
         if (!message.isOwn()) {
         	party.name().subscribe(new Action1<String>() { @Override public void call(String sender) { 
@@ -106,6 +108,6 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
 
 	@Override
 	public void onClick(View v) {
-		((Message) v.getTag()).click();
+		AndroidSneer.doOnClick((Message) v.getTag());
 	}
 }
