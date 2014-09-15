@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">sendfiles</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_view_send_files">ViewSendFilesActivity</string>
 
 </resources>

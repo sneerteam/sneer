@@ -19,8 +19,7 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f040000;
-        public static final int hello_world=0x7f040001;
-        public static final int title_activity_view_send_files=0x7f040002;
+        public static final int title_activity_view_send_files=0x7f040001;
     }
     public static final class style {
         /** 
@@ -32,17 +31,6 @@ public final class R {
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         
-
-        Base application theme for API 11+. This theme completely replaces
-        AppBaseTheme from res/values/styles.xml on API 11+ devices.
-    
- API 11 theme customizations can go here. 
-
-        Base application theme for API 14+. This theme completely replaces
-        AppBaseTheme from BOTH res/values/styles.xml and
-        res/values-v11/styles.xml on API 14+ devices.
-    
- API 14 theme customizations can go here. 
          */
         public static final int AppBaseTheme=0x7f050000;
         /**  Application theme. 
