@@ -1,9 +1,9 @@
 package sneer.android.sendfiles;
 
-import android.app.Activity;
+import sneer.android.ui.MessageActivity;
 import android.os.Bundle;
 
-public class ViewSendFilesActivity extends Activity {
+public class ViewSendFilesActivity extends MessageActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

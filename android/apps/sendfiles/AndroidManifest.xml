@@ -21,10 +21,27 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.VIEW" /> -->
+            <!-- </intent-filter> -->
+
+            
+            <meta-data android:name="sneer:interaction-type" android:value="MESSAGE/COMPOSE" />
+            <meta-data android:name="sneer:tuple-type" android:value="file" />
+            <meta-data android:name="sneer:menu-caption" android:value="Send File" />
+            <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
         <activity
             android:name=".ViewSendFilesActivity"
             android:label="@string/title_activity_view_send_files" >
+            
+<!--             <intent-filter> -->
+<!-- 		        <action android:name="android.intent.action.VIEW" /> -->
+<!-- 		    </intent-filter> -->
+            
+            <meta-data android:name="sneer:interaction-type" android:value="MESSAGE/VIEW" />
+            <meta-data android:name="sneer:tuple-type" android:value="file" />
         </activity>
     </application>
 
