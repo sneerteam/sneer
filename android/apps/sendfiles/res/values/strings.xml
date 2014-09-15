@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name">sendfiles</string>
-    <string name="title_activity_view_send_files">ViewSendFilesActivity</string>
+
+    <string name="title_activity_send_files">Send File</string>
+    <string name="title_activity_view_send_files">View File</string>
 
 </resources>
