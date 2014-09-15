@@ -7,7 +7,7 @@ import android.os.*;
 public abstract class MessageActivity extends SneerActivity {
 
 	protected Object message() {
-		return getExtra(SneerAndroidClient.MESSAGE);
+		return ((Value)getIntent().getParcelableExtra(SneerAndroidClient.MESSAGE)).get();
 	}
 	
 	protected void send(Object... messages) {
