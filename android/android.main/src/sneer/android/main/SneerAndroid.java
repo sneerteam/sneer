@@ -30,6 +30,7 @@ import sneer.android.main.core.SneerSqliteDatabase;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.impl.simulator.SneerAdminSimulator;
+import sneer.tuples.Tuple;
 import sneer.utils.SharedResultReceiver;
 import sneer.utils.Value;
 import android.app.Activity;
@@ -136,7 +137,6 @@ public class SneerAndroid {
 	}
 
 	private static void startViewMessage(final SneerPluginInfo app, Object message) {
-		toast("Starting: " + app.packageName+"."+app.activityName, Toast.LENGTH_SHORT);
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
@@ -315,12 +315,17 @@ public class SneerAndroid {
 
 
 	public static boolean isClickable(Message message) {
-		return false; //tupleViewers.containsKey(message.type());
+		return tupleViewers.containsKey(message.tuple().type());
 	}
 
 
 	public static void doOnClick(Message message) {
-		
+		Tuple tuple = message.tuple();
+		SneerPluginInfo viewer = tupleViewers.get(tuple.type());
+		if (viewer == null) {
+			throw new RuntimeException("Can't find viewer plugin for message type '"+tuple.type()+"'");
+		}
+		startViewMessage(viewer, tuple.payload());
 	}
 
 }
