@@ -4,16 +4,16 @@
 (defn create []
   clojure.lang.PersistentQueue/EMPTY)
 
-(defn enqueue-to-send [packet state]
-  (conj state packet))
+(defn enqueue-to-send [payload state]
+  (conj state {:payload payload :sequence (count state)}))
 
-(defn handle-packet [packet state]
+(defn handle-packet-from-server [packet state]
   state)
 
-(defn peek-packet-to-send [state]
+(defn peek-packet [state]
   (first state))
 
-(defn pop-packet-to-send [state]
+(defn pop-packet [state]
   (pop state))
 
 
@@ -21,13 +21,10 @@
  "New Queues"
 
   (fact "A new queue has no packet to send."
-    (-> (create) next-packet-to-send) => nil)
+    (-> (create) peek-packet) => nil)
 
   (fact "Packet enqueing is FIFO."
     (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
-      (->> queue peek-packet-to-send) => :foo
-      (->> queue pop-packet-to-send peek-packet-to-send) => :bar))
+      (->> queue peek-packet) => {:sequence 0 :payload :foo}
+      (->> queue pop-packet peek-packet) => {:sequence 1 :payload :bar})))
 
-  (fact "Popping the queue removes the next packet to send."
-    (let [queue (create)]
-      (->> queue (enqueue-to-send :foo) pop-packet-to-send peek-packet-to-send) => nil)))
