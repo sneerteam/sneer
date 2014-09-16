@@ -1,5 +1,5 @@
 (ns sneer.networking.client
-  (:require [clojure.core.async :as async :refer [<! >! >!!]]
+  (:require [clojure.core.async :as async :refer [<! >! >!! <!!]]
             [rx.lang.clojure.core :as rx]
             [sneer.core :as core]
             [sneer.rx :refer [subject*]]
@@ -12,12 +12,13 @@
 
 (defn chan->observable [ch]
   (let [subject (rx.subjects.PublishSubject/create)]
-    (async/go-loop []
-      (if-let [value (<! ch)]
-        (do
-          (rx/on-next subject value)
-          (recur))
-        (rx/on-completed subject)))
+    (async/thread
+      (loop []
+        (if-let [value (<!! ch)]
+          (do
+            (rx/on-next subject value)
+            (recur))
+          (rx/on-completed subject))))
     subject))
 
 (defn chan->observer [ch]
