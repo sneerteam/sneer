@@ -31,7 +31,7 @@
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
         <activity
-            android:name=".OpenVoiceMessageActivity"
+            android:name=".ViewVoiceMessageActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_open_voice_message" >
             <intent-filter>
@@ -40,6 +40,7 @@
             
             <meta-data android:name="sneer:interaction-type" android:value="MESSAGE/VIEW" />
             <meta-data android:name="sneer:tuple-type" android:value="audio/3gp" />
+            <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
     </application>
 

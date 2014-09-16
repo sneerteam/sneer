@@ -26,15 +26,6 @@ public class VoiceMessageActivity extends MessageActivity {
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		
-		if (message() != null) {
-			open(message());
-		} else {
-			composeMessage();
-		}
-	}
-
-
-	private void composeMessage() {
 		setContentView(R.layout.activity_voice_message);
 		
 		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
@@ -46,12 +37,7 @@ public class VoiceMessageActivity extends MessageActivity {
 			finish();
 		}});
 		
-		startRecording();
-	}
-
-
-	private void open(Object message) {
-		navigateTo(OpenVoiceMessageActivity.class);
+		startRecording();	
 	}
 
 

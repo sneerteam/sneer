@@ -1,10 +1,12 @@
 package sneer.android.voicemessage;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import android.app.Activity;
+import sneer.android.ui.MessageActivity;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
@@ -16,11 +18,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class OpenVoiceMessageActivity extends Activity {
+public class ViewVoiceMessageActivity extends MessageActivity {
 
 	static final String LOG_TAG = "----> Sneer VoiceMessage";
 
-	private final String audioFileName = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp").getAbsolutePath();
+	static final File TEMP_3GP = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp");
 	private volatile MediaPlayer player;
 
 	private TextView recordingTime;
@@ -38,7 +40,7 @@ public class OpenVoiceMessageActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_open_voice_message);
+		setContentView(R.layout.activity_view_voice_message);
 
 		btnPlay = (ImageButton)findViewById(R.id.btn_play);
 		btnPause = (ImageButton)findViewById(R.id.btn_pause);
@@ -90,7 +92,7 @@ public class OpenVoiceMessageActivity extends Activity {
 	
 	
 	private void activityTitle(String title) {
-		OpenVoiceMessageActivity.this.setTitle(title);
+		ViewVoiceMessageActivity.this.setTitle(title);
 	}
 
 
@@ -109,7 +111,19 @@ public class OpenVoiceMessageActivity extends Activity {
 		player.setOnCompletionListener(new OnCompletionListener() { @Override public void onCompletion(MediaPlayer mp) {
 			finish();
 		}});
-		player.setDataSource(audioFileName);
+		
+		byte[] message = (byte[])message();
+
+		TEMP_3GP.deleteOnExit();
+        FileOutputStream fos = new FileOutputStream(TEMP_3GP);
+		fos.write(message);
+        fos.close();
+      
+        FileInputStream fis = new FileInputStream(TEMP_3GP);
+		
+        player.setDataSource(fis.getFD());
+		fis.close();
+		
 		player.prepare();
 	}
 
