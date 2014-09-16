@@ -191,5 +191,25 @@ public class SneerActivity extends Activity {
 			} });;
 	}
 
+	
+	public byte[] bytes(FileInputStream file) throws FriendlyException {
+		try {
+			return readFully(file);
+		} catch (IOException e) {
+			throw new FriendlyException("Problem reading file");
+		}
+	}
+	
+	
+	static private byte[] readFully(InputStream inputStream) throws IOException {
+		byte[] b = new byte[8192];
+		int read;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		while ((read = inputStream.read(b)) != -1) {
+			out.write(b, 0, read);
+		}
+		return out.toByteArray();
+	}
+	
 }
 

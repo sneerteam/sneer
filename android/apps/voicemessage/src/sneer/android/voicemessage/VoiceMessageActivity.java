@@ -1,10 +1,9 @@
 package sneer.android.voicemessage;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import sneer.android.ui.MessageActivity;
 import sneer.commons.exceptions.FriendlyException;
@@ -103,22 +102,16 @@ public class VoiceMessageActivity extends MessageActivity {
 		
 		byte[] bytes = null;
 		try {
-			bytes = recordingBytes();
+			bytes = bytes(new FileInputStream(audioFileName));
 		} catch (FriendlyException e) {
+			toast(e);
+			finish();
+		} catch (FileNotFoundException e) {
 			toast(e);
 			finish();
 		}
 		if (bytes != null)
 			send(bytes);
-	}
-
-
-	private byte[] recordingBytes() throws FriendlyException {
-		try {
-			return readFully(new FileInputStream(audioFileName));
-		} catch (IOException e) {
-			throw new FriendlyException("Problem with recording");
-		}
 	}
 
 
@@ -149,17 +142,6 @@ public class VoiceMessageActivity extends MessageActivity {
 		} catch (InterruptedException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-
-	static private byte[] readFully(InputStream in) throws IOException {
-		byte[] b = new byte[8192];
-		int read;
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		while ((read = in.read(b)) != -1) {
-			out.write(b, 0, read);
-		}
-		return out.toByteArray();
 	}
 
 

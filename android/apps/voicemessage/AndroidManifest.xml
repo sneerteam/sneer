@@ -33,7 +33,7 @@
         <activity
             android:name=".ViewVoiceMessageActivity"
             android:excludeFromRecents="true"
-            android:label="@string/title_activity_open_voice_message" >
+            android:label="@string/title_activity_view_voice_message" >
             <intent-filter>
 		        <action android:name="android.intent.action.VIEW" />
 		    </intent-filter>
