@@ -23,10 +23,11 @@
   (fact "A new queue has no packet to send."
     (-> (create) next-packet-to-send) => nil)
 
-  (fact "First packet enqueue is first to be sent."
-    (let [queue (create)]
-      (->> queue (enqueue-to-send :foo) (peek-packet-to-send)) => :foo))
+  (fact "Packet enqueing is FIFO."
+    (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
+      (->> queue peek-packet-to-send) => :foo
+      (->> queue pop-packet-to-send peek-packet-to-send) => :bar))
 
-  (fact "First packet enqueue is first to be sent."
+  (fact "Popping the queue removes the next packet to send."
     (let [queue (create)]
       (->> queue (enqueue-to-send :foo) pop-packet-to-send peek-packet-to-send) => nil)))
