@@ -1,49 +1,68 @@
 package sneer.android.sendfiles;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+
 import sneer.android.ui.MessageActivity;
+import sneer.commons.exceptions.FriendlyException;
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 public class SendFilesActivity extends MessageActivity {
 
-	private static final int PICKFILE_RESULT_CODE = 0;
+	private static final int REQUESTCODE_PICK_FILE = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-//		if (message() != null) {
-//			open(message());
-//		} else {
-//			composeMessage();
-//		}
-		open(message());
+		pickFile();
 	}
 
-	private void composeMessage() {
+	
+	private void pickFile() {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		intent.setType("file/*");
-		startActivityForResult(intent, PICKFILE_RESULT_CODE);
+		intent.setType("*/*");
+		startActivityForResult(intent, REQUESTCODE_PICK_FILE);
 	}
-
-	private void open(Object message) {
-		navigateTo(ViewSendFilesActivity.class);
-	}
-
+	
+	
 	@Override
-	public void onPause() {
-		super.onPause();
-		finish();
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    super.onActivityResult(requestCode, resultCode, data);
+	    if (requestCode != REQUESTCODE_PICK_FILE || resultCode != Activity.RESULT_OK) {
+	    	finish();
+	    	return;
+	    }
+	    
+	    Uri fileUri = data.getData();
+	    File file = new File(fileUri.getPath());
+	    String fileName = file.getName();
+		long lastModified = file.lastModified();
+		
+		byte[] bytes = null;
+		try {
+			bytes = bytes(new FileInputStream(file));
+		} catch (FriendlyException e) {
+			toast(e);
+			finish();
+		} catch (FileNotFoundException e) {
+			toast(e);
+			finish();
+		}
+	
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("contents", bytes);
+		map.put("filename", fileName);
+		map.put("last-modified", lastModified);
+		
+		if (bytes != null)
+			send(map);
+		
+	    finish();
 	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		finish();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
+	
 }
