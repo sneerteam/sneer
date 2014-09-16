@@ -15,11 +15,11 @@ public abstract class MessageActivity extends SneerActivity {
 		return envelope.get();
 	}
 	
-	protected void send(Object... messages) {
+	protected void send(Object message) {
 		ResultReceiver resultReceiver = getExtra(SneerAndroidClient.RESULT_RECEIVER);
 
 		Bundle bundle = new Bundle();
-		bundle.putParcelable("value", Value.of(messages));
+		bundle.putParcelable("value", Value.of(message));
 		resultReceiver.send(RESULT_OK, bundle);
 	}
 
