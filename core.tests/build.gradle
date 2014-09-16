@@ -65,5 +65,5 @@ dependencies {
     provided project(':java-api')
     provided project(':core')
     optional project(':server')
-    testCompile 'midje:midje:1.6.3'
+    provided 'midje:midje:1.6.3'
 }
