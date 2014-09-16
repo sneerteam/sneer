@@ -7,6 +7,7 @@ import sneer.*;
 import sneer.Message;
 import android.os.*;
 
+@Deprecated
 public abstract class SessionActivity extends SneerActivity {
 
 	private Session session;
