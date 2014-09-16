@@ -13,6 +13,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault.Dialog" >
+       
         <activity
             android:name=".SendPicsActivity"
             android:label="@string/app_name" >
@@ -24,7 +25,7 @@
             <meta-data android:name="sneer:tuple-type" android:value="picture" />
             <meta-data android:name="sneer:menu-caption" android:value="Send Pictures" />
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
-        </activity>
+        </activity>     
         <activity
             android:name=".ReceivePicsActivity"
             android:label="@string/title_activity_receive_pics" >
@@ -39,5 +40,4 @@
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
     </application>
-
 </manifest>
