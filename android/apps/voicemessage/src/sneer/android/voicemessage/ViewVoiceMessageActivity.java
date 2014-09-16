@@ -173,7 +173,7 @@ public class ViewVoiceMessageActivity extends MessageActivity {
 	}};
 
 	private void updateRecordingTime(long v1, long v2) {
-		recordingTime.setText(String.format("%02d:%02d", toMinutes(v1), minutesToSeconds(toMinutes(v1)) - toSeconds(v2)));
+		recordingTime.setText(String.format("%02d:%02d", toMinutes(v1) * -1, minutesToSeconds(toMinutes(v1)) - toSeconds(v2)));
 	}
 
 
