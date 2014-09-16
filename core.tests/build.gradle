@@ -57,6 +57,7 @@ eclipse.project {
 dependencies {
     provided 'org.clojure:clojure:1.6.0'
     provided 'org.clojure:core.async:0.1.303.0-886421-alpha'
+    provided 'org.clojure:core.match:0.2.1'
     optional 'org.clojure:java.jdbc:0.3.4'
     provided 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
     provided 'junit:junit:4.11'

@@ -1,5 +1,6 @@
 (ns sneer.core.tests.reliable-client-test
-  (:require [midje.sweet :refer :all]))
+  (:require [midje.sweet :refer :all]
+            [clojure.core.match :refer [match]]))
 
 (defn create []
   {:sequence 0
@@ -8,18 +9,22 @@
 (defn enqueue-to-send [payload state]
   (update-in state [:payloads] conj payload))
 
-(defn handle-packet-from-server [packet state]
-  state)
-
-(defn peek-packet [state]
-  (when-some [payload (-> state :payloads first)]
-    {:sequence (state :sequence)
-     :payload payload}))
-
-(defn pop-packet [state]
+(defn- pop-packet [state]
   (-> state
     (update-in [:payloads] pop)
     (update-in [:sequence] inc)))
+
+(defn handle-packet-from-server [packet state]
+  (match packet
+         {:highest-sequence-to-send highest-sequence-to-send}
+           (case (- (state :sequence) highest-sequence-to-send)
+             0 (pop-packet state)
+             1 state
+             (assoc state :reset true))))
+
+(defn peek-packet [state]
+  (when-some [payload (-> state :payloads first)]
+    (assoc (select-keys state [:sequence :reset]) :payload payload)))
 
 
 (facts
@@ -36,4 +41,23 @@
   (fact "Every new packet gets a new sequence number."
   (let [queue (->> (create) (enqueue-to-send :foo))]
     (->> queue pop-packet (enqueue-to-send :bar) peek-packet :sequence) => 1)))
+
+
+(facts
+ "Packet Handling"
+
+  (fact "Packet enqueing is FIFO."
+    (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
+          simulate (fn [highest-sequence-to-send]
+                     (->> queue
+                       (handle-packet-from-server
+                         {:intent :status-of-queues
+                          :highest-sequence-delivered -1
+                          :highest-sequence-to-send highest-sequence-to-send
+                          :full? false})
+                       peek-packet))]
+    
+    (simulate -1) => {:sequence 0 :payload :foo}
+    (simulate 0)  => {:sequence 1 :payload :bar}
+    (simulate 42) => {:sequence 0 :payload :foo :reset true})))
 
