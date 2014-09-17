@@ -1,5 +1,8 @@
 package sneer.android.main.ui;
 
+import static sneer.android.main.SneerApp.admin;
+import static sneer.android.main.SneerApp.sneer;
+import static sneer.android.main.SneerApp.sneerAndroid;
 import static sneer.android.main.SneerAndroid.*;
 
 import java.util.*;
@@ -27,7 +30,7 @@ public class MainActivity extends SneerActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (!checkOnCreate(this)) return;
+		if (!sneerAndroid(this).checkOnCreate(this)) return;
 		
 		setContentView(R.layout.activity_main);
 
@@ -42,7 +45,7 @@ public class MainActivity extends SneerActivity {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
 
-		Profile ownProfile = sneer().profileFor(sneer().self());
+		Profile ownProfile = sneer(this).profileFor(sneer(this).self());
 		
 		plugActionBarTitle(actionBar, ownProfile.ownName());
 		plugActionBarIcon(actionBar, ownProfile.selfie());
@@ -56,7 +59,7 @@ public class MainActivity extends SneerActivity {
 			onClicked(conversation);
 		}});
 		
-		deferUI(sneer().conversations())
+		deferUI(sneer(this).conversations())
 			.subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
 				adapter.clear();
 				adapter.addAll(conversations);
@@ -116,7 +119,7 @@ public class MainActivity extends SneerActivity {
 
 
 	private Observable<String> ownName() {
-		return sneer().profileFor(sneer().self()).ownName();
+		return sneer(this).profileFor(sneer(this).self()).ownName();
 	}
 
 	

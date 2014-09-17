@@ -1,22 +1,30 @@
 package sneer.android.main;
 
-import static sneer.TupleSpaceFactoryClient.SubscriptionOp.*;
-import static sneer.android.main.SneerAndroid.sneer;
+import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_COMPLETED;
+import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_NEXT;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import rx.*;
 import rx.Observable;
-import rx.functions.*;
-import sneer.*;
-import sneer.commons.*;
-import sneer.tuples.*;
-import android.app.*;
-import android.content.*;
-import android.os.*;
+import rx.Subscription;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import sneer.Sneer;
+import sneer.TupleSpaceFactoryClient;
+import sneer.commons.InteractiveSerializer;
+import sneer.tuples.Tuple;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Parcelable;
+import android.os.ResultReceiver;
 
 public class TupleSpaceService extends Service {
 	
@@ -69,7 +77,11 @@ public class TupleSpaceService extends Service {
 			s.unsubscribe();
 		}
 	}
-
+	
+	private Sneer sneer() {
+		return ((SneerApp)getApplication()).sneerAndroid().sneer();
+	}
+	
 	private void subscribe(Map<String, Object> criteria, ResultReceiver resultReceiver) {
 		subscribe(resultReceiver, sneer().tupleSpace().filter().putFields(criteria).tuples());
 	}

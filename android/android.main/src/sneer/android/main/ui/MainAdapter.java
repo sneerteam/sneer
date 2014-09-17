@@ -1,5 +1,6 @@
 package sneer.android.main.ui;
 
+import static sneer.android.main.SneerApp.sneer;
 import static sneer.android.ui.SneerActivity.deferUI;
 import static sneer.android.ui.SneerActivity.findView;
 import static sneer.android.ui.SneerActivity.plug;
@@ -12,6 +13,7 @@ import rx.subscriptions.Subscriptions;
 import sneer.Conversation;
 import sneer.android.main.SneerAndroid;
 import sneer.android.main.R;
+import sneer.android.main.SneerApp;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -65,7 +67,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		Subscription subscription = Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
-				plug(holder.conversationPicture, SneerAndroid.sneer().profileFor(conversation.party()).selfie()),
+				plug(holder.conversationPicture, sneer(getContext()).profileFor(conversation.party()).selfie()),
 				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
 				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
 		subscriptions.add(subscription);

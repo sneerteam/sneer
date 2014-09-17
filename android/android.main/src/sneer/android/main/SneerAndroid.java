@@ -49,8 +49,7 @@ import android.widget.Toast;
 
 public class SneerAndroid {
 	
-	
-	static Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerPluginInfo> apps) {
+	Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerPluginInfo> apps) {
 		return Observable.from(apps)
 			.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
 				return t1.canCompose();
@@ -61,7 +60,7 @@ public class SneerAndroid {
 			.toList();
 	} };
 
-	static private final class ConversationMenuItemImpl implements ConversationMenuItem {
+	private final class ConversationMenuItemImpl implements ConversationMenuItem {
 		
 		private final SneerPluginInfo app;
 
@@ -92,21 +91,21 @@ public class SneerAndroid {
 		}
 	}
 
-	private static SneerAdmin ADMIN;
-	static Context context;
+	private SneerAdmin ADMIN;
+	private Context context;
 	private static String error;
 	private static AlertDialog errorDialog;
 	
 	
 	static private AtomicLong nextSessionId = new AtomicLong(0);
 	
-	private static void startPlugin(SneerPluginInfo app, PublicKey peer) {
+	private void startPlugin(SneerPluginInfo app, PublicKey peer) {
 		if (app.interactionType == SESSION) startSession(app, peer);
 		if (app.interactionType == MESSAGE_COMPOSE) startComposeMessage(app, peer);
 	}
 
 
-	private static void startComposeMessage(final SneerPluginInfo app, final PublicKey peer) {
+	private void startComposeMessage(final SneerPluginInfo app, final PublicKey peer) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
@@ -133,7 +132,7 @@ public class SneerAndroid {
 		context.startActivity(intent);
 	}
 
-	private static void startViewMessage(final SneerPluginInfo app, Object message) {
+	private void startViewMessage(final SneerPluginInfo app, Object message) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
@@ -142,7 +141,7 @@ public class SneerAndroid {
 		context.startActivity(intent);
 	}
 
-	private static void startSession(SneerPluginInfo app, PublicKey peer) {
+	private void startSession(SneerPluginInfo app, PublicKey peer) {
 		long sessionId = nextSessionId.getAndIncrement();
 		
 		sneer().tupleSpace().publisher()
@@ -171,7 +170,7 @@ public class SneerAndroid {
 	}
 
 
-	private static Resources resourceForPackage(String packageName) throws NameNotFoundException {
+	private Resources resourceForPackage(String packageName) throws NameNotFoundException {
 		return context.getPackageManager().getResourcesForApplication(packageName);
 	}
 
@@ -181,12 +180,12 @@ public class SneerAndroid {
 	}
 
 
-	public static SneerAdmin admin() {
+	public SneerAdmin admin() {
 		if (ADMIN == null) throw new IllegalStateException("You must call the initialize method before you call this method.");
 		return ADMIN;
 	}
 
-	public static boolean checkOnCreate(Activity activity) {
+	public boolean checkOnCreate(Activity activity) {
 		if (error == null) return true;
 		finishWith(error, activity);
 		return false;
@@ -197,7 +196,7 @@ public class SneerAndroid {
 			activity.finish();
 			return;
 		}
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 		builder.setMessage(message).setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 			errorDialog.dismiss();
 			errorDialog = null;
@@ -207,7 +206,7 @@ public class SneerAndroid {
 		errorDialog.show();
 	}
 
-	public static void initialize() throws FriendlyException {
+	public void initialize() throws FriendlyException {
 		check(ADMIN == null);
 	
 		ADMIN = isCoreAvailable()
@@ -215,7 +214,7 @@ public class SneerAndroid {
 			: simulator();
 	}
 
-	private static SneerAdmin initialize(Context context) throws FriendlyException {
+	private SneerAdmin initialize(Context context) throws FriendlyException {
 	
 		File adminDir = new File(context.getFilesDir(), "admin");
 		adminDir.mkdirs();
@@ -252,7 +251,7 @@ public class SneerAndroid {
 		return ret;
 	}
 
-	public static Sneer sneer() {
+	public Sneer sneer() {
 		return admin().sneer();
 	}
 
@@ -264,11 +263,11 @@ public class SneerAndroid {
 		}
 	}
 
-	public static void toast(final String message, final int length) {
+	public void toast(final String message, final int length) {
 		Toast.makeText(context, message, length).show();
 	}
 
-	public static void toastOnMainThread(final String message, final int length) {
+	public void toastOnMainThread(final String message, final int length) {
 		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() { @Override public void call() {
 			toast(message, length);
 		} });
@@ -277,9 +276,8 @@ public class SneerAndroid {
 
 	private static Map<String, SneerPluginInfo> tupleViewers = new HashMap<String, SneerPluginInfo>();
 
-	public static void init(Context context) {
-		SneerAndroid.context = context;
-		
+	public SneerAndroid(Context context) {
+		this.context = context;
 		SneerPluginInfo.initialDiscovery(context);
 		
 		try {
@@ -311,12 +309,12 @@ public class SneerAndroid {
 	}
 
 
-	public static boolean isClickable(Message message) {
+	public boolean isClickable(Message message) {
 		return tupleViewers.containsKey(message.tuple().type());
 	}
 
 
-	public static void doOnClick(Message message) {
+	public void doOnClick(Message message) {
 		Tuple tuple = message.tuple();
 		SneerPluginInfo viewer = tupleViewers.get(tuple.type());
 		if (viewer == null) {

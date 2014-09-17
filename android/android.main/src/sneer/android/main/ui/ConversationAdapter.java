@@ -2,6 +2,7 @@ package sneer.android.main.ui;
 
 import static android.os.Build.VERSION.*;
 import static android.os.Build.VERSION_CODES.*;
+import static sneer.android.main.SneerApp.sneerAndroid;
 import static sneer.android.ui.SneerActivity.*;
 
 import java.util.*;
@@ -50,7 +51,7 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
         
         ret.setTag(message);
-        if (SneerAndroid.isClickable(message)) {
+        if (sneerAndroid(getContext()).isClickable(message)) {
 	        ret.setClickable(true);
 	        ret.setOnClickListener(this);
         }
@@ -108,6 +109,6 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
 
 	@Override
 	public void onClick(View v) {
-		SneerAndroid.doOnClick((Message) v.getTag());
+		sneerAndroid(getContext()).doOnClick((Message) v.getTag());
 	}
 }

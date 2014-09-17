@@ -1,11 +1,12 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerAndroid.sneer;
+import static sneer.android.main.SneerApp.sneer;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import sneer.Profile;
 import sneer.android.main.R;
+import sneer.android.main.SneerApp;
 import sneer.android.main.ui.utils.Puk;
 import sneer.android.ui.SneerActivity;
 import sneer.commons.exceptions.FriendlyException;
@@ -47,7 +48,7 @@ public class ProfileActivity extends SneerActivity {
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		profile = sneer().profileFor(sneer().self());
+		profile = sneer(this).profileFor(sneer(this).self());
 
 		firstNameEdit = (EditText) findViewById(R.id.firstName);
 		lastNameEdit = (EditText) findViewById(R.id.lastName);
@@ -78,7 +79,7 @@ public class ProfileActivity extends SneerActivity {
 	        return true;
 
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ProfileActivity.this, sneer().self(), true, null);
+			Puk.sendYourPublicKey(ProfileActivity.this, sneer(this).self(), true, null);
 			break;
 		}
 
@@ -180,7 +181,7 @@ public class ProfileActivity extends SneerActivity {
 
 
 	private Profile self() {
-		return sneer().profileFor(sneer().self());
+		return sneer(this).profileFor(sneer(this).self());
 	}
     
     

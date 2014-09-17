@@ -2,6 +2,7 @@ package sneer.android.main.ui;
 
 import static java.util.concurrent.TimeUnit.*;
 import static sneer.android.main.SneerAndroid.*;
+import static sneer.android.main.SneerApp.sneer;
 
 import java.io.*;
 import java.util.*;
@@ -53,16 +54,16 @@ public class ConversationActivity extends SneerActivity {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
 		
-		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+		party = sneer(this).produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
 		plugActionBarTitle(actionBar, party.name());
-		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
+		plugActionBarIcon(actionBar, sneer(this).profileFor(party).selfie());
 //		Observable<byte[]> selfie = sneer().profileFor(party).selfie();
 //		deferUI(selfie).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
 //			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
 //		}});
 
-		conversation = sneer().produceConversationWith(party);
+		conversation = sneer(this).produceConversationWith(party);
 		conversation.unreadMessageCountReset();
 
 		adapter = new ConversationAdapter(this,
