@@ -2,17 +2,27 @@
   (:require [midje.sweet :refer :all]
             [clojure.core.match :refer [match]]))
 
+(def empty-q clojure.lang.PersistentQueue/EMPTY)
+
 (defn create []
   {:sequence 0
-   :payloads clojure.lang.PersistentQueue/EMPTY})
+   :to-send empty-q
+   :sent empty-q})
 
 (defn enqueue-to-send [payload state]
-  (update-in state [:payloads] conj payload))
+  (update-in state [:to-send] conj payload))
 
 (defn- pop-packet [state]
   (-> state
-    (update-in [:payloads] pop)
+    (update-in [:sent] conj (-> state :to-send first))
+    (update-in [:to-send] pop)
     (update-in [:sequence] inc)))
+
+(defn- reset [{:keys [sequence to-send sent] :as state}]
+  {:sequence (- sequence (count sent))
+   :sent empty-q
+   :to-send (into sent to-send)
+   :reset true})
 
 (defn handle-packet-from-server [packet state]
   (match packet
@@ -20,10 +30,10 @@
            (case (- (state :sequence) highest-sequence-to-send)
              0 (pop-packet state)
              1 state
-             (assoc state :reset true))))
+             (reset state))))
 
 (defn peek-packet [state]
-  (when-some [payload (-> state :payloads first)]
+  (when-some [payload (-> state :to-send first)]
     (assoc (select-keys state [:sequence :reset]) :payload payload)))
 
 
@@ -46,18 +56,36 @@
 (facts
  "Packet Handling"
 
-  (fact "Packet enqueing is FIFO."
-    (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
-          simulate (fn [highest-sequence-to-send]
-                     (->> queue
-                       (handle-packet-from-server
-                         {:intent :status-of-queues
-                          :highest-sequence-delivered -1
-                          :highest-sequence-to-send highest-sequence-to-send
-                          :full? false})
-                       peek-packet))]
+    (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
+
+      (fact "Packet enqueing is FIFO."
+        (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
+              simulate (fn [highest-sequence-to-send]
+                         (->> queue
+                           (handle-packet-from-server
+                             {:intent :status-of-queues
+                              :highest-sequence-delivered -1
+                              :highest-sequence-to-send highest-sequence-to-send
+                              :full? false})
+                           peek-packet))]
     
-    (simulate -1) => {:sequence 0 :payload :foo}
-    (simulate 0)  => {:sequence 1 :payload :bar}
-    (simulate 42) => {:sequence 0 :payload :foo :reset true})))
+        (simulate -1) => {:sequence 0 :payload :foo}
+        (simulate 0)  => {:sequence 1 :payload :bar}
+        (simulate 42) => {:sequence 0 :payload :foo :reset true}))
+  
+      (fact "Delivered packets are forgotten."
+         (let [queue (handle-packet-from-server
+                       {:intent :status-of-queues
+                        :highest-sequence-delivered -1
+                        :highest-sequence-to-send 0
+                        :full? false}
+                       queue)
+               queue (handle-packet-from-server
+                       {:intent :status-of-queues
+                        :highest-sequence-delivered -1
+                        :highest-sequence-to-send -1 ;Restarted
+                        :full? false}
+                       queue)]
+           (peek-packet queue) => {:sequence 0 :payload :foo :reset true}
+           ))))
 
