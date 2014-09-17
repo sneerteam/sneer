@@ -116,12 +116,12 @@ public class SneerAndroid {
 			
 			try {
 				t1.setClassLoader(classLoader);
-				Object payload = ((Value)t1.getParcelable("value")).get();
+				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
 				info("Receiving message of type '" + app.tupleType + "' from " + app.packageName + "." + app.activityName);
 				sneer().tupleSpace().publisher()
 					.type(app.tupleType)
 					.audience(peer)
-					.pub(payload);
+					.pub(message);
 			} catch (final Throwable t) {
 				toastOnMainThread("Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
 				Log.w(SneerAndroid.class.getSimpleName(), "Error receiving message from plugin", t);
