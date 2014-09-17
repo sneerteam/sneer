@@ -3,7 +3,7 @@ package sneer.android.main.ui;
 import static sneer.android.main.SneerApp.admin;
 import static sneer.android.main.SneerApp.sneer;
 import static sneer.android.main.SneerApp.sneerAndroid;
-import static sneer.android.main.SneerAndroid.*;
+import static sneer.android.main.SneerAndroidCore.*;
 
 import java.util.*;
 

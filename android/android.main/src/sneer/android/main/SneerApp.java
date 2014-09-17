@@ -13,7 +13,7 @@ public class SneerApp extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		sneerAndroid = new SneerAndroid(getApplicationContext());
+		sneerAndroid = new SneerAndroidCore(getApplicationContext());
 	}
 	
 	public static Sneer sneer(Context context) {

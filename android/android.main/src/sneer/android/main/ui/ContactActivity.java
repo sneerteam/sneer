@@ -13,7 +13,7 @@ import sneer.Party;
 import sneer.Profile;
 import sneer.PublicKey;
 import sneer.android.main.R;
-import sneer.android.main.SneerAndroid;
+import sneer.android.main.SneerAndroidCore;
 import sneer.android.main.SneerApp;
 import sneer.android.main.ui.utils.Puk;
 import sneer.commons.exceptions.FriendlyException;

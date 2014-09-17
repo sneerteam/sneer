@@ -11,7 +11,7 @@ import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.Subscriptions;
 import sneer.Conversation;
-import sneer.android.main.SneerAndroid;
+import sneer.android.main.SneerAndroidCore;
 import sneer.android.main.R;
 import sneer.android.main.SneerApp;
 import android.app.Activity;
