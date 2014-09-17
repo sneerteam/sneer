@@ -6,11 +6,8 @@ public class SneerApp extends Application {
 	
 	@Override
 	public void onCreate() {
-
-		SneerAndroid.init(getApplicationContext());
-
-		
 		super.onCreate();
+		SneerAndroid.init(getApplicationContext());
 	}
 	
 }
