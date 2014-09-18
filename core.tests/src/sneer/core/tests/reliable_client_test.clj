@@ -54,73 +54,7 @@
     (assoc (select-keys state [:sequence :reset]) :payload payload)))
 
 
-(facts
- "New Queues"
-
-  (fact "A new queue has no packet to send."
-    (-> (create) packet-to-send) => nil)
-
-  ; TODO: Delete these tests that break the queue's encapsulation using pop-packet.
-  
-  (fact "Packet enqueing is FIFO."
-    (let [queue (-> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
-      (->> queue packet-to-send) => {:sequence 0 :payload :foo}
-      (->> queue pop-packet packet-to-send) => {:sequence 1 :payload :bar}))
-  
-  (fact "Every new packet gets a new sequence number."
-  (let [queue (-> (create) (enqueue-to-send :foo))]
-    (-> queue pop-packet (enqueue-to-send :bar) packet-to-send :sequence) => 1)))
-
-
 (facts "Packet Handling"
-
-  (let [queue (-> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
-
-    (fact "Packet enqueing is FIFO."
-      (let [queue (-> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
-            simulate (fn [highest-sequence-to-send]
-                       (-> queue
-                         (handle-packet-from-server
-                           {:intent :status-of-queues
-                            :highest-sequence-delivered -1
-                            :highest-sequence-to-send highest-sequence-to-send
-                            :full? false})
-                         packet-to-send))]
-    
-      (simulate -1) => {:sequence 0 :payload :foo}
-      (simulate 0)  => {:sequence 1 :payload :bar}
-      (simulate 42) => {:sequence 0 :payload :foo :reset true}))
-  
-    (fact "Delivered packets are forgotten."
-       (let [queue (handle-packet-from-server
-                     queue
-                     {:intent :status-of-queues
-                      :highest-sequence-delivered -1
-                      :highest-sequence-to-send 0
-                      :full? false})
-             queue (handle-packet-from-server
-                     queue
-                     {:intent :status-of-queues
-                      :highest-sequence-delivered -1
-                      :highest-sequence-to-send -1  ; Restarted
-                      :full? false})]
-         (packet-to-send queue) => {:sequence 0 :payload :foo :reset true})
-         
-       (let [queue (handle-packet-from-server
-                     queue
-                     {:intent :status-of-queues
-                      :highest-sequence-delivered 0  ; Delivered
-                      :highest-sequence-to-send 0
-                      :full? false})
-             queue (handle-packet-from-server
-                     queue
-                     {:intent :status-of-queues
-                      :highest-sequence-delivered -1
-                      :highest-sequence-to-send -1  ; Restarted
-                      :full? false})]
-         (packet-to-send queue) => {:sequence 1 :payload :bar :reset true})
-       ))
-    
   (let [enqueue (fn [queue start count]
                   (reduce enqueue-to-send queue (range start (+ start count))))
         simulate-from-server (fn [queue highest-sequence-to-send highest-sequence-delivered full?]
@@ -138,22 +72,24 @@
                          queue (simulate-from-server queue hsts1 hsd1 full?1)
                          queue (enqueue queue enq1 enq2)
                          queue (simulate-from-server queue hsts2 hsd2 full?2)
-                         packet-to-send (packet-to-send queue)                 ]
-                     #_(fact (str fact " - Packet payload must be equal to sequence number (this test is designed that way).")
-                        payload => seq)
-                     ))]
+                         packet-to-send (packet-to-send queue)]
+                     (fact "banana"; (str fact)
+                       (:sequence packet-to-send) => seq
+                       (:payload packet-to-send) => seq ;This test is designed so that the sequence and the payload are always the same.
+                       (:reset packet-to-send) => reset)))]
 
-    ;              1st from Server        2nd from Server   peek-to-send
+    ;              1st from Server        2nd from Server   packet-to-send
     ;        enq   hsts hsd full?   enq   hsts hsd full?    seq reset    fact
     (scenario  0    nil nil   nil     0    nil nil   nil    nil   nil    "A new queue has no packet to send.")
     (scenario  1    nil nil   nil     0    nil nil   nil      0   nil    "A packet can be enqueued to send.")
     (scenario  2    nil nil   nil     0    nil nil   nil      0   nil    "Enqueueing is FIFO.")
     (scenario  1     -1  -1 false     0    nil nil   nil      0   nil    "When the server has no packets sent (initial server state), queue sends first packet.")
     (scenario  1      0  -1 false     0    nil nil   nil    nil   nil    "Server sending a packet pops it from the queue (with one enqueued).")
-    (scenario  2      0  -1 false     0    nil nil   nil      1   nil    "Server sending a packet pops it from the queue (with more enqueued).")
+    (scenario  2      0  -1 false     0    nil nil   nil      1   nil    "Server sending a packet pops it from the queue (with two enqueued).")
+    (scenario  1     42   0 false     0    nil nil   nil      0  true    "Reset is sent when server gets out of sync.")
     (scenario  1      0  -1 false     0     -1  -1 false      0  true    "Undelivered packets are sent when the server restarts.")
     (scenario  1      0   0 false     0     -1  -1 false    nil   nil    "Delivered packets are forgotten (with one enqueued).")
-    (scenario  2      0   0 false     0     -1  -1 false      1  true    "Delivered packets are forgotten (with more enqueued).")
+    (scenario  2      0   0 false     0     -1  -1 false      1  true    "Delivered packets are forgotten (with two enqueued).")
     ;TODO:
     ;  Multiple packets.
     ;  Inconsistent packets from server.
