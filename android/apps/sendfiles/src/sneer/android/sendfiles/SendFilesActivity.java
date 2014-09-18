@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 import sneer.android.ui.MessageActivity;
@@ -46,7 +47,7 @@ public class SendFilesActivity extends MessageActivity {
 		
 		byte[] bytes = null;
 		try {
-			bytes = readFully(new FileInputStream(file));
+			bytes = readFully((InputStream)new FileInputStream(file));
 		} catch (FriendlyException e) {
 			toast(e);
 			finish();

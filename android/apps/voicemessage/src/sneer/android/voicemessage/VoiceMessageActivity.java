@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import sneer.android.ui.MessageActivity;
 import sneer.commons.exceptions.FriendlyException;
@@ -102,7 +103,7 @@ public class VoiceMessageActivity extends MessageActivity {
 		
 		byte[] bytes = null;
 		try {
-			bytes = readFully(new FileInputStream(audioFileName));
+			bytes = readFully(((InputStream) new FileInputStream(audioFileName)));
 		} catch (FriendlyException e) {
 			toast(e);
 			finish();

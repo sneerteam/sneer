@@ -188,7 +188,7 @@ public class SneerActivity extends Activity {
 			.show()
 			.setOnCancelListener(new OnCancelListener() {  @Override public void onCancel(DialogInterface dialog) {
 				finish();
-			} });;
+			}});;
 	}
 
 	
