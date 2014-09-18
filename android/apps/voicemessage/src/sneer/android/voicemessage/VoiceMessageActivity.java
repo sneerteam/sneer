@@ -103,7 +103,7 @@ public class VoiceMessageActivity extends MessageActivity {
 		
 		byte[] bytes = null;
 		try {
-			bytes = readFully(((InputStream) new FileInputStream(audioFileName)));
+			bytes = readFully((new FileInputStream(audioFileName)));
 		} catch (FriendlyException e) {
 			toast(e);
 			finish();
