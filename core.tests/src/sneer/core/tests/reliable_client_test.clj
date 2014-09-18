@@ -88,12 +88,8 @@
         1      0    -1   false     0    nil   nil     nil    nil    nil   "Server sending a packet pops it from the queue (with one enqueued)."
         3      0    -1   false     0      1    -1   false      2    nil   "Server sending a packet pops it from the queue (with three enqueued)."
         1     42     0   false     0    nil   nil     nil      0   true   "Reset is sent when server gets out of sync."
+        2     42     0   false     0     -1    -1   false      0    nil   "Reset is not needed for happy-day sequencing."
         1      0    -1   false     0     -1    -1   false      0   true   "Undelivered packets are sent when the server restarts."
         1      0     0   false     0     -1    -1   false    nil    nil   "Delivered packets are forgotten (with one enqueued)."
         2      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with two enqueued)."
-        7      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with several enqueued)."
-        2     42     0   false     0     -1    -1   false      0    nil   "Reset is not needed for happy-day sequencing."
-    ;TODO:
-    ;  Inconsistent packets from server.
-    
-)
+        7      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with several enqueued).")
