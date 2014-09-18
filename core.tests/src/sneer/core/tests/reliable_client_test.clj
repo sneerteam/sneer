@@ -2,6 +2,8 @@
   (:require [midje.sweet :refer :all]
             [clojure.core.match :refer [match]]))
 
+; (do (require 'midje.repl) (midje.repl/autotest :dirs "src"))
+
 (def empty-q clojure.lang.PersistentQueue/EMPTY)
 
 (defn create []
@@ -121,10 +123,22 @@
     
   (let [enqueue (fn [queue start count]
                   (reduce enqueue-to-send queue (range start (+ start count))))
+        simulate-from-server (fn [queue highest-sequence-to-send highest-sequence-delivered full?]
+                               (if highest-sequence-to-send
+                                 (handle-packet-from-server
+                                   queue
+                                   {:intent :status-of-queues
+                                    :highest-sequence-to-send highest-sequence-to-send
+                                    :highest-sequence-delivered highest-sequence-delivered
+                                    :full? full?})
+                                 queue))
         scenario (fn [enq1 hsts1 hsd1 full?1 enq2 hsts2 hsd2 full?2 seq reset fact]
                    (let [queue (create)
-                         queue (enqueue queue 0 enq1)
-                         queue ()]
+                         queue (enqueue queue    0 enq1)
+                         queue (simulate-from-server queue hsts1 hsd1 full?1)
+                         queue (enqueue queue enq1 enq2)
+                         queue (simulate-from-server queue hsts2 hsd2 full?2)
+                         packet-to-send (packet-to-send queue)                 ]
                      #_(fact (str fact " - Packet payload must be equal to sequence number (this test is designed that way).")
                         payload => seq)
                      ))]
