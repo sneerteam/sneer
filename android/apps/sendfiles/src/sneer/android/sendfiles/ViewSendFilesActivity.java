@@ -16,22 +16,19 @@ import android.webkit.MimeTypeMap;
 
 public class ViewSendFilesActivity extends MessageActivity {
 
+	private byte[] bytes;
+	private String filename;
+	private String extension;
+	private String type;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> map = (HashMap<String, Object>) message();
-		byte[] bytes = (byte[]) map.get("contents");
-		String filename = map.get("filename").toString();
-		long lastModified = (long) map.get("last-modified");
+		dataFrom(message());
 
-		File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
-		MimeTypeMap mime = MimeTypeMap.getSingleton();
-		String extension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toString() );
-		String type = mime.getMimeTypeFromExtension(extension);
+		File file = fileFrom();
 
-		
 		try {
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 			bos.write(bytes);
@@ -43,26 +40,32 @@ public class ViewSendFilesActivity extends MessageActivity {
 			return;
 		}
 		
-		
 		Uri fileUri = Uri.fromFile(file);
-		
+
 		Intent intent = new Intent();
-		
 		intent.setDataAndType(fileUri, type);
-
-
-		log(this, "felipeteste> byteslength: "  + bytes.length + 
-						  "  -  filename: "     + filename + 
-						  "  -  lastModified: " + lastModified + 
-						  "  -  ext: "          + extension +
-						  "  -  type: "         + type +
-						  "  -  exists: "       + file.exists() +
-						  "  -  fileUri: "      + fileUri);
 		
 		try {
 			startActivity(intent);
-		} catch (ActivityNotFoundException ex) {
-			ex.printStackTrace();
+			finish();
+		} catch (ActivityNotFoundException e) {
+			toast("Error opening file (" + e.getMessage() + ")");
+			finish();
+			return;
 		}
+	}
+
+	private File fileFrom() {
+		File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
+		extension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toString());
+		type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+		return file;
+	}
+
+	private void dataFrom(Object message) {
+		@SuppressWarnings("unchecked")
+		HashMap<String, Object> map = (HashMap<String, Object>) message;
+		bytes = (byte[]) map.get("contents");
+		filename = (String)map.get("filename");
 	}
 }

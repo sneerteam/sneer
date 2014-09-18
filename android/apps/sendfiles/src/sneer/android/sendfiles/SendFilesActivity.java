@@ -15,6 +15,7 @@ import android.os.Bundle;
 public class SendFilesActivity extends MessageActivity {
 
 	private static final int REQUESTCODE_PICK_FILE = 0;
+	private String fileName;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,31 +39,43 @@ public class SendFilesActivity extends MessageActivity {
 	    	return;
 	    }
 	    
-	    Uri fileUri = data.getData();
-	    File file = new File(fileUri.getPath());
-	    String fileName = file.getName();
-		long lastModified = file.lastModified();
+	    File file = fileFrom(data);
+	    fileName = file.lastModified() + file.getName();
 		
-		byte[] bytes = null;
+		byte[] bytes = bytesFrom(file);
+		send(bytes);
+	    finish();
+	}
+
+
+	private File fileFrom(Intent data) {
+		Uri fileUri = data.getData();
+	    return new File(fileUri.getPath());	    
+	}
+
+
+	private byte[] bytesFrom(File file) {
+		byte[] ret = null;
 		try {
-			bytes = readFully(new FileInputStream(file));
+			ret = readFully(new FileInputStream(file));
 		} catch (FriendlyException e) {
-			toast(e);
+			toast("Error reading file");
 			finish();
 		} catch (FileNotFoundException e) {
-			toast(e);
+			toast("File not found. (" + e.getMessage() + ").");
 			finish();
 		}
-	
+		return ret;
+	}
+
+
+	private void send(byte[] bytes) {
 		if (bytes != null) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("contents", bytes);
 			map.put("filename", fileName);
-			map.put("last-modified", lastModified);
 			send(fileName, map);
 		}
-		
-	    finish();
 	}
 	
 }
