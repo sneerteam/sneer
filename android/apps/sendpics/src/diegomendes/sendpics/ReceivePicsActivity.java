@@ -1,7 +1,5 @@
 package diegomendes.sendpics;
 
-import static sneer.commons.Streams.*;
-
 import java.io.*;
 
 import sneer.android.ui.*;
