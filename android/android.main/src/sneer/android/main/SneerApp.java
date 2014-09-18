@@ -1,5 +1,6 @@
 package sneer.android.main;
 
+import static sneer.android.main.SneerAndroidCore.isCoreAvailable;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import android.app.Activity;
@@ -13,7 +14,12 @@ public class SneerApp extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		sneerAndroid = new SneerAndroidCore(getApplicationContext());
+		
+		if (isCoreAvailable()) {
+			sneerAndroid = new SneerAndroidCore(getApplicationContext());
+		} else {
+			sneerAndroid = new SneerAndroidSimulator(getApplicationContext());
+		}
 	}
 	
 	public static Sneer sneer(Context context) {
@@ -31,4 +37,5 @@ public class SneerApp extends Application {
 	public SneerAndroid sneerAndroid() {
 		return sneerAndroid;
 	}
+	
 }

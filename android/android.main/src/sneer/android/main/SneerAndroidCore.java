@@ -6,7 +6,6 @@ import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import static sneer.SneerAndroidClient.SESSION_ID;
 import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
 import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION;
-import static sneer.commons.exceptions.Exceptions.check;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,7 +28,6 @@ import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
-import sneer.impl.simulator.SneerAdminSimulator;
 import sneer.tuples.Tuple;
 import sneer.utils.SharedResultReceiver;
 import sneer.utils.Value;
@@ -91,7 +89,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 	}
 
-	private SneerAdmin ADMIN;
+	private SneerAdmin sneerAdmin;
 	private Context context;
 	private static String error;
 	private static AlertDialog errorDialog;
@@ -182,8 +180,7 @@ public class SneerAndroidCore implements SneerAndroid {
 
 	@Override
 	public SneerAdmin admin() {
-		if (ADMIN == null) throw new IllegalStateException("You must call the initialize method before you call this method.");
-		return ADMIN;
+		return sneerAdmin;
 	}
 
 	@Override
@@ -208,14 +205,6 @@ public class SneerAndroidCore implements SneerAndroid {
 		errorDialog.show();
 	}
 
-	public void initialize() throws FriendlyException {
-		check(ADMIN == null);
-	
-		ADMIN = isCoreAvailable()
-			? initialize(context)
-			: simulator();
-	}
-
 	private SneerAdmin initialize(Context context) throws FriendlyException {
 	
 		File adminDir = new File(context.getFilesDir(), "admin");
@@ -231,26 +220,12 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 	}
 
-	private static boolean isCoreAvailable() {
-		return sneerAdminFactory() != null;
-	}
-
 	private static SneerAdmin newSneerAdmin(SneerSqliteDatabase db) {
 			try {
 				return (SneerAdmin) sneerAdminFactory().getMethod("create", Object.class).invoke(null, db);
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
-	}
-
-	private static void setOwnName(Sneer sneer, String name) {
-		sneer.profileFor(sneer.self()).setOwnName(name);
-	}
-
-	private static SneerAdmin simulator() {
-		SneerAdminSimulator ret = new SneerAdminSimulator();
-		setOwnName(ret.sneer(), "Neide da Silva"); //Comment this line to get an empty name.
-		return ret;
 	}
 
 	@Override
@@ -278,13 +253,17 @@ public class SneerAndroidCore implements SneerAndroid {
 
 
 	private static Map<String, SneerPluginInfo> tupleViewers = new HashMap<String, SneerPluginInfo>();
+	
+	public static boolean isCoreAvailable() {
+		return sneerAdminFactory() != null;
+	}
 
 	public SneerAndroidCore(Context context) {
 		this.context = context;
 		SneerPluginInfo.initialDiscovery(context);
 		
 		try {
-			initialize();
+			sneerAdmin = initialize(context);
 		} catch (FriendlyException e) {
 			error = e.getMessage();
 		}
