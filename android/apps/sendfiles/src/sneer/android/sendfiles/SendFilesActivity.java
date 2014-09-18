@@ -47,7 +47,7 @@ public class SendFilesActivity extends MessageActivity {
 		
 		byte[] bytes = null;
 		try {
-			bytes = readFully((InputStream)new FileInputStream(file));
+			bytes = readFully(new FileInputStream(file));
 		} catch (FriendlyException e) {
 			toast(e);
 			finish();
@@ -56,13 +56,13 @@ public class SendFilesActivity extends MessageActivity {
 			finish();
 		}
 	
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("contents", bytes);
-		map.put("filename", fileName);
-		map.put("last-modified", lastModified);
-		
-		if (bytes != null)
+		if (bytes != null) {
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("contents", bytes);
+			map.put("filename", fileName);
+			map.put("last-modified", lastModified);
 			send(map);
+		}
 		
 	    finish();
 	}
