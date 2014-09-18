@@ -54,44 +54,45 @@
     (assoc (select-keys state [:sequence :reset]) :payload payload)))
 
 
-(facts "Packet Handling"
-  (let [enqueue (fn [queue start count]
-                  (reduce enqueue-to-send queue (range start (+ start count))))
-        simulate-from-server (fn [queue highest-sequence-to-send highest-sequence-delivered full?]
-                               (if highest-sequence-to-send
-                                 (handle-packet-from-server
-                                   queue
-                                   {:intent :status-of-queues
-                                    :highest-sequence-to-send highest-sequence-to-send
-                                    :highest-sequence-delivered highest-sequence-delivered
-                                    :full? full?})
-                                 queue))
-        scenario (fn [enq1 hsts1 hsd1 full?1 enq2 hsts2 hsd2 full?2 seq reset fact]
-                   (let [queue (create)
-                         queue (enqueue queue    0 enq1)
-                         queue (simulate-from-server queue hsts1 hsd1 full?1)
-                         queue (enqueue queue enq1 enq2)
-                         queue (simulate-from-server queue hsts2 hsd2 full?2)
-                         packet-to-send (packet-to-send queue)]
-                     (fact "banana"; (str fact)
-                       (:sequence packet-to-send) => seq
-                       (:payload packet-to-send) => seq ;This test is designed so that the sequence and the payload are always the same.
-                       (:reset packet-to-send) => reset)))]
+(tabular "Packet Handling"
 
-    ;              1st from Server        2nd from Server   packet-to-send
-    ;        enq   hsts hsd full?   enq   hsts hsd full?    seq reset    fact
-    (scenario  0    nil nil   nil     0    nil nil   nil    nil   nil    "A new queue has no packet to send.")
-    (scenario  1    nil nil   nil     0    nil nil   nil      0   nil    "A packet can be enqueued to send.")
-    (scenario  2    nil nil   nil     0    nil nil   nil      0   nil    "Enqueueing is FIFO.")
-    (scenario  1     -1  -1 false     0    nil nil   nil      0   nil    "When the server has no packets sent (initial server state), queue sends first packet.")
-    (scenario  1      0  -1 false     0    nil nil   nil    nil   nil    "Server sending a packet pops it from the queue (with one enqueued).")
-    (scenario  2      0  -1 false     0    nil nil   nil      1   nil    "Server sending a packet pops it from the queue (with two enqueued).")
-    (scenario  1     42   0 false     0    nil nil   nil      0  true    "Reset is sent when server gets out of sync.")
-    (scenario  1      0  -1 false     0     -1  -1 false      0  true    "Undelivered packets are sent when the server restarts.")
-    (scenario  1      0   0 false     0     -1  -1 false    nil   nil    "Delivered packets are forgotten (with one enqueued).")
-    (scenario  2      0   0 false     0     -1  -1 false      1  true    "Delivered packets are forgotten (with two enqueued).")
+  (fact 
+    (let [enqueue (fn [queue start count]
+                    (reduce enqueue-to-send queue (range start (+ start count))))
+          simulate-from-server (fn [queue highest-sequence-to-send highest-sequence-delivered full?]
+                                 (if highest-sequence-to-send
+                                   (handle-packet-from-server
+                                     queue
+                                     {:intent :status-of-queues
+                                      :highest-sequence-to-send highest-sequence-to-send
+                                      :highest-sequence-delivered highest-sequence-delivered
+                                      :full? full?})
+                                   queue))
+          queue (create)
+          queue (enqueue queue     0 ?enq1)
+          queue (simulate-from-server queue ?hsts1 ?hsd1 ?full?1)
+          queue (enqueue queue ?enq1 ?enq2)
+          queue (simulate-from-server queue ?hsts2 ?hsd2 ?full?2)
+          packet-to-send (packet-to-send queue)]
+      (:sequence packet-to-send) => ?seq
+      (:payload packet-to-send) => ?seq ;This test is designed so that the sequence and the payload are always the same.
+      (:reset packet-to-send) => ?reset))
+  
+    ?enq1 ?hsts1 ?hsd1 ?full?1 ?enq2 ?hsts2 ?hsd2 ?full?2   ?seq ?reset   ?obs
+        0    nil   nil     nil     0    nil   nil     nil    nil    nil   "A new queue has no packet to send."
+        1    nil   nil     nil     0    nil   nil     nil      0    nil   "A packet can be enqueued to send."
+        2    nil   nil     nil     0    nil   nil     nil      0    nil   "Enqueueing is FIFO."
+        1     -1    -1   false     0    nil   nil     nil      0    nil   "When the server has no packets sent (initial server state), queue sends first packet."
+        1      0    -1   false     0    nil   nil     nil    nil    nil   "Server sending a packet pops it from the queue (with one enqueued)."
+        3      0    -1   false     0      1    -1   false      2    nil   "Server sending a packet pops it from the queue (with three enqueued)."
+        1     42     0   false     0    nil   nil     nil      0   true   "Reset is sent when server gets out of sync."
+        1      0    -1   false     0     -1    -1   false      0   true   "Undelivered packets are sent when the server restarts."
+        1      0     0   false     0     -1    -1   false    nil    nil   "Delivered packets are forgotten (with one enqueued)."
+        2      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with two enqueued)."
+
+    ;   (scenario  7      5   3 false     5     -1  -1 false      3  true    "Delivered packets are forgotten (with several enqueued).")
     ;TODO:
     ;  Multiple packets.
     ;  Inconsistent packets from server.
-    ))
-
+    
+)
