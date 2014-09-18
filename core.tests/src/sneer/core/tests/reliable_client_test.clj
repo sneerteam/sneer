@@ -26,6 +26,8 @@
    :to-send (into sent to-send)
    :reset true})
 
+(defn- unreset [state]
+  (dissoc state :reset))
 
 (defn- handle-delivery
 " sent      to-send
@@ -44,8 +46,8 @@
          {:highest-sequence-to-send   highest-sequence-to-send
           :highest-sequence-delivered highest-sequence-delivered}
            (case (- (state :sequence) highest-sequence-to-send)
-             0 (-> state pop-packet (handle-delivery highest-sequence-delivered))
-             1 (-> state            (handle-delivery highest-sequence-delivered))
+             0 (-> state unreset pop-packet (handle-delivery highest-sequence-delivered))
+             1 (-> state unreset            (handle-delivery highest-sequence-delivered))
              (reset state))))
 
 
@@ -89,10 +91,9 @@
         1      0    -1   false     0     -1    -1   false      0   true   "Undelivered packets are sent when the server restarts."
         1      0     0   false     0     -1    -1   false    nil    nil   "Delivered packets are forgotten (with one enqueued)."
         2      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with two enqueued)."
-
-    ;   (scenario  7      5   3 false     5     -1  -1 false      3  true    "Delivered packets are forgotten (with several enqueued).")
+        7      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with several enqueued)."
+        2     42     0   false     0     -1    -1   false      0    nil   "Reset is not needed for happy-day sequencing."
     ;TODO:
-    ;  Multiple packets.
     ;  Inconsistent packets from server.
     
 )
