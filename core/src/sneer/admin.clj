@@ -151,7 +151,8 @@
   (let [created (now)
         received (now)
         type (.type tuple)
-        content (if (= type "message") (.payload tuple) type)
+        label (.get tuple "label")
+        content (if (= type "message") (.payload tuple) (if label label type))
         own? (= own-puk (.author tuple))]
     
     (reify Message

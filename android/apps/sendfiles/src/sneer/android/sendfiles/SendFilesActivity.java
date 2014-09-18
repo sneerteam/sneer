@@ -3,8 +3,6 @@ package sneer.android.sendfiles;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
 import sneer.android.ui.MessageActivity;
@@ -61,7 +59,7 @@ public class SendFilesActivity extends MessageActivity {
 			map.put("contents", bytes);
 			map.put("filename", fileName);
 			map.put("last-modified", lastModified);
-			send(map);
+			send(fileName, map);
 		}
 		
 	    finish();

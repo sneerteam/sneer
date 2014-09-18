@@ -43,7 +43,7 @@ public class SendPicsActivity extends MessageActivity {
 		}
 
 		byte[] imageBytes = scaledDownTo(bitmap, 40 * 1024);
-		send(imageBytes);
+		send("pic", imageBytes);
     }
     
 
@@ -55,8 +55,7 @@ public class SendPicsActivity extends MessageActivity {
 		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
 		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
 
-		startActivityForResult(chooser, TAKE_PICTURE);
-		
+		startActivityForResult(chooser, TAKE_PICTURE);		
 	}
 
     private void open(Object message) {

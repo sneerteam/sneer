@@ -4,6 +4,7 @@ import static sneer.SneerAndroidClient.MESSAGE;
 import static sneer.SneerAndroidClient.OWN_PRIK;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import static sneer.SneerAndroidClient.SESSION_ID;
+import static sneer.SneerAndroidClient.LABEL;
 import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
 import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION;
 
@@ -114,10 +115,12 @@ public class SneerAndroidCore implements SneerAndroid {
 			try {
 				t1.setClassLoader(classLoader);
 				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
-				info("Receiving message of type '" + app.tupleType + "' from " + app.packageName + "." + app.activityName);
+				String label = t1.getString(LABEL);
+				info("Receiving message of type '" + app.tupleType + "' label '" + label + "' from " + app.packageName + "." + app.activityName);
 				sneer().tupleSpace().publisher()
 					.type(app.tupleType)
 					.audience(peer)
+					.field("label", label)
 					.pub(message);
 			} catch (final Throwable t) {
 				toastOnMainThread("Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
@@ -130,11 +133,12 @@ public class SneerAndroidCore implements SneerAndroid {
 		context.startActivity(intent);
 	}
 
-	private void startViewMessage(final SneerPluginInfo app, Object message) {
+	private void startViewMessage(final SneerPluginInfo app, String label, Object message) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
 		intent.putExtra(MESSAGE, Value.of(message));
+		intent.putExtra(LABEL, label);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}
@@ -304,7 +308,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '"+tuple.type()+"'");
 		}
-		startViewMessage(viewer, tuple.payload());
+		startViewMessage(viewer, (String)tuple.get("label"), tuple.payload());
 	}
 
 }

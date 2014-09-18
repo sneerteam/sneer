@@ -13,7 +13,7 @@ public class SendLocationActivity extends MessageActivity {
 		
 		final String[] options = new String[]{"here", "there"};
 		alert("Send Location", options, new OnClickListener() {  @Override public void onClick(DialogInterface arg0, int option) {
-			send(options[option]);
+			send("location = ", options[option]);
 			finish();
 		} });
 	}
