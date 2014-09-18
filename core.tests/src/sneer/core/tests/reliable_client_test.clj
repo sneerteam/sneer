@@ -58,6 +58,8 @@
   (fact "A new queue has no packet to send."
     (-> (create) packet-to-send) => nil)
 
+  ; TODO: Delete these tests that break the queue's encapsulation using pop-packet.
+  
   (fact "Packet enqueing is FIFO."
     (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
       (->> queue packet-to-send) => {:sequence 0 :payload :foo}
@@ -125,7 +127,10 @@
    ;              1st Stat-of-Q          2nd Stat-of-Q     peek-to-send
    ;        enq   hsts hsd full?   enq   hsts hsd full?    seq pay reset  fact
    (scenario  0    nil nil   nil     0    nil nil   nil    nil nil   nil  "A new queue has no packet to send.")
-   (scenario  1    nil nil   nil     0    nil nil   nil      0   1   nil  "A packet can be enqueued to send.")
-   (scenario  2    nil nil   nil     0    nil nil   nil      0   1   nil  "A packet can be enqueued to send.")
+   (scenario  1    nil nil   nil     0    nil nil   nil      0   0   nil  "A packet can be enqueued to send.")
+   (scenario  2    nil nil   nil     0    nil nil   nil      0   0   nil  "Enqueueing is FIFO.")
+   (scenario  1     -1  -1 false     0    nil nil   nil      0   0   nil  "Server starts with no packets to send nor delivered.")
+   (scenario  1      0  -1 false     0    nil nil   nil    nil nil   nil  "Server sending a packet pops it from the queue.")
+   (scenario  1      0  -1 false     0     -1  -1 false      0   0  true  "Undelivered packets are sent when the server restarts.")
    ))
 
