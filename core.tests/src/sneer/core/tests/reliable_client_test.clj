@@ -47,7 +47,7 @@
              (reset state))))
 
 
-(defn peek-packet [state]
+(defn packet-to-send [state]
   (when-some [payload (-> state :to-send first)]
     (assoc (select-keys state [:sequence :reset]) :payload payload)))
 
@@ -56,64 +56,76 @@
  "New Queues"
 
   (fact "A new queue has no packet to send."
-    (-> (create) peek-packet) => nil)
+    (-> (create) packet-to-send) => nil)
 
   (fact "Packet enqueing is FIFO."
     (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
-      (->> queue peek-packet) => {:sequence 0 :payload :foo}
-      (->> queue pop-packet peek-packet) => {:sequence 1 :payload :bar}))
+      (->> queue packet-to-send) => {:sequence 0 :payload :foo}
+      (->> queue pop-packet packet-to-send) => {:sequence 1 :payload :bar}))
   
   (fact "Every new packet gets a new sequence number."
   (let [queue (->> (create) (enqueue-to-send :foo))]
-    (->> queue pop-packet (enqueue-to-send :bar) peek-packet :sequence) => 1)))
+    (->> queue pop-packet (enqueue-to-send :bar) packet-to-send :sequence) => 1)))
 
 
-(facts
- "Packet Handling"
+(facts "Packet Handling"
 
-    (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
+ (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
 
-      (fact "Packet enqueing is FIFO."
-        (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
-              simulate (fn [highest-sequence-to-send]
-                         (->> queue
-                           (handle-packet-from-server
-                             {:intent :status-of-queues
-                              :highest-sequence-delivered -1
-                              :highest-sequence-to-send highest-sequence-to-send
-                              :full? false})
-                           peek-packet))]
+   (fact "Packet enqueing is FIFO."
+     (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
+           simulate (fn [highest-sequence-to-send]
+                      (->> queue
+                        (handle-packet-from-server
+                          {:intent :status-of-queues
+                           :highest-sequence-delivered -1
+                           :highest-sequence-to-send highest-sequence-to-send
+                           :full? false})
+                        packet-to-send))]
     
-        (simulate -1) => {:sequence 0 :payload :foo}
-        (simulate 0)  => {:sequence 1 :payload :bar}
-        (simulate 42) => {:sequence 0 :payload :foo :reset true}))
+     (simulate -1) => {:sequence 0 :payload :foo}
+     (simulate 0)  => {:sequence 1 :payload :bar}
+     (simulate 42) => {:sequence 0 :payload :foo :reset true}))
   
-      (fact "Delivered packets are forgotten."
-         (let [queue (handle-packet-from-server
-                       {:intent :status-of-queues
-                        :highest-sequence-delivered -1
-                        :highest-sequence-to-send 0
-                        :full? false}
-                       queue)
-               queue (handle-packet-from-server
-                       {:intent :status-of-queues
-                        :highest-sequence-delivered -1
-                        :highest-sequence-to-send -1 ;Restarted
-                        :full? false}
-                       queue)]
-           (peek-packet queue) => {:sequence 0 :payload :foo :reset true})
+   (fact "Delivered packets are forgotten."
+      (let [queue (handle-packet-from-server
+                    {:intent :status-of-queues
+                     :highest-sequence-delivered -1
+                     :highest-sequence-to-send 0
+                     :full? false}
+                    queue)
+            queue (handle-packet-from-server
+                    {:intent :status-of-queues
+                     :highest-sequence-delivered -1
+                     :highest-sequence-to-send -1  ; Restarted
+                     :full? false}
+                    queue)]
+        (packet-to-send queue) => {:sequence 0 :payload :foo :reset true})
          
-         (let [queue (handle-packet-from-server
-                       {:intent :status-of-queues
-                        :highest-sequence-delivered 0 ; Delivered
-                        :highest-sequence-to-send 0
-                        :full? false}
-                       queue)
-               queue (handle-packet-from-server
-                       {:intent :status-of-queues
-                        :highest-sequence-delivered -1
-                        :highest-sequence-to-send -1 ;Restarted
-                        :full? false}
-                       queue)]
-           (peek-packet queue) => {:sequence 1 :payload :bar :reset true})
-         )))
+      (let [queue (handle-packet-from-server
+                    {:intent :status-of-queues
+                     :highest-sequence-delivered 0  ; Delivered
+                     :highest-sequence-to-send 0
+                     :full? false}
+                    queue)
+            queue (handle-packet-from-server
+                    {:intent :status-of-queues
+                     :highest-sequence-delivered -1
+                     :highest-sequence-to-send -1  ; Restarted
+                     :full? false}
+                    queue)]
+        (packet-to-send queue) => {:sequence 1 :payload :bar :reset true})
+      ))
+    
+ (let [enqueue (fn [queue start count]
+                 )
+       scenario (fn [enq1 hsts1 hsd1 full?1 enq2 hsts2 hsd2 full?2 seq pay reset fact]
+                  (let [queue (create)
+                        queue (enqueue queue 0 enq1)]))]
+   ;              1st Stat-of-Q          2nd Stat-of-Q     peek-to-send
+   ;        enq   hsts hsd full?   enq   hsts hsd full?    seq pay reset  fact
+   (scenario  0    nil nil   nil     0    nil nil   nil    nil nil   nil  "A new queue has no packet to send.")
+   (scenario  1    nil nil   nil     0    nil nil   nil      0   1   nil  "A packet can be enqueued to send.")
+   (scenario  2    nil nil   nil     0    nil nil   nil      0   1   nil  "A packet can be enqueued to send.")
+   ))
+
