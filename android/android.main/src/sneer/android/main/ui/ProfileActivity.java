@@ -6,7 +6,6 @@ import rx.Subscription;
 import rx.functions.Action1;
 import sneer.Profile;
 import sneer.android.main.R;
-import sneer.android.main.SneerApp;
 import sneer.android.main.ui.utils.Puk;
 import sneer.android.ui.SneerActivity;
 import sneer.commons.exceptions.FriendlyException;

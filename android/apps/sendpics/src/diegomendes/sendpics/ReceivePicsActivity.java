@@ -5,6 +5,7 @@ import static sneer.commons.Streams.*;
 import java.io.*;
 
 import sneer.android.ui.*;
+import sneer.commons.exceptions.FriendlyException;
 import android.content.*;
 import android.graphics.*;
 import android.os.*;
@@ -31,7 +32,7 @@ public class ReceivePicsActivity extends SneerActivity {
 		try {
 			ret = readFully(getClass().getResourceAsStream("selfie_002.png"));
 			image.setImageBitmap((Bitmap) toBitmap(ret));
-		} catch (IOException e) {}
+		} catch (FriendlyException e) {}
 		
 		
 		try {
