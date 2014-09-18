@@ -1,30 +1,47 @@
 package sneer.android.ui;
 
-import static android.widget.Toast.*;
+import static android.widget.Toast.LENGTH_LONG;
+import static android.widget.Toast.LENGTH_SHORT;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import org.ocpsoft.prettytime.*;
+import org.ocpsoft.prettytime.PrettyTime;
 
-import rx.*;
 import rx.Observable;
-import rx.android.schedulers.*;
-import rx.functions.*;
-import rx.schedulers.*;
-import sneer.commons.exceptions.*;
-import android.app.*;
-import android.content.*;
-import android.content.DialogInterface.*;
-import android.content.res.*;
-import android.graphics.*;
-import android.graphics.drawable.*;
-import android.media.*;
-import android.net.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
+import sneer.commons.exceptions.FriendlyException;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class SneerActivity extends Activity {
 
@@ -204,6 +221,11 @@ public class SneerActivity extends Activity {
 			throw new FriendlyException("Failed to read file");
 		}
 		return out.toByteArray();
+	}
+	
+	
+	public static void log(Activity activity, String s) {
+		Log.d(activity.getClass().getSimpleName(), s);
 	}
 	
 }
