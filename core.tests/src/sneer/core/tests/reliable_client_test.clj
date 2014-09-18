@@ -32,8 +32,7 @@
 
   sent      to-send
   (5 6 7 8) (9 10 11)
-       D     S          ; Keep 8
-"
+       D     S          ; Keep 8"
   [highest-sequence-delivered {:keys [sequence sent] :as state}]
   (let [undelivered (- sequence highest-sequence-delivered 1)]
     (assoc state :sent (into empty-q (take-last undelivered sent)))))
