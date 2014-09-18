@@ -45,7 +45,7 @@ public class SendFilesActivity extends MessageActivity {
 		
 		byte[] bytes = null;
 		try {
-			bytes = bytes(new FileInputStream(file));
+			bytes = readFully(new FileInputStream(file));
 		} catch (FriendlyException e) {
 			toast(e);
 			finish();

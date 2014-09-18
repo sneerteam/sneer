@@ -192,12 +192,8 @@ public class SneerActivity extends Activity {
 	}
 
 	
-	public byte[] bytes(FileInputStream file) throws FriendlyException {
-		try {
-			return readFully(file);
-		} catch (IOException e) {
-			throw new FriendlyException("Problem reading file");
-		}
+	public byte[] readFully(FileInputStream file) throws FriendlyException {
+		return readFully(file);
 	}
 	
 	
