@@ -1,8 +1,8 @@
 package sneer.android.main;
 
-import static sneer.android.main.SneerAndroidCore.*;
-import sneer.android.main.ui.*;
-import android.app.*;
+import static sneer.android.main.SneerAndroidCore.isCoreAvailable;
+import sneer.android.main.ui.SneerAndroidProvider;
+import android.app.Application;
 
 public class SneerApp extends Application {
 	
@@ -15,7 +15,7 @@ public class SneerApp extends Application {
 		if (isCoreAvailable()) {
 			sneerAndroid = new SneerAndroidCore(getApplicationContext());
 		} else {
-			sneerAndroid = new SneerAndroidSimulator();
+			sneerAndroid = new SneerAndroidSimulator(getApplicationContext());
 		}
 		
 		SneerAndroidProvider.setInstance(sneerAndroid);
