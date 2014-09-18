@@ -25,7 +25,7 @@
    :reset true})
 
 
-(defn handle-delivery
+(defn- handle-delivery
 " sent      to-send
   (5 6 7 8) (9 10 11)
      D       S          ; Keep 7 and 8
@@ -33,17 +33,17 @@
   sent      to-send
   (5 6 7 8) (9 10 11)
        D     S          ; Keep 8"
-  [highest-sequence-delivered {:keys [sequence sent] :as state}]
+  [{:keys [sequence sent] :as state} highest-sequence-delivered]
   (let [undelivered (- sequence highest-sequence-delivered 1)]
     (assoc state :sent (into empty-q (take-last undelivered sent)))))
 
-(defn handle-packet-from-server [packet state]
+(defn handle-packet-from-server [state packet]
   (match packet
          {:highest-sequence-to-send   highest-sequence-to-send
           :highest-sequence-delivered highest-sequence-delivered}
            (case (- (state :sequence) highest-sequence-to-send)
-             0 (->> state pop-packet (handle-delivery highest-sequence-delivered))
-             1 (->> state            (handle-delivery highest-sequence-delivered))
+             0 (-> state pop-packet (handle-delivery highest-sequence-delivered))
+             1 (-> state            (handle-delivery highest-sequence-delivered))
              (reset state))))
 
 
@@ -77,7 +77,7 @@
    (fact "Packet enqueing is FIFO."
      (let [queue (-> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
            simulate (fn [highest-sequence-to-send]
-                      (->> queue
+                      (-> queue
                         (handle-packet-from-server
                           {:intent :status-of-queues
                            :highest-sequence-delivered -1
@@ -91,31 +91,31 @@
   
    (fact "Delivered packets are forgotten."
       (let [queue (handle-packet-from-server
+                    queue
                     {:intent :status-of-queues
                      :highest-sequence-delivered -1
                      :highest-sequence-to-send 0
-                     :full? false}
-                    queue)
+                     :full? false})
             queue (handle-packet-from-server
+                    queue
                     {:intent :status-of-queues
                      :highest-sequence-delivered -1
                      :highest-sequence-to-send -1  ; Restarted
-                     :full? false}
-                    queue)]
+                     :full? false})]
         (packet-to-send queue) => {:sequence 0 :payload :foo :reset true})
          
       (let [queue (handle-packet-from-server
+                    queue
                     {:intent :status-of-queues
                      :highest-sequence-delivered 0  ; Delivered
                      :highest-sequence-to-send 0
-                     :full? false}
-                    queue)
+                     :full? false})
             queue (handle-packet-from-server
+                    queue
                     {:intent :status-of-queues
                      :highest-sequence-delivered -1
                      :highest-sequence-to-send -1  ; Restarted
-                     :full? false}
-                    queue)]
+                     :full? false})]
         (packet-to-send queue) => {:sequence 1 :payload :bar :reset true})
       ))
     
