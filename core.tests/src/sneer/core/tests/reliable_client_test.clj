@@ -9,7 +9,7 @@
    :to-send empty-q
    :sent empty-q})
 
-(defn enqueue-to-send [payload state]
+(defn enqueue-to-send [state payload]
   (update-in state [:to-send] conj payload))
 
 (defn- pop-packet [state]
@@ -61,21 +61,21 @@
   ; TODO: Delete these tests that break the queue's encapsulation using pop-packet.
   
   (fact "Packet enqueing is FIFO."
-    (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
+    (let [queue (-> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
       (->> queue packet-to-send) => {:sequence 0 :payload :foo}
       (->> queue pop-packet packet-to-send) => {:sequence 1 :payload :bar}))
   
   (fact "Every new packet gets a new sequence number."
-  (let [queue (->> (create) (enqueue-to-send :foo))]
-    (->> queue pop-packet (enqueue-to-send :bar) packet-to-send :sequence) => 1)))
+  (let [queue (-> (create) (enqueue-to-send :foo))]
+    (-> queue pop-packet (enqueue-to-send :bar) packet-to-send :sequence) => 1)))
 
 
 (facts "Packet Handling"
 
- (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
+ (let [queue (-> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))]
 
    (fact "Packet enqueing is FIFO."
-     (let [queue (->> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
+     (let [queue (-> (create) (enqueue-to-send :foo) (enqueue-to-send :bar))
            simulate (fn [highest-sequence-to-send]
                       (->> queue
                         (handle-packet-from-server
@@ -120,7 +120,7 @@
       ))
     
  (let [enqueue (fn [queue start count]
-                 )
+                 (reduce enqueue-to-send queue (range start (+ start count))))
        scenario (fn [enq1 hsts1 hsd1 full?1 enq2 hsts2 hsd2 full?2 seq pay reset fact]
                   (let [queue (create)
                         queue (enqueue queue 0 enq1)]))]
