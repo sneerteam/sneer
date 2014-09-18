@@ -2,6 +2,7 @@ package sneer.android.main;
 
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_COMPLETED;
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_NEXT;
+import static sneer.android.main.ui.SneerAndroidProvider.sneer;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -14,7 +15,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action0;
 import rx.functions.Action1;
-import sneer.Sneer;
 import sneer.TupleSpaceFactoryClient;
 import sneer.commons.InteractiveSerializer;
 import sneer.tuples.Tuple;
@@ -78,10 +78,6 @@ public class TupleSpaceService extends Service {
 		}
 	}
 	
-	private Sneer sneer() {
-		return ((SneerApp)getApplication()).sneerAndroid().sneer();
-	}
-	
 	private void subscribe(Map<String, Object> criteria, ResultReceiver resultReceiver) {
 		subscribe(resultReceiver, sneer().tupleSpace().filter().putFields(criteria).tuples());
 	}
@@ -121,8 +117,6 @@ public class TupleSpaceService extends Service {
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
-
-
 
 	public static void startTupleSpaceService(Context context) {
 		Intent startServiceIntent = new Intent(context, TupleSpaceService.class);

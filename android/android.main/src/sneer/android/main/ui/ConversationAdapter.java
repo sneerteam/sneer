@@ -1,23 +1,30 @@
 package sneer.android.main.ui;
 
-import static android.os.Build.VERSION.*;
-import static android.os.Build.VERSION_CODES.*;
-import static sneer.android.main.SneerApp.sneerAndroid;
-import static sneer.android.ui.SneerActivity.*;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
+import static sneer.android.ui.SneerActivity.findTextView;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
-import rx.functions.*;
-import sneer.*;
-import sneer.android.main.*;
-import sneer.android.main.ui.drawable.*;
-import android.annotation.*;
-import android.content.*;
-import android.graphics.*;
-import android.graphics.drawable.*;
-import android.view.*;
+import rx.functions.Action1;
+import sneer.Message;
+import sneer.Party;
+import sneer.android.main.R;
+import sneer.android.main.ui.drawable.TriangleLeftDrawable;
+import sneer.android.main.ui.drawable.TriangleRightDrawable;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
 
 public class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
 
@@ -51,7 +58,7 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
         
         ret.setTag(message);
-        if (sneerAndroid(getContext()).isClickable(message)) {
+        if (sneerAndroid().isClickable(message)) {
 	        ret.setClickable(true);
 	        ret.setOnClickListener(this);
         }
@@ -109,6 +116,6 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
 
 	@Override
 	public void onClick(View v) {
-		sneerAndroid(getContext()).doOnClick((Message) v.getTag());
+		sneerAndroid().doOnClick((Message) v.getTag());
 	}
 }

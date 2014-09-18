@@ -1,31 +1,41 @@
 package sneer.android.main.ui;
 
-import static java.util.concurrent.TimeUnit.*;
-import static sneer.android.main.SneerAndroidCore.*;
-import static sneer.android.main.SneerApp.sneer;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static sneer.android.main.ui.SneerAndroidProvider.sneer;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import rx.*;
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.*;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.Conversation;
+import sneer.ConversationMenuItem;
 import sneer.Message;
-import sneer.android.main.*;
-import sneer.android.ui.*;
-import sneer.commons.*;
-import android.app.*;
-import android.content.*;
-import android.graphics.*;
-import android.graphics.drawable.*;
-import android.os.*;
-import android.text.*;
-import android.view.*;
+import sneer.Party;
+import sneer.PublicKey;
+import sneer.android.main.R;
+import sneer.android.ui.SneerActivity;
+import sneer.commons.Comparators;
+import android.app.ActionBar;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnDismissListener;
+import android.widget.TextView;
 
 public class ConversationActivity extends SneerActivity {
 
@@ -54,16 +64,16 @@ public class ConversationActivity extends SneerActivity {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
 		
-		party = sneer(this).produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 		
 		plugActionBarTitle(actionBar, party.name());
-		plugActionBarIcon(actionBar, sneer(this).profileFor(party).selfie());
+		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
 //		Observable<byte[]> selfie = sneer().profileFor(party).selfie();
 //		deferUI(selfie).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
 //			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
 //		}});
 
-		conversation = sneer(this).produceConversationWith(party);
+		conversation = sneer().produceConversationWith(party);
 		conversation.unreadMessageCountReset();
 
 		adapter = new ConversationAdapter(this,

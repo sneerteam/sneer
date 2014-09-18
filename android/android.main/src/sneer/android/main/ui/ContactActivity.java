@@ -1,8 +1,8 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.SneerApp.admin;
-import static sneer.android.main.SneerApp.sneer;
-import static sneer.android.main.SneerApp.sneerAndroid;
+import static sneer.android.main.ui.SneerAndroidProvider.admin;
+import static sneer.android.main.ui.SneerAndroidProvider.sneer;
+import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
 import static sneer.android.ui.SneerActivity.plug;
 import rx.Observable;
 import rx.functions.Action1;
@@ -13,8 +13,6 @@ import sneer.Party;
 import sneer.Profile;
 import sneer.PublicKey;
 import sneer.android.main.R;
-import sneer.android.main.SneerAndroidCore;
-import sneer.android.main.SneerApp;
 import sneer.android.main.ui.utils.Puk;
 import sneer.commons.exceptions.FriendlyException;
 import android.app.Activity;
@@ -54,7 +52,7 @@ public class ContactActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		if (!sneerAndroid(this).checkOnCreate(this)) return;
+		if (!sneerAndroid().checkOnCreate(this)) return;
 		
 		setContentView(R.layout.activity_contact);
 		
@@ -88,7 +86,7 @@ public class ContactActivity extends Activity {
 	        return true;
 
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer(this).findContact(party).nickname().current());
+			Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
 			break;
 		}
 		return true;
@@ -102,7 +100,7 @@ public class ContactActivity extends Activity {
 		if (Intent.ACTION_VIEW.equals(action)){
 			try{
 				getActionBar().setDisplayHomeAsUpEnabled(true);
-				loadContact(admin(this).keys().createPublicKey(intent.getData().getQuery()));		
+				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));		
 			}catch(RuntimeException e){
 				toast("Invalid public key.");
 				finish();
@@ -112,7 +110,7 @@ public class ContactActivity extends Activity {
 		} else
 			loadContact(null);
 		
-		if (partyPuk.bytesAsString().equals(sneer(this).self().publicKey().current().bytesAsString())) {
+		if (partyPuk.bytesAsString().equals(sneer().self().publicKey().current().bytesAsString())) {
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
 			finish();
@@ -178,9 +176,9 @@ public class ContactActivity extends Activity {
 				? partyPuk()
 				: puk;				
 		
-		party = sneer(this).produceParty(partyPuk);
-		profile = sneer(this).profileFor(party);	
-		contact = sneer(this).findContact(party);
+		party = sneer().produceParty(partyPuk);
+		profile = sneer().profileFor(party);	
+		contact = sneer().findContact(party);
 
 		newContact = contact == null
 				? true
@@ -193,9 +191,9 @@ public class ContactActivity extends Activity {
 			try {
 				final String nickName = nicknameEdit.getText().toString();
 				if (newContact)
-					sneer(this).addContact(nickName, party);
+					sneer().addContact(nickName, party);
 				else if(isTouched)
-					sneer(this).findContact(party).setNickname(nickName);
+					sneer().findContact(party).setNickname(nickName);
 				toast("contact saved...");
 			} catch (FriendlyException e) {
 				toast(e.getMessage());
