@@ -10,7 +10,6 @@ public class SneerAndroidProvider {
 
 	public static void setInstance(SneerAndroid sneerAndroid) {
 		SneerAndroidProvider.sneerAndroid = sneerAndroid;
-		
 	}
 	
 	public static SneerAndroid sneerAndroid() {

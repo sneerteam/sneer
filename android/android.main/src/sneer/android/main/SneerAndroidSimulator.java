@@ -10,7 +10,7 @@ import android.content.Context;
 public final class SneerAndroidSimulator implements SneerAndroid {
 	private SneerAdmin admin;
 
-	public SneerAndroidSimulator(Context applicationContext) {
+	public SneerAndroidSimulator() {
 		SneerAdminSimulator ret = new SneerAdminSimulator();
 		Sneer sneer = ret.sneer();
 		sneer.profileFor(sneer.self()).setOwnName("Neide da Silva"); // Comment this line to get an empty name.
