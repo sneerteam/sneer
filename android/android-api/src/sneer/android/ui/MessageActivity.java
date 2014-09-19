@@ -5,7 +5,6 @@ import static sneer.SneerAndroidClient.MESSAGE;
 import sneer.SneerAndroidClient;
 import sneer.utils.Value;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.ResultReceiver;
 
 public abstract class MessageActivity extends SneerActivity {
@@ -26,11 +25,7 @@ public abstract class MessageActivity extends SneerActivity {
 		
 	protected void send(String label, Object message) {
 		ResultReceiver resultReceiver = getExtra(SneerAndroidClient.RESULT_RECEIVER);
-
-		Bundle bundle = new Bundle();
-		bundle.putString(LABEL, label);
-		bundle.putParcelable(MESSAGE, Value.of(message));
-		resultReceiver.send(RESULT_OK, bundle);
+		SneerAndroidClient.send(resultReceiver, label, message);
 	}
 
 }

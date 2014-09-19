@@ -5,6 +5,8 @@ import rx.Observable.OnSubscribe;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.tuples.*;
+import sneer.utils.Value;
+import android.app.Activity;
 import android.content.*;
 import android.os.*;
 
@@ -167,6 +169,13 @@ public class SneerAndroidClient {
 			}
 			
 		};
+	}
+
+	public static void send(ResultReceiver resultReceiver, String label, Object message) {
+		Bundle bundle = new Bundle();
+		bundle.putString(LABEL, label);
+		bundle.putParcelable(MESSAGE, Value.of(message));
+		resultReceiver.send(Activity.RESULT_OK, bundle);
 	}
 	
 }
