@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 
 public final class PartnerSession implements SharedResultReceiver.Callback {
+	
 	private final PublicKey host;
 	private final PublicKey partner;
 	private final long sessionId;
@@ -29,13 +30,13 @@ public final class PartnerSession implements SharedResultReceiver.Callback {
 	private ClassLoader classLoader;
 	private Sneer sneer;
 
-	PartnerSession(SneerPluginInfo app, PublicKey host, PublicKey partner, long sessionId, ClassLoader classLoader, Sneer sneer) {
+	PartnerSession(String tupleType, PublicKey host, PublicKey partner, long sessionId, ClassLoader classLoader, Sneer sneer) {
 		this.host = host;
 		this.partner = partner;
 		this.sessionId = sessionId;
 		this.classLoader = classLoader;
 		this.sneer = sneer;
-		this.tupleType = app.tupleType;
+		this.tupleType = tupleType;
 	}
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {

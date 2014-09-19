@@ -178,8 +178,8 @@ public class SneerAndroidCore implements SneerAndroid {
 		context.startActivity(intent);
 	}
 
-	protected SharedResultReceiver createPatnerSession(final SneerPluginInfo app, final PublicKey partner, final long sessionId, final PublicKey host) {
-		return new SharedResultReceiver(new PartnerSession(app, host, partner, sessionId, context.getClassLoader(), sneer()));
+	protected SharedResultReceiver createPatnerSession(SneerPluginInfo app, PublicKey partner, long sessionId, PublicKey host) {
+		return new SharedResultReceiver(new PartnerSession(app.tupleType, host, partner, sessionId, context.getClassLoader(), sneer()));
 	}
 
 	
