@@ -26,14 +26,14 @@ public class ViewSendFilesActivity extends MessageActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		getData(message());
-		File file = createFile();
+		dataFrom(message());
+		File file = prepareFile();
 		writeBytesTo(file);
 		intentFor(Uri.fromFile(file));
 	}
 	
 
-	private void getData(Object message) {
+	private void dataFrom(Object message) {
 		@SuppressWarnings("unchecked")
 		HashMap<String, Object> map = (HashMap<String, Object>) message;
 		bytes = (byte[]) map.get("contents");
@@ -41,7 +41,7 @@ public class ViewSendFilesActivity extends MessageActivity {
 	}
 
 	
-	private File createFile() {
+	private File prepareFile() {
 		File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
 		extension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toString());
 		type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
