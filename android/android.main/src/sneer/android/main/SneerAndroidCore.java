@@ -6,7 +6,7 @@ import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import static sneer.SneerAndroidClient.SESSION_ID;
 import static sneer.SneerAndroidClient.LABEL;
 import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
-import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION;
+import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION_PARTNER;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -99,7 +99,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	static private AtomicLong nextSessionId = new AtomicLong(0);
 	
 	private void startPlugin(SneerPluginInfo app, PublicKey peer) {
-		if (app.interactionType == SESSION) startSession(app, peer);
+		if (app.interactionType == SESSION_PARTNER) startPartnerSession(app, peer);
 		if (app.interactionType == MESSAGE_COMPOSE) startComposeMessage(app, peer);
 	}
 
@@ -143,7 +143,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		context.startActivity(intent);
 	}
 
-	private void startSession(SneerPluginInfo app, PublicKey peer) {
+	private void startPartnerSession(SneerPluginInfo app, PublicKey peer) {
 		long sessionId = nextSessionId.getAndIncrement();
 		
 		sneer().tupleSpace().publisher()
