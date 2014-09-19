@@ -16,7 +16,7 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 	protected void onPartnerName(String name) {};
 
 	
-	protected void send(Object message) { /*TODO*/ }
+	protected void send(String label, Object message) { /*TODO*/ }
 	protected abstract void onMessageSent(Object message);
 	
 	protected abstract void onMessageFromPartner(Object message);

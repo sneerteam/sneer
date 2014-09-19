@@ -15,7 +15,7 @@ public abstract class GroupSessionActivity extends SneerActivity {
 	/** TODO: Who is in the group? Use Party? Use RX? */
 
 	
-	protected void send(Object messageContents) { /*TODO*/ }
+	protected void send(String label, Object messageContents) { /*TODO*/ }
 	protected abstract void onMessage(Message message);
 	
 	
