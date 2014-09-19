@@ -106,22 +106,17 @@ public class ConversationsAPITest extends TestCase {
 
 	public void testChangeContactNickname() throws FriendlyException {
 
-		Party partyB = sneerA.produceParty(userB);
+		Party party = sneerA.produceParty(userB);
 
-		sneerA.addContact("Party Boy", partyB);
+		sneerA.addContact("Party Boy", party);
 		
-		Observable<String> partyBNicks = sneerA.findContact(partyB).nickname().observable();
+		Observable<String> nicks = sneerA.findContact(party).nickname().observable();
 		expecting(
-			values(partyBNicks, "Party Boy"));
+			values(nicks, "Party Boy"));
 
-		ReplaySubject<String> nicknames = ReplaySubject.create();		
-		partyBNicks.subscribe(nicknames);
-
-		sneerA.findContact(partyB).setNickname("Party Man");
-
+		sneerA.findContact(party).setNickname("Party Man");
 		expecting(
-			values(nicknames, "Party Boy", "Party Man"),
-			values(partyBNicks, "Party Man"));
+			values(nicks, "Party Man"));
 	}
 	
 	public void testContactListSequence() throws FriendlyException {
