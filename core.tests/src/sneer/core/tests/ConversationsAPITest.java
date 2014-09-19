@@ -1,21 +1,38 @@
 package sneer.core.tests;
 
-import static sneer.core.tests.ObservableTestUtils.*;
+import static sneer.core.tests.ObservableTestUtils.eventually;
+import static sneer.core.tests.ObservableTestUtils.expecting;
+import static sneer.core.tests.ObservableTestUtils.payloads;
+import static sneer.core.tests.ObservableTestUtils.same;
+import static sneer.core.tests.ObservableTestUtils.values;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import junit.framework.*;
+import junit.framework.TestCase;
+
+import org.junit.Ignore;
+
 import rx.Observable;
-import rx.functions.*;
-import rx.observables.*;
-import rx.subjects.*;
-import sneer.*;
-import sneer.admin.*;
-import sneer.commons.*;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.observables.ConnectableObservable;
+import rx.subjects.ReplaySubject;
+import sneer.Contact;
+import sneer.Conversation;
+import sneer.Message;
+import sneer.Party;
+import sneer.PrivateKey;
+import sneer.Profile;
+import sneer.PublicKey;
+import sneer.Sneer;
+import sneer.admin.SneerAdmin;
 import sneer.commons.Arrays;
-import sneer.commons.exceptions.*;
-import sneer.impl.keys.*;
-import sneer.tuples.*;
+import sneer.commons.Pair;
+import sneer.commons.exceptions.FriendlyException;
+import sneer.impl.keys.KeysImpl;
+import sneer.tuples.Tuple;
 
 public class ConversationsAPITest extends TestCase {
 	
