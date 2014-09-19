@@ -22,7 +22,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
-public final class PartnerSession implements SharedResultReceiver.Callback {
+public final class PartnerSession {
 	
 	private final PublicKey host;
 	private final PublicKey partner;
@@ -71,16 +71,17 @@ public final class PartnerSession implements SharedResultReceiver.Callback {
 		toClient.send(Activity.RESULT_OK, bundle);
 	}
 
-	@Override
-	public void call(Bundle t1) {
-		t1.setClassLoader(classLoader);
-		final ResultReceiver toClient = t1.getParcelable(RESULT_RECEIVER);
-
-		if (toClient != null) {
-			setup(toClient);
-		} else {
-			publish(t1.getString(LABEL), ((Value)t1.getParcelable(MESSAGE)).get());
-		}
+	protected SharedResultReceiver createResultReceiver() {
+		return new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle resultData) {
+			resultData.setClassLoader(PartnerSession.this.classLoader);
+			final ResultReceiver toClient = resultData.getParcelable(RESULT_RECEIVER);
+			
+			if (toClient != null) {
+				PartnerSession.this.setup(toClient);
+			} else {
+				PartnerSession.this.publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
+			}
+		} });
 	}
 
 	private void setup(final ResultReceiver toClient) {
@@ -145,8 +146,9 @@ public final class PartnerSession implements SharedResultReceiver.Callback {
 	public void startActivity() {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
-		intent.putExtra(RESULT_RECEIVER, new SharedResultReceiver(this));
+		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}
+
 }
