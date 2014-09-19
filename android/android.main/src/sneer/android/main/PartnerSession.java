@@ -17,6 +17,8 @@ import sneer.tuples.TupleFilter;
 import sneer.utils.SharedResultReceiver;
 import sneer.utils.Value;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
@@ -29,14 +31,18 @@ public final class PartnerSession implements SharedResultReceiver.Callback {
 	private String tupleType;
 	private ClassLoader classLoader;
 	private Sneer sneer;
+	private SneerPluginInfo app;
+	private Context context;
 
-	PartnerSession(String tupleType, PublicKey host, PublicKey partner, long sessionId, ClassLoader classLoader, Sneer sneer) {
+	PartnerSession(SneerPluginInfo app, PublicKey host, PublicKey partner, long sessionId, Context context, Sneer sneer) {
 		this.host = host;
 		this.partner = partner;
 		this.sessionId = sessionId;
-		this.classLoader = classLoader;
+		this.context = context;
+		this.classLoader = context.getClassLoader();
 		this.sneer = sneer;
-		this.tupleType = tupleType;
+		this.tupleType = app.tupleType;
+		this.app = app;
 	}
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {
@@ -134,5 +140,13 @@ public final class PartnerSession implements SharedResultReceiver.Callback {
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 				sendMessage(toClient, t1);
 			} });
+	}
+ 
+	public void startActivity() {
+		Intent intent = new Intent();
+		intent.setClassName(app.packageName, app.activityName);
+		intent.putExtra(RESULT_RECEIVER, new SharedResultReceiver(this));
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
 	}
 }
