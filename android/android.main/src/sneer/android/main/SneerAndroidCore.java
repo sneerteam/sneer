@@ -6,6 +6,7 @@ import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
 import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_VIEW;
 import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION_PARTNER;
+import static sneer.android.main.TupleSpaceService.startTupleSpaceService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -312,7 +313,7 @@ public class SneerAndroidCore implements SneerAndroid {
 			} });
 			
 		
-		TupleSpaceService.startTupleSpaceService(context);
+		startTupleSpaceService(context);
 		
 	}
 
