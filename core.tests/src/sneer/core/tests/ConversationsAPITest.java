@@ -30,8 +30,9 @@ public class ConversationsAPITest extends TestCase {
 		Glue.tearDownNetwork(network);
 	}
 	
+	protected final Object tupleBaseA = newTupleBase();
 	
-	protected final SneerAdmin adminA = newSneerAdmin();
+	protected final SneerAdmin adminA = newSneerAdmin(KeysImpl.createPrivateKey(), tupleBaseA);
 	protected final SneerAdmin adminB = newSneerAdmin();
 	protected final SneerAdmin adminC = newSneerAdmin();
 
@@ -43,12 +44,16 @@ public class ConversationsAPITest extends TestCase {
 	protected final Sneer sneerB = adminB.sneer();
 	protected final Sneer sneerC = adminC.sneer();
 
+	
 	protected PrivateKey newPrivateKey() {
 		return KeysImpl.createPrivateKey();
 	}
 	
 	private SneerAdmin newSneerAdmin() {
-		return Glue.newSneerAdmin(KeysImpl.createPrivateKey(), network, newTupleBase());
+		return newSneerAdmin(KeysImpl.createPrivateKey(), newTupleBase());
+	}
+	private SneerAdmin newSneerAdmin(PrivateKey prik, Object tupleBase) {
+		return Glue.newSneerAdmin(prik, network, tupleBase);
 	}
 
 	protected Object newTupleBase() {
@@ -93,19 +98,18 @@ public class ConversationsAPITest extends TestCase {
 		assertSame(partyB, sneerA.findContact(partyB).party());
 	}
 
+	
 	public void testExceptionOnDuplicatedNickname() throws FriendlyException {
 
 		sneerA.addContact("Party Boy", sneerA.produceParty(userB));
 		try {
 			sneerA.addContact("Party Boy", sneerA.produceParty(userC));
 			fail("should have failed with "+FriendlyException.class.getSimpleName());
-		} catch (FriendlyException expected) {
-			
-		}
+		} catch (FriendlyException expected) {}
 	}
 
+	
 	public void testChangeContactNickname() throws FriendlyException {
-
 		Party party = sneerA.produceParty(userB);
 
 		sneerA.addContact("Party Boy", party);
@@ -118,6 +122,20 @@ public class ConversationsAPITest extends TestCase {
 		expecting(
 			values(nicks, "Party Man"));
 	}
+
+	
+	public void testChangeContactNicknamePersistence() throws FriendlyException {
+		Party party = sneerA.produceParty(userB);
+		sneerA.addContact("Party Boy", party);
+		
+		Contact contact = sneerA.findContact(party);
+		contact.setNickname("Party Man");
+
+		Sneer newSneer = newSneerAdmin(adminA.privateKey(), tupleBaseA).sneer();
+		Party newParty = newSneer.produceParty(userB);
+		assertEquals("Party Man", newSneer.findContact(newParty).nickname().current());
+	}
+
 	
 	public void testContactListSequence() throws FriendlyException {
 
