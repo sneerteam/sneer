@@ -21,14 +21,35 @@ public class ViewSendFilesActivity extends MessageActivity {
 	private String extension;
 	private String type;
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dataFrom(message());
+		getData(message());
+		File file = createFile();
+		writeBytesTo(file);
+		intentFor(Uri.fromFile(file));
+	}
+	
 
-		File file = fileFrom();
+	private void getData(Object message) {
+		@SuppressWarnings("unchecked")
+		HashMap<String, Object> map = (HashMap<String, Object>) message;
+		bytes = (byte[]) map.get("contents");
+		filename = (String)map.get("filename");
+	}
 
+	
+	private File createFile() {
+		File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
+		extension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toString());
+		type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+		return file;
+	}
+
+	
+	private void writeBytesTo(File file) {
 		try {
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 			bos.write(bytes);
@@ -39,9 +60,10 @@ public class ViewSendFilesActivity extends MessageActivity {
 			finish();
 			return;
 		}
-		
-		Uri fileUri = Uri.fromFile(file);
+	}
 
+	
+	private void intentFor(Uri fileUri) {
 		Intent intent = new Intent();
 		intent.setDataAndType(fileUri, type);
 		
@@ -53,19 +75,5 @@ public class ViewSendFilesActivity extends MessageActivity {
 			finish();
 			return;
 		}
-	}
-
-	private File fileFrom() {
-		File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
-		extension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toString());
-		type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-		return file;
-	}
-
-	private void dataFrom(Object message) {
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> map = (HashMap<String, Object>) message;
-		bytes = (byte[]) map.get("contents");
-		filename = (String)map.get("filename");
 	}
 }
