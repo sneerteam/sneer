@@ -110,7 +110,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		
 		final ClassLoader classLoader = context.getClassLoader();
 		
-		SharedResultReceiver result = new SharedResultReceiver(new Action1<Bundle>() {  @Override public void call(Bundle t1) {
+		SharedResultReceiver result = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {
 			
 			try {
 				t1.setClassLoader(classLoader);

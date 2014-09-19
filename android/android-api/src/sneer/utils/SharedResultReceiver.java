@@ -1,13 +1,17 @@
 package sneer.utils;
 
-import rx.functions.*;
-import android.os.*;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 
 public class SharedResultReceiver extends ResultReceiver {
 
-	private final transient Action1<Bundle> callback;
+	private final transient Callback callback;
+	
+	public interface Callback {
+		void call(Bundle resultData);
+	}
 
-	public SharedResultReceiver(Action1<Bundle> callback) {
+	public SharedResultReceiver(Callback callback) {
 		super(null);
 		this.callback = callback;
 	}
