@@ -21,6 +21,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import sneer.ConversationMenuItem;
 import sneer.Message;
 import sneer.PublicKey;
@@ -314,6 +315,19 @@ public class SneerAndroidCore implements SneerAndroid {
 			
 		
 		startTupleSpaceService(context);
+		
+		sneer().tupleSpace().filter()
+			.localTuples()
+			.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple t1) {
+				return (Long) t1.get("session");
+			} })
+			.scan(new Func2<Long, Long, Long>() {  @Override public Long call(Long t1, Long t2) {
+				return Math.max(t1==null?0:t1, t2==null?0:t2);
+			} })
+			.last()
+			.subscribe(new Action1<Long>() {  @Override public void call(Long max) {
+				nextSessionId.set(max+1);
+			} });
 		
 	}
 
