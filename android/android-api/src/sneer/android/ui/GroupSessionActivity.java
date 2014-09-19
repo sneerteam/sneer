@@ -19,7 +19,10 @@ public abstract class GroupSessionActivity extends SneerActivity {
 	protected abstract void onMessage(Message message);
 	
 	
-	/** Called in the Android main thread (UI thread) after each message, if it is the last message in this session. */
+	/**
+	 * Called in the Android main thread (UI thread) after each message, if it is the most recent message in the session. This method will
+	 * not be called, therefore, when previous messages in the session are being replayed.
+	 */
 	protected abstract void update();
 
 }
