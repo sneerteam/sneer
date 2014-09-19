@@ -178,4 +178,8 @@ public class SneerPluginInfo implements Serializable {
 	public boolean canCompose() {
 		return interactionType.canCompose;
 	}
+
+	public Boolean canView() {
+		return interactionType.canView;
+	}
 }

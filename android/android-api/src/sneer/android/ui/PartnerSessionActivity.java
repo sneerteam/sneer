@@ -1,13 +1,65 @@
 package sneer.android.ui;
 
+import static sneer.SneerAndroidClient.MESSAGE;
+import static sneer.SneerAndroidClient.OWN;
+import static sneer.SneerAndroidClient.PARTNER_NAME;
+import static sneer.SneerAndroidClient.REPLAY_FINISHED;
+import static sneer.SneerAndroidClient.RESULT_RECEIVER;
+import sneer.SneerAndroidClient;
+import sneer.utils.SharedResultReceiver;
+import sneer.utils.Value;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 
 public abstract class PartnerSessionActivity extends SneerActivity {
+
+	private ResultReceiver toSneer;
+	private boolean isReplaying = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// TODO: Start replaying previous messages on separate thread.
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(RESULT_RECEIVER, new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle data) {
+			
+			data.setClassLoader(getApplicationContext().getClassLoader());
+			
+			final String partnerName = data.getString(PARTNER_NAME);
+			
+			if (partnerName != null) {
+				runOnUiThread(new Runnable() {  @Override public void run() {
+					onPartnerName(partnerName);
+				} });
+			}
+			
+			boolean replayFinished = data.getBoolean(REPLAY_FINISHED);
+			if (replayFinished) {
+				isReplaying = false;
+			}
+			
+			Object messageEnvelope = data.get(MESSAGE);
+			
+			if (messageEnvelope != null) {
+				Object message = ((Value)messageEnvelope).get();
+				boolean mine = data.getBoolean(OWN);
+				
+				if (mine) {
+					onMessageSent(message);
+				} else {
+					onMessageFromPartner(message);
+				}
+			}
+			
+			if (!isReplaying) {
+				runOnUiThread(new Runnable() {  @Override public void run() {
+					update();
+				} });
+			}
+			
+		} }));
+		
+		toSneer = getExtra(RESULT_RECEIVER);
+		toSneer.send(0, bundle);
 	}
 
 
@@ -16,7 +68,9 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 	protected void onPartnerName(String name) {};
 
 	
-	protected void send(String label, Object message) { /*TODO*/ }
+	protected void send(String label, Object message) {
+		SneerAndroidClient.send(toSneer, label, message);
+	}
 	protected abstract void onMessageSent(Object message);
 	
 	protected abstract void onMessageFromPartner(Object message);
