@@ -7,9 +7,7 @@ import rx.subjects.*;
 
 public class ObservedSubject<T> {
 
-	/**
-	 * It is expected that the subject will emit a value before the first call to current.
-	 */
+	/** It is expected that the subject will emit a value before the first call to current. */
 	public static <T> ObservedSubject<T> createWithSubject(Subject<T, T> subject) {
 		return new ObservedSubject<T>(subject);
 	}
