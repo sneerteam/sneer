@@ -114,17 +114,17 @@
   `(rx.Observable/defer
      (rx-interop/fn [] ~@body)))
 
-(defn setup [db]
+(defn idempotently [creation-fn]
   (try
-		(create-tuple-table db)
-    (catch Exception e))
-  (try
-		(create-prik-table db)
-    (catch Exception e))
-  (try
-		(create-tuple-indices db)
+		(creation-fn)
     (catch Exception e
-      (.printStackTrace e))))
+      (when-not (-> e .getMessage (.contains "already exists"))
+        (throw e)))))
+
+(defn setup [db]
+  (idempotently #(create-tuple-table db))
+  (idempotently #(create-prik-table db))
+  (idempotently #(create-tuple-indices db)))
 
 (defn create [db]
   (let [new-tuples (rx.subjects.PublishSubject/create)]
