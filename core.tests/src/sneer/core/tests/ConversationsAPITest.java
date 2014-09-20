@@ -11,9 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
-
-import org.junit.Ignore;
-
 import rx.Observable;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -33,6 +30,7 @@ import sneer.commons.Pair;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.impl.keys.KeysImpl;
 import sneer.tuples.Tuple;
+import sneer.tuples.TuplePublisher;
 
 public class ConversationsAPITest extends TestCase {
 	
