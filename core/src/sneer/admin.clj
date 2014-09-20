@@ -18,34 +18,36 @@
    [rx.schedulers TestScheduler]
    [rx.subjects Subject BehaviorSubject ReplaySubject PublishSubject]))
 
+(defn produce [map-atom key fn-if-absent]
+  (if-some [existing (get @map-atom key)]
+    existing
+    (let [new-value (fn-if-absent key)]
+      (swap! map-atom assoc key new-value)
+      new-value)))
+
 (defn behavior-subject [& [initial-value]]
   (BehaviorSubject/create initial-value))
 
-(defn replay-last-subject []
-  (ReplaySubject/createWithSize 1))
-
-(defprotocol PartyImpl
-  (party-name-subject [this]))
+(defprotocol party-impl
+  (name-subject [this]))
 
 (defn new-party [puk]
-  (let [name (replay-last-subject)]
+  (let [name (ObservedSubject/create (str "? PublicKey: " (-> puk .bytesAsString (subs 0 7)) "..."))]
     (reify
       Party
-      (name [this] name)
-      (publicKey [this]
-        (.observed (ObservedSubject/create puk)))
-      PartyImpl
-      (party-name-subject [this] name)
-      (toString [this]
-        (str "#<Party " puk ">")))))
+        (name [this] (.observable name))
+        (publicKey [this]
+          (.observed (ObservedSubject/create puk)))
+        (toString [this]
+          (str "#<Party " puk ">"))
+      party-impl
+        (name-subject [this] name))))
 
 (defn party-puk [^Party party]
   (.. party publicKey current))
 
 (defn produce-party [parties puk]
-  (->
-   (swap! parties update-in [puk] #(if (nil? %) (new-party puk) %))
-   (get puk)))
+  (produce parties puk new-party))
 
 (defn reify-profile [party ^TupleSpace tuple-space]
 
@@ -99,27 +101,22 @@
           (rx/on-next country value))))))
 
 (defn produce-profile [tuple-space profiles party]
-  (let [puk (party-puk party)]
-	  (->
-	   (swap! profiles update-in [puk] #(if (nil? %) (reify-profile party tuple-space) %))
-	   (get puk))))
-
+  (produce profiles party #(reify-profile % tuple-space)))
 
 (defn reify-contact [nickname party]
-  (let [party-name-subject (party-name-subject party)
-        nickname-subject (ObservedSubject/createWithSubject party-name-subject)]
-    (rx/on-next party-name-subject nickname)
+  (let [nick-subject (ObservedSubject/create nickname)]
+    (.subscribe (.observable nick-subject) (name-subject party))
     (reify Contact
       (party [this] party)
       (problemWithNewNickname [this new-nick]
         ;TODO
         )
       (nickname [this]
-        (.observed nickname-subject))
-      (setNickname [this new-nickname]
-        (.set nickname-subject new-nickname))
+        (.observed nick-subject))
+      (setNickname [this new-nick]
+        (.set nick-subject new-nick))
       (toString [this]
-        (str "#<Contact " (.. nickname-subject observed current) ">")))))
+        (str "#<Contact " (.current nick-subject) ">")))))
 
 (defn tuple->contact [^Tuple tuple parties]
   (reify-contact (.payload tuple)
@@ -237,50 +234,49 @@
             (produce-conversation [party]
               (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))]
 
+      (let [self (new-party own-puk)]
+        (reify Sneer
 
-      (reify Sneer
+          (self [this] self)
 
-        (self [this]
-          (new-party own-puk))
+          (profileFor [this party]
+            (produce-profile tuple-space profiles party))
 
-        (profileFor [this party]
-          (produce-profile tuple-space profiles party))
+          (contacts [this]
+            observable-contacts)
 
-        (contacts [this]
-          observable-contacts)
+          (addContact [this nickname party]
+            (add-contact nickname party)
+            (.. tuple-space
+                publisher
+                (audience own-puk)
+                (type "contact")
+                (field "party" (party-puk party))
+                (pub nickname)))
 
-        (addContact [this nickname party]
-          (add-contact nickname party)
-          (.. tuple-space
-              publisher
-              (audience own-puk)
-              (type "contact")
-              (field "party" (party-puk party))
-              (pub nickname)))
+          (findContact [this party]
+            (get @puk->contact (party-puk party)))
 
-        (findContact [this party]
-          (get @puk->contact (party-puk party)))
+          (conversationsContaining [this type]
+            (rx/never))
 
-        (conversationsContaining [this type]
-          (rx/never))
-
-        (conversations [this]
-          (->>
-            observable-contacts
-            (rx/map
-              (partial map (fn [^Contact c] (produce-conversation (.party c)))))))
+          (conversations [this]
+            (->>
+              observable-contacts
+              (rx/map
+                (partial map (fn [^Contact c] (produce-conversation (.party c)))))))
         
-        (setConversationMenuItems [this menu-item-list]
-          (rx/on-next conversation-menu-items menu-item-list))
+          (setConversationMenuItems [this menu-item-list]
+            (rx/on-next conversation-menu-items menu-item-list))
 
-        (produceParty [this puk]
-          (produce-party parties puk))
+          (produceParty [this puk]
+            (produce-party parties puk))
         
-        (tupleSpace [this]
-          tuple-space)
+          (tupleSpace [this]
+            tuple-space)
         
-        (produceConversationWith [this party] 
-          (produce-conversation party))))))
+          (produceConversationWith [this party] 
+            (produce-conversation party)))))))
 
 
 (defprotocol Restartable
