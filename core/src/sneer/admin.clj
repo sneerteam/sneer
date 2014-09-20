@@ -3,6 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject* observe-for-computation atom->observable flatmapseq shared-latest]]
    [sneer.core :as core :refer [connect dispose restarted]]
+   [sneer.commons :refer [produce]]
    [sneer.networking.client :as client]
    [sneer.persistent-tuple-base :as persistence]
    [clojure.java.io :as io])
@@ -17,16 +18,6 @@
    [sneer.impl.keys KeysImpl]
    [rx.schedulers TestScheduler]
    [rx.subjects Subject BehaviorSubject ReplaySubject PublishSubject]))
-
-(defn produce [map-atom key fn-if-absent]
-  (if-some [existing (get @map-atom key)]
-    existing
-    (let [new-value (fn-if-absent key)]
-      (swap! map-atom assoc key new-value)
-      new-value)))
-
-(defn behavior-subject [& [initial-value]]
-  (BehaviorSubject/create initial-value))
 
 (defprotocol party-impl
   (name-subject [this]))
