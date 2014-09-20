@@ -8,6 +8,7 @@ public interface Party {
 
 	Observed<PublicKey> publicKey();
 	
+	@Deprecated //Change return type to Observed.
 	Observable<String> name();
 
 }
