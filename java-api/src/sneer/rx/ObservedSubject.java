@@ -5,7 +5,7 @@ import rx.functions.*;
 import rx.subjects.*;
 
 
-public class ObservedSubject<T> {
+public class ObservedSubject<T> implements Observer<T> {
 
 	/** It is expected that the subject will emit a value before the first call to current. */
 	public static <T> ObservedSubject<T> createWithSubject(Subject<T, T> subject) {
@@ -50,13 +50,34 @@ public class ObservedSubject<T> {
 	}
 
 	
+	public Observable<T> observable() {
+		return subject.asObservable();
+	}
+
+	
+	public T current() {
+		return mostRecent;
+	}
+
+	
 	public void set(T newValue) {
 		subject.onNext(newValue);
 	}
 
 
-	public Subject<T, T> subject() {
-		return subject;
+	@Override
+	public void onCompleted() {
+		subject.onCompleted();
+	}
+
+	@Override
+	public void onError(Throwable e) {
+		subject.onError(e);
+	}
+
+	@Override
+	public void onNext(T t) {
+		subject.onNext(t);
 	}
 	
 }
