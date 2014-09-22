@@ -116,7 +116,7 @@
 
 (defn idempotently [creation-fn]
   (try
-		(creation-fn)
+    (creation-fn)
     (catch Exception e
       (when-not (-> e .getMessage (.contains "already exists"))
         (throw e)))))
@@ -128,9 +128,9 @@
 
 (defn create [db]
   (let [new-tuples (rx.subjects.PublishSubject/create)]
-    
+
     (setup db)
-    
+
     (reify core/TupleBase
 
       (store-tuple [this tuple]
@@ -146,7 +146,7 @@
               (if keep-alive
                 (rx/concat existing new-tuples)
                 existing)))))
-      
+
       (restarted [this]
         (rx/on-completed new-tuples)
         (create db)))))
