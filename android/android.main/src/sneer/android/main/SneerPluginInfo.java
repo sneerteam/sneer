@@ -161,7 +161,7 @@ public class SneerPluginInfo implements Serializable {
 	private static Action1<List<SneerPluginInfo>> pluginsListPublisher() {
 		return new Action1<List<SneerPluginInfo>>() {  @Override public void call(List<SneerPluginInfo> t1) {
 			log("Pushing new app list: " + t1);
-			plugins.set(t1);
+			plugins.onNext(t1);
 		}};
 	}
 

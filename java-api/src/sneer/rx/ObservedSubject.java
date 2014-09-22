@@ -59,25 +59,22 @@ public class ObservedSubject<T> implements Observer<T> {
 		return mostRecent;
 	}
 
-	
-	public void set(T newValue) {
-		subject.onNext(newValue);
-	}
-
 
 	@Override
 	public void onCompleted() {
 		subject.onCompleted();
 	}
 
+	
 	@Override
 	public void onError(Throwable e) {
 		subject.onError(e);
 	}
 
+	
 	@Override
-	public void onNext(T t) {
-		subject.onNext(t);
+	public void onNext(T newValue) {
+		subject.onNext(newValue);
 	}
 	
 }

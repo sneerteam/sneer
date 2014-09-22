@@ -82,10 +82,10 @@ public class ConversationSimulator implements Conversation {
 	
 	private void addMessage(Message message) {
 		List<Message> newMessage = messagesWith(message, BY_TIME_RECEIVED);
-		messages.set(newMessage);
+		messages.onNext(newMessage);
 		Message last = lastIn(newMessage);
-		mostRecentMessageTimestamp.set(last.timestampReceived());
-		mostRecentMessageContent.set(last.content().toString());
+		mostRecentMessageTimestamp.onNext(last.timestampReceived());
+		mostRecentMessageContent.onNext(last.content().toString());
 	}
 
 
@@ -116,7 +116,7 @@ public class ConversationSimulator implements Conversation {
 	
 	private void addMenuItem(ConversationMenuItem menuItem) {
 		List<ConversationMenuItem> newMenuItems = menuItemsWith(menuItem, BY_ALPHABETICAL_ORDER);
-		menuItems.set(newMenuItems);
+		menuItems.onNext(newMenuItems);
 	}
 	
 	
@@ -136,7 +136,7 @@ public class ConversationSimulator implements Conversation {
 
 	@Override
 	public void unreadMessageCountReset() {
-		unreadMessageCount.set(0L);
+		unreadMessageCount.onNext(0L);
 	}
 
 }

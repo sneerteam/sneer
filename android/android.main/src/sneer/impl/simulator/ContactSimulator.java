@@ -29,7 +29,7 @@ public class ContactSimulator implements Contact {
 
 	@Override
 	public void setNickname(String newNickname) {
-		nickname.set(newNickname);
+		nickname.onNext(newNickname);
 	}
 
 
