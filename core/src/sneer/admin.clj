@@ -102,7 +102,7 @@
       (nickname [this]
         (.observed nick-subject))
       (setNickname [this new-nick]
-        (.set nick-subject new-nick))
+        (rx/on-next nick-subject new-nick))
       (toString [this]
         (str "#<Contact " (.current nick-subject) ">")))))
 
