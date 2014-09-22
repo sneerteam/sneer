@@ -11,9 +11,6 @@ public interface Contact {
 	
 	Observed<String> nickname();
 	
-	/** @return null if the new nickname is ok or a reason why the new nickname is not ok. */
-	String problemWithNewNickname(String newNick);
-
 	void setNickname(String newNick) throws FriendlyException;
 
 

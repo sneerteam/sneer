@@ -99,9 +99,6 @@
     (.subscribe (.observable nick-subject) (name-subject party))
     (reify Contact
       (party [this] party)
-      (problemWithNewNickname [this new-nick]
-        ;TODO
-        )
       (nickname [this]
         (.observed nick-subject))
       (setNickname [this new-nick]
@@ -247,6 +244,10 @@
 
           (findContact [this party]
             (get @puk->contact (party-puk party)))
+
+          (problemWithNewNickname [this new-nick]
+            ;TODO
+            )
 
           (conversationsContaining [this type]
             (rx/never))

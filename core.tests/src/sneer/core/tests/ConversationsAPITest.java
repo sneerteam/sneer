@@ -152,6 +152,19 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	
+	public void testProblemWithNewNickname() throws FriendlyException {
+		Party party = sneerA.produceParty(userB);
+		sneerA.addContact("Party Boy", party);
+		
+		Contact contact = sneerA.findContact(party);
+		contact.setNickname("Party Man");
+
+		Sneer newSneer = newSneerAdmin(adminA.privateKey(), tupleBaseA).sneer();
+		Party newParty = newSneer.produceParty(userB);
+		assertEquals("Party Man", newSneer.findContact(newParty).nickname().current());
+	}
+
+	
 	public void testContactListSequence() throws FriendlyException {
 
 		final Party partyB = sneerA.produceParty(userB);

@@ -128,11 +128,17 @@ public class SneerSimulator implements Sneer {
 			.pub(nickname);
 	}
 	
-	
 
 	@Override
 	public Observable<List<Contact>> contacts() {
 		return contacts.asObservable();
+	}
+	
+
+	static private int counter;
+	@Override
+	public String problemWithNewNickname(String newNick) {
+		return (counter++ % 3 == 0) ? "Not cool" : null;
 	}
 
 

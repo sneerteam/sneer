@@ -32,11 +32,4 @@ public class ContactSimulator implements Contact {
 		nickname.onNext(newNickname);
 	}
 
-
-	private int counter;
-	@Override
-	public String problemWithNewNickname(String newNick) {
-		return (counter++ % 3 == 0) ? "Not cool" : null;
-	}
-
 }

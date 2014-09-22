@@ -227,7 +227,7 @@ public class ContactActivity extends Activity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
 			public void afterTextChanged(Editable s) {
-				if (!newContact) nicknameEdit.setError(contact.problemWithNewNickname(textView.getText().toString()));
+				nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
 				isTouched = true;
 			}
 
