@@ -12,7 +12,7 @@ import android.provider.MediaStore.Images;
 import android.view.*;
 import android.widget.*;
 
-public class ReceivePicsActivity extends SneerActivity {
+public class ReceivePicsActivity extends MessageActivity {
 
 	ImageView image;
 	
