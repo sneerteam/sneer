@@ -89,8 +89,8 @@ new tuples as they are stored otherwise it will complete." )
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
-(defn ->envelope [destination type payload]
-  {:address destination type payload})
+(defn ->envelope [destination tuple]
+  {:address destination :tuple tuple})
 
 (defn new-tuple-publisher
   ([tuples-out proto-tuple]
@@ -138,18 +138,12 @@ new tuples as they are stored otherwise it will complete." )
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
 
-(defn payloads [type envelopes]
-  (->> envelopes
-    (rx/map type)
-    (rx/filter (complement nil?))))
-
 (defn get-author [criteria]
   (get criteria "author"))
 
 (defn reify-tuple-space [own-puk tuple-base connection followees]
 
-  (let [tuples-in (rx/distinct (payloads :tuple connection))
-        subs-in (payloads :subscription connection)
+  (let [tuples-in (->> connection (rx/map :tuple) (rx/filter (complement nil?)) rx/distinct)
         subs-out (ReplaySubject/create)
         subscriptions-by-sender (atom {})
         distinct-followees (ReplaySubject/create)]
@@ -168,19 +162,21 @@ new tuples as they are stored otherwise it will complete." )
          (fn [criteria]
            (if (get-author criteria)
              (rx/return criteria)
-             (rx/map #(assoc criteria "author" %) distinct-followees))))
-        (rx/map #(->envelope (get-author %) :subscription (assoc % :sender own-puk)))
-        (rx/do #(println "[SUBS-OUT(" own-puk ")]" %)))
-      #(rx/on-next connection %))
+             (rx/map (partial assoc criteria "author") distinct-followees))))
+        (rx/map
+          (fn [criteria]
+            {"type" "sub"
+             "author" own-puk
+             "audience" (get-author criteria)
+             "criteria" criteria}))
+        (rx/map #(->envelope (% "audience") %)))
+      (partial rx/on-next connection))
 
     (rx/subscribe
-      (->>
-        subs-in
-        (rx/distinct)
-        (rx/do #(println "[SUBS-IN(" own-puk ")]" %)))
-      (fn [subscription]
-        (let [sender (:sender subscription)
-              criteria (dissoc subscription :sender)]
+      (query-tuples tuple-base {"type" "sub" "audience" own-puk} true)
+      (fn [sub]
+        (let [sender (sub "author")
+              criteria (sub "criteria")]
           (swap!
            subscriptions-by-sender
            (fn [cur]
@@ -190,12 +186,12 @@ new tuples as they are stored otherwise it will complete." )
                (let [subscription
                      (rx/subscribe
                        (->>
-                         (query-tuples tuple-base criteria true)
+                         (query-tuples tuple-base criteria true)                         
                          observe-for-io
                          ; TODO: extend query-tuples to support the condition below
                          (rx/filter #(let [audience (get % "audience")]
                                        (or (nil? audience) (= sender audience))))
-                         (rx/map #(->envelope sender :tuple %)))
+                         (rx/map (partial ->envelope sender)))
                        (partial rx/on-next connection))]
 
                  (assoc cur sender (conj existing {:criteria criteria :subscription subscription})))))))))

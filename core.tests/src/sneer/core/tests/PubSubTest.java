@@ -66,13 +66,13 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.pub("paper");
 		
 		tuplesA.publisher()
-			.type("sentinel")
+			.type("rock-paper-scissor/move")
 			.pub("end");
 		
 		expecting(
-			payloads(tuplesA.filter().tuples(), "paper", "end"),
-			payloads(tuplesB.filter().tuples(), "end"),
-			payloads(tuplesC.filter().tuples(), "paper", "end"));
+			payloads(tuplesA.filter().type("rock-paper-scissor/move").tuples(), "paper", "end"),
+			payloads(tuplesB.filter().type("rock-paper-scissor/move").tuples(), "end"),
+			payloads(tuplesC.filter().type("rock-paper-scissor/move").tuples(), "paper", "end"));
 	}
 	
 	@Test
@@ -84,9 +84,13 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.pub(name);
 		
 		expecting(
-			payloads(tuplesB.filter().tuples(), name),
-			payloads(tuplesC.filter().tuples(), name),
-			payloads(tuplesA.filter().tuples(), name));
+			payloads(profileName(tuplesC), name),
+			payloads(profileName(tuplesB), name),
+			payloads(profileName(tuplesA), name));
+	}
+
+	private Observable<Tuple> profileName(TupleSpace tupleSpace) {
+		return tupleSpace.filter().type("profile/name").tuples();
 	}
 	
 	@Test
