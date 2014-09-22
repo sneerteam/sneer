@@ -20,8 +20,6 @@ public class SneerPluginInfo implements Serializable {
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
 
 	enum InteractionType {
-		@Deprecated
-		SESSION,
 		SESSION_PARTNER,
 		MESSAGE,
 		MESSAGE_VIEW(false, true),
