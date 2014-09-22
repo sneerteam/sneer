@@ -19,7 +19,7 @@
    [rx.schedulers TestScheduler]
    [rx.subjects Subject BehaviorSubject ReplaySubject PublishSubject]))
 
-(defprotocol party-impl
+(defprotocol PartyImpl
   (name-subject [this]))
 
 (defn new-party [puk]
@@ -31,7 +31,7 @@
           (.observed (ObservedSubject/create puk)))
         (toString [this]
           (str "#<Party " puk ">"))
-      party-impl
+      PartyImpl
         (name-subject [this] name))))
 
 (defn party-puk [^Party party]
