@@ -8,14 +8,14 @@
    [sneer.persistent-tuple-base :as persistence]
    [clojure.java.io :as io])
   (:import
+   [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation Message]
    [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
-   [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation Message]
+   [sneer.impl.keys KeysImpl]
    [sneer.rx ObservedSubject]
+   [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [java.text SimpleDateFormat]
    [java.util Date]
-   [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
-   [sneer.impl.keys KeysImpl]
    [rx.schedulers TestScheduler]
    [rx.subjects Subject BehaviorSubject ReplaySubject PublishSubject]))
 
