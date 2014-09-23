@@ -2,7 +2,8 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [filter-by observe-for-io]]
-   [sneer.serialization :refer [roundtrip]])
+   [sneer.serialization :refer [roundtrip]]
+   [sneer.commons :refer [now]])
   (:import
    [sneer PrivateKey PublicKey]
    [sneer.rx ObservedSubject]
@@ -83,6 +84,9 @@ new tuples as they are stored otherwise it will complete." )
     (tuple-getter audience)
     (tuple-getter author)
     (tuple-getter payload)
+    (timestampCreated [this] 
+      (let [time (get tuple "timestampCreated")]
+        (if time time 0)))
     (toString [this] (str tuple))))
 
 (defmacro with-field [a]
@@ -106,6 +110,7 @@ new tuples as they are stored otherwise it will complete." )
         (pub [this payload]
            (.. this (payload payload) pub))
         (pub [this]
+           (assoc proto-tuple "timeCreated" now)
            (let [tuple (roundtrip proto-tuple)]
              (store-tuple tuples-out tuple)
              (rx/return

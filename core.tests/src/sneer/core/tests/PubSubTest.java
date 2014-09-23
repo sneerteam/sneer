@@ -268,6 +268,24 @@ public class PubSubTest extends TupleSpaceTestsBase {
 		expecting(payloads(tuplesA.filter().audience(userA).tuples(), "from b", "from c"));
 	}
 	
+	@Test
+	public void timeReceived() {
+		Tuple tuple = tuplesA.publisher()
+			.audience(userA.publicKey())
+			.type("bla")
+			.pub("bla")
+			.toBlocking()
+			.first();
+		
+		Observable<Long> times = tuplesA.filter().tuples()
+				.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple t1) {
+					return t1.timestampCreated();
+				} });
+		
+		expecting(
+				values(times, tuple.timestampCreated()));
+	}
+	
 //	@Test
 //	public void pubIfEmpty() {
 //		
