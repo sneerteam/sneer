@@ -20,14 +20,16 @@ public class PluginHandler implements Serializable {
 	private int menuIcon;
 	private String tupleType;
 	private String menuCaption;
+	private String notificationLabel;
 
-	PluginHandler(String packageName, String activityName, PluginType pluginType, String tupleType, String menuCaption, int menuIcon) {
+	PluginHandler(String packageName, String activityName, PluginType pluginType, String tupleType, String menuCaption, int menuIcon, String notificationLabel) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.pluginType = pluginType;
 		this.tupleType = tupleType;
 		this.menuCaption = menuCaption;
 		this.menuIcon = menuIcon;
+		this.notificationLabel = notificationLabel;
 	}
 	
 	public boolean canCompose() {
@@ -72,6 +74,10 @@ public class PluginHandler implements Serializable {
 
 	public String menuCaption() {
 		return menuCaption;
+	}
+	
+	public String notificationLabel() {
+		return notificationLabel;
 	}
 
 }

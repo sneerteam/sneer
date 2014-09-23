@@ -35,14 +35,17 @@ public class PluginMonitor extends BroadcastReceiver {
 	public static Func1<ActivityInfo, Observable<PluginHandler>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<PluginHandler>>() {  @Override public Observable<PluginHandler> call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
 		try {
+			String menuCaption = getString(meta, "sneer:menu-caption", null);
 			return Observable.just(
 				new PluginHandler(
 					activityInfo.packageName,
 					activityInfo.name,
 					pluginType(getString(meta, "sneer:plugin-type")),
 					getString(meta, "sneer:tuple-type"),
-					getString(meta, "sneer:menu-caption", null),
-					getInt(meta, "sneer:menu-icon")));
+					menuCaption,
+					getInt(meta, "sneer:menu-icon"),
+					getString(meta, "sneer:notification-label", menuCaption)
+					));
 		} catch (FriendlyException e) {
 			SystemReport.updateReport(activityInfo.packageName, "Failed to read package information: " + e.getMessage());
 			return Observable.empty();
