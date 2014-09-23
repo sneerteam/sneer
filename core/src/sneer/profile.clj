@@ -2,15 +2,13 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject* shared-latest]]
-   [sneer.commons :refer [produce]])
+   [sneer.commons :refer [produce]]
+   [sneer.party :refer [party-puk]])
   (:import
    [sneer Party Profile]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace]
    [rx.subjects Subject]))
-
-(defn party-puk [^Party party]
-  (.. party publicKey current))
 
 (defn reify-profile [party ^TupleSpace tuple-space]
 
