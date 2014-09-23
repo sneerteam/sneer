@@ -23,8 +23,6 @@ public class PluginMonitor extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		log("--------> " + intent.getAction() + " - " + intent.getDataString());
-		
 		String packageName = intent.getDataString().substring(intent.getDataString().indexOf(':')+1);
 		if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
 			packageAdded(context, packageName);
