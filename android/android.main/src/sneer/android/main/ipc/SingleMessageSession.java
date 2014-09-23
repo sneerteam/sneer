@@ -6,6 +6,7 @@ import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.android.main.SneerAndroidCore;
+import sneer.android.main.utils.AndroidUtils;
 import sneer.tuples.Tuple;
 import sneer.utils.SharedResultReceiver;
 import sneer.utils.Value;
@@ -55,7 +56,7 @@ public class SingleMessageSession implements PluginSession {
 					.field("label", label)
 					.pub(message);
 			} catch (final Throwable t) {
-				SneerAndroidCore.toastOnMainThread(context, "Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
+				AndroidUtils.toastOnMainThread(context, "Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
 				Log.e(SneerAndroidCore.class.getSimpleName(), "Error receiving message from plugin", t);
 			}			
 		}});
