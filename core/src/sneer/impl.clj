@@ -115,7 +115,7 @@
    (mapcat (fn [^Tuple tuple] [(.get tuple "party") (tuple->contact tuple parties)]))
    (apply hash-map)))
 
-(defn nickname [^Contact contact]
+(defn current-nickname [^Contact contact]
   (.. contact nickname current))
 
 (defn now []
@@ -188,7 +188,7 @@
         profiles (atom {})
         conversation-menu-items (BehaviorSubject/create [])
         puk->contact (atom (restore-contact-list tuple-space own-puk parties))
-        ->contact-list (fn [contact-map] (->> contact-map vals (sort-by nickname) vec))
+        ->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))
         observable-contacts (atom->observable puk->contact ->contact-list)]
 
     (rx/subscribe
