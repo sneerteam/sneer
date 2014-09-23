@@ -53,4 +53,3 @@
 
 (defn create [db]
   (new-sneer-admin-over-db (client/create-network) db))
-
