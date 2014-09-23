@@ -68,7 +68,7 @@ public class PluginMonitor extends BroadcastReceiver {
 			throw new FriendlyException("Missing meta-data " + key);
 	}
 	
-	public static Observable<ActivityInfo> filterSneerApps(Observable<PackageInfo> packageInfos) {
+	public static Observable<ActivityInfo> filterPlugins(Observable<PackageInfo> packageInfos) {
 		return packageInfos.filter(new Func1<PackageInfo, Boolean>() {  @Override public Boolean call(PackageInfo t1) {
 			return t1.activities != null;
 		} })
@@ -81,11 +81,11 @@ public class PluginMonitor extends BroadcastReceiver {
 	}
 	
 	public static void initialDiscovery(Context context) {
-		log("Searching for Sneer apps...");
+		log("Searching for Sneer plugins...");
 		
 		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
 		
-		filterSneerApps(Observable.from(packages))
+		filterPlugins(Observable.from(packages))
 			.flatMap(FROM_ACTIVITY)
 			.toList()
 			.subscribe(pluginsListPublisher());
@@ -98,9 +98,9 @@ public class PluginMonitor extends BroadcastReceiver {
 			log("Package added: " + packageName);
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PACKAGE_INFO_FLAGS);
 			
-			filterSneerApps(Observable.just(packageInfo))
+			filterPlugins(Observable.just(packageInfo))
 				.flatMap(FROM_ACTIVITY)
-				.concatWith(currentKnownApps())
+				.concatWith(currentKnownPlugins())
 				.toList()
 				.subscribe(pluginsListPublisher());
 
@@ -118,7 +118,7 @@ public class PluginMonitor extends BroadcastReceiver {
 			
 		log("Package removed: " + packageName);
 		
-		currentKnownApps()
+		currentKnownPlugins()
 			.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
 				return !t1.packageName.equals(packageName);
 			} })
@@ -129,12 +129,12 @@ public class PluginMonitor extends BroadcastReceiver {
 
 	private static Action1<List<PluginInfo>> pluginsListPublisher() {
 		return new Action1<List<PluginInfo>>() {  @Override public void call(List<PluginInfo> t1) {
-			log("Pushing new app list: " + t1);
+			log("Pushing new plugin list: " + t1);
 			plugins.onNext(t1);
 		}};
 	}
 
-	private static Observable<PluginInfo> currentKnownApps() {
+	private static Observable<PluginInfo> currentKnownPlugins() {
 		return Observable.from(plugins.observed().current());
 	}
 
