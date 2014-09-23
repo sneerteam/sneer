@@ -6,6 +6,7 @@ import java.util.List;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import sneer.Sneer;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.rx.ObservedSubject;
@@ -22,6 +23,7 @@ import android.util.Log;
 public class PluginMonitor extends BroadcastReceiver {
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
 	private static ObservedSubject<List<PluginHandler>> plugins = ObservedSubject.create((List<PluginHandler>)new ArrayList<PluginHandler>());
+	private static Sneer sneer;
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -34,15 +36,6 @@ public class PluginMonitor extends BroadcastReceiver {
 		
 	}
 
-	public static Func1<ActivityInfo, Observable<PluginHandler>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<PluginHandler>>() {  @Override public Observable<PluginHandler> call(ActivityInfo activityInfo) {
-		try {
-			return Observable.just(new PluginHandler(activityInfo));
-		} catch (FriendlyException e) {
-			SystemReport.updateReport(activityInfo.packageName, "Failed to read package information: " + e.getMessage());
-			return Observable.empty();
-		}
-	}};
-	
 	static String getString(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
 		return getString(bundle, key, null);
@@ -74,17 +67,29 @@ public class PluginMonitor extends BroadcastReceiver {
 		} });
 	}
 	
-	public static void initialDiscovery(Context context) {
+	public static void initialDiscovery(Context context, Sneer sneer) {
+		PluginMonitor.sneer = sneer;
 		log("Searching for Sneer plugins...");
 		
 		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
 		
 		filterPlugins(Observable.from(packages))
-			.flatMap(FROM_ACTIVITY)
+			.flatMap(fromActivity(context))
 			.toList()
 			.subscribe(pluginsListPublisher());
 		
 		log("Done.");
+	}
+
+	private static Func1<ActivityInfo, Observable<PluginHandler>> fromActivity(final Context context) {
+		return new Func1<ActivityInfo, Observable<PluginHandler>>() {  @Override public Observable<PluginHandler> call(ActivityInfo activityInfo) {
+			try {
+				return Observable.just(new PluginHandler(context, sneer, activityInfo));
+			} catch (FriendlyException e) {
+				SystemReport.updateReport(activityInfo.packageName, "Failed to read package information: " + e.getMessage());
+				return Observable.empty();
+			}
+		}};
 	}
 
 	public static void packageAdded(Context context, String packageName) {
@@ -93,7 +98,7 @@ public class PluginMonitor extends BroadcastReceiver {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PACKAGE_INFO_FLAGS);
 			
 			filterPlugins(Observable.just(packageInfo))
-				.flatMap(FROM_ACTIVITY)
+				.flatMap(fromActivity(context))
 				.concatWith(currentKnownPlugins())
 				.toList()
 				.subscribe(pluginsListPublisher());

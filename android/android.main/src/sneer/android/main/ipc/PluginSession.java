@@ -1,12 +1,13 @@
 package sneer.android.main.ipc;
 
+import android.content.Intent;
 import sneer.PublicKey;
 import sneer.tuples.Tuple;
 
 public interface PluginSession {
 
-	void resume(Tuple tuple);
+	Intent createResumeIntent(Tuple tuple);
 
-	void start(PublicKey partner);
+	void startNewSessionWith(PublicKey partner);
 
 }

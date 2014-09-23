@@ -50,7 +50,7 @@ public class PluginManager {
 
 		@Override
 		public void call(PublicKey partyPuk) {
-			plugin.start(context, sneer, partyPuk);
+			plugin.start(partyPuk);
 		}
 
 		@Override
@@ -83,7 +83,7 @@ public class PluginManager {
 	}
 	
 	public void initPlugins() {
-		PluginMonitor.initialDiscovery(context);
+		PluginMonitor.initialDiscovery(context, sneer);
 		PluginMonitor.plugins()
 			.flatMap(fromSneerPluginInfoList)
 			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
@@ -116,7 +116,7 @@ public class PluginManager {
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '" + tuple.type() + "'");
 		}
-		viewer.resume(context, sneer, tuple);
+		context.startActivity(viewer.resume(tuple));
 	}
 
 	public PluginHandler tupleViewer(String type) {

@@ -9,6 +9,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.Message;
 import sneer.Sneer;
+import sneer.SneerAndroidClient;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
 import sneer.android.main.ipc.PluginHandler;
@@ -62,7 +63,7 @@ public class SneerAndroidCore implements SneerAndroid {
 			} })
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 				
-				Log.i(SneerAndroidCore.class.getSimpleName(), "-------------> "+ t1.type() + " - " + t1.payload());
+				log("-------------> "+ t1.type() + " - " + t1.payload());
 				
 				PluginHandler plugin = null;
 				Intent intent;
@@ -76,10 +77,14 @@ public class SneerAndroidCore implements SneerAndroid {
 						// TODO intent should direct to app store if plugin not installed
 						return;
 					}
-					intent = plugin.createIntent();
+					intent = plugin.resume(t1);
 				}
 				
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				
+				log("-------------> " + t1.type() + ": " + intent.getExtras().getParcelable(SneerAndroidClient.RESULT_RECEIVER));
+				
+				
+//				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				
 				notifyUser(context, t1, plugin == null ? t1.type() : plugin.notificationLabel(), PendingIntent.getActivity(context, 0, intent, 0));
 
@@ -162,6 +167,10 @@ public class SneerAndroidCore implements SneerAndroid {
 	@Override
 	public void doOnClick(Message message) {
 		pluginManager.doOnClick(message);
+	}
+
+	private void log(String log) {
+		Log.i(SneerAndroidCore.class.getSimpleName(), log);
 	}
 
 }

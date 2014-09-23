@@ -29,17 +29,17 @@ public class SingleMessageSession implements PluginSession {
 	}
 
 	@Override
-	public void resume(Tuple tuple) {
+	public Intent createResumeIntent(Tuple tuple) {
 		Intent intent = plugin.createIntent();
 		
 		intent.putExtra(MESSAGE, Value.of(tuple.payload()));
 		intent.putExtra(LABEL, (String)tuple.get("label"));
-		
-		context.startActivity(intent);
+
+		return intent;
 	}
 
 	@Override
-	public void start(final PublicKey partner) {
+	public void startNewSessionWith(final PublicKey partner) {
 		Intent intent = plugin.createIntent();
 		
 		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {

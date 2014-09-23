@@ -24,8 +24,12 @@ public class PluginHandler implements Serializable {
 	private String tupleType;
 	private String menuCaption;
 	private String notificationLabel;
+	private Context context;
+	private Sneer sneer;
 	
-	public PluginHandler(ActivityInfo activityInfo) throws FriendlyException {
+	public PluginHandler(Context context, Sneer sneer, ActivityInfo activityInfo) throws FriendlyException {
+		this.context = context;
+		this.sneer = sneer;
 		Bundle meta = activityInfo.metaData;
 		String tupleType = PluginMonitor.getString(meta, "sneer:tuple-type");
 		String menuCaption = PluginMonitor.getString(meta, "sneer:menu-caption", tupleType);
@@ -66,12 +70,12 @@ public class PluginHandler implements Serializable {
 		return context.getPackageManager().getResourcesForApplication(packageName).getDrawable(menuIcon);
 	}
 
-	public void start(Context context, Sneer sneer, PublicKey partner) {
-		pluginType.factory.create(context, sneer, this).start(partner);
+	public void start(PublicKey partner) {
+		pluginType.factory.create(context, sneer, this).startNewSessionWith(partner);
 	}
 	
-	public void resume(Context context, Sneer sneer, Tuple tuple) {
-		pluginType.factory.create(context, sneer, this).resume(tuple);
+	public Intent resume(Tuple tuple) {
+		return pluginType.factory.create(context, sneer, this).createResumeIntent(tuple);
 	}
 
 	public String tupleType() {

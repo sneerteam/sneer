@@ -143,21 +143,25 @@ public final class PartnerSession implements PluginSession {
 	}
  
 	private void startActivity() {
+		context.startActivity(createIntent());
+	}
+
+	private Intent createIntent() {
 		Intent intent = plugin.createIntent();
 		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
-		context.startActivity(intent);
+		return intent;
 	}
 
 	@Override
-	public void resume(Tuple tuple) {
+	public Intent createResumeIntent(Tuple tuple) {
 		sessionId = (Long) tuple.get("session");
 		host = (PublicKey) tuple.get("host");
 		partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
-		startActivity();
+		return createIntent();
 	}
 
 	@Override
-	public void start(PublicKey partner) {
+	public void startNewSessionWith(PublicKey partner) {
 		host = sneer.self().publicKey().current();
 		sessionId = nextSessionId.getAndIncrement();
 		this.partner = partner;
