@@ -25,25 +25,25 @@ import android.os.ResultReceiver;
 
 public final class PartnerSession implements PluginSession {
 	
-//	public static PluginSessionFactory partnerSessionFactory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, SneerPluginInfo plugin) {
-//		return new PartnerSession(context, sneer, plugin);
-//	} };
+	public static PluginSessionFactory factory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, PluginInfo plugin, SessionIdDispenser dispenser) {
+		return new PartnerSession(context, sneer, plugin, dispenser);
+	} };
 	
-	private final PublicKey host;
-	private final PublicKey partner;
-	private final long sessionId;
+	private PublicKey host;
+	private PublicKey partner;
+	private long sessionId;
 	private Tuple lastLocalTuple = null;
 	private Sneer sneer;
 	private PluginInfo app;
 	private Context context;
-//	private SessionIdDispenser sessionIdDispenser;
+	private SessionIdDispenser sessionIdDispenser;
 
-//	public PartnerSession(Context context, Sneer sneer, SneerPluginInfo app, SessionIdDispenser sessionIdDispenser) {
-//		this.context = context;
-//		this.sneer = sneer;
-//		this.app = app;
-//		this.sessionIdDispenser = sessionIdDispenser;
-//	}
+	public PartnerSession(Context context, Sneer sneer, PluginInfo app, SessionIdDispenser sessionIdDispenser) {
+		this.context = context;
+		this.sneer = sneer;
+		this.app = app;
+		this.sessionIdDispenser = sessionIdDispenser;
+	}
 	
 	public PartnerSession(Context context, Sneer sneer, PluginInfo app, PublicKey host, long sessionId, PublicKey partner) {
 		this.host = host;
@@ -152,12 +152,28 @@ public final class PartnerSession implements PluginSession {
 			} });
 	}
  
-	public void startActivity() {
+	private void startActivity() {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
+	}
+
+	@Override
+	public void resume(Tuple tuple) {
+		sessionId = (Long) tuple.get("session");
+		host = (PublicKey) tuple.get("host");
+		partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
+		startActivity();
+	}
+
+	@Override
+	public void start(PublicKey partner) {
+		host = sneer.self().publicKey().current();
+		sessionId = sessionIdDispenser.next();
+		this.partner = partner;
+		startActivity();
 	}
 
 }

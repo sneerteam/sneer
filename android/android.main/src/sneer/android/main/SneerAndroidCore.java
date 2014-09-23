@@ -1,11 +1,5 @@
 package sneer.android.main;
 
-import static sneer.SneerAndroidClient.LABEL;
-import static sneer.SneerAndroidClient.MESSAGE;
-import static sneer.SneerAndroidClient.RESULT_RECEIVER;
-import static sneer.android.main.ipc.InteractionType.MESSAGE_COMPOSE;
-import static sneer.android.main.ipc.InteractionType.MESSAGE_VIEW;
-import static sneer.android.main.ipc.InteractionType.SESSION_PARTNER;
 import static sneer.android.main.ipc.TupleSpaceService.startTupleSpaceService;
 
 import java.io.ByteArrayOutputStream;
@@ -28,25 +22,20 @@ import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
-import sneer.android.main.ipc.PartnerSession;
 import sneer.android.main.ipc.PluginInfo;
 import sneer.android.main.ipc.PluginMonitor;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
-import sneer.utils.SharedResultReceiver;
-import sneer.utils.Value;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -109,73 +98,12 @@ public class SneerAndroidCore implements SneerAndroid {
 		long next();
 	}
 	
-	private void startComposePlugin(PluginInfo app, PublicKey peer) {
-		if (app.interactionType == SESSION_PARTNER) startPartnerSession(context, sneer(), app, peer);
-		if (app.interactionType == MESSAGE_COMPOSE) startComposeMessage(app, peer);
+	private void startComposePlugin(PluginInfo plugin, PublicKey partner) {
+		plugin.interactionType.factory.create(context, sneer(), plugin, sessionIdDispenser).start(partner);
 	}
 
-	private void startViewPlugin(PluginInfo app, Tuple tuple) {
-		if (app.interactionType == SESSION_PARTNER) resumePartnerSession(context, sneer(), app, tuple);
-		if (app.interactionType == MESSAGE_VIEW) startViewMessage(app, (String)tuple.get("label"), tuple.payload());
-	}
-
-
-	private void startComposeMessage(final PluginInfo app, final PublicKey peer) {
-		Intent intent = new Intent();
-		intent.setClassName(app.packageName, app.activityName);
-		
-		final ClassLoader classLoader = context.getClassLoader();
-		
-		SharedResultReceiver result = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {
-			
-			try {
-				t1.setClassLoader(classLoader);
-				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
-				String label = t1.getString(LABEL);
-				info("Receiving message of type '" + app.tupleType + "' label '" + label + "' from " + app.packageName + "." + app.activityName);
-				sneer().tupleSpace().publisher()
-					.type(app.tupleType)
-					.audience(peer)
-					.field("label", label)
-					.pub(message);
-			} catch (final Throwable t) {
-				toastOnMainThread("Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
-				Log.w(SneerAndroidCore.class.getSimpleName(), "Error receiving message from plugin", t);
-			}			
-		}});
-		
-		intent.putExtra(RESULT_RECEIVER, result);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		context.startActivity(intent);
-	}
-
-	private void startViewMessage(final PluginInfo app, String label, Object message) {
-		Intent intent = new Intent();
-		intent.setClassName(app.packageName, app.activityName);
-		
-		intent.putExtra(MESSAGE, Value.of(message));
-		intent.putExtra(LABEL, label);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		context.startActivity(intent);
-	}
-	
-	public static void resumePartnerSession(Context context, Sneer sneer, final PluginInfo app, Tuple tuple) {
-		long sessionId = (Long) tuple.get("session");
-		PublicKey host = (PublicKey) tuple.get("host");
-		PublicKey partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
-		
-		PartnerSession s = new PartnerSession(context, sneer, app, host, sessionId, partner);
-		
-		s.startActivity();
-	}
-
-	public static void startPartnerSession(Context context, Sneer sneer, final PluginInfo app, final PublicKey partner) {
-		
-		long sessionId = SneerAndroidCore.nextSessionId.getAndIncrement();
-		
-		PartnerSession s = new PartnerSession(context, sneer, app, sneer.self().publicKey().current(), sessionId, partner);
-		
-		s.startActivity();
+	private void startViewPlugin(PluginInfo plugin, Tuple tuple) {
+		plugin.interactionType.factory.create(context, sneer(), plugin, sessionIdDispenser).resume(tuple);
 	}
 
 	private static byte[] bitmapFor(Drawable icon) {
@@ -188,11 +116,6 @@ public class SneerAndroidCore implements SneerAndroid {
 
 	private Resources resourceForPackage(String packageName) throws NameNotFoundException {
 		return context.getPackageManager().getResourcesForApplication(packageName);
-	}
-
-
-	private static void info(String msg) {
-		Log.i(SneerAndroidCore.class.getSimpleName(), msg);
 	}
 
 
@@ -259,13 +182,13 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 	}
 
-	public void toast(final String message, final int length) {
+	public static void toast(Context context, final String message, final int length) {
 		Toast.makeText(context, message, length).show();
 	}
 
-	public void toastOnMainThread(final String message, final int length) {
+	public static void toastOnMainThread(final Context context, final String message, final int length) {
 		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() { @Override public void call() {
-			toast(message, length);
+			toast(context, message, length);
 		} });
 	}
 

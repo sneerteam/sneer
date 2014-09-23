@@ -4,13 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum InteractionType {
-	SESSION_PARTNER,
-	MESSAGE,
-	MESSAGE_VIEW(false, true),
-	MESSAGE_COMPOSE(true, false);
+	SESSION_PARTNER(PartnerSession.factory, true, true),
+	MESSAGE(MessageSession.factory, true, true),
+	MESSAGE_VIEW(MessageSession.factory, false, true),
+	MESSAGE_COMPOSE(MessageSession.factory, true, false);
 	
 	public final boolean canCompose;
 	public final boolean canView;
+	public final PluginSessionFactory factory;
 
 	private static Set<String> set = new HashSet<String>();
 	static {
@@ -20,11 +21,8 @@ public enum InteractionType {
 		}
 	}
 
-	InteractionType() {
-		this(true, true);
-	}
-	
-	InteractionType(boolean canCompose, boolean canView) {
+	InteractionType(PluginSessionFactory factory, boolean canCompose, boolean canView) {
+		this.factory = factory;
 		this.canCompose = canCompose;
 		this.canView = canView;
 	}
