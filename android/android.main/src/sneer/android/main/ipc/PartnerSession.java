@@ -12,6 +12,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.PublicKey;
 import sneer.Sneer;
+import sneer.android.main.SneerAndroidCore.SessionIdDispenser;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.utils.SharedResultReceiver;
@@ -22,17 +23,29 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
-public final class PartnerSession {
+public final class PartnerSession implements PluginSession {
+	
+//	public static PluginSessionFactory partnerSessionFactory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, SneerPluginInfo plugin) {
+//		return new PartnerSession(context, sneer, plugin);
+//	} };
 	
 	private final PublicKey host;
 	private final PublicKey partner;
 	private final long sessionId;
 	private Tuple lastLocalTuple = null;
 	private Sneer sneer;
-	private SneerPluginInfo app;
+	private PluginInfo app;
 	private Context context;
+//	private SessionIdDispenser sessionIdDispenser;
 
-	public PartnerSession(Context context, Sneer sneer, SneerPluginInfo app, PublicKey host, long sessionId, PublicKey partner) {
+//	public PartnerSession(Context context, Sneer sneer, SneerPluginInfo app, SessionIdDispenser sessionIdDispenser) {
+//		this.context = context;
+//		this.sneer = sneer;
+//		this.app = app;
+//		this.sessionIdDispenser = sessionIdDispenser;
+//	}
+	
+	public PartnerSession(Context context, Sneer sneer, PluginInfo app, PublicKey host, long sessionId, PublicKey partner) {
 		this.host = host;
 		this.partner = partner;
 		this.sessionId = sessionId;

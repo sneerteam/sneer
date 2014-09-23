@@ -14,42 +14,20 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.*;
 import android.util.*;
 
-public class SneerPluginInfo implements Serializable {
+public class PluginInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
 
-	public enum InteractionType {
-		SESSION_PARTNER,
-		MESSAGE,
-		MESSAGE_VIEW(false, true),
-		MESSAGE_COMPOSE(true, false);
-		
-		public final boolean canCompose;
-		public final boolean canView;
-
-		InteractionType() {
-			this(true, true);
-		}
-		
-		InteractionType(boolean canCompose, boolean canView) {
-			this.canCompose = canCompose;
-			this.canView = canView;
-			
-		}
-	}
-	
 	public String packageName;
 	public String activityName;
 
-	public SneerPluginInfo.InteractionType interactionType;
+	public InteractionType interactionType;
 	public String tupleType;
 	public String menuCaption;
 	public int menuIcon;
 
-	protected static ObservedSubject<List<SneerPluginInfo>> plugins = ObservedSubject.create((List<SneerPluginInfo>)new ArrayList<SneerPluginInfo>());
 
-	public SneerPluginInfo(String packageName, String activityName, SneerPluginInfo.InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
+	public PluginInfo(String packageName, String activityName, InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.interactionType = interactionType;
@@ -57,17 +35,28 @@ public class SneerPluginInfo implements Serializable {
 		this.menuCaption = menuCaption;
 		this.menuIcon = menuIcon;
 	}
+	
+	public boolean canCompose() {
+		return interactionType.canCompose;
+	}
+
+	public Boolean canView() {
+		return interactionType.canView;
+	}
 
 	@Override
 	public String toString() {
 		return "SneerAppInfo [" + menuCaption + ", " + tupleType + "]";
 	}
 	
-	public static Func1<ActivityInfo, Observable<SneerPluginInfo>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<SneerPluginInfo>>() {  @Override public Observable<SneerPluginInfo> call(ActivityInfo activityInfo) {
+	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
+	private static ObservedSubject<List<PluginInfo>> plugins = ObservedSubject.create((List<PluginInfo>)new ArrayList<PluginInfo>());
+	
+	public static Func1<ActivityInfo, Observable<PluginInfo>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<PluginInfo>>() {  @Override public Observable<PluginInfo> call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
 		try {
 			return Observable.just(
-				new SneerPluginInfo(
+				new PluginInfo(
 					activityInfo.packageName,
 					activityInfo.name,
 					InteractionType.valueOf(getString(meta, "sneer:interaction-type").replace('/', '_')),
@@ -78,26 +67,26 @@ public class SneerPluginInfo implements Serializable {
 			SystemReport.updateReport(activityInfo.packageName, "Failed to read package information: " + e.getMessage());
 			return Observable.empty();
 		}
-	}
-
-	private String getString(Bundle bundle, String key) throws FriendlyException {
+	}};
+	
+	private static String getString(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
 		return getString(bundle, key, null);
 	}
 	
-	private String getString(Bundle bundle, String key, String def) throws FriendlyException {
+	private static String getString(Bundle bundle, String key, String def) throws FriendlyException {
 		return bundle.getString(key, def);
 	}
 	
-	private int getInt(Bundle bundle, String key) throws FriendlyException {
+	private static int getInt(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
 		return bundle.getInt(key);
 	}
-
-	private void requiredMetadata(Bundle bundle, String key) throws FriendlyException {
+	
+	private static void requiredMetadata(Bundle bundle, String key) throws FriendlyException {
 		if (!bundle.containsKey(key))
 			throw new FriendlyException("Missing meta-data " + key);
-	}};
+	}
 	
 	public static Observable<ActivityInfo> filterSneerApps(Observable<PackageInfo> packageInfos) {
 		return packageInfos.filter(new Func1<PackageInfo, Boolean>() {  @Override public Boolean call(PackageInfo t1) {
@@ -142,7 +131,7 @@ public class SneerPluginInfo implements Serializable {
 	}
 
 	private static void log(String message) {
-		Log.i(SneerPluginInfo.class.getSimpleName(), message);
+		Log.i(PluginInfo.class.getSimpleName(), message);
 	}
 
 	public static void packageRemoved(Context context, final String packageName) {
@@ -150,7 +139,7 @@ public class SneerPluginInfo implements Serializable {
 		log("Package removed: " + packageName);
 		
 		currentKnownApps()
-			.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
+			.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
 				return !t1.packageName.equals(packageName);
 			} })
 			.toList()
@@ -158,26 +147,19 @@ public class SneerPluginInfo implements Serializable {
 	}
 
 
-	private static Action1<List<SneerPluginInfo>> pluginsListPublisher() {
-		return new Action1<List<SneerPluginInfo>>() {  @Override public void call(List<SneerPluginInfo> t1) {
+	private static Action1<List<PluginInfo>> pluginsListPublisher() {
+		return new Action1<List<PluginInfo>>() {  @Override public void call(List<PluginInfo> t1) {
 			log("Pushing new app list: " + t1);
 			plugins.onNext(t1);
 		}};
 	}
 
-	private static Observable<SneerPluginInfo> currentKnownApps() {
+	private static Observable<PluginInfo> currentKnownApps() {
 		return Observable.from(plugins.observed().current());
 	}
 
-	public static Observable<List<SneerPluginInfo>> plugins() {
+	public static Observable<List<PluginInfo>> plugins() {
 		return plugins.observed().observable();
 	}
 
-	public boolean canCompose() {
-		return interactionType.canCompose;
-	}
-
-	public Boolean canView() {
-		return interactionType.canView;
-	}
 }

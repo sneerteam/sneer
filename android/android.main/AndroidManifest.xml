@@ -27,7 +27,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".AppInstallationMonitor"
+            android:name=".ipc.PluginMonitor"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>

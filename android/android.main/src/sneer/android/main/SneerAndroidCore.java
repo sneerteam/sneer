@@ -3,9 +3,9 @@ package sneer.android.main;
 import static sneer.SneerAndroidClient.LABEL;
 import static sneer.SneerAndroidClient.MESSAGE;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
-import static sneer.android.main.ipc.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
-import static sneer.android.main.ipc.SneerPluginInfo.InteractionType.MESSAGE_VIEW;
-import static sneer.android.main.ipc.SneerPluginInfo.InteractionType.SESSION_PARTNER;
+import static sneer.android.main.ipc.InteractionType.MESSAGE_COMPOSE;
+import static sneer.android.main.ipc.InteractionType.MESSAGE_VIEW;
+import static sneer.android.main.ipc.InteractionType.SESSION_PARTNER;
 import static sneer.android.main.ipc.TupleSpaceService.startTupleSpaceService;
 
 import java.io.ByteArrayOutputStream;
@@ -29,7 +29,7 @@ import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
 import sneer.android.main.ipc.PartnerSession;
-import sneer.android.main.ipc.SneerPluginInfo;
+import sneer.android.main.ipc.PluginInfo;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
@@ -51,12 +51,12 @@ import android.widget.Toast;
 
 public class SneerAndroidCore implements SneerAndroid {
 	
-	Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerPluginInfo> apps) {
+	Func1<List<PluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<PluginInfo> apps) {
 		return Observable.from(apps)
-			.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
+			.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
 				return t1.canCompose();
 			} })
-			.map(new Func1<SneerPluginInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final SneerPluginInfo app) {
+			.map(new Func1<PluginInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final PluginInfo app) {
 				return new ConversationMenuItemImpl(app);
 			} })
 			.toList();
@@ -64,9 +64,9 @@ public class SneerAndroidCore implements SneerAndroid {
 
 	private final class ConversationMenuItemImpl implements ConversationMenuItem {
 		
-		private final SneerPluginInfo app;
+		private final PluginInfo app;
 
-		private ConversationMenuItemImpl(SneerPluginInfo app) {
+		private ConversationMenuItemImpl(PluginInfo app) {
 			this.app = app;
 		}
 
@@ -97,21 +97,29 @@ public class SneerAndroidCore implements SneerAndroid {
 	private Context context;
 	private static String error;
 	private static AlertDialog errorDialog;
-	private static Map<String, SneerPluginInfo> tupleViewers = new HashMap<String, SneerPluginInfo>();
+	private static Map<String, PluginInfo> tupleViewers = new HashMap<String, PluginInfo>();
 	private static AtomicLong nextSessionId = new AtomicLong(0);
+	private static SessionIdDispenser sessionIdDispenser = new SessionIdDispenser() {  @Override public long next() {
+		return nextSessionId.getAndIncrement();
+	}  };
 	
-	private void startComposePlugin(SneerPluginInfo app, PublicKey peer) {
+	
+	public interface SessionIdDispenser {
+		long next();
+	}
+	
+	private void startComposePlugin(PluginInfo app, PublicKey peer) {
 		if (app.interactionType == SESSION_PARTNER) startPartnerSession(context, sneer(), app, peer);
 		if (app.interactionType == MESSAGE_COMPOSE) startComposeMessage(app, peer);
 	}
 
-	private void startViewPlugin(SneerPluginInfo app, Tuple tuple) {
+	private void startViewPlugin(PluginInfo app, Tuple tuple) {
 		if (app.interactionType == SESSION_PARTNER) resumePartnerSession(context, sneer(), app, tuple);
 		if (app.interactionType == MESSAGE_VIEW) startViewMessage(app, (String)tuple.get("label"), tuple.payload());
 	}
 
 
-	private void startComposeMessage(final SneerPluginInfo app, final PublicKey peer) {
+	private void startComposeMessage(final PluginInfo app, final PublicKey peer) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
@@ -140,7 +148,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		context.startActivity(intent);
 	}
 
-	private void startViewMessage(final SneerPluginInfo app, String label, Object message) {
+	private void startViewMessage(final PluginInfo app, String label, Object message) {
 		Intent intent = new Intent();
 		intent.setClassName(app.packageName, app.activityName);
 		
@@ -150,7 +158,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		context.startActivity(intent);
 	}
 	
-	public static void resumePartnerSession(Context context, Sneer sneer, final SneerPluginInfo app, Tuple tuple) {
+	public static void resumePartnerSession(Context context, Sneer sneer, final PluginInfo app, Tuple tuple) {
 		long sessionId = (Long) tuple.get("session");
 		PublicKey host = (PublicKey) tuple.get("host");
 		PublicKey partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
@@ -160,7 +168,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		s.startActivity();
 	}
 
-	public static void startPartnerSession(Context context, Sneer sneer, final SneerPluginInfo app, final PublicKey partner) {
+	public static void startPartnerSession(Context context, Sneer sneer, final PluginInfo app, final PublicKey partner) {
 		
 		long sessionId = SneerAndroidCore.nextSessionId.getAndIncrement();
 		
@@ -279,24 +287,24 @@ public class SneerAndroidCore implements SneerAndroid {
 	}
 
 	private void initPlugins() {
-		SneerPluginInfo.initialDiscovery(context);
-		SneerPluginInfo.plugins()
+		PluginInfo.initialDiscovery(context);
+		PluginInfo.plugins()
 			.flatMap(fromSneerPluginInfoList)
 			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
 				sneer().setConversationMenuItems(menuItems);
 			} });
 		
-		SneerPluginInfo.plugins()
-			.flatMap(new Func1<List<SneerPluginInfo>, Observable<Map<String, SneerPluginInfo>>>() {  @Override public Observable<Map<String, SneerPluginInfo>> call(List<SneerPluginInfo> t1) {
+		PluginInfo.plugins()
+			.flatMap(new Func1<List<PluginInfo>, Observable<Map<String, PluginInfo>>>() {  @Override public Observable<Map<String, PluginInfo>> call(List<PluginInfo> t1) {
 				return Observable.from(t1)
-						.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
+						.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
 							return t1.canView();
 						} })
-						.toMap(new Func1<SneerPluginInfo, String>() {  @Override public String call(SneerPluginInfo t1) {
+						.toMap(new Func1<PluginInfo, String>() {  @Override public String call(PluginInfo t1) {
 							return t1.tupleType;
 						}});
 			} })
-			.subscribe(new Action1<Map<String, SneerPluginInfo>>() {  @Override public void call(Map<String, SneerPluginInfo> t1) {
+			.subscribe(new Action1<Map<String, PluginInfo>>() {  @Override public void call(Map<String, PluginInfo> t1) {
 				tupleViewers = t1;
 			} });
 	}
@@ -326,7 +334,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	@Override
 	public void doOnClick(Message message) {
 		Tuple tuple = message.tuple();
-		SneerPluginInfo viewer = tupleViewers.get(tuple.type());
+		PluginInfo viewer = tupleViewers.get(tuple.type());
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '"+tuple.type()+"'");
 		}
