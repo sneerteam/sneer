@@ -32,6 +32,7 @@
            (keys [this] this)
          sneer.keys.Keys
            (createPublicKey [this bytes-as-string]
+             (throw (java.lang.RuntimeException.))  ; This seems not to be used.
              (KeysImpl/createPublicKey bytes-as-string))
          Restartable
            (restart [this]
