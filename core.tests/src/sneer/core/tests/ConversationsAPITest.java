@@ -139,9 +139,8 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	
-	public void testChangeContactNicknamePersistence() throws FriendlyException {
+	public void ignoredTestChangeContactNicknamePersistence() throws FriendlyException {
 		int unignoreThisTest;
-		if ("".isEmpty()) return;
 		
 		Party party = sneerA.produceParty(userB);
 		sneerA.addContact("Party Boy", party);
@@ -155,19 +154,37 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	
-	public void testProblemWithNewNickname() throws FriendlyException {
+	public void ignoredTestProblemWithNewNickname() throws FriendlyException {
 		int unignoreThisTest;
-		if ("".isEmpty()) return;
 
-		Party party = sneerA.produceParty(userB);
-		sneerA.addContact("Party Boy", party);
+		assertNotNull(sneerA.problemWithNewNickname(""));
+		assertNotNull(sneerA.problemWithNewNickname(null));
+
+		Party partyB = sneerA.produceParty(userB);
+		Party partyC = sneerA.produceParty(userC);
 		
-		Contact contact = sneerA.findContact(party);
-		contact.setNickname("Party Man");
+		assertNull   (sneerA.problemWithNewNickname("Party Boy"));
+		sneerA.addContact("Party Boy", partyB);
+		assertNotNull(sneerA.problemWithNewNickname("Party Boy"));
 
-		Sneer newSneer = newSneerAdmin(adminA.privateKey(), tupleBaseA).sneer();
-		Party newParty = newSneer.produceParty(userB);
-		assertEquals("Party Man", newSneer.findContact(newParty).nickname().current());
+		try {
+			sneerA.addContact("Party Boy", partyC);
+			fail();
+		} catch (FriendlyException expected) {}
+
+		try {
+			sneerA.addContact("Party Boy2", partyB);
+			fail();
+		} catch (FriendlyException expected) {}
+
+		sneerA.addContact("Party Chick", partyC);
+		Contact chick = sneerA.findContact(partyC);
+		try {
+			chick.setNickname("Party Boy");
+			fail();
+		} catch (FriendlyException expected) {}
+		
+		chick.setNickname("Party Chick 2");
 	}
 
 	
