@@ -95,9 +95,8 @@ public class SneerAndroidCore implements SneerAndroid {
 	private Context context;
 	private static String error;
 	private static AlertDialog errorDialog;
-	
-	
-	static AtomicLong nextSessionId = new AtomicLong(0);
+	private static Map<String, SneerPluginInfo> tupleViewers = new HashMap<String, SneerPluginInfo>();
+	private static AtomicLong nextSessionId = new AtomicLong(0);
 	
 	private void startComposePlugin(SneerPluginInfo app, PublicKey peer) {
 		if (app.interactionType == SESSION_PARTNER) startPartnerSession(app, peer, sneer(), context);
@@ -154,7 +153,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		PublicKey host = (PublicKey) tuple.get("host");
 		PublicKey partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
 		
-		PartnerSession s = new PartnerSession(app, host, partner, sessionId, context, sneer);
+		PartnerSession s = new PartnerSession(context, sneer, app, host, sessionId, partner);
 		
 		s.startActivity();
 	}
@@ -163,7 +162,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		
 		long sessionId = SneerAndroidCore.nextSessionId.getAndIncrement();
 		
-		PartnerSession s = new PartnerSession(app, sneer.self().publicKey().current(), partner, sessionId, context, sneer);
+		PartnerSession s = new PartnerSession(context, sneer, app, sneer.self().publicKey().current(), sessionId, partner);
 		
 		s.startActivity();
 	}
@@ -259,8 +258,6 @@ public class SneerAndroidCore implements SneerAndroid {
 		} });
 	}
 
-	private static Map<String, SneerPluginInfo> tupleViewers = new HashMap<String, SneerPluginInfo>();
-	
 	public static boolean isCoreAvailable() {
 		return sneerAdminFactory() != null;
 	}

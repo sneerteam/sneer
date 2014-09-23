@@ -28,20 +28,16 @@ public final class PartnerSession {
 	private final PublicKey partner;
 	private final long sessionId;
 	private Tuple lastLocalTuple = null;
-	private String tupleType;
-	private ClassLoader classLoader;
 	private Sneer sneer;
 	private SneerPluginInfo app;
 	private Context context;
 
-	PartnerSession(SneerPluginInfo app, PublicKey host, PublicKey partner, long sessionId, Context context, Sneer sneer) {
+	PartnerSession(Context context, Sneer sneer, SneerPluginInfo app, PublicKey host, long sessionId, PublicKey partner) {
 		this.host = host;
 		this.partner = partner;
 		this.sessionId = sessionId;
 		this.context = context;
-		this.classLoader = context.getClassLoader();
 		this.sneer = sneer;
-		this.tupleType = app.tupleType;
 		this.app = app;
 	}
 	
@@ -73,7 +69,7 @@ public final class PartnerSession {
 
 	protected SharedResultReceiver createResultReceiver() {
 		return new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle resultData) {
-			resultData.setClassLoader(PartnerSession.this.classLoader);
+			resultData.setClassLoader(context.getClassLoader());
 			final ResultReceiver toClient = resultData.getParcelable(RESULT_RECEIVER);
 			
 			if (toClient != null) {
@@ -112,7 +108,7 @@ public final class PartnerSession {
 
 	private void publish(String label, Object message) {
 		sneer.tupleSpace().publisher()
-			.type(tupleType)
+			.type(app.tupleType)
 			.audience(partner)
 			.field("session", sessionId)
 			.field("host", host)
@@ -124,7 +120,7 @@ public final class PartnerSession {
 		return sneer.tupleSpace().filter()
 			.field("session", sessionId)
 			.field("host", host)
-			.type(tupleType);
+			.type(app.tupleType);
 	}
 
 	private void pipeNewTuples(final ResultReceiver toClient) {
