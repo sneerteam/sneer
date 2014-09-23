@@ -51,6 +51,7 @@ public class SingleMessageSession implements PluginSession {
 				sneer.tupleSpace().publisher()
 					.type(plugin.tupleType())
 					.audience(partner)
+					.field("conversation?", true)
 					.field("label", label)
 					.pub(message);
 			} catch (final Throwable t) {

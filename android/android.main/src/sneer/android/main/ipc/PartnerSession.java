@@ -115,6 +115,7 @@ public final class PartnerSession implements PluginSession {
 			.field("session", sessionId)
 			.field("host", host)
 			.field("label", label)
+			.field("conversation?", true)
 			.pub(message);
 	}
 
