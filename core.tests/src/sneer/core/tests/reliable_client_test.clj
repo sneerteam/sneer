@@ -16,8 +16,8 @@
 
 (defn- pop-packet [state]
   (-> state
-    (update-in [:sent] conj (-> state :to-send first))
     (update-in [:to-send] pop)
+    (update-in [:sent] conj (-> state :to-send first))
     (update-in [:sequence] inc)))
 
 (defn- reset [{:keys [sequence to-send sent] :as state}]

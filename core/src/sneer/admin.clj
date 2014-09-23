@@ -232,7 +232,9 @@
 
           (contacts [this]
             observable-contacts)
-
+          (problemWithNewNickname [this new-nick]
+            ;TODO
+            )
           (addContact [this nickname party]
             (add-contact nickname party)
             (.. tuple-space
@@ -241,23 +243,18 @@
                 (type "contact")
                 (field "party" (party-puk party))
                 (pub nickname)))
-
           (findContact [this party]
             (get @puk->contact (party-puk party)))
 
-          (problemWithNewNickname [this new-nick]
-            ;TODO
-            )
-
           (conversationsContaining [this type]
             (rx/never))
-
           (conversations [this]
             (->>
               observable-contacts
               (rx/map
                 (partial map (fn [^Contact c] (produce-conversation (.party c)))))))
-        
+          (produceConversationWith [this party] 
+            (produce-conversation party))
           (setConversationMenuItems [this menu-item-list]
             (rx/on-next conversation-menu-items menu-item-list))
 
@@ -265,10 +262,7 @@
             (produce-party parties puk))
         
           (tupleSpace [this]
-            tuple-space)
-        
-          (produceConversationWith [this party] 
-            (produce-conversation party)))))))
+            tuple-space))))))
 
 
 (defprotocol Restartable
