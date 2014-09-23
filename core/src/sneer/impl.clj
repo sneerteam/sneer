@@ -2,22 +2,15 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject* observe-for-computation atom->observable flatmapseq shared-latest]]
-   [sneer.core :as core :refer [connect dispose restarted]]
-   [sneer.commons :refer [produce]]
-   [sneer.networking.client :as client]
-   [sneer.persistent-tuple-base :as persistence]
-   [clojure.java.io :as io])
+   [sneer.commons :refer [produce]])
   (:import
    [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation Message]
-   [sneer.admin SneerAdmin]
    [sneer.commons.exceptions FriendlyException]
-   [sneer.impl.keys KeysImpl]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [java.text SimpleDateFormat]
    [java.util Date]
-   [rx.schedulers TestScheduler]
-   [rx.subjects Subject BehaviorSubject ReplaySubject PublishSubject]))
+   [rx.subjects Subject BehaviorSubject]))
 
 (defprotocol PartyImpl
   (name-subject [this]))
