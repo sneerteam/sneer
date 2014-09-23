@@ -398,21 +398,23 @@ public class ConversationsAPITest extends TestCase {
 	
 	public void testMessageLabel() {
 		TuplePublisher publisher = sneerA.tupleSpace().publisher()
-			.audience(userB)
+			.field("conversation?", true)
+			.audience(userB)			
 			.type("otherType");
 		
 		publisher.field("label", "mylabel").pub("bla");
 		publisher.field("label", "test").pub("bla");
 		publisher.type("message").pub("bla");
 		
-		Observable<String> contents = sneerA.produceConversationWith(sneerA.produceParty(userB)).
-			messages().
-			flatMapIterable(new Func1<List<Message>, Iterable<? extends Message>>() {  @Override public Iterable<? extends Message> call(List<Message> t1) {
-				return t1;
-			} })
-			.map(new Func1<Message, String>() {  @Override public String call(Message t1) {
-				return t1.content().toString();
-			} });
+		Observable<String> contents = sneerA
+			.produceConversationWith(sneerA.produceParty(userB))
+			.messages()
+			.flatMapIterable(new Func1<List<Message>, Iterable<? extends Message>>() {  @Override public Iterable<? extends Message> call(List<Message> messages) {
+				return messages;
+			}})
+			.map(new Func1<Message, String>() {  @Override public String call(Message message) {
+				return message.content().toString();
+			}});
 		
 		expecting(values(contents, "mylabel", "test", "bla"));
 	}

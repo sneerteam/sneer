@@ -36,7 +36,7 @@
   (let [^PublicKey party-puk (party-puk party)
         messages (atom [])
         observable-messages (atom->observable messages)
-        message-filter (.. tuple-space filter #_(type "message"))]
+        message-filter (.. tuple-space filter (field "conversation?" true))]
     
     (rx/subscribe
       (rx/subscribe-on
@@ -57,6 +57,7 @@
         (..
           tuple-space
           publisher
+          (field "conversation?" true)
           (audience party-puk)
           (type "message")
           (pub content)))
