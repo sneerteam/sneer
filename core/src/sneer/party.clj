@@ -1,13 +1,9 @@
 (ns sneer.party
   (:require
-   [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [subject* shared-latest]]
    [sneer.commons :refer [produce]])
   (:import
    [sneer Party]
-   [sneer.rx ObservedSubject]
-   [sneer.tuples Tuple TupleSpace]
-   [rx.subjects Subject]))
+   [sneer.rx ObservedSubject]))
 
 (defprotocol PartyImpl
   (name-subject [this]))

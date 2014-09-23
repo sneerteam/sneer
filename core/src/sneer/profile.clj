@@ -5,8 +5,7 @@
    [sneer.commons :refer [produce]]
    [sneer.party :refer [party-puk]])
   (:import
-   [sneer Party Profile]
-   [sneer.rx ObservedSubject]
+   [sneer Profile]
    [sneer.tuples Tuple TupleSpace]
    [rx.subjects Subject]))
 

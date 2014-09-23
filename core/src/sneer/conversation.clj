@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [atom->observable]]
-   [sneer.party :refer [name-subject produce-party party-puk]]
+   [sneer.party :refer [party-puk]]
    [sneer.commons :refer [now]])
   (:import
    [sneer PublicKey Party Conversation Message]
