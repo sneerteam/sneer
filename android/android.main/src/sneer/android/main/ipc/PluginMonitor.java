@@ -9,13 +9,15 @@ import rx.functions.Func1;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.rx.ObservedSubject;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.util.*;
+import android.util.Log;
 
 public class PluginMonitor extends BroadcastReceiver {
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
@@ -33,36 +35,24 @@ public class PluginMonitor extends BroadcastReceiver {
 	}
 
 	public static Func1<ActivityInfo, Observable<PluginHandler>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<PluginHandler>>() {  @Override public Observable<PluginHandler> call(ActivityInfo activityInfo) {
-		Bundle meta = activityInfo.metaData;
 		try {
-			String tupleType = getString(meta, "sneer:tuple-type");
-			String menuCaption = getString(meta, "sneer:menu-caption", tupleType);
-			return Observable.just(
-				new PluginHandler(
-					activityInfo.packageName,
-					activityInfo.name,
-					pluginType(getString(meta, "sneer:plugin-type")),
-					tupleType,
-					menuCaption,
-					getInt(meta, "sneer:menu-icon"),
-					getString(meta, "sneer:notification-label", menuCaption)
-					));
+			return Observable.just(new PluginHandler(activityInfo));
 		} catch (FriendlyException e) {
 			SystemReport.updateReport(activityInfo.packageName, "Failed to read package information: " + e.getMessage());
 			return Observable.empty();
 		}
 	}};
 	
-	private static String getString(Bundle bundle, String key) throws FriendlyException {
+	static String getString(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
 		return getString(bundle, key, null);
 	}
 	
-	private static String getString(Bundle bundle, String key, String def) throws FriendlyException {
+	static String getString(Bundle bundle, String key, String def) throws FriendlyException {
 		return bundle.getString(key, def);
 	}
 	
-	private static int getInt(Bundle bundle, String key) throws FriendlyException {
+	static int getInt(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
 		return bundle.getInt(key);
 	}

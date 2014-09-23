@@ -4,12 +4,15 @@ import java.io.Serializable;
 
 import sneer.PublicKey;
 import sneer.Sneer;
+import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 
 public class PluginHandler implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -21,17 +24,20 @@ public class PluginHandler implements Serializable {
 	private String tupleType;
 	private String menuCaption;
 	private String notificationLabel;
-
-	PluginHandler(String packageName, String activityName, PluginType pluginType, String tupleType, String menuCaption, int menuIcon, String notificationLabel) {
-		this.packageName = packageName;
-		this.activityName = activityName;
-		this.pluginType = pluginType;
+	
+	public PluginHandler(ActivityInfo activityInfo) throws FriendlyException {
+		Bundle meta = activityInfo.metaData;
+		String tupleType = PluginMonitor.getString(meta, "sneer:tuple-type");
+		String menuCaption = PluginMonitor.getString(meta, "sneer:menu-caption", tupleType);
+		this.packageName = activityInfo.packageName;
+		this.activityName = activityInfo.name;
+		this.pluginType = PluginMonitor.pluginType(PluginMonitor.getString(meta, "sneer:plugin-type"));
 		this.tupleType = tupleType;
 		this.menuCaption = menuCaption;
-		this.menuIcon = menuIcon;
-		this.notificationLabel = notificationLabel;
+		this.menuIcon = PluginMonitor.getInt(meta, "sneer:menu-icon");
+		this.notificationLabel = PluginMonitor.getString(meta, "sneer:notification-label", menuCaption);
 	}
-	
+
 	public boolean canCompose() {
 		return pluginType.canCompose;
 	}
