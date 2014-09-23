@@ -35,11 +35,17 @@ public class PluginMonitor extends BroadcastReceiver {
 	public static Func1<ActivityInfo, Observable<PluginInfo>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<PluginInfo>>() {  @Override public Observable<PluginInfo> call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
 		try {
+			String interactionTypeString = getString(meta, "sneer:interaction-type");
+			InteractionType interactionType = InteractionType.valueOfOrNull(interactionTypeString.replace('/', '_'));
+			if (interactionType == null) {
+				throw new FriendlyException("Unknown interaction type: " + interactionTypeString);
+			}
+			
 			return Observable.just(
 				new PluginInfo(
 					activityInfo.packageName,
 					activityInfo.name,
-					InteractionType.valueOf(getString(meta, "sneer:interaction-type").replace('/', '_')),
+					interactionType,
 					getString(meta, "sneer:tuple-type"),
 					getString(meta, "sneer:menu-caption", null),
 					getInt(meta, "sneer:menu-icon")));
