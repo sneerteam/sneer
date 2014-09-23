@@ -1,19 +1,28 @@
 package sneer.core.tests;
 
-import static junit.framework.Assert.*;
-import static sneer.core.tests.ObservableTestUtils.*;
-import static sneer.tuples.Tuple.*;
+import static junit.framework.Assert.assertEquals;
+import static sneer.core.tests.ObservableTestUtils.assertList;
+import static sneer.core.tests.ObservableTestUtils.expecting;
+import static sneer.core.tests.ObservableTestUtils.field;
+import static sneer.core.tests.ObservableTestUtils.notifications;
+import static sneer.core.tests.ObservableTestUtils.payloads;
+import static sneer.core.tests.ObservableTestUtils.values;
+import static sneer.tuples.Tuple.TO_TYPE;
 
-import java.util.*;
+import java.util.List;
 
-import org.junit.*;
+import org.junit.Test;
 
-import rx.*;
+import rx.Notification;
 import rx.Observable;
-import rx.functions.*;
-import sneer.*;
-import sneer.impl.keys.*;
-import sneer.tuples.*;
+import rx.functions.Func0;
+import rx.functions.Func1;
+import sneer.PrivateKey;
+import sneer.impl.keys.KeysImpl;
+import sneer.tuples.Tuple;
+import sneer.tuples.TupleFilter;
+import sneer.tuples.TuplePublisher;
+import sneer.tuples.TupleSpace;
 
 public class PubSubTest extends TupleSpaceTestsBase {
 	
@@ -242,6 +251,21 @@ public class PubSubTest extends TupleSpaceTestsBase {
 				assertEquals("userB is cool", t1.payload());
 				return null;
 			}}));
+	}
+	
+	@Test
+	public void receiveTuplesFromAllContacts() {
+		tuplesB.publisher()
+			.audience(userA.publicKey())
+			.type("bla")
+			.pub("from b");
+		
+		tuplesC.publisher()
+			.audience(userA.publicKey())
+			.type("bla")
+			.pub("from c");
+		
+		expecting(payloads(tuplesA.filter().audience(userA).tuples(), "from b", "from c"));
 	}
 	
 //	@Test
