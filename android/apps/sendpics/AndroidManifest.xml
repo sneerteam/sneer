@@ -26,7 +26,7 @@
 
             <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/COMPOSE" />
             <meta-data android:name="sneer:tuple-type" android:value="picture" />
-            <meta-data android:name="sneer:menu-caption" android:value="Send Pictures" />
+            <meta-data android:name="sneer:menu-caption" android:value="Picture" />
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
 
@@ -41,7 +41,6 @@
 
             <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/VIEW" />
             <meta-data android:name="sneer:tuple-type" android:value="picture" />
-            <meta-data android:name="sneer:menu-caption" android:value="Receive Pictures" />
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
     </application>

@@ -23,7 +23,7 @@
 		     
 		    <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/COMPOSE" />
 		    <meta-data android:name="sneer:tuple-type" android:value="location" />
-		    <meta-data android:name="sneer:menu-caption" android:value="Send Location" />
+		    <meta-data android:name="sneer:menu-caption" android:value="Location" />
 		    <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
 		    
         </activity>
