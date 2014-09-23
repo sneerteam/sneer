@@ -5,9 +5,9 @@ import java.util.Set;
 
 public enum InteractionType {
 	SESSION_PARTNER(PartnerSession.factory, true, true),
-	MESSAGE(MessageSession.factory, true, true),
-	MESSAGE_VIEW(MessageSession.factory, false, true),
-	MESSAGE_COMPOSE(MessageSession.factory, true, false);
+	MESSAGE(SingleMessageSession.factory, true, true),
+	MESSAGE_VIEW(SingleMessageSession.factory, false, true),
+	MESSAGE_COMPOSE(SingleMessageSession.factory, true, false);
 	
 	public final boolean canCompose;
 	public final boolean canView;
