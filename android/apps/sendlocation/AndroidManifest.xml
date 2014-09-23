@@ -21,7 +21,7 @@
 		        <action android:name="android.intent.action.VIEW" />
 		    </intent-filter>
 		     
-		    <meta-data android:name="sneer:interaction-type" android:value="MESSAGE/COMPOSE" />
+		    <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/COMPOSE" />
 		    <meta-data android:name="sneer:tuple-type" android:value="location" />
 		    <meta-data android:name="sneer:menu-caption" android:value="Send Location" />
 		    <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
@@ -35,7 +35,7 @@
 		        <action android:name="android.intent.action.VIEW" />
 		    </intent-filter>
 		     
-		    <meta-data android:name="sneer:interaction-type" android:value="MESSAGE/VIEW" />
+		    <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/VIEW" />
 		    <meta-data android:name="sneer:tuple-type" android:value="location" />
 		    <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
 		    

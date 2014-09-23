@@ -39,7 +39,7 @@ public class PluginMonitor extends BroadcastReceiver {
 				new PluginHandler(
 					activityInfo.packageName,
 					activityInfo.name,
-					interactionType(getString(meta, "sneer:interaction-type")),
+					pluginType(getString(meta, "sneer:plugin-type")),
 					getString(meta, "sneer:tuple-type"),
 					getString(meta, "sneer:menu-caption", null),
 					getInt(meta, "sneer:menu-icon")));
@@ -76,7 +76,7 @@ public class PluginMonitor extends BroadcastReceiver {
 			return Observable.from(packageInfo.activities);
 		} })
 		.filter(new Func1<ActivityInfo, Boolean>() {  @Override public Boolean call(ActivityInfo t1) {
-			return t1.metaData != null && t1.metaData.getString("sneer:interaction-type") != null;
+			return t1.metaData != null && t1.metaData.getString("sneer:plugin-type") != null;
 		} });
 	}
 	
@@ -142,11 +142,11 @@ public class PluginMonitor extends BroadcastReceiver {
 		return plugins.observed().observable();
 	}
 
-	protected static InteractionType interactionType(String interactionTypeString) throws FriendlyException {
-		InteractionType interactionType = InteractionType.valueOfOrNull(interactionTypeString.replace('/', '_'));
-		if (interactionType == null) {
-			throw new FriendlyException("Unknown interaction type: " + interactionTypeString);
+	protected static PluginType pluginType(String pluginTypeString) throws FriendlyException {
+		PluginType pluginType = PluginType.valueOfOrNull(pluginTypeString.replace('/', '_'));
+		if (pluginType == null) {
+			throw new FriendlyException("Unknown plugin type: " + pluginTypeString);
 		}
-		return interactionType;
+		return pluginType;
 	}
 }

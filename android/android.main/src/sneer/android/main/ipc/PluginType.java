@@ -4,11 +4,14 @@ import static sneer.android.main.utils.EnumUtils.names;
 
 import java.util.Set;
 
-public enum InteractionType {
-	SESSION_PARTNER(PartnerSessionFactory.singleton, true, true),
+public enum PluginType {
+	PARTNER_SESSION(PartnerSessionFactory.singleton, true, true),
 	MESSAGE(SingleMessageSessionFactory.singleton, true, true),
 	MESSAGE_VIEW(SingleMessageSessionFactory.singleton, false, true),
-	MESSAGE_COMPOSE(SingleMessageSessionFactory.singleton, true, false);
+	MESSAGE_COMPOSE(SingleMessageSessionFactory.singleton, true, false),
+	
+	// future
+	GROUP_SESSION(null, true, true);
 	
 	public final boolean canCompose;
 	public final boolean canView;
@@ -16,13 +19,13 @@ public enum InteractionType {
 
 	private static Set<String> names = names(values());
 
-	InteractionType(PluginSessionFactory factory, boolean canCompose, boolean canView) {
+	PluginType(PluginSessionFactory factory, boolean canCompose, boolean canView) {
 		this.factory = factory;
 		this.canCompose = canCompose;
 		this.canView = canView;
 	}
 
-	public static InteractionType valueOfOrNull(String string) {
+	public static PluginType valueOfOrNull(String string) {
 		return names.contains(string) ? valueOf(string) : null;
 	}
 }

@@ -16,26 +16,26 @@ public class PluginHandler implements Serializable {
 	
 	private String packageName;
 	private String activityName;
-	private InteractionType interactionType;
+	private PluginType pluginType;
 	private int menuIcon;
 	private String tupleType;
 	private String menuCaption;
 
-	PluginHandler(String packageName, String activityName, InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
+	PluginHandler(String packageName, String activityName, PluginType pluginType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
 		this.activityName = activityName;
-		this.interactionType = interactionType;
+		this.pluginType = pluginType;
 		this.tupleType = tupleType;
 		this.menuCaption = menuCaption;
 		this.menuIcon = menuIcon;
 	}
 	
 	public boolean canCompose() {
-		return interactionType.canCompose;
+		return pluginType.canCompose;
 	}
 
 	public Boolean canView() {
-		return interactionType.canView;
+		return pluginType.canView;
 	}
 
 	@Override
@@ -58,11 +58,11 @@ public class PluginHandler implements Serializable {
 	}
 
 	public void start(Context context, Sneer sneer, PublicKey partner) {
-		interactionType.factory.create(context, sneer, this).start(partner);
+		pluginType.factory.create(context, sneer, this).start(partner);
 	}
 	
 	public void resume(Context context, Sneer sneer, Tuple tuple) {
-		interactionType.factory.create(context, sneer, this).resume(tuple);
+		pluginType.factory.create(context, sneer, this).resume(tuple);
 	}
 
 	public String tupleType() {
