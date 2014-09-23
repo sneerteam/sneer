@@ -1,4 +1,4 @@
-package sneer.android.main;
+package sneer.android.main.ipc;
 
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_COMPLETED;
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_NEXT;

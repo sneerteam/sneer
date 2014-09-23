@@ -1,4 +1,4 @@
-package sneer.android.main;
+package sneer.android.main.ipc;
 
 import static sneer.SneerAndroidClient.ERROR;
 import static sneer.SneerAndroidClient.LABEL;
@@ -32,7 +32,7 @@ public final class PartnerSession {
 	private SneerPluginInfo app;
 	private Context context;
 
-	PartnerSession(Context context, Sneer sneer, SneerPluginInfo app, PublicKey host, long sessionId, PublicKey partner) {
+	public PartnerSession(Context context, Sneer sneer, SneerPluginInfo app, PublicKey host, long sessionId, PublicKey partner) {
 		this.host = host;
 		this.partner = partner;
 		this.sessionId = sessionId;

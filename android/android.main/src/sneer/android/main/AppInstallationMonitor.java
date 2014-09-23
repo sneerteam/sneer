@@ -1,5 +1,6 @@
 package sneer.android.main;
 
+import sneer.android.main.ipc.SneerPluginInfo;
 import android.content.*;
 import android.util.*;
 

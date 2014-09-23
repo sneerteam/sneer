@@ -1,4 +1,4 @@
-package sneer.android.main;
+package sneer.android.main.ipc;
 
 import java.io.*;
 import java.util.*;
@@ -19,7 +19,7 @@ public class SneerPluginInfo implements Serializable {
 	
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
 
-	enum InteractionType {
+	public enum InteractionType {
 		SESSION_PARTNER,
 		MESSAGE,
 		MESSAGE_VIEW(false, true),
@@ -39,13 +39,13 @@ public class SneerPluginInfo implements Serializable {
 		}
 	}
 	
-	String packageName;
-	String activityName;
+	public String packageName;
+	public String activityName;
 
-	SneerPluginInfo.InteractionType interactionType;
-	String tupleType;
-	String menuCaption;
-	int menuIcon;
+	public SneerPluginInfo.InteractionType interactionType;
+	public String tupleType;
+	public String menuCaption;
+	public int menuIcon;
 
 	protected static ObservedSubject<List<SneerPluginInfo>> plugins = ObservedSubject.create((List<SneerPluginInfo>)new ArrayList<SneerPluginInfo>());
 

@@ -60,7 +60,7 @@
         </activity>
 
         <service
-            android:name=".TupleSpaceService"
+            android:name=".ipc.TupleSpaceService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="sneer.android.service.TUPLE_SPACE" />

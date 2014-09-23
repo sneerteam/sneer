@@ -3,10 +3,10 @@ package sneer.android.main;
 import static sneer.SneerAndroidClient.LABEL;
 import static sneer.SneerAndroidClient.MESSAGE;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
-import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
-import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_VIEW;
-import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION_PARTNER;
-import static sneer.android.main.TupleSpaceService.startTupleSpaceService;
+import static sneer.android.main.ipc.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
+import static sneer.android.main.ipc.SneerPluginInfo.InteractionType.MESSAGE_VIEW;
+import static sneer.android.main.ipc.SneerPluginInfo.InteractionType.SESSION_PARTNER;
+import static sneer.android.main.ipc.TupleSpaceService.startTupleSpaceService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,6 +28,8 @@ import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
+import sneer.android.main.ipc.PartnerSession;
+import sneer.android.main.ipc.SneerPluginInfo;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
@@ -99,12 +101,12 @@ public class SneerAndroidCore implements SneerAndroid {
 	private static AtomicLong nextSessionId = new AtomicLong(0);
 	
 	private void startComposePlugin(SneerPluginInfo app, PublicKey peer) {
-		if (app.interactionType == SESSION_PARTNER) startPartnerSession(app, peer, sneer(), context);
+		if (app.interactionType == SESSION_PARTNER) startPartnerSession(context, sneer(), app, peer);
 		if (app.interactionType == MESSAGE_COMPOSE) startComposeMessage(app, peer);
 	}
 
 	private void startViewPlugin(SneerPluginInfo app, Tuple tuple) {
-		if (app.interactionType == SESSION_PARTNER) resumePartnerSession(app, tuple, sneer(), context);
+		if (app.interactionType == SESSION_PARTNER) resumePartnerSession(context, sneer(), app, tuple);
 		if (app.interactionType == MESSAGE_VIEW) startViewMessage(app, (String)tuple.get("label"), tuple.payload());
 	}
 
@@ -147,8 +149,8 @@ public class SneerAndroidCore implements SneerAndroid {
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}
-
-	public static void resumePartnerSession(final SneerPluginInfo app, Tuple tuple, Sneer sneer, Context context) {
+	
+	public static void resumePartnerSession(Context context, Sneer sneer, final SneerPluginInfo app, Tuple tuple) {
 		long sessionId = (Long) tuple.get("session");
 		PublicKey host = (PublicKey) tuple.get("host");
 		PublicKey partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
@@ -158,7 +160,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		s.startActivity();
 	}
 
-	public static void startPartnerSession(final SneerPluginInfo app, final PublicKey partner, Sneer sneer, Context context) {
+	public static void startPartnerSession(Context context, Sneer sneer, final SneerPluginInfo app, final PublicKey partner) {
 		
 		long sessionId = SneerAndroidCore.nextSessionId.getAndIncrement();
 		
