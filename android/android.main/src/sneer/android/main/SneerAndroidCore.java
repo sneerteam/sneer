@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import rx.functions.Action1;
+import rx.functions.Func1;
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
@@ -56,21 +57,21 @@ public class SneerAndroidCore implements SneerAndroid {
 			.audience(sneer().self().publicKey().current())
 			.field("conversation?", true)
 			.tuples()
+			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
+				return !t1.author().equals(sneer().self().publicKey().current());
+			} })
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
-				
-				if (t1.author() == sneer().self().publicKey().current()) {
-					return;
-				}
 				
 				Log.i(SneerAndroidCore.class.getSimpleName(), "-------------> "+ t1.type() + " - " + t1.payload());
 				
+				PluginHandler plugin = null;
 				Intent intent;
 				if ("message".equals(t1.type())) {
 					intent = new Intent(context, ConversationActivity.class);
 					intent.putExtra(ConversationActivity.PARTY_PUK, t1.author());
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				} else {
-					PluginHandler plugin = pluginManager.tupleViewer(t1.type());
+					plugin = pluginManager.tupleViewer(t1.type());
 					if (plugin == null) {
 						// TODO intent should direct to app store if plugin not installed
 						return;
@@ -80,27 +81,27 @@ public class SneerAndroidCore implements SneerAndroid {
 				
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				
-				PendingIntent pendIntent = PendingIntent.getActivity(context, 0, intent, 0);
-				
-			    NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-			    builder
-			    		.setSmallIcon(R.drawable.ic_launcher)
-			            .setContentText("tuple: "+ t1)
-			            .setContentTitle("Sneer: " + t1.type())
-			            .setWhen(t1.timestampCreated())
-			            .setAutoCancel(true)
-			            .setOngoing(false)
-			            .setContentIntent(pendIntent);
-			    
-			    NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		        mNotificationManager.notify(t1.type().hashCode(), builder.getNotification());
+				notifyUser(context, t1, plugin == null ? t1.type() : plugin.notificationLabel(), PendingIntent.getActivity(context, 0, intent, 0));
 
-				
 			} });
 	}
 	
+	private static void notifyUser(Context context, Tuple tuple, String notificationLabel, PendingIntent pendIntent) {
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+		builder
+				.setSmallIcon(R.drawable.ic_launcher)
+		        .setContentText(""+("message".equals(tuple.type()) ? tuple.payload() : (tuple.get("label") == null ? tuple.payload() : tuple.get("label"))))
+		        .setContentTitle(notificationLabel)
+		        .setWhen(tuple.timestampCreated())
+		        .setAutoCancel(true)
+		        .setOngoing(false)
+		        .setContentIntent(pendIntent);
+		
+		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.notify("sneer:"+tuple.type(), 0, builder.getNotification());
+	}
 
-	
+
 	private SneerAdmin newSneerAdmin(Context context) throws FriendlyException {
 		
 		File adminDir = new File(context.getFilesDir(), "admin");
