@@ -1,6 +1,7 @@
 package sneer.android.main.ipc;
 
-import java.util.HashSet;
+import static sneer.android.main.utils.EnumUtils.names;
+
 import java.util.Set;
 
 public enum InteractionType {
@@ -13,13 +14,7 @@ public enum InteractionType {
 	public final boolean canView;
 	public final PluginSessionFactory factory;
 
-	private static Set<String> names = new HashSet<String>();
-	static {
-		InteractionType[] e = values();
-		for (InteractionType interactionType : e) {
-			names.add(interactionType.name());
-		}
-	}
+	private static Set<String> names = names(values());
 
 	InteractionType(PluginSessionFactory factory, boolean canCompose, boolean canView) {
 		this.factory = factory;
