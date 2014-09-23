@@ -30,6 +30,7 @@ import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
 import sneer.android.main.ipc.PartnerSession;
 import sneer.android.main.ipc.PluginInfo;
+import sneer.android.main.ipc.PluginMonitor;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
@@ -287,14 +288,14 @@ public class SneerAndroidCore implements SneerAndroid {
 	}
 
 	private void initPlugins() {
-		PluginInfo.initialDiscovery(context);
-		PluginInfo.plugins()
+		PluginMonitor.initialDiscovery(context);
+		PluginMonitor.plugins()
 			.flatMap(fromSneerPluginInfoList)
 			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
 				sneer().setConversationMenuItems(menuItems);
 			} });
 		
-		PluginInfo.plugins()
+		PluginMonitor.plugins()
 			.flatMap(new Func1<List<PluginInfo>, Observable<Map<String, PluginInfo>>>() {  @Override public Observable<Map<String, PluginInfo>> call(List<PluginInfo> t1) {
 				return Observable.from(t1)
 						.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
