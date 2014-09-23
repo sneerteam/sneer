@@ -1,7 +1,6 @@
 package sneer.android.main.ipc;
 
 import sneer.Sneer;
-import sneer.android.main.SneerAndroidCore.SessionIdDispenser;
 import android.content.Context;
 
 public interface PluginSessionFactory {

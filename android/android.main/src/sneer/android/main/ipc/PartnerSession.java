@@ -12,7 +12,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.PublicKey;
 import sneer.Sneer;
-import sneer.android.main.SneerAndroidCore.SessionIdDispenser;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.utils.SharedResultReceiver;

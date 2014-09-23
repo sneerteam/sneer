@@ -24,6 +24,7 @@ import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
 import sneer.android.main.ipc.PluginInfo;
 import sneer.android.main.ipc.PluginMonitor;
+import sneer.android.main.ipc.SessionIdDispenser;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
@@ -93,10 +94,6 @@ public class SneerAndroidCore implements SneerAndroid {
 		return nextSessionId.getAndIncrement();
 	}  };
 	
-	
-	public interface SessionIdDispenser {
-		long next();
-	}
 	
 	private void startComposePlugin(PluginInfo plugin, PublicKey partner) {
 		plugin.interactionType.factory.create(context, sneer(), plugin, sessionIdDispenser).start(partner);
@@ -234,6 +231,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	}
 
 	private void initNextSessionId() {
+		// FIXME nextSessionId might be used before we find out whats the last one
 		sneer().tupleSpace().filter()
 			.localTuples()
 			.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple t1) {

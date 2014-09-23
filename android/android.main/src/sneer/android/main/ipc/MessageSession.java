@@ -6,7 +6,6 @@ import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.android.main.SneerAndroidCore;
-import sneer.android.main.SneerAndroidCore.SessionIdDispenser;
 import sneer.tuples.Tuple;
 import sneer.utils.SharedResultReceiver;
 import sneer.utils.Value;
