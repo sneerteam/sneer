@@ -57,12 +57,12 @@ public class PluginHandler implements Serializable {
 		return context.getPackageManager().getResourcesForApplication(packageName).getDrawable(menuIcon);
 	}
 
-	public void start(Context context, Sneer sneer, SessionIdDispenser sessionIdDispenser, PublicKey partner) {
-		interactionType.factory.create(context, sneer, this, sessionIdDispenser).start(partner);
+	public void start(Context context, Sneer sneer, PublicKey partner) {
+		interactionType.factory.create(context, sneer, this).start(partner);
 	}
 	
-	public void resume(Context context, Sneer sneer, SessionIdDispenser sessionIdDispenser, Tuple tuple) {
-		interactionType.factory.create(context, sneer, this, sessionIdDispenser).resume(tuple);
+	public void resume(Context context, Sneer sneer, Tuple tuple) {
+		interactionType.factory.create(context, sneer, this).resume(tuple);
 	}
 
 	public String tupleType() {

@@ -8,14 +8,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import sneer.ConversationMenuItem;
 import sneer.Message;
 import sneer.PublicKey;
@@ -24,7 +22,6 @@ import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
 import sneer.android.main.ipc.PluginHandler;
 import sneer.android.main.ipc.PluginMonitor;
-import sneer.android.main.ipc.SessionIdDispenser;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
@@ -61,7 +58,7 @@ public class SneerAndroidCore implements SneerAndroid {
 
 		@Override
 		public void call(PublicKey partyPuk) {
-			plugin.start(context, sneer(), sessionIdDispenser, partyPuk);
+			plugin.start(context, sneer(), partyPuk);
 		}
 
 		@Override
@@ -86,10 +83,6 @@ public class SneerAndroidCore implements SneerAndroid {
 	private static String error;
 	private static AlertDialog errorDialog;
 	private static Map<String, PluginHandler> tupleViewers = new HashMap<String, PluginHandler>();
-	private static AtomicLong nextSessionId = new AtomicLong(0);
-	private static SessionIdDispenser sessionIdDispenser = new SessionIdDispenser() {  @Override public long next() {
-		return nextSessionId.getAndIncrement();
-	}  };
 	
 	
 	private static byte[] bitmapFor(Drawable icon) {
@@ -186,7 +179,6 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 		
 		initPlugins();
-		initNextSessionId();
 		startTupleSpaceService(context);
 	}
 
@@ -213,23 +205,6 @@ public class SneerAndroidCore implements SneerAndroid {
 			} });
 	}
 
-	private void initNextSessionId() {
-		// FIXME nextSessionId might be used before we find out whats the last one
-		sneer().tupleSpace().filter()
-			.localTuples()
-			.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple t1) {
-				return (Long) t1.get("session");
-			} })
-			.scan(new Func2<Long, Long, Long>() {  @Override public Long call(Long t1, Long t2) {
-				return Math.max(t1==null?0:t1, t2==null?0:t2);
-			} })
-			.last()
-			.subscribe(new Action1<Long>() {  @Override public void call(Long max) {
-				nextSessionId.set(max+1);
-			} });
-	}
-
-
 	@Override
 	public boolean isClickable(Message message) {
 		return tupleViewers.containsKey(message.tuple().type());
@@ -243,7 +218,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '"+tuple.type()+"'");
 		}
-		viewer.resume(context, sneer(), sessionIdDispenser, tuple);
+		viewer.resume(context, sneer(), tuple);
 	}
 
 }

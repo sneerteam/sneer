@@ -5,10 +5,10 @@ import static sneer.android.main.utils.EnumUtils.names;
 import java.util.Set;
 
 public enum InteractionType {
-	SESSION_PARTNER(PartnerSession.factory, true, true),
-	MESSAGE(SingleMessageSession.factory, true, true),
-	MESSAGE_VIEW(SingleMessageSession.factory, false, true),
-	MESSAGE_COMPOSE(SingleMessageSession.factory, true, false);
+	SESSION_PARTNER(PartnerSessionFactory.singleton, true, true),
+	MESSAGE(SingleMessageSessionFactory.singleton, true, true),
+	MESSAGE_VIEW(SingleMessageSessionFactory.singleton, false, true),
+	MESSAGE_COMPOSE(SingleMessageSessionFactory.singleton, true, false);
 	
 	public final boolean canCompose;
 	public final boolean canView;

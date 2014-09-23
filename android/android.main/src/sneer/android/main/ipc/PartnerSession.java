@@ -7,6 +7,9 @@ import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;
 import static sneer.SneerAndroidClient.REPLAY_FINISHED;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
+
+import java.util.concurrent.atomic.AtomicLong;
+
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -24,9 +27,7 @@ import android.os.ResultReceiver;
 
 public final class PartnerSession implements PluginSession {
 	
-	public static PluginSessionFactory factory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, PluginHandler plugin, SessionIdDispenser dispenser) {
-		return new PartnerSession(context, sneer, plugin, dispenser);
-	} };
+	private static AtomicLong nextSessionId = new AtomicLong(System.currentTimeMillis());
 	
 	private PublicKey host;
 	private PublicKey partner;
@@ -35,13 +36,11 @@ public final class PartnerSession implements PluginSession {
 	private Sneer sneer;
 	private PluginHandler plugin;
 	private Context context;
-	private SessionIdDispenser sessionIdDispenser;
 
-	private PartnerSession(Context context, Sneer sneer, PluginHandler app, SessionIdDispenser sessionIdDispenser) {
+	PartnerSession(Context context, Sneer sneer, PluginHandler app) {
 		this.context = context;
 		this.sneer = sneer;
 		this.plugin = app;
-		this.sessionIdDispenser = sessionIdDispenser;
 	}
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {
@@ -159,7 +158,7 @@ public final class PartnerSession implements PluginSession {
 	@Override
 	public void start(PublicKey partner) {
 		host = sneer.self().publicKey().current();
-		sessionId = sessionIdDispenser.next();
+		sessionId = nextSessionId.getAndIncrement();
 		this.partner = partner;
 		startActivity();
 	}

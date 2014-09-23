@@ -17,15 +17,11 @@ import android.widget.Toast;
 
 public class SingleMessageSession implements PluginSession {
 
-	public static PluginSessionFactory factory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, PluginHandler plugin, SessionIdDispenser session) {
-		return new SingleMessageSession(context, sneer, plugin, session);
-	} };
-	
 	private Context context;
 	private Sneer sneer;
 	private PluginHandler plugin;
 
-	private SingleMessageSession(Context context, Sneer sneer, PluginHandler plugin, SessionIdDispenser session) {
+	SingleMessageSession(Context context, Sneer sneer, PluginHandler plugin) {
 		this.context = context;
 		this.sneer = sneer;
 		this.plugin = plugin;
