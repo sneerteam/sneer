@@ -1,17 +1,31 @@
 package sneer.impl.simulator;
 
-import static sneer.Conversation.*;
-import static sneer.commons.Streams.*;
+import static sneer.Conversation.MOST_RECENT_FIRST;
+import static sneer.commons.Streams.readFully;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.functions.*;
-import rx.subjects.*;
-import sneer.*;
-import sneer.tuples.*;
+import rx.functions.Action1;
+import rx.subjects.BehaviorSubject;
+import sneer.Contact;
+import sneer.Conversation;
+import sneer.ConversationMenuItem;
+import sneer.Party;
+import sneer.PrivateKey;
+import sneer.Profile;
+import sneer.PublicKey;
+import sneer.Sneer;
+import sneer.TuplesFactoryInProcess;
+import sneer.tuples.Tuple;
+import sneer.tuples.TupleSpace;
 
 public class SneerSimulator implements Sneer {
 
@@ -27,7 +41,7 @@ public class SneerSimulator implements Sneer {
 	private final Map<Party, Conversation> conversationsByParty = new ConcurrentHashMap<Party, Conversation>();
 	private final BehaviorSubject<List<Conversation>> conversations = BehaviorSubject.create(conversationsSorted());
 	
-	public static final Comparator<Contact> BY_NICKNAME = new Comparator<Contact>() { @Override public int compare(Contact c1, Contact c2) {
+	private static final Comparator<Contact> BY_NICKNAME = new Comparator<Contact>() { @Override public int compare(Contact c1, Contact c2) {
 		return c1.nickname().current().compareToIgnoreCase(c2.nickname().current());
 	}};
 	private PrivateKey prik;

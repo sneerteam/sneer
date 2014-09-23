@@ -22,7 +22,7 @@ import sneer.rx.ObservedSubject;
 
 public class ConversationSimulator implements Conversation {
 	
-	public static final ReplaySubject<List<ConversationMenuItem>> menu = ReplaySubject.create();
+	static final ReplaySubject<List<ConversationMenuItem>> menu = ReplaySubject.create();
 
 	private final Party party;
 	
@@ -34,7 +34,7 @@ public class ConversationSimulator implements Conversation {
 	private final ObservedSubject<String> mostRecentMessageContent = ObservedSubject.create("");
 	private final ObservedSubject<Long> unreadMessageCount = ObservedSubject.create(4L);
 	
-	public ConversationSimulator(Party party) {
+	ConversationSimulator(Party party) {
 		this.party = party;
 		sendMessage("Vai ter festa!!!! Uhuu!!!");
 		simulateReceivedMessage("Onde? Onde?? o0");

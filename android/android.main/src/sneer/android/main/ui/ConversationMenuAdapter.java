@@ -1,8 +1,8 @@
 package sneer.android.main.ui;
 
-import sneer.*;
-import android.content.*;
-import android.widget.*;
+import sneer.ConversationMenuItem;
+import android.content.Context;
+import android.widget.ArrayAdapter;
 
 public class ConversationMenuAdapter extends ArrayAdapter<ConversationMenuItem> {
 

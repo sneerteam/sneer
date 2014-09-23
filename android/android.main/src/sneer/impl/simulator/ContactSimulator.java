@@ -1,7 +1,9 @@
 package sneer.impl.simulator;
 
-import sneer.*;
-import sneer.rx.*;
+import sneer.Contact;
+import sneer.Party;
+import sneer.rx.Observed;
+import sneer.rx.ObservedSubject;
 
 public class ContactSimulator implements Contact {
 

@@ -26,14 +26,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 
-public class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
+class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
 
-    int layoutUserResourceId;    
-    int listContactResourceId;
+    private int layoutUserResourceId;    
+    private int listContactResourceId;
 	private LayoutInflater inflater;
 	private Party party;
     
-    public ConversationAdapter(Context context,
+    ConversationAdapter(Context context,
     		LayoutInflater inflater,
     		int layoutUserResourceId,
     		int listContactResourceId,

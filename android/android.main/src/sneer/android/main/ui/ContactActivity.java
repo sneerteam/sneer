@@ -31,19 +31,18 @@ import android.widget.Toast;
 
 public class ContactActivity extends Activity {
 
-	static final String PARTY_PUK = "partyPuk";
-	boolean newContact = false;
-	Profile profile;
-	ImageView selfieImage;
-	byte[] selfieBytes;
+	private static final String PARTY_PUK = "partyPuk";
+	private boolean newContact = false;
+	private Profile profile;
+	private ImageView selfieImage;
 
-	EditText nicknameEdit;
-	TextView fullNameView;
-	TextView preferredNickNameView;
-	TextView countryView;
-	TextView cityView;
-	Party party;
-	PublicKey partyPuk;
+	private EditText nicknameEdit;
+	private TextView fullNameView;
+	private TextView preferredNickNameView;
+	private TextView countryView;
+	private TextView cityView;
+	private Party party;
+	private PublicKey partyPuk;
 	private Contact contact;
 	private boolean isOwn;
 	private boolean isTouched;
@@ -186,7 +185,7 @@ public class ContactActivity extends Activity {
 	}
 	
 	
-	public void saveContact() {
+	private void saveContact() {
 		if (isTouched  || newContact) {
 			try {
 				final String nickName = nicknameEdit.getText().toString();

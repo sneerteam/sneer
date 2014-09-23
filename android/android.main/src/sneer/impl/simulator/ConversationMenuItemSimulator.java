@@ -1,6 +1,7 @@
 package sneer.impl.simulator;
 
-import sneer.*;
+import sneer.ConversationMenuItem;
+import sneer.PublicKey;
 
 public class ConversationMenuItemSimulator implements ConversationMenuItem {
 	

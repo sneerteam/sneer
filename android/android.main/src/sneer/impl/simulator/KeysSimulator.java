@@ -1,14 +1,15 @@
 package sneer.impl.simulator;
 
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import sneer.*;
+import sneer.PrivateKey;
+import sneer.PublicKey;
 
 public class KeysSimulator {
 	
 	private static final AtomicInteger counter = new AtomicInteger();
 
-	public static PrivateKey createPrivateKey() {
+	static PrivateKey createPrivateKey() {
 		
 		final int key = counter.incrementAndGet();
 		
@@ -51,7 +52,7 @@ public class KeysSimulator {
 	}
 
 	
-	public static PublicKey createPublicKey(final String bytesAsString) {
+	static PublicKey createPublicKey(final String bytesAsString) {
 	
 		return new PublicKey() {
 			

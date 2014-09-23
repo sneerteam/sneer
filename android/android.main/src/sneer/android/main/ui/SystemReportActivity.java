@@ -1,18 +1,20 @@
 package sneer.android.main.ui;
 
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.android.main.*;
-import sneer.commons.*;
-import android.app.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.android.main.R;
+import sneer.commons.SystemReport;
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 public class SystemReportActivity extends Activity {
 
-	TextView mReportView;
-	ScrollView mScrollView;
+	private TextView mReportView;
+	private ScrollView mScrollView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

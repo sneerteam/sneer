@@ -25,19 +25,18 @@ import android.widget.TextView;
 
 public class ProfileActivity extends SneerActivity {
 
-	static final String PARTY_PUK = "partyPuk";
-	static final int TAKE_PICTURE = 1;
+	private static final int TAKE_PICTURE = 1;
 
-	Profile profile;
+	private Profile profile;
 	
-	EditText firstNameEdit;
-	EditText lastNameEdit;
-	EditText preferredNickNameEdit;
-	EditText countryEdit;
-	EditText cityEdit;
-	ImageView selfieImage;
+	private EditText firstNameEdit;
+	private EditText lastNameEdit;
+	private EditText preferredNickNameEdit;
+	private EditText countryEdit;
+	private EditText cityEdit;
+	private ImageView selfieImage;
 	
-	byte[] selfieBytes;
+	private byte[] selfieBytes;
 	
 
 	@Override
