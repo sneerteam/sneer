@@ -25,7 +25,7 @@ public class SingleMessageSession implements PluginSession {
 	private Sneer sneer;
 	private PluginHandler plugin;
 
-	public SingleMessageSession(Context context, Sneer sneer, PluginHandler plugin, SessionIdDispenser session) {
+	private SingleMessageSession(Context context, Sneer sneer, PluginHandler plugin, SessionIdDispenser session) {
 		this.context = context;
 		this.sneer = sneer;
 		this.plugin = plugin;

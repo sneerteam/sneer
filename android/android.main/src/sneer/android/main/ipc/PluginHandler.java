@@ -21,7 +21,7 @@ public class PluginHandler implements Serializable {
 	private String tupleType;
 	private String menuCaption;
 
-	public PluginHandler(String packageName, String activityName, InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
+	PluginHandler(String packageName, String activityName, InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.interactionType = interactionType;

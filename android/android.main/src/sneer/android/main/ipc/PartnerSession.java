@@ -37,20 +37,11 @@ public final class PartnerSession implements PluginSession {
 	private Context context;
 	private SessionIdDispenser sessionIdDispenser;
 
-	public PartnerSession(Context context, Sneer sneer, PluginHandler app, SessionIdDispenser sessionIdDispenser) {
+	private PartnerSession(Context context, Sneer sneer, PluginHandler app, SessionIdDispenser sessionIdDispenser) {
 		this.context = context;
 		this.sneer = sneer;
 		this.plugin = app;
 		this.sessionIdDispenser = sessionIdDispenser;
-	}
-	
-	public PartnerSession(Context context, Sneer sneer, PluginHandler app, PublicKey host, long sessionId, PublicKey partner) {
-		this.host = host;
-		this.partner = partner;
-		this.sessionId = sessionId;
-		this.context = context;
-		this.sneer = sneer;
-		this.plugin = app;
 	}
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {
