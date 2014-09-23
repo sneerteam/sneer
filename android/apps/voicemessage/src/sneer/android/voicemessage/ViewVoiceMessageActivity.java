@@ -30,12 +30,12 @@ public class ViewVoiceMessageActivity extends MessageActivity {
 	private ImageButton btnPlay;
 
 	private SeekBar seekbar;
-	private Handler handler = new Handler();
+	private final Handler handler = new Handler();
 
 	private int duration;
 	
-	TimeUnit milliseconds = TimeUnit.MILLISECONDS;
-	TimeUnit minutes = TimeUnit.MINUTES;
+	private final TimeUnit milliseconds = TimeUnit.MILLISECONDS;
+	private final TimeUnit minutes = TimeUnit.MINUTES;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +160,7 @@ public class ViewVoiceMessageActivity extends MessageActivity {
 	}
 	
 	
-	private Runnable update = new Runnable() { public void run() {
+	private final Runnable update = new Runnable() { public void run() {
 		if (player == null) return;
 		final long position = player.getCurrentPosition();
 		final long countDown = position - duration;
