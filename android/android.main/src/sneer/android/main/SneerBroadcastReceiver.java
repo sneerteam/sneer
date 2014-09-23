@@ -1,5 +1,6 @@
 package sneer.android.main;
 
+import sneer.android.main.ipc.TupleSpaceService;
 import android.content.*;
 import android.util.*;
 

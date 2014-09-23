@@ -1,12 +1,6 @@
 package sneer.android.main;
 
-import static sneer.SneerAndroidClient.LABEL;
-import static sneer.SneerAndroidClient.MESSAGE;
-import static sneer.SneerAndroidClient.RESULT_RECEIVER;
-import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_COMPOSE;
-import static sneer.android.main.SneerPluginInfo.InteractionType.MESSAGE_VIEW;
-import static sneer.android.main.SneerPluginInfo.InteractionType.SESSION_PARTNER;
-import static sneer.android.main.TupleSpaceService.startTupleSpaceService;
+import static sneer.android.main.ipc.TupleSpaceService.startTupleSpaceService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,33 +22,30 @@ import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
+import sneer.android.main.ipc.PluginHandler;
+import sneer.android.main.ipc.PluginMonitor;
+import sneer.android.main.ipc.SessionIdDispenser;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
-import sneer.utils.SharedResultReceiver;
-import sneer.utils.Value;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 public class SneerAndroidCore implements SneerAndroid {
 	
-	Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<SneerPluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<SneerPluginInfo> apps) {
+	Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<PluginHandler> apps) {
 		return Observable.from(apps)
-			.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
+			.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
 				return t1.canCompose();
 			} })
-			.map(new Func1<SneerPluginInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final SneerPluginInfo app) {
+			.map(new Func1<PluginHandler, ConversationMenuItem>() { @Override public ConversationMenuItem call(final PluginHandler app) {
 				return new ConversationMenuItemImpl(app);
 			} })
 			.toList();
@@ -62,22 +53,21 @@ public class SneerAndroidCore implements SneerAndroid {
 
 	private final class ConversationMenuItemImpl implements ConversationMenuItem {
 		
-		private final SneerPluginInfo app;
+		private final PluginHandler plugin;
 
-		private ConversationMenuItemImpl(SneerPluginInfo app) {
-			this.app = app;
+		private ConversationMenuItemImpl(PluginHandler app) {
+			this.plugin = app;
 		}
 
 		@Override
 		public void call(PublicKey partyPuk) {
-			startComposePlugin(app, partyPuk);
+			plugin.start(context, sneer(), sessionIdDispenser, partyPuk);
 		}
 
 		@Override
 		public byte[] icon() {
 			try {
-				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.menuIcon);
-				return bitmapFor(icon);
+				return bitmapFor(plugin.drawableMenuIcon(context));
 			} catch (Exception e) {
 				Log.w(SneerAndroidCore.class.getSimpleName(), "Error loading bitmap", e);
 				e.printStackTrace();
@@ -87,7 +77,7 @@ public class SneerAndroidCore implements SneerAndroid {
 
 		@Override
 		public String caption() {
-			return app.menuCaption;
+			return plugin.menuCaption();
 		}
 	}
 
@@ -95,96 +85,19 @@ public class SneerAndroidCore implements SneerAndroid {
 	private Context context;
 	private static String error;
 	private static AlertDialog errorDialog;
+	private static Map<String, PluginHandler> tupleViewers = new HashMap<String, PluginHandler>();
+	private static AtomicLong nextSessionId = new AtomicLong(0);
+	private static SessionIdDispenser sessionIdDispenser = new SessionIdDispenser() {  @Override public long next() {
+		return nextSessionId.getAndIncrement();
+	}  };
 	
 	
-	static AtomicLong nextSessionId = new AtomicLong(0);
-	
-	private void startComposePlugin(SneerPluginInfo app, PublicKey peer) {
-		if (app.interactionType == SESSION_PARTNER) startPartnerSession(app, peer, sneer(), context);
-		if (app.interactionType == MESSAGE_COMPOSE) startComposeMessage(app, peer);
-	}
-
-	private void startViewPlugin(SneerPluginInfo app, Tuple tuple) {
-		if (app.interactionType == SESSION_PARTNER) resumePartnerSession(app, tuple, sneer(), context);
-		if (app.interactionType == MESSAGE_VIEW) startViewMessage(app, (String)tuple.get("label"), tuple.payload());
-	}
-
-
-	private void startComposeMessage(final SneerPluginInfo app, final PublicKey peer) {
-		Intent intent = new Intent();
-		intent.setClassName(app.packageName, app.activityName);
-		
-		final ClassLoader classLoader = context.getClassLoader();
-		
-		SharedResultReceiver result = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {
-			
-			try {
-				t1.setClassLoader(classLoader);
-				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
-				String label = t1.getString(LABEL);
-				info("Receiving message of type '" + app.tupleType + "' label '" + label + "' from " + app.packageName + "." + app.activityName);
-				sneer().tupleSpace().publisher()
-					.type(app.tupleType)
-					.audience(peer)
-					.field("label", label)
-					.pub(message);
-			} catch (final Throwable t) {
-				toastOnMainThread("Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
-				Log.w(SneerAndroidCore.class.getSimpleName(), "Error receiving message from plugin", t);
-			}			
-		}});
-		
-		intent.putExtra(RESULT_RECEIVER, result);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		context.startActivity(intent);
-	}
-
-	private void startViewMessage(final SneerPluginInfo app, String label, Object message) {
-		Intent intent = new Intent();
-		intent.setClassName(app.packageName, app.activityName);
-		
-		intent.putExtra(MESSAGE, Value.of(message));
-		intent.putExtra(LABEL, label);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		context.startActivity(intent);
-	}
-
-	public static void resumePartnerSession(final SneerPluginInfo app, Tuple tuple, Sneer sneer, Context context) {
-		long sessionId = (Long) tuple.get("session");
-		PublicKey host = (PublicKey) tuple.get("host");
-		PublicKey partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
-		
-		PartnerSession s = new PartnerSession(app, host, partner, sessionId, context, sneer);
-		
-		s.startActivity();
-	}
-
-	public static void startPartnerSession(final SneerPluginInfo app, final PublicKey partner, Sneer sneer, Context context) {
-		
-		long sessionId = SneerAndroidCore.nextSessionId.getAndIncrement();
-		
-		PartnerSession s = new PartnerSession(app, sneer.self().publicKey().current(), partner, sessionId, context, sneer);
-		
-		s.startActivity();
-	}
-
 	private static byte[] bitmapFor(Drawable icon) {
 		Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 		return stream.toByteArray();
 	}
-
-
-	private Resources resourceForPackage(String packageName) throws NameNotFoundException {
-		return context.getPackageManager().getResourcesForApplication(packageName);
-	}
-
-
-	private static void info(String msg) {
-		Log.i(SneerAndroidCore.class.getSimpleName(), msg);
-	}
-
 
 	@Override
 	public SneerAdmin admin() {
@@ -249,18 +162,16 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 	}
 
-	public void toast(final String message, final int length) {
+	public static void toast(Context context, final String message, final int length) {
 		Toast.makeText(context, message, length).show();
 	}
 
-	public void toastOnMainThread(final String message, final int length) {
+	public static void toastOnMainThread(final Context context, final String message, final int length) {
 		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() { @Override public void call() {
-			toast(message, length);
+			toast(context, message, length);
 		} });
 	}
 
-	private static Map<String, SneerPluginInfo> tupleViewers = new HashMap<String, SneerPluginInfo>();
-	
 	public static boolean isCoreAvailable() {
 		return sneerAdminFactory() != null;
 	}
@@ -280,29 +191,30 @@ public class SneerAndroidCore implements SneerAndroid {
 	}
 
 	private void initPlugins() {
-		SneerPluginInfo.initialDiscovery(context);
-		SneerPluginInfo.plugins()
+		PluginMonitor.initialDiscovery(context);
+		PluginMonitor.plugins()
 			.flatMap(fromSneerPluginInfoList)
 			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
 				sneer().setConversationMenuItems(menuItems);
 			} });
 		
-		SneerPluginInfo.plugins()
-			.flatMap(new Func1<List<SneerPluginInfo>, Observable<Map<String, SneerPluginInfo>>>() {  @Override public Observable<Map<String, SneerPluginInfo>> call(List<SneerPluginInfo> t1) {
+		PluginMonitor.plugins()
+			.flatMap(new Func1<List<PluginHandler>, Observable<Map<String, PluginHandler>>>() {  @Override public Observable<Map<String, PluginHandler>> call(List<PluginHandler> t1) {
 				return Observable.from(t1)
-						.filter(new Func1<SneerPluginInfo, Boolean>() {  @Override public Boolean call(SneerPluginInfo t1) {
+						.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
 							return t1.canView();
 						} })
-						.toMap(new Func1<SneerPluginInfo, String>() {  @Override public String call(SneerPluginInfo t1) {
-							return t1.tupleType;
+						.toMap(new Func1<PluginHandler, String>() {  @Override public String call(PluginHandler t1) {
+							return t1.tupleType();
 						}});
 			} })
-			.subscribe(new Action1<Map<String, SneerPluginInfo>>() {  @Override public void call(Map<String, SneerPluginInfo> t1) {
+			.subscribe(new Action1<Map<String, PluginHandler>>() {  @Override public void call(Map<String, PluginHandler> t1) {
 				tupleViewers = t1;
 			} });
 	}
 
 	private void initNextSessionId() {
+		// FIXME nextSessionId might be used before we find out whats the last one
 		sneer().tupleSpace().filter()
 			.localTuples()
 			.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple t1) {
@@ -327,11 +239,11 @@ public class SneerAndroidCore implements SneerAndroid {
 	@Override
 	public void doOnClick(Message message) {
 		Tuple tuple = message.tuple();
-		SneerPluginInfo viewer = tupleViewers.get(tuple.type());
+		PluginHandler viewer = tupleViewers.get(tuple.type());
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '"+tuple.type()+"'");
 		}
-		startViewPlugin(viewer, tuple);
+		viewer.resume(context, sneer(), sessionIdDispenser, tuple);
 	}
 
 }

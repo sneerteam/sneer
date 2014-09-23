@@ -1,4 +1,4 @@
-package sneer.android.main;
+package sneer.android.main.ipc;
 
 import static sneer.SneerAndroidClient.ERROR;
 import static sneer.SneerAndroidClient.LABEL;
@@ -22,27 +22,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
-public final class PartnerSession {
+public final class PartnerSession implements PluginSession {
 	
-	private final PublicKey host;
-	private final PublicKey partner;
-	private final long sessionId;
+	public static PluginSessionFactory factory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, PluginHandler plugin, SessionIdDispenser dispenser) {
+		return new PartnerSession(context, sneer, plugin, dispenser);
+	} };
+	
+	private PublicKey host;
+	private PublicKey partner;
+	private long sessionId;
 	private Tuple lastLocalTuple = null;
-	private String tupleType;
-	private ClassLoader classLoader;
 	private Sneer sneer;
-	private SneerPluginInfo app;
+	private PluginHandler plugin;
 	private Context context;
+	private SessionIdDispenser sessionIdDispenser;
 
-	PartnerSession(SneerPluginInfo app, PublicKey host, PublicKey partner, long sessionId, Context context, Sneer sneer) {
-		this.host = host;
-		this.partner = partner;
-		this.sessionId = sessionId;
+	private PartnerSession(Context context, Sneer sneer, PluginHandler app, SessionIdDispenser sessionIdDispenser) {
 		this.context = context;
-		this.classLoader = context.getClassLoader();
 		this.sneer = sneer;
-		this.tupleType = app.tupleType;
-		this.app = app;
+		this.plugin = app;
+		this.sessionIdDispenser = sessionIdDispenser;
 	}
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {
@@ -73,13 +72,13 @@ public final class PartnerSession {
 
 	protected SharedResultReceiver createResultReceiver() {
 		return new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle resultData) {
-			resultData.setClassLoader(PartnerSession.this.classLoader);
+			resultData.setClassLoader(context.getClassLoader());
 			final ResultReceiver toClient = resultData.getParcelable(RESULT_RECEIVER);
 			
 			if (toClient != null) {
-				PartnerSession.this.setup(toClient);
+				setup(toClient);
 			} else {
-				PartnerSession.this.publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
+				publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
 			}
 		} });
 	}
@@ -112,7 +111,7 @@ public final class PartnerSession {
 
 	private void publish(String label, Object message) {
 		sneer.tupleSpace().publisher()
-			.type(tupleType)
+			.type(plugin.tupleType())
 			.audience(partner)
 			.field("session", sessionId)
 			.field("host", host)
@@ -124,7 +123,7 @@ public final class PartnerSession {
 		return sneer.tupleSpace().filter()
 			.field("session", sessionId)
 			.field("host", host)
-			.type(tupleType);
+			.type(plugin.tupleType());
 	}
 
 	private void pipeNewTuples(final ResultReceiver toClient) {
@@ -143,12 +142,26 @@ public final class PartnerSession {
 			} });
 	}
  
-	public void startActivity() {
+	private void startActivity() {
 		Intent intent = new Intent();
-		intent.setClassName(app.packageName, app.activityName);
 		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		context.startActivity(intent);
+		plugin.start(context, intent);
+	}
+
+	@Override
+	public void resume(Tuple tuple) {
+		sessionId = (Long) tuple.get("session");
+		host = (PublicKey) tuple.get("host");
+		partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
+		startActivity();
+	}
+
+	@Override
+	public void start(PublicKey partner) {
+		host = sneer.self().publicKey().current();
+		sessionId = sessionIdDispenser.next();
+		this.partner = partner;
+		startActivity();
 	}
 
 }

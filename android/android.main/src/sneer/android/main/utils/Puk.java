@@ -1,4 +1,4 @@
-package sneer.android.main.ui.utils;
+package sneer.android.main.utils;
 
 import sneer.*;
 import android.app.*;
