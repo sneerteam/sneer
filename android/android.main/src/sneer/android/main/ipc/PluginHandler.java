@@ -11,7 +11,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.drawable.Drawable;
 
-public class PluginInfo implements Serializable {
+public class PluginHandler implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private String packageName;
@@ -21,7 +21,7 @@ public class PluginInfo implements Serializable {
 	private String tupleType;
 	private String menuCaption;
 
-	public PluginInfo(String packageName, String activityName, InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
+	public PluginHandler(String packageName, String activityName, InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.interactionType = interactionType;

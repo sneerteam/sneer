@@ -19,7 +19,7 @@ import android.util.*;
 
 public class PluginMonitor extends BroadcastReceiver {
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
-	private static ObservedSubject<List<PluginInfo>> plugins = ObservedSubject.create((List<PluginInfo>)new ArrayList<PluginInfo>());
+	private static ObservedSubject<List<PluginHandler>> plugins = ObservedSubject.create((List<PluginHandler>)new ArrayList<PluginHandler>());
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -32,11 +32,11 @@ public class PluginMonitor extends BroadcastReceiver {
 		
 	}
 
-	public static Func1<ActivityInfo, Observable<PluginInfo>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<PluginInfo>>() {  @Override public Observable<PluginInfo> call(ActivityInfo activityInfo) {
+	public static Func1<ActivityInfo, Observable<PluginHandler>> FROM_ACTIVITY = new Func1<ActivityInfo, Observable<PluginHandler>>() {  @Override public Observable<PluginHandler> call(ActivityInfo activityInfo) {
 		Bundle meta = activityInfo.metaData;
 		try {
 			return Observable.just(
-				new PluginInfo(
+				new PluginHandler(
 					activityInfo.packageName,
 					activityInfo.name,
 					interactionType(getString(meta, "sneer:interaction-type")),
@@ -119,7 +119,7 @@ public class PluginMonitor extends BroadcastReceiver {
 		log("Package removed: " + packageName);
 		
 		currentKnownPlugins()
-			.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
+			.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
 				return !t1.isSamePackage(packageName);
 			} })
 			.toList()
@@ -127,18 +127,18 @@ public class PluginMonitor extends BroadcastReceiver {
 	}
 
 
-	private static Action1<List<PluginInfo>> pluginsListPublisher() {
-		return new Action1<List<PluginInfo>>() {  @Override public void call(List<PluginInfo> t1) {
+	private static Action1<List<PluginHandler>> pluginsListPublisher() {
+		return new Action1<List<PluginHandler>>() {  @Override public void call(List<PluginHandler> t1) {
 			log("Pushing new plugin list: " + t1);
 			plugins.onNext(t1);
 		}};
 	}
 
-	private static Observable<PluginInfo> currentKnownPlugins() {
+	private static Observable<PluginHandler> currentKnownPlugins() {
 		return Observable.from(plugins.observed().current());
 	}
 
-	public static Observable<List<PluginInfo>> plugins() {
+	public static Observable<List<PluginHandler>> plugins() {
 		return plugins.observed().observable();
 	}
 

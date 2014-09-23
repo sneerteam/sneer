@@ -24,7 +24,7 @@ import android.os.ResultReceiver;
 
 public final class PartnerSession implements PluginSession {
 	
-	public static PluginSessionFactory factory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, PluginInfo plugin, SessionIdDispenser dispenser) {
+	public static PluginSessionFactory factory = new PluginSessionFactory() {  @Override public PluginSession create(Context context, Sneer sneer, PluginHandler plugin, SessionIdDispenser dispenser) {
 		return new PartnerSession(context, sneer, plugin, dispenser);
 	} };
 	
@@ -33,18 +33,18 @@ public final class PartnerSession implements PluginSession {
 	private long sessionId;
 	private Tuple lastLocalTuple = null;
 	private Sneer sneer;
-	private PluginInfo plugin;
+	private PluginHandler plugin;
 	private Context context;
 	private SessionIdDispenser sessionIdDispenser;
 
-	public PartnerSession(Context context, Sneer sneer, PluginInfo app, SessionIdDispenser sessionIdDispenser) {
+	public PartnerSession(Context context, Sneer sneer, PluginHandler app, SessionIdDispenser sessionIdDispenser) {
 		this.context = context;
 		this.sneer = sneer;
 		this.plugin = app;
 		this.sessionIdDispenser = sessionIdDispenser;
 	}
 	
-	public PartnerSession(Context context, Sneer sneer, PluginInfo app, PublicKey host, long sessionId, PublicKey partner) {
+	public PartnerSession(Context context, Sneer sneer, PluginHandler app, PublicKey host, long sessionId, PublicKey partner) {
 		this.host = host;
 		this.partner = partner;
 		this.sessionId = sessionId;

@@ -22,7 +22,7 @@ import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
-import sneer.android.main.ipc.PluginInfo;
+import sneer.android.main.ipc.PluginHandler;
 import sneer.android.main.ipc.PluginMonitor;
 import sneer.android.main.ipc.SessionIdDispenser;
 import sneer.commons.SystemReport;
@@ -40,12 +40,12 @@ import android.widget.Toast;
 
 public class SneerAndroidCore implements SneerAndroid {
 	
-	Func1<List<PluginInfo>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginInfo>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<PluginInfo> apps) {
+	Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<PluginHandler> apps) {
 		return Observable.from(apps)
-			.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
+			.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
 				return t1.canCompose();
 			} })
-			.map(new Func1<PluginInfo, ConversationMenuItem>() { @Override public ConversationMenuItem call(final PluginInfo app) {
+			.map(new Func1<PluginHandler, ConversationMenuItem>() { @Override public ConversationMenuItem call(final PluginHandler app) {
 				return new ConversationMenuItemImpl(app);
 			} })
 			.toList();
@@ -53,9 +53,9 @@ public class SneerAndroidCore implements SneerAndroid {
 
 	private final class ConversationMenuItemImpl implements ConversationMenuItem {
 		
-		private final PluginInfo plugin;
+		private final PluginHandler plugin;
 
-		private ConversationMenuItemImpl(PluginInfo app) {
+		private ConversationMenuItemImpl(PluginHandler app) {
 			this.plugin = app;
 		}
 
@@ -85,7 +85,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	private Context context;
 	private static String error;
 	private static AlertDialog errorDialog;
-	private static Map<String, PluginInfo> tupleViewers = new HashMap<String, PluginInfo>();
+	private static Map<String, PluginHandler> tupleViewers = new HashMap<String, PluginHandler>();
 	private static AtomicLong nextSessionId = new AtomicLong(0);
 	private static SessionIdDispenser sessionIdDispenser = new SessionIdDispenser() {  @Override public long next() {
 		return nextSessionId.getAndIncrement();
@@ -199,16 +199,16 @@ public class SneerAndroidCore implements SneerAndroid {
 			} });
 		
 		PluginMonitor.plugins()
-			.flatMap(new Func1<List<PluginInfo>, Observable<Map<String, PluginInfo>>>() {  @Override public Observable<Map<String, PluginInfo>> call(List<PluginInfo> t1) {
+			.flatMap(new Func1<List<PluginHandler>, Observable<Map<String, PluginHandler>>>() {  @Override public Observable<Map<String, PluginHandler>> call(List<PluginHandler> t1) {
 				return Observable.from(t1)
-						.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
+						.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
 							return t1.canView();
 						} })
-						.toMap(new Func1<PluginInfo, String>() {  @Override public String call(PluginInfo t1) {
+						.toMap(new Func1<PluginHandler, String>() {  @Override public String call(PluginHandler t1) {
 							return t1.tupleType();
 						}});
 			} })
-			.subscribe(new Action1<Map<String, PluginInfo>>() {  @Override public void call(Map<String, PluginInfo> t1) {
+			.subscribe(new Action1<Map<String, PluginHandler>>() {  @Override public void call(Map<String, PluginHandler> t1) {
 				tupleViewers = t1;
 			} });
 	}
@@ -239,7 +239,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	@Override
 	public void doOnClick(Message message) {
 		Tuple tuple = message.tuple();
-		PluginInfo viewer = tupleViewers.get(tuple.type());
+		PluginHandler viewer = tupleViewers.get(tuple.type());
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '"+tuple.type()+"'");
 		}
