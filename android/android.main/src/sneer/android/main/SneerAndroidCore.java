@@ -47,11 +47,11 @@ public class SneerAndroidCore implements SneerAndroid {
 		pluginManager.initPlugins();
 		startTupleSpaceService(context);
 		
-//		initNotifications(context);
+		initNotifications(context);
 		
 	}
 
-	protected void initNotifications(final Context context) {
+	private void initNotifications(final Context context) {
 		sneer().tupleSpace().filter()
 			.audience(sneer().self().publicKey().current())
 			.field("conversation?", true)
@@ -64,18 +64,17 @@ public class SneerAndroidCore implements SneerAndroid {
 				
 				Log.i(SneerAndroidCore.class.getSimpleName(), "-------------> "+ t1.type() + " - " + t1.payload());
 				
-				PluginHandler plugin = pluginManager.tupleViewer(t1.type());
-				if (plugin == null) {
-					// TODO intent should direct to app store if plugin not installed
-					return;
-				}
-				
 				Intent intent;
 				if ("message".equals(t1.type())) {
 					intent = new Intent(context, ConversationActivity.class);
 					intent.putExtra(ConversationActivity.PARTY_PUK, t1.author());
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				} else {
+					PluginHandler plugin = pluginManager.tupleViewer(t1.type());
+					if (plugin == null) {
+						// TODO intent should direct to app store if plugin not installed
+						return;
+					}
 					intent = plugin.createIntent();
 				}
 				
@@ -88,7 +87,7 @@ public class SneerAndroidCore implements SneerAndroid {
 			    		.setSmallIcon(R.drawable.ic_launcher)
 			            .setContentText("tuple: "+ t1)
 			            .setContentTitle("Sneer: " + t1.type())
-			            .setWhen(t1.timestampReceived())
+			            .setWhen(t1.timestampCreated())
 			            .setAutoCancel(true)
 			            .setOngoing(false)
 			            .setContentIntent(pendIntent);
