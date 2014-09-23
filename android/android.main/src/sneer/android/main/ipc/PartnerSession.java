@@ -33,14 +33,14 @@ public final class PartnerSession implements PluginSession {
 	private long sessionId;
 	private Tuple lastLocalTuple = null;
 	private Sneer sneer;
-	private PluginInfo app;
+	private PluginInfo plugin;
 	private Context context;
 	private SessionIdDispenser sessionIdDispenser;
 
 	public PartnerSession(Context context, Sneer sneer, PluginInfo app, SessionIdDispenser sessionIdDispenser) {
 		this.context = context;
 		this.sneer = sneer;
-		this.app = app;
+		this.plugin = app;
 		this.sessionIdDispenser = sessionIdDispenser;
 	}
 	
@@ -50,7 +50,7 @@ public final class PartnerSession implements PluginSession {
 		this.sessionId = sessionId;
 		this.context = context;
 		this.sneer = sneer;
-		this.app = app;
+		this.plugin = app;
 	}
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {
@@ -85,9 +85,9 @@ public final class PartnerSession implements PluginSession {
 			final ResultReceiver toClient = resultData.getParcelable(RESULT_RECEIVER);
 			
 			if (toClient != null) {
-				PartnerSession.this.setup(toClient);
+				setup(toClient);
 			} else {
-				PartnerSession.this.publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
+				publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
 			}
 		} });
 	}
@@ -120,7 +120,7 @@ public final class PartnerSession implements PluginSession {
 
 	private void publish(String label, Object message) {
 		sneer.tupleSpace().publisher()
-			.type(app.tupleType)
+			.type(plugin.tupleType())
 			.audience(partner)
 			.field("session", sessionId)
 			.field("host", host)
@@ -132,7 +132,7 @@ public final class PartnerSession implements PluginSession {
 		return sneer.tupleSpace().filter()
 			.field("session", sessionId)
 			.field("host", host)
-			.type(app.tupleType);
+			.type(plugin.tupleType());
 	}
 
 	private void pipeNewTuples(final ResultReceiver toClient) {
@@ -153,10 +153,8 @@ public final class PartnerSession implements PluginSession {
  
 	private void startActivity() {
 		Intent intent = new Intent();
-		intent.setClassName(app.packageName, app.activityName);
 		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		context.startActivity(intent);
+		plugin.start(context, intent);
 	}
 
 	@Override

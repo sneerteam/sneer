@@ -13,11 +13,11 @@ public enum InteractionType {
 	public final boolean canView;
 	public final PluginSessionFactory factory;
 
-	private static Set<String> set = new HashSet<String>();
+	private static Set<String> names = new HashSet<String>();
 	static {
 		InteractionType[] e = values();
 		for (InteractionType interactionType : e) {
-			set.add(interactionType.name());
+			names.add(interactionType.name());
 		}
 	}
 
@@ -28,6 +28,6 @@ public enum InteractionType {
 	}
 
 	public static InteractionType valueOfOrNull(String string) {
-		return set.contains(string) ? valueOf(string) : null;
+		return names.contains(string) ? valueOf(string) : null;
 	}
 }

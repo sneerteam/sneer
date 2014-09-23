@@ -120,7 +120,7 @@ public class PluginMonitor extends BroadcastReceiver {
 		
 		currentKnownPlugins()
 			.filter(new Func1<PluginInfo, Boolean>() {  @Override public Boolean call(PluginInfo t1) {
-				return !t1.packageName.equals(packageName);
+				return !t1.isSamePackage(packageName);
 			} })
 			.toList()
 			.subscribe(pluginsListPublisher());

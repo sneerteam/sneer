@@ -32,8 +32,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -55,22 +53,21 @@ public class SneerAndroidCore implements SneerAndroid {
 
 	private final class ConversationMenuItemImpl implements ConversationMenuItem {
 		
-		private final PluginInfo app;
+		private final PluginInfo plugin;
 
 		private ConversationMenuItemImpl(PluginInfo app) {
-			this.app = app;
+			this.plugin = app;
 		}
 
 		@Override
 		public void call(PublicKey partyPuk) {
-			startComposePlugin(app, partyPuk);
+			plugin.start(context, sneer(), sessionIdDispenser, partyPuk);
 		}
 
 		@Override
 		public byte[] icon() {
 			try {
-				Drawable icon = resourceForPackage(app.packageName).getDrawable(app.menuIcon);
-				return bitmapFor(icon);
+				return bitmapFor(plugin.drawableMenuIcon(context));
 			} catch (Exception e) {
 				Log.w(SneerAndroidCore.class.getSimpleName(), "Error loading bitmap", e);
 				e.printStackTrace();
@@ -80,7 +77,7 @@ public class SneerAndroidCore implements SneerAndroid {
 
 		@Override
 		public String caption() {
-			return app.menuCaption;
+			return plugin.menuCaption();
 		}
 	}
 
@@ -95,26 +92,12 @@ public class SneerAndroidCore implements SneerAndroid {
 	}  };
 	
 	
-	private void startComposePlugin(PluginInfo plugin, PublicKey partner) {
-		plugin.interactionType.factory.create(context, sneer(), plugin, sessionIdDispenser).start(partner);
-	}
-
-	private void startViewPlugin(PluginInfo plugin, Tuple tuple) {
-		plugin.interactionType.factory.create(context, sneer(), plugin, sessionIdDispenser).resume(tuple);
-	}
-
 	private static byte[] bitmapFor(Drawable icon) {
 		Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 		return stream.toByteArray();
 	}
-
-
-	private Resources resourceForPackage(String packageName) throws NameNotFoundException {
-		return context.getPackageManager().getResourcesForApplication(packageName);
-	}
-
 
 	@Override
 	public SneerAdmin admin() {
@@ -222,7 +205,7 @@ public class SneerAndroidCore implements SneerAndroid {
 							return t1.canView();
 						} })
 						.toMap(new Func1<PluginInfo, String>() {  @Override public String call(PluginInfo t1) {
-							return t1.tupleType;
+							return t1.tupleType();
 						}});
 			} })
 			.subscribe(new Action1<Map<String, PluginInfo>>() {  @Override public void call(Map<String, PluginInfo> t1) {
@@ -260,7 +243,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '"+tuple.type()+"'");
 		}
-		startViewPlugin(viewer, tuple);
+		viewer.resume(context, sneer(), sessionIdDispenser, tuple);
 	}
 
 }

@@ -2,18 +2,24 @@ package sneer.android.main.ipc;
 
 import java.io.Serializable;
 
+import sneer.PublicKey;
+import sneer.Sneer;
+import sneer.tuples.Tuple;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources.NotFoundException;
+import android.graphics.drawable.Drawable;
+
 public class PluginInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-
-	public String packageName;
-	public String activityName;
-
-	public InteractionType interactionType;
-	public String tupleType;
-	public String menuCaption;
-	public int menuIcon;
-
+	private String packageName;
+	private String activityName;
+	private InteractionType interactionType;
+	private int menuIcon;
+	private String tupleType;
+	private String menuCaption;
 
 	public PluginInfo(String packageName, String activityName, InteractionType interactionType, String tupleType, String menuCaption, int menuIcon) {
 		this.packageName = packageName;
@@ -34,7 +40,37 @@ public class PluginInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SneerAppInfo [" + menuCaption + ", " + tupleType + "]";
+		return activityName + "(" + tupleType + ")";
+	}
+
+	public void start(Context context, Intent intent) {
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setClassName(packageName, activityName);
+		context.startActivity(intent);
+	}
+
+	public boolean isSamePackage(String packageName) {
+		return this.packageName.equals(packageName);
+	}
+
+	public Drawable drawableMenuIcon(Context context) throws NotFoundException, NameNotFoundException {
+		return context.getPackageManager().getResourcesForApplication(packageName).getDrawable(menuIcon);
+	}
+
+	public void start(Context context, Sneer sneer, SessionIdDispenser sessionIdDispenser, PublicKey partner) {
+		interactionType.factory.create(context, sneer, this, sessionIdDispenser).start(partner);
 	}
 	
+	public void resume(Context context, Sneer sneer, SessionIdDispenser sessionIdDispenser, Tuple tuple) {
+		interactionType.factory.create(context, sneer, this, sessionIdDispenser).resume(tuple);
+	}
+
+	public String tupleType() {
+		return tupleType;
+	}
+
+	public String menuCaption() {
+		return menuCaption;
+	}
+
 }

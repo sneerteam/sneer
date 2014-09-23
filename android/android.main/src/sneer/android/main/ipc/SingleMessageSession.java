@@ -38,7 +38,7 @@ public class SingleMessageSession implements PluginSession {
 		intent.putExtra(MESSAGE, Value.of(tuple.payload()));
 		intent.putExtra(LABEL, (String)tuple.get("label"));
 		
-		startActivity(intent);
+		plugin.start(context, intent);
 	}
 
 	@Override
@@ -51,9 +51,9 @@ public class SingleMessageSession implements PluginSession {
 				t1.setClassLoader(context.getClassLoader());
 				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
 				String label = t1.getString(LABEL);
-				info("Receiving message of type '" + plugin.tupleType + "' label '" + label + "' from " + plugin.packageName + "." + plugin.activityName);
+				info("Receiving message of type '" + plugin.tupleType() + "' label '" + label + "' from " + plugin);
 				sneer.tupleSpace().publisher()
-					.type(plugin.tupleType)
+					.type(plugin.tupleType())
 					.audience(partner)
 					.field("label", label)
 					.pub(message);
@@ -64,15 +64,9 @@ public class SingleMessageSession implements PluginSession {
 		}});
 		
 		intent.putExtra(RESULT_RECEIVER, resultReceiver);
-		startActivity(intent);
+		plugin.start(context, intent);
 	}
 
-	protected void startActivity(Intent intent) {
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.setClassName(plugin.packageName, plugin.activityName);
-		context.startActivity(intent);
-	}
-	
 	protected void info(String string) {
 		Log.i(SingleMessageSession.class.getSimpleName(), string);
 	}
