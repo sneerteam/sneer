@@ -1,6 +1,7 @@
 package diegomendes.sendpics;
 
 import java.io.*;
+import java.util.*;
 
 import sneer.android.ui.*;
 import sneer.commons.exceptions.FriendlyException;
@@ -10,11 +11,14 @@ import android.os.*;
 import android.provider.*;
 import android.provider.MediaStore.Images;
 import android.view.*;
+import android.webkit.*;
 import android.widget.*;
 
 public class ReceivePicsActivity extends MessageActivity {
 
 	ImageView image;
+	private byte[] ret;
+	private String filename;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,16 +26,25 @@ public class ReceivePicsActivity extends MessageActivity {
 		setContentView(R.layout.activity_receive_pics);
 
 		image = (ImageView) findViewById(R.id.picture_received);
-		//image.setImageBitmap((Bitmap) getIntent().getExtras().get("image"));
+	
+		image.setImageBitmap((Bitmap) message());
+		//image.setImageBitmap((Bitmap) getIntent().getExtras().get("pic"));
+		
+		//retirar imagem do message
+		dataFrom(message());
+		
+//		byte[] ret = null;
+		
+		//ret = (byte[]) map.get("pic");
+
 		
 		String filename = "temp.jpg";
 		
-		byte[] ret = null;
-		try {
-			ret = readFully(getClass().getResourceAsStream("selfie_002.png"));
-			image.setImageBitmap((Bitmap) toBitmap(ret));
-		} catch (FriendlyException e) {}
-		
+//		try {
+//			ret = readFully(getClass().getResourceAsStream("selfie_002.png"));
+//			image.setImageBitmap((Bitmap) toBitmap(ret));
+//		} catch (FriendlyException e) {}
+//		
 		
 		try {
 			System.out.println("=====================================");
@@ -43,19 +56,26 @@ public class ReceivePicsActivity extends MessageActivity {
 			e1.printStackTrace();
 		}
 		
-		FileOutputStream outputStream;
 
 		try {
-		  outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+			File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+			bos.write(ret);
+			bos.flush();
+			bos.close();	
+			
+			
+//			FileOutputStream outputStream;
+//		  outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
 //		  outputStream.write(getIntent().getExtras().getByteArray("image"));
-		  outputStream.write(ret);
-		  outputStream.close();
+//		  outputStream.write(ret);
+//		  outputStream.close();
 		  addImageToGallery(getApplicationContext().getFilesDir().getAbsolutePath(), getApplicationContext(), toBitmap(ret));
 		} catch (Exception e) {
 		  e.printStackTrace();
 		}
 
-		testFile();
+		//testFile();
 		
 	}
 
@@ -107,4 +127,29 @@ public class ReceivePicsActivity extends MessageActivity {
 	    
 	    MediaStore.Images.Media.insertImage(context.getContentResolver(), yourBitmap, "Sendpics" , "");
 	}
+	
+	private void dataFrom(Object message) {
+		@SuppressWarnings("unchecked")
+		HashMap<String, Object> map = (HashMap<String, Object>) message;
+		
+		System.out.println("===============================");
+		System.out.println("===============================");
+		System.out.println("Map size: " + map.size());
+		System.out.println("Map empty? " + map.isEmpty());
+		System.out.println("Map element(pic): " + map.containsKey("pic"));
+		System.out.println("===============================");
+		System.out.println("===============================");
+		
+		ret = (byte[]) map.get("pics");
+		filename = (String)map.get("filename");
+	}
+
+	
+//	private File prepareFile() {
+//		File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
+//		extension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toString());
+//		type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+//		return file;
+//	}
+	
 }

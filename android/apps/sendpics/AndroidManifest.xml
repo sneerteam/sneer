@@ -27,7 +27,7 @@
             <meta-data android:name="sneer:tuple-type" android:value="picture" />
             <meta-data android:name="sneer:menu-caption" android:value="Send Pictures" />
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
-        </activity>     
+        </activity>
         <activity
             android:name=".ReceivePicsActivity"
             android:label="@string/title_activity_receive_pics" >

@@ -20,12 +20,8 @@ public class SendPicsActivity extends MessageActivity {
         setContentView(R.layout.activity_send_pics);
         
         image = (ImageView) findViewById(R.id.picture);
-        
-        if (message() != null) {
-        	open(message());
-        } else {
-        	composeMessage();
-        }
+
+        composeMessage();
     }
     
     @Override
@@ -44,6 +40,8 @@ public class SendPicsActivity extends MessageActivity {
 
 		byte[] imageBytes = scaledDownTo(bitmap, 40 * 1024);
 		send("pic", imageBytes);
+		open();
+		//finish();
     }
     
 
@@ -58,9 +56,9 @@ public class SendPicsActivity extends MessageActivity {
 		startActivityForResult(chooser, TAKE_PICTURE);		
 	}
 
-    private void open(Object message) {
+    private void open() {
 		Intent it = new Intent(this, ReceivePicsActivity.class);
-		it.putExtra("image", toBitmap((byte[])message));
+		//it.putExtra("image", toBitmap((byte[])message));
 		startActivity(it);
 	}
 }
