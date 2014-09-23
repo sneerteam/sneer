@@ -2,15 +2,13 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [atom->observable]]
-   [sneer.party :refer [name-subject produce-party party-puk]])
+   [sneer.party :refer [name-subject produce-party party-puk]]
+   [sneer.commons :refer [now]])
   (:import
    [sneer PublicKey Party Conversation Message]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace]
    [java.text SimpleDateFormat]))
-
-(defn now []
-  (System/currentTimeMillis))
 
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 

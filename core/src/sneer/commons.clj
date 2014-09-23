@@ -6,3 +6,6 @@
     (let [new-value (fn-if-absent key)]
       (swap! map-atom assoc key new-value)
       new-value)))
+
+(defn now []
+  (System/currentTimeMillis))
