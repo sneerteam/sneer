@@ -2,9 +2,10 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation atom->observable flatmapseq]]
-   [sneer.conversation :refer [reify-conversation restore-contact-list current-nickname reify-contact]]
-   [sneer.party :refer [party-puk new-party produce-party produce-profile]]
-   )
+   [sneer.conversation :refer [reify-conversation]]
+   [sneer.contact :refer [reify-contact restore-contact-list current-nickname]]
+   [sneer.party :refer [party-puk new-party produce-party]]
+   [sneer.profile :refer [produce-profile]])
   (:import
    [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation]
    [sneer.commons.exceptions FriendlyException]
