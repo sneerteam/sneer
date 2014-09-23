@@ -30,17 +30,17 @@ public class SingleMessageSession implements PluginSession {
 
 	@Override
 	public void resume(Tuple tuple) {
-		Intent intent = new Intent();
+		Intent intent = plugin.createIntent();
 		
 		intent.putExtra(MESSAGE, Value.of(tuple.payload()));
 		intent.putExtra(LABEL, (String)tuple.get("label"));
 		
-		plugin.start(context, intent);
+		context.startActivity(intent);
 	}
 
 	@Override
 	public void start(final PublicKey partner) {
-		Intent intent = new Intent();
+		Intent intent = plugin.createIntent();
 		
 		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {
 			
@@ -62,7 +62,7 @@ public class SingleMessageSession implements PluginSession {
 		}});
 		
 		intent.putExtra(RESULT_RECEIVER, resultReceiver);
-		plugin.start(context, intent);
+		context.startActivity(intent);
 	}
 
 	protected void info(String string) {

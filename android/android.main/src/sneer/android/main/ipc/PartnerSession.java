@@ -143,9 +143,9 @@ public final class PartnerSession implements PluginSession {
 	}
  
 	private void startActivity() {
-		Intent intent = new Intent();
+		Intent intent = plugin.createIntent();
 		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
-		plugin.start(context, intent);
+		context.startActivity(intent);
 	}
 
 	@Override

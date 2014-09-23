@@ -42,11 +42,12 @@ public class PluginHandler implements Serializable {
 	public String toString() {
 		return activityName + "(" + tupleType + ")";
 	}
-
-	public void start(Context context, Intent intent) {
+	
+	public Intent createIntent() {
+		Intent intent = new Intent();
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setClassName(packageName, activityName);
-		context.startActivity(intent);
+		return intent;
 	}
 
 	public boolean isSamePackage(String packageName) {
