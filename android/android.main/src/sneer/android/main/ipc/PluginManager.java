@@ -112,13 +112,15 @@ public class PluginManager {
 
 	public void doOnClick(Message message) {
 		Tuple tuple = message.tuple();
-		PluginHandler viewer = tupleViewers.get(tuple.type());
+		PluginHandler viewer = tupleViewer(tuple.type());
 		if (viewer == null) {
 			throw new RuntimeException("Can't find viewer plugin for message type '" + tuple.type() + "'");
 		}
 		viewer.resume(context, sneer, tuple);
 	}
 
-
+	public PluginHandler tupleViewer(String type) {
+		return tupleViewers.get(type);
+	}
 
 }

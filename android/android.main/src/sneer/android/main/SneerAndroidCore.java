@@ -5,17 +5,26 @@ import static sneer.android.main.ipc.TupleSpaceService.startTupleSpaceService;
 import java.io.File;
 import java.io.IOException;
 
+import rx.functions.Action1;
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.core.SneerSqliteDatabase;
+import sneer.android.main.ipc.PluginHandler;
 import sneer.android.main.ipc.PluginManager;
+import sneer.android.main.ui.ConversationActivity;
 import sneer.android.main.utils.AndroidUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
+import sneer.tuples.Tuple;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 public class SneerAndroidCore implements SneerAndroid {
 	
@@ -32,12 +41,66 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 	}
 
-	private void init(Context context) throws FriendlyException {
+	private void init(final Context context) throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
 		pluginManager = new PluginManager(context, sneer());
 		pluginManager.initPlugins();
 		startTupleSpaceService(context);
+		
+//		initNotifications(context);
+		
 	}
+
+	protected void initNotifications(final Context context) {
+		sneer().tupleSpace().filter()
+			.audience(sneer().self().publicKey().current())
+			.field("conversation?", true)
+			.tuples()
+			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+				
+				if (t1.author() == sneer().self().publicKey().current()) {
+					return;
+				}
+				
+				Log.i(SneerAndroidCore.class.getSimpleName(), "-------------> "+ t1.type() + " - " + t1.payload());
+				
+				PluginHandler plugin = pluginManager.tupleViewer(t1.type());
+				if (plugin == null) {
+					// TODO intent should direct to app store if plugin not installed
+					return;
+				}
+				
+				Intent intent;
+				if ("message".equals(t1.type())) {
+					intent = new Intent(context, ConversationActivity.class);
+					intent.putExtra(ConversationActivity.PARTY_PUK, t1.author());
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				} else {
+					intent = plugin.createIntent();
+				}
+				
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				
+				PendingIntent pendIntent = PendingIntent.getActivity(context, 0, intent, 0);
+				
+			    NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+			    builder
+			    		.setSmallIcon(R.drawable.ic_launcher)
+			            .setContentText("tuple: "+ t1)
+			            .setContentTitle("Sneer: " + t1.type())
+			            .setWhen(t1.timestampReceived())
+			            .setAutoCancel(true)
+			            .setOngoing(false)
+			            .setContentIntent(pendIntent);
+			    
+			    NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		        mNotificationManager.notify(t1.type().hashCode(), builder.getNotification());
+
+				
+			} });
+	}
+	
+
 	
 	private SneerAdmin newSneerAdmin(Context context) throws FriendlyException {
 		

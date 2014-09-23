@@ -39,7 +39,7 @@ import android.widget.TextView;
 
 public class ConversationActivity extends SneerActivity {
 
-	static final String PARTY_PUK = "partyPuk";
+	public static final String PARTY_PUK = "partyPuk";
 	static final String ACTIVITY_TITLE = "activityTitle";
 
 	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
