@@ -39,7 +39,7 @@ public class PluginMonitor extends BroadcastReceiver {
 				new PluginInfo(
 					activityInfo.packageName,
 					activityInfo.name,
-					interactionType(meta),
+					interactionType(getString(meta, "sneer:interaction-type")),
 					getString(meta, "sneer:tuple-type"),
 					getString(meta, "sneer:menu-caption", null),
 					getInt(meta, "sneer:menu-icon")));
@@ -142,8 +142,7 @@ public class PluginMonitor extends BroadcastReceiver {
 		return plugins.observed().observable();
 	}
 
-	protected static InteractionType interactionType(Bundle meta) throws FriendlyException {
-		String interactionTypeString = getString(meta, "sneer:interaction-type");
+	protected static InteractionType interactionType(String interactionTypeString) throws FriendlyException {
 		InteractionType interactionType = InteractionType.valueOfOrNull(interactionTypeString.replace('/', '_'));
 		if (interactionType == null) {
 			throw new FriendlyException("Unknown interaction type: " + interactionTypeString);
