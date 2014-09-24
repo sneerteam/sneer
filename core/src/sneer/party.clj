@@ -24,4 +24,8 @@
   (.. party publicKey current))
 
 (defn produce-party! [parties puk]
-  (produce! new-party parties puk))
+  (parties puk))
+
+(defn create-puk->party []
+  (let [puk->party (atom {})]
+    #(produce! new-party puk->party %)))

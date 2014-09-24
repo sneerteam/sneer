@@ -4,7 +4,7 @@
    [sneer.rx :refer [observe-for-computation atom->observable flatmapseq]]
    [sneer.conversation :refer [reify-conversation]]
    [sneer.contact :refer [reify-contact restore-contact-list current-nickname duplicate-contact?]]
-   [sneer.party :refer [party-puk new-party produce-party!]]
+   [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import
    [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation]
@@ -14,10 +14,10 @@
 
 (defn new-sneer [^TupleSpace tuple-space ^PrivateKey own-prik ^rx.Observable followees]
   (let [own-puk (.publicKey own-prik)
-        parties (atom {})
+        puk->party (create-puk->party)
         profiles (atom {})
         conversation-menu-items (BehaviorSubject/create [])
-        contact-state {:puk->contact (atom (restore-contact-list tuple-space own-puk parties))
+        contact-state {:puk->contact (atom (restore-contact-list tuple-space own-puk puk->party))
                        :->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))}
         contact-state (assoc contact-state :observable-contacts (rx/map (contact-state :->contact-list) (atom->observable (contact-state :puk->contact))))]
 
@@ -78,9 +78,7 @@
             (rx/on-next conversation-menu-items menu-item-list))
 
           (produceParty [this puk]
-            (produce-party! parties puk))
+            (produce-party! puk->party puk))
         
           (tupleSpace [this]
             tuple-space))))))
-
-

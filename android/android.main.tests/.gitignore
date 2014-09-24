@@ -3,3 +3,4 @@ libs
 /gen
 /target
 /.gradle
+*.log
