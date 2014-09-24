@@ -74,7 +74,6 @@ public abstract class LocalTuplesFactory {
 			private Map<String, Object> where = new HashMap<String, Object>();
 			
 			public TupleSubscriberImpl() {
-				where.put("audience", null);
 			}
 			
 			public TupleSubscriberImpl(TupleSubscriberImpl other, String key, Object value) {
@@ -104,7 +103,7 @@ public abstract class LocalTuplesFactory {
 
 			@Override
 			public TupleFilter field(String key, Object value) {
-				return new TupleSubscriberImpl(this, key, value);
+				return new TupleSubscriberImpl(this, key, translateValue(value));
 			}
 
 			@Override
@@ -185,7 +184,7 @@ public abstract class LocalTuplesFactory {
 
 			@Override
 			public TuplePublisher field(String key, Object value) {
-				return new TuplePublisherImpl(this, key, value);
+				return new TuplePublisherImpl(this, key, translateValue(value));
 			}
 
 			@Override
@@ -220,6 +219,18 @@ public abstract class LocalTuplesFactory {
 	
 	public TupleSpace newTupleSpace(PrivateKey prik) {
 		return new TupleSpaceImpl(prik);
+	}
+
+	private static Object translateValue(final Object value) {
+		if (value != null) {
+			if (value.getClass().isArray()) {
+				Object[] array = (Object[]) value;
+				return Arrays.asList(array);
+			} else if (value instanceof Number) {
+				return Long.valueOf(value.toString());
+			}
+		}
+		return value;
 	}
 
 }

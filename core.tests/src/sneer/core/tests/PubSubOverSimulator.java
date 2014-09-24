@@ -1,10 +1,10 @@
 package sneer.core.tests;
 
-import org.junit.*;
-
-import rx.*;
-import sneer.*;
-import sneer.tuples.*;
+import rx.Observable;
+import sneer.PrivateKey;
+import sneer.PublicKey;
+import sneer.TuplesFactoryInProcess;
+import sneer.tuples.TupleSpace;
 
 @Ignore
 public class PubSubOverSimulator extends PubSubTest {
