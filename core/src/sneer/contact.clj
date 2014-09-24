@@ -24,11 +24,11 @@
       (toString [this]
         (str "#<Contact " (.current nick-subject) ">")))))
 
-(defn tuple->contact [^Tuple tuple parties]
+(defn tuple->contact [^Tuple tuple puk->party]
   (reify-contact (.payload tuple)
-                 (produce-party! parties (.get tuple "party"))))
+                 (produce-party! puk->party (.get tuple "party"))))
 
-(defn restore-contact-list [^TupleSpace tuple-space own-puk parties]
+(defn restore-contact-list [^TupleSpace tuple-space own-puk puk->party]
   (->>
    (.. tuple-space
        filter
@@ -37,7 +37,7 @@
        localTuples
        toBlocking
        toIterable)
-   (mapcat (fn [^Tuple tuple] [(.get tuple "party") (tuple->contact tuple parties)]))
+   (mapcat (fn [^Tuple tuple] [(.get tuple "party") (tuple->contact tuple puk->party)]))
    (apply hash-map)))
 
 (defn current-nickname [^Contact contact]
