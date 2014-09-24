@@ -35,14 +35,11 @@ Only maps containing all key/value pairs in criteria are kept."
 (defn seq->observable [^java.lang.Iterable iterable]
   (rx.Observable/from iterable))
 
-(defn atom->observable
-  ([atom]
-    (atom->observable atom identity))
-  ([atom map-fn]
-    (let [subject (BehaviorSubject/create (map-fn @atom))]
-      (add-watch atom nil (fn [_key _ref old-value new-value]
-                            (rx/on-next subject (map-fn new-value))))
-      (.asObservable subject))))
+(defn atom->observable [atom]
+    (let [subject (BehaviorSubject/create @atom)]
+      (add-watch atom (Object.) (fn [_key _ref _old-value new-value]
+                                (rx/on-next subject new-value)))
+      (.asObservable subject)))
 
 (defn flatmapseq [^rx.Observable o]
   (.flatMapIterable o (interop/fn [seq] seq)))

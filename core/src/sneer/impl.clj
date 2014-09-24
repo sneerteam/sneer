@@ -19,10 +19,10 @@
         conversation-menu-items (BehaviorSubject/create [])
         puk->contact (atom (restore-contact-list tuple-space own-puk parties))
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))
-        observable-contacts (atom->observable puk->contact ->contact-list)]
+        observable-contacts (rx/map ->contact-list (atom->observable puk->contact))]
 
     (rx/subscribe
-      (->> 
+      (->>
         observable-contacts
         ;observe-for-computation
         flatmapseq
