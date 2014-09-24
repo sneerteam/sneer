@@ -17,20 +17,20 @@
         parties (atom {})
         profiles (atom {})
         conversation-menu-items (BehaviorSubject/create [])
-        puk->contact (atom (restore-contact-list tuple-space own-puk parties))
-        ->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))
-        observable-contacts (rx/map ->contact-list (atom->observable puk->contact))]
+        contact-state {:puk->contact (atom (restore-contact-list tuple-space own-puk parties))
+                       :->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))}
+        contact-state (assoc contact-state :observable-contacts (rx/map (contact-state :->contact-list) (atom->observable (contact-state :puk->contact))))]
 
     (rx/subscribe
       (->>
-        observable-contacts
+        (contact-state :observable-contacts)
         ;observe-for-computation
         flatmapseq
         (rx/flatmap (fn [^Contact c] (.. c party publicKey observable))))
       (partial rx/on-next followees))
     
     (letfn [(add-contact [nickname party]
-              (swap! puk->contact
+              (swap! (contact-state :puk->contact)
                      (fn [cur]
                        (when (->> cur vals (some (partial duplicate-contact? nickname party)))
                          (throw (FriendlyException. "Duplicate contact!")))
@@ -50,7 +50,7 @@
             (produce-profile tuple-space profiles party))
 
           (contacts [this]
-            observable-contacts)
+            (contact-state :observable-contacts))
           (problemWithNewNickname [this new-nick]
             ;TODO
             )
@@ -63,13 +63,13 @@
                 (field "party" (party-puk party))
                 (pub nickname)))
           (findContact [this party]
-            (get @puk->contact (party-puk party)))
+            (get @(contact-state :puk->contact) (party-puk party)))
 
           (conversationsContaining [this type]
             (rx/never))
           (conversations [this]
             (->>
-              observable-contacts
+              (contact-state :observable-contacts)
               (rx/map
                 (partial map (fn [^Contact c] (produce-conversation (.party c)))))))
           (produceConversationWith [this party] 
