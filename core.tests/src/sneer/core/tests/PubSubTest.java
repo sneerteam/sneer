@@ -1,12 +1,7 @@
 package sneer.core.tests;
 
 import static junit.framework.Assert.assertEquals;
-import static sneer.core.tests.ObservableTestUtils.assertList;
-import static sneer.core.tests.ObservableTestUtils.expecting;
-import static sneer.core.tests.ObservableTestUtils.field;
-import static sneer.core.tests.ObservableTestUtils.notifications;
-import static sneer.core.tests.ObservableTestUtils.payloads;
-import static sneer.core.tests.ObservableTestUtils.values;
+import static sneer.core.tests.ObservableTestUtils.*;
 import static sneer.tuples.Tuple.TO_TYPE;
 
 import java.util.List;
@@ -265,7 +260,11 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.type("bla")
 			.pub("from c");
 		
-		expecting(payloads(tuplesA.filter().audience(userA).tuples(), "from b", "from c"));
+		expecting(
+			payloadSet(
+				tuplesA.filter().audience(userA).tuples(),
+				"from b",
+				"from c"));
 	}
 	
 	@Test

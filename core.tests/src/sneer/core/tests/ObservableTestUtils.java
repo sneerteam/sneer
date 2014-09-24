@@ -28,6 +28,10 @@ public class ObservableTestUtils {
 		return values(tuples.map(TO_PAYLOAD), values);
 	}
 	
+	public static Observable<Void> payloadSet(Observable<Tuple> tuples, final Object... values) {
+		return valueSet(tuples.map(TO_PAYLOAD), values);
+	}
+	
 	public static Observable<Void> notifications(Observable<?> source, @SuppressWarnings("rawtypes") final Notification... values) {
 		return values(source.materialize(), (Object[])values);
 	}
@@ -41,41 +45,67 @@ public class ObservableTestUtils {
 	}
 
 	public static Observable<Void> values(Observable<?> source, final Object... values) {
-		return source
-			.buffer(2, TimeUnit.SECONDS, values.length)
-			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> t1) {
-				assertListSize(values, t1);
-				assertArrayEquals(values, t1.toArray());
-				return null;
-			}});
+		return values(source, SEQUENCE, values);
 	}
 	
-	public static Observable<Void> same(Observable<?> tuples, final Object... expecteds) {
-		return tuples
-			.buffer(500, TimeUnit.MILLISECONDS, expecteds.length)
-			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> list) {
-				assertListSize(expecteds, list);
+	public static Observable<Void> valueSet(Observable<?> source, final Object... values) {
+		return values(source, SET, values);
+	}
+	
+	public static Observable<Void> same(Observable<?> source, final Object... expected) {
+		return values(source, SAME_ELEMENTS, expected);
+	}
 
-				Iterator<?> it = list.iterator();
-				for (Object expected : expecteds) {
-					assertSame(expected, it.next());
-				}
+	private static Observable<Void> values(Observable<?> source, final Action2<Object[], List<?>> assertion, final Object... expected) {
+		return source
+			.buffer(2, TimeUnit.SECONDS, expected.length)
+			.map(new Func1<List<?>, Void>() { @Override public Void call(List<?> actual) {
+				assertion.call(expected, actual);
 				return null;
 			}});
 	}
 	
-	public static <T> void assertList(T[] expected, List<T> list) {
+	static final Action2<Object[], List<?>> SEQUENCE = new Action2<Object[], List<?>>() {  @Override public void call(Object[] expected, List<?> actual) {
+		assertList(expected, actual);
+	}};
+	
+	static final Action2<Object[], List<?>> SET = new Action2<Object[], List<?>>() {  @Override public void call(Object[] expected, List<?> actual) {
+		assertSet(expected, actual);
+	}};
+	
+	static final Action2<Object[], List<?>> SAME_ELEMENTS = new Action2<Object[], List<?>>() {  @Override public void call(Object[] expected, List<?> actual) {
+		assertSameElements(expected, actual);
+	}};
+	
+	public static void assertSameElements(Object[] expected, List<?> list) {
 		assertListSize(expected, list);
-		Iterator<T> it = list.iterator();
+		Iterator<?> it = list.iterator();
+		for (Object o : expected) {
+			assertSame(o, it.next());
+		}
+	}
+	
+	public static <T> void assertList(T[] expected, List<?> list) {
+		assertListSize(expected, list);
+		Iterator<?> it = list.iterator();
 		for (Object e : expected) {
 			if (e.getClass().isArray()) {
 				assertArrayEquals((Object[])e, (Object[])it.next());
 			} else {
-				assertEquals(e, it.next());
+				assertEquals(expectingMessage(expected, list), e, it.next());
 			}
 		}
 	}
 	
+	public static void assertSet(Object[] expected, List<?> actual) {
+		assertSet(Arrays.asList(expected), actual);
+	}
+	
+	public static void assertSet(List<Object> expected, List<?> actual) {
+		if (!expected.containsAll(actual) || !actual.containsAll(expected))
+			fail(expectingMessage(actual, expected));
+	}
+
 	public static void assertArrayEquals(Object[] expected, Object[] actual) {
 		assertList(expected, Arrays.asList(actual));
 	}
@@ -96,7 +126,15 @@ public class ObservableTestUtils {
 
 	private static void assertListSize(Object[] expecteds, List<?> actual) {
 		if (expecteds.length != actual.size())
-			fail("Expecting `" + Arrays.asList(expecteds) + "', got `" + actual + "'");
+			fail(expectingMessage(expecteds, actual));
+	}
+
+	private static String expectingMessage(Object[] expected, List<?> actual) {
+		return expectingMessage(Arrays.asList(expected), actual);
+	}
+
+	private static String expectingMessage(List<?> expected, List<?> actual) {
+		return "Expecting `" + expected + "', got `" + actual + "'";
 	}
 
 	public static Func1<Tuple, Object> field(final String field) {
