@@ -1,5 +1,7 @@
 package sneer.core.tests;
 
+import org.junit.Ignore;
+
 import rx.Observable;
 import sneer.PrivateKey;
 import sneer.PublicKey;
