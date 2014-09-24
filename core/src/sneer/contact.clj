@@ -8,6 +8,10 @@
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace]))
 
+(defn duplicate-contact? [nickname party ^Contact contact]
+              (or (identical? party (.party contact))
+                  (= nickname (.. contact nickname current))))
+
 (defn reify-contact [nickname party]
   (let [nick-subject (ObservedSubject/create nickname)]
     (.subscribe (.observable nick-subject) (name-subject party))

@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation atom->observable flatmapseq]]
    [sneer.conversation :refer [reify-conversation]]
-   [sneer.contact :refer [reify-contact restore-contact-list current-nickname]]
+   [sneer.contact :refer [reify-contact restore-contact-list current-nickname duplicate-contact?]]
    [sneer.party :refer [party-puk new-party produce-party]]
    [sneer.profile :refer [produce-profile]])
   (:import
@@ -29,11 +29,7 @@
         (rx/flatmap (fn [^Contact c] (.. c party publicKey observable))))
       (partial rx/on-next followees))
     
-    (letfn [(duplicate-contact? [nickname party ^Contact contact]
-              (or (identical? party (.party contact))
-                  (= nickname (.. contact nickname current))))
-
-            (add-contact [nickname party]
+    (letfn [(add-contact [nickname party]
               (swap! puk->contact
                      (fn [cur]
                        (when (->> cur vals (some (partial duplicate-contact? nickname party)))
