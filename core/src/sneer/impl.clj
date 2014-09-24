@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation atom->observable flatmapseq]]
    [sneer.conversation :refer [reify-conversation]]
-   [sneer.contact :refer [reify-contact restore-contact-list current-nickname duplicate-contact?]]
+   [sneer.contact :refer [reify-contact restore-contact-list current-nickname duplicate-contact? create-contact-state]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import
@@ -17,9 +17,7 @@
         puk->party (create-puk->party)
         profiles (atom {})
         conversation-menu-items (BehaviorSubject/create [])
-        contact-state {:puk->contact (atom (restore-contact-list tuple-space own-puk puk->party))
-                       :->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))}
-        contact-state (assoc contact-state :observable-contacts (rx/map (contact-state :->contact-list) (atom->observable (contact-state :puk->contact))))]
+        contact-state (create-contact-state tuple-space own-puk puk->party)]
 
     (rx/subscribe
       (->>
