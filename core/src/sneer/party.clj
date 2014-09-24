@@ -1,6 +1,6 @@
 (ns sneer.party
   (:require
-   [sneer.commons :refer [produce]])
+   [sneer.commons :refer [produce!]])
   (:import
    [sneer Party]
    [sneer.rx ObservedSubject]))
@@ -23,5 +23,5 @@
 (defn party-puk [^Party party]
   (.. party publicKey current))
 
-(defn produce-party [parties puk]
-  (produce parties puk new-party))
+(defn produce-party! [parties puk]
+  (produce! new-party parties puk))

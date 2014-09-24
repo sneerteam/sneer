@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject* shared-latest]]
-   [sneer.commons :refer [produce]]
+   [sneer.commons :refer [produce!]]
    [sneer.party :refer [party-puk]])
   (:import
    [sneer Profile]
@@ -61,4 +61,4 @@
           (rx/on-next country value))))))
 
 (defn produce-profile [tuple-space profiles party]
-  (produce profiles party #(reify-profile % tuple-space)))
+  (produce! #(reify-profile % tuple-space) profiles party))

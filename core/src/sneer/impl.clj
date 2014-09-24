@@ -4,7 +4,7 @@
    [sneer.rx :refer [observe-for-computation atom->observable flatmapseq]]
    [sneer.conversation :refer [reify-conversation]]
    [sneer.contact :refer [reify-contact restore-contact-list current-nickname duplicate-contact?]]
-   [sneer.party :refer [party-puk new-party produce-party]]
+   [sneer.party :refer [party-puk new-party produce-party!]]
    [sneer.profile :refer [produce-profile]])
   (:import
    [sneer Sneer PrivateKey PublicKey Party Contact Profile Conversation]
@@ -78,7 +78,7 @@
             (rx/on-next conversation-menu-items menu-item-list))
 
           (produceParty [this puk]
-            (produce-party parties puk))
+            (produce-party! parties puk))
         
           (tupleSpace [this]
             tuple-space))))))

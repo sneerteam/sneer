@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [atom->observable]]
-   [sneer.party :refer [name-subject produce-party]])
+   [sneer.party :refer [name-subject produce-party!]])
   (:import
    [sneer Contact]
    [sneer.rx ObservedSubject]
@@ -26,7 +26,7 @@
 
 (defn tuple->contact [^Tuple tuple parties]
   (reify-contact (.payload tuple)
-                 (produce-party parties (.get tuple "party"))))
+                 (produce-party! parties (.get tuple "party"))))
 
 (defn restore-contact-list [^TupleSpace tuple-space own-puk parties]
   (->>
