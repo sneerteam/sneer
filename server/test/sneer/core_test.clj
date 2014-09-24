@@ -31,6 +31,9 @@
 (def ^:private client-b
   (create-puk "cb"))
 
+(def ^:private client-c
+  (create-puk "cc"))
+
 (defn dropping-chan []
   (async/chan (async/dropping-buffer 1)))
 
@@ -63,6 +66,7 @@ packet for receiver (see below), even if sequence was wrong."
           (send! router {:intent :send :to client-b :from client-a :payload "foo" :sequence 42})
           (take?! router) => {:intent :status-of-queues
                               :to client-a
+                              :follower client-b
                               :highest-sequence-to-send -1
                               :highest-sequence-delivered -1
                               :full? false}))
@@ -74,6 +78,7 @@ sequence number."
           (send! router {:intent :send :from client-a :to client-b :payload "foo" :reset true :sequence 42})
           (take?! router) => {:intent :status-of-queues
                               :to client-a
+                              :follower client-b
                               :highest-sequence-delivered 41
                               :highest-sequence-to-send 42
                               :full? false}))
@@ -86,12 +91,14 @@ sequence number."
          (route! {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
          (<?!! to-a) => {:intent :status-of-queues
                          :to client-a
+                         :follower client-b
                          :highest-sequence-delivered -1
                          :highest-sequence-to-send 0
                          :full? false}
          (route! {:intent :ack :from client-b :to client-a :sequence 0})
          (<?!! to-a) => {:intent :status-of-queues
                          :to client-a
+                         :follower client-b
                          :highest-sequence-delivered 0
                          :highest-sequence-to-send 0
                          :full? false})))
@@ -114,17 +121,31 @@ sequence number."
               to-b (packets-to client-b packets-out)]
 
           (route! {:intent :send :from client-a :to client-b :payload "foo" :sequence 0})
+         
+          (route! {:intent :send :from client-a :to client-c :payload "bar" :sequence 0})
+          
           (<?!! to-a) => {:intent :status-of-queues
                           :to client-a
+                          :follower client-b
                           :highest-sequence-delivered -1
                           :highest-sequence-to-send 0
                           :full? false}
+          
+          (<?!! to-a) => {:intent :status-of-queues
+                          :to client-a
+                          :follower client-c
+                          :highest-sequence-delivered -1
+                          :highest-sequence-to-send 0
+                          :full? false}
+          
           (route! {:intent :send :from client-a :to client-b :payload "bar" :sequence 1})
           (<?!! to-a) => {:intent :status-of-queues
                           :to client-a
+                          :follower client-b
                           :highest-sequence-delivered -1
                           :highest-sequence-to-send 1
                           :full? false}
+          
           (route! {:intent :ping :from client-b})
           (<?!! to-b) => {:intent :pong :to client-b}
           (<?!! to-b) => {:intent :receive :from client-a :to client-b :sequence 0 :payload "foo"}
@@ -133,6 +154,7 @@ sequence number."
           (route! {:intent :ack :from client-b :to client-a :sequence 0})
           (<?!! to-a) => {:intent :status-of-queues
                           :to client-a
+                          :follower client-b
                           :highest-sequence-delivered 0
                           :highest-sequence-to-send 1
                           :full? false}

@@ -38,26 +38,27 @@
       (merge state {:highest-sequence-delivered sequence :packets (pop (state :packets))})
       state)))
 
-(defn status-to [to state]
+(defn status-to [to follower state]
   {:intent :status-of-queues
    :to to
+   :follower follower
    :highest-sequence-delivered (:highest-sequence-delivered state)
    :highest-sequence-to-send (highest-sequence-to-send state)
    :full? false})
 
 (defn handle-packet [packet state]
   (match packet
-    {:intent :ack :sequence sequence :to to}
+    {:intent :ack :sequence sequence :to to :from follower}
     (let [state (ack sequence state)
-          reply (status-to to state)]
+          reply (status-to to follower state)]
       [reply state])
-    {:sequence sequence :reset true :from from}
+    {:sequence sequence :reset true :from from :to follower}
     (let [state (->> state (reset-to sequence) (enqueue packet))
-          reply (status-to from state)]
+          reply (status-to from follower state)]
       [reply state])
-    {:sequence sequence :from from}
+    {:sequence sequence :from from :to follower}
     (let [state (->> state (enqueue packet))
-          reply (status-to from state)]
+          reply (status-to from follower state)]
       [reply state])
     :else
       [(assoc packet :intent :receive) state]))
