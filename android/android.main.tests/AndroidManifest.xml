@@ -8,7 +8,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="sneer.android.main" />
+        android:targetPackage="sneer.android.tests" />
 
     <application
         android:icon="@drawable/ic_launcher"

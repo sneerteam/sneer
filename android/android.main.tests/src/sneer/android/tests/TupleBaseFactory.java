@@ -1,10 +1,11 @@
 package sneer.android.tests;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-import sneer.*;
-import sneer.android.main.core.*;
-import clojure.lang.*;
+import sneer.ClojureUtils;
+import sneer.android.main.core.SneerSqliteDatabase;
+import clojure.lang.IFn;
 
 public class TupleBaseFactory {
 

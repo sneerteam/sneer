@@ -1,10 +1,11 @@
 package sneer.android.tests;
 
-import java.io.*;
+import java.io.IOException;
 
-import junit.framework.*;
-import rx.functions.*;
-import sneer.core.tests.*;
+import junit.framework.TestCase;
+import rx.functions.Func0;
+import sneer.core.tests.PubSubOverPersistentTupleSpace;
+import sneer.core.tests.PubSubTest;
 
 public class PubSubOverSqliteAndroid extends TestCase {
 
