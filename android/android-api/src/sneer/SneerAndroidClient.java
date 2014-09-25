@@ -28,6 +28,7 @@ public class SneerAndroidClient {
 	public static final String OWN = "own";
 	public static final String REPLAY_FINISHED = "replayFinished";
 	public static final String ERROR = "error";
+	public static final String UNSUBSCRIBE = "unsubscribe";
 
 	@Deprecated
 	public static final String SESSION_ID = "sessionId";

@@ -5,6 +5,7 @@ import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;
 import static sneer.SneerAndroidClient.REPLAY_FINISHED;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
+import static sneer.SneerAndroidClient.UNSUBSCRIBE;
 import sneer.SneerAndroidClient;
 import sneer.utils.SharedResultReceiver;
 import sneer.utils.Value;
@@ -61,7 +62,21 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 		toSneer = getExtra(RESULT_RECEIVER);
 		toSneer.send(0, bundle);
 	}
-
+	
+	@Override
+	protected void onDestroy() {
+		
+		if (toSneer != null) {
+			Bundle bundle = new Bundle();
+			bundle.putBoolean(UNSUBSCRIBE, true);
+			toSneer.send(0, bundle);
+		}
+		
+		super.onDestroy();
+		
+	}
+	
+	
 
 	/** Called in the Android main thread (UI thread).
 	 *  @param name The current name of the peer with you in this session. */

@@ -7,14 +7,17 @@ import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;
 import static sneer.SneerAndroidClient.REPLAY_FINISHED;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
+import static sneer.SneerAndroidClient.UNSUBSCRIBE;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
 import sneer.PublicKey;
 import sneer.Sneer;
+import sneer.SneerAndroidClient;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.utils.SharedResultReceiver;
@@ -36,6 +39,7 @@ public final class PartnerSession implements PluginSession {
 	private Sneer sneer;
 	private PluginHandler plugin;
 	private Context context;
+	private CompositeSubscription subscriptions = new CompositeSubscription();
 
 	PartnerSession(Context context, Sneer sneer, PluginHandler app) {
 		this.context = context;
@@ -76,6 +80,8 @@ public final class PartnerSession implements PluginSession {
 			
 			if (toClient != null) {
 				setup(toClient);
+			} else if(resultData.getBoolean(UNSUBSCRIBE)) {
+				subscriptions.unsubscribe();
 			} else {
 				publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
 			}
@@ -88,7 +94,7 @@ public final class PartnerSession implements PluginSession {
 	}
 	
 	private void pipeMessages(final ResultReceiver toClient) {
-		queryTuples().localTuples()
+		subscriptions.add(queryTuples().localTuples()
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 				lastLocalTuple = t1;
 				sendMessage(toClient, t1);
@@ -99,13 +105,13 @@ public final class PartnerSession implements PluginSession {
 			new Action0() {  @Override public void call() {
 				sendReplayFinished(toClient);
 				pipeNewTuples(toClient);
-			} });
+			} }));
 	}
 
 	private void pipePartnerName(final ResultReceiver toClient) {
-		sneer.produceParty(partner).name().subscribe(new Action1<String>() {  @Override public void call(String partnerName) {
+		subscriptions.add(sneer.produceParty(partner).name().subscribe(new Action1<String>() {  @Override public void call(String partnerName) {
 			sendPartnerName(toClient, partnerName);
-		}});
+		}}));
 	}
 
 	private void publish(String label, Object message) {
@@ -127,7 +133,7 @@ public final class PartnerSession implements PluginSession {
 	}
 
 	private void pipeNewTuples(final ResultReceiver toClient) {
-		queryTuples().tuples()
+		subscriptions.add(queryTuples().tuples()
 			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
 				if (lastLocalTuple != null) {
 					if (lastLocalTuple.equals(t1)) {
@@ -139,7 +145,7 @@ public final class PartnerSession implements PluginSession {
 			} })
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 				sendMessage(toClient, t1);
-			} });
+			} }));
 	}
  
 	private void startActivity() {
