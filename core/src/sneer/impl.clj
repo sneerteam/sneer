@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation flatmapseq]]
-   [sneer.conversation :refer [reify-conversation]]
+   [sneer.conversation :refer [produce-conversation]]
    [sneer.contact :refer [create-contact-state add-contact]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
@@ -26,10 +26,7 @@
         (rx/flatmap (fn [^Contact c] (.. c party publicKey observable))))
       (partial rx/on-next followees))
     
-    (letfn [(produce-conversation [party]
-              (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))]
-
-      (let [self (new-party own-puk)]
+    (let [self (new-party own-puk)]
         (reify Sneer
           (self [this] self)
 
@@ -62,10 +59,10 @@
             (->>
               (contact-state :observable-contacts)
               (rx/map
-                (partial map (fn [^Contact c] (produce-conversation (.party c)))))))
+                (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c)))))))
           
           (produceConversationWith [this party] 
-            (produce-conversation party))
+            (produce-conversation tuple-space conversation-menu-items own-puk party))
           
           (setConversationMenuItems [this menu-item-list]
             (rx/on-next conversation-menu-items menu-item-list))
@@ -74,4 +71,4 @@
             (produce-party! puk->party puk))
         
           (tupleSpace [this]
-            tuple-space))))))
+            tuple-space)))))

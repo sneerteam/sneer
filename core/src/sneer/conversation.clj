@@ -71,3 +71,6 @@
       (unreadMessageCount [this] (rx.Observable/just 1))
     
       (unreadMessageCountReset [this]))))
+
+(defn produce-conversation [tuple-space conversation-menu-items own-puk party]
+  (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))
