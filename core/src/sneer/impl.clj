@@ -3,12 +3,11 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation flatmapseq]]
    [sneer.conversation :refer [reify-conversation]]
-   [sneer.contact :refer [reify-contact duplicate-contact? create-contact-state]]
+   [sneer.contact :refer [create-contact-state add-contact]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import 
    [sneer Sneer PrivateKey Contact]
-   [sneer.commons.exceptions FriendlyException]
    [sneer.tuples TupleSpace]
    [rx.subjects BehaviorSubject]))
 
@@ -27,16 +26,7 @@
         (rx/flatmap (fn [^Contact c] (.. c party publicKey observable))))
       (partial rx/on-next followees))
     
-    (letfn [(add-contact [nickname party]
-              (swap! (contact-state :puk->contact)
-                     (fn [cur]
-                       (when (->> cur vals (some (partial duplicate-contact? nickname party)))
-                         (throw (FriendlyException. "Duplicate contact!")))
-                       (assoc cur
-                         (party-puk party)
-                         (reify-contact nickname party)))))
-            
-            (produce-conversation [party]
+    (letfn [(produce-conversation [party]
               (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))]
 
       (let [self (new-party own-puk)]
@@ -54,7 +44,7 @@
             )
        
           (addContact [this nickname party]
-            (add-contact nickname party)
+            (add-contact contact-state nickname party)
             (.. tuple-space
                 publisher
                 (audience own-puk)

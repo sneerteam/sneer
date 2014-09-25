@@ -2,10 +2,11 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [atom->observable]]
-   [sneer.party :refer [name-subject produce-party!]])
+   [sneer.party :refer [party-puk name-subject produce-party!]])
   (:import
    [sneer Contact]
    [sneer.rx ObservedSubject]
+   [sneer.commons.exceptions FriendlyException]
    [sneer.tuples Tuple TupleSpace]))
 
 (defn duplicate-contact? [nickname party ^Contact contact]
@@ -51,3 +52,12 @@
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))]
     {:puk->contact puk->contact   
      :observable-contacts (rx/map ->contact-list (atom->observable puk->contact))}))
+
+(defn add-contact [contact-state nickname party]
+  (swap! (contact-state :puk->contact)
+    (fn [cur]
+      (when (->> cur vals (some (partial duplicate-contact? nickname party)))
+        (throw (FriendlyException. "Duplicate contact!")))
+      (assoc cur
+        (party-puk party)
+        (reify-contact nickname party)))))
