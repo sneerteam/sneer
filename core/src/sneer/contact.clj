@@ -17,10 +17,13 @@
     (.subscribe (.observable nick-subject) (name-subject party))
     (reify Contact
       (party [this] party)
+      
       (nickname [this]
         (.observed nick-subject))
+      
       (setNickname [this new-nick]
         (rx/on-next nick-subject new-nick))
+      
       (toString [this]
         (str "#<Contact " (.current nick-subject) ">")))))
 
