@@ -17,14 +17,19 @@ import sneer.android.main.ui.drawable.TriangleRightDrawable;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
 
@@ -54,14 +59,19 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
         	parent,
         	false);
         
-        findTextView(ret, R.id.messageContent).setText(message.content().toString());
+        final TextView messageView = findTextView(ret, R.id.messageContent);
+        SpannableString messageContent = new SpannableString(message.content().toString());
+		
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
         
         ret.setTag(message);
         if (sneerAndroid().isClickable(message)) {
 	        ret.setClickable(true);
 	        ret.setOnClickListener(this);
+	        styleClickableContent(messageView, messageContent);
         }
+
+        messageView.setText(messageContent);
         
         if (!message.isOwn()) {
         	party.name().subscribe(new Action1<String>() { @Override public void call(String sender) { 
@@ -73,6 +83,12 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
         
        	return ret;
     }
+
+	private void styleClickableContent(final TextView messageView, SpannableString messageContent) {
+		messageContent.setSpan(new UnderlineSpan(), 0, messageContent.length(), 0);
+		messageContent.setSpan(new StyleSpan(Typeface.ITALIC), 0, messageContent.length(), 0);
+		messageView.setTextColor(Color.BLUE);
+	}
 
 	@SuppressLint("NewApi")
 	private void setColors(View row, String sender, boolean own) {
