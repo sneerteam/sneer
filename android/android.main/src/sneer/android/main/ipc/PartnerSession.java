@@ -17,7 +17,6 @@ import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import sneer.PublicKey;
 import sneer.Sneer;
-import sneer.SneerAndroidClient;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.utils.SharedResultReceiver;
