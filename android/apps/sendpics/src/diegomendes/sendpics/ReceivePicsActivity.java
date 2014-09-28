@@ -1,16 +1,17 @@
 package diegomendes.sendpics;
 
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
 
-import sneer.android.ui.*;
-import android.content.*;
-import android.graphics.*;
-import android.os.*;
-import android.provider.*;
+import sneer.android.ui.MessageActivity;
+import android.content.ContentValues;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
-import android.view.*;
-import android.widget.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ImageView;
 
 public class ReceivePicsActivity extends MessageActivity {
 
@@ -31,6 +32,7 @@ public class ReceivePicsActivity extends MessageActivity {
 		
 	}
 
+/*	
 	private void recordImage(String filename) {
 		try {
 			File file = new File(new File(Environment.getExternalStorageDirectory(), filename).getAbsolutePath());
@@ -43,9 +45,9 @@ public class ReceivePicsActivity extends MessageActivity {
 		} catch (Exception e) {
 		  e.printStackTrace();
 		}
-
 	}
-
+*/
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.receive_pics, menu);
