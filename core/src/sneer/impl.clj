@@ -23,7 +23,7 @@
       (->>
         contacts
         flatmapseq
-        (rx/flatmap (fn [^Contact contact] (.. contact party publicKey observable))))
+        (rx/flatmap (fn [^Contact c] (.. c party publicKey observable))))
       (partial rx/on-next followees))
     
     (let [self (new-party own-puk)]
