@@ -23,7 +23,7 @@
     (->> puk->contact vals (some #(= new-nick (.. % nickname current)))) "Already used"))
 
 (defn problem-with-new-nickname [contacts-state new-nick]
-  (problem-with-new-nickname-in (:puk->contact contacts-state) new-nick))
+  (problem-with-new-nickname-in @(:puk->contact contacts-state) new-nick))
 
 (defn check-new-nickname [puk->contact new-nick]
   (when-let [problem (problem-with-new-nickname-in puk->contact new-nick)]
@@ -39,7 +39,7 @@
         (.observed nick-subject))
       
       (setNickname [this new-nick]
-        (check-new-nickname puk->contact new-nick)
+        (check-new-nickname @puk->contact new-nick)
         (publish-contact tuple-space own-puk new-nick party)
         (rx/on-next nick-subject new-nick))
       
@@ -85,7 +85,7 @@
 
 (defn check-new-contact [puk->contact nickname party]
   (when (find-contact-in puk->contact party)
-    (throw (IllegalArgumentException. "Duplicate contact!")))
+    (throw (FriendlyException. "Duplicate contact")))
   (check-new-nickname puk->contact nickname))
 
 (defn add-contact [contacts-state nickname party]
@@ -94,7 +94,7 @@
       (check-new-contact cur nickname party)
       (assoc cur
         (party-puk party)
-        (reify-contact (:tuple-space contacts-state) @(:puk->contact contacts-state) (:own-puk contacts-state) nickname party))))
+        (reify-contact (:tuple-space contacts-state) (:puk->contact contacts-state) (:own-puk contacts-state) nickname party))))
   (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party))
 
 (defn get-contacts [contacts-state]
