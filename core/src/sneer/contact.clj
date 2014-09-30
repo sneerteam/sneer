@@ -69,8 +69,9 @@
   (.. contact nickname current))
 
 (defn create-contacts-state [tuple-space own-puk puk->party]
-  (let [puk->contact (atom (restore-contact-list tuple-space own-puk puk->party))
+  (let [puk->contact (atom {})
         ->contact-list (fn [contact-map] (->> contact-map vals (sort-by current-nickname) vec))]
+    (swap! puk->contact (fn [_] (restore-contact-list tuple-space puk->contact own-puk puk->party)))
     {:own-puk own-puk
      :tuple-space tuple-space
      :puk->contact puk->contact
