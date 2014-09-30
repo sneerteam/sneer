@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation flatmapseq]]
    [sneer.conversation :refer [produce-conversation]]
-   [sneer.contact :refer [create-contact-state add-contact get-contacts]]
+   [sneer.contact :refer [create-contact-state add-contact get-contacts get-puk->contact]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import 
@@ -17,7 +17,8 @@
         profiles (atom {})        
         conversation-menu-items (BehaviorSubject/create [])
         contact-state (create-contact-state tuple-space own-puk puk->party)
-        contacts (get-contacts contact-state)]
+        contacts (get-contacts contact-state)
+        puk->contact (get-puk->contact contact-state)]
 
     (rx/subscribe
       (->>
@@ -44,7 +45,7 @@
             (add-contact tuple-space contact-state nickname party own-puk))
          
           (findContact [this party]
-            (get @(contact-state :puk->contact) (party-puk party)))
+            (get @puk->contact (party-puk party)))
 
           (conversationsContaining [this type]
             (rx/never))
