@@ -17,8 +17,7 @@
         profiles (atom {})        
         conversation-menu-items (BehaviorSubject/create [])
         contact-state (create-contact-state tuple-space own-puk puk->party)
-        contacts (get-contacts contact-state)
-        puk->contact (get-puk->contact contact-state)]
+        contacts (get-contacts contact-state)]
 
     (rx/subscribe
       (->>
@@ -45,7 +44,7 @@
             (add-contact tuple-space contact-state nickname party own-puk))
          
           (findContact [this party]
-            (get @puk->contact (party-puk party)))
+            (get-puk->contact contact-state party))
 
           (conversationsContaining [this type]
             (rx/never))

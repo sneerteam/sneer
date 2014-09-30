@@ -71,5 +71,5 @@
 (defn get-contacts [contact-state]
   (:observable-contacts contact-state))
 
-(defn get-puk->contact [contact-state]
-  (:puk->contact contact-state))
+(defn get-puk->contact [contact-state party]
+  (get @(:puk->contact contact-state) (party-puk party)))
