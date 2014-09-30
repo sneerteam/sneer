@@ -14,14 +14,14 @@
 (defn new-sneer [^TupleSpace tuple-space ^PrivateKey own-prik ^rx.Observable followees]
   (let [own-puk (.publicKey own-prik)
         puk->party (create-puk->party)
-        profiles (atom {})
+        profiles (atom {})        
         conversation-menu-items (BehaviorSubject/create [])
-        contact-state (create-contact-state tuple-space own-puk puk->party)]
+        contact-state (create-contact-state tuple-space own-puk puk->party)
+        contacts (get-contacts contact-state)]
 
     (rx/subscribe
       (->>
-        (contact-state :observable-contacts)
-        ;observe-for-computation
+        contacts
         flatmapseq
         (rx/flatmap (fn [^Contact contact] (.. contact party publicKey observable))))
       (partial rx/on-next followees))
@@ -34,7 +34,7 @@
             (produce-profile tuple-space profiles party))
 
           (contacts [this]
-            (get-contacts contact-state))
+            contacts)
          
           (problemWithNewNickname [this new-nick]
             ;TODO
@@ -51,7 +51,7 @@
         
           (conversations [this]
             (->>
-              (contact-state :observable-contacts)
+              contacts
               (rx/map
                 (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c)))))))
           
