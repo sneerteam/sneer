@@ -140,8 +140,6 @@ public class ConversationsAPITest extends TestCase {
 
 	
 	public void testChangeContactNicknamePersistence() throws FriendlyException {
-		int unignoreThisTest;
-		
 		Party party = sneerA.produceParty(userB);
 		sneerA.addContact("Party Boy", party);
 		
@@ -155,8 +153,6 @@ public class ConversationsAPITest extends TestCase {
 
 	
 	public void testProblemWithNewNickname() throws FriendlyException {
-		int unignoreThisTest;
-
 		assertNotNull(sneerA.problemWithNewNickname(""));
 
 		Party partyB = sneerA.produceParty(userB);
