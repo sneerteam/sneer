@@ -53,7 +53,7 @@
     {:puk->contact puk->contact   
      :observable-contacts (rx/map ->contact-list (atom->observable puk->contact))}))
 
-(defn add-contact [tuple-space contact-state nickname party own-puk]
+(defn add-contact [contact-state tuple-space nickname party own-puk]
   (swap! (contact-state :puk->contact)
     (fn [cur]
       (when (->> cur vals (some (partial duplicate-contact? nickname party)))
@@ -71,5 +71,7 @@
 (defn get-contacts [contact-state]
   (:observable-contacts contact-state))
 
-(defn get-puk->contact [contact-state party]
+(defn find-contact [contact-state party]
   (get @(:puk->contact contact-state) (party-puk party)))
+
+(defn problem-with-new-nickname [contact-state new-nick])

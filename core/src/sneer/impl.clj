@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation flatmapseq]]
    [sneer.conversation :refer [produce-conversation]]
-   [sneer.contact :refer [create-contact-state add-contact get-contacts get-puk->contact]]
+   [sneer.contact :refer [create-contact-state add-contact get-contacts find-contact problem-with-new-nickname]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import 
@@ -37,14 +37,13 @@
             contacts)
          
           (problemWithNewNickname [this new-nick]
-            ;TODO
-            )
+            (problem-with-new-nickname contact-state new-nick))
        
           (addContact [this nickname party]
-            (add-contact tuple-space contact-state nickname party own-puk))
+            (add-contact contact-state tuple-space nickname party own-puk))
          
           (findContact [this party]
-            (get-puk->contact contact-state party))
+            (find-contact contact-state party))
 
           (conversationsContaining [this type]
             (rx/never))

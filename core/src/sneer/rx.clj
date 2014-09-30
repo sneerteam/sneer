@@ -26,7 +26,7 @@
 
 (defn filter-by [criteria observable]
   "Filters an `observable' of maps by `criteria' represented as a map.
-Only maps containing all key/value pairs in criteria are kept."
+   Only maps containing all key/value pairs in criteria are kept."
   (let [ks (keys criteria)]
     (if ks
       (rx/filter #(= criteria (select-keys % ks)) observable)
@@ -52,5 +52,5 @@ Only maps containing all key/value pairs in criteria are kept."
 
 (defn shared-latest [^rx.Observable o]
   "Returns a `rx.Observable' that publishes the latest value of the source sequence
-while sharing a single subscription as long as there are subscribers."
+   while sharing a single subscription as long as there are subscribers."
   (.. o (replay 1) refCount))

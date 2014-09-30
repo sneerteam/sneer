@@ -23,8 +23,8 @@
   (connect
     [network puk]
     "Returns a `rx.subjects.Subject' with an Observable part for packets
-addressed to puk and an Observer part that will send packets over from
-puk." ))
+     addressed to puk and an Observer part that will send packets over from
+     puk." ))
 
 (defprotocol TupleBase
   "A backing store for tuples (represented as maps)."
@@ -34,8 +34,8 @@ puk." ))
 
   (query-tuples ^rx.Observable [this criteria keep-alive]
     "Filters tuples by the criteria represented as a map of
-field/value. When keep-alive is true the observable will keep emitting
-new tuples as they are stored otherwise it will complete." )
+     field/value. When keep-alive is true the observable will keep emitting
+     new tuples as they are stored otherwise it will complete." )
   
   (restarted ^TupleBase [this]))
 
