@@ -53,11 +53,20 @@
     {:puk->contact puk->contact   
      :observable-contacts (rx/map ->contact-list (atom->observable puk->contact))}))
 
-(defn add-contact [contact-state nickname party]
+(defn add-contact [tuple-space contact-state nickname party own-puk]
   (swap! (contact-state :puk->contact)
     (fn [cur]
       (when (->> cur vals (some (partial duplicate-contact? nickname party)))
         (throw (FriendlyException. "Duplicate contact!")))
       (assoc cur
         (party-puk party)
-        (reify-contact nickname party)))))
+        (reify-contact nickname party))))
+  (.. tuple-space
+      publisher
+      (audience own-puk)
+      (type "contact")
+      (field "party" (party-puk party))
+      (pub nickname)))
+
+(defn get-contacts [contact-state]
+  (:observable-contacts contact-state))

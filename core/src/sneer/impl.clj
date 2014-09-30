@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation flatmapseq]]
    [sneer.conversation :refer [produce-conversation]]
-   [sneer.contact :refer [create-contact-state add-contact]]
+   [sneer.contact :refer [create-contact-state add-contact get-contacts]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import 
@@ -23,7 +23,7 @@
         (contact-state :observable-contacts)
         ;observe-for-computation
         flatmapseq
-        (rx/flatmap (fn [^Contact c] (.. c party publicKey observable))))
+        (rx/flatmap (fn [^Contact contact] (.. contact party publicKey observable))))
       (partial rx/on-next followees))
     
     (let [self (new-party own-puk)]
@@ -34,20 +34,14 @@
             (produce-profile tuple-space profiles party))
 
           (contacts [this]
-            (contact-state :observable-contacts))
+            (get-contacts contact-state))
          
           (problemWithNewNickname [this new-nick]
             ;TODO
             )
        
           (addContact [this nickname party]
-            (add-contact contact-state nickname party)
-            (.. tuple-space
-                publisher
-                (audience own-puk)
-                (type "contact")
-                (field "party" (party-puk party))
-                (pub nickname)))
+            (add-contact tuple-space contact-state nickname party own-puk))
          
           (findContact [this party]
             (get @(contact-state :puk->contact) (party-puk party)))
