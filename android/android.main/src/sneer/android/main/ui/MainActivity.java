@@ -113,15 +113,13 @@ public class MainActivity extends SneerActivity {
 
 	
 	private void startProfileActivityIfFirstTime() {
-		ownName().subscribe(new Action1<String>() { @Override public void call(String name) {
-			if (name.isEmpty())
-				startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-		}});
+		if (ownName().isEmpty())
+			startActivity(new Intent(MainActivity.this, ProfileActivity.class));
 	}
 
 
-	private Observable<String> ownName() {
-		return sneer().profileFor(sneer().self()).ownName();
+	private String ownName() {
+		return sneer().profileFor(sneer().self()).ownName().toBlocking().first();
 	}
 
 	

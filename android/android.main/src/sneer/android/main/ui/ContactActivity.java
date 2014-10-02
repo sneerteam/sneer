@@ -105,8 +105,9 @@ public class ContactActivity extends Activity {
 				finish();
 				return;
 			}			
-		} else
+		} else {
 			loadContact(null);
+		}
 		
 		if (partyPuk.bytesAsString().equals(sneer().self().publicKey().current().bytesAsString())) {
 			isOwn = true;
@@ -117,8 +118,7 @@ public class ContactActivity extends Activity {
 		}
 	}
 
-	private String activityTitle() {
-		
+	private String activityTitle() {		
 		if (getIntent().getExtras().get(PARTY_PUK)==null) {
 			newContact = true;
 			return "New Contact";
