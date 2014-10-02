@@ -211,6 +211,6 @@
 
     (reify TupleSpace
       (publisher [this]
-        (new-tuple-publisher tuple-base {"author" own-puk}))
+        (new-tuple-publisher tuple-base {"author" own-puk "timestampCreated" (now) "timestampReceived" (now)}))
       (filter [this]
         (new-tuple-filter tuple-base subs-out)))))

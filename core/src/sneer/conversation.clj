@@ -12,11 +12,11 @@
 
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 
-(defn format-date [time] (.format simple-date-format (now)))
+(defn format-date [time] (.format simple-date-format time))
 
 (defn tuple->message [own-puk ^Tuple tuple]
-  (let [created (now)
-        received (now)
+  (let [created (.timestampCreated tuple)
+        received (.timestampReceived tuple)
         type (.type tuple)
         label (.get tuple "label")
         content (if (= type "message") (.payload tuple) (if label label type))
