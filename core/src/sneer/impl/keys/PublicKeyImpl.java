@@ -9,6 +9,7 @@ import com.google.bitcoin.core.*;
 
 class PublicKeyImpl implements PublicKey {
 	
+
 	//THIS MUST BE PRIVATE. A common base class cannot be extracted for PrivateKeyImpl and PublicKeyImpl.
 	private final ECKey ecKey;
 

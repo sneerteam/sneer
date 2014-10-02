@@ -101,9 +101,7 @@ public class ContactActivity extends Activity {
 				getActionBar().setDisplayHomeAsUpEnabled(true);
 				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));		
 			}catch(RuntimeException e){
-				e.printStackTrace();
-				toast(e.getMessage());
-//				toast("Invalid public key");
+				toast("Invalid public key");
 				finish();
 				return;
 			}			

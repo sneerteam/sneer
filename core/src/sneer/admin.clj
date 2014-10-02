@@ -37,15 +37,14 @@
 
 (defn- produce-private-key [db]
   (if-let [existing (second (persistence/db-query db ["SELECT * FROM keys"]))]
-    (let [keys-impl (KeysImpl.)]
-      (.createPrivateKey keys-impl ^bytes (first existing))
-      (let [new-key (.createPrivateKey keys-impl)]
-        (persistence/db-insert db :keys {"prik" (.bytes new-key)})
-        new-key))))
+    (.createPrivateKey (KeysImpl.) ^bytes (first existing))
+    (let [new-key (.createPrivateKey (KeysImpl.))]
+      (persistence/db-insert db :keys {"prik" (.bytes new-key)})
+      new-key)))
 
 (defn new-sneer-admin-over-db [network db]
   (let [tuple-base (persistence/create db)
-        own-prik (produce-private-key db)]
+        own-prik (produce-private-key db)]    
     (new-sneer-admin own-prik network tuple-base)))
 
 (defn create [db]
