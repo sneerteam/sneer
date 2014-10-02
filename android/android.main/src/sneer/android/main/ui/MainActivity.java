@@ -113,8 +113,8 @@ public class MainActivity extends SneerActivity {
 
 	
 	private void startProfileActivityIfFirstTime() {
-		if (ownName().isEmpty())
-			startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+//		if (ownName().isEmpty())
+//			startActivity(new Intent(MainActivity.this, ProfileActivity.class));
 	}
 
 

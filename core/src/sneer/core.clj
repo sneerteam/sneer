@@ -86,6 +86,11 @@
     (tuple-getter payload)
     (timestampCreated [this] 
       (let [time (get tuple "timestampCreated")]
+        (println (str time "<- created"))
+        (if time time 0)))
+    (timestampReceived [this] 
+      (let [time (get tuple "timestampReceived")]
+        (println (str time "<- received"))
         (if time time 0)))
     (toString [this] (str tuple))))
 
