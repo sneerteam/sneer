@@ -9,9 +9,9 @@ import sneer.tuples.*;
 
 public class TupleSpaceTestsBase extends TestWithNetwork {
 	
-	protected final PrivateKey userA = KeysImpl.createPrivateKey();
-	protected final PrivateKey userB = KeysImpl.createPrivateKey();
-	protected final PrivateKey userC = KeysImpl.createPrivateKey();
+	protected final PrivateKey userA = new KeysImpl().createPrivateKey();
+	protected final PrivateKey userB = new KeysImpl().createPrivateKey();
+	protected final PrivateKey userC = new KeysImpl().createPrivateKey();
 
 	protected final TupleSpace tuplesA;
 	protected final TupleSpace tuplesB;

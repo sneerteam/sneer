@@ -29,11 +29,7 @@
          SneerAdmin
            (sneer [this] sneer)
            (privateKey [this] own-prik)
-           (keys [this] this)
-         sneer.keys.Keys
-           (createPublicKey [this bytes-as-string]
-             (throw (java.lang.RuntimeException.))  ; This seems not to be used.
-             (KeysImpl/createPublicKey bytes-as-string))
+           (keys [this] (KeysImpl.))
          Restartable
            (restart [this]
              (rx/on-completed connection)
@@ -41,10 +37,11 @@
 
 (defn- produce-private-key [db]
   (if-let [existing (second (persistence/db-query db ["SELECT * FROM keys"]))]
-    (KeysImpl/createPrivateKey ^bytes (first existing))
-    (let [new-key (KeysImpl/createPrivateKey)]
-      (persistence/db-insert db :keys {"prik" (.bytes new-key)})
-      new-key)))
+    (let [keys-impl (KeysImpl.)]
+      (.createPrivateKey keys-impl ^bytes (first existing))
+      (let [new-key (.createPrivateKey keys-impl)]
+        (persistence/db-insert db :keys {"prik" (.bytes new-key)})
+        new-key))))
 
 (defn new-sneer-admin-over-db [network db]
   (let [tuple-base (persistence/create db)

@@ -1,4 +1,5 @@
 (ns sneer.persistent-tuple-base
+  (:import [sneer.impl.keys KeysImpl])
   (:require [sneer.core :as core]
             [sneer.rx :refer [filter-by seq->observable]]
             [sneer.serialization :as serialization]
@@ -47,8 +48,10 @@
 
 (def builtin-field? #{"type" "payload" "author" "audience"})
 
-(def puk-serializer {:serialize #(.bytes ^sneer.PublicKey %)
-                     :deserialize #(sneer.impl.keys.KeysImpl/createPublicKey ^bytes %)})
+(def puk-serializer 
+  (let [keys-impl (KeysImpl.)]
+    {:serialize #(.bytes ^sneer.PublicKey %)
+     :deserialize #(.createPublicKey keys-impl ^bytes %)}))
 
 (def core-serializer {:serialize serialization/serialize
                       :deserialize serialization/deserialize})

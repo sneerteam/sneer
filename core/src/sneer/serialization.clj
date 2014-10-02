@@ -14,9 +14,9 @@
      (fn [^PublicKey puk] (.bytes puk)))})
 
 (def ^:private read-handlers
-  {"puk"
-   (transit/read-handler
-     (fn [^bytes rep] (KeysImpl/createPublicKey rep)))})
+  (let [keys-impl (KeysImpl.)]
+    {"puk" (transit/read-handler
+             (fn [^bytes rep] (.createPublicKey keys-impl rep)))}))
 
 (def ^:private write-opts {:handlers write-handlers})
 

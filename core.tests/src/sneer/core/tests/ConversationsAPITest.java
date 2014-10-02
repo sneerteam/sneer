@@ -47,7 +47,7 @@ public class ConversationsAPITest extends TestCase {
 	
 	protected final Object tupleBaseA = newTupleBase();
 	
-	protected final SneerAdmin adminA = newSneerAdmin(KeysImpl.createPrivateKey(), tupleBaseA);
+	protected final SneerAdmin adminA = newSneerAdmin(new KeysImpl().createPrivateKey(), tupleBaseA);
 	protected final SneerAdmin adminB = newSneerAdmin();
 	protected final SneerAdmin adminC = newSneerAdmin();
 
@@ -61,11 +61,11 @@ public class ConversationsAPITest extends TestCase {
 
 	
 	protected PrivateKey newPrivateKey() {
-		return KeysImpl.createPrivateKey();
+		return new KeysImpl().createPrivateKey();
 	}
 	
 	private SneerAdmin newSneerAdmin() {
-		return newSneerAdmin(KeysImpl.createPrivateKey(), newTupleBase());
+		return newSneerAdmin(new KeysImpl().createPrivateKey(), newTupleBase());
 	}
 	private SneerAdmin newSneerAdmin(PrivateKey prik, Object tupleBase) {
 		return Glue.newSneerAdmin(prik, network, tupleBase);

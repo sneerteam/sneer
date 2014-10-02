@@ -105,7 +105,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.type("profile/name")
 			.pub(name);
 		
-		PrivateKey userD = KeysImpl.createPrivateKey();
+		PrivateKey userD = new KeysImpl().createPrivateKey();
 		TupleSpace tuplesD = newTupleSpace(userD, followees(userA));
 		
 		expecting(

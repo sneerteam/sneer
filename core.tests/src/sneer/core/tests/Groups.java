@@ -14,7 +14,7 @@ public class Groups extends TupleSpaceTestsBase {
 	@Test
 	public void targetAudience() {
 		
-		PrivateKey group = KeysImpl.createPrivateKey();
+		PrivateKey group = new KeysImpl().createPrivateKey();
 		
 		tuplesA.publisher()
 			.audience(group.publicKey())
@@ -31,8 +31,8 @@ public class Groups extends TupleSpaceTestsBase {
 	@Test
 	public void noLeaks() {
 		
-		PrivateKey group1 = KeysImpl.createPrivateKey();
-		PrivateKey group2 = KeysImpl.createPrivateKey();
+		PrivateKey group1 = new KeysImpl().createPrivateKey();
+		PrivateKey group2 = new KeysImpl().createPrivateKey();
 		
 		tuplesA.publisher()
 			.audience(group1.publicKey())

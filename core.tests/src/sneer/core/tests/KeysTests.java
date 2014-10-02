@@ -1,24 +1,27 @@
 package sneer.core.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.*;
+import org.junit.Test;
 
-import sneer.*;
-import sneer.impl.keys.*;
+import sneer.PrivateKey;
+import sneer.PublicKey;
+import sneer.impl.keys.KeysImpl;
 
 public class KeysTests {
 	
 	
 	@Test
 	public void recreate() {
-		PrivateKey prik = KeysImpl.createPrivateKey();
-		assertEquals(prik, KeysImpl.createPrivateKey(prik.bytes()));
-		assertEquals(prik, KeysImpl.createPrivateKey(prik.bytesAsString()));
+		KeysImpl subject = new KeysImpl();
+		
+		PrivateKey prik = subject.createPrivateKey();
+		assertEquals(prik, subject.createPrivateKey(prik.bytes()));
+		assertEquals(prik, subject.createPrivateKey(prik.bytesAsString()));
 		
 		PublicKey puk = prik.publicKey();
-		assertEquals(puk, KeysImpl.createPublicKey(puk.bytes()));
-		assertEquals(puk, KeysImpl.createPublicKey(puk.bytesAsString()));
+		assertEquals(puk, subject.createPublicKey(puk.bytes()));
+		assertEquals(puk, subject.createPublicKey(puk.bytesAsString()));
 	}
 	
 	
