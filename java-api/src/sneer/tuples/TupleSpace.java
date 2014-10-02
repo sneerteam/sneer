@@ -7,6 +7,4 @@ public interface TupleSpace {
 
 	TupleFilter filter();
 
-//	Observable<Void> lease(Observable<Void> computation);
-
 }
