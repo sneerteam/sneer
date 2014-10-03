@@ -36,20 +36,20 @@ public class ObservableTestUtils {
 		return values(source.materialize(), (Object[])values);
 	}
 	
-	public static Observable<Void> eventually(Observable<?> source, final Object... values) {
+	public static Observable<Void> eventually(Observable<?> source, final Object... expected) {
 		return values(
 			source.skipWhile(new Func1<Object, Boolean>() { @Override public Boolean call(Object t1) {
-				return !t1.equals(values[0]);
+				return !t1.equals(expected[0]);
 			}}),
-			values);
+			expected);
 	}
 
-	public static Observable<Void> values(Observable<?> source, final Object... values) {
-		return values(source, SEQUENCE, values);
+	public static Observable<Void> values(Observable<?> source, final Object... expected) {
+		return values(source, SEQUENCE, expected);
 	}
 	
-	public static Observable<Void> valueSet(Observable<?> source, final Object... values) {
-		return values(source, SET, values);
+	public static Observable<Void> valueSet(Observable<?> source, final Object... expected) {
+		return values(source, SET, expected);
 	}
 	
 	public static Observable<Void> same(Observable<?> source, final Object... expected) {
