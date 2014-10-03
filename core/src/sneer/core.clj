@@ -84,7 +84,8 @@
     (tuple-getter audience)
     (tuple-getter author)
     (tuple-getter payload)
-    (timestampCreated [this] 
+;    (tuple-getter timestampCreated)
+    (timestampCreated [this]
       (let [time (get tuple "timestampCreated")]
         (if time time 0)))
     (timestampReceived [this] 
@@ -112,8 +113,7 @@
       (pub [this payload]
         (.. this (payload payload) pub))
       (pub [this]
-        (assoc proto-tuple "timestampCreated" (now))
-        (let [tuple (roundtrip proto-tuple)]
+        (let [tuple (roundtrip (assoc proto-tuple "timestampCreated" (now)))]
           (store-tuple tuples-out tuple)
           (rx/return
             (reify-tuple tuple)))))))

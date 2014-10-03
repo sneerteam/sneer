@@ -53,10 +53,14 @@
       (timeCreated [this] (format-date created))
       (tuple [this] tuple))))
 
+(def message-comparator (fn [m1 m2] (compare (.timestampCreated m1) (.timestampCreated m2))))
+
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [^PublicKey party-puk (party-puk party)
-        messages (atom [])
-        observable-messages (atom->observable messages)
+;        messages (atom [])
+;        observable-messages (atom->observable messages)
+        messages (atom (sorted-set-by message-comparator))
+        observable-messages (rx/map vec (atom->observable messages))
         message-filter (.. tuple-space filter (field "conversation?" true))]
     
     (rx/subscribe
