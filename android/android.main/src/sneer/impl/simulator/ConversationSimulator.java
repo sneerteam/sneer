@@ -1,9 +1,9 @@
 package sneer.impl.simulator;
 
 import static sneer.ConversationMenuItem.BY_ALPHABETICAL_ORDER;
-import static sneer.Message.BY_TIME_RECEIVED;
 import static sneer.MessageImpl.createFrom;
 import static sneer.MessageImpl.createOwn;
+import static sneer.commons.Clock.now;
 import static sneer.commons.Lists.lastIn;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class ConversationSimulator implements Conversation {
 	
 	
 	private void addMessage(Message message) {
-		List<Message> newMessage = messagesWith(message, BY_TIME_RECEIVED);
+		List<Message> newMessage = messagesWith(message);
 		messages.onNext(newMessage);
 		Message last = lastIn(newMessage);
 		mostRecentMessageTimestamp.onNext(last.timestampReceived());
@@ -89,10 +89,9 @@ public class ConversationSimulator implements Conversation {
 	}
 
 
-	private List<Message> messagesWith(Message message, Comparator<Message> order) {
+	private List<Message> messagesWith(Message message) {
 		List<Message> ret = new ArrayList<Message>(messages.observed().current());
 		ret.add(message);
-		Collections.sort(ret, order);
 		return ret;
 	}
 	
@@ -102,11 +101,6 @@ public class ConversationSimulator implements Conversation {
 	}
 	
 	
-	static private long now() {
-		return System.currentTimeMillis();
-	}
-
-
 	@Override
 	public Observable<List<ConversationMenuItem>> menu() {
 //		return menuItems.observed().observable();
