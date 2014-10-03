@@ -86,11 +86,9 @@
     (tuple-getter payload)
     (timestampCreated [this] 
       (let [time (get tuple "timestampCreated")]
-        (println (str time "<- created"))
         (if time time 0)))
     (timestampReceived [this] 
       (let [time (get tuple "timestampReceived")]
-        (println (str time "<- received"))
         (if time time 0)))
     (toString [this] (str tuple))))
 
@@ -115,7 +113,7 @@
         (pub [this payload]
            (.. this (payload payload) pub))
         (pub [this]
-           (assoc proto-tuple "timeCreated" now)
+           (assoc proto-tuple "timeCreated" (now))
            (let [tuple (roundtrip proto-tuple)]
              (store-tuple tuples-out tuple)
              (rx/return
@@ -211,6 +209,6 @@
 
     (reify TupleSpace
       (publisher [this]
-        (new-tuple-publisher tuple-base {"author" own-puk "timestampCreated" (now) "timestampReceived" (now)}))
+        (new-tuple-publisher tuple-base {"author" own-puk}))
       (filter [this]
         (new-tuple-filter tuple-base subs-out)))))
