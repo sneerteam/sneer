@@ -113,16 +113,11 @@ public class MainActivity extends SneerActivity {
 
 	
 	private void startProfileActivityIfFirstTime() {
-		if (ownName().isEmpty())
-			startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+//		if (sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable())
+//			startActivity(new Intent(MainActivity.this, ProfileActivity.class));
 	}
 
 
-	private String ownName() {
-		return sneer().profileFor(sneer().self()).ownName().toBlocking().first();
-	}
-
-	
 	public static void log(String s) {
 		Log.d(MainActivity.class.getSimpleName(), s);
 	}

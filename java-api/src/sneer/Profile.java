@@ -19,4 +19,6 @@ public interface Profile {
 	Observable<String> city();
 	void setCity(String newCity);
 
+	/** A hack to determine whether the own name has already been filled in by the user or not (first time using Sneer) without resorting to timeouts on observables. */
+//	boolean isOwnNameLocallyAvailable();
 }
