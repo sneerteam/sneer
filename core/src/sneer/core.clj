@@ -99,25 +99,24 @@
 (defn ->envelope [destination tuple]
   {:address destination :tuple tuple})
 
-(defn new-tuple-publisher
-  ([tuples-out proto-tuple]
-    (letfn
-      [(with [field value]
-          (new-tuple-publisher tuples-out (assoc proto-tuple field value)))]
-      (reify+ TuplePublisher
-        (with-field type)
-        (with-field audience)
-        (with-field payload)
-        (field [this field value]
-           (with field value))
-        (pub [this payload]
-           (.. this (payload payload) pub))
-        (pub [this]
-           (assoc proto-tuple "timeCreated" (now))
-           (let [tuple (roundtrip proto-tuple)]
-             (store-tuple tuples-out tuple)
-             (rx/return
-               (reify-tuple tuple))))))))
+(defn new-tuple-publisher [tuples-out proto-tuple]
+  (letfn
+    [(with [field value]
+       (new-tuple-publisher tuples-out (assoc proto-tuple field value)))]
+    (reify+ TuplePublisher
+      (with-field type)
+      (with-field audience)
+      (with-field payload)
+      (field [this field value]
+        (with field value))
+      (pub [this payload]
+        (.. this (payload payload) pub))
+      (pub [this]
+        (assoc proto-tuple "timestampCreated" (now))
+        (let [tuple (roundtrip proto-tuple)]
+          (store-tuple tuples-out tuple)
+          (rx/return
+            (reify-tuple tuple)))))))
 
 (defn new-tuple-filter
   ([tuple-base subs-out] (new-tuple-filter tuple-base subs-out {}))
