@@ -69,7 +69,7 @@ public class Cloud {
 		@Override
 		public void pub(String receiverPuk, CharSequence contentText, Object payload) {
 			CloudPath path = path(NOTIFICATIONS).append(receiverPuk).appends(segments);
-			path.pub(asMap(contentText, System.currentTimeMillis(), payload));
+			path.pub(asMap(contentText, Clock.now(), payload));
 		}
 
 

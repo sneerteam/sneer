@@ -17,6 +17,7 @@ import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import sneer.PublicKey;
 import sneer.Sneer;
+import sneer.commons.Clock;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.utils.SharedResultReceiver;
@@ -29,7 +30,7 @@ import android.os.ResultReceiver;
 
 public final class PartnerSession implements PluginSession {
 	
-	private static AtomicLong nextSessionId = new AtomicLong(System.currentTimeMillis());
+	private static AtomicLong nextSessionId = new AtomicLong(Clock.now());
 	
 	private PublicKey host;
 	private PublicKey partner;

@@ -6,5 +6,4 @@
            (fn [existing] (if (some? existing) existing (fn-if-absent key))))
     key))
 
-(defn now []
-  (System/currentTimeMillis))
+(defn now [] (sneer.commons.Clock/now))

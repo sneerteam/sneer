@@ -1,11 +1,18 @@
 package sneer.refimpl;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import rx.Observable;
-import sneer.*;
-import sneer.commons.exceptions.*;
-import sneer.tuples.*;
+import sneer.PrivateKey;
+import sneer.PublicKey;
+import sneer.commons.Clock;
+import sneer.commons.exceptions.NotImplementedYet;
+import sneer.tuples.Tuple;
+import sneer.tuples.TupleFilter;
+import sneer.tuples.TuplePublisher;
+import sneer.tuples.TupleSpace;
 
 public abstract class LocalTuplesFactory {
 
@@ -155,7 +162,7 @@ public abstract class LocalTuplesFactory {
 			public Observable<Tuple> pub() {
 				TupleImpl ret = prototype.clone();
 				ret.put("author", identity.publicKey());
-				long now = System.currentTimeMillis();
+				long now = Clock.now();
 				ret.put("timestampCreated", now);
 				ret.put("timestampReceived", now);
 				publishTuple(ret);

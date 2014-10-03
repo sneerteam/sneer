@@ -26,6 +26,7 @@ import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.commons.Arrays;
+import sneer.commons.Clock;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.impl.keys.KeysImpl;
 import sneer.tuples.Tuple;
@@ -314,7 +315,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 	
 	
-	public void testConversationMessageSequence() throws FriendlyException {
+	public void testConversationMessageSequence() throws Exception {
 		
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
@@ -324,10 +325,13 @@ public class ConversationsAPITest extends TestCase {
 		sneerB.addContact("a", pBA);
 		Conversation cBA = sneerB.produceConversationWith(pBA);
 		
+		Clock.mock();
 		cAB.sendMessage("Hello1");
 		messagesEventually(cBA, "Hello1");
+		Clock.tick();
 		cBA.sendMessage("Hello2");
 		messagesEventually(cAB, "Hello1", "Hello2");
+		Clock.tick();
 		cAB.sendMessage("Hello3");
 		messagesEventually(cBA, "Hello1", "Hello2", "Hello3");
 		
@@ -335,7 +339,7 @@ public class ConversationsAPITest extends TestCase {
 		Sneer newSneer = newSneerAdmin(adminA.privateKey(), tupleBaseA).sneer();
 		Party newB = newSneer.produceParty(userB);
 		Conversation newConvo = sneerA.produceConversationWith(newB);
-//		messagesEventually(newConvo, "Hello1", "Hello3", "Hello2");
+		messagesEventually(newConvo, "Hello1", "Hello2", "Hello3");
 	}
 
 	
