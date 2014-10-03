@@ -79,7 +79,6 @@
           tuple-space
           publisher
           (field "conversation?" true)
-          (field "timestampCreated" (now))
           (audience party-puk)
           (type "message")
           (pub content)))
