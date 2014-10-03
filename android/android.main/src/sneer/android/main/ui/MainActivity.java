@@ -5,7 +5,6 @@ import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
 
 import java.util.Collection;
 
-import rx.Observable;
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Profile;
