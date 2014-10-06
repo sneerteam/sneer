@@ -1,9 +1,10 @@
-package sneer.android.sendvideo;
+package sneer.android.videomessage;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import sneer.android.videomessage.R;
 import sneer.android.ui.MessageActivity;
 import android.content.Intent;
 import android.net.Uri;

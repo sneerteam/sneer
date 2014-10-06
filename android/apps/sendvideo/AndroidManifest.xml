@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="sneer.android.sendvideo"
+    package="sneer.android.videomessage"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault.Dialog" >
         <activity
-            android:name=".ComposeVideoMessageActivity"
+            android:name="sneer.android.videomessage.ComposeVideoMessageActivity"
             android:excludeFromRecents="true" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -30,7 +30,7 @@
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
         <activity
-            android:name=".ViewVideoMessageActivity" >
+            android:name="sneer.android.videomessage.ViewVideoMessageActivity" >
             <intent-filter>
 		        <action android:name="android.intent.action.VIEW" />
 		    </intent-filter>

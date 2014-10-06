@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">sendvideo</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">videomessage</string>
     <string name="title_activity_compose_video_message">ComposeVideoMessageActivity</string>
     <string name="title_activity_view_video_message">ViewVideoMessageActivity</string>
 

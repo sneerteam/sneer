@@ -1,7 +1,8 @@
-package sneer.android.sendvideo;
+package sneer.android.videomessage;
 
 import java.io.FileNotFoundException;
 
+import sneer.android.videomessage.R;
 import sneer.android.ui.MessageActivity;
 import sneer.commons.exceptions.FriendlyException;
 import android.content.Intent;
