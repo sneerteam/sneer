@@ -21,9 +21,7 @@
             android:name=".ComposeVideoMessageActivity"
             android:excludeFromRecents="true" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
 
             <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/COMPOSE" />

@@ -1,6 +1,5 @@
 package sneer.android.sendvideo;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import sneer.android.ui.MessageActivity;
@@ -34,8 +33,7 @@ public class ComposeVideoMessageActivity extends MessageActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-	    	Uri videoUri = data.getData();
-	    	send(videoUri);
+	    	send(data.getData());
 	    }
         finish();
 	}
@@ -53,7 +51,7 @@ public class ComposeVideoMessageActivity extends MessageActivity {
 			finish();
 		}
 		if (bytes != null)
-			send("videomessage", bytes);
+			send("video message", bytes);
 	}
 	
 }
