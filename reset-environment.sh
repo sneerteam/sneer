@@ -28,6 +28,6 @@ rm android/apps/.project
 
 if [ -d "../rockpaperscissors" ]; then
 	echo COPYING NODEPS JAR...
-	rm -f ../lizard-spock/libs/sneer-android-api-nodeps-*.jar
-	cp -f android/android-api/build/libs/sneer-android-api-nodeps-*.jar ../lizard-spock/libs/
+	rm -f ../lizardspock/libs/sneer-android-api-nodeps-*.jar
+	cp -f android/android-api/build/libs/sneer-android-api-nodeps-*.jar ../lizardspock/libs/
 fi
