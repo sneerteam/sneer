@@ -19,30 +19,27 @@
         android:theme="@android:style/Theme.DeviceDefault.Dialog" >
         <activity
             android:name=".ComposeVideoMessageActivity"
-            android:excludeFromRecents="true"
-            android:label="@string/title_activity_compose_video_message" >
+            android:excludeFromRecents="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <meta-data
-                android:name="sneer:plugin-type"
-                android:value="MESSAGE/COMPOSE" />
-            <meta-data
-                android:name="sneer:tuple-type"
-                android:value="video" />
-            <meta-data
-                android:name="sneer:menu-caption"
-                android:value="Video Message" />
-            <meta-data
-                android:name="sneer:menu-icon"
-                android:resource="@drawable/ic_launcher" />
+            <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/COMPOSE" />
+            <meta-data android:name="sneer:tuple-type" android:value="video" />
+            <meta-data android:name="sneer:menu-caption" android:value="Video Message" />
+            <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
         <activity
-            android:name=".ViewVideoMessageActivity"
-            android:label="@string/title_activity_view_video_message" >
+            android:name=".ViewVideoMessageActivity" >
+            <intent-filter>
+		        <action android:name="android.intent.action.VIEW" />
+		    </intent-filter>
+            
+            <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/VIEW" />
+            <meta-data android:name="sneer:tuple-type" android:value="video" />
+            <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
     </application>
 
