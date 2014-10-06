@@ -27,10 +27,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <meta-data android:name="sneer:plugin-type" android:value="MESSAGE/COMPOSE" />
-            <meta-data android:name="sneer:tuple-type" android:value="video" />
-            <meta-data android:name="sneer:menu-caption" android:value="Video Message" />
-            <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
+            <meta-data
+                android:name="sneer:plugin-type"
+                android:value="MESSAGE/COMPOSE" />
+            <meta-data
+                android:name="sneer:tuple-type"
+                android:value="video" />
+            <meta-data
+                android:name="sneer:menu-caption"
+                android:value="Video Message" />
+            <meta-data
+                android:name="sneer:menu-icon"
+                android:resource="@drawable/ic_launcher" />
+        </activity>
+        <activity
+            android:name=".ViewVideoMessageActivity"
+            android:label="@string/title_activity_view_video_message" >
         </activity>
     </application>
 
