@@ -150,7 +150,8 @@
 
 (defn reify-tuple-space [own-puk tuple-base connection followees]
 
-  (let [tuples-in (->> connection (rx/map :tuple) (rx/filter (complement nil?)) rx/distinct)
+  (let [tuples-in (->> connection (rx/map :tuple) (rx/filter (complement nil?))
+                    rx/distinct) ;////////////////////////////////////// DISTINCT? Massive leak!
         subs-out (ReplaySubject/create)
         subscriptions-by-sender (atom {})
         distinct-followees (ReplaySubject/create)]
