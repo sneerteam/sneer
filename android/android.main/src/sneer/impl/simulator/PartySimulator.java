@@ -155,4 +155,11 @@ public class PartySimulator implements Party, Profile {
 		} catch (IOException e) {}
 		return ret;
 	}
+
+
+	@Override
+	public boolean isOwnNameLocallyAvailable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

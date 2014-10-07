@@ -112,8 +112,8 @@ public class MainActivity extends SneerActivity {
 
 	
 	private void startProfileActivityIfFirstTime() {
-//		if (sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable())
-//			startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable())
+			startActivity(new Intent(MainActivity.this, ProfileActivity.class));
 	}
 
 
