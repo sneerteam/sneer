@@ -33,20 +33,19 @@
                    (publish value))))))
           
           (local-payloads-of [type]
-            (let [tuple (.. tuple-space
-                            filter
-                            (author (party-puk party))
-                            (type type)
-                            localTuples
-                            toBlocking
-                            (firstOrDefault nil))]))]
+            (.. tuple-space
+                filter
+                (author (party-puk party))
+                (type type)
+                localTuples
+                toBlocking
+                (firstOrDefault nil)))]
 
     (let [^Subject preferred-nickname (payload-subject "profile/preferred-nickname")
           ^Subject own-name (payload-subject "profile/own-name")
           ^Subject selfie (payload-subject "profile/selfie")
           ^Subject city (payload-subject "profile/city")
-          ^Subject country (payload-subject "profile/country")
-          isOwnNameLocallyAvailable (not (nil? (local-payloads-of "profile/own-name")))]
+          ^Subject country (payload-subject "profile/country")]
 
       (reify Profile
         (ownName [this]
@@ -70,7 +69,7 @@
         (setCountry [this value]
           (rx/on-next country value))
         (isOwnNameLocallyAvailable [this]
-          isOwnNameLocallyAvailable)))))
+          (not (nil? (local-payloads-of "profile/own-name"))))))))
 
 (defn produce-profile [tuple-space profiles party]
   (produce! #(reify-profile % tuple-space) profiles party))

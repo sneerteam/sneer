@@ -264,14 +264,13 @@ public class ConversationsAPITest extends TestCase {
 	
 	public void testIsOwnNameLocallyAvailable() {
 		
-		Party self = sneerA.self();
-		Profile profileForSelf = sneerA.profileFor(self);
+		Profile profile = sneerA.profileFor(sneerA.self());
 		
-		assertEquals(false, profileForSelf.isOwnNameLocallyAvailable());
+		assertEquals(false, profile.isOwnNameLocallyAvailable());
 
-		profileForSelf.setOwnName("neide");
+		profile.setOwnName("neide");
 		
-		assertEquals(true, profileForSelf.isOwnNameLocallyAvailable());
+		assertEquals(true, profile.isOwnNameLocallyAvailable());
 		
 	}
 	

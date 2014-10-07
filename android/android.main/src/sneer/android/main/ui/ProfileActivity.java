@@ -171,12 +171,12 @@ public class ProfileActivity extends SneerActivity {
 
 
 	@Override
-    protected void onStop() {
-    	if (profile == self())
+	protected void onPause() {
+		if (profile == self())
     		saveProfile();
-		super.onStop();
-    }
-
+		super.onPause();
+	}
+	
 
 	private Profile self() {
 		return sneer().profileFor(sneer().self());
