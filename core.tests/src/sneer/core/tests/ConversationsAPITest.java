@@ -261,6 +261,20 @@ public class ConversationsAPITest extends TestCase {
 		
 	}	
 	
+	
+	public void testIsOwnNameLocallyAvailable() {
+		
+		Party self = sneerA.self();
+		Profile profileForSelf = sneerA.profileFor(self);
+		
+		assertEquals(false, profileForSelf.isOwnNameLocallyAvailable());
+		
+		profileForSelf.setOwnName("neide");
+		
+		assertEquals(true, profileForSelf.isOwnNameLocallyAvailable());
+	}
+	
+	
 	public void testTuplesFromContactsAreVisible() throws FriendlyException {
 		
 		sneerA.addContact("little b", sneerA.produceParty(userB));

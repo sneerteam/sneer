@@ -36,7 +36,8 @@
           ^Subject own-name (payload-subject "profile/own-name")
           ^Subject selfie (payload-subject "profile/selfie")
           ^Subject city (payload-subject "profile/city")
-          ^Subject country (payload-subject "profile/country")]
+          ^Subject country (payload-subject "profile/country")
+          isOwnNameLocallyAvailable false]
 
       (reify Profile
         (ownName [this]
@@ -58,7 +59,9 @@
         (country [this]
           (.asObservable country))
         (setCountry [this value]
-          (rx/on-next country value))))))
+          (rx/on-next country value))
+        (isOwnNameLocallyAvailable [this]
+          isOwnNameLocallyAvailable)))))
 
 (defn produce-profile [tuple-space profiles party]
   (produce! #(reify-profile % tuple-space) profiles party))
