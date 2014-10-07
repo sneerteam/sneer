@@ -268,10 +268,11 @@ public class ConversationsAPITest extends TestCase {
 		Profile profileForSelf = sneerA.profileFor(self);
 		
 		assertEquals(false, profileForSelf.isOwnNameLocallyAvailable());
-		
+
 		profileForSelf.setOwnName("neide");
 		
 		assertEquals(true, profileForSelf.isOwnNameLocallyAvailable());
+		
 	}
 	
 	
