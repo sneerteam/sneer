@@ -59,10 +59,6 @@ public abstract class LocalTuplesFactory {
 			return (Long) get("timestampCreated");
 		}
 
-		@Override
-		public long timestampReceived() {
-			return (Long) get("timestampReceived");
-		}
 	}
 	
 	protected Tuple newTupleFromMap(Map<String, Object> map) {
@@ -164,7 +160,6 @@ public abstract class LocalTuplesFactory {
 				ret.put("author", identity.publicKey());
 				long now = Clock.now();
 				ret.put("timestampCreated", now);
-				ret.put("timestampReceived", now);
 				publishTuple(ret);
 				return Observable.just((Tuple)ret);
 			}

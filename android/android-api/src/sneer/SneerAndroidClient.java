@@ -141,7 +141,7 @@ public class SneerAndroidClient {
 			@Override
 			public Observable<Message> previousMessages() {
 				return messages(new Func2<SneerAndroidClient.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
-					return msg.timestampReceived() <= session.lastMessageSeen;
+					return msg.timestampCreated() <= session.lastMessageSeen;
 				} }, new Func1<TupleFilter, Observable<Tuple>>() {  @Override public Observable<Tuple> call(TupleFilter t1) {
 					return t1.localTuples();
 				} });
@@ -150,7 +150,7 @@ public class SneerAndroidClient {
 			@Override
 			public Observable<Message> newMessages() {
 				return messages(new Func2<SneerAndroidClient.SessionInfo, Message, Boolean>() {  @Override public Boolean call(SessionInfo session, Message msg) {
-					return msg.timestampReceived() > session.lastMessageSeen;
+					return msg.timestampCreated() > session.lastMessageSeen;
 				} }, new Func1<TupleFilter, Observable<Tuple>>() {  @Override public Observable<Tuple> call(TupleFilter t1) {
 					return t1.tuples();
 				} });

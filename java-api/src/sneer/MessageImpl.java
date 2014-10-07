@@ -14,7 +14,7 @@ public class MessageImpl implements Message {
 	public static Func1<Tuple, Message> fromTuple(final PublicKey ownPuk) {
 		return new Func1<Tuple, Message>() { @Override public Message call(Tuple tuple) {
 			boolean isOwn = tuple.author().equals(ownPuk);
-			return new MessageImpl((Long)tuple.get("timestampCreated"), (Long)tuple.get("timestampReceived"), tuple.payload(), isOwn);
+			return new MessageImpl((Long)tuple.get("timestampCreated"), tuple.payload(), isOwn);
 		} };
 	}
 
@@ -22,24 +22,22 @@ public class MessageImpl implements Message {
 	private final Object content;
 	
 	private final long timestampCreated;
-	private final long timestampReceived;
 	
 	private final boolean isOwn;
 	
 	
-	public static Message createFrom(long timeCreated, long timeReceived, Object content) {
-		return new MessageImpl(timeCreated, timeReceived, content, false);
+	public static Message createFrom(long timeCreated, Object content) {
+		return new MessageImpl(timeCreated, content, false);
 	}	
 
 	
 	public static Message createOwn(long timeCreated, Object content) {
-		return new MessageImpl(timeCreated, timeCreated, content, true);
+		return new MessageImpl(timeCreated, content, true);
 	}	
 
 	
-	public MessageImpl(long timestampCreated, long timestampReceived, Object content, boolean isOwn) {
+	public MessageImpl(long timestampCreated, Object content, boolean isOwn) {
 		this.timestampCreated = timestampCreated;
-		this.timestampReceived = timestampReceived;
 		this.content = content;
 		this.isOwn = isOwn;
 	}
@@ -67,7 +65,7 @@ public class MessageImpl implements Message {
 	/** When this message was received. */
 	@Override
 	public long timestampReceived() {
-		return timestampReceived;
+		return 0;
 	}
 
 

@@ -24,6 +24,4 @@ public interface Tuple extends Map<String, Object> {
 	
 	long timestampCreated();
 
-	long timestampReceived();
-
 }

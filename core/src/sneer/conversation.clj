@@ -16,7 +16,6 @@
 
 (defn tuple->message [own-puk ^Tuple tuple]
   (let [created (.timestampCreated tuple)
-        received (.timestampReceived tuple)
         type (.type tuple)
         label (.get tuple "label")
         content (if (= type "message") (.payload tuple) (if label label type))
@@ -26,11 +25,12 @@
       (isOwn [this] own?)
       (content [this] content)
       (timestampCreated [this] created)
-      (timestampReceived [this] received)
+      (timestampReceived [this] 0)
       (timeCreated [this] (format-date created))
       (tuple [this] tuple))))
 
-(def message-comparator (fn [m1 m2] (compare (.timestampCreated m1) (.timestampCreated m2))))
+(defn values-to-compare [msg] [(.timestampCreated msg) (.content msg)])
+(def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [^PublicKey party-puk (party-puk party)
