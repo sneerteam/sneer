@@ -30,14 +30,23 @@
                latest
                (reify rx.Observer
                  (onNext [this value]
-                   (publish value))))))]
+                   (publish value))))))
+          
+          (local-payloads-of [type]
+            (let [tuple (.. tuple-space
+                            filter
+                            (author (party-puk party))
+                            (type type)
+                            localTuples
+                            toBlocking
+                            (firstOrDefault nil))]))]
 
     (let [^Subject preferred-nickname (payload-subject "profile/preferred-nickname")
           ^Subject own-name (payload-subject "profile/own-name")
           ^Subject selfie (payload-subject "profile/selfie")
           ^Subject city (payload-subject "profile/city")
           ^Subject country (payload-subject "profile/country")
-          isOwnNameLocallyAvailable false]
+          isOwnNameLocallyAvailable (not (nil? (local-payloads-of "profile/own-name")))]
 
       (reify Profile
         (ownName [this]
