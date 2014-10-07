@@ -10,29 +10,6 @@
    [sneer.tuples Tuple TupleSpace]
    [java.text SimpleDateFormat]))
 
-
-
-
-;(defn comp [t1 t2]
-;  (let [c (compare (:tr t1) (:tr t2))]
-;    (if (not= c 0)
-;      c
-;      (let [c (compare (:tc t1) (:tc t2))]
-;        (if (not= c 0)
-;          c
-;          (compare (:id t1) (:id t2)))))))
-
-;(defn new-comp [t1 t2]
-;  (let [c1 (compare (:tr t1) (:tr t2))
-;        c2 (compare (:tc t1) (:tc t2))
-;        c3 (compare (:id t1) (:id t2))]
-;    (if (not= c1 0)
-;      c1
-;      (if (not= c2 0)
-;        c2
-;        c3))))
-
-
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 
 (defn format-date [time] (.format simple-date-format time))
@@ -57,8 +34,6 @@
 
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [^PublicKey party-puk (party-puk party)
-;        messages (atom [])
-;        observable-messages (atom->observable messages)
         messages (atom (sorted-set-by message-comparator))
         observable-messages (rx/map vec (atom->observable messages))
         message-filter (.. tuple-space filter (field "conversation?" true))]
