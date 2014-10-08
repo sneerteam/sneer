@@ -39,8 +39,8 @@ digraph {
 		Server -> { Network Keys };
 	}
 
-	subgraph cluster_RPS { label="RPS";
-		RPSActivity -> SessionActivity;
+	subgraph cluster_Lizard { label="Lizard Spock";
+		LizardSpockActivity -> SessionActivity;
 	}
 
 	subgraph cluster_Send_Pic { label="Send Picture App";
