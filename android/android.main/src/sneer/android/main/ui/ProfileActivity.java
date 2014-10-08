@@ -115,30 +115,28 @@ public class ProfileActivity extends SneerActivity {
 	
 	
 	public void saveProfile() {
-		if (lastNameEdit.getVisibility() == View.GONE) {
-			if (firstNameEdit.getText().toString().trim().length() > 1)
-				profile.setOwnName(firstNameEdit.getText().toString());
-		} else {
-			if (firstNameEdit.getText().toString().trim().length() > 1 && lastNameEdit.getText().toString().trim().length() > 1) 
-				profile.setOwnName(firstNameEdit.getText() + " " + lastNameEdit.getText());
-		}
-		
-		String preferredNickname = preferredNickNameEdit.getText().toString();
+		String preferredNickname = text(preferredNickNameEdit);
 		profile.setPreferredNickname(preferredNickname);
 		
-		String country = countryEdit.getText().toString();
+		String country = text(countryEdit);
 		profile.setCountry(country);
 		
-		String city = cityEdit.getText().toString();
+		String city = text(cityEdit);
 		profile.setCity(city);
 		
 		if (selfieBytes != null)
 			profile.setSelfie(selfieBytes);
 
-		toast("profile saved...");
+		if (lastNameEdit.getVisibility() == View.GONE) {
+			if (text(firstNameEdit).length() > 1) 
+				setOwnName(text(firstNameEdit));
+		} else {
+			if (text(firstNameEdit).length() > 1 && text(lastNameEdit).length() > 1) 
+				setOwnName(text(firstNameEdit) + " " + text(lastNameEdit));
+		}
 	}
-	
-	
+
+
 	public void selfieOnClick(View v) {
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -184,7 +182,7 @@ public class ProfileActivity extends SneerActivity {
     
     
 	public void checkMoreThanOneCharacter(EditText edt) {
-		if (edt.getText().toString().trim().length() <= 1)
+		if (text(edt).length() <= 1)
 			edt.setError("Name too short");
 	}
 
@@ -198,7 +196,16 @@ public class ProfileActivity extends SneerActivity {
 			}
 		}});
 	}
-	
 
+
+	private void setOwnName(String name) {
+		profile.setOwnName(name);
+		toast("Profile saved");
+	}
+
+
+	private String text(EditText editText) {
+		return editText.getText().toString().trim();
+	}
 	
 }
