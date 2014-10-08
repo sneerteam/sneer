@@ -32,6 +32,8 @@
 (defn values-to-compare [msg] [(.timestampCreated msg) (.content msg)])
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
+(def unread-message-counter (atom 0))
+
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [^PublicKey party-puk (party-puk party)
         messages (atom (sorted-set-by message-comparator))
@@ -44,7 +46,10 @@
         (rx/merge
           (.. message-filter (author own-puk) (audience party-puk) tuples)
           (.. message-filter (author party-puk) (audience own-puk) tuples)))
-      #(swap! messages conj (tuple->message own-puk %)))
+      (fn [tuple]
+        (swap! messages conj (tuple->message own-puk tuple))        
+        (swap! unread-message-counter inc)
+        (println "unread: " @unread-message-counter)))
     
     (reify
       Conversation      
@@ -70,9 +75,13 @@
     
       (menu [this] conversation-menu-items)
     
-      (unreadMessageCount [this] (rx.Observable/just 1))
+      (unreadMessageCount [this]
+        (atom->observable unread-message-counter))
     
-      (unreadMessageCountReset [this]))))
+      (unreadMessageCountReset [this]
+        (swap! unread-message-counter (fn [_] 0))
+        ;(reset! unread-message-counter 0)
+        (println "reset: " @unread-message-counter)))))
 
 (defn produce-conversation [tuple-space conversation-menu-items own-puk party]
   (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))
