@@ -192,7 +192,7 @@ public class ContactActivity extends Activity {
 					sneer().addContact(nickName, party);
 				else if(isTouched)
 					sneer().findContact(party).setNickname(nickName);
-				toast("contact saved...");
+				toast("Contact saved");
 			} catch (FriendlyException e) {
 				toast(e.getMessage());
 			}
@@ -207,10 +207,10 @@ public class ContactActivity extends Activity {
 
 	
 	@Override
-	protected void onStop() {
+	protected void onPause() {
 		if(!isOwn)
 			saveContact();
-		super.onStop();
+		super.onPause();
 	}
 
 	
