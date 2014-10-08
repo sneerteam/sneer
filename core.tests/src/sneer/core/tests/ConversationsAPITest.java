@@ -355,6 +355,39 @@ public class ConversationsAPITest extends TestCase {
 		Conversation newConvo = sneerA.produceConversationWith(newB);
 		messagesEventually(newConvo, "Hello1", "Hello2", "Hello3");
 	}
+	
+	
+	public void testUnreadMessageCount() throws Exception {
+		
+		Party pAB = sneerA.produceParty(userB);
+		sneerA.addContact("b", pAB);
+		Conversation cAB = sneerA.produceConversationWith(pAB);
+		
+		Party pBA = sneerB.produceParty(userA);
+		sneerB.addContact("a", pBA);
+		Conversation cBA = sneerB.produceConversationWith(pBA);
+	
+		System.out.println("0 msg");
+		expecting(eventually(cBA.unreadMessageCount(), 0L));
+		
+		System.out.println("Hello1");
+		cAB.sendMessage("Hello1");
+		System.out.println("1 msg");
+		expecting(eventually(cBA.unreadMessageCount(), 1L));
+		
+		System.out.println("reset");
+		cBA.unreadMessageCountReset();
+		System.out.println("0 msg");
+		expecting(eventually(cBA.unreadMessageCount(), 0L));
+		
+		System.out.println("Hello2");
+		cAB.sendMessage("Hello2");
+		System.out.println("Hello3");
+		cAB.sendMessage("Hello3");
+		System.out.println("2 msg");
+		expecting(eventually(cBA.unreadMessageCount(), 2L));
+		
+	}
 
 	
 	private void messagesEventually(Conversation convo, String... msgsExpected) {
