@@ -231,12 +231,6 @@ public class SneerSimulator implements Sneer {
 
 
 	@Override
-	public Observable<String> nameFor(Party party) {
-		throw new UnsupportedOperationException("deprecated, use party.name()");
-	}
-
-
-	@Override
 	public void setConversationMenuItems(List<ConversationMenuItem> menuItems) {
 		ConversationSimulator.menu.onNext(menuItems);
 	}

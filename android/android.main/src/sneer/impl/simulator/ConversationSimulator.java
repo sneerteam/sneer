@@ -97,7 +97,7 @@ public class ConversationSimulator implements Conversation {
 	
 	
 	private void simulateReceivedMessage(String content) {
-		addMessage(createFrom(now(), now(), content));
+		addMessage(createFrom(now(), content));
 	}
 	
 	

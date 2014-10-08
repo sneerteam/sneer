@@ -11,7 +11,9 @@ import android.util.Log;
 public class SendLocationActivity extends MessageActivity implements LocationListener {
 
 	protected LocationManager locationManager;
+	@SuppressWarnings("unused")
 	private String longitude;
+	@SuppressWarnings("unused")
 	private String latitude;
 	
 	@Override
