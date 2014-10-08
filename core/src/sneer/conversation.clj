@@ -5,7 +5,7 @@
    [sneer.party :refer [party-puk]]
    [sneer.commons :refer [now]])
   (:import
-   [sneer PublicKey Party Conversation Message]
+   [sneer PublicKey Party Contact Conversation Message]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace]
    [java.text SimpleDateFormat]))
@@ -80,8 +80,19 @@
     
       (unreadMessageCountReset [this]
         (swap! unread-message-counter (fn [_] 0))
-        ;(reset! unread-message-counter 0)
         (println "reset: " @unread-message-counter)))))
 
 (defn produce-conversation [tuple-space conversation-menu-items own-puk party]
   (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))
+
+(defn create-conversations-state [own-puk tuple-space contacts conversation-menu-items]
+  {:own-puk own-puk
+   :tuple-space tuple-space
+   :contacts contacts
+   :conversation-menu-items conversation-menu-items})
+
+(defn conversations [{:keys [own-puk tuple-space contacts conversation-menu-items]}]
+  (->>
+    contacts
+    (rx/map
+      (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c)))))))
