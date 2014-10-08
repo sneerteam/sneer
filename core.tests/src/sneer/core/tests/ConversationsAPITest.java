@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
+
 import rx.Observable;
 import rx.functions.Func1;
 import rx.observables.ConnectableObservable;
@@ -356,9 +357,9 @@ public class ConversationsAPITest extends TestCase {
 		messagesEventually(newConvo, "Hello1", "Hello2", "Hello3");
 	}
 	
-	
-	public void testUnreadMessageCount() throws Exception {
-		
+	public void ignoredTestUnreadMessageCount() throws Exception {
+
+		int unignore;
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
 		Conversation cAB = sneerA.produceConversationWith(pAB);
