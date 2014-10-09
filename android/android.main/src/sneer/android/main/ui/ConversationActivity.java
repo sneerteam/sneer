@@ -74,7 +74,7 @@ public class ConversationActivity extends SneerActivity {
 //		}});
 
 		conversation = sneer().produceConversationWith(party);
-		conversation.unreadMessageCountReset();
+		conversation.setBeingRead(true);
 
 		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),
@@ -174,6 +174,20 @@ public class ConversationActivity extends SneerActivity {
 			messages.add(insertionPoint, msg);
 			adapter.notifyDataSetChanged();
 		}
+	}
+	
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		conversation.setBeingRead(false);
+	}
+	
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		conversation.setBeingRead(true);
 	}
 	
 }

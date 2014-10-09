@@ -33,6 +33,8 @@ public class ConversationSimulator implements Conversation {
 	private final ObservedSubject<Long> mostRecentMessageTimestamp = ObservedSubject.create(0L);
 	private final ObservedSubject<String> mostRecentMessageContent = ObservedSubject.create("");
 	private final ObservedSubject<Long> unreadMessageCount = ObservedSubject.create(4L);
+
+	private boolean isBeingRead;
 	
 	ConversationSimulator(Party party) {
 		this.party = party;
@@ -129,8 +131,8 @@ public class ConversationSimulator implements Conversation {
 
 
 	@Override
-	public void unreadMessageCountReset() {
-		unreadMessageCount.onNext(0L);
+	public void setBeingRead(boolean isBeingRead) {
+		this.isBeingRead = isBeingRead;
 	}
 
 }
