@@ -1,7 +1,7 @@
 (ns sneer.conversation
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [atom->observable]]
+   [sneer.rx :refer [atom->observable subscribe-on-io]]
    [sneer.party :refer [party-puk]]
    [sneer.commons :refer [now]])
   (:import
@@ -38,20 +38,22 @@
         observable-messages (rx/map vec (atom->observable messages))
         message-filter (.. tuple-space filter (field "conversation?" true))
         unread-message-counter (atom 0)
-        being-read (atom nil)]
+        being-read (atom nil)
+        msg-tuples-out (.. message-filter (author own-puk) (audience party-puk) tuples)
+        msg-tuples-in  (.. message-filter (author party-puk) (audience own-puk) tuples)]
     
-    (rx/subscribe
-      (rx/subscribe-on
-        (rx.schedulers.Schedulers/io)
-        (rx/merge
-          (.. message-filter (author own-puk) (audience party-puk) tuples)
-          (.. message-filter (author party-puk) (audience own-puk) tuples)))
+    (subscribe-on-io
+      (rx/merge msg-tuples-out msg-tuples-in)
       (fn [tuple]
-        (swap! messages conj (tuple->message own-puk tuple))        
-        (swap! unread-message-counter inc)))
+        (swap! messages conj (tuple->message own-puk tuple))))
+    
+    (subscribe-on-io
+      msg-tuples-in
+      (fn [_]
+        (swap! unread-message-counter (if-not @being-read inc))))
     
     (reify
-      Conversation      
+      Conversation
       (party [this] party)
       
       (messages [this]

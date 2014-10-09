@@ -50,6 +50,11 @@
 (defn observe-for-io [^rx.Observable o]
   (.observeOn o (Schedulers/io)))
 
+(defn subscribe-on-io [^rx.Observable o on-next-action]
+  (rx/subscribe
+    (rx/subscribe-on (rx.schedulers.Schedulers/io) o)
+    on-next-action))
+
 (defn shared-latest [^rx.Observable o]
   "Returns a `rx.Observable' that publishes the latest value of the source sequence
    while sharing a single subscription as long as there are subscribers."
