@@ -37,7 +37,8 @@
         messages (atom (sorted-set-by message-comparator))
         observable-messages (rx/map vec (atom->observable messages))
         message-filter (.. tuple-space filter (field "conversation?" true))
-        unread-message-counter (atom 0)]
+        unread-message-counter (atom 0)
+        being-read (atom nil)]
     
     (rx/subscribe
       (rx/subscribe-on
@@ -76,9 +77,9 @@
       (unreadMessageCount [this]
         (atom->observable unread-message-counter))
     
-      (unreadMessageCountReset [this]
-        (swap! unread-message-counter (fn [_] 0))
-        (println "reset: " @unread-message-counter)))))
+      (setBeingRead [this is-being-read]
+        (swap! being-read (fn [_] is-being-read))
+        (if @being-read (swap! unread-message-counter (fn [_] 0)))))))
 
 (defn produce-conversation [tuple-space conversation-menu-items own-puk party]
   (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))

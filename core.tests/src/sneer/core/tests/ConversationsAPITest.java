@@ -357,9 +357,8 @@ public class ConversationsAPITest extends TestCase {
 		messagesEventually(newConvo, "Hello1", "Hello2", "Hello3");
 	}
 	
-	public void ignoredTestUnreadMessageCount() throws Exception {
+	public void testUnreadMessageCount() throws Exception {
 
-		int unignore;
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
 		Conversation cAB = sneerA.produceConversationWith(pAB);
@@ -368,24 +367,19 @@ public class ConversationsAPITest extends TestCase {
 		sneerB.addContact("a", pBA);
 		Conversation cBA = sneerB.produceConversationWith(pBA);
 	
-		System.out.println("0 msg");
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 		
-		System.out.println("Hello1");
 		cAB.sendMessage("Hello1");
-		System.out.println("1 msg");
 		expecting(eventually(cBA.unreadMessageCount(), 1L));
 		
-		System.out.println("reset");
-		cBA.unreadMessageCountReset();
-		System.out.println("0 msg");
+		cBA.setBeingRead(true);
+		expecting(eventually(cBA.unreadMessageCount(), 0L));
+		cAB.sendMessage("Hello2");
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 		
-		System.out.println("Hello2");
-		cAB.sendMessage("Hello2");
-		System.out.println("Hello3");
+		cBA.setBeingRead(false);
 		cAB.sendMessage("Hello3");
-		System.out.println("2 msg");
+		cAB.sendMessage("Hello4");
 		expecting(eventually(cBA.unreadMessageCount(), 2L));
 		
 	}
