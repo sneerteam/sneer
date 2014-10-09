@@ -32,13 +32,12 @@
 (defn values-to-compare [msg] [(.timestampCreated msg) (.content msg)])
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
-(def unread-message-counter (atom 0))
-
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [^PublicKey party-puk (party-puk party)
         messages (atom (sorted-set-by message-comparator))
         observable-messages (rx/map vec (atom->observable messages))
-        message-filter (.. tuple-space filter (field "conversation?" true))]
+        message-filter (.. tuple-space filter (field "conversation?" true))
+        unread-message-counter (atom 0)]
     
     (rx/subscribe
       (rx/subscribe-on
