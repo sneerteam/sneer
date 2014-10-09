@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation flatmapseq]]
-   [sneer.conversation :refer [produce-conversation create-conversations-state conversations]]
+   [sneer.conversation :refer [produce-conversation create-conversations-state conversations produce-conversation-with]]
    [sneer.contact :refer [create-contacts-state add-contact get-contacts find-contact problem-with-new-nickname]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
@@ -52,8 +52,8 @@
           (conversations [this]
             (conversations conversations-state))
           
-          (produceConversationWith [this party] 
-            (produce-conversation tuple-space conversation-menu-items own-puk party))
+          (produceConversationWith [this party]
+            (produce-conversation-with conversations-state party))
           
           (setConversationMenuItems [this menu-item-list]
             (rx/on-next conversation-menu-items menu-item-list))

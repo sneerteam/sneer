@@ -47,8 +47,7 @@
           (.. message-filter (author party-puk) (audience own-puk) tuples)))
       (fn [tuple]
         (swap! messages conj (tuple->message own-puk tuple))        
-        (swap! unread-message-counter inc)
-        (println "unread: " @unread-message-counter)))
+        (swap! unread-message-counter inc)))
     
     (reify
       Conversation      
@@ -95,3 +94,6 @@
     contacts
     (rx/map
       (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c)))))))
+
+(defn produce-conversation-with [{:keys [own-puk tuple-space contacts conversation-menu-items]} party]
+  (produce-conversation tuple-space conversation-menu-items own-puk party))
