@@ -11,7 +11,7 @@ import sneer.Message;
 import sneer.Sneer;
 import sneer.SneerAndroidClient;
 import sneer.admin.SneerAdmin;
-import sneer.android.main.core.SneerSqliteDatabase;
+import sneer.android.main.database.SneerSqliteDatabase;
 import sneer.android.main.ipc.PluginHandler;
 import sneer.android.main.ipc.PluginManager;
 import sneer.android.main.ui.ConversationActivity;

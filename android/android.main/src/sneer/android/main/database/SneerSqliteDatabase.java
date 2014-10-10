@@ -1,4 +1,4 @@
-package sneer.android.main.core;
+package sneer.android.main.database;
 
 import java.io.*;
 import java.util.*;

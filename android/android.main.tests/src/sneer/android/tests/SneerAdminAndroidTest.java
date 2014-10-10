@@ -3,7 +3,7 @@ package sneer.android.tests;
 import java.io.File;
 import java.io.IOException;
 
-import sneer.android.main.core.SneerSqliteDatabase;
+import sneer.android.main.database.SneerSqliteDatabase;
 import sneer.core.tests.SneerAdminTest;
 
 public class SneerAdminAndroidTest extends SneerAdminTest {
