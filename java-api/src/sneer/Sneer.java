@@ -15,7 +15,7 @@ public interface Sneer {
 	Observable<List<Contact>> contacts();
 	/** @return null if party is not a contact. */
 	Contact findContact(Party party); 
-	/** if nickname is already set for another contact or if party is already a contact expect onError to be a FriendlyException. */
+	/** @throws FriendlyException if nickname is already set for another contact or if party is already a contact. */
 	void addContact(String nickname, Party party) throws FriendlyException;
 	/** @return null if the new nickname is ok or a reason why the new nickname is not ok. */
 	String problemWithNewNickname(String newNick);
@@ -34,6 +34,5 @@ public interface Sneer {
 	void setConversationMenuItems(List<ConversationMenuItem> menuItems);
 	
 	TupleSpace tupleSpace();
-
 
 }
