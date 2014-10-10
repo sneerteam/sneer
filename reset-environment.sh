@@ -26,7 +26,7 @@ cd android && ./gradlew jarNodeps eclipse && cd - || echo "Error preparing andro
 #Removing unnecessary .project file that makes eclipse mistakenly load "apps" as a project. Todo: tweak gradle build to not generate this file.
 rm android/apps/.project
 
-if [ -d "../rockpaperscissors" ]; then
+if [ -d "../lizardspock" ]; then
 	echo COPYING NODEPS JAR...
 	rm -f ../lizardspock/libs/sneer-android-api-nodeps-*.jar
 	cp -f android/android-api/build/libs/sneer-android-api-nodeps-*.jar ../lizardspock/libs/
