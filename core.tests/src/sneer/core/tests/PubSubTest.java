@@ -1,7 +1,13 @@
 package sneer.core.tests;
 
 import static junit.framework.Assert.assertEquals;
-import static sneer.core.tests.ObservableTestUtils.*;
+import static sneer.core.tests.ObservableTestUtils.assertList;
+import static sneer.core.tests.ObservableTestUtils.expecting;
+import static sneer.core.tests.ObservableTestUtils.field;
+import static sneer.core.tests.ObservableTestUtils.notifications;
+import static sneer.core.tests.ObservableTestUtils.payloadSet;
+import static sneer.core.tests.ObservableTestUtils.payloads;
+import static sneer.core.tests.ObservableTestUtils.values;
 import static sneer.tuples.Tuple.TO_TYPE;
 
 import java.util.List;

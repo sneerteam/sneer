@@ -1,13 +1,15 @@
 package sneer.core.tests;
 
-import static sneer.ClojureUtils.*;
-import static sneer.core.tests.Glue.*;
+import static sneer.ClojureUtils.dispose;
+import static sneer.core.tests.Glue.newNetworkSimulator;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-import junit.framework.*;
-import sneer.*;
-import sneer.admin.*;
+import junit.framework.TestCase;
+import sneer.ClojureUtils;
+import sneer.PrivateKey;
+import sneer.admin.SneerAdmin;
 
 public class SneerAdminTest extends TestCase {
 	

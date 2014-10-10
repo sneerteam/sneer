@@ -6,7 +6,6 @@ import java.util.*;
 import rx.functions.*;
 import sneer.tuples.*;
 
-
 public class MessageImpl implements Message {
 	
 	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm");

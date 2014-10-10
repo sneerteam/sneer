@@ -1,6 +1,6 @@
 package sneer.rx;
 
-import rx.*;
+import rx.Observable;
 
 /** An Observable that has a notion of a current value. */
 public interface Observed<T> {

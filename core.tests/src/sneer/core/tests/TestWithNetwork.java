@@ -1,6 +1,6 @@
 package sneer.core.tests;
 
-import org.junit.*;
+import org.junit.After;
 
 public class TestWithNetwork {
 

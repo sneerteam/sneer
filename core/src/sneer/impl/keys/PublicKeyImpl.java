@@ -1,11 +1,12 @@
 package sneer.impl.keys;
 
-import java.math.*;
+import java.math.BigInteger;
 
-import sneer.*;
-import sneer.commons.exceptions.*;
+import sneer.PublicKey;
+import sneer.commons.exceptions.Exceptions;
 
-import com.google.bitcoin.core.*;
+import com.google.bitcoin.core.ECKey;
+import com.google.bitcoin.core.Utils;
 
 class PublicKeyImpl implements PublicKey {
 	

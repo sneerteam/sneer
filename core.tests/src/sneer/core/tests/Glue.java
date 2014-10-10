@@ -1,10 +1,14 @@
 package sneer.core.tests;
 
-import static sneer.ClojureUtils.*;
-import rx.*;
-import sneer.*;
-import sneer.admin.*;
-import sneer.tuples.*;
+import static sneer.ClojureUtils.adminVar;
+import static sneer.ClojureUtils.dispose;
+import static sneer.ClojureUtils.sneerCoreVar;
+import static sneer.ClojureUtils.var;
+import rx.Observable;
+import sneer.PrivateKey;
+import sneer.PublicKey;
+import sneer.admin.SneerAdmin;
+import sneer.tuples.TupleSpace;
 
 public class Glue {
 

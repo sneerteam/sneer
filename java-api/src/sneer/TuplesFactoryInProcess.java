@@ -34,6 +34,7 @@ public class TuplesFactoryInProcess extends LocalTuplesFactory {
 				return t1.audience() == null || t1.author().equals(identity.publicKey()) || t1.audience().equals(identity.publicKey());
 			} });
 		}
+		
 		for (final Entry<String, Object> criterion : criteria.entrySet()) {
 			t = t.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
 				String key = criterion.getKey();

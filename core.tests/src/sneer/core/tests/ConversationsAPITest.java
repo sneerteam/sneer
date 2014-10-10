@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
-
 import rx.Observable;
 import rx.functions.Func1;
 import rx.observables.ConnectableObservable;

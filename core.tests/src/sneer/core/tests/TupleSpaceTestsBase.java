@@ -1,11 +1,13 @@
 package sneer.core.tests;
 
-import rx.*;
-import rx.functions.*;
-import rx.subjects.*;
-import sneer.*;
-import sneer.impl.keys.*;
-import sneer.tuples.*;
+import rx.Observable;
+import rx.functions.Func0;
+import rx.subjects.ReplaySubject;
+import sneer.PrivateKey;
+import sneer.PublicKey;
+import sneer.impl.keys.KeysImpl;
+import sneer.tuples.Tuple;
+import sneer.tuples.TupleSpace;
 
 public class TupleSpaceTestsBase extends TestWithNetwork {
 	

@@ -1,6 +1,5 @@
 package sneer.commons;
 
-
 public class Pair<A, B> {
 
 	public static <A, B> Pair<A, B> of(A a, B b) {

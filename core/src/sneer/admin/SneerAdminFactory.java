@@ -1,6 +1,6 @@
 package sneer.admin;
 
-import sneer.*;
+import sneer.ClojureUtils;
 
 public class SneerAdminFactory {
 	

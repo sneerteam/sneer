@@ -1,10 +1,11 @@
 package sneer;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 import rx.Observable;
-import sneer.commons.*;
-import sneer.rx.*;
+import sneer.commons.Comparators;
+import sneer.rx.Observed;
 
 public interface Conversation {
 

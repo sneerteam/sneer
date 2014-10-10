@@ -1,6 +1,6 @@
 package sneer;
 
-import rx.*;
+import rx.Observable;
 
 public interface Profile {
 

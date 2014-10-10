@@ -1,9 +1,10 @@
 package sneer.core.tests;
 
-import static sneer.core.tests.ObservableTestUtils.*;
-import static sneer.tuples.Tuple.*;
-import rx.*;
-import sneer.tuples.*;
+import static sneer.core.tests.ObservableTestUtils.expecting;
+import static sneer.core.tests.ObservableTestUtils.values;
+import static sneer.tuples.Tuple.TO_PAYLOAD;
+import rx.Observable;
+import sneer.tuples.Tuple;
 
 public class TupleTestUtils {
 

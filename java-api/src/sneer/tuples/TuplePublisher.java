@@ -1,10 +1,11 @@
 package sneer.tuples;
 
-import java.util.*;
+import java.util.Map;
 
 import rx.Observable;
-import rx.functions.*;
-import sneer.*;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import sneer.PublicKey;
 
 public interface TuplePublisher extends Action1<Object>, Action0 {
 

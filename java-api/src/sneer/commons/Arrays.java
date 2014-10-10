@@ -1,8 +1,8 @@
 package sneer.commons;
 
-import java.util.*;
+import java.util.List;
 
-import rx.functions.*;
+import rx.functions.Func1;
 
 public class Arrays {
 	

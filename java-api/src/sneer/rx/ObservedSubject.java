@@ -1,9 +1,10 @@
 package sneer.rx;
 
-import rx.*;
-import rx.functions.*;
-import rx.subjects.*;
-
+import rx.Observable;
+import rx.Observer;
+import rx.functions.Action1;
+import rx.subjects.BehaviorSubject;
+import rx.subjects.Subject;
 
 public class ObservedSubject<T> implements Observer<T> {
 

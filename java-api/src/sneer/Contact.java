@@ -1,9 +1,9 @@
 package sneer;
 
-import rx.*;
-import rx.functions.*;
-import sneer.commons.exceptions.*;
-import sneer.rx.*;
+import rx.Observable;
+import rx.functions.Func1;
+import sneer.commons.exceptions.FriendlyException;
+import sneer.rx.Observed;
 
 public interface Contact {
 

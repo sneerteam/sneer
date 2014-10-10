@@ -1,8 +1,8 @@
 package sneer.core.tests;
 
-import org.junit.*;
+import org.junit.Ignore;
 
-import sneer.*;
+import sneer.ClojureUtils;
 
 @Ignore("wip")
 public class PubSubOverUnreliableNetwork extends PubSubTest {
@@ -11,4 +11,5 @@ public class PubSubOverUnreliableNetwork extends PubSubTest {
 	protected Object newNetwork() {
 		return ClojureUtils.var("sneer.core.tests.local-server-network", "start").invoke("unreliable");
 	}
+
 }

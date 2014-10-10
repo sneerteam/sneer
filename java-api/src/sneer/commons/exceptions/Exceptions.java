@@ -1,6 +1,5 @@
 package sneer.commons.exceptions;
 
-
 public class Exceptions {
 
 	public static String asNiceMessage(Throwable t) {

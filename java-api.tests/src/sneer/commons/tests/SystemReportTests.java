@@ -1,10 +1,10 @@
 package sneer.commons.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.*;
+import org.junit.Test;
 
-import sneer.commons.*;
+import sneer.commons.SystemReport;
 
 public class SystemReportTests {
 

@@ -1,6 +1,6 @@
 package sneer.commons;
 
-import java.util.*;
+import java.util.List;
 
 public class Lists {
 

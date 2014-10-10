@@ -1,9 +1,11 @@
 package sneer.core.tests;
 
-import java.io.*;
+import java.io.Closeable;
 
-import org.junit.*;
-import sneer.*;
+import org.junit.Assert;
+import org.junit.Test;
+
+import sneer.ClojureUtils;
 
 public class DisposableProtocolTest {
 	

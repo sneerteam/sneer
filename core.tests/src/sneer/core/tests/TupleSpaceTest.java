@@ -1,10 +1,11 @@
 package sneer.core.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotSame;
 
-import org.junit.*;
+import org.junit.Test;
 
-import sneer.tuples.*;
+import sneer.tuples.TupleFilter;
+import sneer.tuples.TuplePublisher;
 
 public class TupleSpaceTest extends TupleSpaceTestsBase {
 	

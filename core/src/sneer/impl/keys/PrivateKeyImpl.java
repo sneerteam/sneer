@@ -1,10 +1,12 @@
 package sneer.impl.keys;
 
-import java.math.*;
+import java.math.BigInteger;
 
-import sneer.*;
+import sneer.PrivateKey;
+import sneer.PublicKey;
 
-import com.google.bitcoin.core.*;
+import com.google.bitcoin.core.ECKey;
+import com.google.bitcoin.core.Utils;
 
 class PrivateKeyImpl implements PrivateKey { private static final long serialVersionUID = 1L;
 

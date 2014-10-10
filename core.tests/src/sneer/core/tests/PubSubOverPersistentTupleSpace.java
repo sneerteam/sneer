@@ -1,7 +1,7 @@
 package sneer.core.tests;
 
-import rx.functions.*;
-import sneer.*;
+import rx.functions.Func0;
+import sneer.ClojureUtils;
 
 public class PubSubOverPersistentTupleSpace extends PubSubTest {
 	

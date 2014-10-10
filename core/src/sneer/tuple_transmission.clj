@@ -32,7 +32,7 @@
     (alt!
       tuples-in
       ([tuple]
-        ; store tuple if not already in the q
+        ; store tuple if not already in the queue
         (recur))
       packets-in
       ([packet]

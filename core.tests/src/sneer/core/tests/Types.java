@@ -1,6 +1,5 @@
 package sneer.core.tests;
 
-
 public class Types extends TupleSpaceTestsBase {
 	
 //	@Test

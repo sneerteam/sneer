@@ -1,6 +1,6 @@
 package sneer.core.tests;
 
-import sneer.*;
+import sneer.ClojureUtils;
 
 public class PubSubOverLocalServerNetwork extends PubSubTest {
 	

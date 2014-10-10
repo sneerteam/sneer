@@ -1,8 +1,8 @@
 package sneer.core.tests;
 
-import org.junit.*;
+import org.junit.Ignore;
 
-import sneer.*;
+import sneer.ClojureUtils;
 
 @Ignore("unignore to test against production server")
 public class PubSubOverServerNetwork extends PubSubTest {
