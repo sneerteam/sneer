@@ -34,8 +34,6 @@ public class ConversationSimulator implements Conversation {
 	private final ObservedSubject<String> mostRecentMessageContent = ObservedSubject.create("");
 	private final ObservedSubject<Long> unreadMessageCount = ObservedSubject.create(4L);
 
-	private boolean isBeingRead;
-	
 	ConversationSimulator(Party party) {
 		this.party = party;
 		sendMessage("Vai ter festa!!!! Uhuu!!!");
@@ -132,7 +130,7 @@ public class ConversationSimulator implements Conversation {
 
 	@Override
 	public void setBeingRead(boolean isBeingRead) {
-		this.isBeingRead = isBeingRead;
+		System.out.println("Conversation.isBeingRead(" + isBeingRead + ")");
 	}
 
 }
