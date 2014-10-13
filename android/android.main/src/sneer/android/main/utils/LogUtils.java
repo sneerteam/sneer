@@ -13,7 +13,7 @@ public class LogUtils {
 		Log.e(class1.getSimpleName(), msg, t);
 	}
 
-	public static void warn(Class<SneerAndroidCore> class1, String msg, Exception e) {
+	public static void warn(Class<?> class1, String msg, Exception e) {
 		Log.w(class1.getSimpleName(), "Error loading bitmap", e);
 	}
 
