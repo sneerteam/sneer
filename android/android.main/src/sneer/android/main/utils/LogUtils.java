@@ -1,6 +1,5 @@
 package sneer.android.main.utils;
 
-import sneer.android.main.SneerAndroidCore;
 import android.util.Log;
 
 public class LogUtils {
@@ -15,6 +14,10 @@ public class LogUtils {
 
 	public static void warn(Class<?> class1, String msg, Exception e) {
 		Log.w(class1.getSimpleName(), "Error loading bitmap", e);
+	}
+	
+	public static void debug(Class<?> class1, String msg) {
+		Log.d(class1.getSimpleName(), msg);
 	}
 
 }

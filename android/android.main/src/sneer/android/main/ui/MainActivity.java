@@ -14,7 +14,6 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -116,11 +115,6 @@ public class MainActivity extends SneerActivity {
 			toast("First and last name must be filled in");			
 			startActivity(new Intent(this, ProfileActivity.class));
 		}
-	}
-
-
-	public static void log(String s) {
-		Log.d(MainActivity.class.getSimpleName(), s);
 	}
 	
 }

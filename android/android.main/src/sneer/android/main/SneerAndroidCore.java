@@ -16,6 +16,7 @@ import sneer.android.main.ipc.PluginHandler;
 import sneer.android.main.ipc.PluginManager;
 import sneer.android.main.ui.ConversationActivity;
 import sneer.android.main.utils.AndroidUtils;
+import sneer.android.main.utils.LogUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
@@ -26,7 +27,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 public class SneerAndroidCore implements SneerAndroid {
 	
@@ -170,7 +170,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	}
 
 	private void log(String log) {
-		Log.i(SneerAndroidCore.class.getSimpleName(), log);
+		LogUtils.info(SneerAndroidCore.class, log);
 	}
 
 }
