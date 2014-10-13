@@ -1,12 +1,15 @@
 package sneer.android.main.utils;
 
-import sneer.android.main.ipc.SingleMessageSession;
 import android.util.Log;
 
 public class LogUtils {
 
-	public static void info(String string) {
-		Log.i(SingleMessageSession.class.getSimpleName(), string);
+	public static void info(Class<?> c, String msg) {
+		Log.i(c.getSimpleName(), msg);
+	}
+	
+	public static void error(Class<?> c, String msg, Throwable t) {
+		Log.e(c.getSimpleName(), msg, t);
 	}
 
 }

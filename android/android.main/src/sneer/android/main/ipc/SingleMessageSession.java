@@ -14,7 +14,6 @@ import sneer.utils.Value;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 public class SingleMessageSession implements PluginSession {
@@ -51,7 +50,7 @@ public class SingleMessageSession implements PluginSession {
 				t1.setClassLoader(context.getClassLoader());
 				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
 				String label = t1.getString(LABEL);
-				LogUtils.info("Receiving message of type '" + plugin.tupleType() + "' label '" + label + "' from " + plugin);
+				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' label '" + label + "' from " + plugin);
 				sneer.tupleSpace().publisher()
 					.type(plugin.tupleType())
 					.audience(partner)
@@ -60,7 +59,7 @@ public class SingleMessageSession implements PluginSession {
 					.pub(message);
 			} catch (final Throwable t) {
 				AndroidUtils.toastOnMainThread(context, "Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
-				Log.e(SneerAndroidCore.class.getSimpleName(), "Error receiving message from plugin", t);
+				LogUtils.error(SneerAndroidCore.class, "Error receiving message from plugin", t);
 			}			
 		}});
 		
