@@ -56,7 +56,7 @@ public class PluginManager {
 			try {
 				return bitmapFor(plugin.drawableMenuIcon(context));
 			} catch (Exception e) {
-				LogUtils.w(SneerAndroidCore.class, "Error loading bitmap", e);
+				LogUtils.warn(SneerAndroidCore.class, "Error loading bitmap", e);
 				e.printStackTrace();
 			}
 			return null;
