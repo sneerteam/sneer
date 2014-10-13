@@ -24,9 +24,9 @@ public class PluginManager {
 
 	private static Map<String, PluginHandler> tupleViewers = new HashMap<String, PluginHandler>();
 	
-	private Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>>() {  @Override public Observable<List<ConversationMenuItem>> call(List<PluginHandler> apps) {
+	private Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>>() { @Override public Observable<List<ConversationMenuItem>> call(List<PluginHandler> apps) {
 		return Observable.from(apps)
-			.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
+			.filter(new Func1<PluginHandler, Boolean>() { @Override public Boolean call(PluginHandler t1) {
 				return t1.canCompose();
 			}})
 			.map(new Func1<PluginHandler, ConversationMenuItem>() { @Override public ConversationMenuItem call(final PluginHandler app) {
@@ -87,21 +87,21 @@ public class PluginManager {
 		PluginMonitor.initialDiscovery(context, sneer);
 		PluginMonitor.plugins()
 			.flatMap(fromSneerPluginInfoList)
-			.subscribe(new Action1<List<ConversationMenuItem>>() {  @Override public void call(List<ConversationMenuItem> menuItems) {
+			.subscribe(new Action1<List<ConversationMenuItem>>() { @Override public void call(List<ConversationMenuItem> menuItems) {
 				sneer.setConversationMenuItems(menuItems);
 			}});
 		
 		PluginMonitor.plugins()
-			.flatMap(new Func1<List<PluginHandler>, Observable<Map<String, PluginHandler>>>() {  @Override public Observable<Map<String, PluginHandler>> call(List<PluginHandler> t1) {
+			.flatMap(new Func1<List<PluginHandler>, Observable<Map<String, PluginHandler>>>() { @Override public Observable<Map<String, PluginHandler>> call(List<PluginHandler> t1) {
 				return Observable.from(t1)
-						.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
+						.filter(new Func1<PluginHandler, Boolean>() { @Override public Boolean call(PluginHandler t1) {
 							return t1.canView();
 						}})
-						.toMap(new Func1<PluginHandler, String>() {  @Override public String call(PluginHandler t1) {
+						.toMap(new Func1<PluginHandler, String>() { @Override public String call(PluginHandler t1) {
 							return t1.tupleType();
 						}});
 			}})
-			.subscribe(new Action1<Map<String, PluginHandler>>() {  @Override public void call(Map<String, PluginHandler> t1) {
+			.subscribe(new Action1<Map<String, PluginHandler>>() { @Override public void call(Map<String, PluginHandler> t1) {
 				tupleViewers = t1;
 			}});			
 	}

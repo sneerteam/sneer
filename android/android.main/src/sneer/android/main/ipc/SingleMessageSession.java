@@ -45,7 +45,7 @@ public class SingleMessageSession implements PluginSession {
 	public void startNewSessionWith(final PublicKey partner) {
 		Intent intent = plugin.createIntent();
 		
-		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {			
+		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() { @Override public void call(Bundle t1) {			
 			try {
 				t1.setClassLoader(context.getClassLoader());
 				Object message = ((Value)t1.getParcelable(MESSAGE)).get();

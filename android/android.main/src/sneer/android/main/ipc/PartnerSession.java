@@ -80,7 +80,7 @@ public final class PartnerSession implements PluginSession {
 	
 
 	protected SharedResultReceiver createResultReceiver() {
-		return new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle resultData) {
+		return new SharedResultReceiver(new SharedResultReceiver.Callback() { @Override public void call(Bundle resultData) {
 			resultData.setClassLoader(context.getClassLoader());
 			final ResultReceiver toClient = resultData.getParcelable(RESULT_RECEIVER);
 			
@@ -103,14 +103,14 @@ public final class PartnerSession implements PluginSession {
 	
 	private void pipeMessages(final ResultReceiver toClient) {
 		subscriptions.add(queryTuples().localTuples()
-			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+			.subscribe(new Action1<Tuple>() { @Override public void call(Tuple t1) {
 				lastLocalTuple = t1;
 				sendMessage(toClient, t1);
 			}},
-			new Action1<Throwable>() {  @Override public void call(Throwable t1) {
+			new Action1<Throwable>() { @Override public void call(Throwable t1) {
 				sendError(toClient, t1);
 			}},
-			new Action0() {  @Override public void call() {
+			new Action0() { @Override public void call() {
 				sendReplayFinished(toClient);
 				pipeNewTuples(toClient);
 			}}));
@@ -118,7 +118,7 @@ public final class PartnerSession implements PluginSession {
 	
 
 	private void pipePartnerName(final ResultReceiver toClient) {
-		subscriptions.add(sneer.produceParty(partner).name().subscribe(new Action1<String>() {  @Override public void call(String partnerName) {
+		subscriptions.add(sneer.produceParty(partner).name().subscribe(new Action1<String>() { @Override public void call(String partnerName) {
 			sendPartnerName(toClient, partnerName);
 		}}));
 	}
@@ -146,7 +146,7 @@ public final class PartnerSession implements PluginSession {
 
 	private void pipeNewTuples(final ResultReceiver toClient) {
 		subscriptions.add(queryTuples().tuples()
-			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
+			.filter(new Func1<Tuple, Boolean>() { @Override public Boolean call(Tuple t1) {
 				if (lastLocalTuple != null) {
 					if (lastLocalTuple.equals(t1)) {
 						lastLocalTuple = null;
@@ -155,7 +155,7 @@ public final class PartnerSession implements PluginSession {
 				}
 				return true;
 			}})
-			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+			.subscribe(new Action1<Tuple>() { @Override public void call(Tuple t1) {
 				sendMessage(toClient, t1);
 			}}));
 	}
