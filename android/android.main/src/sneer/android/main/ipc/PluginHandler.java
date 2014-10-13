@@ -32,13 +32,11 @@ public class PluginHandler implements Serializable {
 		this.context = context;
 		this.sneer = sneer;
 		Bundle meta = activityInfo.metaData;
-		String tupleType = PluginMonitor.getString(meta, "sneer:tuple-type");
-		String menuCaption = PluginMonitor.getString(meta, "sneer:menu-caption", tupleType);
 		this.packageName = activityInfo.packageName;
 		this.activityName = activityInfo.name;
 		this.pluginType = PluginMonitor.pluginType(PluginMonitor.getString(meta, "sneer:plugin-type"));
-		this.tupleType = tupleType;
-		this.menuCaption = menuCaption;
+		this.tupleType = PluginMonitor.getString(meta, "sneer:tuple-type");
+		this.menuCaption = PluginMonitor.getString(meta, "sneer:menu-caption", tupleType);
 		this.menuIcon = PluginMonitor.getInt(meta, "sneer:menu-icon");
 		this.notificationLabel = PluginMonitor.getString(meta, "sneer:notification-label", menuCaption);
 	}
