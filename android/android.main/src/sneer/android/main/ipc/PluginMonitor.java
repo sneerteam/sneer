@@ -30,11 +30,10 @@ public class PluginMonitor extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		String packageName = intent.getDataString().substring(intent.getDataString().indexOf(':')+1);
-		if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
+		if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction()))
 			packageAdded(context, packageName);
-		} else {
+		else
 			packageRemoved(context, packageName);
-		}
 	}
 	
 
@@ -119,7 +118,6 @@ public class PluginMonitor extends BroadcastReceiver {
 
 	
 	public static void packageRemoved(Context context, final String packageName) {
-			
 		LogUtils.info(PluginMonitor.class, "Package removed: " + packageName);
 		
 		currentKnownPlugins()
