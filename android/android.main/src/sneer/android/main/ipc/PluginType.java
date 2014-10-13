@@ -25,7 +25,9 @@ public enum PluginType {
 		this.canView = canView;
 	}
 
+
 	public static PluginType valueOfOrNull(String string) {
 		return names.contains(string) ? valueOf(string) : null;
 	}
+	
 }

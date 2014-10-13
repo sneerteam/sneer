@@ -1,8 +1,8 @@
 package sneer.android.main.ipc;
 
-import android.content.Intent;
 import sneer.PublicKey;
 import sneer.tuples.Tuple;
+import android.content.Intent;
 
 public interface PluginSession {
 

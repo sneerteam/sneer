@@ -21,9 +21,11 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class PluginMonitor extends BroadcastReceiver {
+	
 	private static final int PACKAGE_INFO_FLAGS = PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA;
 	private static ObservedSubject<List<PluginHandler>> plugins = ObservedSubject.create((List<PluginHandler>)new ArrayList<PluginHandler>());
 	private static Sneer sneer;
+	
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -33,39 +35,44 @@ public class PluginMonitor extends BroadcastReceiver {
 		} else {
 			packageRemoved(context, packageName);
 		}
-		
 	}
+	
 
 	static String getString(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
 		return getString(bundle, key, null);
 	}
 	
+	
 	static String getString(Bundle bundle, String key, String def) throws FriendlyException {
 		return bundle.getString(key, def);
 	}
+	
 	
 	static int getInt(Bundle bundle, String key) throws FriendlyException {
 		requiredMetadata(bundle, key);
 		return bundle.getInt(key);
 	}
 	
+	
 	private static void requiredMetadata(Bundle bundle, String key) throws FriendlyException {
 		if (!bundle.containsKey(key))
 			throw new FriendlyException("Missing meta-data " + key);
 	}
 	
+	
 	public static Observable<ActivityInfo> filterPlugins(Observable<PackageInfo> packageInfos) {
 		return packageInfos.filter(new Func1<PackageInfo, Boolean>() {  @Override public Boolean call(PackageInfo t1) {
 			return t1.activities != null;
-		} })
+		}})
 		.flatMap(new Func1<PackageInfo, Observable<ActivityInfo>>() {  @Override public Observable<ActivityInfo> call(PackageInfo packageInfo) {
 			return Observable.from(packageInfo.activities);
-		} })
+		}})
 		.filter(new Func1<ActivityInfo, Boolean>() {  @Override public Boolean call(ActivityInfo t1) {
 			return t1.metaData != null && t1.metaData.getString("sneer:plugin-type") != null;
-		} });
+		}});
 	}
+	
 	
 	public static void initialDiscovery(Context context, Sneer sneer) {
 		PluginMonitor.sneer = sneer;
@@ -81,6 +88,7 @@ public class PluginMonitor extends BroadcastReceiver {
 		log("Done.");
 	}
 
+	
 	private static Func1<ActivityInfo, Observable<PluginHandler>> fromActivity(final Context context) {
 		return new Func1<ActivityInfo, Observable<PluginHandler>>() {  @Override public Observable<PluginHandler> call(ActivityInfo activityInfo) {
 			try {
@@ -92,6 +100,7 @@ public class PluginMonitor extends BroadcastReceiver {
 		}};
 	}
 
+	
 	public static void packageAdded(Context context, String packageName) {
 		try {
 			log("Package added: " + packageName);
@@ -106,13 +115,14 @@ public class PluginMonitor extends BroadcastReceiver {
 		} catch (NameNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-		
 	}
 
+	
 	private static void log(String message) {
 		Log.i(PluginMonitor.class.getSimpleName(), message);
 	}
 
+	
 	public static void packageRemoved(Context context, final String packageName) {
 			
 		log("Package removed: " + packageName);
@@ -120,7 +130,7 @@ public class PluginMonitor extends BroadcastReceiver {
 		currentKnownPlugins()
 			.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
 				return !t1.isSamePackage(packageName);
-			} })
+			}})
 			.toList()
 			.subscribe(pluginsListPublisher());
 	}
@@ -133,14 +143,17 @@ public class PluginMonitor extends BroadcastReceiver {
 		}};
 	}
 
+	
 	private static Observable<PluginHandler> currentKnownPlugins() {
 		return Observable.from(plugins.observed().current());
 	}
 
+	
 	public static Observable<List<PluginHandler>> plugins() {
 		return plugins.observed().observable();
 	}
 
+	
 	protected static PluginType pluginType(String pluginTypeString) throws FriendlyException {
 		PluginType pluginType = PluginType.valueOfOrNull(pluginTypeString.replace('/', '_'));
 		if (pluginType == null) {
@@ -148,4 +161,5 @@ public class PluginMonitor extends BroadcastReceiver {
 		}
 		return pluginType;
 	}
+	
 }

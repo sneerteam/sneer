@@ -64,8 +64,7 @@ public class TupleSpaceService extends Service {
 		}
 		
 		return START_STICKY;
-	}
-	
+	}	
 	
 	
 	private void unsubscribe(int subscriptionId) {
@@ -78,14 +77,17 @@ public class TupleSpaceService extends Service {
 		}
 	}
 	
+	
 	private void subscribe(Map<String, Object> criteria, ResultReceiver resultReceiver) {
 		subscribe(resultReceiver, sneer().tupleSpace().filter().putFields(criteria).tuples());
 	}
+	
 
 	private void subscribeLocal(Map<String, Object> criteria, ResultReceiver resultReceiver) {
 		subscribe(resultReceiver, sneer().tupleSpace().filter().putFields(criteria).localTuples());
 	}
 
+	
 	private void subscribe(final ResultReceiver resultReceiver, Observable<Tuple> tuples) {
 		int id = nextSubscriptionId.getAndIncrement();
 		resultReceiver.send(TupleSpaceFactoryClient.SubscriptionOp.SUBSCRIPTION_ID.ordinal(), bundle(id));
@@ -94,11 +96,12 @@ public class TupleSpaceService extends Service {
 			resultReceiver.send(ON_COMPLETED.ordinal(), new Bundle());
 		}}).subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 			resultReceiver.send(ON_NEXT.ordinal(), bundle(serializer.serialize(new HashMap<String, Object>(t1))));
-		} });
+		}});
 		
 		subscriptions.put(id, s);
 	}
 
+	
 	private Bundle bundle(Object value) {
 		Bundle ret = new Bundle();
 		if (value instanceof Parcelable) {
@@ -109,15 +112,18 @@ public class TupleSpaceService extends Service {
 		return ret;
 	}
 
+	
 	private void publish(Map<String, Object> tuple) {
 		sneer().tupleSpace().publisher().putFields(tuple).pub();
 	}
 
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
 
+	
 	public static void startTupleSpaceService(Context context) {
 		Intent startServiceIntent = new Intent(context, TupleSpaceService.class);
 	    context.startService(startServiceIntent);

@@ -22,11 +22,13 @@ public class SingleMessageSession implements PluginSession {
 	private Sneer sneer;
 	private PluginHandler plugin;
 
+
 	SingleMessageSession(Context context, Sneer sneer, PluginHandler plugin) {
 		this.context = context;
 		this.sneer = sneer;
 		this.plugin = plugin;
 	}
+	
 
 	@Override
 	public Intent createResumeIntent(Tuple tuple) {
@@ -37,6 +39,7 @@ public class SingleMessageSession implements PluginSession {
 
 		return intent;
 	}
+	
 
 	@Override
 	public void startNewSessionWith(final PublicKey partner) {
@@ -64,6 +67,7 @@ public class SingleMessageSession implements PluginSession {
 		intent.putExtra(RESULT_RECEIVER, resultReceiver);
 		context.startActivity(intent);
 	}
+	
 
 	protected void info(String string) {
 		Log.i(SingleMessageSession.class.getSimpleName(), string);

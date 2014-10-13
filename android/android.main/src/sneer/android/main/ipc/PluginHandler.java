@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 public class PluginHandler implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	
 	private String packageName;
@@ -46,14 +47,17 @@ public class PluginHandler implements Serializable {
 		return pluginType.canCompose;
 	}
 
+	
 	public Boolean canView() {
 		return pluginType.canView;
 	}
 
+	
 	@Override
 	public String toString() {
 		return activityName + "(" + tupleType + ")";
 	}
+	
 	
 	public Intent createIntent() {
 		Intent intent = new Intent();
@@ -61,30 +65,37 @@ public class PluginHandler implements Serializable {
 		intent.setClassName(packageName, activityName);
 		return intent;
 	}
+	
 
 	public boolean isSamePackage(String packageName) {
 		return this.packageName.equals(packageName);
 	}
+	
 
 	public Drawable drawableMenuIcon(Context context) throws NotFoundException, NameNotFoundException {
 		return context.getPackageManager().getResourcesForApplication(packageName).getDrawable(menuIcon);
 	}
+	
 
 	public void start(PublicKey partner) {
 		pluginType.factory.create(context, sneer, this).startNewSessionWith(partner);
 	}
 	
+	
 	public Intent resume(Tuple tuple) {
 		return pluginType.factory.create(context, sneer, this).createResumeIntent(tuple);
 	}
+	
 
 	public String tupleType() {
 		return tupleType;
 	}
+	
 
 	public String menuCaption() {
 		return menuCaption;
 	}
+	
 	
 	public String notificationLabel() {
 		return notificationLabel;

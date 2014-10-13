@@ -10,4 +10,5 @@ public final class SingleMessageSessionFactory implements PluginSessionFactory {
 	@Override public PluginSession create(Context context, Sneer sneer, PluginHandler plugin) {
 		return new SingleMessageSession(context, sneer, plugin);
 	}
+	
 }

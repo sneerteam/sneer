@@ -41,11 +41,13 @@ public final class PartnerSession implements PluginSession {
 	private Context context;
 	private CompositeSubscription subscriptions = new CompositeSubscription();
 
+	
 	PartnerSession(Context context, Sneer sneer, PluginHandler app) {
 		this.context = context;
 		this.sneer = sneer;
 		this.plugin = app;
 	}
+	
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {
 		Bundle data = new Bundle();
@@ -54,6 +56,7 @@ public final class PartnerSession implements PluginSession {
 		data.putParcelable(MESSAGE, Value.of(t1.payload()));
 		toClient.send(0, data);
 	}
+	
 
 	private void sendReplayFinished(ResultReceiver toClient) {
 		Bundle data = new Bundle();
@@ -61,17 +64,20 @@ public final class PartnerSession implements PluginSession {
 		toClient.send(0, data);
 	}
 	
+	
 	private void sendError(ResultReceiver toClient, Throwable t1) {
 		Bundle data = new Bundle();
 		data.putString(ERROR, "Internal error ("+t1.getMessage()+")");
 		toClient.send(0, data);
 	}
 	
+	
 	private void sendPartnerName(ResultReceiver toClient, String partnerName) {
 		Bundle bundle = new Bundle();
 		bundle.putString(PARTNER_NAME, partnerName);
 		toClient.send(Activity.RESULT_OK, bundle);
 	}
+	
 
 	protected SharedResultReceiver createResultReceiver() {
 		return new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle resultData) {
@@ -85,13 +91,15 @@ public final class PartnerSession implements PluginSession {
 			} else {
 				publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
 			}
-		} });
+		}});
 	}
+	
 
 	private void setup(final ResultReceiver toClient) {
 		pipePartnerName(toClient);
 		pipeMessages(toClient);
 	}
+	
 	
 	private void pipeMessages(final ResultReceiver toClient) {
 		subscriptions.add(queryTuples().localTuples()
@@ -105,14 +113,16 @@ public final class PartnerSession implements PluginSession {
 			new Action0() {  @Override public void call() {
 				sendReplayFinished(toClient);
 				pipeNewTuples(toClient);
-			} }));
+			}}));
 	}
+	
 
 	private void pipePartnerName(final ResultReceiver toClient) {
 		subscriptions.add(sneer.produceParty(partner).name().subscribe(new Action1<String>() {  @Override public void call(String partnerName) {
 			sendPartnerName(toClient, partnerName);
 		}}));
 	}
+	
 
 	private void publish(String label, Object message) {
 		sneer.tupleSpace().publisher()
@@ -124,6 +134,7 @@ public final class PartnerSession implements PluginSession {
 			.field("conversation?", true)
 			.pub(message);
 	}
+	
 
 	private TupleFilter queryTuples() {
 		return sneer.tupleSpace().filter()
@@ -131,6 +142,7 @@ public final class PartnerSession implements PluginSession {
 			.field("host", host)
 			.type(plugin.tupleType());
 	}
+	
 
 	private void pipeNewTuples(final ResultReceiver toClient) {
 		subscriptions.add(queryTuples().tuples()
@@ -142,21 +154,24 @@ public final class PartnerSession implements PluginSession {
 					return false;
 				}
 				return true;
-			} })
+			}})
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
 				sendMessage(toClient, t1);
-			} }));
+			}}));
 	}
+	
  
 	private void startActivity() {
 		context.startActivity(createIntent());
 	}
+	
 
 	private Intent createIntent() {
 		Intent intent = plugin.createIntent();
 		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
 		return intent;
 	}
+	
 
 	@Override
 	public Intent createResumeIntent(Tuple tuple) {
@@ -165,6 +180,7 @@ public final class PartnerSession implements PluginSession {
 		partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
 		return createIntent();
 	}
+	
 
 	@Override
 	public void startNewSessionWith(PublicKey partner) {

@@ -10,4 +10,5 @@ public final class PartnerSessionFactory implements PluginSessionFactory {
 	@Override public PluginSession create(Context context, Sneer sneer, PluginHandler plugin) {
 		return new PartnerSession(context, sneer, plugin);
 	}
+	
 }
