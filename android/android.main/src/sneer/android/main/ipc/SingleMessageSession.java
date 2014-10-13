@@ -7,6 +7,7 @@ import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.android.main.SneerAndroidCore;
 import sneer.android.main.utils.AndroidUtils;
+import sneer.android.main.utils.LogUtils;
 import sneer.tuples.Tuple;
 import sneer.utils.SharedResultReceiver;
 import sneer.utils.Value;
@@ -45,13 +46,12 @@ public class SingleMessageSession implements PluginSession {
 	public void startNewSessionWith(final PublicKey partner) {
 		Intent intent = plugin.createIntent();
 		
-		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {
-			
+		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle t1) {			
 			try {
 				t1.setClassLoader(context.getClassLoader());
 				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
 				String label = t1.getString(LABEL);
-				info("Receiving message of type '" + plugin.tupleType() + "' label '" + label + "' from " + plugin);
+				LogUtils.info("Receiving message of type '" + plugin.tupleType() + "' label '" + label + "' from " + plugin);
 				sneer.tupleSpace().publisher()
 					.type(plugin.tupleType())
 					.audience(partner)
@@ -68,9 +68,4 @@ public class SingleMessageSession implements PluginSession {
 		context.startActivity(intent);
 	}
 	
-
-	protected void info(String string) {
-		Log.i(SingleMessageSession.class.getSimpleName(), string);
-	}
-
 }

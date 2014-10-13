@@ -1,8 +1,8 @@
 package sneer.android.main.utils;
 
-import sneer.*;
-import android.app.*;
-import android.content.*;
+import sneer.Party;
+import android.app.Activity;
+import android.content.Intent;
 
 public class Puk {
 
