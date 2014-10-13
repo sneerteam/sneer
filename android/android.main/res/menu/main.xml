@@ -1,6 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/action_add_contact"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_add_contact"/>
+    <item
         android:id="@+id/action_search_for_apps"
         android:orderInCategory="102"
         android:title="@string/action_search_for_apps"/>

@@ -6,7 +6,6 @@ import rx.Subscription;
 import rx.functions.Action1;
 import sneer.Profile;
 import sneer.android.main.R;
-import sneer.android.main.utils.Puk;
 import sneer.android.ui.SneerActivity;
 import sneer.commons.exceptions.FriendlyException;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -63,24 +61,12 @@ public class ProfileActivity extends SneerActivity {
 	
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.profile, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-	
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 	        NavUtils.navigateUpFromSameTask(this);
-	        return true;
-
-		case R.id.action_share:
-			Puk.sendYourPublicKey(ProfileActivity.this, sneer().self(), true, null);
-			break;
+	        return true;		
 		}
-
 		return true;
 	}
 

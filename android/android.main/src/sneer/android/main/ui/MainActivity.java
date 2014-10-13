@@ -9,6 +9,7 @@ import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Profile;
 import sneer.android.main.R;
+import sneer.android.main.utils.Puk;
 import sneer.android.ui.SneerActivity;
 import android.app.ActionBar;
 import android.content.Intent;
@@ -80,6 +81,9 @@ public class MainActivity extends SneerActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			navigateTo(ProfileActivity.class);
+			break;
+		case R.id.action_add_contact:
+			Puk.sendYourPublicKey(MainActivity.this, sneer().self(), true, null);
 			break;
 		case R.id.action_search_for_apps:
 			Intent viewIntent =
