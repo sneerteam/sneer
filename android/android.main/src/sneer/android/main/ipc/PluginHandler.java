@@ -28,6 +28,7 @@ public class PluginHandler implements Serializable {
 	private Context context;
 	private Sneer sneer;
 	
+	
 	public PluginHandler(Context context, Sneer sneer, ActivityInfo activityInfo) throws FriendlyException {
 		this.context = context;
 		this.sneer = sneer;
@@ -41,6 +42,7 @@ public class PluginHandler implements Serializable {
 		this.notificationLabel = PluginMonitor.getString(meta, "sneer:notification-label", menuCaption);
 	}
 
+	
 	public boolean canCompose() {
 		return pluginType.canCompose;
 	}
