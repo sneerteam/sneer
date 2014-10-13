@@ -1,12 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <!-- Search / will display always
-    <item
-        android:id="@+id/action_search"
-        android:actionViewClass="android.widget.SearchView"
-        android:icon="@drawable/ic_action_search"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_search"/> -->
     <item
         android:id="@+id/action_search_for_apps"
         android:orderInCategory="102"
