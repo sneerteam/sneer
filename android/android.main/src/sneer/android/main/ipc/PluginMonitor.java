@@ -7,6 +7,7 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.Sneer;
+import sneer.android.main.utils.LogUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.rx.ObservedSubject;
@@ -18,7 +19,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.util.Log;
 
 public class PluginMonitor extends BroadcastReceiver {
 	
@@ -76,7 +76,7 @@ public class PluginMonitor extends BroadcastReceiver {
 	
 	public static void initialDiscovery(Context context, Sneer sneer) {
 		PluginMonitor.sneer = sneer;
-		log("Searching for Sneer plugins...");
+		LogUtils.info(PluginMonitor.class, "Searching for Sneer plugins...");
 		
 		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
 		
@@ -85,7 +85,7 @@ public class PluginMonitor extends BroadcastReceiver {
 			.toList()
 			.subscribe(pluginsListPublisher());
 		
-		log("Done.");
+		LogUtils.info(PluginMonitor.class, "Done.");
 	}
 
 	
@@ -103,7 +103,7 @@ public class PluginMonitor extends BroadcastReceiver {
 	
 	public static void packageAdded(Context context, String packageName) {
 		try {
-			log("Package added: " + packageName);
+			LogUtils.info(PluginMonitor.class, "Package added: " + packageName);
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PACKAGE_INFO_FLAGS);
 			
 			filterPlugins(Observable.just(packageInfo))
@@ -118,14 +118,9 @@ public class PluginMonitor extends BroadcastReceiver {
 	}
 
 	
-	private static void log(String message) {
-		Log.i(PluginMonitor.class.getSimpleName(), message);
-	}
-
-	
 	public static void packageRemoved(Context context, final String packageName) {
 			
-		log("Package removed: " + packageName);
+		LogUtils.info(PluginMonitor.class, "Package removed: " + packageName);
 		
 		currentKnownPlugins()
 			.filter(new Func1<PluginHandler, Boolean>() {  @Override public Boolean call(PluginHandler t1) {
@@ -138,7 +133,7 @@ public class PluginMonitor extends BroadcastReceiver {
 
 	private static Action1<List<PluginHandler>> pluginsListPublisher() {
 		return new Action1<List<PluginHandler>>() {  @Override public void call(List<PluginHandler> t1) {
-			log("Pushing new plugin list: " + t1);
+			LogUtils.info(PluginMonitor.class, "Pushing new plugin list: " + t1);
 			plugins.onNext(t1);
 		}};
 	}

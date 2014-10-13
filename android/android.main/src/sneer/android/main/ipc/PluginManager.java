@@ -13,12 +13,12 @@ import sneer.Message;
 import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.android.main.SneerAndroidCore;
+import sneer.android.main.utils.LogUtils;
 import sneer.tuples.Tuple;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 public class PluginManager {
 
@@ -56,7 +56,7 @@ public class PluginManager {
 			try {
 				return bitmapFor(plugin.drawableMenuIcon(context));
 			} catch (Exception e) {
-				Log.w(SneerAndroidCore.class.getSimpleName(), "Error loading bitmap", e);
+				LogUtils.w(SneerAndroidCore.class, "Error loading bitmap", e);
 				e.printStackTrace();
 			}
 			return null;
