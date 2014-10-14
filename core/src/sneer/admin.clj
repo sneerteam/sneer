@@ -44,7 +44,7 @@
 
 (defn new-sneer-admin-over-db [network db]
   (let [tuple-base (persistence/create db)
-        own-prik (produce-private-key db)]    
+        own-prik (produce-private-key db)]
     (new-sneer-admin own-prik network tuple-base)))
 
 (defn create [db]

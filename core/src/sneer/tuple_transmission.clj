@@ -19,13 +19,13 @@
 		[
 			{:table :follower
 				:columns [:id :int :autoincrement
-					         :puk :blob :unique
-					         :next-sequence-to-send :int]}
+					        :puk :blob :unique
+					        :next-sequence-to-send :int]}
 					   
 			{:table :follower-queue
 				:columns [[:sequence :int :autoincrement]
-					         [:follower :int]
-					         [:tuple :int]]}])
+					        [:follower :int]
+					        [:tuple :int]]}])
 
 (defn start-queue [database tuples-in packets-in packets-out]
   (go-loop []
