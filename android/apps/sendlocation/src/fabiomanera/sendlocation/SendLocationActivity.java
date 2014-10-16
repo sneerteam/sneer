@@ -24,6 +24,7 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 		boolean isGPS = locationManager.isProviderEnabled(gpsProvider);
 		if (!isGPS) {
 			toast("no gps available");
+			finish();
 			return;
 		}
 
