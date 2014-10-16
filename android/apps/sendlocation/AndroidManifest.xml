@@ -18,7 +18,7 @@
         <activity
             android:name=".SendLocationActivity"
             android:excludeFromRecents="true"
-            android:label="@string/app_name" >
+            android:label="Searching for GPS..." >
 
             <intent-filter>
 		        <action android:name="android.intent.action.VIEW" />
