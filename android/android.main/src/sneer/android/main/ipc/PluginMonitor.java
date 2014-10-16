@@ -38,12 +38,12 @@ public class PluginMonitor extends BroadcastReceiver {
 	
 
 	static String getString(Bundle bundle, String key) throws FriendlyException {
+		requiredMetadata(bundle, key);
 		return getString(bundle, key, null);
 	}
 	
 	
 	static String getString(Bundle bundle, String key, String def) throws FriendlyException {
-		requiredMetadata(bundle, key);
 		return bundle.getString(key, def);
 	}
 	
