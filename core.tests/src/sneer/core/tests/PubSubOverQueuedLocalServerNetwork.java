@@ -15,9 +15,9 @@ public class PubSubOverQueuedLocalServerNetwork extends PubSubTest {
 	protected TupleSpace newTupleSpace(PrivateKey ownPrik, Observable<PublicKey> followees) {
 		Object db = ClojureUtils.var("sneer.core.tests.jdbc-tuple-base", "create-sqlite-db").invoke(null);
 		Object tupleBase = ClojureUtils.var("sneer.persistent-tuple-base", "create").invoke(db);
-		Object fromChannel = null;
-		Object toChannel = null;
-		Object tupleTransmission = ClojureUtils.var("sneer.tuple-transmission", "start").invoke(tupleBase, db, fromChannel, toChannel, ownPrik.publicKey());
+//		Object fromChannel = null;
+//		Object toChannel = null;
+//		Object tupleTransmission = ClojureUtils.var("sneer.tuple-transmission", "start").invoke(tupleBase, db, fromChannel, toChannel, ownPrik.publicKey());
 		return Glue.newTupleSpace(ownPrik.publicKey(), tupleBase, network, followees);
 	}
 	
