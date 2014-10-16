@@ -13,14 +13,22 @@ import android.os.Bundle;
 public class SendLocationActivity extends MessageActivity implements LocationListener {
 
 	protected LocationManager locationManager;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+		boolean isGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		if (!isGPS) {
+			toast("no gps available");
+			return;
+		}
+
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	}
-	
+
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location != null) {
@@ -35,19 +43,15 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 		}
 	}
 	
-	@Override
-	public void onProviderDisabled(String arg0) {}
-
-	@Override
-	public void onProviderEnabled(String arg0) {}
-
-	@Override
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-
+	
 	@Override
 	protected void onPause() {
 		super.onPause();
 		locationManager.removeUpdates(this);
 	}
+
+	@Override public void onProviderDisabled(String arg0) {}
+	@Override public void onProviderEnabled(String arg0) {}
+	@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
 	
 }
