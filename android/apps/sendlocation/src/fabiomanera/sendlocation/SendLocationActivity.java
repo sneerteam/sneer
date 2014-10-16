@@ -21,7 +21,8 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location != null) {
-			send("Location: ", "Latitude - " + location.getLatitude() + "Longitude - " + location.getLongitude());
+			String url = "https://google.com/maps/place/" + location.getLatitude() + "," + location.getLongitude();
+			send(url, url);
 			finish();
 		}
 	}
