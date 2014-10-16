@@ -4,3 +4,4 @@ libs
 /target
 /.gradle
 *.log
+/classes/
