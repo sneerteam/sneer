@@ -19,14 +19,15 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 		super.onCreate(savedInstanceState);
 
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-		boolean isGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		String gpsProvider = LocationManager.GPS_PROVIDER;
+		
+		boolean isGPS = locationManager.isProviderEnabled(gpsProvider);
 		if (!isGPS) {
 			toast("no gps available");
 			return;
 		}
 
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+		locationManager.requestLocationUpdates(gpsProvider, 0, 0, this);
 	}
 
 	@Override
