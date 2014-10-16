@@ -10,9 +10,15 @@ buildscript {
     }
 }
 
+configurations {
+  libs
+  compile.extendsFrom libs
+}
+
 dependencies {
-  compile project(':android.main')
-  compile 'me.sneer:core.tests:0.0.1'
+    libs 'com.netflix.rxjava:rxjava-android:' + external.rx.version
+    compile project(':android.main')
+    compile 'me.sneer:core.tests:0.0.1'
 }
 
 android {
