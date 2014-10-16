@@ -3,6 +3,7 @@ package fabiomanera.sendlocation;
 import sneer.android.ui.*;
 import android.content.*;
 import android.content.DialogInterface.*;
+import android.net.Uri;
 import android.os.*;
 
 public class ViewLocationActivity extends MessageActivity {
@@ -13,9 +14,11 @@ public class ViewLocationActivity extends MessageActivity {
 		
 		Object location = message();
 		
-		alert("Location: " + location, new String[] {"OK"}, new OnClickListener() {  @Override public void onClick(DialogInterface arg0, int option) {
-			finish();
-		} });
+		String uri = (String)location;
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+		startActivity(intent);
+		
+		finish();
 	}
 	
 }
