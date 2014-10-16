@@ -1,24 +1,38 @@
 package fabiomanera.sendlocation;
 
-import sneer.android.ui.*;
-import android.content.*;
-import android.content.DialogInterface.*;
+import java.util.HashMap;
+
+import sneer.android.ui.MessageActivity;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.*;
+import android.os.Bundle;
 
 public class ViewLocationActivity extends MessageActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		locationFrom(message());
+	}
+
+	
+	private void locationFrom(Object message) {
+		@SuppressWarnings("unchecked")
+		HashMap<String, Double> map = (HashMap<String, Double>) message;
+		double latitude = map.get("latitude");
+		double longitude = map.get("longitude");
+		Uri geoUri = Uri.parse("geo:" + latitude + "," + longitude);
 		
-		Object location = message();
-		
-		String uri = (String)location;
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-		startActivity(intent);
-		
+		openMapFor(geoUri);
+
 		finish();
 	}
+
 	
+	private void openMapFor(Uri geoUri) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, geoUri);
+		startActivity(intent);
+	}
+
 }

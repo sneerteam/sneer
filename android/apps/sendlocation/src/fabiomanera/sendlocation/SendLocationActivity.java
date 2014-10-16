@@ -1,10 +1,13 @@
 package fabiomanera.sendlocation;
 
+import java.util.HashMap;
+
 import sneer.android.ui.MessageActivity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 public class SendLocationActivity extends MessageActivity implements LocationListener {
@@ -21,12 +24,17 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location != null) {
-			String url = "https://google.com/maps/place/" + location.getLatitude() + "," + location.getLongitude();
-			send(url, url);
+			double latitude = location.getLatitude();
+			double longitude = location.getLongitude();
+			Uri geoUri = Uri.parse("geo:" + latitude + "," + longitude);
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("latitude", latitude);
+			map.put("longitude", longitude);
+			send(geoUri.toString(), map);
 			finish();
 		}
 	}
-
+	
 	@Override
 	public void onProviderDisabled(String arg0) {}
 
