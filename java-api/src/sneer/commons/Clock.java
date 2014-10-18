@@ -7,9 +7,13 @@ public class Clock {
 	private static volatile long now = -1;
 	
 
-	public static void mock() {
+	public static void startMocking() {
 		check(!isMocked());
 		now = 0;
+	}
+	public static void stopMocking() {
+		check(isMocked());
+		now = -1;
 	}
 
 	
