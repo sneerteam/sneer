@@ -13,7 +13,7 @@ public class ViewLocationActivity extends MessageActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		locationFrom(message());
+		locationFrom(messagePayload());
 	}
 
 	

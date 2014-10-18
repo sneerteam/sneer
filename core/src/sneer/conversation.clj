@@ -15,21 +15,22 @@
 (defn format-date [time] (.format simple-date-format time))
 
 (defn tuple->message [own-puk ^Tuple tuple]
+  ; Use MessageImpl.fromTuple instead of reimplementing it here.
   (let [created (.timestampCreated tuple)
         type (.type tuple)
-        label (.get tuple "label")
-        content (if (= type "message") (.payload tuple) (if label label type))
+        text (.get tuple "text")
+        label (if (= type "message") (.payload tuple) (if text text type))
         own? (= own-puk (.author tuple))]
     
     (reify Message
       (isOwn [this] own?)
-      (content [this] content)
+      (label [this] label)
       (timestampCreated [this] created)
       (timestampReceived [this] 0)
       (timeCreated [this] (format-date created))
       (tuple [this] tuple))))
 
-(defn values-to-compare [msg] [(.timestampCreated msg) (.content msg)])
+(defn values-to-compare [msg] [(.timestampCreated msg) (.label msg)])
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
@@ -59,14 +60,16 @@
       (messages [this]
         observable-messages)
       
-      (sendMessage [this content]
+      (sendText [this text]
         (..
           tuple-space
           publisher
-          (field "conversation?" true)
+          (field "conversation?" true) ;Delete this
           (audience party-puk)
           (type "message")
-          (pub content)))
+;         (field "text" text)
+;         (pub)
+          (pub text)))
       
       (mostRecentMessageContent [this]
         (.observed (ObservedSubject/create "hello")))

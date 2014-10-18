@@ -60,7 +60,7 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
         	false);
         
         final TextView messageView = findTextView(ret, R.id.messageContent);
-        SpannableString messageContent = new SpannableString(message.content().toString());
+        SpannableString messageContent = new SpannableString(message.label());
 		
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
         

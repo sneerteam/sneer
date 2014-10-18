@@ -119,7 +119,7 @@ public class ConversationActivity extends SneerActivity {
 	
 	private void handleClick(String text) {
 		if (!text.isEmpty())
-			conversation.sendMessage(text);
+			conversation.sendText(text);
 		else
 			openIteractionMenu();
 	}

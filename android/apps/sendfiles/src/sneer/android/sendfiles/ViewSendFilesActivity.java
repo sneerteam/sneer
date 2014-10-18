@@ -26,7 +26,7 @@ public class ViewSendFilesActivity extends MessageActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dataFrom(message());
+		dataFrom(messagePayload());
 		File file = prepareFile();
 		writeBytesTo(file);
 		intentFor(Uri.fromFile(file));

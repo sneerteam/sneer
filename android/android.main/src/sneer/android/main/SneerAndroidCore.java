@@ -95,7 +95,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		builder
 				.setSmallIcon(R.drawable.ic_launcher)
-		        .setContentText(""+("message".equals(tuple.type()) ? tuple.payload() : (tuple.get("label") == null ? tuple.payload() : tuple.get("label"))))
+		        .setContentText(""+("message".equals(tuple.type()) ? tuple.payload() : (tuple.get("text") == null ? tuple.payload() : tuple.get("text"))))
 		        .setContentTitle(notificationLabel)
 		        .setWhen(tuple.timestampCreated())
 		        .setAutoCancel(true)

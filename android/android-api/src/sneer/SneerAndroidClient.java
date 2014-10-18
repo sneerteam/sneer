@@ -1,14 +1,21 @@
 package sneer;
 
-import rx.*;
+import rx.Observable;
 import rx.Observable.OnSubscribe;
-import rx.functions.*;
-import rx.subjects.*;
-import sneer.tuples.*;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.subjects.ReplaySubject;
+import sneer.tuples.Tuple;
+import sneer.tuples.TupleFilter;
+import sneer.tuples.TupleSpace;
 import sneer.utils.Value;
 import android.app.Activity;
-import android.content.*;
-import android.os.*;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 
 public class SneerAndroidClient {
 
@@ -19,9 +26,9 @@ public class SneerAndroidClient {
 	public static final String DISABLE_MENUS = "disable-menus";
 
 	//Message
-	public static final String MESSAGE = "message";
+	public static final String PAYLOAD = "payload";
 	public static final String RESULT_RECEIVER = "result";
-	public static final String LABEL = "label";
+	public static final String TEXT = "text";
 
 	//Session
 	public static final String PARTNER_NAME = "partnerName";
@@ -179,10 +186,10 @@ public class SneerAndroidClient {
 		};
 	}
 
-	public static void send(ResultReceiver resultReceiver, String label, Object message) {
+	public static void send(ResultReceiver resultReceiver, String text, Object payload) {
 		Bundle bundle = new Bundle();
-		bundle.putString(LABEL, label);
-		bundle.putParcelable(MESSAGE, Value.of(message));
+		bundle.putString(TEXT, text);
+		bundle.putParcelable(PAYLOAD, Value.of(payload));
 		resultReceiver.send(Activity.RESULT_OK, bundle);
 	}
 	

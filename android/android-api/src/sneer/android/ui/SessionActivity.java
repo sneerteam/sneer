@@ -41,17 +41,17 @@ public abstract class SessionActivity extends SneerActivity {
 
 	private void newMessage(Message message) {
 		if (message.isOwn())
-			newMessageSent(message.content());
+			newMessageSent(message.payload());
 		else
-			newMessageReceived(message.content());
+			newMessageReceived(message.payload());
 	}
 
 
 	private void replayMessage(Message message) {
 		if (message.isOwn())
-			replayMessageSent(message.content());
+			replayMessageSent(message.payload());
 		else
-			replayMessageReceived(message.content());
+			replayMessageReceived(message.payload());
 	}
 
 

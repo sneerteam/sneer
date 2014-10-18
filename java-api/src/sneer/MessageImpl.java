@@ -18,7 +18,7 @@ public class MessageImpl implements Message {
 	}
 
 	
-	private final Object content;
+	private final Object payload;
 	
 	private final long timestampCreated;
 	
@@ -37,7 +37,7 @@ public class MessageImpl implements Message {
 	
 	public MessageImpl(long timestampCreated, Object content, boolean isOwn) {
 		this.timestampCreated = timestampCreated;
-		this.content = content;
+		this.payload = content;
 		this.isOwn = isOwn;
 	}
 
@@ -49,8 +49,8 @@ public class MessageImpl implements Message {
 	
 	
 	@Override
-	public Object content() {
-		return content;
+	public Object payload() {
+		return payload;
 	}
 	
 
@@ -76,13 +76,50 @@ public class MessageImpl implements Message {
 	
 	@Override
 	public String toString() {
-		return "Message [" + timestampCreated + ": " + content + "]";
+		return "Message [" + timestampCreated + ": " + payload + "]";
 	}
 
 
 	@Override
 	public Tuple tuple() {
 		return null;
+	}
+
+
+	@Override
+	public String messageType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String text() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String url() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public byte[] jpegImage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String label() {
+		if (text()        != null) return text();
+		if (url()         != null) return url();
+		if (messageType() != null) return messageType();
+		return "";
 	}
 	
 }

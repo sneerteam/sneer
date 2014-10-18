@@ -112,7 +112,7 @@ public class ViewVoiceMessageActivity extends MessageActivity {
 			finish();
 		}});
 		
-		byte[] message = (byte[])message();
+		byte[] message = (byte[])messagePayload();
 
 		TEMP_3GP.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(TEMP_3GP);

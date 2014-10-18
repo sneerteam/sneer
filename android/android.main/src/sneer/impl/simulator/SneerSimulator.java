@@ -131,7 +131,7 @@ public class SneerSimulator implements Sneer {
 			
 			ContactSimulator c = new ContactSimulator(nickname, party);
 			contactsByParty.put(party, c);
-			produceConversationWith(party).sendMessage("Hey " + nickname + "!");
+			produceConversationWith(party).sendText("Hey " + nickname + "!");
 			contacts.onNext(contactsSorted());
 		}
 		

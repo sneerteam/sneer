@@ -34,11 +34,7 @@ import sneer.tuples.TuplePublisher;
 
 public class ConversationsAPITest extends TestCase {
 	
-	protected final Object network = newNetwork();
-
-	protected Object newNetwork() {
-		return Glue.newNetworkSimulator();
-	}
+	private final Object network = Glue.newNetworkSimulator();
 
 	@Override
 	public void tearDown() {
@@ -339,14 +335,14 @@ public class ConversationsAPITest extends TestCase {
 		sneerB.addContact("a", pBA);
 		Conversation cBA = sneerB.produceConversationWith(pBA);
 		
-		Clock.mock();
-		cAB.sendMessage("Hello1");
+		Clock.startMocking();
+		cAB.sendText("Hello1");
 		messagesEventually(cBA, "Hello1");
 		Clock.tick();
-		cBA.sendMessage("Hello2");
+		cBA.sendText("Hello2");
 		messagesEventually(cAB, "Hello1", "Hello2");
 		Clock.tick();
-		cAB.sendMessage("Hello3");
+		cAB.sendText("Hello3");
 		messagesEventually(cBA, "Hello1", "Hello2", "Hello3");
 		
 		//Restart
@@ -354,6 +350,7 @@ public class ConversationsAPITest extends TestCase {
 		Party newB = newSneer.produceParty(userB);
 		Conversation newConvo = sneerA.produceConversationWith(newB);
 		messagesEventually(newConvo, "Hello1", "Hello2", "Hello3");
+		Clock.stopMocking();
 	}
 	
 	public void testUnreadMessageCount() throws Exception {
@@ -368,17 +365,17 @@ public class ConversationsAPITest extends TestCase {
 	
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 		
-		cAB.sendMessage("Hello1");
+		cAB.sendText("Hello1");
 		expecting(eventually(cBA.unreadMessageCount(), 1L));
 		
 		cBA.setBeingRead(true);
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
-		cAB.sendMessage("Hello2");
+		cAB.sendText("Hello2");
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 		
 		cBA.setBeingRead(false);
-		cAB.sendMessage("Hello3");
-		cAB.sendMessage("Hello4");
+		cAB.sendText("Hello3");
+		cAB.sendText("Hello4");
 		expecting(eventually(cBA.unreadMessageCount(), 2L));
 		
 	}
@@ -407,13 +404,16 @@ public class ConversationsAPITest extends TestCase {
 	}
 	
 	public void testMessageLabel() {
+		Clock.startMocking();
 		TuplePublisher publisher = sneerA.tupleSpace().publisher()
 			.field("conversation?", true)
 			.audience(userB)			
 			.type("otherType");
 		
-		publisher.field("label", "mylabel").pub("bla");
-		publisher.field("label", "test").pub("bla");
+		publisher.field("text", "mytext").pub("bla");
+		Clock.tick();
+		publisher.field("text", "mytext2").pub("bla");
+		Clock.tick();
 		publisher.type("message").pub("bla");
 		
 		Observable<String> contents = sneerA
@@ -423,17 +423,17 @@ public class ConversationsAPITest extends TestCase {
 				return messages;
 			}})
 			.map(new Func1<Message, String>() {  @Override public String call(Message message) {
-				return message.content().toString();
+				return message.label().toString();
 			}});
 		
-		expecting(values(contents, "mylabel", "test", "bla"));
+		expecting(values(contents, "mytext", "mytext2", "bla"));
 	}
 	
 	
 	private Func1<? super List<Message>, ? extends List<Object>> toMessageContentList() {
 		return new Func1<List<Message>, List<Object>>() {  @Override public List<Object> call(List<Message> t1) {
 			ArrayList<Object> r = new ArrayList<Object>(t1.size());
-			for (Message m : t1) r.add(m.content());
+			for (Message m : t1) r.add(m.label());
 			return r;
 		}};
 	}

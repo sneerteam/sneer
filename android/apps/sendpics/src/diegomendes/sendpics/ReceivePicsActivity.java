@@ -25,7 +25,7 @@ public class ReceivePicsActivity extends MessageActivity {
 
 		image = (ImageView) findViewById(R.id.picture_received);
 
-		extractImage(message());
+		extractImage(messagePayload());
 
 		//recordImage("temp.jpg");
 		addImageToGallery(getApplicationContext().getFilesDir().getAbsolutePath(), getApplicationContext(), toBitmap(ret));

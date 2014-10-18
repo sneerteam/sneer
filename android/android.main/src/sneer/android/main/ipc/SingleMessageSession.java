@@ -1,7 +1,7 @@
 package sneer.android.main.ipc;
 
-import static sneer.SneerAndroidClient.LABEL;
-import static sneer.SneerAndroidClient.MESSAGE;
+import static sneer.SneerAndroidClient.TEXT;
+import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import sneer.PublicKey;
 import sneer.Sneer;
@@ -34,8 +34,8 @@ public class SingleMessageSession implements PluginSession {
 	public Intent createResumeIntent(Tuple tuple) {
 		Intent intent = plugin.createIntent();
 		
-		intent.putExtra(MESSAGE, Value.of(tuple.payload()));
-		intent.putExtra(LABEL, (String)tuple.get("label"));
+		intent.putExtra(PAYLOAD, Value.of(tuple.payload()));
+		intent.putExtra(TEXT, (String)tuple.get("text"));
 
 		return intent;
 	}
@@ -45,18 +45,17 @@ public class SingleMessageSession implements PluginSession {
 	public void startNewSessionWith(final PublicKey partner) {
 		Intent intent = plugin.createIntent();
 		
-		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() { @Override public void call(Bundle t1) {			
+		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() { @Override public void call(Bundle bundle) {			
 			try {
-				t1.setClassLoader(context.getClassLoader());
-				Object message = ((Value)t1.getParcelable(MESSAGE)).get();
-				String label = t1.getString(LABEL);
-				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' label '" + label + "' from " + plugin);
+				bundle.setClassLoader(context.getClassLoader());
+				String text = bundle.getString(TEXT);
+				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' text '" + text + "' from " + plugin);
 				sneer.tupleSpace().publisher()
 					.type(plugin.tupleType())
 					.audience(partner)
 					.field("conversation?", true)
-					.field("label", label)
-					.pub(message);
+					.field("text", text)
+					.pub(getPayload(bundle));
 			} catch (final Throwable t) {
 				AndroidUtils.toastOnMainThread(context, "Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
 				LogUtils.error(SneerAndroidCore.class, "Error receiving message from plugin", t);
@@ -65,6 +64,11 @@ public class SingleMessageSession implements PluginSession {
 		
 		intent.putExtra(RESULT_RECEIVER, resultReceiver);
 		context.startActivity(intent);
+	}
+
+
+	static private Object getPayload(Bundle bundle) {
+		return ((Value)bundle.getParcelable(PAYLOAD)).get();
 	}
 	
 }

@@ -1,8 +1,8 @@
 package sneer.android.main.ipc;
 
 import static sneer.SneerAndroidClient.ERROR;
-import static sneer.SneerAndroidClient.LABEL;
-import static sneer.SneerAndroidClient.MESSAGE;
+import static sneer.SneerAndroidClient.TEXT;
+import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;
 import static sneer.SneerAndroidClient.REPLAY_FINISHED;
@@ -51,9 +51,9 @@ public final class PartnerSession implements PluginSession {
 	
 	private void sendMessage(ResultReceiver toClient, Tuple t1) {
 		Bundle data = new Bundle();
-		data.putString(LABEL, (String) t1.get("label"));
+		data.putString(TEXT, (String) t1.get("text"));
 		data.putBoolean(OWN, t1.author().equals(sneer.self().publicKey().current()));
-		data.putParcelable(MESSAGE, Value.of(t1.payload()));
+		data.putParcelable(PAYLOAD, Value.of(t1.payload()));
 		toClient.send(0, data);
 	}
 	
@@ -89,7 +89,7 @@ public final class PartnerSession implements PluginSession {
 			} else if(resultData.getBoolean(UNSUBSCRIBE)) {
 				subscriptions.unsubscribe();
 			} else {
-				publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(MESSAGE)).get());
+				publish(resultData.getString(TEXT), ((Value)resultData.getParcelable(PAYLOAD)).get());
 			}
 		}});
 	}
@@ -124,13 +124,13 @@ public final class PartnerSession implements PluginSession {
 	}
 	
 
-	private void publish(String label, Object message) {
+	private void publish(String text, Object message) {
 		sneer.tupleSpace().publisher()
 			.type(plugin.tupleType())
 			.audience(partner)
 			.field("session", sessionId)
 			.field("host", host)
-			.field("label", label)
+			.field("text", text)
 			.field("conversation?", true)
 			.pub(message);
 	}

@@ -1,6 +1,6 @@
 package sneer.android.ui;
 
-import static sneer.SneerAndroidClient.MESSAGE;
+import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;
 import static sneer.SneerAndroidClient.REPLAY_FINISHED;
@@ -38,7 +38,7 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 				isReplaying = false;
 			}
 			
-			Object messageEnvelope = data.get(MESSAGE);
+			Object messageEnvelope = data.get(PAYLOAD);
 			
 			if (messageEnvelope != null) {
 				Object message = ((Value)messageEnvelope).get();

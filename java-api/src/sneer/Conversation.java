@@ -16,7 +16,8 @@ public interface Conversation {
 	Observed<String> mostRecentMessageContent();
 	
 	/** Publish a new message with isOwn() true, with party() as the audience and using System.currentTimeMillis() as the timestamp. */
-	void sendMessage(String content);
+	void sendText(String text);
+	void sendMessage(String messageType, String text, String url, byte[] jpegImage, Object payload);
 
 	Observable<List<ConversationMenuItem>> menu();
 	

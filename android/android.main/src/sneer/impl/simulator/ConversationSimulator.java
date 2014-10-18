@@ -36,7 +36,7 @@ public class ConversationSimulator implements Conversation {
 
 	ConversationSimulator(Party party) {
 		this.party = party;
-		sendMessage("Vai ter festa!!!! Uhuu!!!");
+		sendText("Vai ter festa!!!! Uhuu!!!");
 		simulateReceivedMessage("Onde? Onde?? o0");
 		
 		addMenuItem(new ConversationMenuItemSimulator("Send Bitcoins"));
@@ -62,9 +62,9 @@ public class ConversationSimulator implements Conversation {
 
 	
 	@Override
-	public void sendMessage(String content) {		
-		addMessage(createOwn(now(), content));
-		simulateReceivedMessage("Echo: " + content);
+	public void sendText(String text) {		
+		addMessage(createOwn(now(), text));
+		simulateReceivedMessage("Echo: " + text);
 	}
 
 
@@ -85,7 +85,7 @@ public class ConversationSimulator implements Conversation {
 		messages.onNext(newMessage);
 		Message last = lastIn(newMessage);
 		mostRecentMessageTimestamp.onNext(last.timestampReceived());
-		mostRecentMessageContent.onNext(last.content().toString());
+		mostRecentMessageContent.onNext(last.label());
 	}
 
 
@@ -131,6 +131,14 @@ public class ConversationSimulator implements Conversation {
 	@Override
 	public void setBeingRead(boolean isBeingRead) {
 		System.out.println("Conversation.isBeingRead(" + isBeingRead + ")");
+	}
+
+
+	@Override
+	public void sendMessage(String arg0, String arg1, String arg2, byte[] arg3,
+			Object arg4) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
