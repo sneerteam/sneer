@@ -1,5 +1,7 @@
 package fabiomanera.sendlocation;
 
+import static android.location.LocationManager.GPS_PROVIDER;
+
 import java.util.HashMap;
 
 import sneer.android.ui.MessageActivity;
@@ -12,44 +14,44 @@ import android.os.Bundle;
 
 public class SendLocationActivity extends MessageActivity implements LocationListener {
 
-	protected LocationManager locationManager;
+	private static final int TEN_SECONDS = 10000;
+	private volatile LocationManager locationManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		String gpsProvider = LocationManager.GPS_PROVIDER;
-		
-		boolean isGPS = locationManager.isProviderEnabled(gpsProvider);
-		if (!isGPS) {
-			toast("no gps available");
+		if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
+			toast("No GPS available");
 			finish();
 			return;
 		}
 
-		locationManager.requestLocationUpdates(gpsProvider, 0, 0, this);
+		locationManager.requestLocationUpdates(GPS_PROVIDER, TEN_SECONDS, 0, this);
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		if (location != null) {
-			double latitude = location.getLatitude();
-			double longitude = location.getLongitude();
-			Uri geoUri = Uri.parse("geo:" + latitude + "," + longitude);
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("latitude", latitude);
-			map.put("longitude", longitude);
-			send(geoUri.toString(), map);
-			finish();
-		}
+		if (location == null) return;
+
+		double latitude = location.getLatitude();
+		double longitude = location.getLongitude();
+		Uri geoUri = Uri.parse("geo:" + latitude + "," + longitude);
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("latitude", latitude);
+		map.put("longitude", longitude);
+		send(geoUri.toString(), map);
+		finish();
 	}
 	
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
+		if (locationManager == null) return;
 		locationManager.removeUpdates(this);
+		locationManager = null;
 	}
 
 	@Override public void onProviderDisabled(String arg0) {}
