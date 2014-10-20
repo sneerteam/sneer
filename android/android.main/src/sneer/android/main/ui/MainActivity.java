@@ -37,8 +37,6 @@ public class MainActivity extends SneerActivity {
 		if (!sneerAndroid().checkOnCreate(this)) return;
 		
 		setContentView(R.layout.activity_main);
-
-		if (!SIMULATOR) startProfileActivityIfFirstTime();
 		
 		makeConversationList();
 	}
@@ -128,6 +126,13 @@ public class MainActivity extends SneerActivity {
 		super.onDestroy();
 	}
 
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (!SIMULATOR) startProfileActivityIfFirstTime();		
+	}
+	
 	
 	private void startProfileActivityIfFirstTime() {
 		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable()) {
