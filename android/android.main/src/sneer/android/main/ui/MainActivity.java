@@ -24,6 +24,7 @@ import android.widget.ListView;
 
 public class MainActivity extends SneerActivity {
 	
+	static final boolean SIMULATOR = false;
 	private MainAdapter adapter;
 	private ListView conversations;
 
@@ -35,7 +36,7 @@ public class MainActivity extends SneerActivity {
 		
 		setContentView(R.layout.activity_main);
 
-		startProfileActivityIfFirstTime();
+		if (!SIMULATOR) startProfileActivityIfFirstTime();
 		
 		makeConversationList();
 	}
