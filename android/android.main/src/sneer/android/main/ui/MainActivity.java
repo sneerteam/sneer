@@ -12,6 +12,8 @@ import sneer.android.main.R;
 import sneer.android.main.utils.Puk;
 import sneer.android.ui.SneerActivity;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,7 +22,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends SneerActivity {
 	
@@ -84,7 +88,7 @@ public class MainActivity extends SneerActivity {
 			navigateTo(ProfileActivity.class);
 			break;
 		case R.id.action_add_contact:
-			Puk.sendYourPublicKey(MainActivity.this, sneer().self(), true, null);
+			shareDialog();
 			break;
 		case R.id.action_search_for_apps:
 			Intent viewIntent =
@@ -99,6 +103,17 @@ public class MainActivity extends SneerActivity {
 		return true;
 	}
 	
+	
+	private void shareDialog() {
+		AlertDialog.Builder adb = new AlertDialog.Builder(this);
+		adb.setTitle("To add contacts, send them your public key and they send you theirs.")
+			.setIcon(android.R.drawable.ic_dialog_info)
+			.setPositiveButton("Send Public Key", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int which) {
+				Puk.sendYourPublicKey(MainActivity.this, sneer().self(), true, null);
+			}})
+			.show();
+	}
+
 	
 	protected void onClicked(Conversation conversation) {
 		Intent intent = new Intent();
