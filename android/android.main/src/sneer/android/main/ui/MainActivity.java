@@ -131,7 +131,7 @@ public class MainActivity extends SneerActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable()) {
+		if (!isOwnNameLocallyAvailable()) {
 			toast("First and last name must be filled in");
 			finish();
 			return;
@@ -140,9 +140,14 @@ public class MainActivity extends SneerActivity {
 	
 	
 	private void startProfileActivityIfFirstTime() {
-		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable()) {
+		if (!isOwnNameLocallyAvailable()) {
 			startActivity(new Intent(this, ProfileActivity.class));
 		}
+	}
+	
+	
+	private boolean isOwnNameLocallyAvailable() {
+		return sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable();
 	}
 	
 }
