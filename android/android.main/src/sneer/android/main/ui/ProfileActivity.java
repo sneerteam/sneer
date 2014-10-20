@@ -64,17 +64,24 @@ public class ProfileActivity extends SneerActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-	        NavUtils.navigateUpFromSameTask(this);
+			backToMainActivity();
 	        return true;		
 		}
 		return true;
 	}
-	
-	
+
+
 	@Override
 	public void onBackPressed() {
-		NavUtils.navigateUpFromSameTask(this);
+		backToMainActivity();
 		super.onBackPressed();
+	}
+	
+	
+	private void backToMainActivity() {
+		Intent intent = new Intent(this, MainActivity.class);
+		intent.putExtra("profile","true");
+		startActivity(intent);
 	}
 
 
