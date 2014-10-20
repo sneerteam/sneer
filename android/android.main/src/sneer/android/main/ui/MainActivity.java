@@ -123,7 +123,8 @@ public class MainActivity extends SneerActivity {
 	
 	@Override
 	protected void onDestroy() {
-		adapter.dispose();
+		if (adapter != null)
+			adapter.dispose();
 		super.onDestroy();
 	}
 
