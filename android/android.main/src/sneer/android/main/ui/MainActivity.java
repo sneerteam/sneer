@@ -137,6 +137,12 @@ public class MainActivity extends SneerActivity {
 	private void startProfileActivityIfFirstTime() {
 		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable()) {
 			toast("First and last name must be filled in");
+			if (getIntent().getStringExtra("profile") != null) {
+				moveTaskToBack(true);
+				finish();
+				System.exit(0);
+				return;
+			}
 			startActivity(new Intent(this, ProfileActivity.class));
 		}
 	}
