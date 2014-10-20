@@ -21,7 +21,7 @@
 				:columns [:id :int :autoincrement
 					        :puk :blob :unique
 					        :next-sequence-to-send :int]}
-					   
+
 			{:table :follower-queue
 				:columns [[:sequence :int :autoincrement]
 					        [:follower :int]
@@ -52,7 +52,7 @@
   (throw (Exception. "not implemented")))
 
 (defn start [tuple-base database from-server to-server own-puk]
-  
+
   (let [from-queues (chan)
         queues (atom {}) ; follower -> queue
         create-queue (fn [follower]
@@ -62,22 +62,22 @@
                              queue-process (start-queue database tuples-in packets-in packets-out)]
                          (async/pipe packets-out from-queues)
                          {:tuples tuples-in :packets packets-in}))
-        produce-queue-for (partial produce! queues create-queue)
-        query-tuples (fn [criteria] (query-tuples tuple-base criteria true))] 
-  
+        queue-for (partial produce! queues create-queue)
+        query-tuples (fn [criteria] (query-tuples tuple-base criteria true))]
+
 	  ; 1. network loop
 	  (go-loop [ping-timeout (new-ping-timeout)]
-            
+
 	    (alt!
-       
+
         ping-timeout
         ([_]
           (>! to-server {:intent :ping})
           (recur (new-ping-timeout)))
-        
+
 	      from-server
 	      ([packet]
-	        (match packet	               
+	        (match packet
              {:intent :receive :from followee :sequence sequence :payload tuple}
              (do
                ; TODO: verify tuple before storing
@@ -86,23 +86,23 @@
                (recur (new-ping-timeout)))
              {:intent :status-of-queues :follower follower}
              (do
-               (>! ((produce-queue-for follower) :packets) packet)
+               (>! (:packets (queue-for follower)) packet)
                (recur ping-timeout))
              {:intent :pong}
-             (do 
+             (do
                (println "PONG")
                (recur ping-timeout))
              :else
              (do
                (println "unknown packet" packet)
                (recur ping-timeout))))
-       
+
          from-queues
          ([packet]
            (do
              (>! to-server packet)
              (recur (new-ping-timeout))))))
-  
+
 	  ; 2. feeds follower queues
 	  (->
 	    (query-tuples {"type" "sub" "audience" own-puk})
@@ -111,8 +111,8 @@
 	    (rx/subscribe
 	      (fn [sub]
          (let [follower (sub "author")]
-           (-> 
+           (->
 	            (query-tuples (criteria-for-sub sub))
 	            (rx/subscribe
 	              (fn [tuple]
-	                (>!! ((produce-queue-for follower) :tuples) tuple))))))))))
+	                (>!! (:tuples (queue-for follower)) tuple))))))))))
