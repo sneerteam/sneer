@@ -141,7 +141,6 @@ public class MainActivity extends SneerActivity {
 				moveTaskToBack(true);
 				finish();
 				System.exit(0);
-				return;
 			}
 			startActivity(new Intent(this, ProfileActivity.class));
 		}
