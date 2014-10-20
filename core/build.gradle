@@ -20,7 +20,6 @@ buildscript {
     }
 }
 
-
 repositories {
     mavenCentral()
     maven { url "https://clojars.org/repo" }
@@ -31,11 +30,7 @@ clojure.warnOnReflection = true
 sourceSets {
     main {
         clojure {
-            srcDir 'src'
             aotCompile = true
-        }
-        java {
-            srcDir 'src'
         }
     }
 }
