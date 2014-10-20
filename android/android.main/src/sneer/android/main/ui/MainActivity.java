@@ -35,6 +35,7 @@ public class MainActivity extends SneerActivity {
 		super.onCreate(savedInstanceState);
 
 		if (!sneerAndroid().checkOnCreate(this)) return;
+		if (!SIMULATOR) startProfileActivityIfFirstTime();
 		
 		setContentView(R.layout.activity_main);
 		
@@ -130,18 +131,18 @@ public class MainActivity extends SneerActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (!SIMULATOR) startProfileActivityIfFirstTime();		
+		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable()) {
+			toast("First and last name must be filled in");
+			
+			finish();
+			return;
+		}
+//		}	
 	}
 	
 	
 	private void startProfileActivityIfFirstTime() {
 		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable()) {
-			toast("First and last name must be filled in");
-			if (getIntent().getStringExtra("profile") != null) {
-				moveTaskToBack(true);
-				finish();
-				System.exit(0);
-			}
 			startActivity(new Intent(this, ProfileActivity.class));
 		}
 	}

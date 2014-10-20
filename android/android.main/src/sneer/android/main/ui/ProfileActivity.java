@@ -63,26 +63,12 @@ public class ProfileActivity extends SneerActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			backToMainActivity();
+			onBackPressed();
 	        return true;		
 		}
 		return true;
 	}
-
-
-	@Override
-	public void onBackPressed() {
-		backToMainActivity();
-		super.onBackPressed();
-	}
 	
-	
-	private void backToMainActivity() {
-		Intent intent = new Intent(this, MainActivity.class);
-		intent.putExtra("profile","true");
-		startActivity(intent);
-	}
-
 
 	private void afterTextChanged(final EditText textView) {
 		textView.addTextChangedListener(new TextWatcher() {
