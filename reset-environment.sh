@@ -19,9 +19,9 @@ echo "-------------------> Preparing the workspace"
 
 rm ~/.m2/repository/me/sneer/ -rf
 
-./gradlew install eclipse
+./gradlew clean install eclipse || echo "Error preparing projects. Aborting." && exit -1
 
-cd android && ./gradlew jarNodeps eclipse && cd - || echo "Error preparing android projects, aborting." && exit -1
+cd android && ./gradlew jarNodeps eclipse && cd - || echo "Error preparing android projects. Aborting." && exit -1
 
 #Removing unnecessary .project file that makes eclipse mistakenly load "apps" as a project. Todo: tweak gradle build to not generate this file.
 rm android/apps/.project
