@@ -10,7 +10,7 @@
    [sneer.tuples Tuple TupleSpace]))
 
 (defn publish-contact [tuple-space own-puk new-nick party]  
-  (.. tuple-space
+  (.. ^TupleSpace tuple-space
       publisher
       (audience own-puk)
       (type "contact")
@@ -19,8 +19,8 @@
 
 (defn problem-with-new-nickname-in [puk->contact new-nick]
   (cond
-    (.isEmpty new-nick) "Cannot be empty"
-    (->> puk->contact vals (some #(= new-nick (.. % nickname current)))) "Already used"))
+    (.isEmpty ^String new-nick) "Cannot be empty"
+    (->> puk->contact vals (some #(= new-nick (.. % ^String nickname ^String current)))) "Already used"))
 
 (defn problem-with-new-nickname [contacts-state new-nick]
   (problem-with-new-nickname-in @(:puk->contact contacts-state) new-nick))

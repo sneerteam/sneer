@@ -21,7 +21,7 @@
   "Returns an encoded datagram of the given value, with the given socket address set."
   [[address value]]
   (doto (new-datagram)
-    (.setSocketAddress address)
+    (.setSocketAddress ^SocketAddress address)
     (.setData (serialize value))))
 
 

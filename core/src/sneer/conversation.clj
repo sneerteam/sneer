@@ -12,7 +12,7 @@
 
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 
-(defn format-date [time] (.format simple-date-format time))
+(defn format-date [time] (.format ^SimpleDateFormat simple-date-format time))
 
 (defn tuple->message [own-puk ^Tuple tuple]
   ; Use MessageImpl.fromTuple instead of reimplementing it here.
