@@ -79,7 +79,7 @@ public class ProfileActivity extends SneerActivity {
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		});
 	}
 	

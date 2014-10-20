@@ -133,11 +133,9 @@ public class MainActivity extends SneerActivity {
 		super.onResume();
 		if (!sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable()) {
 			toast("First and last name must be filled in");
-			
 			finish();
 			return;
-		}
-//		}	
+		}	
 	}
 	
 	

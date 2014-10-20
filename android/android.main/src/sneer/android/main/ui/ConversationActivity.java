@@ -68,11 +68,7 @@ public class ConversationActivity extends SneerActivity {
 		
 		plugActionBarTitle(actionBar, party.name());
 		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
-//		Observable<byte[]> selfie = sneer().profileFor(party).selfie();
-//		deferUI(selfie).subscribe(new Action1<byte[]>() { @Override public void call(byte[] selfie) {
-//			actionBar.setIcon((Drawable)new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(selfie, 0, selfie.length)));
-//		}});
-
+		
 		conversation = sneer().produceConversationWith(party);
 		conversation.setBeingRead(true);
 
