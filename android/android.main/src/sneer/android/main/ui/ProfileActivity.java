@@ -69,6 +69,13 @@ public class ProfileActivity extends SneerActivity {
 		}
 		return true;
 	}
+	
+	
+	@Override
+	public void onBackPressed() {
+		NavUtils.navigateUpFromSameTask(this);
+		super.onBackPressed();
+	}
 
 
 	private void afterTextChanged(final EditText textView) {
