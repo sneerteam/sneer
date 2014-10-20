@@ -75,7 +75,7 @@ public class ProfileActivity extends SneerActivity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
 			public void afterTextChanged(Editable s) {
-				checkMoreThanOneCharacter(textView);
+				checkNameLength(textView);
 			}
 
 			@Override
@@ -155,20 +155,14 @@ public class ProfileActivity extends SneerActivity {
 
 	@Override
 	protected void onPause() {
-		if (profile == self())
-    		saveProfile();
 		super.onPause();
+    	saveProfile();
 	}
 	
-
-	private Profile self() {
-		return sneer().profileFor(sneer().self());
-	}
     
-    
-	public void checkMoreThanOneCharacter(EditText edt) {
-		if (text(edt).length() <= 1)
-			edt.setError("Name too short");
+	public void checkNameLength(EditText edit) {
+		if (text(edit).length() <= 1)
+			edit.setError("Name too short");
 	}
 
 	public static Subscription plugOwnName(final TextView textView1, final TextView textView2, Observable<?> observable) {

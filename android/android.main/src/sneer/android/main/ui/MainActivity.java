@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import rx.functions.Action1;
 import sneer.Conversation;
+import sneer.Party;
 import sneer.Profile;
 import sneer.android.main.R;
 import sneer.android.main.utils.Puk;
@@ -27,17 +28,19 @@ import android.widget.ListView;
 public class MainActivity extends SneerActivity {
 	
 	static final boolean SIMULATOR = false;
+
 	private MainAdapter adapter;
 	private ListView conversations;
 
+	Party self = sneer().self();
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
 		if (!sneerAndroid().checkOnCreate(this)) return;
 		if (!SIMULATOR) startProfileActivityIfFirstTime();
-		
-		setContentView(R.layout.activity_main);
 		
 		makeConversationList();
 	}
@@ -48,7 +51,7 @@ public class MainActivity extends SneerActivity {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
 
-		Profile ownProfile = sneer().profileFor(sneer().self());
+		Profile ownProfile = sneer().profileFor(self);
 		
 		plugActionBarTitle(actionBar, ownProfile.ownName());
 		plugActionBarIcon(actionBar, ownProfile.selfie());
@@ -102,11 +105,11 @@ public class MainActivity extends SneerActivity {
 	
 	
 	private void shareDialog() {
-		AlertDialog.Builder adb = new AlertDialog.Builder(this);
-		adb.setTitle("To add contacts, send them your public key and they send you theirs.")
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		alert.setTitle("To add contacts, send them your public key and they send you theirs.")
 			.setIcon(android.R.drawable.ic_dialog_info)
 			.setPositiveButton("Send Public Key", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int which) {
-				Puk.sendYourPublicKey(MainActivity.this, sneer().self(), true, null);
+				Puk.sendYourPublicKey(MainActivity.this, self, true, null);
 			}})
 			.show();
 	}
@@ -134,7 +137,6 @@ public class MainActivity extends SneerActivity {
 		if (!isOwnNameLocallyAvailable()) {
 			toast("First and last name must be filled in");
 			finish();
-			return;
 		}	
 	}
 	
@@ -147,7 +149,7 @@ public class MainActivity extends SneerActivity {
 	
 	
 	private boolean isOwnNameLocallyAvailable() {
-		return sneer().profileFor(sneer().self()).isOwnNameLocallyAvailable();
+		return sneer().profileFor(self).isOwnNameLocallyAvailable();
 	}
 	
 }
