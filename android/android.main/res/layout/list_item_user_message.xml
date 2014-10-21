@@ -24,6 +24,7 @@
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:autoLink="all"
             android:textSize="15sp" />
 
         <TextView
