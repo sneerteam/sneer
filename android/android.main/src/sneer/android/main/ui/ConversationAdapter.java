@@ -33,7 +33,8 @@ import android.widget.TextView;
 
 class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
 
-    private int layoutUserResourceId;    
+    
+	private int layoutUserResourceId;    
     private int listContactResourceId;
 	private LayoutInflater inflater;
 	private Party party;
@@ -51,6 +52,7 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
 		this.party = party;
     }
 
+    
 	@SuppressLint("ViewHolder") @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 		final Message message = this.getItem(position);
@@ -84,12 +86,14 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
        	return ret;
     }
 
+	
 	private void styleClickableContent(final TextView messageView, SpannableString messageContent) {
 		messageContent.setSpan(new UnderlineSpan(), 0, messageContent.length(), 0);
 		messageContent.setSpan(new StyleSpan(Typeface.ITALIC), 0, messageContent.length(), 0);
 		messageView.setTextColor(Color.BLUE);
 	}
 
+	
 	@SuppressLint("NewApi")
 	private void setColors(View row, String sender, boolean own) {
 		final RelativeLayout speechBubble = (RelativeLayout)row.findViewById(R.id.speechBubble);
@@ -114,13 +118,16 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
 		}
 	}
 
+	
 	private static int darkColorDeterminedBy(String string) {
 		return colorDeterminedBy(string, 50);
 	}
 	
+	
 	private static int lightColorDeterminedBy(String string) {
 		return colorDeterminedBy(string, 170);
 	}
+	
 	
 	private static int colorDeterminedBy(String string, int strength) {
 		Random random = new Random(string.hashCode() * 713);
@@ -130,8 +137,10 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
 		return Color.argb(255, r, g, b);
 	}
 
+	
 	@Override
 	public void onClick(View v) {
 		sneerAndroid().doOnClick((Message) v.getTag());
 	}
+	
 }
