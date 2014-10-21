@@ -86,8 +86,8 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
 	
 	private void clickableMessageStyle(final TextView messageView, SpannableString messageContent) {
 		messageContent.setSpan(new UnderlineSpan(), 0, messageContent.length(), 0);
-		messageContent.setSpan(new StyleSpan(Typeface.ITALIC), 0, messageContent.length(), 0);
-		messageView.setTextColor(Color.BLUE);
+//		messageContent.setSpan(new StyleSpan(Typeface.ITALIC), 0, messageContent.length(), 0);
+		messageView.setTextColor(Color.rgb(064, 183, 228));
 	}
 
 	
