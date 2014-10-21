@@ -40,10 +40,6 @@ sourceSets {
     }
 }
 
-afterEvaluate {
-	compileClojure.dependsOn compileJava
-}
-
 eclipse.project {
     natures 'ccw.nature'
     buildCommand 'ccw.builder'
