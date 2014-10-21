@@ -19,15 +19,17 @@ echo "-------------------> Preparing the workspace"
 
 rm ~/.m2/repository/me/sneer/ -rf
 
-./gradlew clean install eclipse || echo "Error preparing projects. Aborting."
+./gradlew clean install eclipse || exit -1
 
-cd android && ./gradlew jarNodeps eclipse && cd - || echo "Error preparing android projects. Aborting."
+cd android && ./gradlew jarNodeps eclipse && cd - || exit -1
 
 #Removing unnecessary .project file that makes eclipse mistakenly load "apps" as a project. Todo: tweak gradle build to not generate this file.
 rm android/apps/.project
 
 if [ -d "../lizardspock" ]; then
 	echo COPYING NODEPS JAR...
-	rm -f ../lizardspock/libs/sneer-android-api-nodeps-*.jar
-	cp -f android/android-api/build/libs/sneer-android-api-nodeps-*.jar ../lizardspock/libs/
+	rm -f ../lizardspock/libs/sneer-android-api-nodeps-*.jar || exit -1
+	cp -f android/android-api/build/libs/sneer-android-api-nodeps-*.jar ../lizardspock/libs/ || exit -1
 fi
+
+echo "Reset environment sucessful"
