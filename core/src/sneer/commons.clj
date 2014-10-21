@@ -6,7 +6,7 @@
       existing
       (get
         (swap! map-atom update-in [key]
-               (fn [existing2] (if (some? existing2) existing2 (fn-if-absent key))))
+          (fn [existing2] (if (some? existing2) existing2 (fn-if-absent key))))
         key))))
 
 (defn now [] (sneer.commons.Clock/now))
