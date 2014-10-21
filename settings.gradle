@@ -1,3 +1,4 @@
 include 'java-api', 'java-api.tests'
+include 'keys'
 include 'core', 'core.tests'
 include 'server'
