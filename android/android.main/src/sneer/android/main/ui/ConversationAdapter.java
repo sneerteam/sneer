@@ -68,24 +68,23 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
         if (sneerAndroid().isClickable(message)) {
 	        ret.setClickable(true);
 	        ret.setOnClickListener(this);
-	        styleClickableContent(messageView, messageContent);
+	        clickableMessageStyle(messageView, messageContent);
         }
 
         messageView.setText(messageContent);
         
-        if (!message.isOwn()) {
+        if (!message.isOwn())
         	party.name().subscribe(new Action1<String>() { @Override public void call(String sender) { 
         		setColors(ret, sender, message.isOwn());
         	}});
-        } else {
-			setColors(ret, null, true);
-        }
+        else
+        	setColors(ret, null, true);
         
        	return ret;
     }
 
 	
-	private void styleClickableContent(final TextView messageView, SpannableString messageContent) {
+	private void clickableMessageStyle(final TextView messageView, SpannableString messageContent) {
 		messageContent.setSpan(new UnderlineSpan(), 0, messageContent.length(), 0);
 		messageContent.setSpan(new StyleSpan(Typeface.ITALIC), 0, messageContent.length(), 0);
 		messageView.setTextColor(Color.BLUE);
@@ -98,7 +97,6 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
 		if (own) {
 			View speechBubbleArrowRight = row.findViewById(R.id.speechBubbleArrowRight);
 			speechBubbleArrowRight.setBackground(new TriangleRightDrawable(Color.parseColor("#D34F39")));
-			
 		} else {
 			View speechBubbleArrowLeft = row.findViewById(R.id.speechBubbleArrowLeft);
 			speechBubbleArrowLeft.setBackground(new TriangleLeftDrawable(darkColorDeterminedBy(sender)));
