@@ -1,7 +1,5 @@
 package sneer.android.main.ui;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findTextView;
 
@@ -99,15 +97,11 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
 		final RelativeLayout speechBubble = (RelativeLayout)row.findViewById(R.id.speechBubble);
 		if (own) {
 			View speechBubbleArrowRight = row.findViewById(R.id.speechBubbleArrowRight);
-			if (SDK_INT >= ICE_CREAM_SANDWICH){
-				speechBubbleArrowRight.setBackground(new TriangleRightDrawable(Color.parseColor("#D34F39")));
-			} 
+			speechBubbleArrowRight.setBackground(new TriangleRightDrawable(Color.parseColor("#D34F39")));
 			
 		} else {
 			View speechBubbleArrowLeft = row.findViewById(R.id.speechBubbleArrowLeft);
-			if (SDK_INT >= ICE_CREAM_SANDWICH){
-				speechBubbleArrowLeft.setBackground(new TriangleLeftDrawable(darkColorDeterminedBy(sender)));
-			} 
+			speechBubbleArrowLeft.setBackground(new TriangleLeftDrawable(darkColorDeterminedBy(sender)));
 			
 			LayerDrawable bubbleLayer = (LayerDrawable) speechBubble.getBackground();
 			GradientDrawable bubbleBackground = (GradientDrawable) bubbleLayer.findDrawableByLayerId(R.id.bubbleBackground);
