@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -64,37 +63,23 @@ public class ProfileActivity extends SneerActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			backToMainActivity();
+			onBackPressed();
 	        return true;		
 		}
 		return true;
 	}
-
-
-	@Override
-	public void onBackPressed() {
-		backToMainActivity();
-		super.onBackPressed();
-	}
 	
-	
-	private void backToMainActivity() {
-		Intent intent = new Intent(this, MainActivity.class);
-		intent.putExtra("profile","true");
-		startActivity(intent);
-	}
-
 
 	private void afterTextChanged(final EditText textView) {
 		textView.addTextChangedListener(new TextWatcher() {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
 			public void afterTextChanged(Editable s) {
-				checkMoreThanOneCharacter(textView);
+				checkNameLength(textView);
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		});
 	}
 	
@@ -170,20 +155,14 @@ public class ProfileActivity extends SneerActivity {
 
 	@Override
 	protected void onPause() {
-		if (profile == self())
-    		saveProfile();
 		super.onPause();
+    	saveProfile();
 	}
 	
-
-	private Profile self() {
-		return sneer().profileFor(sneer().self());
-	}
     
-    
-	public void checkMoreThanOneCharacter(EditText edt) {
-		if (text(edt).length() <= 1)
-			edt.setError("Name too short");
+	public void checkNameLength(EditText edit) {
+		if (text(edit).length() <= 1)
+			edit.setError("Name too short");
 	}
 
 	public static Subscription plugOwnName(final TextView textView1, final TextView textView2, Observable<?> observable) {
