@@ -41,7 +41,6 @@ public class SneerAndroidClient {
 	public static final String SESSION_ID = "sessionId";
 	@Deprecated
 	public static final String OWN_PRIK = "ownPrik";
-
 	
 	private static final PrivateKey EMPTY_KEY = new PrivateKey() {
 		private static final long serialVersionUID = 1L;
@@ -64,13 +63,16 @@ public class SneerAndroidClient {
 	private Context context;
 	private TupleSpace tupleSpace;
 
+	
 	static Object unbundle(Bundle resultData) {
 		return resultData.get("value");
 	}
 	
+	
 	public SneerAndroidClient(Context context) {
 		this.context = context;
 	}
+	
 	
 	static class SessionInfo {
 		long id;
@@ -85,6 +87,7 @@ public class SneerAndroidClient {
 		}
 	}
 	
+	
 	public static Observable<String> partyName(TupleSpace tupleSpace, PublicKey partyPuk, PrivateKey ownPrik) {
 		return tupleSpace.filter()
 			.audience(ownPrik)
@@ -95,12 +98,14 @@ public class SneerAndroidClient {
 			.cast(String.class);
 	};
 	
+	
 	public TupleSpace tupleSpace() {
 		if (tupleSpace == null)
 			tupleSpace = new TupleSpaceFactoryClient(context).newTupleSpace(EMPTY_KEY);
 		return tupleSpace;
 	}
 
+	
 	public Session session(final long id, final PrivateKey ownPrik) {
 		final ReplaySubject<SessionInfo> sessionInfo = ReplaySubject.create();
 
@@ -179,6 +184,7 @@ public class SneerAndroidClient {
 		};
 	}
 
+	
 	public static void send(ResultReceiver resultReceiver, String text, Object payload) {
 		Bundle bundle = new Bundle();
 		bundle.putString(TEXT, text);
