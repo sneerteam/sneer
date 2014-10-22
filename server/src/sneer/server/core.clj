@@ -1,7 +1,8 @@
 (ns sneer.server.core
   (:require
    [clojure.core.async :as async :refer [chan >! <! >!! <!! alts!! timeout]]
-   [clojure.java.io :as io]))
+   [clojure.java.io :as io]
+   [sneer.async :refer [go!]]))
 
 
 (defmacro while-let
@@ -12,14 +13,7 @@
        ~@forms
        (recur))))
 
-(defmacro go!
-  [& forms]
-  `(async/go
-     (try
-       ~@forms
-       (catch java.lang.Exception ~'e
-         (println "GO ERROR" ~'e)
-         (. ~'e printStackTrace)))))
+
 
 (defmacro go-while-let
   "Makes it easy to continue processing data from a channel until it closes"
