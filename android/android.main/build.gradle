@@ -13,7 +13,7 @@ buildscript {
 }
 
 dependencies {
-    compile('me.sneer:core:0.0.1')
+    compile('me.sneer:core:0.0.1') // Comment this line to run with the core simulator.
     compile 'com.google.android:support-v4:r7'
     compile project(':android-api')
 }
