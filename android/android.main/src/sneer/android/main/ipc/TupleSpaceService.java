@@ -68,13 +68,13 @@ public class TupleSpaceService extends Service {
 	
 	
 	private void unsubscribe(int subscriptionId) {
-		if (subscriptionId == -1) {
+		if (subscriptionId == -1)
 			throw new IllegalArgumentException("Unknown subscription: " + subscriptionId);
-		}
+
 		Subscription s = subscriptions.remove(subscriptionId);
-		if (s != null) {
+		
+		if (s != null)
 			s.unsubscribe();
-		}
 	}
 	
 	

@@ -12,11 +12,10 @@ public class SneerApp extends Application {
 		
 		SneerAndroid sneerAndroid;
 		
-		if (isCoreAvailable()) {
+		if (isCoreAvailable())
 			sneerAndroid = new SneerAndroidCore(getApplicationContext());
-		} else {
+		else
 			sneerAndroid = new SneerAndroidSimulator(getApplicationContext());
-		}
 		
 		SneerAndroidProvider.setInstance(sneerAndroid);
 	}
