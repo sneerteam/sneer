@@ -135,8 +135,8 @@ public class MainActivity extends SneerActivity {
 	protected void onRestart() {
 		super.onRestart();
 		if (isOwnNameLocallyAvailable()) return;
-		toast("First and last name must be filled in");
 		finish();
+		toast("First and last name must be filled in");
 	}
 	
 	
