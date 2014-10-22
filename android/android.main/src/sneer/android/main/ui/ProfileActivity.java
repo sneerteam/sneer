@@ -150,8 +150,8 @@ public class ProfileActivity extends SneerActivity {
 
 	@Override
 	protected void onPause() {
+		saveProfile();
 		super.onPause();
-    	saveProfile();
 	}
 	
     
