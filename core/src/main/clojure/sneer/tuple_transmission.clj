@@ -2,6 +2,7 @@
   (:require [sneer.commons :refer [produce!]]
             [sneer.core :refer [query-tuples]]
             [sneer.rx :refer [observe-for-io]]
+            [sneer.async :refer [go!]]
             [rx.lang.clojure.core :as rx]
             [clojure.core.match :refer [match]]
             [clojure.core.async :as async :refer [<! >! >!! <!! chan go-loop alt!]]))
@@ -16,31 +17,39 @@
     :full? false})
 
 (def reliable-client-tables
-		[
-			{:table :follower
-				:columns [:id :int :autoincrement
-					        :puk :blob :unique
-					        :next-sequence-to-send :int]}
+  [
+   {:table :follower
+    :columns [:id :int :autoincrement
+              :puk :blob :unique
+              :next-sequence-to-send :int]}
 
-			{:table :follower-queue
-				:columns [[:sequence :int :autoincrement]
-					        [:follower :int]
-					        [:tuple :int]]}])
+   {:table :follower-queue
+    :columns [[:sequence :int :autoincrement]
+              [:follower :int]
+              [:tuple :int]]}])
 
-(defn start-queue [database tuples-in packets-in packets-out]
-  (go-loop []
-    (alt!
-      tuples-in
-      ([tuple]
-        ; store tuple if not already in the queue
-        (recur))
-      packets-in
-      ([packet]
-        (match packet
-          {:intent :status-of-queues}
-	        (do
-	          (println "status" packet)
-            (recur)))))))
+(defprotocol QueueStore
+  (-peek [store to]))
+
+(defn start-queue-transmitter [from to store tuples-in packets-in packets-out]
+  (go!
+   (loop []
+
+     (when-let [{:keys [sequence tuple]} (-peek store to)]
+       (>! packets-out {:intent :send :from from :to to :sequence sequence :payload tuple}))
+
+     (alt!
+       tuples-in
+       ([tuple]
+          ; store tuple if not already in the queue
+          (recur))
+       packets-in
+       ([packet]
+          (match packet
+                 {:intent :status-of-queues}
+                 (do
+                   (println "status" packet)
+                   (recur))))))))
 
 (defn new-ping-timeout []
   (async/timeout 20000))
@@ -59,7 +68,7 @@
                        (let [tuples-in (chan 1)
                              packets-in (chan (async/sliding-buffer 1))
                              packets-out (chan (async/sliding-buffer 1))
-                             queue-process (start-queue database tuples-in packets-in packets-out)]
+                             queue-process (start-queue-transmitter database tuples-in packets-in packets-out)]
                          (async/pipe packets-out from-queues)
                          {:tuples tuples-in :packets packets-in}))
         queue-for (partial produce! queues create-queue)
