@@ -74,54 +74,54 @@
         queue-for (partial produce! queues create-queue)
         query-tuples (fn [criteria] (query-tuples tuple-base criteria true))]
 
-	  ; 1. network loop
-	  (go-loop [ping-timeout (new-ping-timeout)]
+                                        ; 1. network loop
+    (go-loop [ping-timeout (new-ping-timeout)]
 
-	    (alt!
+      (alt!
 
         ping-timeout
         ([_]
-          (>! to-server {:intent :ping})
-          (recur (new-ping-timeout)))
+           (>! to-server {:intent :ping})
+           (recur (new-ping-timeout)))
 
-	      from-server
-	      ([packet]
-	        (match packet
-             {:intent :receive :from followee :sequence sequence :payload tuple}
-             (do
-               ; TODO: verify tuple before storing
-               (store-tuple tuple-base tuple)
-               (>! to-server {:intent :ack :to followee :sequence sequence})
-               (recur (new-ping-timeout)))
-             {:intent :status-of-queues :follower follower}
-             (do
-               (>! (:packets (queue-for follower)) packet)
-               (recur ping-timeout))
-             {:intent :pong}
-             (do
-               (println "PONG")
-               (recur ping-timeout))
-             :else
-             (do
-               (println "unknown packet" packet)
-               (recur ping-timeout))))
+        from-server
+        ([packet]
+           (match packet
+                  {:intent :receive :from followee :sequence sequence :payload tuple}
+                  (do
+                    ; TODO: verify tuple before storing
+                    (store-tuple tuple-base tuple)
+                    (>! to-server {:intent :ack :to followee :sequence sequence})
+                    (recur (new-ping-timeout)))
+                  {:intent :status-of-queues :follower follower}
+                  (do
+                    (>! (:packets (queue-for follower)) packet)
+                    (recur ping-timeout))
+                  {:intent :pong}
+                  (do
+                    (println "PONG")
+                    (recur ping-timeout))
+                  :else
+                  (do
+                    (println "unknown packet" packet)
+                    (recur ping-timeout))))
 
-         from-queues
-         ([packet]
+        from-queues
+        ([packet]
            (do
              (>! to-server packet)
              (recur (new-ping-timeout))))))
 
-	  ; 2. feeds follower queues
-	  (->
-	    (query-tuples {"type" "sub" "audience" own-puk})
-	    observe-for-io
-	    ; (rx/filter expired?)
-	    (rx/subscribe
-	      (fn [sub]
-         (let [follower (sub "author")]
-           (->
-	            (query-tuples (criteria-for-sub sub))
-	            (rx/subscribe
-	              (fn [tuple]
-	                (>!! (:tuples (queue-for follower)) tuple))))))))))
+                                        ; 2. feeds follower queues
+    (->
+     (query-tuples {"type" "sub" "audience" own-puk})
+     observe-for-io
+                                        ; (rx/filter expired?)
+     (rx/subscribe
+      (fn [sub]
+        (let [follower (sub "author")]
+          (->
+           (query-tuples (criteria-for-sub sub))
+           (rx/subscribe
+            (fn [tuple]
+              (>!! (:tuples (queue-for follower)) tuple))))))))))
