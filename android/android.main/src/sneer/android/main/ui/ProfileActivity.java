@@ -162,12 +162,8 @@ public class ProfileActivity extends SneerActivity {
 
 	public static Subscription plugOwnName(final TextView textView1, final TextView textView2, Observable<?> observable) {
 		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			if (obj.toString() != null && !obj.toString().trim().isEmpty()) {
-				textView1.setText(obj.toString());
-				textView2.setVisibility(View.GONE);
-			} else {
-				textView2.setVisibility(View.VISIBLE);
-			}
+			textView1.setText(obj.toString());
+			textView2.setVisibility(View.GONE);
 		}});
 	}
 
