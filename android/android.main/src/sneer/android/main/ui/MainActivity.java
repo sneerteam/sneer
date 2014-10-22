@@ -5,15 +5,12 @@ import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
 import static sneer.commons.Clock.now;
 import static sneer.commons.SystemReport.updateReport;
 
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +24,6 @@ import sneer.Profile;
 import sneer.android.main.R;
 import sneer.android.main.utils.Puk;
 import sneer.android.ui.SneerActivity;
-import sneer.commons.Clock;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.Exceptions;
 import android.app.ActionBar;
@@ -117,7 +113,7 @@ public class MainActivity extends SneerActivity {
 
 	    byte[] sigBytes = signature.sign();
 
-	    long count = 1000;
+	    long count = 20;
 	    long t0 = now();
 	    for (int i = 0; i < count; i++) {
 	    	signature.initVerify(keyPair.getPublic());
