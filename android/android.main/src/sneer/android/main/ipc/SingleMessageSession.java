@@ -57,8 +57,8 @@ public class SingleMessageSession implements PluginSession {
 					.field("text", text)
 					.pub(getPayload(bundle));
 			} catch (final Throwable t) {
-				AndroidUtils.toastOnMainThread(context, "Error receiving message from plugin: " + t.getMessage(), Toast.LENGTH_LONG);
-				LogUtils.error(SneerAndroidCore.class, "Error receiving message from plugin", t);
+				AndroidUtils.toastOnMainThread(context, "Error receiving message from plugin: " + plugin, Toast.LENGTH_LONG);
+				LogUtils.error(SneerAndroidCore.class, "Error receiving message from plugin: " + plugin, t);
 			}			
 		}});
 		
