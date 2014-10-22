@@ -49,8 +49,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		pluginManager.initPlugins();
 		startTupleSpaceService(context);
 		
-		initNotifications(context);
-		
+		initNotifications(context);		
 	}
 
 	private void initNotifications(final Context context) {
@@ -87,20 +86,18 @@ public class SneerAndroidCore implements SneerAndroid {
 //				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				
 				notifyUser(context, t1, plugin == null ? t1.type() : plugin.notificationLabel(), PendingIntent.getActivity(context, 0, intent, 0));
-
-			} });
+			}});
 	}
 	
 	private static void notifyUser(Context context, Tuple tuple, String notificationLabel, PendingIntent pendIntent) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		builder
-				.setSmallIcon(R.drawable.ic_launcher)
-		        .setContentText(""+("message".equals(tuple.type()) ? tuple.payload() : (tuple.get("text") == null ? tuple.payload() : tuple.get("text"))))
-		        .setContentTitle(notificationLabel)
-		        .setWhen(tuple.timestampCreated())
-		        .setAutoCancel(true)
-		        .setOngoing(false)
-		        .setContentIntent(pendIntent);
+		builder.setSmallIcon(R.drawable.ic_launcher)
+			.setContentText("" + ("message".equals(tuple.type()) ? tuple.payload() : (tuple.get("text") == null ? tuple.payload() : tuple.get("text"))))
+			.setContentTitle(notificationLabel)
+			.setWhen(tuple.timestampCreated())
+			.setAutoCancel(true)
+			.setOngoing(false)
+			.setContentIntent(pendIntent);
 		
 		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.notify("sneer:"+tuple.type(), 0, builder.getNotification());
