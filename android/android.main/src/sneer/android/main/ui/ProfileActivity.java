@@ -100,6 +100,15 @@ public class ProfileActivity extends SneerActivity {
 	
 	
 	public void saveProfile() {
+		if (text(firstNameEdit).length() < 2) return;
+				
+		if (lastNameEdit.getVisibility() == View.GONE) {
+			setOwnName(text(firstNameEdit));
+		} else {
+			if (text(lastNameEdit).length() < 2) return; 
+			setOwnName(text(firstNameEdit) + " " + text(lastNameEdit));
+		}
+		
 		String preferredNickname = text(preferredNickNameEdit);
 		profile.setPreferredNickname(preferredNickname);
 		
@@ -111,14 +120,6 @@ public class ProfileActivity extends SneerActivity {
 		
 		if (selfieBytes != null)
 			profile.setSelfie(selfieBytes);
-
-		if (lastNameEdit.getVisibility() == View.GONE) {
-			if (text(firstNameEdit).length() > 1) 
-				setOwnName(text(firstNameEdit));
-		} else {
-			if (text(firstNameEdit).length() > 1 && text(lastNameEdit).length() > 1) 
-				setOwnName(text(firstNameEdit) + " " + text(lastNameEdit));
-		}
 	}
 
 
