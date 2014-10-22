@@ -28,9 +28,9 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 			final String partnerName = data.getString(PARTNER_NAME);
 			
 			if (partnerName != null) {
-				runOnUiThread(new Runnable() {  @Override public void run() {
+				runOnUiThread(new Runnable() { @Override public void run() {
 					onPartnerName(partnerName);
-				} });
+				}});
 			}
 			
 			boolean replayFinished = data.getBoolean(REPLAY_FINISHED);
@@ -44,36 +44,33 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 				Object message = ((Value)messageEnvelope).get();
 				boolean mine = data.getBoolean(OWN);
 				
-				if (mine) {
-					onMessageSent(message);
-				} else {
-					onMessageFromPartner(message);
-				}
+				if (mine)
+					onMessageToPartner(message);
+				else
+					onMessageFromPartner(message);				
 			}
 			
 			if (!isReplaying) {
 				runOnUiThread(new Runnable() {  @Override public void run() {
 					update();
-				} });
-			}
-			
-		} }));
+				}});
+			}			
+		}}));
 		
 		toSneer = getExtra(RESULT_RECEIVER);
 		toSneer.send(0, bundle);
 	}
 	
+	
 	@Override
-	protected void onDestroy() {
-		
+	protected void onDestroy() {		
 		if (toSneer != null) {
 			Bundle bundle = new Bundle();
 			bundle.putBoolean(UNSUBSCRIBE, true);
 			toSneer.send(0, bundle);
 		}
 		
-		super.onDestroy();
-		
+		super.onDestroy();		
 	}
 	
 	
@@ -86,7 +83,7 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 	protected void send(String label, Object message) {
 		SneerAndroidClient.send(toSneer, label, message);
 	}
-	protected abstract void onMessageSent(Object message);
+	protected abstract void onMessageToPartner(Object message);
 	
 	protected abstract void onMessageFromPartner(Object message);
 
