@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends SneerActivity {
 	
@@ -32,7 +33,8 @@ public class MainActivity extends SneerActivity {
 	private MainAdapter adapter;
 	private ListView conversations;
 
-	Party self = sneer().self();
+	private Party self = sneer().self();
+	private Profile ownProfile = sneer().profileFor(self);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,6 @@ public class MainActivity extends SneerActivity {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
 
-		Profile ownProfile = sneer().profileFor(self);
 		
 		plugActionBarTitle(actionBar, ownProfile.ownName());
 		plugActionBarIcon(actionBar, ownProfile.selfie());
@@ -131,23 +132,22 @@ public class MainActivity extends SneerActivity {
 
 	
 	@Override
-	protected void onResume() {
-		super.onResume();
-		if (!isOwnNameLocallyAvailable()) {
-			toast("First and last name must be filled in");
-			finish();
-		}	
+	protected void onRestart() {
+		super.onRestart();
+		if (isOwnNameLocallyAvailable()) return;
+		toast("First and last name must be filled in");
+		finish();
 	}
 	
 	
 	private void startProfileActivityIfFirstTime() {
 		if (!isOwnNameLocallyAvailable())
-			startActivity(new Intent(this, ProfileActivity.class));
+			navigateTo(ProfileActivity.class);
 	}
 	
 	
 	private boolean isOwnNameLocallyAvailable() {
-		return sneer().profileFor(self).isOwnNameLocallyAvailable();
+		return ownProfile.isOwnNameLocallyAvailable();
 	}
 	
 }
