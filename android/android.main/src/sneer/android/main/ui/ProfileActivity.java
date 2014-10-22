@@ -70,16 +70,14 @@ public class ProfileActivity extends SneerActivity {
 	}
 	
 
-	private void afterTextChanged(final EditText textView) {
-		textView.addTextChangedListener(new TextWatcher() {
-			public void onTextChanged(CharSequence s, int start, int before, int count) {}
-			
-			public void afterTextChanged(Editable s) {
-				checkNameLength(textView);
+	private void afterTextChanged(final EditText editText) {
+		editText.addTextChangedListener(new TextWatcher() {
+			@Override public void afterTextChanged(Editable s) {
+				checkNameLength(editText);
 			}
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			@Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		});
 	}
 	
@@ -92,12 +90,6 @@ public class ProfileActivity extends SneerActivity {
 		plug(selfieImage, profile.selfie());
 	}
 
-
-	@Override
-	public void onContentChanged() {
-		super.onContentChanged();
-	}
-	
 	
 	public void saveProfile() {
 		if (text(firstNameEdit).length() < 2) return;
