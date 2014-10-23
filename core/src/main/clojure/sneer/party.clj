@@ -2,14 +2,14 @@
   (:require
    [sneer.commons :refer [produce!]])
   (:import
-   [sneer Party PrivateKey]
+   [sneer Party PublicKey]
    [sneer.rx ObservedSubject]))
 
 (defprotocol PartyImpl
   (name-subject [this]))
 
 (defn new-party [puk]
-  (let [name (ObservedSubject/create (str "? PublicKey: " (-> ^PrivateKey puk .bytesAsString (subs 0 7)) "..."))]
+  (let [name (ObservedSubject/create (str "? PublicKey: " (-> ^PublicKey puk .bytesAsString (subs 0 7)) "..."))]
     (reify
       Party
         (name [this] (.observable name))
