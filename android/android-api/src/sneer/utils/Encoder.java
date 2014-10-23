@@ -13,6 +13,7 @@ public class Encoder {
 		return result;
 	}
 
+	
 	public static Value[] pathEncode(List<Object> segments) {
 		Value[] result = new Value[segments.size()];
 		int i = 0;
@@ -21,10 +22,12 @@ public class Encoder {
 		return result;
 	}
 	
-	static Object toKeywordOrString(String s) {
+	
+	public static Object toKeywordOrString(String s) {
 		if (s.startsWith(":"))
 			throw new NotImplementedYet();
 		else
 			return s;
 	}
+	
 }
