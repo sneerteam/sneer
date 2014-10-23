@@ -10,7 +10,7 @@
                  [midje "1.6.3"]
                  [com.netflix.rxjava/rxjava-clojure "0.20.3"]
                  [me.sneer/java-api "0.0.1"]
-                 [me.sneer/keys "0.0.1"]]
+                 [me.sneer/crypto "0.0.1"]]
   :plugins [[lein-midje "3.0.0"]]
   :source-paths ["src/main/clojure"]
   :java-source-paths ["src/main/java"]

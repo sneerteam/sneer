@@ -54,7 +54,7 @@ dependencies {
     	exclude group: 'com.google.protobuf', module: 'protobuf-java'
     	exclude group: 'com.lambdaworks', module: 'scrypt'
     }
-    compile project(':keys')
+    compile project(':crypto')
     compile project(':java-api')
     testCompile 'midje:midje:1.6.3'
 }
