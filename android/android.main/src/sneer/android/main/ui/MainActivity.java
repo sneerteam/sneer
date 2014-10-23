@@ -4,7 +4,6 @@ import static sneer.android.main.ui.SneerAndroidProvider.sneer;
 import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
 import static sneer.commons.Clock.now;
 import static sneer.commons.SystemReport.updateReport;
-
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -15,14 +14,11 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECPoint;
-import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Collection;
-
 import javax.crypto.KeyAgreement;
-
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Party;
@@ -32,6 +28,7 @@ import sneer.android.main.utils.Puk;
 import sneer.android.ui.SneerActivity;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.Exceptions;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -72,6 +69,7 @@ public class MainActivity extends SneerActivity {
 	}
 
 	
+	@SuppressLint("TrulyRandom")
 	private void cryptoSpike() throws Exception {
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
 	    ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
