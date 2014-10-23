@@ -1,4 +1,4 @@
-package sneer.keys.tests;
+package sneer.crypto.tests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import sneer.PrivateKey;
 import sneer.PublicKey;
-import sneer.impl.keys.KeysImpl;
+import sneer.crypto.impl.KeysImpl;
 
 public class KeysTests {
 

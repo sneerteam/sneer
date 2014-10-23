@@ -1,4 +1,4 @@
-package sneer.impl.keys;
+package sneer.crypto.impl;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.nanoTime;
@@ -25,6 +25,7 @@ class NewPrivateKeyImpl implements PrivateKey { private static final long serial
 	private final byte[] seed;
 
 	private final PublicKey puk;
+	@SuppressWarnings("unused")
 	private final java.security.PrivateKey delegatePrik;
 	
 	
@@ -42,15 +43,19 @@ class NewPrivateKeyImpl implements PrivateKey { private static final long serial
 		check(seed.length == 32);
 		this.seed = seed;
 	
-		throw new NotImplementedYet();
+		KeyPairGenerator keyGen;
+		try {
+			keyGen = KeyPairGenerator.getInstance("EC");
+			ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
+			keyGen.initialize(ecSpec, new RandomWrapper(seed));
+			KeyPair pair = keyGen.generateKeyPair();
+			delegatePrik = pair.getPrivate();
+//			puk = pair.getPublic().;
+			puk = null;
+		} catch (Exception e) {
+			throw new NotImplementedYet();
+		}
 		
-//		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
-//	    ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
-//	    keyGen.initialize(ecSpec, new RandomWrapper(seed));
-//	    KeyPair pair = keyGen.generateKeyPair();
-//		
-//		delegatePrik = pair.getPrivate();
-//		puk = pair.getPublic().;
 	}
 	
 	

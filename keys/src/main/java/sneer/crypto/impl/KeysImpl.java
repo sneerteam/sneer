@@ -1,8 +1,8 @@
-package sneer.impl.keys;
+package sneer.crypto.impl;
 
 import sneer.PrivateKey;
 import sneer.PublicKey;
-import sneer.keys.Keys;
+import sneer.crypto.Keys;
 
 public class KeysImpl implements Keys {
 

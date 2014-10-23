@@ -5,7 +5,7 @@ import rx.functions.Func0;
 import rx.subjects.ReplaySubject;
 import sneer.PrivateKey;
 import sneer.PublicKey;
-import sneer.impl.keys.KeysImpl;
+import sneer.crypto.impl.KeysImpl;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleSpace;
 

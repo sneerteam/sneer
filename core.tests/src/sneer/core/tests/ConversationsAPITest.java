@@ -28,7 +28,7 @@ import sneer.admin.SneerAdmin;
 import sneer.commons.Arrays;
 import sneer.commons.Clock;
 import sneer.commons.exceptions.FriendlyException;
-import sneer.impl.keys.KeysImpl;
+import sneer.crypto.impl.KeysImpl;
 import sneer.tuples.Tuple;
 import sneer.tuples.TuplePublisher;
 

@@ -2,7 +2,7 @@
   (:import
     [java.io ByteArrayInputStream ByteArrayOutputStream]
     [sneer PublicKey]
-    [sneer.impl.keys KeysImpl])
+    [sneer.crypto.impl KeysImpl])
   (:require [cognitect.transit :as transit]))
 
 (def ^:private transit-format :json) ; other options are :json-verbose and :msgpack

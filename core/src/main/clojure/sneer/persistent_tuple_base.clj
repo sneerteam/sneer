@@ -1,5 +1,5 @@
 (ns sneer.persistent-tuple-base
-  (:import [sneer.impl.keys KeysImpl])
+  (:import [sneer.crypto.impl KeysImpl])
   (:require [sneer.core :as core]
             [sneer.rx :refer [filter-by seq->observable]]
             [sneer.serialization :as serialization]

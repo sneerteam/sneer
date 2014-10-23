@@ -19,7 +19,7 @@ import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import sneer.PrivateKey;
-import sneer.impl.keys.KeysImpl;
+import sneer.crypto.impl.KeysImpl;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.tuples.TuplePublisher;

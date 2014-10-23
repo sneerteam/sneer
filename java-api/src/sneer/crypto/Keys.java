@@ -1,4 +1,4 @@
-package sneer.keys;
+package sneer.crypto;
 
 import sneer.PublicKey;
 

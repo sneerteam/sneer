@@ -1,4 +1,4 @@
-package sneer.impl.keys;
+package sneer.crypto.impl;
 
 import static sneer.commons.exceptions.Exceptions.check;
 

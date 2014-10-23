@@ -8,7 +8,7 @@
   (:import
    [sneer PrivateKey]
    [sneer.admin SneerAdmin]
-   [sneer.impl.keys KeysImpl]
+   [sneer.crypto.impl KeysImpl]
    [rx.subjects ReplaySubject PublishSubject]))
 
 (defprotocol Restartable

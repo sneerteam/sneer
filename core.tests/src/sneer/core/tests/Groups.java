@@ -7,7 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import sneer.PrivateKey;
-import sneer.impl.keys.KeysImpl;
+import sneer.crypto.impl.KeysImpl;
 
 @Ignore("wip")
 public class Groups extends TupleSpaceTestsBase {

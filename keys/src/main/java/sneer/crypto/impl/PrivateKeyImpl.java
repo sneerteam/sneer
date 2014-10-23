@@ -1,39 +1,47 @@
-package sneer.impl.keys;
+package sneer.crypto.impl;
 
 import java.math.BigInteger;
 
+import sneer.PrivateKey;
 import sneer.PublicKey;
-import sneer.commons.exceptions.Exceptions;
 
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.Utils;
 
-class PublicKeyImpl implements PublicKey {
-	
+class PrivateKeyImpl implements PrivateKey { private static final long serialVersionUID = 1L;
 
-	//THIS MUST BE PRIVATE. A common base class cannot be extracted for PrivateKeyImpl and PublicKeyImpl.
 	private final ECKey ecKey;
-
 	
-	PublicKeyImpl(byte[] bytes) {
-		this(new ECKey(null, bytes, true));
+	
+	PrivateKeyImpl() {
+		this(new ECKey());
 	}
-
 	
-	PublicKeyImpl(String bytesAsString) {
+	
+	PrivateKeyImpl(String bytesAsString) {
 		this(new BigInteger(bytesAsString, 16).toByteArray());
 	}
 
-
-	private PublicKeyImpl(ECKey ecKey) {
-		Exceptions.check(!ecKey.hasPrivKey());
+	
+	PrivateKeyImpl(byte[] bytes) {
+		this(new ECKey(new BigInteger(1, bytes), null, true));
+	}
+	
+	
+	private PrivateKeyImpl(ECKey ecKey) {
 		this.ecKey = ecKey;
 	}
 
+
+	@Override
+	public PublicKey publicKey() {
+		return new PublicKeyImpl(ecKey.getPubKey());
+	}
+	
 	
 	@Override
 	public byte[] bytes() {
-		return ecKey.getPubKey();
+		return ecKey.getPrivKeyBytes();
 	}
 	
 	
@@ -41,11 +49,11 @@ class PublicKeyImpl implements PublicKey {
 	public String bytesAsString() {
 		return Utils.bytesToHexString(bytes());
 	}
-	
 
+	
 	@Override
 	public String toString() {
-		return "PUK::" + bytesAsString().substring(0, 5);
+		return "PRIK:" + publicKey().bytesAsString().substring(0, 5);
 	}
 
 	
@@ -61,14 +69,10 @@ class PublicKeyImpl implements PublicKey {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof PublicKeyImpl))
+		if (!(obj instanceof PrivateKeyImpl))
 			return false;
-		PublicKeyImpl other = (PublicKeyImpl) obj;
+		PrivateKeyImpl other = (PrivateKeyImpl) obj;
 		return ecKey.equals(other.ecKey);
 	}
-	
-	
-	private static final long serialVersionUID = 1L;
-
 
 }
