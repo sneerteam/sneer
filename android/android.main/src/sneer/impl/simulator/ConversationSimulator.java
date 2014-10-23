@@ -103,7 +103,6 @@ public class ConversationSimulator implements Conversation {
 	
 	@Override
 	public Observable<List<ConversationMenuItem>> menu() {
-//		return menuItems.observed().observable();
 		return menu;
 	}
 	
@@ -135,10 +134,8 @@ public class ConversationSimulator implements Conversation {
 
 
 	@Override
-	public void sendMessage(String arg0, String arg1, String arg2, byte[] arg3,
-			Object arg4) {
+	public void sendMessage(String arg0, String arg1, String arg2, byte[] arg3, Object arg4) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }
