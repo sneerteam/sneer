@@ -5,6 +5,8 @@ import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
 import static sneer.commons.Clock.now;
 import static sneer.commons.SystemReport.updateReport;
 
+import java.math.BigInteger;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -12,6 +14,10 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.ECPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -65,7 +71,7 @@ public class MainActivity extends SneerActivity {
 		makeConversationList();
 	}
 
-
+	
 	private void cryptoSpike() throws Exception {
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
 	    ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
@@ -73,9 +79,37 @@ public class MainActivity extends SneerActivity {
 	    KeyPair keyPair1 = keyGen.generateKeyPair();
 	    KeyPair keyPair2 = keyGen.generateKeyPair();
 
-	    updateReport("Crypto.puk1", keyPair1.getPublic());
-	    updateReport("Crypto.puk2", keyPair2.getPublic());
-	
+	    updateReport("Crypto.puk1", Arrays.toString(keyPair1.getPublic().getEncoded()));
+
+	    
+	    
+	    byte[] pukBytes = keyPair1.getPublic().getEncoded();
+		PublicKey clonePuk = KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(pukBytes));
+	    updateReport("crypto/encoding", (keyPair1.getPublic().equals(clonePuk)));
+
+	    ECPublicKeySpec spec = KeyFactory.getInstance("EC").getKeySpec(clonePuk, ECPublicKeySpec.class);
+	    BigInteger x = spec.getW().getAffineX();
+	    BigInteger y = spec.getW().getAffineY();
+
+	    updateReport("crypto/encoding/x", x.toString(16));
+	    updateReport("crypto/encoding/y", y.toString(16));
+
+	    ECPublicKeySpec spec2 = KeyFactory.getInstance("EC").getKeySpec(keyPair2.getPublic(), ECPublicKeySpec.class);
+	    updateReport("crypto/same-specs", spec.equals(spec2));
+	    BigInteger x2 = spec2.getW().getAffineX();
+	    BigInteger y2 = spec2.getW().getAffineY();
+
+	    updateReport("crypto/encoding/x2", x2.toString(16));
+	    updateReport("crypto/encoding/y2", y2.toString(16));
+	    
+	    
+	    
+	    
+	    ECPoint w = new ECPoint(x, y);
+		PublicKey clonePuk2 = KeyFactory.getInstance("EC").generatePublic(new ECPublicKeySpec(w, spec2.getParams()));
+	    updateReport("crypto/encoding2", (keyPair1.getPublic().equals(clonePuk2)));
+
+
 	    verifySignature(keyPair1);
 	    
 	    diffieHellman(keyPair1, keyPair2);
