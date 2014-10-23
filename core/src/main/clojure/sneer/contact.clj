@@ -4,7 +4,7 @@
    [sneer.rx :refer [atom->observable]]
    [sneer.party :refer [party-puk name-subject produce-party!]])
   (:import
-   [sneer Contact]
+   [sneer Contact Party]
    [sneer.rx ObservedSubject]
    [sneer.commons.exceptions FriendlyException]
    [sneer.tuples Tuple TupleSpace]))
@@ -20,7 +20,7 @@
 (defn problem-with-new-nickname-in [puk->contact new-nick]
   (cond
     (.isEmpty ^String new-nick) "Cannot be empty"
-    (->> puk->contact vals (some #(= new-nick (.. % ^String nickname ^String current)))) "Already used"))
+    (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current)))) "Already used"))
 
 (defn problem-with-new-nickname [contacts-state new-nick]
   (problem-with-new-nickname-in @(:puk->contact contacts-state) new-nick))

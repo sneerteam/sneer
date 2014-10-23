@@ -10,9 +10,9 @@
 
 (defn data->value
   "Reads the encoded datagram and returns [socket-address value]"
-  [datagram]
-  (let [address (. datagram getSocketAddress)
-        value (deserialize (. datagram getData) (. datagram getLength))]
+  [^DatagramPacket datagram]
+  (let [address (.getSocketAddress datagram)
+        value (deserialize (.getData datagram) (.getLength datagram))]
     (println address value)
     [address value]))
 
@@ -20,8 +20,8 @@
 (defn value->data
   "Returns an encoded datagram of the given value, with the given socket address set."
   [[address value]]
-  (doto (new-datagram)
-    (.setSocketAddress ^SocketAddress address)
+  (doto (^DatagramPacket new-datagram)
+    (.setSocketAddress address)
     (.setData (serialize value))))
 
 
@@ -71,7 +71,7 @@
 ;;(send-ping "dynamic.sneer.me" 5555)
 
 (defn send-ping [host port]
-  (with-open [socket (new DatagramSocket (+ 10000 port))]
+  (with-open [socket (new DatagramSocket ^int (+ 10000 port))]
     (let [addr (InetSocketAddress. host port)]
       (send-value socket [addr {:intent :ping}])
       (. socket setSoTimeout 500)

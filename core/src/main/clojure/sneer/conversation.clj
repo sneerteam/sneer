@@ -8,7 +8,8 @@
    [sneer PublicKey Party Contact Conversation Message]
    [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace]
-   [java.text SimpleDateFormat]))
+   [java.text SimpleDateFormat]
+   [rx.subjects BehaviorSubject]))
 
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 
@@ -30,7 +31,7 @@
       (timeCreated [this] (format-date created))
       (tuple [this] tuple))))
 
-(defn values-to-compare [msg] [(.timestampCreated msg) (.label msg)])
+(defn values-to-compare [^Message msg] [(.timestampCreated msg) (.label msg)])
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
@@ -87,7 +88,7 @@
         (if @being-read (swap! unread-message-counter (fn [_] 0)))))))
 
 (defn produce-conversation [tuple-space conversation-menu-items own-puk party]
-  (reify-conversation tuple-space (.asObservable conversation-menu-items) own-puk party))
+  (reify-conversation tuple-space (.asObservable ^BehaviorSubject conversation-menu-items) own-puk party))
 
 (defn create-conversations-state [own-puk tuple-space contacts conversation-menu-items]
   {:own-puk own-puk
