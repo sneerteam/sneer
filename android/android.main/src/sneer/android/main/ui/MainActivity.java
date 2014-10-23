@@ -45,8 +45,6 @@ import android.widget.ListView;
 
 public class MainActivity extends SneerActivity {
 	
-	static final boolean SIMULATOR = false;
-
 	private MainAdapter adapter;
 	private ListView conversations;
 
@@ -65,7 +63,8 @@ public class MainActivity extends SneerActivity {
 		}
 		
 		if (!sneerAndroid().checkOnCreate(this)) return;
-		if (!SIMULATOR) startProfileActivityIfFirstTime();
+		
+		startProfileActivityIfFirstTime();
 		
 		makeConversationList();
 	}
@@ -137,7 +136,6 @@ public class MainActivity extends SneerActivity {
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
-
 		
 		plugActionBarTitle(actionBar, ownProfile.ownName());
 		plugActionBarIcon(actionBar, ownProfile.selfie());

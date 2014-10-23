@@ -159,7 +159,6 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public boolean isOwnNameLocallyAvailable() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 }
