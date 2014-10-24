@@ -40,7 +40,7 @@
 
   (when port (println "Opening port" port))
 
-  (let [socket (if port (new DatagramSocket port) (new DatagramSocket))
+  (let [socket (if port (new DatagramSocket ^int port) (new DatagramSocket))
         print-err-if-open #(when (is-open socket) (.printStackTrace %))]
 
     (async/go
@@ -68,7 +68,7 @@
 
 (defn send-ping [host port]
   (with-open [socket (new DatagramSocket ^int (+ 10000 port))]
-    (let [addr (InetSocketAddress. host port)]
+    (let [addr (InetSocketAddress. ^String host ^int port)]
       (send-value socket [addr {:intent :ping}])
       (. socket setSoTimeout 500)
       (let [[_ pong] (receive-value socket)]
@@ -88,8 +88,8 @@
 
   (start-echo-server echo-port)
 
-  (let [socket (new DatagramSocket (+ 10000 echo-port))
-        addr (InetSocketAddress. "localhost" echo-port)]
+  (let [socket (new DatagramSocket ^int (+ 10000 echo-port))
+        addr (InetSocketAddress. "localhost" ^int echo-port)]
     (send-value socket [addr "Hello"])
     (. socket setSoTimeout 100)
     (let [[_ msg] (receive-value socket)]

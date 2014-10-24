@@ -39,7 +39,7 @@
        (async/thread
 
          ; ensure no network activity takes place on caller thread to workaround android limitation
-         (let [server-addr (InetSocketAddress. server-host server-port)
+         (let [server-addr (InetSocketAddress. ^String server-host ^int server-port)
                udp-server (udp/serve-udp udp-in udp-out)
                ping [server-addr {:intent :ping :from puk}]]
 
@@ -81,7 +81,7 @@
        (async/thread
 
          ; ensure no network activity takes place on caller thread to workaround android limitation
-         (let [server-addr (InetSocketAddress. server-host server-port)
+         (let [server-addr (InetSocketAddress. ^String server-host ^int server-port)
                udp-server (udp/serve-udp udp-in udp-out)
                ping [server-addr {:intent :ping :from puk}]]
 
