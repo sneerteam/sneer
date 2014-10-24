@@ -7,7 +7,6 @@
 (defn new-datagram []
   (new DatagramPacket (byte-array 1024) 1024))
 
-
 (defn data->value
   "Reads the encoded datagram and returns [socket-address value]"
   [^DatagramPacket datagram]
@@ -16,7 +15,6 @@
     (println address value)
     [address value]))
 
-
 (defn value->data
   "Returns an encoded datagram of the given value, with the given socket address set."
   [[address value]]
@@ -24,10 +22,8 @@
     (.setSocketAddress address)
     (.setData (serialize value))))
 
-
 (defn send-value [socket value]
   (. socket send (value->data value)))
-
 
 (defn receive-value [socket]
   (let [datagram (new-datagram)]
@@ -77,7 +73,6 @@
       (. socket setSoTimeout 500)
       (let [[_ pong] (receive-value socket)]
         (println pong)))))
-
 
 (defn start-echo-server
   "Starts an echo UDP server that echoes whatever UDP packet it receives."
