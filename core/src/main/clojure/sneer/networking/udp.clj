@@ -44,7 +44,7 @@
         print-err-if-open #(when (is-open socket) (.printStackTrace ^Exception %))]
 
     (async/go
-      (with-open [socket socket]
+      (with-open [^DatagramSocket socket ^DatagramSocket socket]
         (loop []
           (when-let [packet (<! packets-out)]
             (try
