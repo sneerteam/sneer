@@ -228,8 +228,8 @@ public class SneerActivity extends Activity {
 	}
 	
 	
-	public static void log(Activity activity, String s) {
-		Log.d(activity.getClass().getSimpleName(), s);
+	public static void log(Activity activity, Object obj) {
+		Log.d(activity.getClass().getSimpleName(), obj.toString());
 	}
 	
 }
