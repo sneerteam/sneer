@@ -23,15 +23,15 @@
     (.setData (serialize value))))
 
 (defn send-value [socket value]
-  (. socket send (value->data value)))
+  (. ^DatagramSocket socket send (value->data value)))
 
 (defn receive-value [socket]
   (let [datagram (new-datagram)]
-    (. socket receive datagram)
+    (. ^DatagramSocket socket receive datagram)
     (data->value datagram)))
 
 (defn is-open [socket]
-  (not (.isClosed socket)))
+  (not (.isClosed ^DatagramSocket socket)))
 
 (defn serve-udp
   "Opens a UDP socket on port, putting received packets into packets-in, sending packets taken from packets-out.
@@ -41,7 +41,7 @@
   (when port (println "Opening port" port))
 
   (let [socket (if port (new DatagramSocket ^int port) (new DatagramSocket))
-        print-err-if-open #(when (is-open socket) (.printStackTrace %))]
+        print-err-if-open #(when (is-open socket) (.printStackTrace ^Exception %))]
 
     (async/go
       (with-open [socket socket]
