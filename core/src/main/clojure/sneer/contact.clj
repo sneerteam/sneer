@@ -31,7 +31,7 @@
 
 (defn reify-contact [tuple-space puk->contact own-puk nickname party]
   (let [nick-subject (ObservedSubject/create nickname)]
-    (.subscribe ^rx.Observable (.observable nick-subject) ^rx.Subscriber (name-subject party))
+    (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party))
     (reify Contact
       (party [this] party)
       
