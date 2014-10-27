@@ -8,4 +8,4 @@
        ~@forms
        (catch java.lang.Exception ~'e
          (println "GO ERROR" ~'e)
-         (. ~'e printStackTrace)))))
+         (. ~'^Exception e printStackTrace)))))
