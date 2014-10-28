@@ -1,6 +1,6 @@
 (ns sneer.tests.tuple-transmission-test
   (:require [midje.sweet :refer :all]
-            [sneer.tuple-transmission :refer [start-queue-transmitter QueueStore]]
+            [sneer.tuple-transmission :refer [start-queue-transmitter QueueStore new-retry-timeout]]
             [clojure.core.async :as async :refer [chan >!!]]))
 
 (defn dropping-chan []
@@ -28,13 +28,18 @@
     (async/timeout 200) ([_] :timeout)
     ch ([v] v)))
 
+(def own-puk :me)
+
+(def peer-puk :peer)
+
+(def t0 {:tag :first})
+
+(def t1 {:tag :next})
+
 (facts
  "about tuple transmission" 
  
- (let [t0 {:tag :first}
-       own-puk :me
-       peer-puk :peer
-       tuples-in (dropping-chan)
+ (let [tuples-in (dropping-chan)
        packets-in (dropping-chan)
        packets-out (chan)
        store (empty-store)
@@ -64,8 +69,7 @@
       (let [tuples-in (dropping-chan)
             packets-in (dropping-chan)
             packets-out (chan)
-            subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)
-            t1 {:tag :next}]
+            subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)]
         (>!! tuples-in t1)        
         (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0}
         (>!! packets-in {:intent :status-of-queues
@@ -78,4 +82,15 @@
         (async/close! tuples-in))))
  
  (fact
-   "it retries to send tuple"))
+   "it retries to send tuple" 
+   (let [retry-timeout (chan 10)]
+     (with-redefs [new-retry-timeout (constantly retry-timeout)]
+       (let [tuples-in (dropping-chan)
+             packets-in (dropping-chan)
+             packets-out (chan)
+             subject (start-queue-transmitter own-puk peer-puk (empty-store) tuples-in packets-in packets-out)]
+         (>!! tuples-in t0)
+         (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0}
+         (>!! retry-timeout ::stimulus)
+         (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0}
+         (async/close! tuples-in))))))
