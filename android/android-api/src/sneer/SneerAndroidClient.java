@@ -29,6 +29,7 @@ public class SneerAndroidClient {
 
 	//Message
 	public static final String PAYLOAD = "payload";
+	public static final String URL = "url";
 	public static final String RESULT_RECEIVER = "result";
 	public static final String TEXT = "text";
 
