@@ -2,6 +2,7 @@ package sneer.android.main.ui;
 
 import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findTextView;
+import static sneer.android.ui.SneerActivity.findImageView;
 
 import java.util.List;
 import java.util.Random;
@@ -19,11 +20,13 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -58,12 +61,15 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
         	false);
         
         final TextView messageView = findTextView(ret, R.id.messageContent);
+        final ImageView img = findImageView(ret, R.id.img);
+        
         SpannableString messageContent = new SpannableString(message.label());
-		
+        messageView.setAutoLinkMask(Linkify.ALL);
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
         
         ret.setTag(message);
         if (sneerAndroid().isClickable(message)) {
+        	messageView.setAutoLinkMask(0);
 	        ret.setClickable(true);
 	        ret.setOnClickListener(this);
 	        clickableMessageStyle(messageView, messageContent);
