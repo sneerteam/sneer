@@ -2,6 +2,7 @@ package sneer.android.ui;
 
 import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.URL;
+import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import static sneer.SneerAndroidClient.TEXT;
 import sneer.SneerAndroidClient;
 import sneer.utils.Value;
@@ -34,8 +35,8 @@ public abstract class MessageActivity extends SneerActivity {
 
 		
 	protected void send(String label, Object payload) {
-		ResultReceiver resultReceiver = getExtra(SneerAndroidClient.RESULT_RECEIVER);
+		ResultReceiver resultReceiver = getExtra(RESULT_RECEIVER);
 		SneerAndroidClient.send(resultReceiver, label, payload);
 	}
-
+	
 }
