@@ -29,27 +29,33 @@
               [:tuple :int]]}])
 
 (defprotocol QueueStore
-  (-peek [store to]))
+  (-peek [store to])
+  (-enqueue [store to tuple]))
 
 (defn start-queue-transmitter [from to store tuples-in packets-in packets-out]
   (go!
    (loop []
 
-     (when-let [{:keys [sequence tuple]} (-peek store to)]
+     (when-some [{:keys [sequence tuple]} (-peek store to)]
        (>! packets-out {:intent :send :from from :to to :sequence sequence :payload tuple}))
 
      (alt!
+       
        tuples-in
        ([tuple]
-          ; store tuple if not already in the queue
-          (recur))
+         (when tuple
+           (-enqueue store to tuple)
+           (recur)))
+       
        packets-in
        ([packet]
           (match packet
                  {:intent :status-of-queues}
                  (do
                    (println "status" packet)
-                   (recur))))))))
+                   (recur))))))
+   
+   (async/close! packets-out)))
 
 (defn new-ping-timeout []
   (async/timeout 20000))
