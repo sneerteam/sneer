@@ -1,24 +1,30 @@
 package sneer.android.main.database;
 
-import java.io.*;
-import java.util.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-import sneer.admin.*;
-import sneer.commons.*;
-import android.annotation.*;
-import android.content.*;
-import android.database.*;
-import android.database.sqlite.*;
+import sneer.admin.Database;
+import sneer.commons.Lists;
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 
 public class SneerSqliteDatabase implements Closeable, Database {
+	
+	private SQLiteDatabase sqlite;
+
 	
 	public static SneerSqliteDatabase openDatabase(File file) throws IOException {
 		return new SneerSqliteDatabase(SQLiteDatabase.openOrCreateDatabase(file,null));
 	}
 
-	private SQLiteDatabase sqlite;
 
 	public SneerSqliteDatabase(SQLiteDatabase sqlite) {
 		this.sqlite = sqlite;
@@ -43,6 +49,7 @@ public class SneerSqliteDatabase implements Closeable, Database {
 	public long insert(String tableName, Map<String, Object> values) {
 		return sqlite.insert(tableName, null, toContentValues(values));
 	}
+	
 	
 	@Override
 	public Iterable<List<?>> query(String sql, List<Object> args) {

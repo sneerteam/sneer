@@ -1,12 +1,12 @@
 package sneer.android.main.ipc;
 
 import static sneer.SneerAndroidClient.ERROR;
-import static sneer.SneerAndroidClient.TEXT;
-import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;
+import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.REPLAY_FINISHED;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
+import static sneer.SneerAndroidClient.TEXT;
 import static sneer.SneerAndroidClient.UNSUBSCRIBE;
 
 import java.util.concurrent.atomic.AtomicLong;

@@ -1,5 +1,7 @@
 package sneer;
 
+import java.net.URL;
+
 import rx.Observable;
 import rx.Observable.OnSubscribe;
 import rx.Subscriber;
@@ -185,10 +187,18 @@ public class SneerAndroidClient {
 	}
 
 	
-	public static void send(ResultReceiver resultReceiver, String text, Object payload) {
+	public static void send(ResultReceiver resultReceiver, String label, Object payload) {
 		Bundle bundle = new Bundle();
-		bundle.putString(TEXT, text);
+		bundle.putString(TEXT, label);
 		bundle.putParcelable(PAYLOAD, Value.of(payload));
+		resultReceiver.send(Activity.RESULT_OK, bundle);
+	}
+	
+	
+	public static void sendUrl(ResultReceiver resultReceiver, String label, URL url) {
+		Bundle bundle = new Bundle();
+		bundle.putString(TEXT, label);
+		bundle.putParcelable(PAYLOAD, Value.of(url));
 		resultReceiver.send(Activity.RESULT_OK, bundle);
 	}
 	
