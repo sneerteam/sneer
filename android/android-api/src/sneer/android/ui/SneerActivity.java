@@ -202,6 +202,7 @@ public class SneerActivity extends Activity {
 		startActivity(new Intent().setClass(this, class1));
 	}
 
+	
 	protected void alert(String title, CharSequence[] items, DialogInterface.OnClickListener onClickListener) {
 		new AlertDialog.Builder(this)
 			.setTitle(title)

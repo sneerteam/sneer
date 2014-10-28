@@ -1,29 +1,35 @@
 package sneer.utils;
 
-import android.os.*;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 public class Value implements Parcelable {
 
+	final Object value;
+
+	
 	public static Value of(Object o) {
 		return new Value(o);
 	}
 
-	final Object value;
 	
 	Value(Object value) {
 		this.value = value;
 	}
+	
 	
 	@Override
 	public int describeContents() {
 		return 0;
 	}
 
+	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeValue(value);
 	}
 
+	
 	public static final Parcelable.Creator<Value> CREATOR = new Parcelable.Creator<Value>() {
 		public Value createFromParcel(Parcel in) {
 			return Value.of(in.readValue(null));
@@ -34,15 +40,18 @@ public class Value implements Parcelable {
 		}
 	};
 
+	
 	public Object get() {
 		return value;
 	}
+	
 	
 	@Override
 	public String toString() {
 		return "Value(" + value + ")";
 	}
 
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -50,6 +59,7 @@ public class Value implements Parcelable {
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
+	
 
 	@Override
 	public boolean equals(Object obj) {

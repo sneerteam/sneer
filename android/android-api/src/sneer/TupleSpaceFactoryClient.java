@@ -34,10 +34,12 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 	private Context context;
 	private InteractiveSerializer serializer = new InteractiveSerializer();
 
+	
 	public TupleSpaceFactoryClient(Context context) {
 		this.context = context;
 	}
 
+	
 	@Override
 	protected void publishTuple(final Tuple ret) {
 		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() {  @Override public void call() {
@@ -48,15 +50,18 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 		}});
 	}
 
+	
 	@Override
 	protected Observable<Tuple> query(PrivateKey identity, final Map<String, Object> criteria) {
 		return query(TupleSpaceFactoryClient.TupleSpaceOp.SUBSCRIBE, criteria);
 	}
 
+	
 	@Override
 	protected Observable<Tuple> queryLocal(PrivateKey identity, Map<String, Object> criteria) {
 		return query(TupleSpaceFactoryClient.TupleSpaceOp.SUBSCRIBE_LOCAL, criteria);
 	}
+	
 	
 	private Observable<Tuple> query(final TupleSpaceOp op, final Map<String, Object> criteria) {
 		return Observable.create(new Observable.OnSubscribe<Tuple>() {  @Override public void call(final Subscriber<? super Tuple> subscriber) {
@@ -95,6 +100,7 @@ public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 		}}).observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread());
 	}
 
+	
 	private void log(String message) {
 		Log.i(TuplesFactoryInProcess.class.getSimpleName(), message);
 	}

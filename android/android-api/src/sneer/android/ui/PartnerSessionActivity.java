@@ -1,8 +1,8 @@
 package sneer.android.ui;
 
-import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;
+import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.REPLAY_FINISHED;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import static sneer.SneerAndroidClient.UNSUBSCRIBE;

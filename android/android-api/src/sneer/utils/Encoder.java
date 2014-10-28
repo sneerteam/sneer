@@ -1,8 +1,9 @@
 package sneer.utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import sneer.commons.exceptions.*;
+import sneer.commons.exceptions.NotImplementedYet;
 
 public class Encoder {
 	

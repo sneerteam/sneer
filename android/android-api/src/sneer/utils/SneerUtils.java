@@ -1,10 +1,12 @@
 package sneer.utils;
 
-import android.app.*;
-import android.content.*;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.pm.*;
-import android.net.*;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 
 public class SneerUtils {
 
@@ -16,6 +18,7 @@ public class SneerUtils {
             showInstallSneerDialog(activity);
         }
     }
+    
 
 	public static void showInstallSneerDialog(final Activity activity) {
 		new AlertDialog.Builder(activity)

@@ -1,31 +1,38 @@
 package sneer.utils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import sneer.commons.exceptions.*;
-import android.os.*;
+import sneer.commons.exceptions.NotImplementedYet;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 public class OldValue implements Parcelable {
+
+	final Object value;
+
 
 	public static OldValue of(Object o) {
 		return new OldValue(o);
 	}
 
-	final Object value;
 	
 	OldValue(Object value) {
 		this.value = value;
 	}
+	
 	
 	@Override
 	public int describeContents() {
 		return 0;
 	}
 
+	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		write(dest, value);
 	}
+	
 
 	public static final Parcelable.Creator<OldValue> CREATOR = new Parcelable.Creator<OldValue>() {
 		public OldValue createFromParcel(Parcel in) {
@@ -37,14 +44,17 @@ public class OldValue implements Parcelable {
 		}
 	};
 
+	
 	public Object get() {
 		return value;
 	}
+	
 	
 	@Override
 	public String toString() {
 		return Type.of(value).name() + "(" + value + ")";
 	}
+	
 	
 	@Override
 	public boolean equals(Object o) {
@@ -55,9 +65,11 @@ public class OldValue implements Parcelable {
 		return equals(value, ((OldValue)o).value);
 	}
 
+	
 	static boolean equals(Object x, Object y) {
 		return x == y || (x != null && y != null && x.equals(y));
 	}
+	
 	
 	public static enum Type {
 		NULL {
@@ -154,15 +166,17 @@ public class OldValue implements Parcelable {
 		public abstract void writeToParcel(Parcel dest, Object value);
 	}
 	
+	
 	static Object read(Parcel in) {
 		Type type = Type.values()[in.readInt()];
 		return type.createFromParcel(in);
-		
 	}
+	
 	
 	static void write(Parcel dest, Object value) {
 		Type t = Type.of(value);
 		dest.writeInt(t.ordinal());
 		t.writeToParcel(dest, value);
 	}
+	
 }
