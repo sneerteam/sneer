@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="TODO"
-            android:src="@android:drawable/ic_lock_lock" >
+            android:src="@drawable/place_holder_map" >
         </ImageView>
 
         <TextView
