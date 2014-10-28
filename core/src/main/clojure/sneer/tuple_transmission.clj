@@ -37,37 +37,50 @@
 (def IMMEDIATELY (doto (async/chan)
                    async/close!))
 
+(def NEVER (async/chan))
+
 (defn new-retry-timeout []
   (async/timeout 1000))
 
 (defn start-queue-transmitter [from to store tuples-in packets-in packets-out]
-  (go!
-   (loop [retry-timeout IMMEDIATELY]
+  (letfn [(next-packet []
+            (when-some [{:keys [sequence tuple]} (-peek store to)]
+              {:intent :send :from from :to to :sequence sequence :payload tuple}))]
+    (go!
+     (loop [retry-timeout IMMEDIATELY]
      
-     (alt!
+       (alt!
        
-       retry-timeout
-       ([_]
-         (when-some [{:keys [sequence tuple]} (-peek store to)]
-                (>! packets-out {:intent :send :from from :to to :sequence sequence :payload tuple}))
-         (recur (new-retry-timeout)))
+         retry-timeout
+         ([_]
+           (if-some [packet (next-packet)]
+             (do
+               (>! packets-out packet)
+               (recur (new-retry-timeout)))
+             (recur NEVER)))
        
-       tuples-in
-       ([tuple]
-         (when tuple
-           (let [first? (-empty? store to)]
-             (-enqueue store to tuple)
-             (recur (if first? IMMEDIATELY retry-timeout)))))
+         tuples-in
+         ([tuple]
+           (when tuple
+             (let [first? (-empty? store to)]
+               (-enqueue store to tuple)
+               (recur (if first? IMMEDIATELY retry-timeout)))))
        
-       packets-in
-       ([packet]
-          (match packet
-                 {:intent :status-of-queues}
-                 (do
-                   (-pop store to)
-                   (recur IMMEDIATELY))))))
+         packets-in
+         ([packet]
+            (match packet
+                   {:intent :status-of-queues :highest-sequence-to-send hsts}
+                   (if-some [{:keys [sequence]} (-peek store to)]
+                     (if (= hsts sequence)
+                       (do
+                         (-pop store to)
+                         (recur IMMEDIATELY))
+                       (do
+                         (>! packets-out (assoc (next-packet) :reset true))
+                         (recur (new-retry-timeout))))
+                     (recur NEVER))))))
    
-   (async/close! packets-out)))
+     (async/close! packets-out))))
 
 (defn new-ping-timeout []
   (async/timeout 20000))
