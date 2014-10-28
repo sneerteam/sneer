@@ -1,7 +1,5 @@
 package fabiomanera.sendlocation;
 
-import java.net.URL;
-
 import sneer.android.ui.MessageActivity;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,17 +10,30 @@ public class ViewLocationActivity extends MessageActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_view_location);
 	}
 	
 	
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		URL url = (URL)messageUrl();
+		String url = (String)messageUrl();
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setData(Uri.parse(url.toString()));
+		intent.setData(Uri.parse(url));
 		startActivity(intent);
+	}
+	
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		finish();
+	}
+
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		finish();
 	}
 	
 }
