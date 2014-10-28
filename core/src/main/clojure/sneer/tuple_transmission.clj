@@ -29,31 +29,43 @@
               [:tuple :int]]}])
 
 (defprotocol QueueStore
+  (-empty? [store to])
   (-peek [store to])
-  (-enqueue [store to tuple]))
+  (-enqueue [store to tuple])
+  (-pop [store to]))
+
+(def IMMEDIATELY (doto (async/chan)
+                   async/close!))
+
+(defn new-retry-timeout []
+  (async/timeout 1000))
 
 (defn start-queue-transmitter [from to store tuples-in packets-in packets-out]
   (go!
-   (loop []
-
-     (when-some [{:keys [sequence tuple]} (-peek store to)]
-       (>! packets-out {:intent :send :from from :to to :sequence sequence :payload tuple}))
-
+   (loop [retry-timeout IMMEDIATELY]
+     
      (alt!
+       
+       retry-timeout
+       ([_]
+         (when-some [{:keys [sequence tuple]} (-peek store to)]
+                (>! packets-out {:intent :send :from from :to to :sequence sequence :payload tuple}))
+         (recur (new-retry-timeout)))
        
        tuples-in
        ([tuple]
          (when tuple
-           (-enqueue store to tuple)
-           (recur)))
+           (let [first? (-empty? store to)]
+             (-enqueue store to tuple)
+             (recur (if first? IMMEDIATELY retry-timeout)))))
        
        packets-in
        ([packet]
           (match packet
                  {:intent :status-of-queues}
                  (do
-                   (println "status" packet)
-                   (recur))))))
+                   (-pop store to)
+                   (recur IMMEDIATELY))))))
    
    (async/close! packets-out)))
 

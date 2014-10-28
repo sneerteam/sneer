@@ -14,10 +14,14 @@
         enqueue (fn [{:keys [q sequence]} tuple]
                   {:q (conj q {:sequence sequence :tuple tuple}) :sequence (inc sequence)})]
     (reify QueueStore
+      (-empty? [store to]
+        (-> @state :q empty?))
       (-peek [store to]
-        (-> @state :q peek))
+        (-> @state :q peek))      
       (-enqueue [store to tuple]
-        (swap! state enqueue tuple)))))
+        (swap! state enqueue tuple))
+      (-pop [store to]
+        (swap! state update-in [:q] pop)))))
 
 (defn <!!? [ch]
   (async/alt!!
@@ -25,35 +29,53 @@
     ch ([v] v)))
 
 (facts
- "about tuple transmission"
-
- (fact
-  "when first tuple is received it's sent to the server")
+ "about tuple transmission" 
  
- (fact
-  "when restarting over store with tuples it starts sending stored tuples"
+ (let [t0 {:tag :first}
+       own-puk :me
+       peer-puk :peer
+       tuples-in (dropping-chan)
+       packets-in (dropping-chan)
+       packets-out (chan)
+       store (empty-store)
+       subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)]
+    (>!! tuples-in t0)    
+    
+    (fact
+      "when first tuple is received it's sent to the server"
+      (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0})
+    
+    (fact
+      "packets-out must be closed when tuples-in is closed"
+      (async/close! tuples-in)
+      (<!!? packets-out) => nil)
   
-  (let [t1 {}
-        own-puk :me
-        peer-puk :peer
-        tuples-in (dropping-chan)
-        packets-in (dropping-chan)
-        packets-out (chan)
-        store (empty-store)
-        subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)]
-    (>!! tuples-in t1)    
+    (fact
+      "when restarting over store with tuples it starts sending stored tuples"
+      (let [tuples-in (dropping-chan)
+            packets-in (dropping-chan)
+            packets-out (chan)
+            subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)]
+        (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0}
+        (async/close! tuples-in)))
     
-    (fact "packets-out must be closed after we close tuples-in"
-          (async/close! tuples-in)
-          (<!!? (async/filter< nil? packets-out)) => nil)
-    
-    (let [tuples-in (dropping-chan)
-          packets-in (dropping-chan)
-          packets-out (chan)
-          subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)]
-      (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t1 :sequence 0}
-      (async/close! tuples-in)))) 
-
+    (fact
+      "when ack is received it starts sending next tuple"
+      (let [tuples-in (dropping-chan)
+            packets-in (dropping-chan)
+            packets-out (chan)
+            subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)
+            t1 {:tag :next}]
+        (>!! tuples-in t1)        
+        (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0}
+        (>!! packets-in {:intent :status-of-queues
+                         :to own-puk
+                         :follower peer-puk
+                         :highest-sequence-delivered -1
+                         :highest-sequence-to-send 0
+                         :full? false})
+        (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t1 :sequence 1}
+        (async/close! tuples-in))))
  
  (fact
-  "when ack is received tuple is deleted from store "))
+   "it retries to send tuple"))
