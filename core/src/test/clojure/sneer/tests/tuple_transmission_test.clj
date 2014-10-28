@@ -6,6 +6,9 @@
 (defn dropping-chan [& [n]]
   (chan (async/dropping-buffer (or n 1))))
 
+(defn sliding-chan [& [n]]
+  (chan (async/sliding-buffer (or n 1))))
+
 (defn persistent-queue [& [elements]]
   (reduce conj clojure.lang.PersistentQueue/EMPTY elements))
 
@@ -85,7 +88,7 @@
       "when server is out of sync it sends a reset"
       (let [tuples-in (dropping-chan 2)
             packets-in (dropping-chan 2)
-            packets-out (dropping-chan)
+            packets-out (sliding-chan)
             store (empty-store)
             subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)]
         (>!! tuples-in t0)
@@ -93,7 +96,7 @@
         (>!! packets-in {:intent :status-of-queues
                          :to own-puk
                          :follower peer-puk
-                         :highest-sequence-delivered -1
+                         :highest-sequence-delivered 0
                          :highest-sequence-to-send 0
                          :full? false})
         ;server restarted
@@ -105,7 +108,7 @@
                          :full? false})
         (<!!? (async/filter< :reset packets-out)) => {:intent :send :from own-puk :to peer-puk :payload t1 :sequence 1 :reset true}
         (async/close! tuples-in)))
- 
+     
  (fact
    "it retries to send tuple" 
    (let [retry-timeout (chan 10)]
