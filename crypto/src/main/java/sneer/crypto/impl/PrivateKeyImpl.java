@@ -40,20 +40,20 @@ class PrivateKeyImpl implements PrivateKey { private static final long serialVer
 	
 	
 	@Override
-	public byte[] bytes() {
+	public byte[] toBytes() {
 		return ecKey.getPrivKeyBytes();
 	}
 	
 	
 	@Override
-	public String bytesAsString() {
-		return Utils.bytesToHexString(bytes());
+	public String toHex() {
+		return Utils.bytesToHexString(toBytes());
 	}
 
 	
 	@Override
 	public String toString() {
-		return "PRIK:" + publicKey().bytesAsString().substring(0, 5);
+		return "PRIK:" + publicKey().toHex().substring(0, 5);
 	}
 
 	

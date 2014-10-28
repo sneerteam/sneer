@@ -11,13 +11,13 @@ public class KeysImpl implements Keys {
 	}
 
 	
-	public PrivateKey createPrivateKey(byte[] bytes) {
-		return new PrivateKeyImpl(bytes);
+	public PrivateKey createPrivateKey(byte[] seed) {
+		return new PrivateKeyImpl(seed);
 	}
 	
 	
-	public PrivateKey createPrivateKey(String bytesAsString) {
-		return new PrivateKeyImpl(bytesAsString);
+	public PrivateKey createPrivateKey(String hexSeed) {
+		return new PrivateKeyImpl(hexSeed);
 	}
 	
 	
@@ -27,8 +27,8 @@ public class KeysImpl implements Keys {
 
 	
 	@Override	
-	public PublicKey createPublicKey(String bytesAsString) {
-		return new PublicKeyImpl(bytesAsString);
+	public PublicKey createPublicKey(String hex) {
+		return new PublicKeyImpl(hex);
 	}
 
 }

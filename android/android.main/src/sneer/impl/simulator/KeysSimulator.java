@@ -19,12 +19,12 @@ public class KeysSimulator {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public byte[] bytes() {
-				return bytesAsString().getBytes();
+			public byte[] toBytes() {
+				return toHex().getBytes();
 			}
 
 			@Override
-			public String bytesAsString() {
+			public String toHex() {
 				return "PRIK-" + key;
 			}
 
@@ -36,17 +36,17 @@ public class KeysSimulator {
 			@Override
 			public boolean equals(Object o) {
 				return o instanceof PrivateKey
-					&& ((PrivateKey)o).bytesAsString().equals(bytesAsString());
+					&& ((PrivateKey)o).toHex().equals(toHex());
 			}
 			
 			@Override
 			public int hashCode() {
-				return bytesAsString().hashCode();
+				return toHex().hashCode();
 			}
 			
 			@Override
 			public String toString() {
-				return bytesAsString();
+				return toHex();
 			}
 		};
 	}
@@ -59,29 +59,29 @@ public class KeysSimulator {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public byte[] bytes() {
-				return bytesAsString().getBytes();
+			public byte[] toBytes() {
+				return toHex().getBytes();
 			}
 
 			@Override
-			public String bytesAsString() {
+			public String toHex() {
 				return bytesAsString;
 			}
 			
 			@Override
 			public boolean equals(Object o) {
 				return o instanceof PublicKey
-					&& ((PublicKey)o).bytesAsString().equals(bytesAsString());
+					&& ((PublicKey)o).toHex().equals(toHex());
 			}
 			
 			@Override
 			public int hashCode() {
-				return bytesAsString().hashCode();
+				return toHex().hashCode();
 			}
 
 			@Override
 			public String toString() {
-				return bytesAsString();
+				return toHex();
 			}
 		};
 	}

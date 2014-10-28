@@ -3,5 +3,7 @@ package sneer.crypto;
 import sneer.PublicKey;
 
 public interface Keys {
-	PublicKey createPublicKey(String bytesAsString);
+	
+	/** @see PublicKey.toHex() */
+	PublicKey createPublicKey(String hex);
 }

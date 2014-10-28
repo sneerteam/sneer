@@ -9,7 +9,7 @@
   (name-subject [this]))
 
 (defn new-party [puk]
-  (let [name (ObservedSubject/create (str "? PublicKey: " (-> ^PublicKey puk .bytesAsString (subs 0 7)) "..."))]
+  (let [name (ObservedSubject/create (str "? PublicKey: " (-> ^PublicKey puk .toHex (subs 0 7)) "..."))]
     (reify
       Party
         (name [this] (.observable name))

@@ -11,7 +11,7 @@
   {PublicKey
    (transit/write-handler
      (fn [_] "puk")
-     (fn [^PublicKey puk] (.bytes puk)))})
+     (fn [^PublicKey puk] (.toBytes puk)))})
 
 (def ^:private read-handlers
   (let [keys-impl (KeysImpl.)]

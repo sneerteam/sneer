@@ -109,7 +109,7 @@ public class ContactActivity extends Activity {
 			loadContact(null);
 		}
 		
-		if (partyPuk.bytesAsString().equals(sneer().self().publicKey().current().bytesAsString())) {
+		if (partyPuk.toHex().equals(sneer().self().publicKey().current().toHex())) {
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
 			finish();

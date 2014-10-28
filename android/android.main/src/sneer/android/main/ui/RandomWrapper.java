@@ -1,8 +1,10 @@
-package sneer.crypto.impl;
+package sneer.android.main.ui;
 
 import static sneer.commons.exceptions.Exceptions.check;
 
 import java.security.SecureRandom;
+
+import sneer.commons.SystemReport;
 
 /**
  * Using SecureRandom instances provided by the java security mechanism is a
@@ -13,6 +15,7 @@ class RandomWrapper extends SecureRandom { private static final long serialVersi
 
 	private final byte[] randomBytes;
 	private boolean wasUsed = false;
+
 
 	RandomWrapper(byte[] randomBytes) {
 		this.randomBytes = randomBytes;
@@ -38,12 +41,18 @@ class RandomWrapper extends SecureRandom { private static final long serialVersi
 		throw new UnsupportedOperationException();
 	}
 
+	
+	
+	private int counter;
 	@Override
 	public synchronized void nextBytes(byte[] bytes) {
+		if (bytes.length != randomBytes.length) throw new IllegalStateException("bytes " + bytes.length + " randomBytes " + randomBytes.length);
 		check(bytes.length == randomBytes.length);
 		check(!wasUsed);
 		wasUsed = true;
 
+		SystemReport.updateReport("crypto/random" + counter++, "read");
+		
 		System.arraycopy(randomBytes, 0, bytes, 0, randomBytes.length);
 	}
 

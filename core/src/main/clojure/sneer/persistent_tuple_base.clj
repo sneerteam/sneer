@@ -50,7 +50,7 @@
 
 (def puk-serializer 
   (let [keys-impl (KeysImpl.)]
-    {:serialize #(.bytes ^sneer.PublicKey %)
+    {:serialize #(.toBytes ^sneer.PublicKey %)
      :deserialize #(.createPublicKey keys-impl ^bytes %)}))
 
 (def core-serializer {:serialize serialization/serialize

@@ -50,12 +50,12 @@ public class SneerAndroidClient {
 		}
 
 		@Override
-		public byte[] bytes() {
+		public byte[] toBytes() {
 			return null;
 		}
 
 		@Override
-		public String bytesAsString() {
+		public String toHex() {
 			return null;
 		}
 	};

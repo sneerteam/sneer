@@ -39,7 +39,7 @@
   (if-let [existing (second (persistence/db-query db ["SELECT * FROM keys"]))]
     (.createPrivateKey (KeysImpl.) ^bytes (first existing))
     (let [new-key (.createPrivateKey (KeysImpl.))]
-      (persistence/db-insert db :keys {"prik" (.bytes new-key)})
+      (persistence/db-insert db :keys {"prik" (.toBytes new-key)})
       new-key)))
 
 (defn new-sneer-admin-over-db [network db]

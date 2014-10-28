@@ -32,20 +32,20 @@ class PublicKeyImpl implements PublicKey {
 
 	
 	@Override
-	public byte[] bytes() {
+	public byte[] toBytes() {
 		return ecKey.getPubKey();
 	}
 	
 	
 	@Override
-	public String bytesAsString() {
-		return Utils.bytesToHexString(bytes());
+	public String toHex() {
+		return Utils.bytesToHexString(toBytes());
 	}
 	
 
 	@Override
 	public String toString() {
-		return "PUK::" + bytesAsString().substring(0, 5);
+		return "PUK::" + toHex().substring(0, 5);
 	}
 
 	

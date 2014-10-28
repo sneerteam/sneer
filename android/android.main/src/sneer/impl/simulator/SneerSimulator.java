@@ -192,7 +192,7 @@ public class SneerSimulator implements Sneer {
 		PrivateKey prik = KeysSimulator.createPrivateKey();
 		PartySimulator party = produceParty(prik.publicKey());
 		System.out.println("==============================");
-		System.out.println("http://sneer.me/public-key?" + party.publicKey().current().bytesAsString());
+		System.out.println("http://sneer.me/public-key?" + party.publicKey().current().toHex());
 		System.out.println("==============================");
 		addUnknownContact(name, party);
 		return prik;
