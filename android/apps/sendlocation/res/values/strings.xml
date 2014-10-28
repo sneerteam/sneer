@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <string name="app_name">Send Location</string>
-	<string name="image_view_content_description">Location</string>
-	
+    <string name="title_activity_view_location">ViewLocationActivity</string>
+
 </resources>
