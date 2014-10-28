@@ -77,12 +77,9 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
 
         messageView.setText(messageContent);
         
-        if (!message.isOwn())
-        	party.name().subscribe(new Action1<String>() { @Override public void call(String sender) { 
-        		setColors(ret, sender, message.isOwn());
-        	}});
-        else
-        	setColors(ret, null, true);
+        party.name().subscribe(new Action1<String>() { @Override public void call(String sender) {
+        	setColors(ret, sender, message.isOwn());
+        }});
         
        	return ret;
     }
