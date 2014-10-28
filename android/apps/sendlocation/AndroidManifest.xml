@@ -38,6 +38,7 @@
         </activity>
         <activity
             android:name=".ViewLocationActivity"
+            android:excludeFromRecents="true"
             android:label="@string/title_activity_view_location" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
