@@ -129,6 +129,11 @@ public class SneerActivity extends Activity {
 	}
 
 	
+	static public ImageView findImageView(View view, int id) {
+		return (ImageView)view.findViewById(id);
+	}
+
+
 	protected void toast(Object text) { toast(text, LENGTH_SHORT); }
 	protected void toast(FriendlyException e) { toast(e.getMessage(), LENGTH_LONG); }
 	protected void toast(final Object text, final int length) {
