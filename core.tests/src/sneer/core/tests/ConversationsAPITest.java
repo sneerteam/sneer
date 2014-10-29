@@ -406,27 +406,28 @@ public class ConversationsAPITest extends TestCase {
 	public void testMessageLabel() {
 		Clock.startMocking();
 		TuplePublisher publisher = sneerA.tupleSpace().publisher()
-			.field("conversation?", true)
 			.audience(userB)			
-			.type("otherType");
+			.type("message");
 		
-		publisher.field("text", "mytext").pub("bla");
+		publisher.field("text", "mytext").pub();
 		Clock.tick();
-		publisher.field("text", "mytext2").pub("bla");
+		publisher.field("text", "mytext2").pub();
 		Clock.tick();
-		publisher.type("message").pub("bla");
+		publisher.field("text", "mytext3").pub();
 		
 		Observable<String> contents = sneerA
 			.produceConversationWith(sneerA.produceParty(userB))
 			.messages()
-			.flatMapIterable(new Func1<List<Message>, Iterable<? extends Message>>() {  @Override public Iterable<? extends Message> call(List<Message> messages) {
+			.flatMapIterable(new Func1<List<Message>, Iterable<? extends Message>>() { @Override public Iterable<? extends Message> call(List<Message> messages) {
 				return messages;
 			}})
-			.map(new Func1<Message, String>() {  @Override public String call(Message message) {
+			.map(new Func1<Message, String>() { @Override public String call(Message message) {
 				return message.label().toString();
 			}});
 		
-		expecting(values(contents, "mytext", "mytext2", "bla"));
+		expecting(values(contents, "mytext", "mytext2", "mytext3"));
+
+		Clock.stopMocking();
 	}
 	
 	
