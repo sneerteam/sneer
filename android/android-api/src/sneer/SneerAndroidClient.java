@@ -116,19 +116,19 @@ public class SneerAndroidClient {
 			.field("session", id)
 			.localTuples()
 			.last()
-			.map(new Func1<Tuple, SessionInfo>() { @Override public SessionInfo call(Tuple t1) {
-				return new SessionInfo(id, (PublicKey)t1.get("partyPuk"), (String)t1.get("sessionType"), (Long)t1.get("lastMessageSeen"));
+			.map(new Func1<Tuple, SessionInfo>() { @Override public SessionInfo call(Tuple tuple) {
+				return new SessionInfo(id, (PublicKey)tuple.get("partyPuk"), (String)tuple.get("sessionType"), (Long)tuple.get("lastMessageSeen"));
 			}})
 			.subscribe(sessionInfo);
 		
 		return new Session() {
 			@Override
 			public void sendMessage(final Object content) {
-				sessionInfo.subscribe(new Action1<SessionInfo>() { @Override public void call(SessionInfo t1) {
+				sessionInfo.subscribe(new Action1<SessionInfo>() { @Override public void call(SessionInfo info) {
 					tupleSpace().publisher()
-						.audience(t1.partyPuk)
-						.type(t1.type)
-						.field("session", t1.id)
+						.audience(info.partyPuk)
+						.type(info.type)
+						.field("session", info.id)
 						.pub(content);
 				}});
 			}
@@ -151,8 +151,8 @@ public class SneerAndroidClient {
 			public Observable<Message> previousMessages() {
 				return messages(new Func2<SneerAndroidClient.SessionInfo, Message, Boolean>() { @Override public Boolean call(SessionInfo session, Message msg) {
 					return msg.timestampCreated() <= session.lastMessageSeen;
-				}}, new Func1<TupleFilter, Observable<Tuple>>() { @Override public Observable<Tuple> call(TupleFilter t1) {
-					return t1.localTuples();
+				}}, new Func1<TupleFilter, Observable<Tuple>>() { @Override public Observable<Tuple> call(TupleFilter filter) {
+					return filter.localTuples();
 				}});
 			}
 			
@@ -160,8 +160,8 @@ public class SneerAndroidClient {
 			public Observable<Message> newMessages() {
 				return messages(new Func2<SneerAndroidClient.SessionInfo, Message, Boolean>() { @Override public Boolean call(SessionInfo session, Message msg) {
 					return msg.timestampCreated() > session.lastMessageSeen;
-				}}, new Func1<TupleFilter, Observable<Tuple>>() { @Override public Observable<Tuple> call(TupleFilter t1) {
-					return t1.tuples();
+				}}, new Func1<TupleFilter, Observable<Tuple>>() { @Override public Observable<Tuple> call(TupleFilter filter) {
+					return filter.tuples();
 				}});
 			}
 			
