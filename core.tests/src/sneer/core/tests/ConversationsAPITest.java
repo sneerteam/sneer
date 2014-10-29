@@ -211,12 +211,12 @@ public class ConversationsAPITest extends TestCase {
 
 
 	private Observable<Void> contactsOf(final Sneer sneer, final Party... parties) {
-		return sneer.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> t1) {
+		return sneer.contacts().map(new Func1<List<Contact>, Void>() {  @Override public Void call(List<Contact> contacts) {
 			ObservableTestUtils.assertArrayEquals(
-				Arrays.map(parties, new Func1<Party, Contact>() {  @Override public Contact call(Party t1) {
-					return sneer.findContact(t1);
+				Arrays.map(parties, new Func1<Party, Contact>() {  @Override public Contact call(Party party) {
+					return sneer.findContact(party);
 				}}),
-				t1.toArray());
+				contacts.toArray());
 			return null;
 		} });
 	}
@@ -310,8 +310,8 @@ public class ConversationsAPITest extends TestCase {
 
 		expecting(
 			same(
-				flatMapConversationsOf(sneerA).map(new Func1<Conversation, Party>() {  @Override public Party call(Conversation t1) {
-					return t1.party();
+				flatMapConversationsOf(sneerA).map(new Func1<Conversation, Party>() {  @Override public Party call(Conversation conversation) {
+					return conversation.party();
 				}}), 
 				partyBOfA));
 		
@@ -319,8 +319,8 @@ public class ConversationsAPITest extends TestCase {
 
 	private Observable<Conversation> flatMapConversationsOf(Sneer sneer) {
 		return sneer.conversations()
-			.flatMapIterable(new Func1<List<Conversation>, Iterable<? extends Conversation>>() {  @Override public Iterable<? extends Conversation> call(List<Conversation> t1) {
-				return t1;
+			.flatMapIterable(new Func1<List<Conversation>, Iterable<? extends Conversation>>() {  @Override public Iterable<? extends Conversation> call(List<Conversation> conversations) {
+				return conversations;
 			} });
 	}
 	
@@ -432,16 +432,16 @@ public class ConversationsAPITest extends TestCase {
 	
 	
 	private Func1<? super List<Message>, ? extends List<Object>> toMessageContentList() {
-		return new Func1<List<Message>, List<Object>>() {  @Override public List<Object> call(List<Message> t1) {
-			ArrayList<Object> r = new ArrayList<Object>(t1.size());
-			for (Message m : t1) r.add(m.label());
+		return new Func1<List<Message>, List<Object>>() {  @Override public List<Object> call(List<Message> messages) {
+			ArrayList<Object> r = new ArrayList<Object>(messages.size());
+			for (Message m : messages) r.add(m.label());
 			return r;
 		}};
 	}
 
 	protected Func1<List<?>,Boolean> isEmpty() {
-		return new Func1<List<?>, Boolean>() { @Override public Boolean call(List<?> t1) {
-			return t1.isEmpty();
+		return new Func1<List<?>, Boolean>() { @Override public Boolean call(List<?> stuff) {
+			return stuff.isEmpty();
 		}};
 	}
 

@@ -247,9 +247,9 @@ public class PubSubTest extends TupleSpaceTestsBase {
 				.tuples();
 		
 		expecting(
-			actual.map(new Func1<Tuple, Void>() { @SuppressWarnings({ "unchecked", "deprecation" }) @Override public Void call(Tuple t1) {
-				assertList(array, ((List<Object>)t1.get("path")));				
-				assertEquals("userB is cool", t1.payload());
+			actual.map(new Func1<Tuple, Void>() { @SuppressWarnings({ "unchecked", "deprecation" }) @Override public Void call(Tuple tuple) {
+				assertList(array, ((List<Object>)tuple.get("path")));
+				assertEquals("userB is cool", tuple.payload());
 				return null;
 			}}));
 	}
@@ -283,8 +283,8 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.first();
 		
 		Observable<Long> times = tuplesA.filter().tuples()
-				.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple t1) {
-					return t1.timestampCreated();
+				.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple tuple) {
+					return tuple.timestampCreated();
 				} });
 		
 		expecting(
@@ -327,12 +327,12 @@ public class PubSubTest extends TupleSpaceTestsBase {
 //						.localTuples()
 //						.last();
 //			} })
-//			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
-//				return !t1.containsKey("deleted");
+//			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple tuple) {
+//				return !tuple.containsKey("deleted");
 //			} })
-//			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+//			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
 //				
-//				System.out.println("party id: " + t1.get("partyId") +  ", nickname: " + t1.payload());
+//				System.out.println("party id: " + tuple.get("partyId") +  ", nickname: " + tuple.payload());
 //			} });
 //		
 //		
@@ -346,22 +346,22 @@ public class PubSubTest extends TupleSpaceTestsBase {
 //			.flatMap(new Func1<GroupedObservable<PartyId, Tuple>, Observable<Tuple>>() {  @Override public Observable<Tuple> call(GroupedObservable<PartyId, Tuple> group) {
 //				return group.last();
 //			} })
-//			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
-//				return !t1.containsKey("deleted");
+//			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple tuple) {
+//				return !tuple.containsKey("deleted");
 //			} })
-//			.map(new Func1<Tuple, Object>() {  @Override public Object call(Tuple t1) {
-//				return t1.get("nickname");
+//			.map(new Func1<Tuple, Object>() {  @Override public Object call(Tuple tuple) {
+//				return tuple.get("nickname");
 //			} })
 //			.cast(String.class);
 //		
 //		allNicknames
-//			.filter(new Func1<String, Boolean>() {  @Override public Boolean call(String t1) {
-//				return t1.equals("new nickname");
+//			.filter(new Func1<String, Boolean>() {  @Override public Boolean call(String str) {
+//				return str.equals("new nickname");
 //			} });
 //			
 //			
-////			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
-////				System.out.println("party id: " + t1.get("partyId") +  ", last-known-puk: " + t1.get("puk") + ", nickname: " + t1.get("nickname"));
+////			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
+////				System.out.println("party id: " + tuple.get("partyId") +  ", last-known-puk: " + tuple.get("puk") + ", nickname: " + tuple.get("nickname"));
 ////			} });
 //
 //		
@@ -375,8 +375,8 @@ public class PubSubTest extends TupleSpaceTestsBase {
 //			.flatMap(new Func1<GroupedObservable<PartyId, Tuple>, Observable<Tuple>>() {  @Override public Observable<Tuple> call(GroupedObservable<PartyId, Tuple> group) {
 //				return group.last();
 //			} })
-//			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
-//				System.out.println("party id: " + t1.get("partyId") +  ", last-known-puk: " + t1.get("puk") + ", nickname: " + t1.get("nickname"));
+//			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
+//				System.out.println("party id: " + tuple.get("partyId") +  ", last-known-puk: " + tuple.get("puk") + ", nickname: " + tuple.get("nickname"));
 //			} });
 //
 //	}

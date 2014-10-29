@@ -61,14 +61,14 @@ public class PluginMonitor extends BroadcastReceiver {
 	
 	
 	public static Observable<ActivityInfo> filterPlugins(Observable<PackageInfo> packageInfos) {
-		return packageInfos.filter(new Func1<PackageInfo, Boolean>() { @Override public Boolean call(PackageInfo t1) {
-			return t1.activities != null;
+		return packageInfos.filter(new Func1<PackageInfo, Boolean>() { @Override public Boolean call(PackageInfo info) {
+			return info.activities != null;
 		}})
 		.flatMap(new Func1<PackageInfo, Observable<ActivityInfo>>() { @Override public Observable<ActivityInfo> call(PackageInfo packageInfo) {
 			return Observable.from(packageInfo.activities);
 		}})
-		.filter(new Func1<ActivityInfo, Boolean>() { @Override public Boolean call(ActivityInfo t1) {
-			return t1.metaData != null && t1.metaData.getString("sneer:plugin-type") != null;
+		.filter(new Func1<ActivityInfo, Boolean>() { @Override public Boolean call(ActivityInfo info) {
+			return info.metaData != null && info.metaData.getString("sneer:plugin-type") != null;
 		}});
 	}
 	
@@ -121,8 +121,8 @@ public class PluginMonitor extends BroadcastReceiver {
 		LogUtils.info(PluginMonitor.class, "Package removed: " + packageName);
 		
 		currentKnownPlugins()
-			.filter(new Func1<PluginHandler, Boolean>() { @Override public Boolean call(PluginHandler t1) {
-				return !t1.isSamePackage(packageName);
+			.filter(new Func1<PluginHandler, Boolean>() { @Override public Boolean call(PluginHandler handler) {
+				return !handler.isSamePackage(packageName);
 			}})
 			.toList()
 			.subscribe(pluginsListPublisher());

@@ -68,11 +68,11 @@ public class SneerSimulator implements Sneer {
 		
 		tupleSpace.filter().type("rock-paper-scissors/move").audience(playerPrik).tuples()
 			.delay(1, TimeUnit.SECONDS)
-			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
 				tupleSpace.publisher()
 					.type("rock-paper-scissors/move")
-					.audience(t1.author())
-					.field("session", t1.get("session"))
+					.audience(tuple.author())
+					.field("session", tuple.get("session"))
 					.pub(move);
 			}});
 	}

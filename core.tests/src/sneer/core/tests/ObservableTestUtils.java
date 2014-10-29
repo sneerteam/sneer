@@ -38,8 +38,8 @@ public class ObservableTestUtils {
 	
 	public static Observable<Void> eventually(Observable<?> source, final Object... expected) {
 		return values(
-			source.skipWhile(new Func1<Object, Boolean>() { @Override public Boolean call(Object t1) {
-				return !t1.equals(expected[0]);
+			source.skipWhile(new Func1<Object, Boolean>() { @Override public Boolean call(Object obj) {
+				return !obj.equals(expected[0]);
 			}}),
 			expected);
 	}
@@ -138,8 +138,8 @@ public class ObservableTestUtils {
 	}
 
 	public static Func1<Tuple, Object> field(final String field) {
-		return new Func1<Tuple, Object>() {  @Override public Object call(Tuple t1) {
-			return t1.get(field);
+		return new Func1<Tuple, Object>() {  @Override public Object call(Tuple tuple) {
+			return tuple.get(field);
 		}};
 	}
 

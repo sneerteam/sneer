@@ -49,11 +49,11 @@ public final class PartnerSession implements PluginSession {
 	}
 	
 	
-	private void sendMessage(ResultReceiver toClient, Tuple t1) {
+	private void sendMessage(ResultReceiver toClient, Tuple tuple) {
 		Bundle data = new Bundle();
-		data.putString(TEXT, (String) t1.get("text"));
-		data.putBoolean(OWN, t1.author().equals(sneer.self().publicKey().current()));
-		data.putParcelable(PAYLOAD, Value.of(t1.payload()));
+		data.putString(TEXT, (String) tuple.get("text"));
+		data.putBoolean(OWN, tuple.author().equals(sneer.self().publicKey().current()));
+		data.putParcelable(PAYLOAD, Value.of(tuple.payload()));
 		toClient.send(0, data);
 	}
 	
@@ -65,9 +65,9 @@ public final class PartnerSession implements PluginSession {
 	}
 	
 	
-	private void sendError(ResultReceiver toClient, Throwable t1) {
+	private void sendError(ResultReceiver toClient, Throwable throwable) {
 		Bundle data = new Bundle();
-		data.putString(ERROR, "Internal error ("+t1.getMessage()+")");
+		data.putString(ERROR, "Internal error (" + throwable.getMessage() + ")");
 		toClient.send(0, data);
 	}
 	

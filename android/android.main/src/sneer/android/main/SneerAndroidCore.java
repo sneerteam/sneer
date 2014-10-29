@@ -57,33 +57,33 @@ public class SneerAndroidCore implements SneerAndroid {
 			.audience(sneer().self().publicKey().current())
 			.type("message")
 			.tuples()
-			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
-				return !t1.author().equals(sneer().self().publicKey().current());
+			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple tuple) {
+				return !tuple.author().equals(sneer().self().publicKey().current());
 			} })
-			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple t1) {
+			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
 				
-				log("-------------> "+ t1.type() + " - " + t1.payload());
+				log("-------------> "+ tuple.type() + " - " + tuple.payload());
 				
 				PluginHandler plugin = null;
 				Intent intent;
-				if ("chat".equals(t1.get("message-type"))) {
+				if ("chat".equals(tuple.get("message-type"))) {
 					intent = new Intent(context, ConversationActivity.class);
-					intent.putExtra(ConversationActivity.PARTY_PUK, t1.author());
+					intent.putExtra(ConversationActivity.PARTY_PUK, tuple.author());
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				} else {
-					plugin = pluginManager.tupleViewer((String)t1.get("message-type"));
+					plugin = pluginManager.tupleViewer((String)tuple.get("message-type"));
 					if (plugin == null) {
 						// TODO intent should direct to app store if plugin not installed
 						return;
 					}
-					intent = plugin.resume(t1);
+					intent = plugin.resume(tuple);
 				}
 				
-				log("-------------> " + t1.type() + ": " + intent.getExtras().getParcelable(SneerAndroidClient.RESULT_RECEIVER));
+				log("-------------> " + tuple.type() + ": " + intent.getExtras().getParcelable(SneerAndroidClient.RESULT_RECEIVER));
 				
 //				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				
-				notifyUser(context, t1, plugin == null ? t1.type() : plugin.notificationLabel(), PendingIntent.getActivity(context, 0, intent, 0));
+				notifyUser(context, tuple, plugin == null ? tuple.type() : plugin.notificationLabel(), PendingIntent.getActivity(context, 0, intent, 0));
 			}});
 	}
 	
