@@ -55,7 +55,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	private void initNotifications(final Context context) {
 		sneer().tupleSpace().filter()
 			.audience(sneer().self().publicKey().current())
-			.field("conversation?", true)
+			.type("message")
 			.tuples()
 			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple t1) {
 				return !t1.author().equals(sneer().self().publicKey().current());
@@ -66,12 +66,12 @@ public class SneerAndroidCore implements SneerAndroid {
 				
 				PluginHandler plugin = null;
 				Intent intent;
-				if ("message".equals(t1.type())) {
+				if ("chat".equals(t1.get("message-type"))) {
 					intent = new Intent(context, ConversationActivity.class);
 					intent.putExtra(ConversationActivity.PARTY_PUK, t1.author());
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				} else {
-					plugin = pluginManager.tupleViewer(t1.type());
+					plugin = pluginManager.tupleViewer((String)t1.get("message-type"));
 					if (plugin == null) {
 						// TODO intent should direct to app store if plugin not installed
 						return;
@@ -79,9 +79,7 @@ public class SneerAndroidCore implements SneerAndroid {
 					intent = plugin.resume(t1);
 				}
 				
-				
 				log("-------------> " + t1.type() + ": " + intent.getExtras().getParcelable(SneerAndroidClient.RESULT_RECEIVER));
-				
 				
 //				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				

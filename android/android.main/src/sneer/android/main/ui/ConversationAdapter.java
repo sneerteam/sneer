@@ -1,8 +1,8 @@
 package sneer.android.main.ui;
 
 import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
-import static sneer.android.ui.SneerActivity.findTextView;
 import static sneer.android.ui.SneerActivity.findImageView;
+import static sneer.android.ui.SneerActivity.findTextView;
 
 import java.util.List;
 import java.util.Random;
@@ -15,6 +15,8 @@ import sneer.android.main.ui.drawable.TriangleLeftDrawable;
 import sneer.android.main.ui.drawable.TriangleRightDrawable;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -61,9 +63,14 @@ class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListen
         	false);
         
         final TextView messageView = findTextView(ret, R.id.messageContent);
-        final ImageView img = findImageView(ret, R.id.img);
+        final ImageView imageView = findImageView(ret, R.id.img);
         
         SpannableString messageContent = new SpannableString(message.label());
+        byte[] messageImage = (byte[])message.jpegImage();
+        
+        if (messageImage != null)
+        	imageView.setImageBitmap(BitmapFactory.decodeByteArray(messageImage, 0, messageImage.length));
+        
         messageView.setAutoLinkMask(Linkify.ALL);
         findTextView(ret, R.id.messageTime).setText(message.timeCreated());
         

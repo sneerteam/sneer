@@ -126,12 +126,12 @@ public final class PartnerSession implements PluginSession {
 
 	private void publish(String text, Object message) {
 		sneer.tupleSpace().publisher()
-			.type(plugin.tupleType())
+			.type("message")
+			.field("message-type", plugin.tupleType())
 			.audience(partner)
 			.field("session", sessionId)
 			.field("host", host)
 			.field("text", text)
-			.field("conversation?", true)
 			.pub(message);
 	}
 	

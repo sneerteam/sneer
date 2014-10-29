@@ -19,13 +19,15 @@
   ; Use MessageImpl.fromTuple instead of reimplementing it here.
   (let [created (.timestampCreated tuple)
         type (.type tuple)
+        jpeg-image ^bytes (.get tuple "jpeg-image")
         text (.get tuple "text")
-        label (if (= type "message") (.payload tuple) (if text text type))
+        label (if text text (if jpeg-image "" type))
         own? (= own-puk (.author tuple))]
     
     (reify Message
       (isOwn [this] own?)
       (label [this] label)
+      (jpegImage [this] jpeg-image)
       (timestampCreated [this] created)
       (timestampReceived [this] 0)
       (timeCreated [this] (format-date created))
@@ -38,7 +40,7 @@
   (let [^PublicKey party-puk (party-puk party)
         messages (atom (sorted-set-by message-comparator))
         observable-messages (rx/map vec (atom->observable messages))
-        message-filter (.. tuple-space filter (field "conversation?" true))
+        message-filter (.. tuple-space filter (type "message"))
         unread-message-counter (atom 0)
         being-read (atom nil)
         msg-tuples-out (.. message-filter (author own-puk) (audience party-puk) tuples)
@@ -65,12 +67,10 @@
         (..
           tuple-space
           publisher
-          (field "conversation?" true) ;Delete this
           (audience party-puk)
           (type "message")
-;         (field "text" text)
-;         (pub)
-          (pub text)))
+          (field "text" text)
+          (pub)))
       
       (mostRecentMessageContent [this]
         (.observed (ObservedSubject/create "hello")))
