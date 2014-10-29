@@ -108,15 +108,15 @@ public class PluginManager {
 	
 	
 	public boolean isClickable(Message message) {
-		return tupleViewers.containsKey(message.tuple().type());
+		return tupleViewers.containsKey(message.tuple().get("message-type"));
 	}
 
 	
 	public void doOnClick(Message message) {
 		Tuple tuple = message.tuple();
-		PluginHandler viewer = tupleViewer(tuple.type());
+		PluginHandler viewer = tupleViewer((String)tuple.get("message-type"));
 		if (viewer == null) {
-			throw new RuntimeException("Can't find viewer plugin for message type '" + tuple.type() + "'");
+			throw new RuntimeException("Can't find viewer plugin for message type '" + tuple.get("message-type") + "'");
 		}
 		context.startActivity(viewer.resume(tuple));
 	}
