@@ -31,45 +31,15 @@ import sneer.crypto.Keys;
 
 public class KeysImpl implements Keys {
 
-	private static SecureRandom random = new SecureRandom();
-	
-
-	private static Provider bouncyCastle() {
-		try {
-			return (Provider) Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider").newInstance();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+	private static final SecureRandom random = new SecureRandom();
 	
 	
-	public static void autotest() {
-		new KeysImpl();
-	}
-	
-	
-	{
+	static {
 		if (Security.getProvider("BC") == null) {
 			check(!isAndroid());
 			Security.addProvider(bouncyCastle());
 		}
-
-		autotestInstance();
-	}
-
-	
-	/** We want this to run in Android production environments to make sure the crypto providers are OK.*/
-	private void autotestInstance() {
-		PrivateKey prik = createPrivateKey();
-		check(createPrivateKey(prik.toBytes()).equals(prik));
-		check(createPrivateKey(prik.toHex()).equals(prik));
-			
-		PublicKey puk = prik.publicKey();
-		check(createPublicKey(puk.toBytes()).equals(puk));
-		check(createPublicKey(puk.toHex()).equals(puk));
-		
-		if (isAndroid())
-			System.out.println("Crypto Keys Autotest SUCCESS: " + KeysImpl.class.getName());
+		autotest();
 	}
 	
 	
@@ -89,7 +59,23 @@ public class KeysImpl implements Keys {
 	}
 
 	
-	private byte[] encode(java.security.PublicKey puk) {
+	public PrivateKey createPrivateKey(String hexSeed) {
+		return createPrivateKey(fromHex(hexSeed));
+	}
+	
+	
+	public PublicKey createPublicKey(byte[] bytes) {
+		return new PublicKeyImpl(decode(bytes), bytes);
+	}
+
+	
+	@Override	
+	public PublicKey createPublicKey(String hex) {
+		return createPublicKey(fromHex(hex));
+	}
+
+	
+	static private byte[] encode(java.security.PublicKey puk) {
 		ECPublicKeySpec spec;
 		try {
 			spec = KeyFactory.getInstance("EC").getKeySpec(puk, ECPublicKeySpec.class);
@@ -103,68 +89,8 @@ public class KeysImpl implements Keys {
 	}
 
 
-	private byte[] to32bytes(byte[] integer) {
-		if (integer.length == 32) return integer;
-		if (integer.length == 33) {
-			check(integer[0] == 0);
-			return Arrays.copyOfRange(integer, 1, integer.length); //Omit first byte (always zero because of BigInteger encoding).
-		}
-		
-		return paddedTo32Bytes(integer);
-	}
-
-
-	private byte[] paddedTo32Bytes(byte[] integer) {
-		byte[] ret = new byte[32];
-		System.arraycopy(integer, 0, ret, 32 - integer.length, integer.length);
-		return ret;
-	}
-
-
-	public static byte[] concat(byte[] a, byte[] b) {
-		byte[] ret = Arrays.copyOf(a, a.length + b.length);
-		arraycopy(b, 0, ret, a.length, b.length);
-		return ret;
-	}
-
-
-	private KeyPair generateKeyPair(byte[] seedBytes) {
-		try {
-			return keyGenerator(spec(), seedBytes).generateKeyPair();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
-	
-	private ECParameterSpec spec() {
-		return new ECParameterSpec(
-			new EllipticCurve(
-				new ECFieldFp(new BigInteger("115792089237316195423570985008687907853269984665640564039457584007908834671663")),
-				new BigInteger("0"),
-				new BigInteger("7")),
-			new ECPoint(
-				new BigInteger("55066263022277343669578718895168534326250603453777594175500187360389116729240"),
-				new BigInteger("32670510020758816978083085130507043184471273380659243275938904335757337482424")),
-			new BigInteger("115792089237316195423570985008687907852837564279074904382605163141518161494337"),
-			1);
-	}
-
-	
-
-	private KeyPairGenerator keyGenerator(AlgorithmParameterSpec spec, byte[] seed) throws Exception {
-		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "BC");
-		keyGen.initialize(spec, new RandomWrapper(seed));
-		return keyGen;
-	}
-	
-	public PrivateKey createPrivateKey(String hexSeed) {
-		return createPrivateKey(fromHex(hexSeed));
-	}
-	
-	
-	public PublicKey createPublicKey(byte[] bytes) {
-		byte[] tmp = new byte[33]; //BigInteger wastes one bit for signed representation.
+	private java.security.PublicKey decode(byte[] bytes) {
+		byte[] tmp = new byte[33]; //BigInteger wastes one byte for signed representation.
 		arraycopy(bytes,  0, tmp, 1, 32);
 		BigInteger x = new BigInteger(tmp);
 		arraycopy(bytes, 32, tmp, 1, 32);
@@ -181,15 +107,66 @@ public class KeysImpl implements Keys {
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
-		return new PublicKeyImpl(puk, bytes);
+		return puk;
 	}
 
 	
-	@Override	
-	public PublicKey createPublicKey(String hex) {
-		return createPublicKey(fromHex(hex));
+	static private byte[] to32bytes(byte[] integer) {
+		if (integer.length == 32) return integer;
+		if (integer.length == 33) {
+			check(integer[0] == 0);
+			return Arrays.copyOfRange(integer, 1, integer.length); //Omit first byte (always zero because of BigInteger encoding).
+		}
+		
+		return paddedTo32Bytes(integer);
 	}
 
+
+	static private byte[] paddedTo32Bytes(byte[] integer) {
+		byte[] ret = new byte[32];
+		System.arraycopy(integer, 0, ret, 32 - integer.length, integer.length);
+		return ret;
+	}
+
+
+	private static byte[] concat(byte[] a, byte[] b) {
+		byte[] ret = Arrays.copyOf(a, a.length + b.length);
+		arraycopy(b, 0, ret, a.length, b.length);
+		return ret;
+	}
+
+
+	private static KeyPair generateKeyPair(byte[] seedBytes) {
+		try {
+			return keyGenerator(spec(), seedBytes).generateKeyPair();
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	
+	/** Curve used by Bitcoin. */
+	public static ECParameterSpec spec() {
+		return new ECParameterSpec(
+			new EllipticCurve(
+				new ECFieldFp(new BigInteger("115792089237316195423570985008687907853269984665640564039457584007908834671663")),
+				new BigInteger("0"),
+				new BigInteger("7")),
+			new ECPoint(
+				new BigInteger("55066263022277343669578718895168534326250603453777594175500187360389116729240"),
+				new BigInteger("32670510020758816978083085130507043184471273380659243275938904335757337482424")),
+			new BigInteger("115792089237316195423570985008687907852837564279074904382605163141518161494337"),
+			1);
+	}
+	
+
+	public static KeyPairGenerator keyGenerator(AlgorithmParameterSpec spec, byte[] seed) throws Exception {
+		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "BC");
+		keyGen.initialize(spec, new RandomWrapper(seed));
+		return keyGen;
+	}
+
+	
 	private static byte[] randomSeed() {
 		random.setSeed(currentTimeMillis());
 		random.setSeed(nanoTime());
@@ -213,6 +190,32 @@ public class KeysImpl implements Keys {
 			SystemReport.updateReport("security/random-seed/warning", "Warning: Unable to read from /dev/urandom. OK if you are not on Linux.");
 		}
 		return ret;
+	}
+	
+	
+	private static Provider bouncyCastle() {
+		try {
+			return (Provider) Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider").newInstance();
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+	
+
+	/** We want this to run in Android production environments to make sure the crypto providers are OK.*/
+	public static void autotest() {
+		KeysImpl subject = new KeysImpl();
+		
+		PrivateKey prik = subject.createPrivateKey();
+		check(subject.createPrivateKey(prik.toBytes()).equals(prik));
+		check(subject.createPrivateKey(prik.toHex()).equals(prik));
+			
+		PublicKey puk = prik.publicKey();
+		check(subject.createPublicKey(puk.toBytes()).equals(puk));
+		check(subject.createPublicKey(puk.toHex()).equals(puk));
+		
+		if (isAndroid())
+			System.out.println("Crypto Keys Autotest SUCCESS: " + KeysImpl.class.getName());
 	}
 
 
