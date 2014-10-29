@@ -2,6 +2,7 @@ package sneer.android.main.ipc;
 
 import static sneer.SneerAndroidClient.TEXT;
 import static sneer.SneerAndroidClient.PAYLOAD;
+import static sneer.SneerAndroidClient.JPEG_IMAGE;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import sneer.PublicKey;
 import sneer.Sneer;
@@ -49,12 +50,14 @@ public class SingleMessageSession implements PluginSession {
 			try {
 				bundle.setClassLoader(context.getClassLoader());
 				String text = bundle.getString(TEXT);
+				byte[] jpegImage = bundle.getByteArray(JPEG_IMAGE);
 				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' text '" + text + "' from " + plugin);
 				sneer.tupleSpace().publisher()
-					.type(plugin.tupleType())
+					.field("message-type", plugin.tupleType())
+					.type("message")
 					.audience(partner)
-					.field("conversation?", true)
-					.field("text", text)
+					.field(TEXT, text)
+					.field(JPEG_IMAGE, jpegImage)
 					.pub(getPayload(bundle));
 			} catch (final Throwable t) {
 				AndroidUtils.toastOnMainThread(context, "Error receiving message from plugin: " + plugin, Toast.LENGTH_LONG);

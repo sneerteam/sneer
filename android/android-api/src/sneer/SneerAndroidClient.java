@@ -26,9 +26,10 @@ public class SneerAndroidClient {
 	public static final String DISABLE_MENUS = "disable-menus";
 
 	//Message
+	public static final String TEXT = "text";
+	public static final String JPEG_IMAGE = "jpeg-image";
 	public static final String PAYLOAD = "payload";
 	public static final String RESULT_RECEIVER = "result";
-	public static final String TEXT = "text";
 
 	//Session
 	public static final String PARTNER_NAME = "partnerName";
@@ -185,10 +186,11 @@ public class SneerAndroidClient {
 	}
 
 	
-	public static void send(ResultReceiver resultReceiver, String label, Object payload) {
+	public static void send(ResultReceiver resultReceiver, String label, Object payload, byte[] jpegImage) {
 		Bundle bundle = new Bundle();
 		bundle.putString(TEXT, label);
 		bundle.putParcelable(PAYLOAD, Value.of(payload));
+		bundle.putParcelable(JPEG_IMAGE, Value.of(jpegImage));
 		resultReceiver.send(Activity.RESULT_OK, bundle);
 	}
 	

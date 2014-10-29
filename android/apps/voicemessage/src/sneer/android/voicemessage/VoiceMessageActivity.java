@@ -111,7 +111,7 @@ public class VoiceMessageActivity extends MessageActivity {
 			finish();
 		}
 		if (bytes != null)
-			send("audiofile", bytes);
+			send("audiofile", bytes, null);
 	}
 
 

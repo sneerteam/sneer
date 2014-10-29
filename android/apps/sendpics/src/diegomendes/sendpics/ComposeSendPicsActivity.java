@@ -47,7 +47,7 @@ public class ComposeSendPicsActivity extends MessageActivity {
 		}
 
 		byte[] imageBytes = scaledDownTo(bitmap, 40 * 1024);
-		send("pic", imageBytes);
+		send("pic", imageBytes, imageBytes);
 		finish();
     }
 

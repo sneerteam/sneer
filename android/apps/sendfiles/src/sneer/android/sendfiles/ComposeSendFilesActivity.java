@@ -74,7 +74,7 @@ public class ComposeSendFilesActivity extends MessageActivity {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("contents", bytes);
 			map.put("filename", fileName);
-			send(fileName, map);
+			send(fileName, map, null);
 		}
 	}
 	

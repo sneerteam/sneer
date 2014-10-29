@@ -3,6 +3,8 @@ package fabiomanera.sendlocation;
 import static android.location.LocationManager.GPS_PROVIDER;
 import sneer.android.ui.MessageActivity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,7 +18,7 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
 			toast("No GPS available");
@@ -31,7 +33,13 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	public void onLocationChanged(Location location) {
 		if (location == null) return;
 		String url = "https://google.com/maps/place/" + location.getLatitude() + "," + location.getLongitude();
-		send(url, url);
+
+		
+		Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_launcher);
+
+		byte[] imageBytes = scaledDownTo(bitmap, 10 * 1024);
+		
+		send(url, url, imageBytes);
 		finish();
 	}
 	

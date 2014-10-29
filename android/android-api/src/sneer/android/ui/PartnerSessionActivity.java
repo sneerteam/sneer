@@ -81,7 +81,7 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 
 	
 	protected void send(String label, Object message) {
-		SneerAndroidClient.send(toSneer, label, message);
+		SneerAndroidClient.send(toSneer, label, message, null);
 	}
 	protected abstract void onMessageToPartner(Object message);
 	

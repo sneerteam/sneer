@@ -33,9 +33,9 @@ public abstract class MessageActivity extends SneerActivity {
 	}
 
 		
-	protected void send(String label, Object payload) {
+	protected void send(String label, Object payload, byte[] jpegImage) {
 		ResultReceiver resultReceiver = getExtra(RESULT_RECEIVER);
-		SneerAndroidClient.send(resultReceiver, label, payload);
+		SneerAndroidClient.send(resultReceiver, label, payload, jpegImage);
 	}
 	
 }
