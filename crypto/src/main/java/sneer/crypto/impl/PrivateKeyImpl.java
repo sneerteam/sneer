@@ -18,7 +18,7 @@ class PrivateKeyImpl implements PrivateKey { private static final long serialVer
 	PrivateKeyImpl(byte[] seed, java.security.PrivateKey prik, java.security.PublicKey puk, byte[] pukBytes) {
 		this.seed = seed;
 		delegatePrik = prik;
-		this.puk = new PublicKeyImpl(puk, pukBytes);
+		this.puk = new PublicKeyImpl(pukBytes);
 	}
 
 

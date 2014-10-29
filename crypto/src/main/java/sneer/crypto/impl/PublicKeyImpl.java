@@ -9,14 +9,11 @@ class PublicKeyImpl implements PublicKey {
 	
 
 	//THIS MUST BE PRIVATE. A common base class cannot be extracted for PrivateKeyImpl and PublicKeyImpl for security reasons.
-	@SuppressWarnings("unused")
-	private final java.security.PublicKey delegatePuk;
 	private final byte[] bytes;
 
 
 
-	public PublicKeyImpl(java.security.PublicKey puk, byte[] bytes) {
-		delegatePuk = puk;
+	public PublicKeyImpl(byte[] bytes) {
 		this.bytes = bytes;
 	}
 	
@@ -54,7 +51,7 @@ class PublicKeyImpl implements PublicKey {
 			return false;
 		if (!(obj instanceof PublicKeyImpl))
 			return false;
-		PublicKeyImpl other = (PublicKeyImpl) obj;
+		PublicKeyImpl other = (PublicKeyImpl)obj;
 		return Arrays.equals(bytes, other.bytes);
 	}
 	

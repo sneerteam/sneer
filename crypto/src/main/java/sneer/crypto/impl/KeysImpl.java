@@ -13,6 +13,8 @@ import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -41,6 +43,8 @@ public class KeysImpl implements Keys {
 		}
 		autotest();
 	}
+
+
 	
 	
 	public PrivateKey createPrivateKey() {
@@ -65,7 +69,7 @@ public class KeysImpl implements Keys {
 	
 	
 	public PublicKey createPublicKey(byte[] bytes) {
-		return new PublicKeyImpl(decode(bytes), bytes);
+		return new PublicKeyImpl(bytes);
 	}
 
 	
@@ -85,11 +89,26 @@ public class KeysImpl implements Keys {
 
 		byte[] x = to32bytes(spec.getW().getAffineX().toByteArray());
 		byte[] y = to32bytes(spec.getW().getAffineY().toByteArray());
-		return concat(x, y);
+		
+		MessageDigest digest = sha256();
+		digest.update(x);
+		digest.update(y);
+		return digest.digest();
 	}
 
 
+	private static MessageDigest sha256() {
+		try {
+			return MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	
+	@SuppressWarnings("unused") //This will be used when we start actually using real crypto.
 	private java.security.PublicKey decode(byte[] bytes) {
+		
 		byte[] tmp = new byte[33]; //BigInteger wastes one byte for signed representation.
 		arraycopy(bytes,  0, tmp, 1, 32);
 		BigInteger x = new BigInteger(tmp);
@@ -125,13 +144,6 @@ public class KeysImpl implements Keys {
 	static private byte[] paddedTo32Bytes(byte[] integer) {
 		byte[] ret = new byte[32];
 		System.arraycopy(integer, 0, ret, 32 - integer.length, integer.length);
-		return ret;
-	}
-
-
-	private static byte[] concat(byte[] a, byte[] b) {
-		byte[] ret = Arrays.copyOf(a, a.length + b.length);
-		arraycopy(b, 0, ret, a.length, b.length);
 		return ret;
 	}
 
