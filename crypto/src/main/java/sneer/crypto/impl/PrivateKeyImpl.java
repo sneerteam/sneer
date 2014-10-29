@@ -1,53 +1,42 @@
 package sneer.crypto.impl;
 
-import java.math.BigInteger;
+import java.util.Arrays;
 
 import sneer.PrivateKey;
 import sneer.PublicKey;
-
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.Utils;
+import sneer.commons.Codec;
 
 class PrivateKeyImpl implements PrivateKey { private static final long serialVersionUID = 1L;
 
-	private final ECKey ecKey;
-	
-	
-	PrivateKeyImpl() {
-		this(new ECKey());
-	}
-	
-	
-	PrivateKeyImpl(String bytesAsString) {
-		this(new BigInteger(bytesAsString, 16).toByteArray());
-	}
+	private final byte[] seed;
 
+	private final PublicKey puk;
+	@SuppressWarnings("unused")
+	private final java.security.PrivateKey delegatePrik;
 	
-	PrivateKeyImpl(byte[] bytes) {
-		this(new ECKey(new BigInteger(1, bytes), null, true));
-	}
 	
-	
-	private PrivateKeyImpl(ECKey ecKey) {
-		this.ecKey = ecKey;
+	PrivateKeyImpl(byte[] seed, java.security.PrivateKey prik, java.security.PublicKey puk, byte[] pukBytes) {
+		this.seed = seed;
+		delegatePrik = prik;
+		this.puk = new PublicKeyImpl(puk, pukBytes);
 	}
 
 
 	@Override
 	public PublicKey publicKey() {
-		return new PublicKeyImpl(ecKey.getPubKey());
+		return puk;
 	}
 	
 	
 	@Override
 	public byte[] toBytes() {
-		return ecKey.getPrivKeyBytes();
+		return seed;
 	}
 	
 	
 	@Override
 	public String toHex() {
-		return Utils.bytesToHexString(toBytes());
+		return Codec.toHex(toBytes());
 	}
 
 	
@@ -55,11 +44,11 @@ class PrivateKeyImpl implements PrivateKey { private static final long serialVer
 	public String toString() {
 		return "PRIK:" + publicKey().toHex().substring(0, 5);
 	}
-
 	
+
 	@Override
 	public int hashCode() {
-		return ecKey.hashCode();
+		return Codec.hashCode(seed);
 	}
 
 	
@@ -72,7 +61,7 @@ class PrivateKeyImpl implements PrivateKey { private static final long serialVer
 		if (!(obj instanceof PrivateKeyImpl))
 			return false;
 		PrivateKeyImpl other = (PrivateKeyImpl) obj;
-		return ecKey.equals(other.ecKey);
+		return Arrays.equals(seed, other.seed);
 	}
 
 }

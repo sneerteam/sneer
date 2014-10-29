@@ -12,12 +12,13 @@ repositories {
 }
 
 dependencies {
-    compile('com.google:bitcoinj:0.11.3') {
-    	exclude group: 'com.google.protobuf', module: 'protobuf-java'
-    	exclude group: 'com.lambdaworks', module: 'scrypt'
-    }
+
     compile project(':java-api')
+
     testCompile 'junit:junit:4.11'
+
+    runtime ('org.bouncycastle:bcprov-jdk16:1.46')
+
 }
 
 uploadArchives {

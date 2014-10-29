@@ -41,7 +41,7 @@ subprojects {
         task configureAndroidForEclipseTask << {
             new File(projectDir, "project.properties").withWriter { writer ->
                 writer << "target=${android.compileSdkVersion}\n"
-                writer << "dex.force.jumbo=true\n"
+                //writer << "dex.force.jumbo=true\n"
                 if (plugins.hasPlugin('android-library')) {
                     writer << "android.library=true\n"
                 }

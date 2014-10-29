@@ -1,45 +1,36 @@
 package sneer.crypto.impl;
 
-import java.math.BigInteger;
+import java.util.Arrays;
 
 import sneer.PublicKey;
-import sneer.commons.exceptions.Exceptions;
-
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.Utils;
+import sneer.commons.Codec;
 
 class PublicKeyImpl implements PublicKey {
 	
 
-	//THIS MUST BE PRIVATE. A common base class cannot be extracted for PrivateKeyImpl and PublicKeyImpl.
-	private final ECKey ecKey;
+	//THIS MUST BE PRIVATE. A common base class cannot be extracted for PrivateKeyImpl and PublicKeyImpl for security reasons.
+	@SuppressWarnings("unused")
+	private final java.security.PublicKey delegatePuk;
+	private final byte[] bytes;
 
-	
-	PublicKeyImpl(byte[] bytes) {
-		this(new ECKey(null, bytes, true));
+
+
+	public PublicKeyImpl(java.security.PublicKey puk, byte[] bytes) {
+		delegatePuk = puk;
+		this.bytes = bytes;
 	}
-
 	
-	PublicKeyImpl(String bytesAsString) {
-		this(new BigInteger(bytesAsString, 16).toByteArray());
-	}
-
-
-	private PublicKeyImpl(ECKey ecKey) {
-		Exceptions.check(!ecKey.hasPrivKey());
-		this.ecKey = ecKey;
-	}
-
 	
+
 	@Override
 	public byte[] toBytes() {
-		return ecKey.getPubKey();
+		return bytes;
 	}
 	
 	
 	@Override
 	public String toHex() {
-		return Utils.bytesToHexString(toBytes());
+		return Codec.toHex(bytes);
 	}
 	
 
@@ -51,7 +42,7 @@ class PublicKeyImpl implements PublicKey {
 	
 	@Override
 	public int hashCode() {
-		return ecKey.hashCode();
+		return Codec.hashCode(toBytes());
 	}
 
 	
@@ -64,11 +55,9 @@ class PublicKeyImpl implements PublicKey {
 		if (!(obj instanceof PublicKeyImpl))
 			return false;
 		PublicKeyImpl other = (PublicKeyImpl) obj;
-		return ecKey.equals(other.ecKey);
+		return Arrays.equals(bytes, other.bytes);
 	}
 	
 	
 	private static final long serialVersionUID = 1L;
-
-
 }

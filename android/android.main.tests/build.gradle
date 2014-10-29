@@ -18,14 +18,12 @@ configurations {
 dependencies {
     libs 'com.netflix.rxjava:rxjava-android:' + external.rx.version
     compile project(':android.main')
-    compile 'me.sneer:core.tests:0.0.1'
+    compile ('me.sneer:core.tests:0.0.1') {
+       exclude group:'org.bouncycastle'
+    }
 }
 
 android {
-
-	dexOptions {
-        jumboMode = true
-    }
 
     lintOptions {
         abortOnError false
