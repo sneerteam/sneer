@@ -9,8 +9,6 @@ public interface Message {
 	String messageType();
 	/** Can be null. */
 	String text();
-	/** Not guaranteed to be a valid url. Can be null. */
-	String url();
 	/** Can be null. */
 	byte[] jpegImage();
 	/** Any parcelable object such as arrays, collections, number types, etc. Can be null. */

@@ -101,13 +101,6 @@ public class MessageImpl implements Message {
 
 
 	@Override
-	public String url() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
 	public byte[] jpegImage() {
 		// TODO Auto-generated method stub
 		return null;
@@ -117,7 +110,6 @@ public class MessageImpl implements Message {
 	@Override
 	public String label() {
 		if (text()        != null) return text();
-		if (url()         != null) return url();
 		if (messageType() != null) return messageType();
 		return "";
 	}
