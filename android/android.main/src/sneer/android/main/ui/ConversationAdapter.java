@@ -15,7 +15,6 @@ import sneer.android.main.ui.drawable.TriangleLeftDrawable;
 import sneer.android.main.ui.drawable.TriangleRightDrawable;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
