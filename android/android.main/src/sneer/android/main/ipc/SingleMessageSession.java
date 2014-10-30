@@ -36,7 +36,8 @@ public class SingleMessageSession implements PluginSession {
 		Intent intent = plugin.createIntent();
 		
 		intent.putExtra(PAYLOAD, Value.of(tuple.payload()));
-		intent.putExtra(TEXT, (String)tuple.get("text"));
+		intent.putExtra(TEXT, (String)tuple.get(TEXT));
+		intent.putExtra(JPEG_IMAGE, (String)tuple.get(JPEG_IMAGE));
 
 		return intent;
 	}
@@ -51,7 +52,7 @@ public class SingleMessageSession implements PluginSession {
 				bundle.setClassLoader(context.getClassLoader());
 				String text = bundle.getString(TEXT);
 				byte[] jpegImage = bundle.getByteArray(JPEG_IMAGE);
-				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' text '" + text + "' from " + plugin);
+				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' text '" + text + "' jpeg-image " + jpegImage + "' from " + plugin);
 				sneer.tupleSpace().publisher()
 					.field("message-type", plugin.tupleType())
 					.type("message")

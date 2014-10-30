@@ -189,8 +189,8 @@ public class SneerAndroidClient {
 	public static void send(ResultReceiver resultReceiver, String label, Object payload, byte[] jpegImage) {
 		Bundle bundle = new Bundle();
 		bundle.putString(TEXT, label);
+		bundle.putByteArray(JPEG_IMAGE, jpegImage);
 		bundle.putParcelable(PAYLOAD, Value.of(payload));
-		bundle.putParcelable(JPEG_IMAGE, Value.of(jpegImage));
 		resultReceiver.send(Activity.RESULT_OK, bundle);
 	}
 	
