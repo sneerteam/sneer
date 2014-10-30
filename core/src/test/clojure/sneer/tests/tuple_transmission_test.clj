@@ -28,8 +28,13 @@
 
 (defn <!!? [ch]
   (async/alt!!
-    (async/timeout 200) ([_] :timeout)
+    (async/timeout 500) :timeout
     ch ([v] v)))
+
+(defn >!!? [ch v]
+  (async/alt!!
+    (async/timeout 500) false
+    [[ch v]] true))
 
 (def own-puk :me)
 
@@ -86,13 +91,13 @@
  
      (fact
       "when server is out of sync it sends a reset"
-      (let [tuples-in (dropping-chan 2)
+      (let [tuples-in (chan)
             packets-in (dropping-chan 2)
             packets-out (sliding-chan)
             store (empty-store)
             subject (start-queue-transmitter own-puk peer-puk store tuples-in packets-in packets-out)]
         (>!! tuples-in t0)
-        (>!! tuples-in t1)        
+        (>!!? tuples-in t1) => true      
         (>!! packets-in {:intent :status-of-queues
                          :to own-puk
                          :follower peer-puk
