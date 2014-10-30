@@ -27,15 +27,16 @@ public class SendPicsActivity extends MessageActivity {
 		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
 		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
 	
-		startActivityForResult(chooser, TAKE_PICTURE);		
+		startActivityForResult(chooser, TAKE_PICTURE);
 	}
 
 
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)  {
-    	if (requestCode != TAKE_PICTURE) return;
-		if (resultCode != RESULT_OK) return;
-		if (intent == null) return;
+    	if (requestCode != TAKE_PICTURE || resultCode != RESULT_OK || intent == null) {
+    		finish();
+    		return;
+    	}
 		
         Bitmap bitmap;
 		try {
