@@ -40,7 +40,7 @@
 (def NEVER (async/chan))
 
 (defn new-retry-period []
-  (async/timeout 1000)) 
+  (async/timeout 3000))
 
 (defn start-queue-transmitter [from to store tuples-in packets-in packets-out]
   (letfn [(next-packet []
