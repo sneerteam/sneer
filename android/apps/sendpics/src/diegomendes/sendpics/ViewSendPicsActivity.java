@@ -1,7 +1,5 @@
 package diegomendes.sendpics;
 
-import java.util.HashMap;
-
 import sneer.android.ui.MessageActivity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,8 +11,7 @@ import android.widget.ImageView;
 
 public class ViewSendPicsActivity extends MessageActivity {
 
-	private ImageView image;
-	private byte[] ret;
+	private ImageView imageView;
 	
 	
 	@Override
@@ -22,11 +19,12 @@ public class ViewSendPicsActivity extends MessageActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_receive_pics);
 
-		image = (ImageView)findViewById(R.id.picture_received);
+		imageView = (ImageView)findViewById(R.id.picture_received);
 
-		extractImage(messagePayload());
+		Bitmap bmp = (Bitmap)toBitmap(messageJpegImage());
+		imageView.setImageBitmap(bmp);
 
-		addImageToGallery(getApplicationContext().getFilesDir().getAbsolutePath(), getApplicationContext(), toBitmap(ret));
+		addImageToGallery(getApplicationContext().getFilesDir().getAbsolutePath(), getApplicationContext(), bmp);
 	}
 	
 	
@@ -41,15 +39,7 @@ public class ViewSendPicsActivity extends MessageActivity {
 	    
 	    MediaStore.Images.Media.insertImage(context.getContentResolver(), yourBitmap, "Sendpics" , "");
 	    
-	    image.setImageBitmap(yourBitmap);
+	    imageView.setImageBitmap(yourBitmap);
 	}
 	
-	private void extractImage(Object message) {
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> map = (HashMap<String, Object>) message;
-			
-		ret = (byte[]) map.get("pics");
-		image.setImageBitmap((Bitmap) toBitmap(ret));
-	}
-
 }

@@ -15,7 +15,6 @@ public class SendPicsActivity extends MessageActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_send_pics);
         composeMessage();
     }
     
@@ -47,7 +46,7 @@ public class SendPicsActivity extends MessageActivity {
 		}
 
 		byte[] imageBytes = scaledDownTo(bitmap, 40 * 1024);
-		send("pic", imageBytes, imageBytes);
+		send(null, null, imageBytes);
 		finish();
     }
 
