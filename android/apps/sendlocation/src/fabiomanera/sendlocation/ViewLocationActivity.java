@@ -16,7 +16,7 @@ public class ViewLocationActivity extends MessageActivity {
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		String url = (String)messageUrl();
+		String url = (String)messagePayload();
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse(url));
 		startActivity(intent);
