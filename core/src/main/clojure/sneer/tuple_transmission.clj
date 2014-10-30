@@ -49,8 +49,8 @@
     (go!
      (loop [retry-timeout IMMEDIATELY]
      
-       (alt!
-       
+       (alt! :priority true
+         
          retry-timeout
          ([_]
            (if-some [packet (next-packet)]
