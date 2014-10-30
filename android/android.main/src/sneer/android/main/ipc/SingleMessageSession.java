@@ -37,7 +37,7 @@ public class SingleMessageSession implements PluginSession {
 		
 		intent.putExtra(PAYLOAD, Value.of(tuple.payload()));
 		intent.putExtra(TEXT, (String)tuple.get(TEXT));
-		intent.putExtra(JPEG_IMAGE, (String)tuple.get(JPEG_IMAGE));
+		intent.putExtra(JPEG_IMAGE, (byte[])tuple.get(JPEG_IMAGE));
 
 		return intent;
 	}
