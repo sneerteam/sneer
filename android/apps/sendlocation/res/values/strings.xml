@@ -2,6 +2,5 @@
 <resources>
 
     <string name="app_name">Send Location</string>
-    <string name="title_activity_view_location">ViewLocationActivity</string>
 
 </resources>

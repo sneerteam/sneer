@@ -36,25 +36,6 @@
                 android:name="sneer:menu-icon"
                 android:resource="@drawable/ic_launcher" />
         </activity>
-        <activity
-            android:name=".ViewLocationActivity"
-            android:excludeFromRecents="true"
-            android:label="@string/title_activity_view_location" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-            </intent-filter>
-
-            <meta-data
-                android:name="sneer:plugin-type"
-                android:value="MESSAGE/VIEW" />
-            <meta-data
-                android:name="sneer:tuple-type"
-                android:value="location" />
-            <meta-data
-                android:name="sneer:menu-icon"
-                android:resource="@drawable/ic_launcher" >
-            </meta-data>
-        </activity>
     </application>
 
 </manifest>
