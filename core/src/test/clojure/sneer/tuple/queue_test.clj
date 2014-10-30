@@ -1,6 +1,6 @@
 (ns sneer.tuple.queue-test
   (:require [midje.sweet :refer :all]
-            [sneer.tuple.queue :refer [start-queue-transmitter QueueStore new-retry-timeout]]
+            [sneer.tuple.queue :refer [start-queue-transmitter QueueStore new-retry-period]]
             [sneer.async :refer :all]
             [clojure.core.async :as async :refer [chan >!! <! go-loop]]))
 
@@ -111,15 +111,15 @@
      
  (fact
    "it retries to send tuple" 
-   (let [retry-timeout (chan 10)]
-     (with-redefs [new-retry-timeout (constantly retry-timeout)]
+   (let [retry-period (chan 10)]
+     (with-redefs [new-retry-period (constantly retry-period)]
        (let [tuples-in (dropping-chan)
              packets-in (dropping-chan)
              packets-out (chan)
              subject (start-queue-transmitter own-puk peer-puk (empty-store) tuples-in packets-in packets-out)]
          (>!! tuples-in t0)
          (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0}
-         (>!! retry-timeout ::stimulus)
+         (>!! retry-period ::stimulus)
          (<!!? packets-out) => {:intent :send :from own-puk :to peer-puk :payload t0 :sequence 0}
          (async/close! tuples-in))))))
 

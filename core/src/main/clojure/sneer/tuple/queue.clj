@@ -39,24 +39,24 @@
 
 (def NEVER (async/chan))
 
-(defn new-retry-timeout []
-  (async/timeout 1000))
+(defn new-retry-period []
+  (async/timeout 1000)) 
 
 (defn start-queue-transmitter [from to store tuples-in packets-in packets-out]
   (letfn [(next-packet []
             (when-some [{:keys [sequence tuple]} (-peek store to)]
               {:intent :send :from from :to to :sequence sequence :payload tuple}))]
     (go-trace
-     (loop [retry-timeout IMMEDIATELY]
+     (loop [retry-period IMMEDIATELY]
      
        (alt! :priority true
          
-         retry-timeout
+         retry-period
          ([_]
            (if-some [packet (next-packet)]
              (do
                (>! packets-out packet)
-               (recur (new-retry-timeout)))
+               (recur (new-retry-period)))
              (recur NEVER)))
        
          tuples-in
@@ -64,7 +64,7 @@
            (when tuple
              (let [first? (-empty? store to)]
                (-enqueue store to tuple)
-               (recur (if first? IMMEDIATELY retry-timeout)))))
+               (recur (if first? IMMEDIATELY retry-period)))))
        
          packets-in
          ([packet]
@@ -77,7 +77,7 @@
                          (recur IMMEDIATELY))
                        (do
                          (>! packets-out (assoc (next-packet) :reset true))
-                         (recur (new-retry-timeout))))
+                         (recur (new-retry-period))))
                      (recur NEVER))))))
    
      (async/close! packets-out))))
