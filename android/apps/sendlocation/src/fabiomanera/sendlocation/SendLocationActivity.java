@@ -39,7 +39,7 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 
 		byte[] imageBytes = scaledDownTo(bitmap, 20 * 1024);
 		
-		send(null, url, imageBytes);
+		send(url, null, imageBytes);
 		finish();
 	}
 	
