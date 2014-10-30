@@ -47,11 +47,10 @@
             (when-some [{:keys [sequence tuple]} (-peek store to)]
               {:intent :send :from from :to to :sequence sequence :payload tuple}))]
     (go-trace
-     (loop [retry-period IMMEDIATELY]
-     
+     (loop [send-period IMMEDIATELY]
        (alt! :priority true
          
-         retry-period
+         send-period
          ([_]
            (if-some [packet (next-packet)]
              (do
@@ -64,7 +63,7 @@
            (when tuple
              (let [first? (-empty? store to)]
                (-enqueue store to tuple)
-               (recur (if first? IMMEDIATELY retry-period)))))
+               (recur (if first? IMMEDIATELY send-period)))))
        
          packets-in
          ([packet]
