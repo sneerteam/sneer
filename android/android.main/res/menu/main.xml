@@ -9,6 +9,7 @@
     <item
         android:id="@+id/action_search_for_apps"
         android:orderInCategory="102"
+        android:visible="false"
         android:title="@string/action_search_for_apps"/>
     <item
         android:id="@+id/action_advanced"
