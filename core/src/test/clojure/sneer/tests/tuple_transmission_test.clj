@@ -1,13 +1,8 @@
 (ns sneer.tests.tuple-transmission-test
   (:require [midje.sweet :refer :all]
             [sneer.tuple-transmission :refer [start-queue-transmitter QueueStore new-retry-timeout]]
+            [sneer.async :refer :all]
             [clojure.core.async :as async :refer [chan >!! <! go-loop]]))
-
-(defn dropping-chan [& [n]]
-  (chan (async/dropping-buffer (or n 1))))
-
-(defn sliding-chan [& [n]]
-  (chan (async/sliding-buffer (or n 1))))
 
 (defn persistent-queue [& [elements]]
   (reduce conj clojure.lang.PersistentQueue/EMPTY elements))
@@ -129,7 +124,7 @@
          (async/close! tuples-in))))))
 
 (defn wait-for-last [ch]
-  (go-loop [previous :nothing]
+  (go-loop [previous nil]
     (if-some [v (<! ch)]
       (recur v)
       previous)))
