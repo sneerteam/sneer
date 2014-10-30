@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
-public class ComposeSendPicsActivity extends MessageActivity {
+public class SendPicsActivity extends MessageActivity {
 
 	private static final int TAKE_PICTURE = 1;
 	
