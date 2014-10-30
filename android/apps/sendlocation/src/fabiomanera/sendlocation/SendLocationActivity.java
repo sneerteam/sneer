@@ -35,11 +35,11 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 		String url = "https://google.com/maps/place/" + location.getLatitude() + "," + location.getLongitude();
 
 		
-		Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_launcher);
+		Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.map);
 
-		byte[] imageBytes = scaledDownTo(bitmap, 10 * 1024);
+		byte[] imageBytes = scaledDownTo(bitmap, 20 * 1024);
 		
-		send(url, url, imageBytes);
+		send(null, url, imageBytes);
 		finish();
 	}
 	
