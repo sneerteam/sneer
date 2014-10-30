@@ -1,8 +1,8 @@
-(ns sneer.core.tests.reliable-client-test
+(ns sneer.tuple.reliable-client-test
   (:require [midje.sweet :refer :all]
             [clojure.core.match :refer [match]]))
 
-; (do (require 'midje.repl) (midje.repl/autotest :dirs "src"))
+; (do (require 'midje.repl) (midje.repl/autotest))
 
 (def empty-q clojure.lang.PersistentQueue/EMPTY)
 
