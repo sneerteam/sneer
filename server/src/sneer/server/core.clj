@@ -2,7 +2,7 @@
   (:require
    [clojure.core.async :as async :refer [chan >! <! >!! <!! alts!! timeout]]
    [clojure.java.io :as io]
-   [sneer.async :refer [go!]]))
+   [sneer.async :refer [go-trace]]))
 
 
 (defmacro while-let
@@ -18,7 +18,7 @@
 (defmacro go-while-let
   "Makes it easy to continue processing data from a channel until it closes"
   [binding & forms]
-  `(go!
+  `(go-trace
      (while-let ~binding
                 ~@forms)))
 
@@ -101,7 +101,7 @@
 (defn announce [to-subs new-paths path value]
   (let [new-pubs (mapv (fn [p] [p ::new]) new-paths)
         all-pubs (conj new-pubs [path value])]
-    (go!
+    (go-trace
      (doseq [[path value] all-pubs]
        (>! log (str "publishing " path " " value))
        (>! to-subs {:tag :notification :path path :value value})))))

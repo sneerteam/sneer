@@ -3,7 +3,7 @@
             [sneer.core :refer [query-tuples]]
             [sneer.tuple.queue :refer :all]
             [sneer.rx :refer [observe-for-io]]
-            [sneer.async :refer [go!]]
+            [sneer.async :refer [go-trace]]
             [rx.lang.clojure.core :as rx]
             [clojure.core.match :refer [match]]
             [clojure.core.async :as async :refer [<! >! >!! <!! chan go-loop alt!]]))

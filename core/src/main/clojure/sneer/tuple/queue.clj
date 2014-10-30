@@ -2,7 +2,7 @@
   (:require [sneer.commons :refer [produce!]]
             [sneer.core :refer [query-tuples]]
             [sneer.rx :refer [observe-for-io]]
-            [sneer.async :refer [go!]]
+            [sneer.async :refer [go-trace]]
             [rx.lang.clojure.core :as rx]
             [clojure.core.match :refer [match]]
             [clojure.core.async :as async :refer [<! >! >!! <!! chan go-loop alt!]]))
@@ -46,7 +46,7 @@
   (letfn [(next-packet []
             (when-some [{:keys [sequence tuple]} (-peek store to)]
               {:intent :send :from from :to to :sequence sequence :payload tuple}))]
-    (go!
+    (go-trace
      (loop [retry-timeout IMMEDIATELY]
      
        (alt! :priority true
