@@ -164,7 +164,7 @@
      
   
      ?enq1 ?hsts1 ?hsd1 ?full?1 ?enq2 ?hsts2 ?hsd2 ?full?2   ?seq ?reset   ?obs
-;         0    nil   nil     nil     0    nil   nil     nil    nil    nil   "A new queue has no packet to send."
+         0    nil   nil     nil     0    nil   nil     nil    nil    nil   "A new queue has no packet to send."
          1    nil   nil     nil     0    nil   nil     nil      0    nil   "A packet can be enqueued to send."
 ;         2    nil   nil     nil     0    nil   nil     nil      0    nil   "Enqueueing is FIFO."
 ;         1     -1    -1   false     0    nil   nil     nil      0    nil   "When the server has no packets sent (initial server state), queue sends first packet."
