@@ -6,7 +6,7 @@
 
 (def empty-q clojure.lang.PersistentQueue/EMPTY)
 
-(defn create []
+(def initial-state
   {:sequence 0
    :to-send empty-q
    :sent empty-q})
@@ -55,6 +55,15 @@
   (when-some [payload (-> state :to-send first)]
     (assoc (select-keys state [:sequence :reset]) :payload payload)))
 
+;(reify QueueStore
+;      (-empty? [_ to]
+;        (-> @state :q empty?))
+;      (-peek [_ to]
+;        (-> @state :q peek))      
+;      (-enqueue [_ to tuple]
+;        (swap! state enqueue tuple))
+;      (-pop [_ to]
+;        (swap! state update-in [:q] pop)))
 
 (tabular "Packet Handling"
 
@@ -70,7 +79,7 @@
                                       :highest-sequence-delivered highest-sequence-delivered
                                       :full? full?})
                                    queue))
-          queue (create)
+          queue initial-state
           queue (enqueue queue     0 ?enq1)
           queue (simulate-from-server queue ?hsts1 ?hsd1 ?full?1)
           queue (enqueue queue ?enq1 ?enq2)
