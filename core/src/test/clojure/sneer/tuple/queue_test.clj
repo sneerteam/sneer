@@ -151,8 +151,6 @@
        (async/close! tuples-in)
 
        (let [packet-to-send (<!!? (wait-for-last packets-out))]
-         (println ?seq packet-to-send)
-    
          (:sequence packet-to-send) => ?seq
          (-> packet-to-send :payload :tag) => ?seq ;This test is designed so that the sequence and the payload are always the same.
          (:reset packet-to-send) => ?reset)))
