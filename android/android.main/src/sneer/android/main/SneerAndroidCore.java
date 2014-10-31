@@ -42,6 +42,7 @@ public class SneerAndroidCore implements SneerAndroid {
 			error = e.getMessage();
 		}
 	}
+	
 
 	private void init(final Context context) throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
@@ -52,6 +53,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		initNotifications(context);		
 	}
 
+	
 	private void initNotifications(final Context context) {
 		sneer().tupleSpace().filter()
 			.audience(sneer().self().publicKey().current())
@@ -87,6 +89,7 @@ public class SneerAndroidCore implements SneerAndroid {
 			}});
 	}
 	
+	
 	private static void notifyUser(Context context, Tuple tuple, String notificationLabel, PendingIntent pendIntent) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		builder.setSmallIcon(R.drawable.ic_launcher)
@@ -117,6 +120,7 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 	}
 	
+	
 	private static SneerAdmin newSneerAdmin(SneerSqliteDatabase db) {
 		try {
 			return (SneerAdmin) sneerAdminFactory().getMethod("create", Object.class).invoke(null, db);
@@ -124,6 +128,7 @@ public class SneerAndroidCore implements SneerAndroid {
 			throw new IllegalStateException(e);
 		}
 	}
+	
 	
 	private static Class<?> sneerAdminFactory() {
 		try {
@@ -133,15 +138,18 @@ public class SneerAndroidCore implements SneerAndroid {
 		}
 	}
 	
+	
 	public static boolean isCoreAvailable() {
 		return sneerAdminFactory() != null;
 	}
 
+	
 	@Override
 	public SneerAdmin admin() {
 		return sneerAdmin;
 	}
 
+	
 	@Override
 	public boolean checkOnCreate(Activity activity) {
 		if (error == null) return true;
@@ -149,21 +157,25 @@ public class SneerAndroidCore implements SneerAndroid {
 		return false;
 	}
 
+	
 	@Override
 	public Sneer sneer() {
 		return admin().sneer();
 	}
 
+	
 	@Override
 	public boolean isClickable(Message message) {
 		return pluginManager.isClickable(message);
 	}
 
+	
 	@Override
 	public void doOnClick(Message message) {
 		pluginManager.doOnClick(message);
 	}
 
+	
 	private void log(String log) {
 		LogUtils.info(SneerAndroidCore.class, log);
 	}
