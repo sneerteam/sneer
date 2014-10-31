@@ -77,6 +77,7 @@
                        (do
                          (>! packets-out (assoc (next-packet) :reset true))
                          (recur (new-retry-period))))
-                     (recur NEVER))))))
+                     (recur NEVER))
+                   :else (recur send-period)))))
    
      (async/close! packets-out))))
