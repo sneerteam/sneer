@@ -12,13 +12,13 @@
         enqueue (fn [{:keys [q sequence]} tuple]
                   {:q (conj q {:sequence sequence :tuple tuple}) :sequence (inc sequence)})]
     (reify QueueStore
-      (-empty? [store to]
+      (-empty? [_ to]
         (-> @state :q empty?))
-      (-peek [store to]
+      (-peek [_ to]
         (-> @state :q peek))      
-      (-enqueue [store to tuple]
+      (-enqueue [_ to tuple]
         (swap! state enqueue tuple))
-      (-pop [store to]
+      (-pop [_ to]
         (swap! state update-in [:q] pop)))))
 
 (defn <!!? [ch]
