@@ -21,16 +21,6 @@
       (-pop [_ to]
         (swap! state update-in [:q] pop)))))
 
-(defn <!!? [ch]
-  (async/alt!!
-    (async/timeout 200) :timeout
-    ch ([v] v)))
-         
-(defn >!!? [ch v]
-  (async/alt!!
-    (async/timeout 200) false
-    [[ch v]] true))
-
 (def own-puk :me)
 
 (def peer-puk :peer)
