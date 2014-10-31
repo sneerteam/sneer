@@ -107,14 +107,12 @@
 (defn create [_store from to]
   (let [state (atom initial-state)]
     (reify Queue
-      (-enqueue-to-send [queue tuple]
-        (swap! state enqueue-to-send tuple)
-        queue)
-      (-packet-to-send [queue]
+      (-enqueue-to-send [_ tuple]
+        (swap! state enqueue-to-send tuple))
+      (-packet-to-send [_]
         (packet-to-send @state from to))
-      (-handle-packet-from-server [queue packet]
-        (swap! state handle-packet-from-server packet)
-        queue))))
+      (-handle-packet-from-server [_ packet]
+        (swap! state handle-packet-from-server packet)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Wiring

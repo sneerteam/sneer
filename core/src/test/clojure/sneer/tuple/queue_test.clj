@@ -133,7 +133,7 @@
          (-> packet-to-send :payload :tag) => ?seq ;This test is designed so that the sequence and the payload are always the same.
          (:reset packet-to-send) => ?reset)))
 
-  
+
      ?enq1 ?hsts1 ?hsd1 ?full?1 ?enq2 ?hsts2 ?hsd2 ?full?2   ?seq ?reset   ?obs
          0    nil   nil     nil     0    nil   nil     nil    nil    nil   "A new queue has no packet to send."
          1    nil   nil     nil     0    nil   nil     nil      0    nil   "A packet can be enqueued to send."
