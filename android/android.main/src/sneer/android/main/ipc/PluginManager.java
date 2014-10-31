@@ -10,10 +10,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.ConversationMenuItem;
 import sneer.Message;
-import sneer.PublicKey;
 import sneer.Sneer;
-import sneer.android.main.SneerAndroidCore;
-import sneer.android.main.utils.LogUtils;
 import sneer.tuples.Tuple;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -30,52 +27,22 @@ public class PluginManager {
 				return handler.canCompose();
 			}})
 			.map(new Func1<PluginHandler, ConversationMenuItem>() { @Override public ConversationMenuItem call(final PluginHandler app) {
-				return new ConversationMenuItemImpl(app);
+				return new ConversationMenuItemImpl(PluginManager.this, app);
 			}})
 			.toList();
 	}};
 
-	private Context context;
+	Context context;
 	private Sneer sneer;
 	
 	
-	private final class ConversationMenuItemImpl implements ConversationMenuItem {
-		private final PluginHandler plugin;
-
-		private ConversationMenuItemImpl(PluginHandler app) {
-			this.plugin = app;
-		}
-
-		@Override
-		public void call(PublicKey partyPuk) {
-			plugin.start(partyPuk);
-		}
-
-		@Override
-		public byte[] icon() {
-			try {
-				return bitmapFor(plugin.drawableMenuIcon(context));
-			} catch (Exception e) {
-				LogUtils.warn(SneerAndroidCore.class, "Error loading bitmap", e);
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		public String caption() {
-			return plugin.menuCaption();
-		}
-	}
-	
-
 	public PluginManager(Context context, Sneer sneer) {
 		this.context = context;
 		this.sneer = sneer;
 	}
 
 	
-	private static byte[] bitmapFor(Drawable icon) {
+	static byte[] bitmapFor(Drawable icon) {
 		Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
