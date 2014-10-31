@@ -14,7 +14,7 @@ public interface Message {
 	/** Any parcelable object such as arrays, collections, number types, etc. Can be null. */
 	Object payload();
 
-	/** Text, if present, or url, if present, or messageType, if present, or empty string. Never null. */
+	/** Text, if present, or messageType, if present, or empty string. Never null. */
 	String label();
 
 	/** When this message was created. */

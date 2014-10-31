@@ -113,12 +113,14 @@ public class ConversationActivity extends SneerActivity {
 		} });
 	}
 	
+	
 	private void handleClick(String text) {
 		if (!text.isEmpty())
 			conversation.sendText(text);
 		else
 			openIteractionMenu();
 	}
+	
 	
 	private void openIteractionMenu() {
 		final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
