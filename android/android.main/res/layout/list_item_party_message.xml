@@ -23,14 +23,15 @@
             android:id="@+id/img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="TODO" >
+            android:layout_toRightOf="@+id/messageContent" >
         </ImageView>
 
         <TextView
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/img"
+            android:minWidth="30dp"
+            android:paddingRight="5dp"
             android:textSize="15sp" />
 
         <TextView
@@ -38,6 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/messageContent"
+            android:layout_alignParentBottom="true"
             android:layout_below="@+id/messageContent"
             android:textColor="#777"
             android:textSize="12sp" />

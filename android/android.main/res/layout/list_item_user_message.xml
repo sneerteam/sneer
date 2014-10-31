@@ -23,23 +23,26 @@
         <ImageView
             android:id="@+id/img"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="TODO" >
+            android:layout_height="wrap_content" >
         </ImageView>
 
         <TextView
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/img"
+            android:layout_toRightOf="@+id/img"
+            android:minWidth="30dp"
+            android:paddingLeft="5dp"
             android:textSize="15sp" />
 
         <TextView
             android:id="@+id/messageTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/messageContent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignRight="@+id/messageContent"
             android:layout_below="@+id/messageContent"
+            android:paddingLeft="5dp"
             android:textColor="#777"
             android:textSize="12sp" />
     </RelativeLayout>
