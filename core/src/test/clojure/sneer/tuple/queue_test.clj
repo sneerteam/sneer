@@ -156,19 +156,19 @@
          (:sequence packet-to-send) => ?seq
          (-> packet-to-send :payload :tag) => ?seq ;This test is designed so that the sequence and the payload are always the same.
          (:reset packet-to-send) => ?reset)))
-     
+
   
      ?enq1 ?hsts1 ?hsd1 ?full?1 ?enq2 ?hsts2 ?hsd2 ?full?2   ?seq ?reset   ?obs
          0    nil   nil     nil     0    nil   nil     nil    nil    nil   "A new queue has no packet to send."
          1    nil   nil     nil     0    nil   nil     nil      0    nil   "A packet can be enqueued to send."
-;         2    nil   nil     nil     0    nil   nil     nil      0    nil   "Enqueueing is FIFO."
-;         1     -1    -1   false     0    nil   nil     nil      0    nil   "When the server has no packets sent (initial server state), queue sends first packet."
-;         1      0    -1   false     0    nil   nil     nil    nil    nil   "Server sending a packet pops it from the queue (with one enqueued)."
-;         3      0    -1   false     0      1    -1   false      2    nil   "Server sending a packet pops it from the queue (with three enqueued)."
-;         1     42     0   false     0    nil   nil     nil      0   true   "Reset is sent when server gets out of sync."
-;         2     42     0   false     0     -1    -1   false      0    nil   "Reset is not needed for happy-day sequencing."
-;         1      0    -1   false     0     -1    -1   false      0   true   "Undelivered packets are sent when the server restarts."
-;         1      0     0   false     0     -1    -1   false    nil    nil   "Delivered packets are forgotten (with one enqueued)."
-;         2      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with two enqueued)."
-;         7      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with several enqueued)."
+         2    nil   nil     nil     0    nil   nil     nil      0    nil   "Enqueueing is FIFO."
+;        1     -1    -1   false     0    nil   nil     nil      0    nil   "When the server has no packets sent (initial server state), queue sends first packet."
+;        1      0    -1   false     0    nil   nil     nil    nil    nil   "Server sending a packet pops it from the queue (with one enqueued)."
+         3      0    -1   false     0      1    -1   false      2    nil   "Server sending a packet pops it from the queue (with three enqueued)."
+         1     42     0   false     0    nil   nil     nil      0   true   "Reset is sent when server gets out of sync."
+;        2     42     0   false     0     -1    -1   false      0    nil   "Reset is not needed for happy-day sequencing."
+;        1      0    -1   false     0     -1    -1   false      0   true   "Undelivered packets are sent when the server restarts."
+;        1      0     0   false     0     -1    -1   false    nil    nil   "Delivered packets are forgotten (with one enqueued)."
+         2      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with two enqueued)."
+         7      0     0   false     0     -1    -1   false      1   true   "Delivered packets are forgotten (with several enqueued)."
 )
