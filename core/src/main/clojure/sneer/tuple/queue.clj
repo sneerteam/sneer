@@ -49,14 +49,14 @@
   (-packet-to-send [queue])
   (-handle-packet-from-server [queue packet]))
 
-(def empty-q clojure.lang.PersistentQueue/EMPTY)
+(def ^:private empty-q clojure.lang.PersistentQueue/EMPTY)
 
-(def initial-state
+(def ^:private initial-state
   {:sequence 0
    :to-send empty-q
    :sent empty-q})
 
-(defn enqueue-to-send [state payload]
+(defn- enqueue-to-send [state payload]
   (update-in state [:to-send] conj payload))
 
 (defn- pop-packet [state]
@@ -86,7 +86,7 @@
   (let [undelivered (- sequence highest-sequence-delivered 1)]
     (assoc state :sent (into empty-q (take-last undelivered sent)))))
 
-(defn handle-packet-from-server [state packet]
+(defn- handle-packet-from-server [state packet]
   (match packet
          {:highest-sequence-to-send   hsts
           :highest-sequence-delivered hsd}
@@ -96,7 +96,7 @@
              (reset state))))
 
 
-(defn packet-to-send [state from to]
+(defn- packet-to-send [state from to]
   (when-some [payload (-> state :to-send first)]
     (merge (select-keys state [:sequence :reset])
       {:intent :send
