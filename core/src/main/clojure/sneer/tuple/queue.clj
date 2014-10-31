@@ -47,37 +47,38 @@
             (when-some [{:keys [sequence tuple]} (-peek store to)]
               {:intent :send :from from :to to :sequence sequence :payload tuple}))]
     (go-trace
-     (loop [send-period IMMEDIATELY]
-       (alt! :priority true
+      (loop [send-period IMMEDIATELY]
+       
+        (alt! :priority true
          
-         send-period
-         ([_]
-           (if-some [packet (next-packet)]
-             (do
-               (>! packets-out packet)
-               (recur (new-retry-period)))
-             (recur NEVER)))
+          send-period
+          ([_]
+            (if-some [packet (next-packet)]
+              (do
+                (>! packets-out packet)
+                (recur (new-retry-period)))
+              (recur NEVER)))
        
-         tuples-in
-         ([tuple]
-           (when tuple
-             (let [first? (-empty? store to)]
-               (-enqueue store to tuple)
-               (recur (if first? IMMEDIATELY send-period)))))
+          tuples-in
+          ([tuple]
+            (when tuple
+              (let [first? (-empty? store to)]
+                (-enqueue store to tuple)
+                (recur (if first? IMMEDIATELY send-period)))))
        
-         packets-in
-         ([packet]
-            (match packet
-                   {:intent :status-of-queues :highest-sequence-to-send hsts}
-                   (if-some [{:keys [sequence]} (-peek store to)]
-                     (if (= hsts sequence)
-                       (do
-                         (-pop store to)
-                         (recur IMMEDIATELY))
-                       (do
-                         (>! packets-out (assoc (next-packet) :reset true))
-                         (recur (new-retry-period))))
-                     (recur NEVER))
-                   :else (recur send-period)))))
+          packets-in
+          ([packet]
+             (match packet
+                    {:intent :status-of-queues :highest-sequence-to-send hsts}
+                    (if-some [{:keys [sequence]} (-peek store to)]
+                      (if (= hsts sequence)
+                        (do
+                          (-pop store to)
+                          (recur IMMEDIATELY))
+                        (do
+                          (>! packets-out (assoc (next-packet) :reset true))
+                          (recur (new-retry-period))))
+                      (recur NEVER))
+                    :else (recur send-period)))))
    
      (async/close! packets-out))))
