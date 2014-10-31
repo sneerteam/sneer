@@ -1,5 +1,6 @@
 (ns sneer.tuple.reliable-client-test
   (:require [midje.sweet :refer :all]
+            [sneer.tuple.queue :refer :all]
             [clojure.core.match :refer [match]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
@@ -55,36 +56,36 @@
   (when-some [payload (-> state :to-send first)]
     (assoc (select-keys state [:sequence :reset]) :payload payload)))
 
-;(reify QueueStore
-;      (-empty? [_ to]
-;        (-> @state :q empty?))
-;      (-peek [_ to]
-;        (-> @state :q peek))      
-;      (-enqueue [_ to tuple]
-;        (swap! state enqueue tuple))
-;      (-pop [_ to]
-;        (swap! state update-in [:q] pop)))
+(defn create []
+  (let [state (atom initial-state)]
+    (reify Queue
+      (-enqueue-to-send [queue tuple]
+        (swap! state enqueue-to-send tuple)
+        queue)
+      (-packet-to-send [queue]
+        (packet-to-send @state))
+      (-handle-packet-from-server [queue packet]
+        (swap! state handle-packet-from-server packet)
+        queue))))
 
 (tabular "Packet Handling"
-
-  (fact 
+  (fact
     (let [enqueue (fn [queue start count]
-                    (reduce enqueue-to-send queue (range start (+ start count))))
+                    (doall (map #(-enqueue-to-send queue %) (range start (+ start count)))))
           simulate-from-server (fn [queue highest-sequence-to-send highest-sequence-delivered full?]
                                  (if highest-sequence-to-send
-                                   (handle-packet-from-server
+                                   (-handle-packet-from-server
                                      queue
                                      {:intent :status-of-queues
                                       :highest-sequence-to-send highest-sequence-to-send
                                       :highest-sequence-delivered highest-sequence-delivered
-                                      :full? full?})
-                                   queue))
-          queue initial-state
-          queue (enqueue queue     0 ?enq1)
-          queue (simulate-from-server queue ?hsts1 ?hsd1 ?full?1)
-          queue (enqueue queue ?enq1 ?enq2)
-          queue (simulate-from-server queue ?hsts2 ?hsd2 ?full?2)
-          packet-to-send (packet-to-send queue)]
+                                      :full? full?})))
+          queue (create)
+          _ (enqueue queue     0 ?enq1)
+          _ (simulate-from-server queue ?hsts1 ?hsd1 ?full?1)
+          _ (enqueue queue ?enq1 ?enq2)
+          _ (simulate-from-server queue ?hsts2 ?hsd2 ?full?2)
+          packet-to-send (-packet-to-send queue)]
       (:sequence packet-to-send) => ?seq
       (:payload packet-to-send) => ?seq ;This test is designed so that the sequence and the payload are always the same.
       (:reset packet-to-send) => ?reset))

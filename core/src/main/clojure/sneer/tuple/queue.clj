@@ -37,6 +37,11 @@
   (-unreset [store to])
   (-reset? [store to]))
 
+(defprotocol Queue
+  (-enqueue-to-send [queue tuple])
+  (-packet-to-send [queue])
+  (-handle-packet-from-server [queue packet]))
+
 (def IMMEDIATELY (doto (async/chan)
                    async/close!))
 
