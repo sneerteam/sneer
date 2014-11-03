@@ -34,13 +34,16 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
         this.activity = activity;
 		this.subscriptions = new CompositeSubscription();
     }
+	
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         final ConversationtHolder holder;
         
-        if (row == null) {
+        if (row != null) {
+            holder = (ConversationtHolder)row.getTag();
+        } else {
             LayoutInflater inflater = activity.getLayoutInflater();
             row = inflater.inflate(R.layout.list_item_main, parent, false);
             
@@ -57,8 +60,6 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
             holder.conversationSummary.getPaint().setShader(textShader);
             
             row.setTag(holder);
-        } else {
-            holder = (ConversationtHolder)row.getTag();
         }
         
 		Conversation conversation = getItem(position);
@@ -76,7 +77,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
     static class ConversationtHolder {
 		TextView conversationParty;
 		TextView conversationSummary;
-		TextView conversationDate;
+		TextView conversationDate;	
 		TextView conversationUnread;
 		ImageView conversationPicture;
 	}
@@ -96,4 +97,5 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 	public void dispose() {
 		subscriptions.unsubscribe();
 	}
+
 }
