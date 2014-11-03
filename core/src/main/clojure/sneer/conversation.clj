@@ -68,6 +68,7 @@
           tuple-space
           publisher
           (audience party-puk)
+          (field "message-type" "chat")
           (type "message")
           (field "text" text)
           (pub)))
