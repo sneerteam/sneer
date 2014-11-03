@@ -1,23 +1,22 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     tools:context=".MainActivity" >
 
     <ListView
         android:id="@+id/conversationList"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
         android:padding="5dp" />
 
-    <ImageButton
+    <Button
         android:id="@+id/image_button_add_contact"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:padding="5dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/ic_add_contact" />
+        android:text="Add Contact" />
 
-</RelativeLayout>
+</LinearLayout>
