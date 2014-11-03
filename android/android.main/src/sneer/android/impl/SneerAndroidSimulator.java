@@ -1,8 +1,9 @@
-package sneer.android;
+package sneer.android.impl;
 
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
+import sneer.android.SneerAndroid;
 import sneer.impl.simulator.SneerAdminSimulator;
 import android.app.Activity;
 import android.content.Context;
@@ -20,26 +21,31 @@ public final class SneerAndroidSimulator implements SneerAndroid {
 		admin = ret;
 	}
 
+	
 	@Override
 	public Sneer sneer() {
 		return admin.sneer();
 	}
 
+	
 	@Override
 	public boolean isClickable(Message message) {
 		return true;
 	}
 
+	
 	@Override
 	public void doOnClick(Message message) {
 		Toast.makeText(context, "Message clicked: " + message, Toast.LENGTH_SHORT).show();
 	}
 
+	
 	@Override
 	public boolean checkOnCreate(Activity activity) {
 		return true;
 	}
 
+	
 	@Override
 	public SneerAdmin admin() {
 		return admin;
