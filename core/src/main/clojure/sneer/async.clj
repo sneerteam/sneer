@@ -3,7 +3,7 @@
 
 (defn <!!? [ch]
   (async/alt!!
-    (async/timeout 200) :timeout
+    (async/timeout 200) ::timeout
     ch ([v] v)))
          
 (defn >!!? [ch v]
