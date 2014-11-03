@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 public class MainActivity extends SneerActivity {
@@ -44,6 +45,11 @@ public class MainActivity extends SneerActivity {
 		startProfileActivityIfFirstTime();
 		
 		makeConversationList();
+		
+		ImageButton addContact = (ImageButton)findViewById(R.id.image_button_add_contact);
+		addContact.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
+			shareDialog();
+		}});
 	}
 
 
