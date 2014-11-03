@@ -10,4 +10,14 @@
         android:layout_height="fill_parent"
         android:padding="5dp" />
 
+    <ImageButton
+        android:id="@+id/image_button_add_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:padding="5dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:src="@drawable/ic_add_contact" />
+
 </RelativeLayout>

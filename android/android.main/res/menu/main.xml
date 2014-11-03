@@ -5,6 +5,7 @@
         android:icon="@drawable/ic_add_contact"
         android:orderInCategory="100"
         android:showAsAction="always"
+        android:visible="false"
         android:title="@string/action_add_contact"/>
     <item
         android:id="@+id/action_search_for_apps"
