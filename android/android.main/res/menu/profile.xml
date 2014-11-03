@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="sneer.android.main.ContactActivity" >
+    tools:context="sneer.android.ContactActivity" >
 
     <item
         android:id="@+id/action_share"

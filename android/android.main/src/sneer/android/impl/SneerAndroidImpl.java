@@ -1,6 +1,6 @@
 package sneer.android.impl;
 
-import static sneer.android.main.ipc.TupleSpaceService.startTupleSpaceService;
+import static sneer.android.ipc.TupleSpaceService.startTupleSpaceService;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,14 +11,14 @@ import sneer.Message;
 import sneer.Sneer;
 import sneer.SneerAndroidClient;
 import sneer.admin.SneerAdmin;
-import sneer.android.main.R;
-import sneer.android.main.SneerAndroid;
-import sneer.android.main.database.SneerSqliteDatabase;
-import sneer.android.main.ipc.PluginHandler;
-import sneer.android.main.ipc.PluginManager;
-import sneer.android.main.ui.ConversationActivity;
-import sneer.android.main.utils.AndroidUtils;
-import sneer.android.main.utils.LogUtils;
+import sneer.android.SneerAndroid;
+import sneer.android.database.SneerSqliteDatabase;
+import sneer.android.ipc.PluginHandler;
+import sneer.android.ipc.PluginManager;
+import sneer.android.R;
+import sneer.android.ui.ConversationActivity;
+import sneer.android.utils.AndroidUtils;
+import sneer.android.utils.LogUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;

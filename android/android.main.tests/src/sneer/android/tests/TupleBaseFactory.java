@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import sneer.ClojureUtils;
-import sneer.android.main.database.SneerSqliteDatabase;
+import sneer.android.database.SneerSqliteDatabase;
 import clojure.lang.IFn;
 
 public class TupleBaseFactory {
