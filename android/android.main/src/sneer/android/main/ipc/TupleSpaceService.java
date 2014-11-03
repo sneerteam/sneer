@@ -104,11 +104,11 @@ public class TupleSpaceService extends Service {
 	
 	private Bundle bundle(Object value) {
 		Bundle ret = new Bundle();
-		if (value instanceof Parcelable) {
+		if (value instanceof Parcelable)
 			ret.putParcelable("value", (Parcelable) value);
-		} else {
+		else
 			ret.putSerializable("value", (Serializable) value);
-		}
+		
 		return ret;
 	}
 
