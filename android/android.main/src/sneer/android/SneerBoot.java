@@ -6,11 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public class SneerBroadcastReceiver extends BroadcastReceiver {
+public class SneerBoot extends BroadcastReceiver {
 	
 	@Override
     public void onReceive(Context context, Intent intent) {
-		LogUtils.debug(SneerBroadcastReceiver.class, "Starting Sneer background service");
+		LogUtils.debug(SneerBoot.class, "Starting Sneer background service");
         TupleSpaceService.startTupleSpaceService(context);
     }
 	

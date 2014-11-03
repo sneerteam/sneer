@@ -47,7 +47,7 @@ public class SendPicsActivity extends MessageActivity {
 		}
 
 		byte[] imageBytes = scaledDownTo(bitmap, 40 * 1024);
-		send(null, null, imageBytes);
+		send("pic", null, imageBytes);
 		finish();
     }
 
