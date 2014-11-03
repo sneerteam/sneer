@@ -22,7 +22,8 @@
             android:clickable="true"
             android:contentDescription="@string/profile_view_content_description"
             android:onClick="selfieOnClick"
-            android:src="@drawable/avatar" />
+            android:src="@drawable/avatar"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/firstName"

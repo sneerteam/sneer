@@ -11,7 +11,8 @@
         android:contentDescription="@string/conversation_summary_picture"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
-        android:paddingTop="5dp" />
+        android:paddingTop="5dp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/conversationParty"

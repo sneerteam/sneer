@@ -54,18 +54,17 @@
             android:layout_marginTop="3dp"
             android:background="@android:color/black" />
         
-        
         <ImageView
             android:id="@+id/selfie"
             android:layout_width="80dp"
             android:layout_height="80dp"
+            android:layout_below="@+id/view1"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="15dp"
-            android:layout_below="@+id/view1"
             android:background="@android:color/transparent"
             android:contentDescription="@string/profile_view_content_description"
-            android:src="@drawable/avatar" />
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/fullName"

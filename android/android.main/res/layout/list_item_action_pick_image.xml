@@ -1,19 +1,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
+
     <ImageView
-            android:id="@+id/icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/pick_image_action_list_icon_description" />
-    
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/pick_image_action_list_icon_description"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/actionList"
-        android:layout_toRightOf="@+id/icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/icon"
         android:divider="@null"
         android:padding="10dp" />
-    
+
 </RelativeLayout>
