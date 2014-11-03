@@ -13,7 +13,6 @@ import sneer.SneerAndroidClient;
 import sneer.admin.SneerAdmin;
 import sneer.android.main.R;
 import sneer.android.main.SneerAndroid;
-import sneer.android.main.R.drawable;
 import sneer.android.main.database.SneerSqliteDatabase;
 import sneer.android.main.ipc.PluginHandler;
 import sneer.android.main.ipc.PluginManager;
