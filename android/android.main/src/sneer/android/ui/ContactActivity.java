@@ -97,14 +97,14 @@ public class ContactActivity extends Activity {
 		final String action = intent.getAction();
 		
 		if (Intent.ACTION_VIEW.equals(action)){
-			try{
+			try {
 				getActionBar().setDisplayHomeAsUpEnabled(true);
-				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));		
-			}catch(RuntimeException e){
+				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));
+			} catch (RuntimeException e) {
 				toast("Invalid public key");
 				finish();
 				return;
-			}			
+			}		
 		} else {
 			loadContact(null);
 		}
@@ -145,13 +145,9 @@ public class ContactActivity extends Activity {
 			plug(nicknameEdit, contact.nickname().observable());
 
 		plug(fullNameView, profile.ownName());
-		plug(preferredNickNameView, profile.preferredNickname().map(new Func1<Object, String>() {
-		
-			@Override
-			public String call(Object obj) {
-				return "(" + obj.toString() + ")";
-			}
-		}));
+		plug(preferredNickNameView, profile.preferredNickname().map(new Func1<Object, String>() { @Override public String call(Object obj) {
+			return "(" + obj.toString() + ")";
+		}}));
 		plug(countryView, profile.country());
 		plug(cityView, profile.city());
 		plug(selfieImage, profile.selfie());
@@ -185,7 +181,7 @@ public class ContactActivity extends Activity {
 	
 	
 	private void saveContact() {
-		if (isTouched  || newContact) {
+		if (isTouched || newContact) {
 			try {
 				final String nickName = nicknameEdit.getText().toString();
 				if (newContact)

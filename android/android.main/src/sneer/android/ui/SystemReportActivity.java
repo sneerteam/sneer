@@ -22,7 +22,7 @@ public class SystemReportActivity extends Activity {
 		setContentView(R.layout.activity_system_report);
 		
 		mReportView = (TextView)findViewById(R.id.reportView);
-		mScrollView = (ScrollView) findViewById(R.id.scrollView);
+		mScrollView = (ScrollView)findViewById(R.id.scrollView);
 		
 		report();
 	}
