@@ -1,4 +1,4 @@
-package sneer.android.main;
+package sneer.android.impl;
 
 import static sneer.android.main.ipc.TupleSpaceService.startTupleSpaceService;
 
@@ -11,6 +11,9 @@ import sneer.Message;
 import sneer.Sneer;
 import sneer.SneerAndroidClient;
 import sneer.admin.SneerAdmin;
+import sneer.android.main.R;
+import sneer.android.main.SneerAndroid;
+import sneer.android.main.R.drawable;
 import sneer.android.main.database.SneerSqliteDatabase;
 import sneer.android.main.ipc.PluginHandler;
 import sneer.android.main.ipc.PluginManager;
@@ -28,14 +31,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-public class SneerAndroidCore implements SneerAndroid {
+public class SneerAndroidImpl implements SneerAndroid {
 	
 	private SneerAdmin sneerAdmin;
 	private static String error;
 	public static AlertDialog errorDialog;
 	private PluginManager pluginManager;
 	
-	public SneerAndroidCore(Context context) {
+	public SneerAndroidImpl(Context context) {
 		try {
 			init(context);
 		} catch (FriendlyException e) {
@@ -44,7 +47,7 @@ public class SneerAndroidCore implements SneerAndroid {
 	}
 	
 
-	private void init(final Context context) throws FriendlyException {
+	private void init(Context context) throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
 		pluginManager = new PluginManager(context, sneer());
 		pluginManager.initPlugins();
@@ -177,7 +180,7 @@ public class SneerAndroidCore implements SneerAndroid {
 
 	
 	private void log(String log) {
-		LogUtils.info(SneerAndroidCore.class, log);
+		LogUtils.info(SneerAndroidImpl.class, log);
 	}
 
 }

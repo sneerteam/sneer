@@ -1,7 +1,7 @@
 package sneer.android.main.ui;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static sneer.android.main.ui.SneerAndroidProvider.sneer;
+import static sneer.android.main.SneerAndroidSingleton.sneer;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;

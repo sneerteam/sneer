@@ -1,6 +1,6 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.ui.SneerAndroidProvider.sneer;
+import static sneer.android.main.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.SneerActivity.deferUI;
 import static sneer.android.ui.SneerActivity.findView;
 import static sneer.android.ui.SneerActivity.plug;

@@ -8,13 +8,11 @@ import android.app.Activity;
 public interface SneerAndroid {
 
 	SneerAdmin admin();
+	Sneer sneer();
 
 	boolean checkOnCreate(Activity activity);
 
-	Sneer sneer();
-
 	boolean isClickable(Message message);
-
 	void doOnClick(Message message);
 
 }

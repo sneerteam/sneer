@@ -1,8 +1,8 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.ui.SneerAndroidProvider.admin;
-import static sneer.android.main.ui.SneerAndroidProvider.sneer;
-import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
+import static sneer.android.main.SneerAndroidSingleton.admin;
+import static sneer.android.main.SneerAndroidSingleton.sneer;
+import static sneer.android.main.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.plug;
 import rx.Observable;
 import rx.functions.Action1;

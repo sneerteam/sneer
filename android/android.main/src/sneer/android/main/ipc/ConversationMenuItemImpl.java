@@ -2,7 +2,7 @@ package sneer.android.main.ipc;
 
 import sneer.ConversationMenuItem;
 import sneer.PublicKey;
-import sneer.android.main.SneerAndroidCore;
+import sneer.android.impl.SneerAndroidImpl;
 import sneer.android.main.utils.LogUtils;
 
 public class ConversationMenuItemImpl implements ConversationMenuItem {
@@ -27,7 +27,7 @@ public class ConversationMenuItemImpl implements ConversationMenuItem {
 		try {
 			return PluginManager.bitmapFor(plugin.drawableMenuIcon(this.pluginManager.context));
 		} catch (Exception e) {
-			LogUtils.error(SneerAndroidCore.class, "Error loading bitmap", e);
+			LogUtils.error(SneerAndroidImpl.class, "Error loading bitmap", e);
 			e.printStackTrace();
 		}
 		return null;

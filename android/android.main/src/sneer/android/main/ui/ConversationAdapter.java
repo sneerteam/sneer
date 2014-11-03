@@ -1,6 +1,6 @@
 package sneer.android.main.ui;
 
-import static sneer.android.main.ui.SneerAndroidProvider.sneerAndroid;
+import static sneer.android.main.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findImageView;
 import static sneer.android.ui.SneerActivity.findTextView;
 

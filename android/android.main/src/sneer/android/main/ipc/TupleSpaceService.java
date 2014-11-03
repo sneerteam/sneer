@@ -2,7 +2,7 @@ package sneer.android.main.ipc;
 
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_COMPLETED;
 import static sneer.TupleSpaceFactoryClient.SubscriptionOp.ON_NEXT;
-import static sneer.android.main.ui.SneerAndroidProvider.sneer;
+import static sneer.android.main.SneerAndroidSingleton.sneer;
 
 import java.io.Serializable;
 import java.util.HashMap;
