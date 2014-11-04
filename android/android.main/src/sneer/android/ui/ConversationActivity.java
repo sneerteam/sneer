@@ -41,7 +41,7 @@ public class ConversationActivity extends SneerActivity {
 	public static final String PARTY_PUK = "partyPuk";
 	private static final String ACTIVITY_TITLE = "activityTitle";
 
-	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(final Message lhs, final Message rhs) {
+	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
 		return Comparators.compare(lhs.timestampReceived(), rhs.timestampReceived());
 	}};
 
@@ -55,7 +55,7 @@ public class ConversationActivity extends SneerActivity {
 	private ImageButton actionButton;
 
 	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversation);
 
@@ -79,7 +79,7 @@ public class ConversationActivity extends SneerActivity {
 			party);
 
 		deferUI(conversation.messages().throttleLast(250, MILLISECONDS)) //Maybe the Android UI already does its own throttling? Try with and without this throttling and see if there is a difference.
-			.subscribe(new Action1<List<Message>>() { @Override public void call(final List<Message> msgs) {
+			.subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
 				messages.clear();
 				messages.addAll(msgs);
 				adapter.notifyDataSetChanged();
@@ -90,7 +90,7 @@ public class ConversationActivity extends SneerActivity {
 		final TextView editText = (TextView) findViewById(R.id.editText);
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (editText.getText().toString().trim() != null && !editText.getText().toString().trim().isEmpty())
 					actionButton.setImageResource(R.drawable.ic_action_send);
 				else
@@ -98,22 +98,22 @@ public class ConversationActivity extends SneerActivity {
 			}
 
 			@Override
-			public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
 			@Override
-			public void afterTextChanged(final Editable s) {}
+			public void afterTextChanged(Editable s) {}
 		});
 
 		actionButton = (ImageButton)findViewById(R.id.actionButton);
 		actionButton.setImageResource(R.drawable.ic_action_new);
-		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(final View v) {
+		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			handleClick(editText.getText().toString().trim());
 			editText.setText("");
 		} });
 	}
 
 
-	private void handleClick(final String text) {
+	private void handleClick(String text) {
 		if (!text.isEmpty())
 			conversation.sendText(text);
 		else
@@ -125,26 +125,26 @@ public class ConversationActivity extends SneerActivity {
 		final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
 
 		final Subscription s = conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")
-		@Override public void call(final List<ConversationMenuItem> menuItems) {
+		@Override public void call(List<ConversationMenuItem> menuItems) {
 			menu.getMenu().close();
 			menu.getMenu().clear();
 			for (final ConversationMenuItem item : menuItems) {
-				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(final MenuItem ignored) {
+				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
 					menu.getMenu().close();
 					item.call(party.publicKey().current());
 					return true;
 				}}).setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
 			}
 			menu.show();
-		} });
-		menu.setOnDismissListener(new OnDismissListener() {  @Override public void onDismiss(final PopupMenu menu) {
+		}});
+		menu.setOnDismissListener(new OnDismissListener() {  @Override public void onDismiss(PopupMenu menu) {
 			s.unsubscribe();
-		} });
+		}});
 	}
 
 
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			navigateToProfile();
@@ -155,7 +155,7 @@ public class ConversationActivity extends SneerActivity {
 
 
 	private void navigateToProfile() {
-		final Intent intent = new Intent();
+		Intent intent = new Intent();
 		intent.setClass(this, ContactActivity.class);
 		intent.putExtra(PARTY_PUK, party.publicKey().current());
 		intent.putExtra(ACTIVITY_TITLE, "Contact");
@@ -164,10 +164,10 @@ public class ConversationActivity extends SneerActivity {
 
 
 	@SuppressWarnings("unused")
-	private void onMessage(final Message msg) {
-		final int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
+	private void onMessage(Message msg) {
+		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
 		if (insertionPointHint < 0) {
-			final int insertionPoint = Math.abs(insertionPointHint) - 1;
+			int insertionPoint = Math.abs(insertionPointHint) - 1;
 			messages.add(insertionPoint, msg);
 			adapter.notifyDataSetChanged();
 		}
