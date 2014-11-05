@@ -1,6 +1,6 @@
-(ns sneer.tuple.queue-test
+(ns sneer.networking.transmission-test
   (:require [midje.sweet :refer :all]
-            [sneer.tuple.queue :refer [start-queue-transmitter new-retry-timeout]]
+            [sneer.networking.transmission :refer [start-queue-transmitter new-retry-timeout]]
             [sneer.async :refer :all]
             [sneer.test-util :refer :all]
             [clojure.core.async :refer [chan >!! <! go-loop close!]]))
