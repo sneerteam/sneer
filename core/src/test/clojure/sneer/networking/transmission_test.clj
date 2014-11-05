@@ -1,49 +1,58 @@
 (ns sneer.networking.transmission-test
   (:require [midje.sweet :refer :all]
-            [sneer.networking.transmission :refer [start-queue-transmitter new-retry-timeout]]
+            [sneer.networking.transmission :refer [start-transciever new-retry-timeout]]
             [sneer.async :refer :all]
             [sneer.test-util :refer :all]
-            [clojure.core.async :refer [chan >!! <! go-loop close!]]))
+            [clojure.core.async :as async :refer [chan >!! <! go-loop close!]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-(def peer-puk "Peer-Puk")
+#_(facts
+   "About value transmission"
 
-(def t0 {:id 0 "some-field" "First"})
-(def t1 {:id 1 "some-field" "Next"})
+   (let [tuples-a (mapv #(do {:id % :some-field (str "Value A " %)}) (range 0 4))
+         tuples-b (mapv #(do {:id % :some-field (str "Value B " %)}) (range 0 4))
+        
+         to-b   (chan 10)
+         from-b (chan 10)
+         lease-a (chan)
 
-(facts
-  "About tuple transmission"
+         to-a   (chan 10)
+         from-a (chan 10)
+         lease-b (chan)
 
-  (let [tuples-in (chan 2)
-        packets-in (chan 1)
-        packets-out (chan)
-        retry-timeout (chan 1)]
+         packets-ab (chan)
+         packets-ba (chan)
+        
+         a (start-transciever to-b from-b packets-ab packets-ba lease-a)
+         b (start-transciever to-a from-a packets-ba packets-ab lease-b)]
+
+     (with-redefs [new-retry-timeout (constantly IMMEDIATELY)]
     
-    (with-redefs [new-retry-timeout (constantly retry-timeout)]
-      (start-queue-transmitter peer-puk tuples-in packets-in packets-out)
+       (fact
+         "One value is transmitted from A to B"
+         (>!! to-b (tuples-a 0))
+         (<!!? from-a) => (tuples-a 0))
 
-      (>!! tuples-in t0)
-      (>!! tuples-in t1)
-    
-      (fact
-        "A tuple is sent to the server"
-        (<!!? packets-out) => {:intent :send :to peer-puk :tuple t0})
+       (fact
+         "One value is transmitted from B to A"
+         (>!! to-a :b1)
+         (<!!? from-b) => :b1)
 
-      (fact
-        "Sending is retried"
-        (>!! retry-timeout ::stimulus)
-        (<!!? packets-out) => {:intent :send :to peer-puk :tuple t0})
-      
-      (fact
-        "When ack is received it starts sending next tuple"
-        (>!! packets-in {:intent :ack
-                         :follower peer-puk
-                         :id 0})
-        (<!!? packets-out) => {:intent :send :to peer-puk :tuple t1})  
-    
-    (fact
-      "Channels out are closed when BOTH channels in are closed"
-      (close! tuples-in)
-      (close! packets-in)
-      (<!!? packets-out) => nil))))
+       (fact
+         "Several values are transmitted in both directions"
+         (>!! to-b (tuples-a 1))
+         (>!! to-a (tuples-b 1))
+         (>!! to-b (tuples-a 2))
+         (>!! to-a (tuples-b 2))
+         (>!! to-a (tuples-b 3))
+         (>!! to-b (tuples-a 3))
+         (doseq [ta (rest tuples-a)] (<!!? from-a) => ta)
+         (doseq [tb (rest tuples-b)] (<!!? from-b) => tb))
+
+       (fact
+         "Transceivers close when lease is closed"
+         (close! lease-a)
+         (<!!? (async/filter< nil? a)) => nil
+         (close! lease-b)
+         (<!!? (async/filter< nil? b)) => nil))))
