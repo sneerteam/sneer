@@ -3,7 +3,7 @@
 
 (defn <!!? [ch]
   (alt!!
-    (timeout 200) ::timeout
+    (timeout 200) :timeout
     ch ([v] v)))
          
 (defn >!!? [ch v]
