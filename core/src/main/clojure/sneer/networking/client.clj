@@ -2,6 +2,7 @@
   (:require [clojure.core.async :as async :refer [<! >! >!! <!!]]
             [rx.lang.clojure.core :as rx]
             [sneer.core :as core]
+            [sneer.test-util :refer [compromised compromised-if]]
             [sneer.rx :refer [subject*]]
             [sneer.networking.udp :as udp])
   (:import [java.net InetSocketAddress]
@@ -63,15 +64,6 @@
              udp-out)))
 
        {:udp-out udp-out :from-server from-server :to-server to-server})))
-
-
-(defn compromised [ch]
-  (async/filter> (fn [_] (> (rand) 0.7)) ch))
-
-(defn compromised-if [unreliable ch]
-  (if unreliable
-    (compromised ch)
-    ch))
 
 (defn- start
   ([puk from-server to-server server-host server-port unreliable]
