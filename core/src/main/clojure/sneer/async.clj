@@ -1,6 +1,8 @@
 (ns sneer.async
   (:require [clojure.core.async :as async :refer [chan go]]))
 
+(def IMMEDIATELY (doto (async/chan) async/close!))
+
 (defn dropping-chan [& [n]]
   (chan (async/dropping-buffer (or n 1))))
 
