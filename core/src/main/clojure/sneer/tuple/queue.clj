@@ -5,7 +5,7 @@
 (def IMMEDIATELY           (doto (async/chan) async/close!))
 (defn new-retry-timeout [] (async/timeout 3000))
 
-(defn start-queue-transmitter [from to tuples-in packets-in packets-out]
+(defn start-queue-transmitter [to tuples-in packets-in packets-out]
   (go-trace
     (loop []
       (when-let [tuple (<! tuples-in)]
@@ -15,7 +15,7 @@
 
             time-to-send
             ([_] (do
-                   (>! packets-out {:intent :send :tuple tuple :from from :to to})
+                   (>! packets-out {:intent :send :tuple tuple :to to})
                    (recur (new-retry-timeout))))
 
             packets-in

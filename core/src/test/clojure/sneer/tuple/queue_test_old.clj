@@ -2,6 +2,7 @@
   (:require [midje.sweet :refer :all]
             [sneer.tuple.queue-old :refer [start-queue-transmitter QueueStore new-retry-timeout]]
             [sneer.async :refer :all]
+            [sneer.test-util :refer :all]
             [clojure.core.async :as async :refer [chan >!! <! go-loop]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
