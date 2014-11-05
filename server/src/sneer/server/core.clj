@@ -2,27 +2,7 @@
   (:require
    [clojure.core.async :as async :refer [chan >! <! >!! <!! alts!! timeout]]
    [clojure.java.io :as io]
-   [sneer.async :refer [go-trace]]))
-
-
-(defmacro while-let
-  "Makes it easy to continue processing an expression as long as it is true"
-  [binding & forms]
-  `(loop []
-     (when-let ~binding
-       ~@forms
-       (recur))))
-
-
-
-(defmacro go-while-let
-  "Makes it easy to continue processing data from a channel until it closes"
-  [binding & forms]
-  `(go-trace
-     (while-let ~binding
-                ~@forms)))
-
-
+   [sneer.async :refer [go-trace while-let go-while-let]]))
 
 (defn prefixes [path]
   "(1 2 3) -> ([1] [1 2] [1 2 3])"
