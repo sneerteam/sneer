@@ -31,19 +31,15 @@
           
             packets-in
             (do
-              #_(println "Packet in: " v)
               (match v
                 {:intent :send :data data}
                 (do
                   (>! received data)
                   (>! packets-out {:intent :ack :hash (hash-fn data)})
-                  #_(println ">>>>>>>>>>>ACK sent")
                   (recur packet-out time-to-send))
               
                 {:intent :ack :hash hash}
                 (do
-                  #_(println ">>>>>>>>>>>>>packet-out " packet-out)
-                  #_(println hash " " (-> packet-out :data hash-fn) " " (= hash (-> packet-out :data hash-fn)))
                   (if (and packet-out (= hash (-> packet-out :data hash-fn)))
                     (recur nil nil)
                     (recur packet-out time-to-send)))
