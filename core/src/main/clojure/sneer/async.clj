@@ -1,7 +1,17 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go]]))
+  (:require [clojure.core.async :as async :refer [chan go remove< >! <!]]))
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
+
+(defn distinct-until-changed< [ch]
+  (let [ret (chan)]
+    (go-trace
+      (loop [previous nil]
+        (when-some [v (<! ch)]
+          (when-not (= v previous)
+            (>! ret v))
+          (recur v))))
+    ret))
 
 (defn dropping-chan [& [n]]
   (chan (async/dropping-buffer (or n 1))))
