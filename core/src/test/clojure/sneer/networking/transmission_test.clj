@@ -7,52 +7,66 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-#_(facts
-   "About value transmission"
+(facts
+ "About value transmission"
 
-   (let [tuples-a (mapv #(do {:id % :some-field (str "Value A " %)}) (range 0 4))
-         tuples-b (mapv #(do {:id % :some-field (str "Value B " %)}) (range 0 4))
+ (let [arr (fn [b] (doto (byte-array 100) (java.util.Arrays/fill (byte b))))
+       arr? (fn [b] (fn [actual] (= (seq (arr b)) (seq actual))))
+       hash-fn (fn [bytes] (aget bytes 0))
+       
+       to-b   (chan 10)
+       from-b (chan 10)
+       lease-a (chan)
+
+       to-a   (chan 10)
+       from-a (chan 10)
+       lease-b (chan)
+
+       packets-ab (chan 1)
+       packets-ba (chan 1)
         
-         to-b   (chan 10)
-         from-b (chan 10)
-         lease-a (chan)
+       a (start-transciever to-b from-b packets-ab packets-ba hash-fn lease-a)
+       b (start-transciever to-a from-a packets-ba packets-ab hash-fn lease-b)]
 
-         to-a   (chan 10)
-         from-a (chan 10)
-         lease-b (chan)
-
-         packets-ab (chan)
-         packets-ba (chan)
-        
-         a (start-transciever to-b from-b packets-ab packets-ba lease-a)
-         b (start-transciever to-a from-a packets-ba packets-ab lease-b)]
-
-     (with-redefs [new-retry-timeout (constantly IMMEDIATELY)]
+   (with-redefs [new-retry-timeout (constantly (chan))]
     
-       (fact
-         "One value is transmitted from A to B"
-         (>!! to-b (tuples-a 0))
-         (<!!? from-a) => (tuples-a 0))
+     (fact
+      "One value is transmitted from A to B"
+      (>!! to-b (arr 0))
+      (<!!? from-a) => (arr? 0))
 
-       (fact
-         "One value is transmitted from B to A"
-         (>!! to-a :b1)
-         (<!!? from-b) => :b1)
+     (fact
+     "Another value is transmitted from A to B"
+     (>!! to-b (arr 42))
+     (<!!? from-a) => (arr? 42))
 
-       (fact
-         "Several values are transmitted in both directions"
-         (>!! to-b (tuples-a 1))
-         (>!! to-a (tuples-b 1))
-         (>!! to-b (tuples-a 2))
-         (>!! to-a (tuples-b 2))
-         (>!! to-a (tuples-b 3))
-         (>!! to-b (tuples-a 3))
-         (doseq [ta (rest tuples-a)] (<!!? from-a) => ta)
-         (doseq [tb (rest tuples-b)] (<!!? from-b) => tb))
+     (fact
+       "One value is transmitted from B to A"
+       (>!! to-a (arr 100))
+       (<!!? from-b) => (arr? 100))
 
-       (fact
-         "Transceivers close when lease is closed"
-         (close! lease-a)
-         (<!!? (async/filter< nil? a)) => nil
-         (close! lease-b)
-         (<!!? (async/filter< nil? b)) => nil))))
+     (fact
+      "Several values are transmitted in both directions"
+      (>!! to-b (arr   1))
+      (>!! to-a (arr 101))
+      (>!! to-b (arr   2))
+      (>!! to-a (arr 102))
+      (>!! to-a (arr 103))
+      (>!! to-b (arr   3))
+      (<!!? from-a) => (arr?   1)
+      (<!!? from-a) => (arr?   2)
+      (<!!? from-a) => (arr?   3)
+      (<!!? from-b) => (arr? 101)
+      (<!!? from-b) => (arr? 102)
+      (<!!? from-b) => (arr? 103))
+
+     (fact
+      "Transceivers close when lease is closed"
+      (close! lease-a)
+      (<!!? (async/filter< nil? a)) => nil
+      (close! lease-b)
+      (<!!? (async/filter< nil? b)) => nil)
+     
+     #_(fact
+        "Retry IMMEDIATELY"
+        "Retry" => "IMMEDIATELY"))))

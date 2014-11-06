@@ -3,52 +3,50 @@
             [clojure.core.match :refer [match]]
             [clojure.core.async :as async :refer [<! >! >!! <!! chan go-loop alts!]]))
 
+(defn- handle-packet []
+  )
+
 (defn new-retry-timeout [] (async/timeout 3000))
 
-(defn start-transciever [tuples-to-send tuples-received packets-out packets-in lease]
+(defn start-transciever [to-send received packets-out packets-in hash-fn lease]
   "'A transceiver is a device comprising both a transmitter and a receiver which are combined and share common circuitry'"
-  (let [channels [packets-in lease]]
-      
+  (let [inputs [packets-in lease]]
     (go-trace
-      (loop [tuple nil
+      (loop [packet-out nil
              time-to-send nil]
-        (let [channels (conj channels (if tuple time-to-send tuples-to-send))
-              [c v] (alts! channels)]
-          (case c
+        (let [channels (conj inputs (if packet-out time-to-send to-send))
+              [v c] (alts! channels)]
+          (condp identical? c
           
-            tuples-to-send
-            (recur v IMMEDIATELY)
+            to-send
+            (recur {:intent :send :data v} IMMEDIATELY)
           
             time-to-send
             (do
-              (>! packets-out {:intent :send :tuple tuple})
-              (recur tuple (new-retry-timeout)))
+              (>! packets-out packet-out)
+              (recur packet-out (new-retry-timeout)))
           
             lease
             :closed
           
-          
-          
-            )
-          )
-      
-      
-        )
-      ))
-  
-  
-  #_(go-while-let [tuple (<! tuples-to-send)]
-     (let [id (:id tuple)]
-       (loop [time-to-send IMMEDIATELY]
-         (alt! :priority true
+            packets-in
+            (do
+              #_(println "Packet in: " v)
+              (match v
+                {:intent :send :data data}
+                (do
+                  (>! received data)
+                  (>! packets-out {:intent :ack :hash (hash-fn data)})
+                  #_(println ">>>>>>>>>>>ACK sent")
+                  (recur packet-out time-to-send))
+              
+                {:intent :ack :hash hash}
+                (do
+                  #_(println ">>>>>>>>>>>>>packet-out " packet-out)
+                  #_(println hash " " (-> packet-out :data hash-fn) " " (= hash (-> packet-out :data hash-fn)))
+                  (if (and packet-out (= hash (-> packet-out :data hash-fn)))
+                    (recur nil nil)
+                    (recur packet-out time-to-send)))
 
-           packets-in
-           ([packet] (when packet
-                       (match packet
-                          {:intent :ack :id id} :ok
-                          :else (recur time-to-send))))
-
-           time-to-send
-           ([_] (do
-                  (>! packets-out {:intent :send :tuple tuple})
-                  (recur (new-retry-timeout)))))))))
+                :else
+                (recur packet-out time-to-send)))))))))
