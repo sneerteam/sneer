@@ -2,7 +2,7 @@
   (:require
    [clojure.core.async :as async :refer [>! <!]]
    [clojure.core.match :refer [match]]
-   [sneer.server.core :as core :refer [go-while-let]]))
+   [sneer.async :refer [go-while-let]]))
 
 (defn timeout-for [transition]
   (async/timeout
