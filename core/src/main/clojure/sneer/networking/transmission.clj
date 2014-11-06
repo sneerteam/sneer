@@ -15,7 +15,7 @@
       (loop [packet-out nil
              time-to-send nil]
         (let [channels (conj inputs (if packet-out time-to-send to-send))
-              [v c] (alts! channels)]
+              [v c] (alts! channels :priority true)]
           (condp identical? c
           
             to-send

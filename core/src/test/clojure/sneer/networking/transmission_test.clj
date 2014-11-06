@@ -29,7 +29,7 @@
        a (start-transciever to-b raw-from-b packets-ab packets-ba hash-fn lease-a)
        b (start-transciever to-a raw-from-a packets-ba packets-ab hash-fn lease-b)]
 
-   (with-redefs [new-retry-timeout (constantly (chan))]
+   (with-redefs [new-retry-timeout (constantly IMMEDIATELY)]
     
      (fact
       "One value is transmitted from A to B"
