@@ -10,15 +10,16 @@
 (facts
  "About value transmission"
 
- (let [arr (fn [b] (doto (byte-array 100) (java.util.Arrays/fill (byte b))))
-       arr? (fn [b] (fn [actual] (= (seq (arr b)) (seq actual))))
-       hash-fn (fn [bytes] (aget bytes 0))
+ (let [data (fn [d] [d d d])
+       hash-fn (fn [data] (data 0))
        
        to-b   (chan 10)
+;       from-b (distinct-until-changed< (chan 10))
        from-b (chan 10)
        lease-a (chan)
 
        to-a   (chan 10)
+;       from-a (distinct-until-changed< (chan 10))
        from-a (chan 10)
        lease-b (chan)
 
@@ -32,33 +33,33 @@
     
      (fact
       "One value is transmitted from A to B"
-      (>!! to-b (arr 0))
-      (<!!? from-a) => (arr? 0))
+      (>!! to-b (data 0))
+      (<!!? from-a) => (data 0))
 
      (fact
      "Another value is transmitted from A to B"
-     (>!! to-b (arr 42))
-     (<!!? from-a) => (arr? 42))
+     (>!! to-b (data 42))
+     (<!!? from-a) => (data 42))
 
      (fact
        "One value is transmitted from B to A"
-       (>!! to-a (arr 100))
-       (<!!? from-b) => (arr? 100))
+       (>!! to-a (data 100))
+       (<!!? from-b) => (data 100))
 
      (fact
       "Several values are transmitted in both directions"
-      (>!! to-b (arr   1))
-      (>!! to-a (arr 101))
-      (>!! to-b (arr   2))
-      (>!! to-a (arr 102))
-      (>!! to-a (arr 103))
-      (>!! to-b (arr   3))
-      (<!!? from-a) => (arr?   1)
-      (<!!? from-a) => (arr?   2)
-      (<!!? from-a) => (arr?   3)
-      (<!!? from-b) => (arr? 101)
-      (<!!? from-b) => (arr? 102)
-      (<!!? from-b) => (arr? 103))
+      (>!! to-b (data   1))
+      (>!! to-a (data 101))
+      (>!! to-b (data   2))
+      (>!! to-a (data 102))
+      (>!! to-a (data 103))
+      (>!! to-b (data   3))
+      (<!!? from-a) => (data   1)
+      (<!!? from-a) => (data   2)
+      (<!!? from-a) => (data   3)
+      (<!!? from-b) => (data 101)
+      (<!!? from-b) => (data 102)
+      (<!!? from-b) => (data 103))
 
      (fact
       "Transceivers close when lease is closed"
