@@ -14,20 +14,20 @@
        hash-fn (fn [data] (data 0))
        
        to-b   (chan 10)
-;       from-b (distinct-until-changed< (chan 10))
-       from-b (chan 10)
+       raw-from-b (chan 10)
+       from-b (distinct-until-changed< raw-from-b)
        lease-a (chan)
 
        to-a   (chan 10)
-;       from-a (distinct-until-changed< (chan 10))
-       from-a (chan 10)
+       raw-from-a (chan 10)
+       from-a (distinct-until-changed< raw-from-a)
        lease-b (chan)
 
        packets-ab (chan 1)
        packets-ba (chan 1)
         
-       a (start-transciever to-b from-b packets-ab packets-ba hash-fn lease-a)
-       b (start-transciever to-a from-a packets-ba packets-ab hash-fn lease-b)]
+       a (start-transciever to-b raw-from-b packets-ab packets-ba hash-fn lease-a)
+       b (start-transciever to-a raw-from-a packets-ba packets-ab hash-fn lease-b)]
 
    (with-redefs [new-retry-timeout (constantly (chan))]
     
