@@ -18,7 +18,7 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
 			toast("No GPS available");
@@ -28,7 +28,7 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 
 		locationManager.requestLocationUpdates(GPS_PROVIDER, TEN_SECONDS, 0, this);
 	}
-	
+
 
 	@Override
 	public void onLocationChanged(Location location) {
@@ -37,12 +37,12 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 
 		Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.map);
 		byte[] imageBytes = scaledDownTo(bitmap, 20 * 1024);
-		
+
 		send(url, null, imageBytes);
 		finish();
 	}
-	
-	
+
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -51,9 +51,9 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 		locationManager = null;
 	}
 
-	
+
 	@Override public void onProviderDisabled(String arg0) {}
 	@Override public void onProviderEnabled(String arg0) {}
 	@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-	
+
 }

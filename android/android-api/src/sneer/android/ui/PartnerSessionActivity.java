@@ -22,72 +22,72 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 		super.onCreate(savedInstanceState);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(RESULT_RECEIVER, new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle data) {
-			
+
 			data.setClassLoader(getApplicationContext().getClassLoader());
-			
+
 			final String partnerName = data.getString(PARTNER_NAME);
-			
+
 			if (partnerName != null) {
 				runOnUiThread(new Runnable() { @Override public void run() {
 					onPartnerName(partnerName);
 				}});
 			}
-			
+
 			boolean replayFinished = data.getBoolean(REPLAY_FINISHED);
 			if (replayFinished) {
 				isReplaying = false;
 			}
-			
+
 			Object messageEnvelope = data.get(PAYLOAD);
-			
+
 			if (messageEnvelope != null) {
 				Object message = ((Value)messageEnvelope).get();
 				boolean mine = data.getBoolean(OWN);
-				
+
 				if (mine)
 					onMessageToPartner(message);
 				else
-					onMessageFromPartner(message);				
+					onMessageFromPartner(message);
 			}
-			
+
 			if (!isReplaying) {
 				runOnUiThread(new Runnable() {  @Override public void run() {
 					update();
 				}});
-			}			
+			}
 		}}));
-		
+
 		toSneer = getExtra(RESULT_RECEIVER);
 		toSneer.send(0, bundle);
 	}
-	
-	
+
+
 	@Override
-	protected void onDestroy() {		
+	protected void onDestroy() {
 		if (toSneer != null) {
 			Bundle bundle = new Bundle();
 			bundle.putBoolean(UNSUBSCRIBE, true);
 			toSneer.send(0, bundle);
 		}
-		
-		super.onDestroy();		
+
+		super.onDestroy();
 	}
-	
-	
+
+
 
 	/** Called in the Android main thread (UI thread).
 	 *  @param name The current name of the peer with you in this session. */
 	protected void onPartnerName(String name) {};
 
-	
+
 	protected void send(String label, Object message) {
 		SneerAndroidClient.send(toSneer, label, message, null);
 	}
 	protected abstract void onMessageToPartner(Object message);
-	
+
 	protected abstract void onMessageFromPartner(Object message);
 
-	
+
 	/**
 	 * Called in the Android main thread (UI thread) after each message, if it is the most recent message in the session. This method will
 	 * not be called, therefore, when previous messages in the session are being replayed.
