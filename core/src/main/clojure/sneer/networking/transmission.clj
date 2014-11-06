@@ -37,18 +37,18 @@
       ))
   
   
-  (go-while-let [tuple (<! tuples-to-send)]
-    (let [id (:id tuple)]
-      (loop [time-to-send IMMEDIATELY]
-        (alt! :priority true
+  #_(go-while-let [tuple (<! tuples-to-send)]
+     (let [id (:id tuple)]
+       (loop [time-to-send IMMEDIATELY]
+         (alt! :priority true
 
-          packets-in
-          ([packet] (when packet
-                      (match packet
-                         {:intent :ack :id id} :ok
-                         :else (recur time-to-send))))
+           packets-in
+           ([packet] (when packet
+                       (match packet
+                          {:intent :ack :id id} :ok
+                          :else (recur time-to-send))))
 
-          time-to-send
-          ([_] (do
-                 (>! packets-out {:intent :send :tuple tuple})
-                 (recur (new-retry-timeout)))))))))
+           time-to-send
+           ([_] (do
+                  (>! packets-out {:intent :send :tuple tuple})
+                  (recur (new-retry-timeout)))))))))
