@@ -140,7 +140,7 @@ public final class PartnerSession implements PluginSession {
 		return sneer.tupleSpace().filter()
 			.field("session", sessionId)
 			.field("host", host)
-			.type(plugin.tupleType());
+			.field("message-type", plugin.tupleType());
 	}
 	
 
