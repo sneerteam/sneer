@@ -5,3 +5,4 @@ libs
 /.gradle
 *.log
 /classes/
+.gradletasknamecache
