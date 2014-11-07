@@ -1,5 +1,7 @@
 package sneer.android.test;
 
+import rx.Observable;
+import rx.functions.Action1;
 import sneer.android.ui.MainActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -49,21 +51,25 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 		// Go to ConversationActivity
 		solo.clickInList(1);
 
-		// send text
-		solo.typeText(0, "This is a test");
+		sendSomeMessages();
+
+//		// send location
 		solo.clickOnImageButton(0);
-
-		// send location
-		solo.clickOnImage(0);
 		solo.clickInList(2);
-
+//
 		backToConversationList();
-
 	}
 
 	private void backToConversationList() {
 		// Go back to first activity
 		solo.goBackToActivity("MainActivity");
+	}
+
+	private void sendSomeMessages() {
+		Observable.range(1, 10).subscribe(new Action1<Integer>() { @Override public void call(Integer t1) {
+			solo.typeText(0, "This is a test " + t1);
+			solo.clickOnImageButton(0);
+		}});
 	}
 
 }
