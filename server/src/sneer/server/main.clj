@@ -4,12 +4,12 @@
             [clojure.core.async :as async])
   (:gen-class))
 
-(def home-dir (System/getProperty "user.home"))
+#_(def home-dir (System/getProperty "user.home"))
 
-(defn storage-dir [args]
-  (if (nil? args)
-    home-dir
-    (first args)))
+#_(defn storage-dir [args]
+   (if (nil? args)
+     home-dir
+     (first args)))
 
 (defn update-puk-address [puk->address [address payload]]
   (let [puk (:from payload)]
