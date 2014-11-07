@@ -21,7 +21,7 @@ public abstract class LocalTuplesFactory {
 
 		public TupleImpl() {
 		}
-		
+
 		@Override
 		public TupleImpl clone() {
 			TupleImpl t = new TupleImpl();
@@ -60,25 +60,25 @@ public abstract class LocalTuplesFactory {
 		}
 
 	}
-	
+
 	protected Tuple newTupleFromMap(Map<String, Object> map) {
 		TupleImpl t = new TupleImpl();
 		t.putAll(map);
 		return t;
 	}
-	
+
 	protected class TupleSpaceImpl implements TupleSpace {
-		
-		
-		private PrivateKey identity; int isThisNecessary;
+
+
+		private final PrivateKey identity; int isThisNecessary;
 
 		protected final class TupleSubscriberImpl implements TupleFilter {
-			
-			private Map<String, Object> where = new HashMap<String, Object>();
-			
+
+			private final Map<String, Object> where = new HashMap<String, Object>();
+
 			public TupleSubscriberImpl() {
 			}
-			
+
 			public TupleSubscriberImpl(TupleSubscriberImpl other, String key, Object value) {
 				where.putAll(other.where);
 				where.put(key, value);
@@ -129,15 +129,15 @@ public abstract class LocalTuplesFactory {
 		}
 
 		private final class TuplePublisherImpl implements TuplePublisher {
-			private TupleImpl prototype = new TupleImpl();
-			
+			private final TupleImpl prototype = new TupleImpl();
+
 			public TuplePublisherImpl() {
 			}
 
 			public TuplePublisherImpl(TuplePublisherImpl other) {
 				prototype.putAll(other.prototype);
 			}
-			
+
 			public TuplePublisherImpl(TuplePublisherImpl other, String key, Object value) {
 				this(other);
 				prototype.put(key, value);
@@ -150,8 +150,8 @@ public abstract class LocalTuplesFactory {
 			}
 
 			@Override
-			public void call(Object t1) {
-				pub(t1);
+			public void call(Object value) {
+				pub(value);
 			}
 
 			@Override
@@ -173,7 +173,7 @@ public abstract class LocalTuplesFactory {
 			public TuplePublisher payload(Object value) {
 				return field("payload", value);
 			}
-			
+
 			@Override
 			public TuplePublisher type(String type) {
 				return field("type", type);
@@ -214,11 +214,11 @@ public abstract class LocalTuplesFactory {
 	}
 
 	abstract protected void publishTuple(Tuple ret);
-	
+
 	abstract protected Observable<Tuple> query(PrivateKey identity, Map<String, Object> criteria);
-	
+
 	abstract protected Observable<Tuple> queryLocal(PrivateKey identity, Map<String, Object> criteria);
-	
+
 	public TupleSpace newTupleSpace(PrivateKey prik) {
 		return new TupleSpaceImpl(prik);
 	}

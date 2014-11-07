@@ -29,26 +29,26 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 
 public final class PartnerSession implements PluginSession {
-	
+
 	private static AtomicLong nextSessionId = new AtomicLong(Clock.now());
-	
+
 	private PublicKey host;
 	private PublicKey partner;
 	private long sessionId;
 	private Tuple lastLocalTuple = null;
-	private Sneer sneer;
-	private PluginHandler plugin;
-	private Context context;
-	private CompositeSubscription subscriptions = new CompositeSubscription();
+	private final Sneer sneer;
+	private final PluginHandler plugin;
+	private final Context context;
+	private final CompositeSubscription subscriptions = new CompositeSubscription();
 
-	
+
 	PartnerSession(Context context, Sneer sneer, PluginHandler app) {
 		this.context = context;
 		this.sneer = sneer;
-		this.plugin = app;
+		plugin = app;
 	}
-	
-	
+
+
 	private void sendMessage(ResultReceiver toClient, Tuple tuple) {
 		Bundle data = new Bundle();
 		data.putString(TEXT, (String) tuple.get("text"));
@@ -56,34 +56,34 @@ public final class PartnerSession implements PluginSession {
 		data.putParcelable(PAYLOAD, Value.of(tuple.payload()));
 		toClient.send(0, data);
 	}
-	
+
 
 	private void sendReplayFinished(ResultReceiver toClient) {
 		Bundle data = new Bundle();
 		data.putBoolean(REPLAY_FINISHED, true);
 		toClient.send(0, data);
 	}
-	
-	
+
+
 	private void sendError(ResultReceiver toClient, Throwable throwable) {
 		Bundle data = new Bundle();
 		data.putString(ERROR, "Internal error (" + throwable.getMessage() + ")");
 		toClient.send(0, data);
 	}
-	
-	
+
+
 	private void sendPartnerName(ResultReceiver toClient, String partnerName) {
 		Bundle bundle = new Bundle();
 		bundle.putString(PARTNER_NAME, partnerName);
 		toClient.send(Activity.RESULT_OK, bundle);
 	}
-	
+
 
 	protected SharedResultReceiver createResultReceiver() {
 		return new SharedResultReceiver(new SharedResultReceiver.Callback() { @Override public void call(Bundle resultData) {
 			resultData.setClassLoader(context.getClassLoader());
 			final ResultReceiver toClient = resultData.getParcelable(RESULT_RECEIVER);
-			
+
 			if (toClient != null) {
 				setup(toClient);
 			} else if(resultData.getBoolean(UNSUBSCRIBE)) {
@@ -93,36 +93,36 @@ public final class PartnerSession implements PluginSession {
 			}
 		}});
 	}
-	
+
 
 	private void setup(final ResultReceiver toClient) {
 		pipePartnerName(toClient);
 		pipeMessages(toClient);
 	}
-	
-	
+
+
 	private void pipeMessages(final ResultReceiver toClient) {
 		subscriptions.add(queryTuples().localTuples()
-			.subscribe(new Action1<Tuple>() { @Override public void call(Tuple t1) {
-				lastLocalTuple = t1;
-				sendMessage(toClient, t1);
+			.subscribe(new Action1<Tuple>() { @Override public void call(Tuple tuple) {
+				lastLocalTuple = tuple;
+				sendMessage(toClient, tuple);
 			}},
-			new Action1<Throwable>() { @Override public void call(Throwable t1) {
-				sendError(toClient, t1);
+			new Action1<Throwable>() { @Override public void call(Throwable throwable) {
+				sendError(toClient, throwable);
 			}},
 			new Action0() { @Override public void call() {
 				sendReplayFinished(toClient);
 				pipeNewTuples(toClient);
 			}}));
 	}
-	
+
 
 	private void pipePartnerName(final ResultReceiver toClient) {
 		subscriptions.add(sneer.produceParty(partner).name().subscribe(new Action1<String>() { @Override public void call(String partnerName) {
 			sendPartnerName(toClient, partnerName);
 		}}));
 	}
-	
+
 
 	private void publish(String text, Object message) {
 		sneer.tupleSpace().publisher()
@@ -134,7 +134,7 @@ public final class PartnerSession implements PluginSession {
 			.field("text", text)
 			.pub(message);
 	}
-	
+
 
 	private TupleFilter queryTuples() {
 		return sneer.tupleSpace().filter()
@@ -142,36 +142,36 @@ public final class PartnerSession implements PluginSession {
 			.field("host", host)
 			.field("message-type", plugin.tupleType());
 	}
-	
+
 
 	private void pipeNewTuples(final ResultReceiver toClient) {
 		subscriptions.add(queryTuples().tuples()
-			.filter(new Func1<Tuple, Boolean>() { @Override public Boolean call(Tuple t1) {
+			.filter(new Func1<Tuple, Boolean>() { @Override public Boolean call(Tuple tuple) {
 				if (lastLocalTuple != null) {
-					if (lastLocalTuple.equals(t1)) {
+					if (lastLocalTuple.equals(tuple)) {
 						lastLocalTuple = null;
 					}
 					return false;
 				}
 				return true;
 			}})
-			.subscribe(new Action1<Tuple>() { @Override public void call(Tuple t1) {
-				sendMessage(toClient, t1);
+			.subscribe(new Action1<Tuple>() { @Override public void call(Tuple tuple) {
+				sendMessage(toClient, tuple);
 			}}));
 	}
-	
- 
+
+
 	private void startActivity() {
 		context.startActivity(createIntent());
 	}
-	
+
 
 	private Intent createIntent() {
 		Intent intent = plugin.createIntent();
 		intent.putExtra(RESULT_RECEIVER, createResultReceiver());
 		return intent;
 	}
-	
+
 
 	@Override
 	public Intent createResumeIntent(Tuple tuple) {
@@ -180,7 +180,7 @@ public final class PartnerSession implements PluginSession {
 		partner = tuple.author().equals(sneer.self().publicKey().current()) ? tuple.audience() : tuple.author();
 		return createIntent();
 	}
-	
+
 
 	@Override
 	public void startNewSessionWith(PublicKey partner) {

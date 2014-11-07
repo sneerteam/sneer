@@ -93,8 +93,8 @@ public class TupleSpaceService extends Service {
 
 		Subscription s = tuples.doOnCompleted(new Action0() { @Override public void call() {
 			resultReceiver.send(ON_COMPLETED.ordinal(), new Bundle());
-		}}).subscribe(new Action1<Tuple>() { @Override public void call(Tuple t1) {
-			resultReceiver.send(ON_NEXT.ordinal(), bundle(serializer.serialize(new HashMap<String, Object>(t1))));
+		}}).subscribe(new Action1<Tuple>() { @Override public void call(Tuple tuple) {
+			resultReceiver.send(ON_NEXT.ordinal(), bundle(serializer.serialize(new HashMap<String, Object>(tuple))));
 		}});
 
 		subscriptions.put(id, s);

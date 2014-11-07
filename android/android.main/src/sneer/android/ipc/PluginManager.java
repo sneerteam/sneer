@@ -20,8 +20,8 @@ import android.graphics.drawable.Drawable;
 public class PluginManager {
 
 	private static Map<String, PluginHandler> tupleViewers = new HashMap<String, PluginHandler>();
-	
-	private Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>>() { @Override public Observable<List<ConversationMenuItem>> call(List<PluginHandler> apps) {
+
+	private final Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>> fromSneerPluginInfoList = new Func1<List<PluginHandler>, Observable<List<ConversationMenuItem>>>() { @Override public Observable<List<ConversationMenuItem>> call(List<PluginHandler> apps) {
 		return Observable.from(apps)
 			.filter(new Func1<PluginHandler, Boolean>() { @Override public Boolean call(PluginHandler handler) {
 				return handler.canCompose();
@@ -33,23 +33,23 @@ public class PluginManager {
 	}};
 
 	Context context;
-	private Sneer sneer;
-	
-	
+	private final Sneer sneer;
+
+
 	public PluginManager(Context context, Sneer sneer) {
 		this.context = context;
 		this.sneer = sneer;
 	}
 
-	
+
 	static byte[] bitmapFor(Drawable icon) {
 		Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 		return stream.toByteArray();
 	}
-	
-	
+
+
 	public void initPlugins() {
 		PluginMonitor.initialDiscovery(context, sneer);
 		PluginMonitor.plugins()
@@ -57,10 +57,10 @@ public class PluginManager {
 			.subscribe(new Action1<List<ConversationMenuItem>>() { @Override public void call(List<ConversationMenuItem> menuItems) {
 				sneer.setConversationMenuItems(menuItems);
 			}});
-		
+
 		PluginMonitor.plugins()
-			.flatMap(new Func1<List<PluginHandler>, Observable<Map<String, PluginHandler>>>() { @Override public Observable<Map<String, PluginHandler>> call(List<PluginHandler> t1) {
-				return Observable.from(t1)
+			.flatMap(new Func1<List<PluginHandler>, Observable<Map<String, PluginHandler>>>() { @Override public Observable<Map<String, PluginHandler>> call(List<PluginHandler> handlers) {
+				return Observable.from(handlers)
 						.filter(new Func1<PluginHandler, Boolean>() { @Override public Boolean call(PluginHandler handler) {
 							return handler.canView();
 						}})
@@ -68,17 +68,17 @@ public class PluginManager {
 							return handler.tupleType();
 						}});
 			}})
-			.subscribe(new Action1<Map<String, PluginHandler>>() { @Override public void call(Map<String, PluginHandler> t1) {
-				tupleViewers = t1;
-			}});			
+			.subscribe(new Action1<Map<String, PluginHandler>>() { @Override public void call(Map<String, PluginHandler> handlers) {
+				tupleViewers = handlers;
+			}});
 	}
-	
-	
+
+
 	public boolean isClickable(Message message) {
 		return tupleViewers.containsKey(message.tuple().get("message-type"));
 	}
 
-	
+
 	public void doOnClick(Message message) {
 		Tuple tuple = message.tuple();
 		PluginHandler viewer = tupleViewer((String)tuple.get("message-type"));
@@ -88,7 +88,7 @@ public class PluginManager {
 		context.startActivity(viewer.resume(tuple));
 	}
 
-	
+
 	public PluginHandler tupleViewer(String type) {
 		return tupleViewers.get(type);
 	}

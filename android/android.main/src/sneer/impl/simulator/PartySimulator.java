@@ -1,16 +1,21 @@
 package sneer.impl.simulator;
 
-import static sneer.Contact.*;
-import static sneer.commons.Streams.*;
-import static sneer.commons.exceptions.Exceptions.*;
+import static sneer.Contact.TO_NICKNAME;
+import static sneer.commons.Streams.readFully;
+import static sneer.commons.exceptions.Exceptions.check;
 
-import java.io.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import rx.*;
-import rx.functions.*;
-import sneer.*;
-import sneer.rx.*;
+import rx.Observable;
+import rx.functions.Func1;
+import sneer.Contact;
+import sneer.Party;
+import sneer.Profile;
+import sneer.PublicKey;
+import sneer.Sneer;
+import sneer.rx.Observed;
+import sneer.rx.ObservedSubject;
 
 
 public class PartySimulator implements Party, Profile {
@@ -20,8 +25,8 @@ public class PartySimulator implements Party, Profile {
 
 	/** Profile */
 	private Sneer sneer;
-	
-	
+
+
 	PartySimulator(PublicKey puk) {
 		this(puk, true);
 	}
@@ -34,7 +39,7 @@ public class PartySimulator implements Party, Profile {
 
 
 	PartySimulator(PublicKey puk, boolean isSelf) {
-		this.publicKey = ObservedSubject.create(puk);
+		publicKey = ObservedSubject.create(puk);
 		this.isSelf = isSelf;
 	}
 
@@ -44,28 +49,28 @@ public class PartySimulator implements Party, Profile {
 		return publicKey.observed();
 	}
 
-	
+
 	/////////////////////// Profile
 
 	@Override
 	public Observable<String> ownName() {
-		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
-			return "ownName " + t1;
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long interval) {
+			return "ownName " + interval;
 		}});
 	}
 
-	
+
 	@Override
 	public void setOwnName(String newName) {
 		check(isSelf);
 		System.out.println("================> setOwnName() called");
 	}
 
-	
+
 	@Override
 	public Observable<String> preferredNickname() {
-		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
-			return "preferredNickname " + t1;
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long interval) {
+			return "preferredNickname " + interval;
 		}});
 	}
 
@@ -78,18 +83,18 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public Observable<byte[]> selfie() {
-		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, byte[]>() { @Override public byte[] call(Long t1) {
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, byte[]>() { @Override public byte[] call(Long interval) {
 			String file;
-			boolean isEven = t1 % 2 == 0;
+			boolean isEven = interval % 2 == 0;
 			if (isEven)
 				file = "selfie_001.png";
 			else
 				file = "selfie_002.png";
-					
+
 			return selfieFromFileSystem(file);
 		}});
 	}
-	
+
 
 	@Override
 	public void setSelfie(byte[] newSelfie) {
@@ -100,8 +105,8 @@ public class PartySimulator implements Party, Profile {
 
 	@Override
 	public Observable<String> city() {
-		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
-			return "city " + t1;
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long interval) {
+			return "city " + interval;
 		}});
 	}
 
@@ -112,15 +117,15 @@ public class PartySimulator implements Party, Profile {
 		System.out.println("================> setCity() called");
 	}
 
-	
+
 	@Override
 	public Observable<String> country() {
-		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long t1) {
-			return "country " + t1;
+		return Observable.interval(3, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long interval) {
+			return "country " + interval;
 		}});
 	}
-	
-	
+
+
 	@Override
 	public void setCountry(String newCountry) {
 		check(isSelf);
@@ -132,7 +137,7 @@ public class PartySimulator implements Party, Profile {
 	public Observable<String> name() {
 		return ownName().first().concatWith(nickname());
 	}
-	
+
 
 	private Observable<String> nickname() {
 		return sneer.contacts().map(new Func1<Object, Contact>() { @Override public Contact call(Object ignored) {
@@ -141,13 +146,13 @@ public class PartySimulator implements Party, Profile {
 			return found != null;
 		}}).flatMap(TO_NICKNAME);
 	}
-	
+
 
 	private Contact findContact() {
 		return sneer.findContact(this);
 	}
-	
-	
+
+
 	private byte[] selfieFromFileSystem(String fileName) {
 		byte[] ret = null;
 		try {
