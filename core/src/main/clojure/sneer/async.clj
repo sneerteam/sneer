@@ -3,16 +3,6 @@
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
 
-(defn distinct-until-changed< [ch]
-  (let [ret (chan)]
-    (go-trace
-      (loop [previous nil]
-        (when-some [v (<! ch)]
-          (when-not (= v previous)
-            (>! ret v))
-          (recur v))))
-    ret))
-
 (defn dropping-chan [& [n]]
   (chan (async/dropping-buffer (or n 1))))
 
@@ -42,3 +32,13 @@
   `(go-trace
      (while-let ~binding
                 ~@forms)))
+
+(defn distinct-until-changed< [ch]
+  (let [ret (chan)]
+    (go-trace
+      (loop [previous nil]
+        (when-some [v (<! ch)]
+          (when-not (= v previous)
+            (>! ret v))
+          (recur v))))
+    ret))
