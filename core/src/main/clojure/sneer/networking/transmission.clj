@@ -1,10 +1,8 @@
 (ns sneer.networking.transmission
   (:require [sneer.async :refer [go-while-let go-trace IMMEDIATELY]]
+            [sneer.commons :refer [byte-array=]]
             [clojure.core.match :refer [match]]
             [clojure.core.async :as async :refer [<! >! >!! <!! chan go-loop alts!]]))
-
-(defn- handle-packet []
-  )
 
 (defn new-retry-timeout [] (async/timeout 3000))
 
@@ -40,7 +38,7 @@
               
                 {:intent :ack :hash hash}
                 (do
-                  (if (and packet-out (= hash (-> packet-out :data hash-fn)))
+                  (if (and packet-out (byte-array= hash (-> packet-out :data hash-fn)))
                     (recur nil nil)
                     (recur packet-out time-to-send)))
 

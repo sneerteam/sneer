@@ -1,5 +1,8 @@
 (ns sneer.commons)
 
+(defn byte-array= [^bytes a1 ^bytes a2]
+  (java.util.Arrays/equals a1 a2))
+
 (defn produce! [fn-if-absent map-atom key]
   (let [existing (get @map-atom key)]
     (if (some? existing)

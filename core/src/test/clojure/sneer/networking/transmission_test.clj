@@ -3,7 +3,8 @@
             [sneer.networking.transmission :refer [start-transciever new-retry-timeout]]
             [sneer.async :refer :all]
             [sneer.test-util :refer :all]
-            [clojure.core.async :as async :refer [chan >!! <! go-loop close!]]))
+            [clojure.core.async :as async :refer [chan >!! <! go-loop close!]])
+  (:import sneer.crypto.impl.Hashes))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
@@ -11,7 +12,7 @@
  "About value transmission"
 
  (let [data (fn [d] [d d d])
-       hash-fn (fn [data] (data 0))
+       hash-fn (fn [data] (Hashes/sha256 (into-array Byte/TYPE data)))
        
        to-b   (chan 10)
        raw-from-b (chan 10)
