@@ -7,7 +7,7 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-(facts
+(tabular
  "About value transmission"
 
  (let [data (fn [d] [d d d])
@@ -23,9 +23,9 @@
        from-a (distinct-until-changed< raw-from-a)
        lease-b (chan)
 
-       packets-ab (chan 1)
-       packets-ba (chan 1)
-        
+       packets-ab (compromised (chan 1) ?failure-rate)
+       packets-ba (compromised (chan 1) ?failure-rate)
+
        a (start-transciever to-b raw-from-b packets-ab packets-ba hash-fn lease-a)
        b (start-transciever to-a raw-from-a packets-ba packets-ab hash-fn lease-b)]
 
@@ -66,8 +66,9 @@
       (close! lease-a)
       (<!!? (async/filter< nil? a)) => nil
       (close! lease-b)
-      (<!!? (async/filter< nil? b)) => nil)
-     
-     #_(fact
-        "Retry IMMEDIATELY"
-        "Retry" => "IMMEDIATELY"))))
+      (<!!? (async/filter< nil? b)) => nil)))
+ 
+     ?failure-rate
+     0
+     0.5
+ )

@@ -11,8 +11,10 @@
     (timeout 200) false
     [[ch v]] true))
 
-(defn compromised [ch]
-  (filter> (fn [_] (> (rand) 0.7)) ch))
+(defn compromised
+  ([ch] (compromised ch 0.7))
+  ([ch failure-rate]
+    (filter> (fn [_] (> (rand) failure-rate)) ch)))
 
 (defn compromised-if [unreliable ch]
   (if unreliable
