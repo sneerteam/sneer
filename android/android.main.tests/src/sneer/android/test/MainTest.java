@@ -30,7 +30,7 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 		solo.finishOpenedActivities();
 	}
 
-	public void testAddContact() throws Exception {
+	public void testAll() throws Exception {
 		// Unlock the lock screen
 		solo.unlockScreen();
 
@@ -38,35 +38,52 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 		// Assert that SystemReportActivity activity is opened
 		solo.assertCurrentActivity("Expected SystemReport activity", "SystemReportActivity");
 
-		backToConversationList();
-
-		// Assert that MainActivity activity is opened
-		solo.assertCurrentActivity("Expected MainActivity activity", "MainActivity");
+		goToAndAssert("MainActivity");
 
 		solo.clickOnButton("Add Contact");
 		solo.clickOnButton("Send Public Key");
 
-		backToConversationList();
+		goToAndAssert("MainActivity");
 
 		// Go to ConversationActivity
 		solo.clickInList(1);
 
 		sendSomeMessages();
 
-//		// send location
+		goToAndAssert("MainActivity");
+
+		solo.clickOnActionBarHomeButton();
+		solo.assertCurrentActivity("Expected ProfileActivity activity", "ProfileActivity");
+		solo.clearEditText(0);
+		solo.typeText(0, "New User");
+		solo.clearEditText(1);
+		solo.typeText(1, "New Nick");
+		solo.clearEditText(2);
+		solo.typeText(2, "New City");
+		solo.clearEditText(3);
+		solo.typeText(3, "New Country");
+		goToAndAssert("MainActivity");
+
+		// Go to ConversationActivity
+		solo.clickInList(2);
+
+		// send location
 		solo.clickOnImageButton(0);
 		solo.clickInList(2);
-//
-		backToConversationList();
+
+		// Open location
+		solo.clickInList(1);
 	}
 
-	private void backToConversationList() {
-		// Go back to first activity
-		solo.goBackToActivity("MainActivity");
+
+	private void goToAndAssert(String activity) {
+		solo.goBackToActivity(activity);
+		solo.assertCurrentActivity("Expected MainActivity activity", "MainActivity");
 	}
+
 
 	private void sendSomeMessages() {
-		Observable.range(1, 10).subscribe(new Action1<Integer>() { @Override public void call(Integer t1) {
+		Observable.range(1, 3).subscribe(new Action1<Integer>() { @Override public void call(Integer t1) {
 			solo.typeText(0, "This is a test " + t1);
 			solo.clickOnImageButton(0);
 		}});
