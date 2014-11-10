@@ -1,4 +1,4 @@
-package sneer.android.test;
+package sneer.android.tests;
 
 import rx.Observable;
 import rx.functions.Action1;
@@ -15,12 +15,14 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 		super(MainActivity.class);
 	}
 
+
 	@Override
 	public void setUp() throws Exception {
 		// setUp() is run before a test case is started.
 		// This is where the solo object is created.
 		solo = new Solo(getInstrumentation(), getActivity());
 	}
+
 
 	@Override
 	public void tearDown() throws Exception {
@@ -29,6 +31,7 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 		// been opened during the test execution.
 		solo.finishOpenedActivities();
 	}
+
 
 	public void testAll() throws Exception {
 		// Unlock the lock screen
