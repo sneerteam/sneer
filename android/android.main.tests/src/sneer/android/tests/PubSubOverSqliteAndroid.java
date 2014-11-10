@@ -1,4 +1,3 @@
-package sneer.android.tests;
 //package sneer.android.tests;
 //
 //import java.io.IOException;

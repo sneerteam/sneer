@@ -17,8 +17,7 @@ dependencies {
        exclude group:'org.bouncycastle'
     }
     compile 'com.google.android:support-v4:r7'
-    compile project(':android-api')
-    
+    compile project(':android-api')    
 }
 
 android {
