@@ -1,6 +1,5 @@
 package sneer.android.ui;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static sneer.android.SneerAndroidSingleton.sneer;
 
 import java.io.ByteArrayInputStream;
@@ -83,7 +82,7 @@ public class ConversationActivity extends SneerActivity {
 			messages,
 			party);
 
-		deferUI(conversation.messages().throttleLast(250, MILLISECONDS)) //Maybe the Android UI already does its own throttling? Try with and without this throttling and see if there is a difference.
+		deferUI(conversation.messages())
 			.subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
 				messages.clear();
 				messages.addAll(msgs);
