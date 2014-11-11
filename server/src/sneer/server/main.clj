@@ -1,5 +1,5 @@
 (ns sneer.server.main
-  (:require [sneer.networking.udp :as udp]
+  (:require [sneer.networking.udp-old :as udp]
             [sneer.server.router :as router]
             [clojure.core.async :as async])
   (:gen-class))

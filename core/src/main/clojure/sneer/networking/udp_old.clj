@@ -1,4 +1,4 @@
-(ns sneer.networking.udp
+(ns sneer.networking.udp-old
   (:require [sneer.serialization :refer [serialize deserialize]]
             [sneer.async :refer [go-trace]]
             [clojure.core.async :as async :refer [>! <! >!! <!!]])
@@ -34,7 +34,7 @@
 (defn is-open [socket]
   (not (.isClosed ^DatagramSocket socket)))
 
-(defn start-udp-server
+(defn serve-udp
   "Opens a UDP socket on port, putting received packets into packets-in, sending packets taken from packets-out.
   Server will stop when packets-out is closed."
   [packets-in packets-out & [port]]
@@ -61,3 +61,16 @@
             (println ">!!" packet)
             (>!! packets-in packet))
           (catch Exception e (print-err-if-open e)))))))
+
+;; Tests
+
+;;(send-ping "localhost" 5555)
+;;(send-ping "dynamic.sneer.me" 5555)
+
+(defn send-ping [host port]
+  (with-open [socket (new DatagramSocket ^int (+ 10000 port))]
+    (let [addr (InetSocketAddress. ^String host ^int port)]
+      (send-value socket [addr {:intent :ping}])
+      (. socket setSoTimeout 500)
+      (let [[_ pong] (receive-value socket)]
+        (println pong)))))

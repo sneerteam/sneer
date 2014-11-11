@@ -4,7 +4,7 @@
             [sneer.core :as core]
             [sneer.test-util :refer [compromised compromised-if]]
             [sneer.rx :refer [subject*]]
-            [sneer.networking.udp :as udp])
+            [sneer.networking.udp-old :as udp])
   (:import [java.net InetSocketAddress]
            [sneer.commons SystemReport]))
 
