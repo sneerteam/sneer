@@ -21,22 +21,25 @@ import sneer.commons.Comparators;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnDismissListener;
-import android.widget.TextView;
 
 public class ConversationActivity extends SneerActivity {
 
@@ -56,7 +59,7 @@ public class ConversationActivity extends SneerActivity {
 
 	private ImageButton actionButton;
 	protected boolean justOpened;
-	private TextView editText;
+	private EditText editText;
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
@@ -91,7 +94,7 @@ public class ConversationActivity extends SneerActivity {
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
-		editText = (TextView) findViewById(R.id.editText);
+		editText = (EditText) findViewById(R.id.editText);
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -108,12 +111,19 @@ public class ConversationActivity extends SneerActivity {
 			public void afterTextChanged(Editable s) {}
 		});
 
+		editText.setOnKeyListener(new OnKeyListener() { @Override public boolean onKey(View v, int keyCode, KeyEvent event) {
+			if (!isHardwareKeyboardAvailable()) return false;
+			if (!(event.getAction() == KeyEvent.ACTION_DOWN)) return false;
+			if (!(keyCode == KeyEvent.KEYCODE_ENTER)) return false;
+			handleClick(editText.getText().toString().trim());
+			return true;
+		}});
+
 		actionButton = (ImageButton)findViewById(R.id.actionButton);
 		actionButton.setImageResource(R.drawable.ic_action_new);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			handleClick(editText.getText().toString().trim());
-			editText.setText("");
-		} });
+		}});
 	}
 
 
@@ -122,6 +132,7 @@ public class ConversationActivity extends SneerActivity {
 			conversation.sendText(text);
 		else
 			openIteractionMenu();
+		editText.setText("");
 	}
 
 
@@ -178,6 +189,21 @@ public class ConversationActivity extends SneerActivity {
 	}
 
 
+	private void hideKeyboard() {
+		if (justOpened) {
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		}
+		justOpened = false;
+	}
+
+
+	private boolean isHardwareKeyboardAvailable() {
+		return getResources().getConfiguration().keyboard != Configuration.KEYBOARD_NOKEYS;
+	}
+
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -190,16 +216,6 @@ public class ConversationActivity extends SneerActivity {
 		super.onResume();
 		conversation.setBeingRead(true);
 		hideKeyboard();
-	}
-
-
-	private void hideKeyboard() {
-		if (justOpened) {
-			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-		}
-		justOpened = false;
 	}
 
 }
