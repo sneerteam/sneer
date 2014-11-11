@@ -20,6 +20,7 @@ import sneer.PublicKey;
 import sneer.android.R;
 import sneer.commons.Comparators;
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -30,6 +31,8 @@ import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -53,12 +56,14 @@ public class ConversationActivity extends SneerActivity {
 	private Conversation conversation;
 
 	private ImageButton actionButton;
+	protected boolean justOpened;
+	private TextView editText;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversation);
-
+		justOpened = true;
 		actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
@@ -87,7 +92,7 @@ public class ConversationActivity extends SneerActivity {
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
-		final TextView editText = (TextView) findViewById(R.id.editText);
+		editText = (TextView) findViewById(R.id.editText);
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -185,6 +190,17 @@ public class ConversationActivity extends SneerActivity {
 	protected void onResume() {
 		super.onResume();
 		conversation.setBeingRead(true);
+		hideKeyboard();
+	}
+
+
+	private void hideKeyboard() {
+		if (justOpened) {
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		}
+		justOpened = false;
 	}
 
 }
