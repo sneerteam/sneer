@@ -32,39 +32,6 @@
     (onCompleted [this]
       (async/close! ch))))
 
-(defn- start-old
-  ([puk from-server to-server server-host server-port]
-     (let [udp-in (async/chan)
-           udp-out (async/chan)]
-
-       (async/thread
-
-         ; ensure no network activity takes place on caller thread to workaround android limitation
-         (let [server-addr (InetSocketAddress. ^String server-host ^int server-port)
-               udp-server (udp/serve-udp udp-in udp-out)
-               ping [server-addr {:intent :ping :from puk}]]
-
-           ; server ping loop
-           (async/go-loop []
-             (when (>! udp-out ping)
-               (<! (async/timeout 20000))
-               (recur)))
-
-           (async/go-loop []
-             (when-let [packet (<! udp-in)]
-               (SystemReport/updateReport "packet" packet)
-               (when-let [payload (-> packet second :payload)]
-                 (>! from-server payload))
-               (recur)))
-
-           (async/pipe
-             (async/map
-               (fn [payload] [server-addr {:intent :send :from puk :to (:address payload) :payload payload}])
-               [to-server])
-             udp-out)))
-
-       {:udp-out udp-out :from-server from-server :to-server to-server})))
-
 (defn- start
   ([puk from-server to-server server-host server-port unreliable]
      (let [udp-in (compromised-if unreliable (async/chan))
