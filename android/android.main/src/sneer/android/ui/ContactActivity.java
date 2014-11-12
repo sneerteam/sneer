@@ -46,15 +46,15 @@ public class ContactActivity extends Activity {
 	private Contact contact;
 	private boolean isOwn;
 	private boolean isTouched;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if (!sneerAndroid().checkOnCreate(this)) return;
-		
+
 		setContentView(R.layout.activity_contact);
-		
+
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
 		preferredNickNameView = (TextView) findViewById(R.id.preferredNickName);
@@ -63,19 +63,19 @@ public class ContactActivity extends Activity {
 		cityView = (TextView) findViewById(R.id.city);
 
 		load();
-		
+
 		getActionBar().setTitle(activityTitle());
-		
+
 		validationOnTextChanged(nicknameEdit);
 	}
-	
-	
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.profile, menu);
 		return super.onCreateOptionsMenu(menu);
-	}
-	
+	} 
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -90,12 +90,12 @@ public class ContactActivity extends Activity {
 		}
 		return true;
 	}
-	
+
 
 	private void load() {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
-		
+
 		if (Intent.ACTION_VIEW.equals(action)){
 			try {
 				getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -104,11 +104,11 @@ public class ContactActivity extends Activity {
 				toast("Invalid public key");
 				finish();
 				return;
-			}		
+			}
 		} else {
 			loadContact(null);
 		}
-		
+
 		if (partyPuk.toHex().equals(sneer().self().publicKey().current().toHex())) {
 			isOwn = true;
 			startActivity(new Intent().setClass(this, ProfileActivity.class));
@@ -118,7 +118,7 @@ public class ContactActivity extends Activity {
 		}
 	}
 
-	private String activityTitle() {		
+	private String activityTitle() {
 		if (getIntent().getExtras().get(PARTY_PUK)==null) {
 			newContact = true;
 			return "New Contact";
@@ -127,7 +127,7 @@ public class ContactActivity extends Activity {
 		return "Contact";
 	}
 
-	
+
 	private PublicKey partyPuk() {
 		Bundle extras = getIntent().getExtras();
 		if (extras == null)
@@ -135,8 +135,8 @@ public class ContactActivity extends Activity {
 
 		return (PublicKey) extras.getSerializable(PARTY_PUK);
 	}
-	
-	private void loadProfile() {		
+
+	private void loadProfile() {
 		if (newContact) {
 			plug(nicknameEdit, profile.ownName());
 			if (nicknameEdit.getText().toString().isEmpty())
@@ -151,7 +151,7 @@ public class ContactActivity extends Activity {
 		plug(countryView, profile.country());
 		plug(cityView, profile.city());
 		plug(selfieImage, profile.selfie());
-		
+
 		if(!newContact)
 			Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>(){ @Override public Boolean call(String preferredNickname, String ownName) {
 				if(preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current()))
@@ -162,24 +162,24 @@ public class ContactActivity extends Activity {
 					if (validation)
 						preferredNickNameView.setVisibility(View.GONE);
 				}});
-		
+
 	}
 
 	private void loadContact(PublicKey puk){
 		partyPuk = puk == null
 				? partyPuk()
-				: puk;				
-		
+				: puk;
+
 		party = sneer().produceParty(partyPuk);
-		profile = sneer().profileFor(party);	
+		profile = sneer().profileFor(party);
 		contact = sneer().findContact(party);
 
 		newContact = contact == null
 				? true
-				: false; 		
+				: false;
 	}
-	
-	
+
+
 	private void saveContact() {
 		if (isTouched || newContact) {
 			try {
@@ -195,13 +195,13 @@ public class ContactActivity extends Activity {
 		}
 	}
 
-	
+
 	@Override
 	public void onContentChanged() {
 		super.onContentChanged();
 	}
 
-	
+
 	@Override
 	protected void onPause() {
 		if(!isOwn)
@@ -209,17 +209,19 @@ public class ContactActivity extends Activity {
 		super.onPause();
 	}
 
-	
+
 	private void toast(String message) {
 		Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
 		toast.show();
 	}
 
-	
+
 	private void validationOnTextChanged(final EditText textView) {
 		textView.addTextChangedListener(new TextWatcher() {
+			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
-			
+
+			@Override
 			public void afterTextChanged(Editable s) {
 				nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
 				isTouched = true;
@@ -229,5 +231,5 @@ public class ContactActivity extends Activity {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 		});
 	}
-	
+
 }

@@ -17,10 +17,10 @@ import android.database.sqlite.SQLiteDatabase;
 
 
 public class SneerSqliteDatabase implements Closeable, Database {
-	
-	private SQLiteDatabase sqlite;
 
-	
+	private final SQLiteDatabase sqlite;
+
+
 	public static SneerSqliteDatabase openDatabase(File file) throws IOException {
 		return new SneerSqliteDatabase(SQLiteDatabase.openOrCreateDatabase(file,null));
 	}
@@ -30,7 +30,7 @@ public class SneerSqliteDatabase implements Closeable, Database {
 		this.sqlite = sqlite;
 	}
 
-	
+
 	@Override
 	public void createTable(String tableName, List<List<Object>> columns) {
 		String sql = "CREATE TABLE " + tableName + " (" + columnsString((List<?>)columns) + ")";
@@ -44,20 +44,20 @@ public class SneerSqliteDatabase implements Closeable, Database {
 		sqlite.execSQL(sql);
 	}
 
-	
+
 	@Override
 	public long insert(String tableName, Map<String, Object> values) {
 		return sqlite.insert(tableName, null, toContentValues(values));
 	}
-	
-	
+
+
 	@Override
 	public Iterable<List<?>> query(String sql, List<Object> args) {
 		Cursor cursor = sqlite.rawQuery(sql, toQueryArgs(args));
 		ArrayList<List<?>> ret = new ArrayList<List<?>>(cursor.getCount() + 1);
 		ret.add(Arrays.asList(cursor.getColumnNames()));
 		if (!cursor.moveToFirst()) return ret;
-		
+
 		do {
 			ret.add(row(cursor));
 		} while (cursor.moveToNext());
@@ -65,7 +65,7 @@ public class SneerSqliteDatabase implements Closeable, Database {
 		return ret;
 	}
 
-	
+
 	private String[] toQueryArgs(List<Object> args) {
 		return args.isEmpty()
 			? null
@@ -85,7 +85,7 @@ public class SneerSqliteDatabase implements Closeable, Database {
 		if (value instanceof String) cv.put(key, (String)value);
 		else cv.put(key, (byte[])value);
 	}
-	
+
 	private List<?> row(Cursor cursor) {
 		List<Object> ret = new ArrayList<Object>(cursor.getColumnCount());
 		for (int i = 0; i < cursor.getColumnCount(); i++)

@@ -10,8 +10,8 @@ import android.content.Context;
 import android.widget.Toast;
 
 public final class SneerAndroidSimulator implements SneerAndroid {
-	private SneerAdmin admin;
-	private Context context;
+	private final SneerAdmin admin;
+	private final Context context;
 
 	public SneerAndroidSimulator(Context context) {
 		this.context = context;
@@ -21,31 +21,31 @@ public final class SneerAndroidSimulator implements SneerAndroid {
 		admin = ret;
 	}
 
-	
+
 	@Override
 	public Sneer sneer() {
 		return admin.sneer();
 	}
 
-	
+
 	@Override
 	public boolean isClickable(Message message) {
 		return true;
 	}
 
-	
+
 	@Override
 	public void doOnClick(Message message) {
 		Toast.makeText(context, "Message clicked: " + message, Toast.LENGTH_SHORT).show();
 	}
 
-	
+
 	@Override
 	public boolean checkOnCreate(Activity activity) {
 		return true;
 	}
 
-	
+
 	@Override
 	public SneerAdmin admin() {
 		return admin;

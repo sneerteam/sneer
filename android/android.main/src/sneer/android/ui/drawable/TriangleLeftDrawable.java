@@ -1,6 +1,6 @@
 package sneer.android.ui.drawable;
 
-import android.graphics.*;
+import android.graphics.Canvas;
 
 public class TriangleLeftDrawable extends TriangleDrawable {
 
@@ -15,8 +15,8 @@ public class TriangleLeftDrawable extends TriangleDrawable {
 		path.lineTo(width(), height());
 		path.lineTo(0, 0);
 		path.close();
-		
+
 		canvas.drawPath(path, paint);
 	}
-	
-} 
+
+}

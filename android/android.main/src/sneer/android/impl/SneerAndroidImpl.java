@@ -11,11 +11,11 @@ import sneer.Message;
 import sneer.Sneer;
 import sneer.SneerAndroidClient;
 import sneer.admin.SneerAdmin;
+import sneer.android.R;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
 import sneer.android.ipc.PluginHandler;
 import sneer.android.ipc.PluginManager;
-import sneer.android.R;
 import sneer.android.ui.ConversationActivity;
 import sneer.android.utils.AndroidUtils;
 import sneer.android.utils.LogUtils;
@@ -31,31 +31,31 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 public class SneerAndroidImpl implements SneerAndroid {
-	
+
 	private SneerAdmin sneerAdmin;
 	private static String error;
 	public static AlertDialog errorDialog;
 	private PluginManager pluginManager;
-	
+
 	public SneerAndroidImpl(Context context) {
 		try {
 			init(context);
-		} catch (FriendlyException e) {
+		 } catch (FriendlyException e) {
 			error = e.getMessage();
 		}
 	}
-	
+
 
 	private void init(Context context) throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
 		pluginManager = new PluginManager(context, sneer());
 		pluginManager.initPlugins();
 		startTupleSpaceService(context);
-		
-		initNotifications(context);		
+
+		initNotifications(context);
 	}
 
-	
+
 	private void initNotifications(final Context context) {
 		sneer().tupleSpace().filter()
 			.audience(sneer().self().publicKey().current())
@@ -65,9 +65,9 @@ public class SneerAndroidImpl implements SneerAndroid {
 				return !tuple.author().equals(sneer().self().publicKey().current());
 			} })
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
-				
+
 				log("-------------> "+ tuple.type() + " - " + tuple.payload());
-				
+
 				PluginHandler plugin = null;
 				Intent intent;
 				if ("chat".equals(tuple.get("message-type"))) {
@@ -82,16 +82,16 @@ public class SneerAndroidImpl implements SneerAndroid {
 					}
 					intent = plugin.resume(tuple);
 				}
-				
+
 				log("-------------> " + tuple.type() + ": " + intent.getExtras().getParcelable(SneerAndroidClient.RESULT_RECEIVER));
-				
+
 //				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-				
+
 				notifyUser(context, tuple, plugin == null ? tuple.type() : plugin.notificationLabel(), PendingIntent.getActivity(context, 0, intent, 0));
 			}});
 	}
-	
-	
+
+
 	private static void notifyUser(Context context, Tuple tuple, String notificationLabel, PendingIntent pendIntent) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		builder.setSmallIcon(R.drawable.ic_launcher)
@@ -101,14 +101,14 @@ public class SneerAndroidImpl implements SneerAndroid {
 			.setAutoCancel(true)
 			.setOngoing(false)
 			.setContentIntent(pendIntent);
-		
+
 		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.notify("sneer:"+tuple.type(), 0, builder.getNotification());
 	}
 
 
 	private SneerAdmin newSneerAdmin(Context context) throws FriendlyException {
-		
+
 		File adminDir = new File(context.getFilesDir(), "admin");
 		adminDir.mkdirs();
 		File secureFile = new File(adminDir, "tupleSpace.sqlite");
@@ -121,8 +121,8 @@ public class SneerAndroidImpl implements SneerAndroid {
 			throw new FriendlyException("Error starting Sneer", e);
 		}
 	}
-	
-	
+
+
 	private static SneerAdmin newSneerAdmin(SneerSqliteDatabase db) {
 		try {
 			return (SneerAdmin) sneerAdminFactory().getMethod("create", Object.class).invoke(null, db);
@@ -130,8 +130,8 @@ public class SneerAndroidImpl implements SneerAndroid {
 			throw new IllegalStateException(e);
 		}
 	}
-	
-	
+
+
 	private static Class<?> sneerAdminFactory() {
 		try {
 			return Class.forName("sneer.admin.SneerAdminFactory");
@@ -139,19 +139,19 @@ public class SneerAndroidImpl implements SneerAndroid {
 			return null;
 		}
 	}
-	
-	
+
+
 	public static boolean isCoreAvailable() {
 		return sneerAdminFactory() != null;
 	}
 
-	
+
 	@Override
 	public SneerAdmin admin() {
 		return sneerAdmin;
 	}
 
-	
+
 	@Override
 	public boolean checkOnCreate(Activity activity) {
 		if (error == null) return true;
@@ -159,25 +159,25 @@ public class SneerAndroidImpl implements SneerAndroid {
 		return false;
 	}
 
-	
+
 	@Override
 	public Sneer sneer() {
 		return admin().sneer();
 	}
 
-	
+
 	@Override
 	public boolean isClickable(Message message) {
 		return pluginManager.isClickable(message);
 	}
 
-	
+
 	@Override
 	public void doOnClick(Message message) {
 		pluginManager.doOnClick(message);
 	}
 
-	
+
 	private void log(String log) {
 		LogUtils.info(SneerAndroidImpl.class, log);
 	}

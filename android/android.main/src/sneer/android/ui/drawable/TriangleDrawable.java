@@ -1,7 +1,9 @@
 package sneer.android.ui.drawable;
 
-import android.graphics.*;
-import android.graphics.drawable.*;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 
 public abstract class TriangleDrawable extends Drawable {
 
@@ -17,25 +19,25 @@ public abstract class TriangleDrawable extends Drawable {
 
 	@Override
 	public void setAlpha(int alpha) {
-	
+
 	}
-	
+
 	@Override
 	public void setColorFilter(ColorFilter cf) {
-	
+
 	}
-	
+
 	@Override
 	public int getOpacity() {
 		return 255;
 	}
-	
+
 	protected int width() {
 		return getBounds().width();
 	}
-	
+
 	protected int height() {
 		return getBounds().height();
 	}
-	
-} 
+
+}
