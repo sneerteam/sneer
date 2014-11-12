@@ -6,5 +6,5 @@ import android.content.Context;
 public interface PluginSessionFactory {
 
 	PluginSession create(Context context, Sneer sneer, PluginHandler plugin);
-	
+
 }

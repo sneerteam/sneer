@@ -9,10 +9,10 @@ public enum PluginType {
 	MESSAGE(SingleMessageSessionFactory.singleton, true, true),
 	MESSAGE_VIEW(SingleMessageSessionFactory.singleton, false, true),
 	MESSAGE_COMPOSE(SingleMessageSessionFactory.singleton, true, false),
-	
+
 	// future
 	GROUP_SESSION(null, true, true);
-	
+
 	public final boolean canCompose;
 	public final boolean canView;
 	public final PluginSessionFactory factory;
@@ -29,5 +29,5 @@ public enum PluginType {
 	public static PluginType valueOfOrNull(String string) {
 		return names.contains(string) ? valueOf(string) : null;
 	}
-	
+
 }

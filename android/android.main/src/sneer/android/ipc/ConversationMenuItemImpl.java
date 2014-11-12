@@ -12,20 +12,20 @@ public class ConversationMenuItemImpl implements ConversationMenuItem {
 
 	ConversationMenuItemImpl(PluginManager pluginManager, PluginHandler app) {
 		this.pluginManager = pluginManager;
-		this.plugin = app;
+		plugin = app;
 	}
 
-	
+
 	@Override
 	public void call(PublicKey partyPuk) {
 		plugin.start(partyPuk);
 	}
 
-	
+
 	@Override
 	public byte[] icon() {
 		try {
-			return PluginManager.bitmapFor(plugin.drawableMenuIcon(this.pluginManager.context));
+			return PluginManager.bitmapFor(plugin.drawableMenuIcon(pluginManager.context));
 		} catch (Exception e) {
 			LogUtils.error(SneerAndroidImpl.class, "Error loading bitmap", e);
 			e.printStackTrace();
@@ -33,10 +33,10 @@ public class ConversationMenuItemImpl implements ConversationMenuItem {
 		return null;
 	}
 
-	
+
 	@Override
 	public String caption() {
 		return plugin.menuCaption();
 	}
-	
+
 }
