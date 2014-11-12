@@ -11,5 +11,5 @@ public class ConversationMenuAdapter extends ArrayAdapter<ConversationMenuItem> 
 		// TODO Auto-generated constructor stub
 	}
 
-	
+
 }

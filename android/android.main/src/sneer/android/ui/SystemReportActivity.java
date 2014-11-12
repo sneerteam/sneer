@@ -14,16 +14,16 @@ public class SystemReportActivity extends Activity {
 
 	private TextView mReportView;
 	private ScrollView mScrollView;
-	
-	
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_system_report);
-		
+
 		mReportView = (TextView)findViewById(R.id.reportView);
 		mScrollView = (ScrollView)findViewById(R.id.scrollView);
-		
+
 		report();
 	}
 
@@ -34,5 +34,5 @@ public class SystemReportActivity extends Activity {
 			mScrollView.fullScroll(View.FOCUS_DOWN);
 		}});
 	}
-	
+
 }

@@ -41,8 +41,8 @@ class RandomWrapper extends SecureRandom { private static final long serialVersi
 		throw new UnsupportedOperationException();
 	}
 
-	
-	
+
+
 	private int counter;
 	@Override
 	public synchronized void nextBytes(byte[] bytes) {
@@ -52,9 +52,9 @@ class RandomWrapper extends SecureRandom { private static final long serialVersi
 		wasUsed = true;
 
 		SystemReport.updateReport("crypto/random" + counter++, "read");
-		
+
 		System.arraycopy(randomBytes, 0, bytes, 0, randomBytes.length);
 	}
 
-	
+
 }

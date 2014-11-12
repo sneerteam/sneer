@@ -6,7 +6,6 @@ import rx.Subscription;
 import rx.functions.Action1;
 import sneer.Profile;
 import sneer.android.R;
-import sneer.android.ui.SneerActivity;
 import sneer.commons.exceptions.FriendlyException;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -25,22 +24,22 @@ public class ProfileActivity extends SneerActivity {
 	private static final int TAKE_PICTURE = 1;
 
 	private Profile profile;
-	
+
 	private EditText firstNameEdit;
 	private EditText lastNameEdit;
 	private EditText preferredNickNameEdit;
 	private EditText countryEdit;
 	private EditText cityEdit;
 	private ImageView selfieImage;
-	
+
 	private byte[] selfieBytes;
-	
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
-		
+
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		profile = sneer().profileFor(sneer().self());
@@ -51,24 +50,24 @@ public class ProfileActivity extends SneerActivity {
 		selfieImage = (ImageView) findViewById(R.id.selfie);
 		countryEdit = (EditText) findViewById(R.id.country);
 		cityEdit = (EditText) findViewById(R.id.city);
-		
+
 		afterTextChanged(firstNameEdit);
 		afterTextChanged(lastNameEdit);
-		
+
 		loadProfile();
 	}
-	
-	
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			onBackPressed();
-	        return true;		
+	        return true;
 		}
 		return true;
 	}
-	
+
 
 	private void afterTextChanged(final EditText editText) {
 		editText.addTextChangedListener(new TextWatcher() {
@@ -80,8 +79,8 @@ public class ProfileActivity extends SneerActivity {
 			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		});
 	}
-	
-	
+
+
 	private void loadProfile() {
 		plugOwnName(firstNameEdit, lastNameEdit, profile.ownName());
 		plug(preferredNickNameEdit, profile.preferredNickname());
@@ -90,29 +89,29 @@ public class ProfileActivity extends SneerActivity {
 		plug(selfieImage, profile.selfie());
 	}
 
-	
+
 	public void saveProfile() {
 		if (text(firstNameEdit).length() < 2) return;
-				
+
 		if (lastNameEdit.getVisibility() == View.GONE) {
 			profile.setOwnName(text(firstNameEdit));
 		} else {
-			if (text(lastNameEdit).length() < 2) return; 
+			if (text(lastNameEdit).length() < 2) return;
 			profile.setOwnName(text(firstNameEdit) + " " + text(lastNameEdit));
 		}
-		
+
 		String preferredNickname = text(preferredNickNameEdit);
 		profile.setPreferredNickname(preferredNickname);
-		
+
 		String country = text(countryEdit);
 		profile.setCountry(country);
-		
+
 		String city = text(cityEdit);
 		profile.setCity(city);
-		
+
 		if (selfieBytes != null)
 			profile.setSelfie(selfieBytes);
-		
+
 		toast("Profile saved");
 	}
 
@@ -121,20 +120,20 @@ public class ProfileActivity extends SneerActivity {
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		galleryIntent.setType("image/*");
-		
+
 		Intent chooser = Intent.createChooser(galleryIntent, "Open with");
 		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent});
 
 		startActivityForResult(chooser, TAKE_PICTURE);
 	}
-	
-	
+
+
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)  {
 		if (requestCode != TAKE_PICTURE) return;
 		if (resultCode != RESULT_OK) return;
 		if (intent == null) return;
-		
+
         Bitmap bitmap;
 		try {
 			bitmap = loadBitmap(intent);
@@ -153,8 +152,8 @@ public class ProfileActivity extends SneerActivity {
 		saveProfile();
 		super.onPause();
 	}
-	
-    
+
+
 	public void checkNameLength(EditText edit) {
 		if (text(edit).length() <= 1)
 			edit.setError("Name too short");
@@ -171,5 +170,5 @@ public class ProfileActivity extends SneerActivity {
 	private String text(EditText editText) {
 		return editText.getText().toString().trim();
 	}
-	
+
 }

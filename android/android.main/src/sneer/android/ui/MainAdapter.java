@@ -26,42 +26,42 @@ import android.widget.TextView;
 
 public class MainAdapter extends ArrayAdapter<Conversation> {
 
-	private Activity activity;
-	private CompositeSubscription subscriptions;
-    
+	private final Activity activity;
+	private final CompositeSubscription subscriptions;
+
 	public MainAdapter(Activity activity) {
         super(activity, R.layout.list_item_main);
         this.activity = activity;
-		this.subscriptions = new CompositeSubscription();
+		subscriptions = new CompositeSubscription();
     }
-	
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         final ConversationtHolder holder;
-        
+
         if (row != null) {
             holder = (ConversationtHolder)row.getTag();
         } else {
             LayoutInflater inflater = activity.getLayoutInflater();
             row = inflater.inflate(R.layout.list_item_main, parent, false);
-            
+
             holder = new ConversationtHolder();
             holder.conversationParty = findView(row, R.id.conversationParty);
             holder.conversationSummary = findView(row, R.id.conversationSummary);
             holder.conversationDate = findView(row, R.id.conversationDate);
             holder.conversationPicture = findView(row, R.id.conversationPicture);
             holder.conversationUnread = findView(row, R.id.conversationUnread);
-            
-            Shader textShader = new LinearGradient(200, 0, 650, 0, 
+
+            Shader textShader = new LinearGradient(200, 0, 650, 0,
             		new int[] {Color.DKGRAY, Color.LTGRAY},
             		new float[] {0, 1}, TileMode.CLAMP);
             holder.conversationSummary.getPaint().setShader(textShader);
-            
+
             row.setTag(holder);
         }
-        
+
 		Conversation conversation = getItem(position);
 		Subscription subscription = Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
@@ -77,12 +77,12 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
     static class ConversationtHolder {
 		TextView conversationParty;
 		TextView conversationSummary;
-		TextView conversationDate;	
+		TextView conversationDate;
 		TextView conversationUnread;
 		ImageView conversationPicture;
 	}
 
-	
+
 	public static Subscription plugUnreadMessage(final TextView textView, Observable<Long> observable) {
 		return deferUI(observable).subscribe(new Action1<Long>() { @Override public void call(Long obj) {
 			if (obj == 0)
