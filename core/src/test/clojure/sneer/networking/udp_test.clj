@@ -11,17 +11,21 @@
 "UDP socket"
 
  (let [echo-port 1024
-       echo (chan)
+       loopback (chan)
        packets-out (chan 3)
        packets-in (chan)
-       localhost (InetSocketAddress. "localhost" echo-port)]
+       localhost (InetSocketAddress. "localhost" echo-port)
+       echo (fn [string]
+              (>!! packets-out [localhost (.getBytes string)])
+              (-> (<!!? packets-in) (get 1) String.))]
     
-   (start-udp-server echo echo echo-port)
+   (start-udp-server loopback loopback echo-port)
    (start-udp-server packets-out packets-in)
     
-   (fact "One value is echoed"
-     (>!! packets-out [localhost (.getBytes "Hello")])
-     (-> (<!!? packets-in) (get 1) String.) => "Hello")
+   (fact "Packets are sent and received"
+     (echo "Hello") => "Hello"
+     (echo "42") => "42"
+     (echo "Goodbye") => "Goodbye")
    
-   (close! echo)
+   (close! loopback)
    (close! packets-out)))

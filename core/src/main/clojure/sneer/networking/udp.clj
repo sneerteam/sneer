@@ -53,14 +53,12 @@
     (go-trace
       (with-open [^DatagramSocket socket ^DatagramSocket socket]
         (loop []
-          (if-let [packet (<! packets-out)]
-            (do
-              (try
-                #_(println "<!" packet)
-                (send-value socket packet)
-                (catch Exception e (print-err-if-open e)))
-              (recur))
-            (.close socket)))))
+          (when-let [packet (<! packets-out)]
+            (try
+               #_(println "<!" packet)
+               (send-value socket packet)
+               (catch Exception e (print-err-if-open e)))
+              (recur)))))
 
     (async/thread
       (while (is-open socket)
