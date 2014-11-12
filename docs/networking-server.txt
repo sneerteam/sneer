@@ -1,0 +1,33 @@
+Server:
+
+Queue [tuples]
+
+
+
+Queue Multiplexer
+  received: [follower tuple]
+
+
+Serializer [to-send received serialized-to-send serialized-received]
+
+
+Transciever [to-send received packets-out packets-in] : NEEDS TO SIGNAL ITS FULL
+  to-send, received : channel of Hashable
+
+
+Pinger [packs-out packs-in] : Receives :ping(s), sends :pong(s)
+
+
+Peer Multiplexer
+
+   (:from -> IP)
+
+
+
+Addresser [addr-packs-out addr-packs-in packs-out packs-in] : channels of value
+  Addresses packets out with last seen IP of peer.
+  Filters out addr-packs-in that come from a different address than the server's.
+
+
+UDP [addr-packs-out addr-packs-in] : channels of [SocketAddress packet]
+  packet : clj value serialized using transit
