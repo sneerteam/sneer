@@ -26,32 +26,32 @@ import sneer.tuples.TuplePublisher;
 import sneer.tuples.TupleSpace;
 
 public class PubSubTest extends TupleSpaceTestsBase {
-	
-	public PubSubTest() {} 
-	
+
+	public PubSubTest() {}
+
 	protected PubSubTest(Func0<Object> tupleBaseFactory) {
 		super(tupleBaseFactory);
 	}
 
 	@Test
 	public void messagePassing() {
-		
+
 		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userB.publicKey())
 			.type("rock-paper-scissor/move");
-			
+
 		publisher.pub("paper");
 		publisher.pub("rock");
-		
+
 		publisher.type("rock-paper-scissor/message")
 			.pub("hehehe");
-		
-		TupleFilter subscriber = tuplesB.filter();		
+
+		TupleFilter subscriber = tuplesB.filter();
 		expecting(
 			payloads(subscriber.tuples(), "paper", "rock", "hehehe"),
 			payloads(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock"),
 			payloads(subscriber.type("rock-paper-scissor/message").tuples(), "hehehe"));
-		
+
 	}
 
 	@Test
@@ -61,38 +61,38 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.audience(userB.publicKey());
 		publisher.type("rock-paper-scissor/move").pub("paper");
 		publisher.type("rock-paper-scissor/message").pub("hehehe");
-		
+
 		expecting(
 			values(tuplesB.filter().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message"));
-		
+
 	}
-	
+
 	@Test
 	public void targetUser() {
-		
+
 		tuplesA.publisher()
 			.audience(userC.publicKey())
 			.type("rock-paper-scissor/move")
 			.pub("paper");
-		
+
 		tuplesA.publisher()
 			.type("rock-paper-scissor/move")
 			.pub("end");
-		
+
 		expecting(
 			payloads(tuplesA.filter().type("rock-paper-scissor/move").tuples(), "paper", "end"),
 			payloads(tuplesB.filter().type("rock-paper-scissor/move").tuples(), "end"),
 			payloads(tuplesC.filter().type("rock-paper-scissor/move").tuples(), "paper", "end"));
 	}
-	
+
 	@Test
 	public void publicTuples() {
-		
+
 		String name = "UserA McCloud";
 		tuplesA.publisher()
 			.type("profile/name")
 			.pub(name);
-		
+
 		expecting(
 			payloads(profileName(tuplesC), name),
 			payloads(profileName(tuplesB), name),
@@ -102,22 +102,22 @@ public class PubSubTest extends TupleSpaceTestsBase {
 	private Observable<Tuple> profileName(TupleSpace tupleSpace) {
 		return tupleSpace.filter().type("profile/name").tuples();
 	}
-	
+
 	@Test
 	public void newPeerCanSubscribeToPastTuples() {
-		
+
 		String name = "UserA McCloud";
 		tuplesA.publisher()
 			.type("profile/name")
 			.pub(name);
-		
+
 		PrivateKey userD = new KeysImpl().createPrivateKey();
 		TupleSpace tuplesD = newTupleSpace(userD, followees(userA));
-		
+
 		expecting(
 			payloads(tuplesD.filter().tuples(), name));
 	}
-	
+
 	@Test
 	public void byAuthor() {
 		tuplesA.publisher()
@@ -126,34 +126,34 @@ public class PubSubTest extends TupleSpaceTestsBase {
 		tuplesB.publisher()
 			.type("user/name")
 			.pub("UserB McCloud");
-		
+
 		expecting(
 			payloads(tuplesC.filter().author(userA.publicKey()).tuples(), "UserA McCloud"),
 			payloads(tuplesC.filter().author(userB.publicKey()).tuples(), "UserB McCloud"));
 	}
-	
+
 	@Test
 	public void audienceIgnoresPublic() {
-		
+
 		tuplesA.publisher()
 			.type("chat/message")
 			.pub("hey people!");
-		
+
 		tuplesA.publisher()
 			.audience(userB.publicKey())
 			.type("sentinel")
 			.pub("eof");
-		
+
 		expecting(
 			payloads(tuplesB.filter().audience(userB).tuples(), "eof"));
 	}
-	
+
 	@Test
 	public void customFieldTypeRepresentation() {
 		TuplePublisher customPublisher = tuplesA.publisher().type("banana-type");
 		customPublisher.field("custom", 42).pub();
 		customPublisher.field("custom", 23).pub();
-		
+
 		expecting(
 			values(
 				tuplesA
@@ -168,7 +168,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 	public void payloadTypeRepresentation() {
 		tuplesA.publisher().type("banana-type")
 			.pub(42);
-		
+
 		expecting(
 			payloads(
 				tuplesA
@@ -179,14 +179,14 @@ public class PubSubTest extends TupleSpaceTestsBase {
 
 	@Test
 	public void completedLocalTuples() {
-		
+
 		TuplePublisher publisher = tuplesA.publisher()
 			.audience(userA.publicKey())
 			.type("profile/name");
-			
+
 		publisher.pub("old name");
 		publisher.pub("new name");
-		
+
 		expecting(
 			notifications(
 				tuplesA.filter()
@@ -198,29 +198,29 @@ public class PubSubTest extends TupleSpaceTestsBase {
 				Notification.createOnNext("new name"),
 				Notification.createOnCompleted()));
 	}
-	
+
 	@Test
 	public void localTupleQueriesAreDeferredUntilSubscribe() {
-		
-		TuplePublisher publisher = tuplesA.publisher().type("local");			
+
+		TuplePublisher publisher = tuplesA.publisher().type("local");
 		publisher.pub("before");
-		
+
 		Observable<Object> localPayloads = tuplesA.filter()
 				.type("local")
 				.localTuples()
 				.map(Tuple.TO_PAYLOAD);
-		
+
 		publisher.pub("after");
-		
+
 		expecting(
 			notifications(
 				localPayloads,
 				Notification.createOnNext("before"),
 				Notification.createOnNext("after"),
 				Notification.createOnCompleted()));
-		
+
 		publisher.pub("later");
-		
+
 		expecting(
 			notifications(
 				localPayloads,
@@ -229,23 +229,23 @@ public class PubSubTest extends TupleSpaceTestsBase {
 				Notification.createOnNext("later"),
 				Notification.createOnCompleted()));
 	}
-	
+
 	@Test
 	public void subscriberCriteriaWithArray() {
 		final Object[] array = {"notes", userB.publicKey()};
-		
+
 		tuplesA.publisher()
 			.audience(userA.publicKey())
 			.type("file")
 			.field("path", array)
 			.pub("userB is cool");
-			
+
 		Observable<Tuple> actual = tuplesA.filter()
 				.audience(userA)
 				.type("file")
 				//.field("path", array)
 				.tuples();
-		
+
 		expecting(
 			actual.map(new Func1<Tuple, Void>() { @SuppressWarnings({ "unchecked", "deprecation" }) @Override public Void call(Tuple tuple) {
 				assertList(array, ((List<Object>)tuple.get("path")));
@@ -253,26 +253,26 @@ public class PubSubTest extends TupleSpaceTestsBase {
 				return null;
 			}}));
 	}
-	
+
 	@Test
 	public void receiveTuplesFromAllContacts() {
 		tuplesB.publisher()
 			.audience(userA.publicKey())
 			.type("bla")
 			.pub("from b");
-		
+
 		tuplesC.publisher()
 			.audience(userA.publicKey())
 			.type("bla")
 			.pub("from c");
-		
+
 		expecting(
 			payloadSet(
 				tuplesA.filter().audience(userA).tuples(),
 				"from b",
 				"from c"));
 	}
-	
+
 	@Test
 	public void timeReceived() {
 		Tuple tuple = tuplesA.publisher()
@@ -281,40 +281,40 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.pub("bla")
 			.toBlocking()
 			.first();
-		
+
 		Observable<Long> times = tuplesA.filter().tuples()
 				.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple tuple) {
 					return tuple.timestampCreated();
-				} });
-		
+				}});
+
 		expecting(
 				values(times, tuple.timestampCreated()));
 	}
-	
+
 //	@Test
 //	public void pubIfEmpty() {
-//		
+//
 //		TuplePublisher publisher = tuplesA.publisher()
 //			.audience(userA.publicKey())
 //			.type("profile.nickname");
-//		
+//
 //		TupleFilter filter = tuplesA.filter()
 //			.audience(userA)
 //			.type("profile/profile.nickname");
-//		
+//
 //		expecting(
 //				values(publisher.pubIfEmpty(filter, "a"), Pair.of(true, "a")),
 //				values(publisher.pubIfEmpty(filter, "b"), Pair.of(false, "a")));
-//		
+//
 //	}
-//	
+//
 //	interface PartyId {
-//		
+//
 //	}
 //
 //	@Test
 //	public void pubIfEmptay() {
-//		
+//
 //		tuplesA.filter()
 //			.author(userA.publicKey())
 //			.type("party")
@@ -326,45 +326,45 @@ public class PubSubTest extends TupleSpaceTestsBase {
 //						.field("partyId", contact.get("partyId"))
 //						.localTuples()
 //						.last();
-//			} })
+//			}})
 //			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple tuple) {
 //				return !tuple.containsKey("deleted");
-//			} })
+//			}})
 //			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
-//				
+//
 //				System.out.println("party id: " + tuple.get("partyId") +  ", nickname: " + tuple.payload());
-//			} });
-//		
-//		
+//			}});
+//
+//
 //		Observable<String> allNicknames = tuplesA.filter()
 //			.author(userA.publicKey())
 //			.type("contact")
 //			.localTuples()
 //			.groupBy(new Func1<Tuple, PartyId>() {  @Override public PartyId call(Tuple tuple) {
 //				return (PartyId) tuple.get("partyId");
-//			} })
+//			}})
 //			.flatMap(new Func1<GroupedObservable<PartyId, Tuple>, Observable<Tuple>>() {  @Override public Observable<Tuple> call(GroupedObservable<PartyId, Tuple> group) {
 //				return group.last();
-//			} })
+//			}})
 //			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple tuple) {
 //				return !tuple.containsKey("deleted");
-//			} })
+//			}})
 //			.map(new Func1<Tuple, Object>() {  @Override public Object call(Tuple tuple) {
 //				return tuple.get("nickname");
-//			} })
+//			}})
 //			.cast(String.class);
-//		
+//
 //		allNicknames
 //			.filter(new Func1<String, Boolean>() {  @Override public Boolean call(String str) {
 //				return str.equals("new nickname");
-//			} });
-//			
-//			
+//			}});
+//
+//
 ////			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
 ////				System.out.println("party id: " + tuple.get("partyId") +  ", last-known-puk: " + tuple.get("puk") + ", nickname: " + tuple.get("nickname"));
-////			} });
+////			}});
 //
-//		
+//
 //		tuplesA.filter()
 //			.author(userA.publicKey())
 //			.type("party")
@@ -374,10 +374,10 @@ public class PubSubTest extends TupleSpaceTestsBase {
 //			}})
 //			.flatMap(new Func1<GroupedObservable<PartyId, Tuple>, Observable<Tuple>>() {  @Override public Observable<Tuple> call(GroupedObservable<PartyId, Tuple> group) {
 //				return group.last();
-//			} })
+//			}})
 //			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
 //				System.out.println("party id: " + tuple.get("partyId") +  ", last-known-puk: " + tuple.get("puk") + ", nickname: " + tuple.get("nickname"));
-//			} });
+//			}});
 //
 //	}
 

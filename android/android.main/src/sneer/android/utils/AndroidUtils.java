@@ -17,7 +17,7 @@ public class AndroidUtils {
 			return;
 		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setMessage(message).setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+		builder.setMessage(message).setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int id) {
 			SneerAndroidImpl.errorDialog.dismiss();
 			SneerAndroidImpl.errorDialog = null;
 			activity.finish();
@@ -33,7 +33,7 @@ public class AndroidUtils {
 	public static void toastOnMainThread(final Context context, final String message, final int length) {
 		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() { @Override public void call() {
 			toast(context, message, length);
-		} });
+		}});
 	}
 
 }

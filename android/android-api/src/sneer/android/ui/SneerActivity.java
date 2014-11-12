@@ -58,22 +58,22 @@ public class SneerActivity extends Activity {
 			textView.setText(obj.toString());
 		}});
 	}
-	
-	
+
+
 	public static Subscription plug(final EditText editText, Observable<?> observable) {
 		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			editText.setText(obj.toString());
 		}});
 	}
 
-	
+
 	public static Subscription plug(final ImageView imageView, Observable<byte[]> observable) {
 		return deferUI(observable.map(TO_BITMAP)).subscribe(new Action1<Bitmap>() { @Override public void call(Bitmap bitmap) {
 			imageView.setImageBitmap(bitmap);
 		}});
 	}
 
-	
+
 	protected Subscription plugActionBarIcon(ActionBar actionBar, Observable<byte[]> observable) {
 		return plugActionBarIcon(actionBar, observable, getResources());
 	}
@@ -87,48 +87,48 @@ public class SneerActivity extends Activity {
 			actionBar.setTitle(obj.toString());
 		}});
 	}
-	
-	
+
+
 	public static Subscription plugHeaderTitle(final ContextMenu menu, Observable<?> observable) {
 		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			menu.setHeaderTitle(obj.toString());
 		}});
 	}
-	
-	
+
+
 	public static Subscription plugDate(final TextView textView, Observable<Long> date) {
 		return plug(textView, Observable.combineLatest(EVERY_MINUTE, date, new Func2<Long, Long, String>() { @Override public String call(Long tickIgnored, Long date) {
 			return prettyTime(date);
 		}}));
 	}
-	
-	
+
+
 	public static String prettyTime(Long timestamp) {
 		return new PrettyTime().format(new Date(timestamp));
 	}
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	static public <V> V findView(View view, int id) {
 		return (V)view.findViewById(id);
 	}
-	
-	
+
+
 	protected Button button(int id) {
 		return (Button)findViewById(id);
 	}
-	
-	
+
+
 	protected TextView textView(int id) {
 		return (TextView)findViewById(id);
 	}
 
-	
+
 	static public TextView findTextView(View view, int id) {
 		return (TextView)view.findViewById(id);
 	}
 
-	
+
 	static public ImageView findImageView(View view, int id) {
 		return (ImageView)view.findViewById(id);
 	}
@@ -138,29 +138,29 @@ public class SneerActivity extends Activity {
 	protected void toast(FriendlyException e) { toast(e.getMessage(), LENGTH_LONG); }
 	protected void toast(final Object text, final int length) {
 		this.runOnUiThread(new Runnable() {  @Override public void run() {
-			Toast.makeText(SneerActivity.this, text.toString(), length).show(); 
-		} });
+			Toast.makeText(SneerActivity.this, text.toString(), length).show();
+		}});
 	}
 
-	
+
 	@SuppressWarnings("unchecked")
 	protected <T> T getExtra(String extra) {
 		Bundle extras = getIntent().getExtras();
 		return extras == null ? null : (T)extras.get(extra);
 	}
-	
-	
+
+
 	public static <T> Observable<T> deferUI(Observable<T> observable) {
 		return observable
 				.subscribeOn(Schedulers.computation())
 				.observeOn(AndroidSchedulers.mainThread());
 	}
-	
+
 	public static Bitmap toBitmap(byte[] bytes) {
 		return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 	}
-	
-	
+
+
 	public static Func1<byte[], Drawable> toDrawable(final Resources resources) {
 		return new Func1<byte[], Drawable>() { @Override public Drawable call(byte[] bytes) {
 			return toDrawable(bytes, resources);
@@ -169,17 +169,17 @@ public class SneerActivity extends Activity {
 	public static Drawable toDrawable(byte[] bytes, Resources resources) {
 		return new BitmapDrawable(resources, toBitmap(bytes));
 	}
-	
-	
+
+
 	protected Bitmap loadBitmap(Intent intent) throws FriendlyException {
 		final Bundle extras = intent.getExtras();
 		if (extras != null && extras.get("data") != null)
 			return (Bitmap)extras.get("data");
-		
+
 		Uri uri = intent.getData();
 		if (uri == null)
 			throw new FriendlyException("No image found.");
-	
+
 		try {
 			return BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
 		} catch (FileNotFoundException e) {
@@ -201,13 +201,13 @@ public class SneerActivity extends Activity {
 			reduced = ThumbnailUtils.extractThumbnail(original, side, side);
 		}
 	}
-	
-	
+
+
 	public void navigateTo(Class<?> class1) {
 		startActivity(new Intent().setClass(this, class1));
 	}
 
-	
+
 	protected void alert(String title, CharSequence[] items, DialogInterface.OnClickListener onClickListener) {
 		new AlertDialog.Builder(this)
 			.setTitle(title)
@@ -218,7 +218,7 @@ public class SneerActivity extends Activity {
 			}});;
 	}
 
-	
+
 	public byte[] readFully(InputStream inputStream) throws FriendlyException {
 		byte[] b = new byte[8192];
 		int read;
@@ -232,11 +232,11 @@ public class SneerActivity extends Activity {
 		}
 		return out.toByteArray();
 	}
-	
-	
+
+
 	public static void log(Activity activity, Object obj) {
 		Log.d(activity.getClass().getSimpleName(), obj.toString());
 	}
-	
+
 }
 

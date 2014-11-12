@@ -35,7 +35,6 @@ public class KeysImpl implements Keys {
 
 	private static final SecureRandom random = new SecureRandom();
 
-
 	static {
 		if (Security.getProvider("BC") == null) {
 			check(!isAndroid());
@@ -43,8 +42,6 @@ public class KeysImpl implements Keys {
 		}
 		autotest();
 	}
-
-
 
 
 	public PrivateKey createPrivateKey() {
@@ -99,7 +96,6 @@ public class KeysImpl implements Keys {
 
 	@SuppressWarnings("unused") //This will be used when we start actually using real crypto.
 	private java.security.PublicKey decode(byte[] bytes) {
-
 		byte[] tmp = new byte[33]; //BigInteger wastes one byte for signed representation.
 		arraycopy(bytes,  0, tmp, 1, 32);
 		BigInteger x = new BigInteger(tmp);

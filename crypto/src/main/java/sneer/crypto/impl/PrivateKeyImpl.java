@@ -13,8 +13,8 @@ class PrivateKeyImpl implements PrivateKey { private static final long serialVer
 	private final PublicKey puk;
 	@SuppressWarnings("unused")
 	private final java.security.PrivateKey delegatePrik;
-	
-	
+
+
 	PrivateKeyImpl(byte[] seed, java.security.PrivateKey prik, java.security.PublicKey puk, byte[] pukBytes) {
 		this.seed = seed;
 		delegatePrik = prik;
@@ -26,32 +26,32 @@ class PrivateKeyImpl implements PrivateKey { private static final long serialVer
 	public PublicKey publicKey() {
 		return puk;
 	}
-	
-	
+
+
 	@Override
 	public byte[] toBytes() {
 		return seed;
 	}
-	
-	
+
+
 	@Override
 	public String toHex() {
 		return Codec.toHex(toBytes());
 	}
 
-	
+
 	@Override
 	public String toString() {
 		return "PRIK:" + publicKey().toHex().substring(0, 5);
 	}
-	
+
 
 	@Override
 	public int hashCode() {
 		return Codec.hashCode(seed);
 	}
 
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

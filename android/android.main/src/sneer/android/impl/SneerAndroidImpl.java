@@ -63,7 +63,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 			.tuples()
 			.filter(new Func1<Tuple, Boolean>() {  @Override public Boolean call(Tuple tuple) {
 				return !tuple.author().equals(sneer().self().publicKey().current());
-			} })
+			}})
 			.subscribe(new Action1<Tuple>() {  @Override public void call(Tuple tuple) {
 
 				log("-------------> "+ tuple.type() + " - " + tuple.payload());
