@@ -2,14 +2,14 @@ import java.nio.file.*;
 import org.gradle.api.artifacts.*;
 
 ext {
-    external = [
-        rx: [version: '0.20.3'],
-        android: [
-            sdkVersion: 19,
-            minSdkVersion: 16,
-            buildToolsVersion: '19.0.3'
-        ]
+  external = [
+    rx: [version: '0.20.3'],
+    android: [
+        sdkVersion: 21,
+        minSdkVersion: 16,
+        buildToolsVersion: '21.1.1'
     ]
+  ]
 }
 
 buildscript {

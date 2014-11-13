@@ -13,7 +13,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.0+'
+        classpath 'com.android.tools.build:gradle:0.14.+'
     }
 }
 
@@ -104,7 +104,7 @@ android.libraryVariants.all { variant ->
 	}
 
 	task sourcesJar(type: Jar) {
-        from variant.javaCompile.source
+    from variant.javaCompile.source
 	    classifier = 'sources'
 	}
 
@@ -116,7 +116,5 @@ android.libraryVariants.all { variant ->
 	}
 
 }
-
-
 
 defaultTasks 'copyLibs'
