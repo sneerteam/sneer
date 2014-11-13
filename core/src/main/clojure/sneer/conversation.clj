@@ -54,7 +54,7 @@
     (subscribe-on-io
       msg-tuples-in
       (fn [_]
-        (if-not @being-read (swap! unread-message-counter inc))))
+        (if-not @being-read (swap! unread-message-counter 0))))
     
     (reify
       Conversation
