@@ -10,19 +10,17 @@ buildscript {
     }
 }
 
-
 dependencies {
     compile 'com.netflix.rxjava:rxjava-android:' + external.rx.version
     compile 'com.jayway.android.robotium:robotium-solo:5.2.1'
-    compile project(':android.main')
-    compile ('me.sneer:core.tests:0.0.1') {
-       exclude group:'org.bouncycastle'
-    }
+    //compile project(':android.main')
+    //compile ('me.sneer:core.tests:0.0.1') {
+    //   exclude group:'org.bouncycastle'
+    //}
 }
 
 
 android {
-
     lintOptions {
         abortOnError false
     }
