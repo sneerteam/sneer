@@ -1,0 +1,25 @@
+//To produce an image called networking.png using this input file:
+//apt-get install graphviz
+//dot -Tpng -onetworking.png networking-dot.txt
+
+digraph {
+
+	splines=line;
+
+	subgraph cluster_router { label="Router";
+		Router;
+	}
+
+	subgraph cluster_client { label="Client";
+		TupleDispatcher -> { TupleBase Router };
+		RouterProxy -> { Router } [style=dashed, arrowhead=onormal];
+		ClientMain -> { TupleDispatcher RouterProxy }
+	}
+
+	subgraph cluster_server { label="Server";
+		RouterImpl -> { Router } [style=dashed, arrowhead=onormal];
+		ServerConnection -> Router;
+		ServerMain -> { RouterImpl ServerConnection }
+	}
+
+}
