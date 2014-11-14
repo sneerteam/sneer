@@ -2,6 +2,55 @@
 //apt-get install graphviz
 //dot -Tpng -onetworking.png networking-dot.txt
 
+//sneer.async
+//  committed [chan]
+//    "Returns a channel that will forward to chan following every value with :commit."
+//    "  E.g.: v1 :commit v2 :commit v3 :commit...
+//    "  If chan has no buffer, this will result in chan blocking until the consumer of the returned channel has taken the value and the :commit."
+//    "  This can be used to synchronize producer and consumer, much like a function call."
+//
+//
+//CLIENT:
+//
+//  defprotocol Router
+//    queue-for [receiver-puk]
+//      "Returns a committed channel for the outgoing tuples for the receiver."
+//    tuples-in []
+//	"Returns a committed channel for incoming tuples."
+//
+//  connect-to-server [own-puk]
+//    "Returns a Router."
+//
+//  start-dispatching-tuples [tuplebase router]
+//
+//
+//SERVER:
+//
+//  start-server []
+//    "Returns a Server."
+//
+//  defprotocol Server
+//    enqueue [from-puk to-puk tuple]
+//      "Returns true if the tuple was enqueued to be forwarded, false if the queue was full."
+//
+//    tuples-for [receiver]
+//      "Returns a channel for outgoing tuples for receiver separated by :commit."
+//      "  E.g.: t1 :commit t2 :commit t3 :commit
+//      "  :commit should only be consumed after the preceding tuple is ackd by the client, so that the tuple be removed from the queue."
+//
+//    connect-to-server [own-puk]
+//    "Returns [tuples-out-enqueue-fn tuples-in]."
+//    "  tuples-out-enqueue-fn is a fn with two args (receiver-puk and tuple)."
+//    "    It returns whether tuple was enqueued to be forwarded, false if the queue is full."
+//    "  tuples-in is a channel for incoming tuples separated by :commit."
+//    "    E.g.: t1 :commit t2 :commit t3 :commit
+//    "    :commit should only be consumed after the preceding tuple is persisted."
+//
+//  start-dispatching-tuples [tuplebase tuples-out-enqueue-fn tuples-in]
+//
+
+
+
 digraph {
 
 	splines=line;
