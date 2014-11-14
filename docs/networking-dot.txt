@@ -12,63 +12,82 @@
 //
 //CLIENT:
 //
-//  defprotocol Router
+//  defprotocol RouterConnection
 //    queue-for [receiver-puk]
 //      "Returns a committed channel for the outgoing tuples for the receiver."
 //    tuples-in []
 //	"Returns a committed channel for incoming tuples."
 //
-//  connect-to-server [own-puk]
-//    "Returns a Router."
+//  open-router-connection [own-puk]
+//    "Returns a RouterConnection to the server at dynamic.sneer.me:7777 using UDP."
 //
-//  start-dispatching-tuples [tuplebase router]
+//  start-dispatching-tuples [tuplebase router-connection]
 //
 //
 //SERVER:
 //
-//  start-server []
-//    "Returns a Server."
-//
-//  defprotocol Server
+//  defprotocol Router
 //    enqueue [from-puk to-puk tuple]
 //      "Returns true if the tuple was enqueued to be forwarded, false if the queue was full."
-//
 //    tuples-for [receiver]
-//      "Returns a channel for outgoing tuples for receiver separated by :commit."
-//      "  E.g.: t1 :commit t2 :commit t3 :commit
-//      "  :commit should only be consumed after the preceding tuple is ackd by the client, so that the tuple be removed from the queue."
+//      "Returns a commited channel for the outgoing tuples to receiver."
 //
-//    connect-to-server [own-puk]
-//    "Returns [tuples-out-enqueue-fn tuples-in]."
-//    "  tuples-out-enqueue-fn is a fn with two args (receiver-puk and tuple)."
-//    "    It returns whether tuple was enqueued to be forwarded, false if the queue is full."
-//    "  tuples-in is a channel for incoming tuples separated by :commit."
-//    "    E.g.: t1 :commit t2 :commit t3 :commit
-//    "    :commit should only be consumed after the preceding tuple is persisted."
+//  start-router []
+//    "Returns a Router."
 //
-//  start-dispatching-tuples [tuplebase tuples-out-enqueue-fn tuples-in]
-//
+//  serve-router-connections [router]
+//    "Opens UDP port 7777 and services incoming connections."
 
+//Using fns instead of committed channels:
+//
+//CLIENT:
+//
+//  defprotocol RouterConnection
+//    queue-for [receiver-puk]
+//      "Returns a fn for the outgoing tuples for the receiver."
+//    init-consumer-for-tuples-in [fn]
+//	"Registers the fn that will handle tuples-in."
+//
+//  open-router-connection [own-puk]
+//    "Returns a RouterConnection to the server at dynamic.sneer.me:7777 using UDP."
+//
+//  start-dispatching-tuples [tuplebase router-connection]
+//
+//
+//SERVER:
+//
+//  defprotocol Router
+//    enqueue [from-puk to-puk tuple]
+//      "Returns true if the tuple was enqueued to be forwarded, false if the queue was full."
+//    init-consumer-for-tuples-for [receiver]
+//	"Registers the fn that will handle tuples to receiver."
+//
+//  start-router []
+//    "Returns a Router."
+//
+//  serve-router-connections [router]
+//    "Opens UDP port 7777 and services incoming connections."
 
 
 digraph {
 
 	splines=line;
 
-	subgraph cluster_router { label="Router";
-		Router;
+	subgraph cluster_udp { label="UDP";
+		UDP;
 	}
 
 	subgraph cluster_client { label="Client";
-		TupleDispatcher -> { TupleBase Router };
-		RouterProxy -> { Router } [style=dashed, arrowhead=onormal];
-		ClientMain -> { TupleDispatcher RouterProxy }
+		"open-router-connection" -> RouterConnection [style=dashed, arrowhead=onormal];
+		"open-router-connection" -> UDP;
+		"start-dispatching-tuples" -> { TupleBase RouterConnection };
+		"client-main" -> { "open-router-connection" "start-dispatching-tuples" }
 	}
 
 	subgraph cluster_server { label="Server";
-		RouterImpl -> { Router } [style=dashed, arrowhead=onormal];
-		ServerConnection -> Router;
-		ServerMain -> { RouterImpl ServerConnection }
+		"start-router" -> Router [style=dashed, arrowhead=onormal];
+		"serve-router-connections" -> { UDP Router }
+		"server-main" -> { "start-router" "serve-router-connections" }
 	}
 
 }
