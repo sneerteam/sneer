@@ -1,60 +1,94 @@
 (ns sneer.server.router-test
   (:require
-   [clojure.core.async :as async :refer [>! <! >!! <!! alts!! timeout]]
-   [clojure.test :refer :all]
+   [clojure.core.async :as async :refer [alt! chan >! <! >!! <!! alts!! timeout]]
    [midje.sweet :refer :all]
-   [sneer.server.router :as router]
-   [sneer.server.io :as io]))
+   [sneer.test-util :refer :all]
+   [sneer.async :refer :all]
+   [sneer.commons :refer [produce!]]
+   [sneer.server.router :as router]))
 
-(defn <?!! [c]
-  (let [[v _] (alts!! [c (timeout 100)])]
-    v))
+(def ^:private empty-q clojure.lang.PersistentQueue/EMPTY)
 
-(defn create-puk [seed]
-  seed)
+(defn dropping-conj [max-size xs x]
+  (let [full? (>= (count xs) max-size)]
+    (if full? xs (conj xs x))))
 
-(defn create-router []
-  (let [packets-in (async/chan 1)
-        packets-out (async/chan 1)]
-    (router/start packets-in packets-out)
-    {:packets-in packets-in :packets-out packets-out}))
+(defn dropping-enqueue [max-size q element]
+  (dropping-conj max-size (or q empty-q) element))
 
-(defn send! [router packet]
-  (>!! (:packets-in router) packet))
+(defn pop-only [xs x]
+  (if (= x (peek xs))
+    (pop xs)
+    xs))
 
-(defn take?! [router]
-  (<?!! (:packets-out router)))
+(defprotocol Router
+  (enqueue! [_ sender receiver tuple]
+    "Adds tuple to its receiver/sender send queue if the queue isn't full. Returns whether the queue was able to accept tuple (queue was not full).")
+  (peek-tuple-for [_ receiver]
+    "Returns the next tuple to be sent to receiver.")
+  (pop-tuple-for! [_ receiver]
+    "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the from-puk of the sender to be notified."))
 
-(defn retry! [router]
-  #_(>!! (:retry router) ::stimulus))
+(defn create-router [queue-size]
+  (let [enqueue (partial dropping-enqueue queue-size)
+        qs (atom {})]
+    (reify Router
+      (enqueue! [_ sender receiver tuple]
+        (let [qs-before @qs]
+        #_(swap! qs update-in [receiver sender] enqueue tuple)
+          (swap! qs update-in [receiver       ] enqueue tuple)
+          (not (identical? qs qs-before))))
+      (peek-tuple-for [_ receiver]
+        (peek (@qs receiver)))
+      (pop-tuple-for! [_ receiver]
+        ))))
 
-(def ^:private client-a
-  (create-puk "ca"))
-
-(def ^:private client-b
-  (create-puk "cb"))
-
-(def ^:private client-c
-  (create-puk "cc"))
-
-(defn hash-data [string]
-  (str "#" string))
+#_(defn start-router [in out queue-size send-retry-timeout-fn]
+   "in - channel with:
+     {:enqueue-packet-to-forward packet} where packet: {:from puk :to puk :tuple t}
+     {:dequeue-packet-sent       packet} where packet: {:from puk :to puk :tuple t}
+   out - channel for:
+     {:enqueue-result boolean :packet packet} where packet: {:from puk :to puk :tuple t}
+     {:next-packet-to-send packet}            where packet: {          :to puk :tuple t}"
+   (let [enqueue (fn [q tuple] dropping-enqueue queue-size q tuple)]
+     (go-trace
+       (loop [qs {} ; {to {from q}} where q: PersistentQueue of tuple.
+              receivers [] ]
+         (alt!
+           in
+           ([command]
+             (recur
+               (match command
+                 {:enqueue-packet-to-forward packet}
+              
+                 (let [{:keys [from to tuple]} packet
+                       new-qs (update-in qs [to from] enqueue tuple)
+                       accepted? (not (identical? new-qs qs))]
+                   (>! out {:enqueue-result accepted? :packet packet})
+                   new-qs)
+              
+                 {:dequeue-packet-sent {:from from :to to :tuple tuple}}
+                 (update-in qs [to from] pop-only tuple)))
+             (when new-tuple-arrived-at-first-queue-position (>! out {:next-packet-to-send packet}))
+             )
+      
+           [packets-to-send packet | :none ]
+      
+           )))))
 
 (facts
- "Facts about client/server conversations"
+  "Routing"
 
-  (fact "to each ping its pong"
-        (let [router (create-router)]
-          (send! router      {:intent :ping :from client-a})
-          (take?! router) => {:intent :pong :to   client-a}))
+  (let [q-size 3
+        router (create-router q-size)]
+    
+    (fact "Queues start empty and accept tuples."
+      (enqueue! router :A :B "Hello") => true)
 
-  #_(fact "sendTo(Puk receiver, byte[] payload) => receiveFrom(Puk sender, byte[] payload)"
-         (let [router (create-router)]
-           (send! router      {:intent :send    :from client-a :to client-b :data "42"})
-           (take?! router) => {:intent :ack     :to   client-a :hash (hash-data "42")}
-           (take?! router) => {:intent :send    :to   client-b :data "42"}
-           (send! router      {:intent :send    :from client-a :to client-b :data "43"})
-           (take?! router) => {:intent :ack     :to   client-a :hash (hash-data "43")}
-           (retry! router)
-           (take?! router) => {:intent :send    :to   client-b :data "42"}
-           )))
+    (fact "One value is routed from A to B"
+      (peek-tuple-for router :B) => "Hello")
+
+    (fact "One value is routed from B to A"
+      (enqueue! router :B :A "Hi there")
+      (peek-tuple-for router :A) => "Hi there")
+    ))
