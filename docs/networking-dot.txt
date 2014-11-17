@@ -18,8 +18,8 @@
 //    tuples-in []
 //	"Returns a committed channel for incoming tuples."
 //
-//  open-router-connection [own-puk]
-//    "Returns a RouterConnection to the server at dynamic.sneer.me:7777 using UDP."
+//  open-router-connection [host own-puk]
+//    "Returns a RouterConnection to the host and port using UDP port 7777."
 //
 //  start-dispatching-tuples [tuplebase router-connection]
 //
@@ -30,13 +30,14 @@
 //    enqueue [from-puk to-puk tuple]
 //      "Returns true if the tuple was enqueued to be forwarded, false if the queue was full."
 //    tuples-for [receiver]
-//      "Returns a commited channel for the outgoing tuples to receiver."
+//      "Returns a committed channel for the outgoing tuples to receiver."
 //
 //  start-router []
 //    "Returns a Router."
 //
 //  serve-router-connections [router]
 //    "Opens UDP port 7777 and services incoming connections."
+
 
 //Using fns instead of committed channels:
 //
