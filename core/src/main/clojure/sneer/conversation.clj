@@ -74,7 +74,7 @@
           (pub)))
       
       (mostRecentMessageContent [this]
-        (.observed (ObservedSubject/create "hello")))
+        (.observed (ObservedSubject/create "")))
       
       (mostRecentMessageTimestamp [this]
         (.observed (ObservedSubject/create (now))))
