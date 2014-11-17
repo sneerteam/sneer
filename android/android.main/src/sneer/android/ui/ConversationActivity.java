@@ -67,7 +67,6 @@ public class ConversationActivity extends SneerActivity {
 		setContentView(R.layout.activity_conversation);
 		justOpened = true;
 		actionBar = getActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
 
 		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));

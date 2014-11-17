@@ -54,7 +54,6 @@ public class MainActivity extends SneerActivity {
 
 	private void makeConversationList() {
 		final ActionBar actionBar = getActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setHomeButtonEnabled(true);
 
 		plugActionBarTitle(actionBar, ownProfile.ownName());
