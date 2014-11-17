@@ -34,14 +34,13 @@
         qs (atom {})]
     (reify Router
       (enqueue! [_ sender receiver tuple]
-        (let [qs-before @qs]
-        #_(swap! qs update-in [receiver sender] enqueue tuple)
-          (swap! qs update-in [receiver       ] enqueue tuple)
-          (not (identical? qs qs-before))))
+        (let [qs-before @qs
+              qs-after (swap! qs update-in [receiver #_sender ] enqueue tuple)]
+          (not (identical? qs-after qs-before))))
       (peek-tuple-for [_ receiver]
         (peek (@qs receiver)))
       (pop-tuple-for! [_ receiver]
-        ))))
+        (swap! qs update-in [receiver] pop)))))
 
 #_(defn start-router [in out queue-size send-retry-timeout-fn]
    "in - channel with:
@@ -91,4 +90,14 @@
     (fact "One value is routed from B to A"
       (enqueue! router :B :A "Hi there")
       (peek-tuple-for router :A) => "Hi there")
-    ))
+
+    (fact "Tuples are enqueued."
+      (enqueue! router :A :B "Hello Again")
+      (peek-tuple-for router :B) => "Hello"
+      (pop-tuple-for! router :B)
+      (peek-tuple-for router :B) => "Hello Again")
+
+    (fact "Tuples grow up to max-size."
+      (enqueue! router :A :B "Msg 2")
+      (enqueue! router :A :B "Msg 3") => true
+      (enqueue! router :A :B "Msg 3") => false)))
