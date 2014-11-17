@@ -24,7 +24,6 @@ import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -102,8 +101,8 @@ public class SneerAndroidImpl implements SneerAndroid {
 			.setOngoing(false)
 			.setContentIntent(pendIntent);
 
-		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		//mNotificationManager.notify("sneer:"+tuple.type(), 0, builder.getNotification());
+//		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//		mNotificationManager.notify("sneer:"+tuple.type(), 0, builder.getNotification());
 	}
 
 
