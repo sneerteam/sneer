@@ -35,8 +35,17 @@
       after
       (assoc after :turn sender))))
 
+(defn next-turn [receiver-q]
+  (let [senders (-> receiver-q :qs-by-sender keys vec)
+        turn (:turn receiver-q)
+        index (.indexOf senders turn)]
+    (get senders (mod (inc index) (count senders)))))
+
 (defn pop-tuple [receiver-q]
-  (update-in receiver-q [:qs-by-sender (:turn receiver-q)] pop))
+  (let [after (update-in receiver-q [:qs-by-sender (:turn receiver-q)] pop)]
+    (if (identical? after receiver-q)
+      after
+      (assoc after :turn (next-turn receiver-q)))))
 
 (defn create-router [queue-size]
   (let [enqueue-fn (partial dropping-enqueue queue-size)
@@ -85,13 +94,10 @@
      (enqueue! router :C :B "Hello  from C")
      (enqueue! router :C :B "Hello2 from C")
      (pop-tuple-for! router :B)
-;     (peek-tuple-for router :B) => "Hello  from C"
-;     (pop-tuple-for! router :B)
-;     (peek-tuple-for router :B) => "Msg 2"
-;     (pop-tuple-for! router :B)
-;     (peek-tuple-for router :B) => "Hello2 from C"
-;     (pop-tuple-for! router :B)
-;     (peek-tuple-for router :B) => "Msg 3"
-)
-    
-    ))
+     (peek-tuple-for router :B) => "Hello  from C"
+     (pop-tuple-for! router :B)
+     (peek-tuple-for router :B) => "Msg 2"
+     (pop-tuple-for! router :B)
+     (peek-tuple-for router :B) => "Hello2 from C"
+     (pop-tuple-for! router :B)
+     (peek-tuple-for router :B) => "Msg 3")))
