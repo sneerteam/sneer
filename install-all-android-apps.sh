@@ -1,3 +1,4 @@
+#!/bin/bash
 cd android &&
 
 # Remove android.main.tests stuff that is not working :(
