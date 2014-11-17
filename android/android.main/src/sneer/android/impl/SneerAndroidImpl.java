@@ -103,7 +103,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 			.setContentIntent(pendIntent);
 
 		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify("sneer:"+tuple.type(), 0, builder.getNotification());
+		//mNotificationManager.notify("sneer:"+tuple.type(), 0, builder.getNotification());
 	}
 
 
