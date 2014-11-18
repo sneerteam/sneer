@@ -29,6 +29,11 @@
   (pop-tuple-for! [_ receiver]
     "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the from-puk of the sender to be notified."))
 
+(defn peek-for [receiver-q]
+  (let [{:keys [qs-by-sender turn]} receiver-q]
+    (when qs-by-sender
+      (peek (qs-by-sender turn)))))
+
 (defn enqueue-for [receiver-q enqueue-fn sender tuple]
   (let [after (update-in receiver-q [:qs-by-sender sender] enqueue-fn tuple)]
     (if-some [turn (:turn receiver-q)]
@@ -37,15 +42,33 @@
 
 (defn next-turn [receiver-q]
   (let [senders (-> receiver-q :qs-by-sender keys vec)
-        turn (:turn receiver-q)
-        index (.indexOf senders turn)]
-    (get senders (mod (inc index) (count senders)))))
+        count (count senders)]
+    (if (zero? count)
+      nil
+      (let [turn (:turn receiver-q)
+            index (.indexOf senders turn)]
+        (get senders (mod (inc index) count))))))
 
 (defn pop-tuple [receiver-q]
-  (let [after (update-in receiver-q [:qs-by-sender (:turn receiver-q)] pop)]
-    (if (identical? after receiver-q)
-      after
-      (assoc after :turn (next-turn receiver-q)))))
+  (let [before receiver-q
+        turn (:turn before)
+        receiver-q (update-in before [:qs-by-sender turn] pop)]
+    (if (identical? receiver-q before)
+      before
+      (let [empty? (nil? (peek-for receiver-q))
+            receiver-q (if empty?
+                         (update-in receiver-q [:qs-by-sender] dissoc turn)
+                         receiver-q)]
+        (if-some [next-turn (next-turn receiver-q)]
+          (assoc receiver-q :turn next-turn)
+          nil)))))
+
+(defn pop-tuple-for [qs receiver]
+  (let [qs (update-in qs [receiver] pop-tuple)
+        empty? (-> qs receiver peek-for nil?)]
+    (if empty?
+      (dissoc qs receiver)
+      qs)))
 
 (defn create-router [queue-size]
   (let [enqueue-fn (partial dropping-enqueue queue-size)
@@ -55,49 +78,66 @@
         (let [qs-before @qs
               qs-after (swap! qs update-in [receiver] enqueue-for enqueue-fn sender tuple)]
           (not (identical? qs-after qs-before))))
-      (peek-tuple-for [_ receiver] ; { :qs-by-sender sender->q  :turn sender }
-        (let [qs @qs
-              {:keys [qs-by-sender turn]} (qs receiver)]
-          (peek (qs-by-sender turn))))
+      (peek-tuple-for [_ receiver]
+        (peek-for (@qs receiver)))
       (pop-tuple-for! [_ receiver]
-        (swap! qs update-in [receiver] pop-tuple)))))
+        (swap! qs pop-tuple-for receiver)))))
 
 
 (facts
   "Routing"
 
-  (let [q-size 3
-        router (create-router q-size)]
+  (let [max-q-size 3
+        subject (atom nil)
+        reset! #(reset! subject (create-router max-q-size))
+        enq! (fn [from to msg] (enqueue! @subject from to msg))
+        peek #(peek-tuple-for @subject %)
+        pop! #(pop-tuple-for! @subject %)]
     
+    (reset!)
+
     (fact "Queues start empty and accept tuples."
-      (enqueue! router :A :B "Hello") => true)
+      (peek :B) => nil
+      (enq! :A :B "Hello") => true)
 
     (fact "One value is routed from A to B"
-      (peek-tuple-for router :B) => "Hello")
+      (peek :B) => "Hello")
 
     (fact "One value is routed from B to A"
-      (enqueue! router :B :A "Hi there")
-      (peek-tuple-for router :A) => "Hi there")
+      (enq! :B :A "Hi there")
+      (peek :A) => "Hi there")
 
     (fact "Tuples are enqueued."
-      (enqueue! router :A :B "Hello Again")
-      (peek-tuple-for router :B) => "Hello"
-      (pop-tuple-for! router :B)
-      (peek-tuple-for router :B) => "Hello Again")
+      (enq! :A :B "Hello Again")
+      (peek :B) => "Hello"
+      (pop! :B)
+      (peek :B) => "Hello Again")
 
     (fact "Tuples grow up to max-size."
-      (enqueue! router :A :B "Msg 2")
-      (enqueue! router :A :B "Msg 3") => true
-      (enqueue! router :A :B "Msg 4") => false)
+      (enq! :A :B "Msg 2")
+      (enq! :A :B "Msg 3") => true
+      (enq! :A :B "Msg 4") => false)
     
     (fact "Tuples from multiple senders are multiplexed."
-     (enqueue! router :C :B "Hello  from C")
-     (enqueue! router :C :B "Hello2 from C")
-     (pop-tuple-for! router :B)
-     (peek-tuple-for router :B) => "Hello  from C"
-     (pop-tuple-for! router :B)
-     (peek-tuple-for router :B) => "Msg 2"
-     (pop-tuple-for! router :B)
-     (peek-tuple-for router :B) => "Hello2 from C"
-     (pop-tuple-for! router :B)
-     (peek-tuple-for router :B) => "Msg 3")))
+     (enq! :C :B "Hello  from C")
+     (enq! :C :B "Hello2 from C")
+     (pop! :B)
+     (peek :B) => "Hello  from C"
+     (pop! :B)
+     (peek :B) => "Msg 2"
+     (pop! :B)
+     (peek :B) => "Hello2 from C"
+     (pop! :B)
+     (peek :B) => "Msg 3")
+  
+    (reset!)
+    
+    (fact "Queues that become empty are discarded"
+      (enq! :A :B "A1")
+      (enq! :C :B "C1")
+      (enq! :C :B "C2")
+      (pop! :B) ; "A1"
+      (pop! :B) ; "C1"
+      (peek :B) => "C2"
+      (pop! :B)
+      (peek :B) => nil)))
