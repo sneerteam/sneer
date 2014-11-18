@@ -1,6 +1,6 @@
 (ns sneer.server.router-test
   (:require
-   [clojure.core.async :as async :refer [alt! chan >! <! >!! <!! alts!! timeout]]
+   [clojure.set :refer [difference]]
    [midje.sweet :refer :all]
    [sneer.test-util :refer :all]
    [sneer.async :refer :all]
@@ -29,52 +29,55 @@
   (pop-tuple-for! [_ receiver]
     "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the sender to be notified."))
 
-(defn peek-for [receiver-q]
+(defn- peek-for [receiver-q]
   (let [{:keys [qs-by-sender turn]} receiver-q]
     (when qs-by-sender
       (peek (qs-by-sender turn)))))
 
-(defn enqueue-for [receiver-q enqueue-fn sender tuple]
-  (let [after (update-in receiver-q [:qs-by-sender sender] enqueue-fn tuple)]
-    (if-some [turn (:turn receiver-q)]
-      after
-      (assoc after :turn sender))))
+(defn- enqueue-for [receiver-q enqueue-fn sender tuple]
+  (let [before receiver-q
+        receiver-q (update-in before [:qs-by-sender sender] enqueue-fn tuple)]
+    (if-some [turn (:turn before)]
+      receiver-q
+      (assoc receiver-q :turn sender))))
 
-(defn next-turn [receiver-q]
-  (let [senders (-> receiver-q :qs-by-sender keys vec)
-        count (count senders)]
+(defn- next-turn [coll turn]
+  (let [count (count coll)]
     (if (zero? count)
       nil
-      (let [turn (:turn receiver-q)
-            index (.indexOf senders turn)]
-        (get senders (mod (inc index) count))))))
+      (let [vec (vec coll)
+            index (.indexOf vec turn)]
+        (get vec (mod (inc index) count))))))
 
-(defn pop-tuple [receiver-q]
+(defn- pop-tuple! [receiver-q]
   (let [before receiver-q
         turn (:turn before)
-        receiver-q (update-in before [:qs-by-sender turn] pop)]
-    (if (identical? receiver-q before)
-      before
-      (let [empty? (nil? (peek-for receiver-q))
-            receiver-q (if empty?
-                         (update-in receiver-q [:qs-by-sender] dissoc turn)
-                         receiver-q)]
-        (if-some [next-turn (next-turn receiver-q)]
-          (assoc receiver-q :turn next-turn)
-          nil)))))
+        receiver-q (update-in before [:qs-by-sender turn] pop)
+        empty? (nil? (peek-for receiver-q))
+        receiver-q (if empty?
+                     (update-in receiver-q [:qs-by-sender] dissoc turn)
+                     receiver-q)
+        senders (-> before :qs-by-sender keys)]
+      (if-some [next-turn (next-turn senders turn)]
+        (assoc receiver-q :turn next-turn)
+        nil))
+  )
 
-(defn pop-tuple-for [qs receiver]
-  (let [qs (update-in qs [receiver] pop-tuple)
+(defn- pop-for! [qs receiver]
+  (let [qs (update-in qs [receiver] pop-tuple!)
         empty? (-> qs receiver peek-for nil?)]
     (if empty?
       (dissoc qs receiver)
       qs)))
 
+(defn- senders-to-notify-of [qs receiver]
+  (get-in qs [receiver :senders-to-notify-when-empty]))
+
 (defn create-router [queue-size]
   (let [enqueue-fn (partial dropping-enqueue queue-size)
         qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
                       ;              :turn                         sender
-                      ;              :senders-to-notify-when-empty #(sender) } } 
+                      ;              :senders-to-notify-when-empty #{sender} } } 
     (reify Router
       (enqueue! [_ sender receiver tuple]
         (let [qs-before @qs
@@ -83,8 +86,10 @@
       (peek-tuple-for [_ receiver]
         (peek-for (@qs receiver)))
       (pop-tuple-for! [_ receiver]
-        (swap! qs pop-tuple-for receiver)
-        nil))))
+        (let [to-notify #(get-in @qs [receiver :senders-to-notify-when-empty])
+              to-notify-before (to-notify)]
+          (swap! qs pop-for! receiver)
+          (-> (difference to-notify-before (to-notify)) first))))))
 
 
 (facts
