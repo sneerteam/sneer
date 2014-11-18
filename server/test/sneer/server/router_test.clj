@@ -27,7 +27,7 @@
   (peek-tuple-for [_ receiver]
     "Returns the next tuple to be sent to receiver.")
   (pop-tuple-for! [_ receiver]
-    "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the from-puk of the sender to be notified."))
+    "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the sender to be notified."))
 
 (defn peek-for [receiver-q]
   (let [{:keys [qs-by-sender turn]} receiver-q]
@@ -92,7 +92,7 @@
         reset! #(reset! subject (create-router max-q-size))
         enq! (fn [from to msg] (enqueue! @subject from to msg))
         peek #(peek-tuple-for @subject %)
-        pop! #(pop-tuple-for! @subject %)]
+        pop! #(do (pop-tuple-for! @subject %) (peek %))]
     
     (reset!)
 
@@ -110,8 +110,7 @@
     (fact "Tuples are enqueued."
       (enq! :A :B "Hello Again")
       (peek :B) => "Hello"
-      (pop! :B)
-      (peek :B) => "Hello Again")
+      (pop! :B) => "Hello Again")
 
     (fact "Tuples grow up to max-size."
       (enq! :A :B "Msg 2")
@@ -119,25 +118,31 @@
       (enq! :A :B "Msg 4") => false)
     
     (fact "Tuples from multiple senders are multiplexed."
-     (enq! :C :B "Hello  from C")
-     (enq! :C :B "Hello2 from C")
-     (pop! :B)
-     (peek :B) => "Hello  from C"
-     (pop! :B)
-     (peek :B) => "Msg 2"
-     (pop! :B)
-     (peek :B) => "Hello2 from C"
-     (pop! :B)
-     (peek :B) => "Msg 3")
+      (enq! :C :B "Hello  from C")
+      (enq! :C :B "Hello2 from C")
+      (pop! :B) => "Hello  from C"
+      (pop! :B) => "Msg 2"
+      (pop! :B) => "Hello2 from C"
+      (pop! :B) => "Msg 3")
   
     (reset!)
     
-    (fact "Queues that become empty are discarded"
+    (fact "Queues that become empty return nil."
       (enq! :A :B "A1")
       (enq! :C :B "C1")
       (enq! :C :B "C2")
-      (pop! :B) ; "A1"
-      (pop! :B) ; "C1"
-      (peek :B) => "C2"
-      (pop! :B)
-      (peek :B) => nil)))
+      (peek :B) => "A1"
+      (pop! :B) => "C1"
+      (pop! :B) => "C2"
+      (pop! :B) => nil)
+
+    (reset!)
+    
+    (fact "Multiple receivers can have enqueued tuples."
+      (enq! :A :B "AB1")
+      (enq! :A :C "AC1")
+      (enq! :B :A "BA1")
+      (enq! :B :C "AC1")
+)
+    
+    ))
