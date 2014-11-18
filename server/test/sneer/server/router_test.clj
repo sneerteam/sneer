@@ -72,7 +72,9 @@
 
 (defn create-router [queue-size]
   (let [enqueue-fn (partial dropping-enqueue queue-size)
-        qs (atom {})]
+        qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
+                      ;              :turn                         sender
+                      ;              :senders-to-notify-when-empty #(sender) } } 
     (reify Router
       (enqueue! [_ sender receiver tuple]
         (let [qs-before @qs
