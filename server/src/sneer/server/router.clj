@@ -2,6 +2,14 @@
   (:require
    [clojure.set :refer [difference]]))
 
+(defprotocol Router
+  (enqueue! [_ sender receiver tuple]
+    "Adds tuple to its receiver/sender send queue if the queue isn't full. Returns whether the queue was able to accept tuple (queue was not full).")
+  (peek-tuple-for [_ receiver]
+    "Returns the next tuple to be sent to receiver.")
+  (pop-tuple-for! [_ receiver]
+    "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the sender to be notified."))
+
 (def ^:private empty-q clojure.lang.PersistentQueue/EMPTY)
 
 (defn dropping-conj [xs x max-size]
@@ -23,14 +31,6 @@
       (let [vec (vec coll)
             index (.indexOf vec element)]
         (get vec (mod (inc index) count))))))
-
-(defprotocol Router
-  (enqueue! [_ sender receiver tuple]
-    "Adds tuple to its receiver/sender send queue if the queue isn't full. Returns whether the queue was able to accept tuple (queue was not full).")
-  (peek-tuple-for [_ receiver]
-    "Returns the next tuple to be sent to receiver.")
-  (pop-tuple-for! [_ receiver]
-    "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the sender to be notified."))
 
 (defn- peek-for [receiver-q]
   (let [{:keys [qs-by-sender turn]} receiver-q]
