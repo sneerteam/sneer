@@ -69,6 +69,9 @@
 (defn- senders-to-notify-of [qs receiver]
   (get-in qs [receiver :senders-to-notify-when-empty]))
 
+(defn- mark-full [receiver-q sender]
+  (update-in receiver-q [:senders-to-notify-when-empty] #(conj (or % #{}) sender)))
+
 (defn create-router [queue-size]
   (let [qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
                       ;              :turn                         sender
@@ -76,8 +79,11 @@
     (reify Router
       (enqueue! [_ sender receiver tuple]
         (let [qs-before @qs
-              qs-after (swap! qs update-in [receiver] enqueue-for queue-size sender tuple)]
-          (not (identical? qs-after qs-before))))
+              qs-after (swap! qs update-in [receiver] enqueue-for queue-size sender tuple)
+              full? (identical? qs-after qs-before)]
+          (when full?
+            (swap! qs update-in [receiver] mark-full sender))
+          (not full?)))
       (peek-tuple-for [_ receiver]
         (peek-for (@qs receiver)))
       (pop-tuple-for! [_ receiver]
@@ -164,7 +170,5 @@
       (enq! :A :B "AB4") => false
       (pop? :B) => nil
       (pop? :B) => nil
-      (pop? :B) => nil
-;      (pop? :B) => :A
-;      (pop? :B) => nil
-      )))
+      (pop? :B) => :A
+      (pop? :B) => nil)))
