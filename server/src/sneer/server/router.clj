@@ -1,178 +1,88 @@
 (ns sneer.server.router
   (:require
-   [clojure.core.async :as async :refer [>! <!]]
-   [clojure.core.match :refer [match]]
-   [sneer.async :refer [go-while-let]]))
+   [clojure.set :refer [difference]]))
 
-(defn timeout-for [transition]
-  (async/timeout
-    (case transition
-      :offline 30000
-      :retry 3000)))
+(def ^:private empty-q clojure.lang.PersistentQueue/EMPTY)
 
-(defn- closed-chan []
-  (let [ch (async/chan)]
-    (async/close! ch)
-    ch))
+(defn dropping-conj [xs x max-size]
+  (let [full? (>= (count xs) max-size)]
+    (if full? xs (conj xs x))))
 
-(def ^:private NEVER (async/chan))
+(defn dropping-enqueue [q element max-size]
+  (dropping-conj (or q empty-q) element max-size))
 
-(def ^:private IMMEDIATELY (closed-chan))
+(defn pop-only [xs x]
+  (if (= x (peek xs))
+    (pop xs)
+    xs))
 
-(defn- create-queue [packets-in packets-out receiver-heart-beats]
-  (let [state (atom {:highest-sequence-delivered -1
-                     :packets clojure.lang.PersistentQueue/EMPTY})]
-    (letfn
-        [(status-to [to]
-           {:intent :status-of-queues
-            :to to
-            :highest-sequence-delivered (highest-sequence-delivered)
-            :highest-sequence-to-send (highest-sequence-to-send)
-            :full? false})
-         (reset-to! [sequence]
-           (swap! state merge {:highest-sequence-delivered (dec sequence)
-                               :packets clojure.lang.PersistentQueue/EMPTY}))
-         (enqueue! [packet]
-           (swap! state update-in [:packets] conj (routed packet))
-           (status-to (:from packet)))
-         (next-packet []
-           (-> @state :packets peek))
-         (ack! [sequence]
-           (swap! state (fn [state]
-                          (merge state {:highest-sequence-delivered sequence
-                                        :packets (pop (state :packets))}))))
-         (highest-sequence-delivered []
-           (@state :highest-sequence-delivered))
-         (highest-sequence-to-send []
-           (let [{:keys [highest-sequence-delivered packets]} @state]
-             (+ highest-sequence-delivered (count packets))))
-         (valid? [sequence]
-           (= sequence (inc (highest-sequence-to-send))))
-         (routed [packet]
-           (assoc (select-keys packet [:from :to :sequence :payload]) :intent :receive))]
+(defn next-wrap [coll element]
+  (let [count (count coll)]
+    (if (zero? count)
+      nil
+      (let [vec (vec coll)
+            index (.indexOf vec element)]
+        (get vec (mod (inc index) count))))))
 
-      (let [OFFLINE {:online receiver-heart-beats
-                     :keep-alive NEVER
-                     :offline NEVER
-                     :retry NEVER}]
-        (async/go-loop
-          [{:keys [online keep-alive offline retry] :as transitions} OFFLINE]
+(defprotocol Router
+  (enqueue! [_ sender receiver tuple]
+    "Adds tuple to its receiver/sender send queue if the queue isn't full. Returns whether the queue was able to accept tuple (queue was not full).")
+  (peek-tuple-for [_ receiver]
+    "Returns the next tuple to be sent to receiver.")
+  (pop-tuple-for! [_ receiver]
+    "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the sender to be notified."))
 
-          (async/alt!
-            online
-              ([_]
-                (recur {:online NEVER
-                        :keep-alive receiver-heart-beats
-                        :offline (timeout-for :offline)
-                        :retry IMMEDIATELY}))
-            keep-alive
-              ([_]
-                (recur (assoc transitions :offline (timeout-for :offline))))
-            offline
-              ([_]
-                (recur OFFLINE))
-            retry
-              ([_]
-                (when-let [packet (next-packet)]
-                  (>! packets-out packet))
-                (recur (assoc transitions :retry (timeout-for :retry))))
-            packets-in
-              ([packet]
-                (when packet
-                  (match packet
-                    {:intent :ack :sequence sequence}
-                      (do
-                        (when (= sequence (inc (highest-sequence-delivered)))
-                          (ack! sequence)
-                          (>! packets-out (status-to (:to packet))))
-                        (recur (assoc transitions :retry IMMEDIATELY)))
-                    :else
-                      (do
-                        (match packet
-                          {:sequence sequence :reset true}
-                            (do
-                              (reset-to! sequence)
-                              (>! packets-out (enqueue! packet)))
-                          {:sequence (sequence :guard valid?)}
-                            (>! packets-out (enqueue! packet))
-                          {:sequence _}
-                            (>! packets-out (status-to (:from packet)))
-                          :else
-                            (>! packets-out (assoc packet :intent :receive)))
-                        (recur transitions))))))))
-      packets-in)))
+(defn- peek-for [receiver-q]
+  (let [{:keys [qs-by-sender turn]} receiver-q]
+    (when qs-by-sender
+      (peek (qs-by-sender turn)))))
 
+(defn- enqueue-for [receiver-q queue-size sender tuple]
+  (let [before receiver-q
+        receiver-q (update-in before [:qs-by-sender sender] dropping-enqueue tuple queue-size)]
+    (if-some [turn (:turn before)]
+      receiver-q
+      (assoc receiver-q :turn sender))))
 
-(defn start [packets-in packets-out]
-  "Store-and-Forward Server Protocol
-The purpose of the temporary central server is to store
-payloads (byte[]s) being sent from one peer to another in a
-limited-size (100 elements?) FIFO queue and forward them as soon as
-possible.  Clients must gracefully handle the server losing all its
-state at any moment and restarting fresh.
+(defn- pop-tuple [receiver-q]
+  (let [turn (:turn receiver-q)
+        receiver-q (update-in receiver-q [:qs-by-sender turn] pop)
+        sender-q-empty? (nil? (peek-for receiver-q))
+        senders (-> receiver-q :qs-by-sender keys)
+        receiver-q (assoc receiver-q :turn (next-wrap senders turn))]
+    (if sender-q-empty?
+      (update-in receiver-q [:qs-by-sender] dissoc turn) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
+      receiver-q)))
 
-Packets From Client to Server
-ping()
-Let's the server know the client is
-online, when the client has no other useful packet to send. Keeps the
-UDP connection open. Server replies with pong().
+(defn- pop-tuple-for [qs receiver]
+  (let [qs (update-in qs [receiver] pop-tuple)
+        empty? (-> qs receiver peek-for nil?)]
+    (if empty?
+      (dissoc qs receiver)
+      qs)))
 
-sendTo(Puk receiver, boolean reset, long sequence, byte[] payload)
-If reset is true, the server will discard the entire queue of packets to
-be sent to receiver, if any, and use sequence as the next expected
-sequence number. The server does not expect any sequence number when it
-starts, so the first packet sent from a peer to another must always have
-reset true. If sequence is the next expected sequence number, adds
-payload to the queue of payloads to be sent from the sender to receiver,
-otherwise ignores the payload. Server replies with a statusOfQueues
-packet for receiver (see below), even if sequence was wrong.
+(defn- senders-to-notify-of [qs receiver]
+  (get-in qs [receiver :senders-to-notify-when-empty]))
 
-ack(Puk sender, long sequence)
-See receiveFrom(...) below.
+(defn- mark-full [receiver-q sender]
+  (update-in receiver-q [:senders-to-notify-when-empty] #(conj (or % #{}) sender)))
 
-queryStatusOfQueues(Puk[] peers)
-Server replies with a statusOfQueue packet for peers. See below.
-
-Packets From Server to Client
-pong()
-Reply to ping() to indicate the server is alive.
-
-receiveFrom(Puk sender, long sequence, byte[] payload)
-Client replies with ack(sender, sequence);
-
-statusOfQueues(StatusOfQueue[] statuses)
-Indicates de status of the queues of payloads from this client to some
-peers. StatusOfQueue is {Puk receiver, long highest-sequence-delivered,
-long highest-sequence-to-send, boolean isFull}. The client can consider
-all payloads up to highest-sequence-delivered as received by the
-receiver. The client can consider all payloads up to
-highest-sequence-to-send as received by the server and temporarily (the
-server might crash and restart fresh) queued to be sent to
-receiver. This packet is sent as a reply to queryStatusOfQueues(...), as
-a reply to sendTo(...) and when the receiver
-"
-  (let [queues (atom {})
-        mult-packets-in (async/mult packets-in)
-        packets-in (async/tap mult-packets-in (async/chan))]
-    (letfn
-        [(heart-beats-of [client]
-           (async/filter< #(= client (:from %))
-                          (async/tap mult-packets-in (async/chan))
-                          (async/dropping-buffer 1)))
-         (ensure-queue [to queue]
-           (if queue
-             queue
-             (create-queue (async/chan (async/dropping-buffer 1))
-                           packets-out
-                           (heart-beats-of to))))
-         (produce-queue [from to]
-           (let [path [from to]]
-             (get-in (swap! queues update-in path (partial ensure-queue to)) path)))]
-
-      (go-while-let
-       [packet (<! packets-in)]
-       (println "router/<!" packet)
-       (match packet
-         {:intent :ping :from from} (>! packets-out {:intent :pong :to from})
-         {:intent :send :from from :to to} (>! (produce-queue from to) packet)
-         {:intent :ack  :from from :to to} (>! (produce-queue to from) packet))))))
+(defn create-router [queue-size]
+  (let [qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
+                      ;              :turn                         sender
+                      ;              :senders-to-notify-when-empty #{sender} } } 
+    (reify Router
+      (enqueue! [_ sender receiver tuple]
+        (let [qs-before @qs
+              qs-after (swap! qs update-in [receiver] enqueue-for queue-size sender tuple)
+              full? (identical? qs-after qs-before)]
+          (when full?
+            (swap! qs update-in [receiver] mark-full sender))
+          (not full?)))
+      (peek-tuple-for [_ receiver]
+        (peek-for (@qs receiver)))
+      (pop-tuple-for! [_ receiver]
+        (let [to-notify #(get-in @qs [receiver :senders-to-notify-when-empty])
+              to-notify-before (to-notify)]
+          (swap! qs pop-tuple-for receiver)
+          (-> (difference to-notify-before (to-notify)) first))))))
