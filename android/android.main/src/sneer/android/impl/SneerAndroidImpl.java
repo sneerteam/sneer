@@ -1,6 +1,7 @@
 package sneer.android.impl;
 
 import static sneer.android.ipc.TupleSpaceService.startTupleSpaceService;
+import static sneer.android.ui.ConversationActivity.PARTY_PUK;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 				Intent intent;
 				if ("chat".equals(tuple.get("message-type"))) {
 					intent = new Intent(context, ConversationActivity.class);
-					intent.putExtra(ConversationActivity.PARTY_PUK, tuple.author());
+					intent.putExtra(PARTY_PUK, tuple.author());
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				} else {
 					plugin = pluginManager.tupleViewer((String)tuple.get("message-type"));
