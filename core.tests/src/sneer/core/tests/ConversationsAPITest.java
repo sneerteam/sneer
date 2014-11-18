@@ -37,8 +37,14 @@ public class ConversationsAPITest extends TestCase {
 	private final Object network = Glue.newNetworkSimulator();
 
 	@Override
+	protected void setUp() {
+		Clock.startMocking();
+	}
+	
+	@Override
 	public void tearDown() {
 		Glue.tearDownNetwork(network);
+		Clock.stopMocking();
 	}
 
 	protected final Object tupleBaseA = newTupleBase();
@@ -335,7 +341,6 @@ public class ConversationsAPITest extends TestCase {
 		sneerB.addContact("a", pBA);
 		Conversation cBA = sneerB.produceConversationWith(pBA);
 
-		Clock.startMocking();
 		cAB.sendText("Hello1");
 		messagesEventually(cBA, "Hello1");
 		Clock.tick();
@@ -406,7 +411,6 @@ public class ConversationsAPITest extends TestCase {
 
 
 	public void testMessageLabel() {
-		Clock.startMocking();
 		TuplePublisher publisher = sneerA.tupleSpace().publisher()
 			.audience(userB)
 			.type("message");
@@ -428,8 +432,6 @@ public class ConversationsAPITest extends TestCase {
 			}});
 
 		expecting(values(contents, "mytext", "mytext2", "mytext3"));
-
-		Clock.stopMocking();
 	}
 
 
