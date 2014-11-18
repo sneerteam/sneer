@@ -21,12 +21,12 @@
     (pop xs)
     xs))
 
-(defn- next-turn [coll turn]
+(defn- next-wrap [coll element]
   (let [count (count coll)]
     (if (zero? count)
       nil
       (let [vec (vec coll)
-            index (.indexOf vec turn)]
+            index (.indexOf vec element)]
         (get vec (mod (inc index) count))))))
 
 (defprotocol Router
@@ -49,24 +49,18 @@
       receiver-q
       (assoc receiver-q :turn sender))))
 
-(defn- pop-tuple! [receiver-q]
-  (let [before receiver-q
-        turn (:turn before)
-        receiver-q (update-in before [:qs-by-sender turn] pop)
+(defn- pop-tuple [receiver-q]
+  (let [turn (:turn receiver-q)
+        receiver-q (update-in receiver-q [:qs-by-sender turn] pop)
         sender-q-empty? (nil? (peek-for receiver-q))
-        receiver-q (if sender-q-empty?
-                     (update-in receiver-q [:qs-by-sender] dissoc turn)
-                     receiver-q)
-                senders (-> receiver-q :qs-by-sender keys)
-]
-    
-      (if-some [next-turn (next-turn senders turn)]
-        (assoc receiver-q :turn next-turn)
-        nil))
-  )
+        senders (-> receiver-q :qs-by-sender keys)
+        receiver-q (assoc receiver-q :turn (next-wrap senders turn))]
+    (if sender-q-empty?
+      (update-in receiver-q [:qs-by-sender] dissoc turn) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
+      receiver-q)))
 
-(defn- pop-for! [qs receiver]
-  (let [qs (update-in qs [receiver] pop-tuple!)
+(defn- pop-tuple-for [qs receiver]
+  (let [qs (update-in qs [receiver] pop-tuple)
         empty? (-> qs receiver peek-for nil?)]
     (if empty?
       (dissoc qs receiver)
@@ -90,7 +84,7 @@
       (pop-tuple-for! [_ receiver]
         (let [to-notify #(get-in @qs [receiver :senders-to-notify-when-empty])
               to-notify-before (to-notify)]
-          (swap! qs pop-for! receiver)
+          (swap! qs pop-tuple-for receiver)
           (-> (difference to-notify-before (to-notify)) first))))))
 
 
