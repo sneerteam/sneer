@@ -9,6 +9,8 @@
 
   (let [max-q-size 3
         subject (atom nil)
+        
+        ; DSL:
         reset! #(reset! subject (create-router max-q-size))
         enq! (fn [from to msg] (enqueue! @subject from to msg))
         peek #(peek-tuple-for @subject %)
