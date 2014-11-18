@@ -9,12 +9,12 @@
 
 (def ^:private empty-q clojure.lang.PersistentQueue/EMPTY)
 
-(defn dropping-conj [max-size xs x]
+(defn dropping-conj [xs x max-size]
   (let [full? (>= (count xs) max-size)]
     (if full? xs (conj xs x))))
 
-(defn dropping-enqueue [max-size q element]
-  (dropping-conj max-size (or q empty-q) element))
+(defn dropping-enqueue [q element max-size]
+  (dropping-conj (or q empty-q) element max-size))
 
 (defn pop-only [xs x]
   (if (= x (peek xs))
@@ -42,9 +42,9 @@
     (when qs-by-sender
       (peek (qs-by-sender turn)))))
 
-(defn- enqueue-for [receiver-q enqueue-fn sender tuple]
+(defn- enqueue-for [receiver-q queue-size sender tuple]
   (let [before receiver-q
-        receiver-q (update-in before [:qs-by-sender sender] enqueue-fn tuple)]
+        receiver-q (update-in before [:qs-by-sender sender] dropping-enqueue tuple queue-size)]
     (if-some [turn (:turn before)]
       receiver-q
       (assoc receiver-q :turn sender))))
@@ -70,14 +70,13 @@
   (get-in qs [receiver :senders-to-notify-when-empty]))
 
 (defn create-router [queue-size]
-  (let [enqueue-fn (partial dropping-enqueue queue-size)
-        qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
+  (let [qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
                       ;              :turn                         sender
                       ;              :senders-to-notify-when-empty #{sender} } } 
     (reify Router
       (enqueue! [_ sender receiver tuple]
         (let [qs-before @qs
-              qs-after (swap! qs update-in [receiver] enqueue-for enqueue-fn sender tuple)]
+              qs-after (swap! qs update-in [receiver] enqueue-for queue-size sender tuple)]
           (not (identical? qs-after qs-before))))
       (peek-tuple-for [_ receiver]
         (peek-for (@qs receiver)))
