@@ -53,11 +53,13 @@
   (let [before receiver-q
         turn (:turn before)
         receiver-q (update-in before [:qs-by-sender turn] pop)
-        empty? (nil? (peek-for receiver-q))
-        receiver-q (if empty?
+        sender-q-empty? (nil? (peek-for receiver-q))
+        receiver-q (if sender-q-empty?
                      (update-in receiver-q [:qs-by-sender] dissoc turn)
                      receiver-q)
-        senders (-> before :qs-by-sender keys)]
+                senders (-> receiver-q :qs-by-sender keys)
+]
+    
       (if-some [next-turn (next-turn senders turn)]
         (assoc receiver-q :turn next-turn)
         nil))
@@ -133,6 +135,10 @@
       (pop! :B) => "Hello2 from C"
       (pop! :B) => "Msg 3")
   
+    (reset!)
+    (fact "Blank crazy pop doesn't crash"
+      (pop! :Foo) => nil)
+
     (reset!)
     (fact "Queues that become empty return nil."
       (enq! :A :B "A1")
