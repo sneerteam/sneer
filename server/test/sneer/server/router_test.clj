@@ -21,6 +21,14 @@
     (pop xs)
     xs))
 
+(defn- next-turn [coll turn]
+  (let [count (count coll)]
+    (if (zero? count)
+      nil
+      (let [vec (vec coll)
+            index (.indexOf vec turn)]
+        (get vec (mod (inc index) count))))))
+
 (defprotocol Router
   (enqueue! [_ sender receiver tuple]
     "Adds tuple to its receiver/sender send queue if the queue isn't full. Returns whether the queue was able to accept tuple (queue was not full).")
@@ -40,14 +48,6 @@
     (if-some [turn (:turn before)]
       receiver-q
       (assoc receiver-q :turn sender))))
-
-(defn- next-turn [coll turn]
-  (let [count (count coll)]
-    (if (zero? count)
-      nil
-      (let [vec (vec coll)
-            index (.indexOf vec turn)]
-        (get vec (mod (inc index) count))))))
 
 (defn- pop-tuple! [receiver-q]
   (let [before receiver-q
