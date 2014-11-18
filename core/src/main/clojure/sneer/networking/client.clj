@@ -37,9 +37,7 @@
      (let [udp-in (compromised-if unreliable (async/chan))
            udp-out (compromised-if unreliable (async/chan))]
 
-       (async/thread
-
-         ; ensure no network activity takes place on caller thread to workaround android limitation
+       (async/thread ; ensure no network activity takes place on caller thread to workaround android limitation
          (let [server-addr (InetSocketAddress. ^String server-host ^int server-port)
                udp-server (udp/serve-udp udp-in udp-out)
                ping [server-addr {:intent :ping :from puk}]]
@@ -50,6 +48,7 @@
                (<! (async/timeout 20000))
                (recur)))
 
+           ; Couldn't this be an async/pipe with a filter, like the one below.
            (async/go-loop []
              (when-let [packet (<! udp-in)]
                (SystemReport/updateReport "packet" packet)
