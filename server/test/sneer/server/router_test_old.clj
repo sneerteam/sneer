@@ -3,7 +3,7 @@
    [clojure.core.async :as async :refer [>! <! >!! <!! alts!! timeout]]
    [clojure.test :refer :all]
    [midje.sweet :refer :all]
-   [sneer.server.router :as router]
+   [sneer.server.router-old :as router]
    [sneer.server.io :as io]))
 
 (defn <?!! [c]
