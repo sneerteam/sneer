@@ -83,7 +83,8 @@
       (peek-tuple-for [_ receiver]
         (peek-for (@qs receiver)))
       (pop-tuple-for! [_ receiver]
-        (swap! qs pop-tuple-for receiver)))))
+        (swap! qs pop-tuple-for receiver)
+        nil))))
 
 
 (facts
@@ -157,9 +158,9 @@
       (enq! :A :B "AB2")
       (enq! :A :B "AB3")
       (enq! :A :B "AB4") => false
-;      (pop? :B) => nil
-;      (pop? :B) => nil
-;      (pop? :B) => nil
+      (pop? :B) => nil
+      (pop? :B) => nil
+      (pop? :B) => nil
 ;      (pop? :B) => :A
 ;      (pop? :B) => nil
       )))
