@@ -31,7 +31,8 @@ import android.widget.Toast;
 
 public class ContactActivity extends Activity {
 
-	private static final String PARTY_PUK = "partyPuk";
+	static final String PARTY_PUK = "partyPuk";
+	static final String CURRENT_NICKNAME = "currentNickname";
 	private boolean newContact = false;
 	private Profile profile;
 	private ImageView selfieImage;
@@ -45,7 +46,6 @@ public class ContactActivity extends Activity {
 	private PublicKey partyPuk;
 	private Contact contact;
 	private boolean isOwn;
-	private boolean isTouched;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class ContactActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.profile, menu);
 		return super.onCreateOptionsMenu(menu);
-	} 
+	}
 
 
 	@Override
@@ -119,7 +119,7 @@ public class ContactActivity extends Activity {
 	}
 
 	private String activityTitle() {
-		if (getIntent().getExtras().get(PARTY_PUK)==null) {
+		if (getIntent().getExtras().get(PARTY_PUK) == null) {
 			newContact = true;
 			return "New Contact";
 		}
@@ -141,8 +141,9 @@ public class ContactActivity extends Activity {
 			plug(nicknameEdit, profile.ownName());
 			if (nicknameEdit.getText().toString().isEmpty())
 				plug(nicknameEdit, profile.preferredNickname());
-		} else
+		} else {
 			plug(nicknameEdit, contact.nickname().observable());
+		}
 
 		plug(fullNameView, profile.ownName());
 		plug(preferredNickNameView, profile.preferredNickname().map(new Func1<Object, String>() { @Override public String call(Object obj) {
@@ -181,18 +182,17 @@ public class ContactActivity extends Activity {
 
 
 	private void saveContact() {
-		if (isTouched || newContact) {
-			try {
-				final String nickName = nicknameEdit.getText().toString();
-				if (newContact)
-					sneer().addContact(nickName, party);
-				else if(isTouched)
-					sneer().findContact(party).setNickname(nickName);
-				toast("Contact saved");
-			} catch (FriendlyException e) {
-				toast(e.getMessage());
-			}
+		final String nickName = nicknameEdit.getText().toString();
+		try {
+			if (newContact)
+				sneer().addContact(nickName, party);
+
+			if (!nickName.equals(getIntent().getExtras().getString(CURRENT_NICKNAME)))
+				sneer().findContact(party).setNickname(nickName);
+		} catch (FriendlyException e) {
+			toast(e.getMessage());
 		}
+		toast("Contact saved");
 	}
 
 
@@ -223,8 +223,8 @@ public class ContactActivity extends Activity {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
-				isTouched = true;
+				if(newContact)
+					nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
 			}
 
 			@Override

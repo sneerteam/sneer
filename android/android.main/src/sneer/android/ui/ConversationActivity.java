@@ -1,6 +1,7 @@
 package sneer.android.ui;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -172,6 +173,7 @@ public class ConversationActivity extends SneerActivity {
 		Intent intent = new Intent();
 		intent.setClass(this, ContactActivity.class);
 		intent.putExtra(PARTY_PUK, party.publicKey().current());
+		intent.putExtra(CURRENT_NICKNAME, actionBar.getTitle());
 		intent.putExtra(ACTIVITY_TITLE, "Contact");
 		startActivity(intent);
 	}
