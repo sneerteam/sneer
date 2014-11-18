@@ -95,7 +95,6 @@
         pop! #(do (pop-tuple-for! @subject %) (peek %))]
     
     (reset!)
-
     (fact "Queues start empty and accept tuples."
       (peek :B) => nil
       (enq! :A :B "Hello") => true)
@@ -126,7 +125,6 @@
       (pop! :B) => "Msg 3")
   
     (reset!)
-    
     (fact "Queues that become empty return nil."
       (enq! :A :B "A1")
       (enq! :C :B "C1")
@@ -137,12 +135,17 @@
       (pop! :B) => nil)
 
     (reset!)
-    
     (fact "Multiple receivers can have enqueued tuples."
       (enq! :A :B "AB1")
       (enq! :A :C "AC1")
       (enq! :B :A "BA1")
-      (enq! :B :C "AC1")
-)
+      (enq! :B :C "BC1")
+      (peek :A) => "BA1"
+      (peek :B) => "AB1"
+      (peek :C) => "AC1"
+      (pop! :A) => nil
+      (pop! :B) => nil
+      (pop! :C) => "BC1"
+      (pop! :C) => nil)
     
     ))
