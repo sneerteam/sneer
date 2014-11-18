@@ -92,7 +92,8 @@
         reset! #(reset! subject (create-router max-q-size))
         enq! (fn [from to msg] (enqueue! @subject from to msg))
         peek #(peek-tuple-for @subject %)
-        pop! #(do (pop-tuple-for! @subject %) (peek %))]
+        pop! #(do (pop-tuple-for! @subject %) (peek %))
+        pop? #(pop-tuple-for! @subject %)]
     
     (reset!)
     (fact "Queues start empty and accept tuples."
@@ -148,4 +149,15 @@
       (pop! :C) => "BC1"
       (pop! :C) => nil)
     
-    ))
+    (reset!)
+    (fact "Senders are notified of queues that were full and became empty."
+      (enq! :A :B "AB1")
+      (enq! :A :B "AB2")
+      (enq! :A :B "AB3")
+      (enq! :A :B "AB4") => false
+;      (pop? :B) => nil
+;      (pop? :B) => nil
+;      (pop? :B) => nil
+;      (pop? :B) => :A
+;      (pop? :B) => nil
+      )))
