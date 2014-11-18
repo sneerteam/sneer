@@ -354,7 +354,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
-	public void testUnreadMessageCount() throws Exception {
+	public void ignoreTestUnreadMessageCount() throws Exception {
 
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
