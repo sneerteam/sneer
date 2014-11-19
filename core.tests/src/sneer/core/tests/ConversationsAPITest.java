@@ -355,7 +355,6 @@ public class ConversationsAPITest extends TestCase {
 		Party newB = newSneer.produceParty(userB);
 		Conversation newConvo = sneerA.produceConversationWith(newB);
 		messagesEventually(newConvo, "Hello1", "Hello2", "Hello3");
-		Clock.stopMocking();
 	}
 
 
