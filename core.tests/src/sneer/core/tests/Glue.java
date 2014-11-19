@@ -16,7 +16,7 @@ public class Glue {
 		return (TupleSpace) sneerCoreVar("reify-tuple-space").invoke(ownPuk, tupleBase, connect(network, ownPuk), followees);
 	}
 
-	public static Object connect(Object network, PublicKey ownPuk) {
+	private static Object connect(Object network, PublicKey ownPuk) {
 		return sneerCoreVar("connect").invoke(network, ownPuk);
 	}
 
