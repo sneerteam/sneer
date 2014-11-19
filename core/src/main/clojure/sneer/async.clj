@@ -14,9 +14,9 @@
   `(go
      (try
        ~@forms
-       (catch java.lang.Exception ~'e
+       (catch java.lang.Throwable ~'e
          (println "GO ERROR" ~'e)
-         (. ~'^Exception e printStackTrace)))))
+         (. ~'^Throwable e printStackTrace)))))
 
 (defmacro while-let
   "Makes it easy to continue processing an expression as long as it is true"
