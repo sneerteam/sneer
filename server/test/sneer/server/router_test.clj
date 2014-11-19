@@ -33,7 +33,7 @@
       (peek :B) => "Hello"
       (pop! :B) => "Hello Again")
 
-    (fact "Tuples grow up to max-size."
+    (fact "Queues grow up to max-size."
       (enq! :A :B "Msg 2")
       (enq! :A :B "Msg 3") => true
       (enq! :A :B "Msg 4") => false)
