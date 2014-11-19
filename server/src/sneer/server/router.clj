@@ -3,8 +3,10 @@
    [clojure.set :refer [difference]]))
 
 (defprotocol Router
+  (-sender-queue-full? [_ sender receiver]
+    "Returns whether the receiver/sender send queue is full.")
   (enqueue! [_ sender receiver tuple]
-    "Adds tuple to its receiver/sender send queue if the queue isn't full. Returns whether the queue was able to accept tuple (queue was not full).")
+    "Adds tuple to its receiver/sender send queue. Pre-requisite: the queue is not full.")
   (peek-tuple-for [_ receiver]
     "Returns the next tuple to be sent to receiver.")
   (pop-tuple-for! [_ receiver]
@@ -69,11 +71,16 @@
 (defn- mark-full [receiver-q sender]
   (update-in receiver-q [:senders-to-notify-when-empty] (fnil conj #{}) sender))
 
+(defn- sender-queue-count [qs sender receiver]
+  (-> qs (get-in [receiver :qs-by-sender sender]) count))
+
 (defn create-router [queue-size]
   (let [qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
                       ;              :turn                         sender
                       ;              :senders-to-notify-when-empty #{sender} } } 
     (reify Router
+      (-sender-queue-full? [_ sender receiver]
+        (>= (sender-queue-count @qs sender receiver) queue-size))
       (enqueue! [_ sender receiver tuple]
         (let [qs-before @qs
               qs-after (swap! qs update-in [receiver] enqueue-for queue-size sender tuple)
