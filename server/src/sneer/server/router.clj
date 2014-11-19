@@ -68,12 +68,13 @@
         (update-in [:senders-to-notify-when-empty] disj turn)) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
       receiver-q)))
 
-(defn- pop-tuple-for [qs receiver]
-  (let [qs (update-in qs [receiver] pop-tuple)
-        empty? (-> qs receiver peek-for nil?)]
+(defn pop-tuple-for [router receiver]
+  "Removes the next tuple to be sent to receiver from its queue."
+  (let [router (update-in router [receiver] pop-tuple)
+        empty? (-> router receiver peek-for nil?)]
     (if empty?
-      (dissoc qs receiver)
-      qs)))
+      (dissoc router receiver)
+      router)))
 
 (defn- senders-to-notify-of [receiver qs]
   (get-in qs [receiver :senders-to-notify-when-empty]))
@@ -88,18 +89,16 @@
   "Returns the next tuple to be sent to receiver."
   (peek-for (router receiver)))
       
-(defn pop-tuple-for! [router receiver]
-  "Removes the next tuple to be sent to receiver from its queue. If the queue had been full and is now empty, returns the sender to be notified."
-  (let [to-notify (partial senders-to-notify-of receiver)
-        to-notify-before (to-notify router)
-        router (pop-tuple-for router receiver)]
-    [router (-> (difference to-notify-before (to-notify router)) first)]))
+(defn sender-to-notify [original-router new-router receiver]
+  "If a sender queue had been full and is now empty, returns the sender to be notified."
+  (let [to-notify (partial senders-to-notify-of receiver)]
+    (-> (difference (to-notify original-router) (to-notify new-router)) first)))
 
 
-
-; { receiver        { :qs-by-sender                 { sender q }
+; { :max-queue-size x
+;   receiver        { :qs-by-sender                 { sender q }
 ;                     :turn                         sender
-;                     :senders-to-notify-when-empty #{sender} } 
-;   :max-queue-size x }
+;                     :senders-to-notify-when-empty #{sender} } }
+;
 (defn create-router [max-queue-size]
   { :max-queue-size max-queue-size })

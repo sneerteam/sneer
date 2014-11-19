@@ -15,9 +15,9 @@
                                  (queue-full? from to)
                                  not))
         peek #(peek-tuple-for @subject %)
-        pop? #(let [[router to-notify] (pop-tuple-for! @subject %)]
-                (reset! subject router)
-                to-notify)
+        pop? #(let [original @subject
+                    router (swap! subject pop-tuple-for %)]
+                (sender-to-notify original router %))
         pop! #(do (pop? %) (peek %))
         ]
     

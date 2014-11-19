@@ -25,8 +25,9 @@
               (recur (enqueue! router sender receiver tuple))))
            
           {:pop receiver}
-          (let [[router sender-to-notify] (pop-tuple-for! router receiver)]
-            (when (some? sender-to-notify)
+          (let [original router
+                router (pop-tuple-for router receiver)]
+            (when-some [sender-to-notify (sender-to-notify original router receiver)]
               (>! packets-out {:cts true :to sender-to-notify :for receiver}))
             (when-some [tuple (peek-tuple-for router receiver)]
               (>! packets-out {:send tuple :to receiver})
