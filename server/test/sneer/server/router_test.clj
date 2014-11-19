@@ -10,13 +10,18 @@
   (let [max-q-size 3
         subject (atom nil)
         ; DSL:
-        reset! #(reset! subject (create-router max-q-size))
-        enq! (fn [from to msg] (enqueue! @subject from to msg))
+        restart! #(reset! subject (create-router max-q-size))
+        enq! (fn [from to msg] (-> subject (swap! enqueue! from to msg)
+                                 (queue-full? from to)
+                                 not))
         peek #(peek-tuple-for @subject %)
-        pop! #(do (pop-tuple-for! @subject %) (peek %))
-        pop? #(pop-tuple-for! @subject %)]
+        pop? #(let [[router to-notify] (pop-tuple-for! @subject %)]
+                (reset! subject router)
+                to-notify)
+        pop! #(do (pop? %) (peek %))
+        ]
     
-    (reset!)
+    (restart!)
     (fact "Queues start empty and accept tuples."
       (peek :B) => nil
       (enq! :A :B "Hello") => true)
@@ -46,11 +51,11 @@
       (pop! :B) => "Hello2 from C"
       (pop! :B) => "Msg 3")
   
-    (reset!)
+    (restart!)
     (fact "Blank crazy pop doesn't crash"
       (pop! :Foo) => nil)
 
-    (reset!)
+    (restart!)
     (fact "Queues that become empty return nil."
       (enq! :A :B "A1")
       (enq! :C :B "C1")
@@ -60,7 +65,7 @@
       (pop! :B) => "C2"
       (pop! :B) => nil)
 
-    (reset!)
+    (restart!)
     (fact "Multiple receivers can have enqueued tuples."
       (enq! :A :B "AB1")
       (enq! :A :C "AC1")
@@ -74,7 +79,7 @@
       (pop! :C) => "BC1"
       (pop! :C) => nil)
     
-    (reset!)
+    (restart!)
     (fact "Senders are notified of queues that were full and became empty."
       (enq! :A :B "AB1")
       (enq! :A :B "AB2")

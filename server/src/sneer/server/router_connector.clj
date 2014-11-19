@@ -16,17 +16,16 @@
         (match packet
 
           {:send tuple :from sender :to receiver}
-          (if (-sender-queue-full? router sender receiver)
+          (if (queue-full? router sender receiver)
             (do
               (>! packets-out {:cts false :to sender :for receiver})
               (recur router))
             (do
               (>! packets-out {:cts true  :to sender :for receiver})
-              (enqueue! router sender receiver tuple)
-              (recur router)))
+              (recur (enqueue! router sender receiver tuple))))
            
           {:pop receiver}
-          (let [sender-to-notify (pop-tuple-for! router receiver)]
+          (let [[router sender-to-notify] (pop-tuple-for! router receiver)]
             (when (some? sender-to-notify)
               (>! packets-out {:cts true :to sender-to-notify :for receiver}))
             (when-some [tuple (peek-tuple-for router receiver)]
