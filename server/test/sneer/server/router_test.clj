@@ -34,8 +34,8 @@
       (pop! :B) => "Hello Again")
 
     (fact "Queues grow up to max-size."
-      (enq! :A :B "Msg 2")
-      (enq! :A :B "Msg 3") => true
+      (enq! :A :B "Msg 2") => true
+      (enq! :A :B "Msg 3") => false
       (enq! :A :B "Msg 4") => false)
     
     (fact "Tuples from multiple senders are multiplexed."

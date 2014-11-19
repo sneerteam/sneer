@@ -11,39 +11,38 @@
 
 (defn start-connector [queue-size packets-in packets-out]
   (go-trace
-    (loop [router (create-router queue-size)
-           previous-tuple nil]
+    (loop [router (create-router queue-size)]
       (when-some [packet (<! packets-in)]
         (match packet
 
           {:send tuple :from sender :to receiver}
           (if (-sender-queue-full? router sender receiver)
             (do
-              (>! packets-out {:cts false :to sender})
-              (recur router previous-tuple))
+              (>! packets-out {:cts false :to sender :for receiver})
+              (recur router))
             (do
-              (>! packets-out {:cts true  :to sender})
+              (>! packets-out {:cts true  :to sender :for receiver})
               (enqueue! router sender receiver tuple)
-              (let [tuple (peek-tuple-for router receiver)]
-	              (if (= tuple previous-tuple)
-                  (recur router previous-tuple)
-                  (do
-                    (>! packets-out {:send tuple :to receiver})
-                    (recur router tuple))))))
+              (recur router)))
            
           {:pop receiver}
+          (let [sender-to-notify (pop-tuple-for! router receiver)]
+            (when (some? sender-to-notify)
+              (>! packets-out {:cts true :to sender-to-notify :for receiver}))
+            (when-some [tuple (peek-tuple-for router receiver)]
+              (>! packets-out {:send tuple :to receiver})
+              (recur router)))
+
+          {:peek receiver}
           (do
-            (pop-tuple-for! router receiver)
-            (if-some [tuple (peek-tuple-for router receiver)]
-              (do
-                (>! packets-out {:send tuple :to receiver})
-                (recur router tuple))
-              (recur router previous-tuple)))
-           
+            (when-some [tuple (peek-tuple-for router receiver)]
+              (>! packets-out {:send tuple :to receiver}))
+            (recur router))
+          
           :else
           (do
             (println "Weird packet received: " packet)
-            (recur router previous-tuple)))))
+            (recur router)))))
 
     (close! packets-out)))
 
@@ -61,18 +60,27 @@
   []
   []
   
-  "A tuple is sent"
+  "A tuple is enqueued"
   [{:send "Hello" :from :A :to :B}]
-  [{:cts true :to :A} {:send "Hello" :to :B}]
+  [{:cts true :to :A :for :B}]
 
-  "Queue is full"
-  [{:send "Hello" :from :A :to :B}              {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B}]
-  [{:cts true :to :A} {:send "Hello" :to :B}    {:cts true :to :A}               {:cts false :to :A}]
+  "A tuple is sent"
+  [{:send "Hello" :from :A :to :B} {:peek :B}]
+  [{:cts true :to :A :for :B}      {:send "Hello" :to :B}]
   
-  "B receives a tuple"
-  [{:send "Hello" :from :A :to :B}           {:pop :B}]
-  [{:cts true :to :A} {:send "Hello" :to :B}]
+  "Queue is full"
+  [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B}]
+  [{:cts true :to :A :for :B}      {:cts true :to :A :for :B}       {:cts false :to :A :for :B}]
+  
+  "B comes online and receives a tuple that was waiting"
+  [{:send "Hello" :from :A :to :B} {:peek :B}]
+  [{:cts true :to :A :for :B}      {:send "Hello" :to :B}]
 
   "B receives a tuple with another enqueued"
-  [{:send "Hello" :from :A :to :B}           {:send "Hello2" :from :A :to :B} {:pop :B}]
-  [{:cts true :to :A} {:send "Hello" :to :B} {:cts true :to :A}               {:send "Hello2" :to :B}])
+  [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:peek :B}             {:pop :B}]
+  [{:cts true :to :A :for :B}      {:cts true :to :A :for :B}       {:send "Hello" :to :B} {:send "Hello2" :to :B}]
+
+  "A is notified when its send queue for B is empty."
+  [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B} {:pop :B} {:pop :B}]
+  (fn [packets] (= (last packets) {:cts true :to :A :for :B}))
+)

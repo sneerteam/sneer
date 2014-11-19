@@ -79,17 +79,21 @@
                       ;              :turn                         sender
                       ;              :senders-to-notify-when-empty #{sender} } } 
     (reify Router
+      
       (-sender-queue-full? [_ sender receiver]
         (>= (sender-queue-count @qs sender receiver) queue-size))
-      (enqueue! [_ sender receiver tuple]
+      
+      (enqueue! [router sender receiver tuple]
         (let [qs-before @qs
               qs-after (swap! qs update-in [receiver] enqueue-for queue-size sender tuple)
-              full? (identical? qs-after qs-before)]
+              full? (-sender-queue-full? router sender receiver)]
           (when full?
             (swap! qs update-in [receiver] mark-full sender))
           (not full?)))
+      
       (peek-tuple-for [_ receiver]
         (peek-for (@qs receiver)))
+      
       (pop-tuple-for! [_ receiver]
         (let [to-notify (partial senders-to-notify-of receiver)
               to-notify-before (to-notify @qs)
