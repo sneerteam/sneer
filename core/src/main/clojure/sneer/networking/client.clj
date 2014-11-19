@@ -32,7 +32,8 @@
     (onCompleted [this]
       (async/close! ch))))
 
-(defn- start
+(defn- start-connection
+  ([puk connection])
   ([puk from-server to-server server-host server-port unreliable]
      (let [udp-in (compromised-if unreliable (async/chan))
            udp-out (compromised-if unreliable (async/chan))]
@@ -68,7 +69,7 @@
   (async/close! (:udp-out client)))
 
 (defn create-connection [puk from-server to-server host port unreliable]
-  (start puk from-server to-server host port unreliable)
+  (start-connection puk from-server to-server host port unreliable)
   (subject* (chan->observable from-server)
             (chan->observer to-server)))
 
