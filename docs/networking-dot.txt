@@ -10,17 +10,22 @@ digraph {
 		UDP;
 	}
 
-	subgraph cluster_client { label="Client";
+	subgraph cluster_client { label="client";
 		"open-router-connection" -> RouterConnection [style=dashed, arrowhead=onormal];
 		"open-router-connection" -> UDP;
 		"start-dispatching-tuples" -> { TupleBase RouterConnection };
 		"client-main" -> { "open-router-connection" "start-dispatching-tuples" }
 	}
 
-	subgraph cluster_server { label="Server";
-		"start-router" -> Router [style=dashed, arrowhead=onormal];
+	subgraph cluster_server { label="server";
+		"create-router" -> Router [style=dashed, arrowhead=onormal];
 		"serve-router-connections" -> { UDP Router }
-		"server-main" -> { "start-router" "serve-router-connections" }
+		"server-main" -> { "create-router" "serve-router-connections" }
+	}
+
+	subgraph cluster_coretests { label="core.tests";
+		"local-integration-test" -> "RouterConnection" [style=dashed, arrowhead=onormal];
+		"local-integration-test" -> { "create-router" "start-dispatching-tuples" };
 	}
 
 }
