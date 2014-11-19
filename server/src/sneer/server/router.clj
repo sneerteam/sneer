@@ -51,7 +51,9 @@
         senders (-> receiver-q :qs-by-sender keys)
         receiver-q (assoc receiver-q :turn (next-wrap senders turn))]
     (if sender-q-empty?
-      (update-in receiver-q [:qs-by-sender] dissoc turn) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
+      (-> receiver-q
+        (update-in [:qs-by-sender] dissoc turn)
+        (update-in [:senders-to-notify-when-empty] disj turn)) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
       receiver-q)))
 
 (defn- pop-tuple-for [qs receiver]
@@ -61,11 +63,11 @@
       (dissoc qs receiver)
       qs)))
 
-(defn- senders-to-notify-of [qs receiver]
+(defn- senders-to-notify-of [receiver qs]
   (get-in qs [receiver :senders-to-notify-when-empty]))
 
 (defn- mark-full [receiver-q sender]
-  (update-in receiver-q [:senders-to-notify-when-empty] #(conj (or % #{}) sender)))
+  (update-in receiver-q [:senders-to-notify-when-empty] (fnil conj #{}) sender))
 
 (defn create-router [queue-size]
   (let [qs (atom {})] ; { receiver { :qs-by-sender                 { sender q }
@@ -82,7 +84,7 @@
       (peek-tuple-for [_ receiver]
         (peek-for (@qs receiver)))
       (pop-tuple-for! [_ receiver]
-        (let [to-notify #(get-in @qs [receiver :senders-to-notify-when-empty])
-              to-notify-before (to-notify)]
-          (swap! qs pop-tuple-for receiver)
-          (-> (difference to-notify-before (to-notify)) first))))))
+        (let [to-notify (partial senders-to-notify-of receiver)
+              to-notify-before (to-notify @qs)
+              after (swap! qs pop-tuple-for receiver)]
+          (-> (difference to-notify-before (to-notify after)) first))))))

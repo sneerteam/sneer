@@ -80,7 +80,14 @@
       (enq! :A :B "AB2")
       (enq! :A :B "AB3")
       (enq! :A :B "AB4") => false
+      (enq! :C :B "CB1")
+      (enq! :C :B "CB2")
+      (enq! :C :B "CB3")
+      (enq! :C :B "CB4") => false
+      (pop? :B) => nil
+      (pop? :B) => nil
       (pop? :B) => nil
       (pop? :B) => nil
       (pop? :B) => :A
+      (pop? :B) => :C
       (pop? :B) => nil)))
