@@ -1,0 +1,16 @@
+Client Originates                     Server Replies
+=================                     ==============
+
+{:from own-puk}                       :pong  (Empty packet is a ping. The client knows the server is there. The server knows the client is online.)
+
+{:from own-puk :send tuple :to puk}   {:ack tuple-id :for puk}  or
+                                      {:nak tuple-id :for puk}  (Rejected because queue is full)
+
+
+Client Replies                        Server Originates
+==============                        =================
+
+{:from own-puk :ack puk :id id}       {:send tuple}
+
+{:from own-puk :ack puk}              {:cts puk}  (The send queue to puk became empty)
+
