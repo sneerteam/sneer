@@ -9,6 +9,15 @@
 (defn sliding-chan [& [n]]
   (chan (async/sliding-buffer (or n 1))))
 
+(defn connection [in out]
+  [in out])
+(defn in [connection]
+  (first connection))
+(defn out [connection]
+  (second connection))
+(defn other-side [[in out]]
+  [out in])
+
 (defmacro go-trace
   [& forms]
   `(go
