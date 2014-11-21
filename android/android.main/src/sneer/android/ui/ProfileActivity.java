@@ -34,7 +34,6 @@ public class ProfileActivity extends SneerActivity {
 
 	private byte[] selfieBytes;
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

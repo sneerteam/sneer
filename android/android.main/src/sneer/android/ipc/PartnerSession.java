@@ -84,13 +84,12 @@ public final class PartnerSession implements PluginSession {
 			resultData.setClassLoader(context.getClassLoader());
 			final ResultReceiver toClient = resultData.getParcelable(RESULT_RECEIVER);
 
-			if (toClient != null) {
+			if (toClient != null)
 				setup(toClient);
-			} else if(resultData.getBoolean(UNSUBSCRIBE)) {
+			else if (resultData.getBoolean(UNSUBSCRIBE))
 				subscriptions.unsubscribe();
-			} else {
+			else
 				publish(resultData.getString(TEXT), ((Value)resultData.getParcelable(PAYLOAD)).get());
-			}
 		}});
 	}
 

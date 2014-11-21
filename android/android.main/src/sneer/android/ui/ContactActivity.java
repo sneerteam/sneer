@@ -153,9 +153,9 @@ public class ContactActivity extends Activity {
 		plug(cityView, profile.city());
 		plug(selfieImage, profile.selfie());
 
-		if(!newContact)
+		if (!newContact)
 			Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>(){ @Override public Boolean call(String preferredNickname, String ownName) {
-				if(preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current()))
+				if (preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current()))
 					return true;
 				else
 					return false;
@@ -204,7 +204,7 @@ public class ContactActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		if(!isOwn)
+		if (!isOwn)
 			saveContact();
 		super.onPause();
 	}
@@ -223,7 +223,7 @@ public class ContactActivity extends Activity {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if(newContact)
+				if (newContact)
 					nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
 			}
 

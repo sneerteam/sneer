@@ -7,9 +7,8 @@ public class EnumUtils {
 
 	public static Set<String> names(Enum<?>[] values) {
 		Set<String> names = new HashSet<String>();
-		for (Enum<?> e : values) {
+		for (Enum<?> e : values)
 			names.add(e.name());
-		}
 		return names;
 	}
 

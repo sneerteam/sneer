@@ -33,7 +33,7 @@ public class SneerSqliteDatabase implements Closeable, Database {
 
 	@Override
 	public void createTable(String tableName, List<List<Object>> columns) {
-		String sql = "CREATE TABLE " + tableName + " (" + columnsString((List<?>)columns) + ")";
+		String sql = "CREATE TABLE " + tableName + " (" + columnsString(columns) + ")";
 		sqlite.execSQL(sql);
 	}
 
@@ -109,7 +109,8 @@ public class SneerSqliteDatabase implements Closeable, Database {
 	private String columnsString(List<?> columns) {
 		String ret = "";
 		for (Object column : columns) {
-			if (ret.length() > 0) ret += ",";
+			if (ret.length() > 0)
+				ret += ",";
 			ret += columnString((List<?>)column);
 		}
 		return ret;

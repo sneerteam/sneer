@@ -26,9 +26,11 @@ public class AndroidUtils {
 		SneerAndroidImpl.errorDialog.show();
 	}
 
+
 	private static void toast(Context context, final String message, final int length) {
 		Toast.makeText(context, message, length).show();
 	}
+
 
 	public static void toastOnMainThread(final Context context, final String message, final int length) {
 		AndroidSchedulers.mainThread().createWorker().schedule(new Action0() { @Override public void call() {
