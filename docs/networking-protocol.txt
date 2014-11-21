@@ -1,16 +1,16 @@
-Client Originates                     Server Replies
-=================                     ==============
+Client Originates                              Server Replies
+=================                              ==============
 
-{:from own-puk}                       :pong  (Empty packet is a ping. The client knows the server is there. The server knows the client is online.)
+{:from own-puk}                                {}  (Empty map. The client knows the server is there. The server knows the client is online. One ping/pong every 20s means 258000 packets per month, so they should be as small as possible)
 
-{:from own-puk :send tuple :to puk}   {:ack tuple-id :for puk}  or
-                                      {:nak tuple-id :for puk}  (Rejected because queue is full)
+{:from own-puk :send tuple :to puk}            {:ack tuple-id :for puk}  or
+                                               {:nak tuple-id :for puk}  (Rejected because queue is full)
 
 
-Client Replies                        Server Originates
-==============                        =================
+Client Replies                                 Server Originates
+==============                                 =================
 
-{:from own-puk :ack puk :id id}       {:send tuple}
+{:from own-puk :ack author-puk :id tuple-id}   {:send tuple}
 
-{:from own-puk :ack puk}              {:cts puk}  (The send queue to puk became empty)
+{:from own-puk :ack puk}                       {:cts puk}  (The send queue to puk became empty)
 
