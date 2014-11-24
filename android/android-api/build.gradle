@@ -66,7 +66,7 @@ android.libraryVariants.all { variant ->
 
         from variant.javaCompile.destinationDir
         from variant.javaCompile.source
-        from variant.processResources.resDir
+        //from variant.processResources.resDir
 
 	    appendix = "nodeps"
 	    baseName = "sneer-android-api"
@@ -95,7 +95,7 @@ android.libraryVariants.all { variant ->
 
 	task ourJar(type: Jar) {
         from variant.javaCompile.destinationDir
-        from variant.processResources.resDir
+        //from variant.processResources.resDir
     }
 
 	task javadocJar(type: Jar, dependsOn: javadocRelease) {
