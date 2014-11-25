@@ -20,23 +20,24 @@ Server Implementation
 =====================
 
 ; online-clients { puk { :pending-to-send  <tuple or cts-puk>
-                         :online-countdown n             } }
+;                        :online-countdown n                  } }
 
-Go loop [router, online-clients, send-round, offline-timer, send-timer] :priority :true
+Go loop [router, online-clients, send-round, offline-timer, send-timer] :priority :false
+  (if some (next-packet-to-send send-round))
+    >! packets-out (next-packet-to-send)
+    <! resend-timer (500ms)
+      recur send-round with (keys online-clients)
+
   <! packets-in
     when :from not online
       update-in online-clients [:from :pending-to-send (router peek))
     update-in online-clients [:from :online-countdown] 20
 
     match
-      ping  - >! packets-out pong.
+      ping  - >! packets-out :pong.
       :send - enqueue. >! packets-out ack or nak.
       :ack  - if (= tuple/cts (:from pending-out)) (assoc pending-out :from (router pop))
 
   <! offline-timer (5s)
-    decrement online-countdown and purge offline entries from online-clients. Optimization: use an "online-round" number that is incremented at every purge instead of currentTimeMillis.
-
-  >! packets-out (next-packet-to-send()) (if some)
-
-  <! resend-timer (500ms)
-    
+    decrement online-countdown and purge offline entries from online-clients.
+ 
