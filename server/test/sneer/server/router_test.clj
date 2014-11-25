@@ -4,6 +4,8 @@
    [sneer.test-util :refer :all]
    [sneer.server.router :refer :all]))
 
+; (do (require 'midje.repl) (midje.repl/autotest))
+
 (facts
   "Routing"
 
@@ -14,12 +16,11 @@
         enq! (fn [from to msg] (-> subject (swap! enqueue! from to msg)
                                  (queue-full? from to)
                                  not))
-        peek #(peek-tuple-for @subject %)
+        peek #(:send (peek-packet-for @subject %))
         pop? #(let [original @subject
-                    router (swap! subject pop-tuple-for %)]
+                    router (swap! subject pop-packet-for %)]
                 (sender-to-notify original router %))
-        pop! #(do (pop? %) (peek %))
-        ]
+        pop! #(do (pop? %) (peek %))]
     
     (restart!)
     (fact "Queues start empty and accept tuples."
@@ -63,7 +64,8 @@
       (peek :B) => "A1"
       (pop! :B) => "C1"
       (pop! :B) => "C2"
-      (pop! :B) => nil)
+      (pop! :B) => nil
+      )
 
     (restart!)
     (fact "Multiple receivers can have enqueued tuples."
@@ -81,18 +83,18 @@
     
     (restart!)
     (fact "Senders are notified of queues that were full and became empty."
-      (enq! :A :B "AB1")
-      (enq! :A :B "AB2")
-      (enq! :A :B "AB3")
-      (enq! :A :B "AB4") => false
-      (enq! :C :B "CB1")
-      (enq! :C :B "CB2")
-      (enq! :C :B "CB3")
-      (enq! :C :B "CB4") => false
-      (pop? :B) => nil
-      (pop? :B) => nil
-      (pop? :B) => nil
-      (pop? :B) => nil
-      (pop? :B) => :A
-      (pop? :B) => :C
-      (pop? :B) => nil)))
+     (enq! :A :B "AB1")
+     (enq! :A :B "AB2")
+     (enq! :A :B "AB3")
+     (enq! :A :B "AB4") => false
+     (enq! :C :B "CB1")
+     (enq! :C :B "CB2")
+     (enq! :C :B "CB3")
+     (enq! :C :B "CB4") => false
+     (pop? :B) => nil
+     (pop? :B) => nil
+     (pop? :B) => nil
+     (pop? :B) => nil
+     (pop? :B) => :A
+     (pop? :B) => :C
+     (pop? :B) => nil)))

@@ -31,17 +31,17 @@
            
           {:pop receiver}
           (let [original router
-                router (pop-tuple-for router receiver)]
+                router (pop-packet-for router receiver)]
             (when-some [sender-to-notify (sender-to-notify original router receiver)]
               (>! packets-out {:cts true :to sender-to-notify :for receiver}))
-            (when-some [tuple (peek-tuple-for router receiver)]
-              (>! packets-out {:send tuple :to receiver})
+            (when-some [tuple (peek-packet-for router receiver)]
+              (>! packets-out (assoc tuple :to receiver))
               (recur router)))
 
           {:peek receiver}
           (do
-            (when-some [tuple (peek-tuple-for router receiver)]
-              (>! packets-out {:send tuple :to receiver}))
+            (when-some [tuple (peek-packet-for router receiver)]
+              (>! packets-out (assoc tuple :to receiver)))
             (recur router))
           
           :else
