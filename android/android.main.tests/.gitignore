@@ -1,8 +1,0 @@
-libs
-/bin
-/gen
-/target
-/.gradle
-*.log
-/classes/
-.gradletasknamecache
