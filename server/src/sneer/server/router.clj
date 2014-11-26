@@ -24,11 +24,14 @@
             index (.indexOf vec element)]
         (get vec (mod (inc index) count))))))
 
-(defn- peek-for [receiver-q]
+(defn- peek-tuple-for [receiver-q]
   (let [{:keys [qs-by-sender turn]} receiver-q
         tuple (when qs-by-sender
                 (peek (qs-by-sender turn)))]
     (when tuple {:send tuple})))
+
+(defn- peek-for [receiver-q]
+  (peek-tuple-for receiver-q))
 
 (defn- mark-full [receiver-q sender]
   (update-in receiver-q [:senders-to-notify-when-cts] (fnil conj #{}) sender))
@@ -54,16 +57,19 @@
 (defn- pop-tuple-packet [receiver-q]
     (let [turn (:turn receiver-q)
         receiver-q (update-in receiver-q [:qs-by-sender turn] pop)
-        sender-q-empty? (nil? (peek-for receiver-q))
+        sender-q-empty? (nil? (peek-tuple-for receiver-q))
         senders (-> receiver-q :qs-by-sender keys)
-        receiver-q (assoc receiver-q :turn (next-wrap senders turn))]
-    (if sender-q-empty?
-      (-> receiver-q
-        (update-in [:qs-by-sender] dissoc turn)
-        (update-in [:senders-to-notify-when-cts] disj turn)) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
-      receiver-q)))
+        receiver-q (assoc receiver-q :turn (next-wrap senders turn))
+        receiver-q (if sender-q-empty?
+                     (-> receiver-q
+                       (update-in [:qs-by-sender] dissoc turn)
+                       (update-in [:senders-to-notify-when-cts] disj turn)) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
+                     receiver-q)]
+      receiver-q
+      ))
 
-(defn- pop-cts-packet [receiver-q])
+(defn- pop-cts-packet [receiver-q]
+  )
 
 (defn- pop-packet [receiver-q]
   (if (-> receiver-q :receivers-cts empty?)
