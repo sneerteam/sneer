@@ -16,11 +16,12 @@
         enq! (fn [from to msg] (-> subject (swap! enqueue! from to msg)
                                  (queue-full? from to)
                                  not))
-        peek #(:send (peek-packet-for @subject %))
-        pop? #(let [original @subject
-                    router (swap! subject pop-packet-for %)]
-                (sender-to-notify original router %))
-        pop! #(do (pop? %) (peek %))]
+        peek #(let [packet (peek-packet-for @subject %)]
+;                (println "> > > > > > > >" packet)
+                 (if (:send packet) (:send packet) packet))
+        pop! #(do
+                (swap! subject pop-packet-for %)
+                (peek %))]
     
     (restart!)
     (fact "Queues start empty and accept tuples."
@@ -91,10 +92,8 @@
      (enq! :C :B "CB2")
      (enq! :C :B "CB3")
      (enq! :C :B "CB4") => false
-     (pop? :B) => nil
-     (pop? :B) => nil
-     (pop? :B) => nil
-     (pop? :B) => nil
-     (pop? :B) => :A
-     (pop? :B) => :C
-     (pop? :B) => nil)))
+     (pop! :B)
+     (pop! :B)
+     (pop! :B)
+;    (peek :A) => {:cts :B}
+     )))

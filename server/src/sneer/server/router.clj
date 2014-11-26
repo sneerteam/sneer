@@ -30,8 +30,13 @@
                 (peek (qs-by-sender turn)))]
     (when tuple {:send tuple})))
 
+(defn- peek-cts-for [receiver-q]
+  (-> receiver-q :receivers-cts peek))
+
 (defn- peek-for [receiver-q]
-  (peek-tuple-for receiver-q))
+  (or
+    (peek-cts-for receiver-q)
+    (peek-tuple-for receiver-q)))
 
 (defn- mark-full [receiver-q sender]
   (update-in receiver-q [:senders-to-notify-when-cts] (fnil conj #{}) sender))
@@ -60,25 +65,27 @@
         sender-q-empty? (nil? (peek-tuple-for receiver-q))
         senders (-> receiver-q :qs-by-sender keys)
         receiver-q (assoc receiver-q :turn (next-wrap senders turn))
+        sender-to-notify (get-in receiver-q [:senders-to-notify-when-cts turn])
         receiver-q (if sender-q-empty?
                      (-> receiver-q
                        (update-in [:qs-by-sender] dissoc turn)
                        (update-in [:senders-to-notify-when-cts] disj turn)) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
                      receiver-q)]
-      receiver-q
-      ))
+      [receiver-q (when sender-q-empty? sender-to-notify)]))
 
 (defn- pop-cts-packet [receiver-q]
-  )
+  ())
 
 (defn- pop-packet [receiver-q]
-  (if (-> receiver-q :receivers-cts empty?)
-    (pop-tuple-packet receiver-q)
-    (pop-cts-packet receiver-q)))
+  (if (peek-cts-for receiver-q)
+    [(pop-cts-packet receiver-q)]
+    (pop-tuple-packet receiver-q)))
 
 (defn- senders-to-notify-of [receiver qs]
   (get-in qs [receiver :senders-to-notify-when-cts]))
 
+(defn- enqueue-cts [router sender receiver]
+  (update-in router [sender :receivers-cts] (fnil conj empty-q) receiver))
 
 
 (defn enqueue! [router sender receiver tuple]
@@ -91,11 +98,14 @@
 
 (defn pop-packet-for [router receiver]
   "Removes the next tuple to be sent to receiver from its queue."
-  (let [router (update-in router [receiver] pop-packet)
-        empty? (-> router receiver peek-for nil?)]
+  (let [[receiver-q sender-cts] (-> router receiver pop-packet)
+        router (if sender-cts
+                 (enqueue-cts router sender-cts receiver)
+                 router)
+        empty? (-> receiver-q peek-for nil?)]
     (if empty?
       (dissoc router receiver)
-      router)))
+      (assoc router receiver receiver-q))))
 
 (defn queue-full? [router sender receiver]
   "Returns whether the receiver/sender send queue is full."
