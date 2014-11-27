@@ -10,6 +10,8 @@
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
 (def t1 {:id 1 :payload "1"})
+(def t2 {:id 2 :payload "2"})
+(def t3 {:id 3 :payload "3"})
 
 (tabular "Router Connector"
   (fact ?fact
@@ -27,17 +29,17 @@
   
   "A tuple is enqueued"
   [{:send t1 :from :A :to  :B}]
-  [{:ack  1  :to   :A :for :B}]
+  [{:ack   1 :to   :A :for :B}]
 
   "A tuple is sent when client comes online (sends a ping)"
   [{:send t1 :from :A :to  :B} {:from :B}]
-  [{:ack  1  :to   :A :for :B} {:send t1 :to :B}]
+  [{:ack   1 :to   :A :for :B} {:send t1 :to :B}]
 
-  #_(
+  "Full queue emits NAK"
+  [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:send t3 :from :A :to  :B}]
+  [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B} {:nak   3 :to   :A :for :B}]
   
-  "Queue is full"
-  [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B}]
-  [{:cts true :to :A :for :B}      {:cts true :to :A :for :B}       {:cts false :to :A :for :B}]
+  #_(
   
   "B comes online and receives a tuple that was waiting"
   [{:send "Hello" :from :A :to :B} {:peek :B}]

@@ -42,9 +42,13 @@
                 state (update-in state [:online-clients from :pending-to-send] #(if % % (peek-packet-for router from)))
                 state (match packet
                         {:send tuple :from from :to to}
-                        (do
-                          (>! packets-out {:ack (:id tuple) :for to :to from})
-                          (update-in state [:router] enqueue! from to tuple))
+                        (if (queue-full? router from to)
+                          (do
+                            (>! packets-out {:nak (:id tuple) :for to :to from})
+                            state)
+                          (do
+                            (>! packets-out {:ack (:id tuple) :for to :to from})
+                            (update-in state [:router] enqueue! from to tuple)))
                          
                         :else
                         state)]
