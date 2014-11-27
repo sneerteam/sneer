@@ -1,15 +1,14 @@
 (ns sneer.server.router
   (:require
-   [clojure.set :refer [difference]]))
-
-(def ^:private empty-q clojure.lang.PersistentQueue/EMPTY)
+    [sneer.commons :refer [empty-queue]]
+    [clojure.set :refer [difference]]))
 
 (defn dropping-conj [xs x max-size]
   (let [full? (>= (count xs) max-size)]
     (if full? xs (conj xs x))))
 
 (defn dropping-enqueue [q element max-size]
-  (dropping-conj (or q empty-q) element max-size))
+  (dropping-conj (or q empty-queue) element max-size))
 
 (defn pop-only [xs x]
   (if (= x (peek xs))
@@ -86,7 +85,7 @@
   (get-in qs [receiver :senders-to-notify-when-cts]))
 
 (defn- enqueue-cts [router sender receiver]
-  (update-in router [sender :receivers-cts] (fnil conj empty-q) receiver))
+  (update-in router [sender :receivers-cts] (fnil conj empty-queue) receiver))
 
 
 (defn enqueue! [router sender receiver tuple]

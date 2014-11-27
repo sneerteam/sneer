@@ -1,5 +1,7 @@
 (ns sneer.commons)
 
+(def empty-queue clojure.lang.PersistentQueue/EMPTY)
+
 (defn byte-array= [^bytes a1 ^bytes a2]
   (java.util.Arrays/equals a1 a2))
 
