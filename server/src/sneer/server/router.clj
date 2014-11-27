@@ -31,7 +31,8 @@
     (when tuple {:send tuple})))
 
 (defn- peek-cts-for [receiver-q]
-  (-> receiver-q :receivers-cts peek))
+  (when-some [peer (-> receiver-q :receivers-cts peek)]
+    {:cts peer}))
 
 (defn- peek-for [receiver-q]
   (or

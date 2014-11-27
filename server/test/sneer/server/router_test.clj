@@ -85,15 +85,17 @@
     (restart!)
     (fact "Senders are notified of queues that were full and became empty."
      (enq! :A :B "AB1")
-     (enq! :A :B "AB2")
-     (enq! :A :B "AB3")
-     (enq! :A :B "AB4") => false
+     (enq! :A :B "AB2") => true
+     (enq! :A :B "AB3") => false
      (enq! :C :B "CB1")
-     (enq! :C :B "CB2")
-     (enq! :C :B "CB3")
-     (enq! :C :B "CB4") => false
+     (enq! :C :B "CB2") => true
+     (enq! :C :B "CB3") => false
      (pop! :B)
      (pop! :B)
      (pop! :B)
-;    (peek :A) => {:cts :B}
+     (pop! :B)
+     (pop! :B)
+     (peek :A) => {:cts :B}
+     (pop! :B)
+     (peek :C) => {:cts :B}
      )))
