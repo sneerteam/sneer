@@ -9,9 +9,9 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-(def t1 {:id 1 :payload "1"})
-(def t2 {:id 2 :payload "2"})
-(def t3 {:id 3 :payload "3"})
+(def t1 {:id 1 :author :A :payload "1"})
+(def t2 {:id 2 :author :A :payload "2"})
+(def t3 {:id 3 :author :A :payload "3"})
 
 (tabular "Router Connector"
   (fact ?fact
@@ -38,17 +38,13 @@
   "Full queue emits NAK"
   [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:send t3 :from :A :to  :B}]
   [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B} {:nak   3 :to   :A :for :B}]
-  
-  #_(
-  
-  "B comes online and receives a tuple that was waiting"
-  [{:send "Hello" :from :A :to :B} {:peek :B}]
-  [{:cts true :to :A :for :B}      {:send "Hello" :to :B}]
 
   "B receives a tuple with another enqueued"
-  [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:peek :B}             {:pop :B}]
-  [{:cts true :to :A :for :B}      {:cts true :to :A :for :B}       {:send "Hello" :to :B} {:send "Hello2" :to :B}]
+  [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:from :B}        {:ack :A :id 1 :from :B}]
+  [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B} {:send t1 :to :B} {:send t2      :to   :B}]
+  
 
+  #_(
   "A is notified when its send queue for B is empty."
   [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B} {:pop :B} {:pop :B}]
   (fn [packets] (= (last packets) {:cts true :to :A :for :B}))
