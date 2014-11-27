@@ -7,6 +7,9 @@
     [sneer.async :refer :all]
     [sneer.server.router-connector :refer :all]))
 
+; (do (require 'midje.repl) (midje.repl/autotest))
+
+(def t1 {:id 1 :payload "1"})
 
 (tabular "Router Connector"
   (fact ?fact
@@ -23,12 +26,14 @@
   []
   
   "A tuple is enqueued"
-  [{:send "Hello" :from :A :to :B}]
-  [{:cts true :to :A :for :B}]
+  [{:send t1 :from :A :to  :B}]
+  [{:ack  1  :to   :A :for :B}]
 
-  "A tuple is sent"
-  [{:send "Hello" :from :A :to :B} {:peek :B}]
-  [{:cts true :to :A :for :B}      {:send "Hello" :to :B}]
+  "A tuple is sent when client comes online (sends a ping)"
+  [{:send t1 :from :A :to  :B} {:from :B}]
+  [{:ack  1  :to   :A :for :B} {:send t1 :to :B}]
+
+  #_(
   
   "Queue is full"
   [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B}]
@@ -45,4 +50,5 @@
   "A is notified when its send queue for B is empty."
   [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B} {:pop :B} {:pop :B}]
   (fn [packets] (= (last packets) {:cts true :to :A :for :B}))
+  )
 )
