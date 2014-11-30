@@ -22,7 +22,8 @@ Server Implementation
 ; online-clients { puk { :pending-to-send  <tuple or cts-puk>
 ;                        :online-countdown n                  } }
 
-Go loop [router, online-clients, send-round, offline-timer, send-timer] :priority :false
+Go loop [router, online-clients, send-round, offline-timer, resend-timer] :priority :false
+  Choose a channel operation:
   (if some (next-packet-to-send send-round))
     >! packets-out (next-packet-to-send)
       decrement online-countdown
@@ -44,3 +45,7 @@ Go loop [router, online-clients, send-round, offline-timer, send-timer] :priorit
     decrement online-countdown
     purge offline entries from online-clients.
  
+
+enqueue! -> enqueue
+
+
