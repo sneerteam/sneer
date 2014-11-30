@@ -15,3 +15,8 @@
         key))))
 
 (defn now [] (sneer.commons.Clock/now))
+
+(defn loop-state [fn initial]
+  (let [next (try (fn initial) (catch Throwable t (.printStackTrace t)))]
+    (when (not= next :break)
+      (recur fn (merge initial next)))))
