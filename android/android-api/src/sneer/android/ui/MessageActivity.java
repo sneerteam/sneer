@@ -11,6 +11,12 @@ import android.os.ResultReceiver;
 
 public abstract class MessageActivity extends SneerActivity {
 
+	protected void send(String label, Object payload, byte[] jpegImage) {
+		ResultReceiver resultReceiver = getExtra(RESULT_RECEIVER);
+		SneerAndroidClient.send(resultReceiver, label, payload, null);
+	}
+
+	
 	protected Object messagePayload() {
 		Intent intent = getIntent();
 		if (intent == null) return null;
@@ -37,10 +43,5 @@ public abstract class MessageActivity extends SneerActivity {
 		return getIntent() == null ? null : getIntent().getStringExtra(TEXT);
 	}
 
-
-	protected void send(String label, Object payload, byte[] jpegImage) {
-		ResultReceiver resultReceiver = getExtra(RESULT_RECEIVER);
-		SneerAndroidClient.send(resultReceiver, label, payload, null);
-	}
 
 }

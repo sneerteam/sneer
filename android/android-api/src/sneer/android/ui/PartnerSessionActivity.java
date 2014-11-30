@@ -74,6 +74,10 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 	}
 
 
+	
+	
+	
+	
 
 	/** Called in the Android main thread (UI thread).
 	 *  @param name The current name of the peer with you in this session. */
