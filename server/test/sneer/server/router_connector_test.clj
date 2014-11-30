@@ -43,7 +43,6 @@
   [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:from :B}        {:ack :A :id 1 :from :B}]
   [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B} {:send t1 :to :B} {:send t2      :to   :B}]
   
-
   #_(
   "A is notified when its send queue for B is empty."
   [{:send "Hello" :from :A :to :B} {:send "Hello2" :from :A :to :B} {:send "Hello3" :from :A :to :B} {:pop :B} {:pop :B}]
