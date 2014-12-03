@@ -25,8 +25,7 @@
 
 (defn- peek-tuple-for [receiver-q]
   (let [{:keys [qs-by-sender turn]} receiver-q
-        tuple (when qs-by-sender
-                (peek (qs-by-sender turn)))]
+        tuple (some-> turn qs-by-sender peek)]
     (when tuple {:send tuple})))
 
 (defn- peek-cts-for [receiver-q]
