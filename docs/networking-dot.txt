@@ -1,7 +1,5 @@
-//To produce an image called networking.png using this input file:
-//apt-get install graphviz
-//dot -Tpng -onetworking.png networking-dot.txt
-
+// nano networking-dot.txt && dot -Tpng -onetworking.png networking-dot.txt && xdg-open networking.png
+ 
 digraph {
 
 	splines=line;
@@ -11,9 +9,9 @@ digraph {
 	}
 
 	subgraph cluster_client { label="client";
-		"open-router-connection" -> RouterConnection [style=dashed, arrowhead=onormal];
+                "TupleSpace" -> TupleBase;
 		"open-router-connection" -> UDP;
-		"start-dispatching-tuples" -> { TupleBase RouterConnection };
+		"start-dispatching-tuples" -> { TupleBase };
 		"client-main" -> { "open-router-connection" "start-dispatching-tuples" }
 	}
 
@@ -24,7 +22,6 @@ digraph {
 	}
 
 	subgraph cluster_coretests { label="core.tests";
-		"local-integration-test" -> "RouterConnection" [style=dashed, arrowhead=onormal];
 		"local-integration-test" -> { "create-router" "start-dispatching-tuples" };
 	}
 
