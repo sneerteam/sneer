@@ -25,6 +25,5 @@
   
   (fact "A tuple is sent"
     (>!!? toB t1) ; Non-blocking
-    (<!!? packets-out) => :timeout
-;   (<!!? packets-out) => {:from :A :send t1 :to :B}
+    (<!!? packets-out) => {:from :A :send t1 :to :B}
     ))
