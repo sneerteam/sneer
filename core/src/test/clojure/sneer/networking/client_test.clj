@@ -12,6 +12,8 @@
 (def t2 {:id 2 :author :A :payload "2"})
 (def t3 {:id 3 :author :A :payload "3"})
 
+(def tC {:id 42 :author :C :payload "42"})
+
 (let [packets-in (chan)
       packets-out (chan)
       tuples-received (chan)
@@ -25,5 +27,9 @@
   
   (fact "A tuple is sent"
     (>!!? toB t1) ; Non-blocking
-    (<!!? packets-out) => {:from :A :send t1 :to :B}
-    ))
+    (<!!? packets-out) => {:from :A :send t1 :to :B})
+
+  (fact "A tuple is received"
+    (>!!? packets-in {:send tC})
+    (<!!? tuples-received) => tC
+    (<!!? packets-out) => {:from :A :ack (:author tC) :id (:id tC)}))
