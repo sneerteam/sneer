@@ -1,21 +1,18 @@
 (ns sneer.networking.client-new
-  (:require [clojure.core.async :as async])
+  (:require [clojure.core.async :refer [pipe map< map> mult tap filter<]])
   (:import [sneer.commons SystemReport]))
 
-(defn connect-to-follower 
-  "client is what is returned by start-client, below.
-  Throws IllegalState if there already is a connection to that follower."
-  [client follower-puk tuples-out]
-  (let [follower-packets-out (->> tuples-out (async/map< #(do {:send % :to follower-puk})))]
-    (async/pipe follower-packets-out (:packets-out client))))
+(defn- ->ack [tuple]
+  {:ack (:author tuple) :id (:id tuple)})
 
-(defn ack-for-tuple [t]
-  {:ack (:author t) :id (:id t)})
+(defn connect-to-follower [client follower-puk tuples-out]
+  (pipe
+    tuples-out
+    (map> #(do {:send % :to follower-puk}) (:packets-out client))))
 
 (defn start-client [own-puk packets-in packets-out tuples-received]
-  (let [packets-out (async/map> #(assoc % :from own-puk) packets-out)
-        tuples (->> packets-in (async/map< :send) (async/filter< some?))
-        mult-tuples (async/mult tuples)]
-    (async/tap mult-tuples tuples-received)
-    (async/tap mult-tuples (async/map> ack-for-tuple packets-out))
+  (let [packets-out (map> #(assoc % :from own-puk) packets-out)
+        tuples-in (->> packets-in (map< :send) (filter< some?) mult)]
+    (tap tuples-in tuples-received)
+    (tap tuples-in (map> ->ack packets-out))
     {:packets-out packets-out}))
