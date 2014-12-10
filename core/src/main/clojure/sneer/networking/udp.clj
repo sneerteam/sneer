@@ -4,7 +4,7 @@
             [clojure.core.async :as async :refer [>! <! >!! <!!]])
   (:import [java.net DatagramPacket DatagramSocket SocketAddress InetAddress InetSocketAddress SocketException]))
 
-(def MTU 1400)  ; Anecdotal.
+(def MTU 1400)  ; Anecdotal suggestions on the web.
 
 (defn new-datagram []
   (new DatagramPacket (byte-array MTU) MTU))
