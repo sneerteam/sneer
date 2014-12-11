@@ -39,6 +39,7 @@
   (fact "Pending tuple is sent when :cts"
     (>!!? packets-in {:nak (:id t1) :for :B})
     (>!!? packets-in {:cts :B})
+    (<!!? packets-out) => {:from :A :ack :B}
     (<!!? packets-out) => {:from :A :send t1 :to :B})
 
   (fact "Pending tuple is resent"
@@ -48,4 +49,9 @@
   (fact "Next tuple is sent on :ack"
     (>!!? toB t2)
     (>!!? packets-in {:ack (:id t1) :for :B})
+    (<!!? packets-out) => {:from :A :send t2 :to :B})
+
+  (fact "Bogus packet doesn't interfere with resend"
+    (>!!? packets-in {:bogus true :for :B})
+    (>!!? resend-timeout :stimulus)
     (<!!? packets-out) => {:from :A :send t2 :to :B}))
