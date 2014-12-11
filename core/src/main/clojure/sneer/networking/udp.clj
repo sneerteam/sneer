@@ -43,7 +43,7 @@
 (defn start-udp-server
   "Opens a UDP socket on port, sending packets taken from packets-out and putting received packets into packets-in.
   Server will stop when packets-out is closed."
-  [packets-out packets-in & [port]]
+  [packets-in packets-out & [port]]
 
   (when port (println "Opening port" port))
 
@@ -58,7 +58,8 @@
                #_(println "<!" packet)
                (send-value socket packet)
                (catch Exception e (print-err-if-open e)))
-              (recur)))))
+              (recur))))
+      (when port (println "Closing port" port)))
 
     (async/thread
       (while (is-open socket)

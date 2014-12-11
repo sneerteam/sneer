@@ -20,7 +20,7 @@
               (-> (<!!? packets-in) (get 1) String.))]
     
    (start-udp-server loopback loopback echo-port)
-   (start-udp-server packets-out packets-in)
+   (start-udp-server packets-in packets-out)
     
    (fact "Packets are sent and received"
      (echo "Hello") => "Hello"
