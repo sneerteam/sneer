@@ -1,5 +1,5 @@
 (ns sneer.networking.client-new
-  (:require [clojure.core.async :refer [>! <! map< map> mult tap filter< go-loop timeout alt! chan]]
+  (:require [clojure.core.async :refer [>! <! map> timeout alt! chan]]
             [sneer.async :refer [go-while-let dropping-chan IMMEDIATELY]]
             [clojure.core.match :refer [match]])
   (:import [sneer.commons SystemReport]))
