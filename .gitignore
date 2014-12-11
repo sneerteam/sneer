@@ -4,6 +4,11 @@
 .settings
 project.properties
 
+.idea
+*.iml
+*.ipr
+*.iws
+
 .gradle/
 
 local.properties
