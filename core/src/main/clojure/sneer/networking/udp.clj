@@ -2,14 +2,15 @@
   (:require [sneer.serialization :refer [serialize deserialize]]
             [sneer.async :refer [go-trace]]
             [clojure.core.async :as async :refer [>! <! >!! <!!]])
-  (:import [java.net DatagramPacket DatagramSocket SocketAddress InetAddress InetSocketAddress SocketException]))
+  (:import [java.net DatagramPacket DatagramSocket SocketAddress InetAddress InetSocketAddress SocketException]
+           [sneer.commons SystemReport]))
 
 (def MTU 1400)  ; Anecdotal suggestions on the web.
 
-(defn new-datagram []
+(defn- new-datagram []
   (new DatagramPacket (byte-array MTU) MTU))
 
-(defn data->value
+(defn- ->value
   "Reads the encoded datagram and returns [socket-address value]"
   [^DatagramPacket datagram]
   (let [address (.getSocketAddress datagram)
@@ -17,22 +18,22 @@
     #_(println address value)
     [address value]))
 
-(defn value->data
+(defn- ->datagram
   "Returns an encoded datagram of the given value, with the given socket address set."
   [[address value]]
   (doto (^DatagramPacket new-datagram)
     (.setSocketAddress address)
     (.setData (serialize value))))
 
-(defn send-value [socket value]
-  (. ^DatagramSocket socket send (value->data value)))
+(defn- send-value [socket value]
+  (.send ^DatagramSocket socket (->datagram value)))
 
-(defn receive-value [socket]
+(defn- receive-value [socket]
   (let [datagram (new-datagram)]
-    (. ^DatagramSocket socket receive datagram)
-    (data->value datagram)))
+   (.receive ^DatagramSocket socket datagram)
+   (->value datagram)))
 
-(defn is-open [socket]
+(defn- is-open [socket]
   (not (.isClosed ^DatagramSocket socket)))
 
 (defn- open-socket [port]
