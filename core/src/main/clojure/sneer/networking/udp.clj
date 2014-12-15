@@ -1,14 +1,15 @@
 (ns sneer.networking.udp
   (:require [sneer.serialization :refer [serialize deserialize]]
             [sneer.async :refer [go-trace]]
-            [clojure.core.async :as async :refer [>! <! >!! <!!]])
+            [clojure.core.async :as async :refer [>! <! >!! <!!]]
+            [sneer.commons :refer :all])
   (:import [java.net DatagramPacket DatagramSocket SocketAddress InetAddress InetSocketAddress SocketException]
            [sneer.commons SystemReport]))
 
 (def MTU 1400)  ; Anecdotal suggestions on the web.
 
 (defn- new-datagram []
-  (new DatagramPacket (byte-array MTU) MTU))
+  (DatagramPacket. (byte-array MTU) MTU))
 
 (defn- ->value
   "Reads the encoded datagram and returns [socket-address value]"
@@ -34,12 +35,31 @@
    (->value datagram)))
 
 (defn- is-open [socket]
-  (not (.isClosed ^DatagramSocket socket)))
+  (and (not (#{:none :closed} socket))
+       (not (.isClosed ^DatagramSocket socket))))
 
 (defn- open-socket [port]
   (if port
     (DatagramSocket. ^int port)
     (DatagramSocket.)))
+
+(defn- close-socket [socket]
+  (when (is-open socket)
+    (try
+      (.close socket)
+      (catch Exception e :ignored)))
+  :closed)
+
+(defn- produce-socket [port socket-atom]
+  (swap! socket-atom #(if (= % :none) (open-socket port) %)))
+
+(defn- handle-err [socket-atom err]
+  (swap! socket-atom
+         (fn [socket]
+           (when (is-open socket)
+             (.close socket)
+             (.printStackTrace ^Exception err))
+           :none)))
 
 (defn start-udp-server
   "Opens a UDP socket on port, sending packets taken from packets-out and putting received packets into packets-in.
@@ -48,24 +68,25 @@
 
   (when port (println "Opening port" port))
 
-  (let [socket (open-socket port)
-        print-err-if-open #(when (is-open socket) (.printStackTrace ^Exception %))]
-
-    (go-trace
-      (with-open [^DatagramSocket socket ^DatagramSocket socket]
-        (loop []
-          (when-let [packet (<! packets-out)]
-            (try
-               #_(println "<!" packet)
-               (send-value socket packet)
-               (catch Exception e (print-err-if-open e)))
-              (recur))))
-      (when port (println "Closing port" port)))
+  (let [^DatagramSocket socket (atom :none)]
 
     (async/thread
-      (while (is-open socket)
+      (loop []
+        (if-let [packet (<!! packets-out)]
+          (do
+            (try
+              #_(println "<!!" packet)
+              (send-value socket packet)
+              (catch Exception e (handle-err socket e)))
+            (recur))
+          (do
+            (when port (println "Closing port" port))
+            (swap! socket close-socket)))))
+
+    (async/thread
+      (while-let [s (produce-socket port socket)]
         (try
-          (let [packet (receive-value socket)]
+          (let [packet (receive-value s)]
             #_(println ">!!" packet)
             (>!! packets-in packet))
-          (catch Exception e (print-err-if-open e)))))))
+          (catch Exception e (handle-err socket e)))))))
