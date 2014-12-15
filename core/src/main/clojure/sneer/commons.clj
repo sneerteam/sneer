@@ -20,3 +20,11 @@
   (let [next (try (fn initial) (catch Throwable t (.printStackTrace t)))]
     (when (not= next :break)
       (recur fn (merge initial next)))))
+
+(defmacro while-let
+  "Makes it easy to continue processing an expression as long as it is true"
+  [binding & forms]
+  `(loop []
+     (when-let ~binding
+       ~@forms
+       (recur))))
