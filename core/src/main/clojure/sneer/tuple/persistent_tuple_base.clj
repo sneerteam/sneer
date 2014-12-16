@@ -1,8 +1,8 @@
 (ns sneer.tuple.persistent-tuple-base
   (:import [sneer.crypto.impl KeysImpl])
   (:require [sneer.core :as core]
-            [sneer.async :refer [dropping-chan]]
-            [clojure.core.async :refer [go-loop <! >! >!!]]
+            [sneer.async :refer [dropping-chan go-while-let dropping-tap]]
+            [clojure.core.async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
             [sneer.serialization :as serialization]
             [rx.lang.clojure.core :as rx]
@@ -14,9 +14,9 @@
   (store-tuple ^Void [this tuple]
     "Stores the tuple represented as map.")
 
-  (query-tuples [this criteria keep-alive tuples-out]
+  (query-tuples [this criteria live? tuples-out lease]
     "Filters tuples by the criteria represented as a map of
-     field/value. When keep-alive is true the channel will keep receiving
+     field/value. When live? is true the channel will keep receiving
      new tuples as they are stored otherwise it will complete." )
   
   (restarted ^TupleBase [this]))
@@ -144,7 +144,8 @@
   (idempotently #(create-tuple-indices db)))
 
 (defn create [db]
-  (let [new-tuples (dropping-chan)]
+  (let [new-tuples (dropping-chan)
+        new-tuples-mult (mult new-tuples)]
 
     (setup db)
 
@@ -155,13 +156,15 @@
         ;(dump-tuples db)
         (>!! new-tuples tuple))
 
-      (query-tuples [this criteria keep-alive tuples-out]
-        (if keep-alive
-          (go-loop []
-            (doseq [tuple (query-tuples-from-db db criteria)]
-              (>! tuples-out tuple))
-            (<! new-tuples)
-            (recur))))
+      (query-tuples [this criteria live? tuples-out lease]
+        (if live?
+          (let [new-tuples (dropping-tap new-tuples-mult)]
+            (go (<! lease) (close! new-tuples))
+            (go-loop []
+              (doseq [tuple (query-tuples-from-db db criteria)]
+                (>! tuples-out tuple))
+              (when (<! new-tuples)
+                (recur))))))
 
       (restarted [this]
         (create db)))))

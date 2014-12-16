@@ -1,5 +1,5 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go remove< >! <!]]
+  (:require [clojure.core.async :as async :refer [chan go remove< >! <! tap]]
             [sneer.commons :refer :all]))
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
@@ -44,3 +44,6 @@
             (>! ret v))
           (recur v))))
     ret))
+
+(defn dropping-tap [mult]
+  (tap mult (dropping-chan)))

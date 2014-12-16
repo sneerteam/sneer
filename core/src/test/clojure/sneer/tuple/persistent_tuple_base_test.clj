@@ -9,6 +9,8 @@
   (:import [java.sql DriverManager]
            [sneer.crypto.impl KeysImpl]))
 
+;  (do (require 'midje.repl) (midje.repl/autotest))
+
 (defn create-sqlite-db [databaseFile]
   (let [connection (DriverManager/getConnection (if databaseFile (str "jdbc:sqlite:" (.getAbsolutePath databaseFile)) "jdbc:sqlite::memory:"))
         db {:connection connection}]
@@ -40,9 +42,15 @@
 (facts "About query-tuples"
   (let [subject (create)
         result (async/chan)
+        lease (async/chan)
         t1 {"type" "sub" "payload" "42" "author" (create-puk (.getBytes "neide"))}
-        select-t1-keys #(select-keys % (keys t1))]
+        select-t1-keys #(select-keys % (keys t1))
+        query (query-tuples subject {"type" "sub"} true result lease)]
+
     (fact "When keep-alive is true it sends new tuples"
-      (query-tuples subject {"type" "sub"} true result)
       (store-tuple subject t1)
-      (-> (<!!? result) select-t1-keys) => t1)))
+      (-> (<!!? result) select-t1-keys) => t1)
+
+    (fact "When lease channel is closed query-tuples is terminated"
+      (async/close! lease)
+      (<!!? query) => nil)))
