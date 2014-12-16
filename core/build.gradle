@@ -24,6 +24,20 @@ repositories {
     maven { url "https://clojars.org/repo" }
 }
 
+buildscript {
+    repositories {
+        maven { url 'https://repo.spring.io/plugins-release' }
+    }
+
+    dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
+    }
+}
+
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-eclipse'
+
 clojure.warnOnReflection = true
 
 sourceSets {
@@ -52,6 +66,8 @@ dependencies {
     compile project(':crypto')
     compile project(':java-api')
     testCompile 'midje:midje:1.6.3'
+    optional 'org.clojure:java.jdbc:0.3.6'
+    optional 'org.xerial:sqlite-jdbc:3.8.6'
 }
 
 uploadArchives {
