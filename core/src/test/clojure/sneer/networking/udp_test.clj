@@ -10,7 +10,7 @@
 (facts
 "UDP socket"
 
- (let [echo-port 1024
+ (let [echo-port 1031 
        loopback (chan)
        packets-out (chan 3)
        packets-in (chan)
