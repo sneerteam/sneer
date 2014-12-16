@@ -14,10 +14,13 @@
   (store-tuple ^Void [this tuple]
     "Stores the tuple represented as map.")
 
-  (query-tuples [this criteria live? tuples-out lease]
+  (query-tuples
+    [this criteria tuples-out]
+    [this criteria tuples-out lease]
     "Filters tuples by the criteria represented as a map of
-     field/value. When live? is true the channel will keep receiving
-     new tuples as they are stored otherwise it will complete." )
+     field/value. When a lease channel is passed the result
+     channel will keep receiving new tuples until the lease
+     emits a value.")
   
   (restarted ^TupleBase [this]))
 
@@ -156,15 +159,16 @@
         ;(dump-tuples db)
         (>!! new-tuples tuple))
 
-      (query-tuples [this criteria live? tuples-out lease]
-        (if live?
-          (let [new-tuples (dropping-tap new-tuples-mult)]
-            (go (<! lease) (close! new-tuples))
-            (go-loop []
-              (doseq [tuple (query-tuples-from-db db criteria)]
-                (>! tuples-out tuple))
-              (when (<! new-tuples)
-                (recur))))))
+      (query-tuples [this criteria tuples-out lease]
+        (let [new-tuples (dropping-tap new-tuples-mult)]
+          (go (<! lease) (close! new-tuples))
+          (go-loop []
+            (doseq [tuple (query-tuples-from-db db criteria)]
+              (>! tuples-out tuple))
+            ;(>! tuples-out :wait-marker)
+            (when (<! new-tuples)
+              (recur)))))
 
       (restarted [this]
         (create db)))))
+

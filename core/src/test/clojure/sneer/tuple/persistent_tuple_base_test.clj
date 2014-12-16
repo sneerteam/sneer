@@ -45,9 +45,9 @@
         lease (async/chan)
         t1 {"type" "sub" "payload" "42" "author" (create-puk (.getBytes "neide"))}
         select-t1-keys #(select-keys % (keys t1))
-        query (query-tuples subject {"type" "sub"} true result lease)]
+        query (query-tuples subject {"type" "sub"} result lease)]
 
-    (fact "When keep-alive is true it sends new tuples"
+    (fact "When query is live it sends new tuples"
       (store-tuple subject t1)
       (-> (<!!? result) select-t1-keys) => t1)
 
