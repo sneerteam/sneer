@@ -2,7 +2,7 @@
   (:require
    [clojure.core.async :as async :refer [chan >! <! >!! <!! alts!! timeout]]
    [clojure.java.io :as io]
-   [sneer.async :refer [go-trace while-let go-while-let]]))
+   [sneer.async :refer [go-trace go-while-let]]))
 
 (defn prefixes [path]
   "(1 2 3) -> ([1] [1 2] [1 2 3])"
