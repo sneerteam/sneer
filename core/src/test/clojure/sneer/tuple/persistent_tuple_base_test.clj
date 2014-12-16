@@ -37,10 +37,12 @@
 
 (defn- create-puk [^bytes rep] (.createPublicKey (KeysImpl.) rep))
 
-(fact "It works!"
+(facts "About query-tuples"
   (let [subject (create)
         result (async/chan)
-        t1 {"type" "sub" "payload" "42" "author" (create-puk (.getBytes "neide"))}]
-    (query-tuples subject {"type" "sub"} true result)
-    (store-tuple subject t1)
-    (<!!? result) => t1))
+        t1 {"type" "sub" "payload" "42" "author" (create-puk (.getBytes "neide"))}
+        select-t1-keys #(select-keys % (keys t1))]
+    (fact "When keep-alive is true it sends new tuples"
+      (query-tuples subject {"type" "sub"} true result)
+      (store-tuple subject t1)
+      (-> (<!!? result) select-t1-keys) => t1)))
