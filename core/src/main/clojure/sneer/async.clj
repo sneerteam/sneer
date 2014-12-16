@@ -1,6 +1,6 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go remove< >! <!]
-             sneer.commons :refer :all]))
+  (:require [clojure.core.async :as async :refer [chan go remove< >! <!]]
+            [sneer.commons :refer :all]))
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
 
