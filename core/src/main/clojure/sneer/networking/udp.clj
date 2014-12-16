@@ -35,8 +35,7 @@
    (->value datagram)))
 
 (defn- is-open [socket]
-  (and (not (#{:none :closed} socket))
-       (not (.isClosed ^DatagramSocket socket))))
+  (and socket (not (.isClosed ^DatagramSocket socket))))
 
 (defn- open-socket [port]
   (when port (println "Opening port" port))
@@ -44,39 +43,33 @@
     (DatagramSocket. ^int port)
     (DatagramSocket.)))
 
-(defn- close-socket [socket port]
-  (when port (println "closing: " socket))
+(defn- close-socket [verbose? socket]
+  (when verbose? (println "closing: " socket))
   (when socket
     (try
       (.close socket)
-      (when port (println "closed"))
+      (when verbose? (println "closed"))
       (catch Exception e :ignored))))
 
-(defn- produce-socket [port socket-atom status]
-  (case status
-    :closed
-    (do 
-      (close-socket @socket-atom port)
-      nil)
-
-    :running
-    @socket-atom
-
-    :missing
-    (do
-      (swap! socket-atom
-             #(do
-                (close-socket % port)
-                (open-socket port))))))
-
-(defn- handle-err [socket-atom err port]
-  (swap! socket-atom
-         (fn [socket]
-           (when port (println "error: " err))
-           (when (is-open socket)
-             (.close socket)
-             (.printStackTrace ^Exception err))
-           :none)))
+(defn- produce-socket [port socket-atom closed?]
+  (loop []
+    (let [current @socket-atom]
+      (if @closed?
+        (do
+          (close-socket port current)
+          nil)
+        (if (is-open current)
+          current
+          (do
+            (try
+              (reset! socket-atom (open-socket port))
+              (catch Exception e (Thread/sleep 3000)))
+            (recur))))))) ; Make sure closed? is false.
+  
+(defn- close-on-err [verbose? socket socket-fn]
+  (try
+    (socket-fn socket)
+    (catch Exception e (close-socket verbose? socket))))
 
 (defn start-udp-server
   "Opens a UDP socket on port, sending packets taken from packets-out and putting received packets into packets-in.
@@ -84,23 +77,15 @@
   [packets-in packets-out & [port]]  
 
   (let [socket-atom (atom nil)
-        status (atom :missing)
-        with-socket (fn [action]
-                      (try
-                        (action @socket-atom)
-                        (catch Exception e nil)))]
+        closed? (atom false)]
 
     (async/thread
       (while-let [packet (<!! packets-out)]
-        (let [socket @socket-atom]
-          (try
-            (send-value socket packet)
-            (catch Exception e (close-socket socket)))))
-      (reset! status :closed))
+        (when-let [socket @socket-atom]
+          (close-on-err port socket #(send-value % packet))))
+      (reset! closed? true)
+      (close-socket port @socket-atom))
 
     (async/thread
-      (while-let [socket (produce-socket port socket-atom @status)]
-        (try
-          (let [packet (receive-value socket)]
-            (>!! packets-in packet))
-          (catch Exception e (swap! status #(if (= % :closed) :closed :missing))))))))
+      (while-let [socket (produce-socket port socket-atom closed?)]
+        (close-on-err port socket #(>!! packets-in (receive-value %)))))))
