@@ -10,7 +10,9 @@
                  [midje "1.6.3"]
                  [com.netflix.rxjava/rxjava-clojure "0.20.3"]
                  [me.sneer/java-api "0.0.1"]
-                 [me.sneer/crypto "0.0.1"]]
+                 [me.sneer/crypto "0.0.1"]
+                 [org.clojure/java.jdbc "0.3.6"]
+                 [org.xerial/sqlite-jdbc "3.8.6"]]
   :profiles {:dev {:plugins [[cider/cider-nrepl "0.8.1"]]}}
   :plugins [[lein-midje "3.0.0"]]
   :source-paths ["src/main/clojure"]
