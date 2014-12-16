@@ -9,7 +9,6 @@ buildscript {
         maven { url "https://clojars.org/repo" }
     }
 
-
     dependencies {
         classpath "clojuresque:clojuresque:1.7.0"
     }
@@ -19,7 +18,6 @@ repositories {
     mavenCentral()
     maven { url "https://clojars.org/repo" }
 }
-
 
 sourceSets {
     main {

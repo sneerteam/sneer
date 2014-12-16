@@ -14,7 +14,6 @@ buildscript {
         maven { url "https://clojars.org/repo" }
     }
 
-
     dependencies {
         classpath "clojuresque:clojuresque:1.7.0"
     }
@@ -50,7 +49,6 @@ dependencies {
     	exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
     	exclude group: 'org.apache.directory.studio', module: 'org.apache.commons.codec'
     }
-
     compile project(':crypto')
     compile project(':java-api')
     testCompile 'midje:midje:1.6.3'
