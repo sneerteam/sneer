@@ -73,14 +73,14 @@
   (NamedChannel. :resend-timeout (resend-timeout-fn)))
 
 (defn- send-round [online-clients]
-  (let [result (->>
-                 online-clients
-                 keys
-                 (filter #(get-in online-clients [% :pending-to-send]))
-                 (into empty-queue))]
-    (when-some [round (seq result)]
+  (let [pending-packets (->>
+                          online-clients
+                          keys
+                          (filter #(get-in online-clients [% :pending-to-send]))
+                          (into empty-queue))]
+    (when-some [round (seq pending-packets)]
       (println "SEND-ROUND" round))
-    result))
+    pending-packets))
 
 (defmulti handle (fn [_ _ channel] (:name channel)))
 
