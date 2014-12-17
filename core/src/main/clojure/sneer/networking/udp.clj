@@ -43,13 +43,13 @@
     (DatagramSocket. ^int port)
     (DatagramSocket.)))
 
-(defn- close-socket [verbose? socket]
-  (when verbose? (println "closing: " socket))
-  (when socket
-    (try
-      (.close socket)
-      (when verbose? (println "closed"))
-      (catch Exception e :ignored))))
+(defn- close-socket [port socket]
+  (when (is-open socket)
+    (when port (println "Closing port" port))
+    (when socket
+      (try
+        (.close socket)
+        (catch Exception e :ignored)))))
 
 (defn- produce-socket [port socket-atom closed?]
   (loop []
@@ -64,7 +64,7 @@
             (try
               (reset! socket-atom (open-socket port))
               (catch Exception e (Thread/sleep 3000)))
-            (recur))))))) ; Make sure closed? is false.
+            (recur))))))) ; Make sure closed? is still false.
   
 (defn- close-on-err [verbose? socket socket-fn]
   (try
