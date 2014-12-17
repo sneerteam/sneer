@@ -26,7 +26,9 @@
     ; server ping loop
     (go-trace
       (while (>! to-server ping)
-        (<! (timeout 20000))))
+        ;; TODO: increase timeout to 20000
+        (println "TODO: increase timeout to 20000")
+        (<! (timeout 100))))
 
     udp-out))
 
