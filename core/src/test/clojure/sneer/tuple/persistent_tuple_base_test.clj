@@ -1,18 +1,13 @@
 (ns sneer.tuple.persistent-tuple-base-test
-  (:require [clojure.java.jdbc :as sql]
-            [clojure.string :as string]
-            [sneer.tuple.persistent-tuple-base :refer [query-tuples store-tuple]]
+  (:require [sneer.tuple.persistent-tuple-base :refer [query-tuples store-tuple]]
             [sneer.core :as core]            
             [sneer.test-util :refer [<!!?]]
             [midje.sweet :refer :all]
             [clojure.core.async :as async]
-            [sneer.tuple.jdbc-tuple-base :as jdbc-tuple-base])
-  (:import [java.sql DriverManager]
-           [sneer.crypto.impl KeysImpl]))
+            [sneer.tuple.jdbc-tuple-base :as jdbc-tuple-base]
+            [sneer.tuple.keys :refer [create-puk]]))
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
-
-(defn- create-puk [^bytes rep] (.createPublicKey (KeysImpl.) rep))
 
 (facts "About query-tuples"
   (let [subject (jdbc-tuple-base/create)
