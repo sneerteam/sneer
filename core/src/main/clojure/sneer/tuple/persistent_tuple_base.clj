@@ -161,7 +161,8 @@
 
       (query-tuples [this criteria tuples-out lease]
         (let [new-tuples (dropping-tap new-tuples-mult)]
-          (go (<! lease) (close! new-tuples))
+          (go (<! lease)
+              (close! new-tuples))
           (go-loop []
             (doseq [tuple (query-tuples-from-db db criteria)]
               (>! tuples-out tuple))
