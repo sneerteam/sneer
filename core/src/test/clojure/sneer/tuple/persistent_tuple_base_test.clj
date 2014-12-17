@@ -5,7 +5,7 @@
             [midje.sweet :refer :all]
             [clojure.core.async :as async]
             [sneer.tuple.jdbc-tuple-base :as jdbc-tuple-base]
-            [sneer.tuple.keys :refer [create-puk]]))
+            [sneer.tuple.keys :refer [->puk]]))
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
 
@@ -13,7 +13,7 @@
   (let [subject (jdbc-tuple-base/create)
         result (async/chan)
         lease (async/chan)
-        t1 {"type" "sub" "payload" "42" "author" (create-puk (.getBytes "neide"))}
+        t1 {"type" "sub" "payload" "42" "author" (->puk "neide")}
         select-t1-keys #(select-keys % (keys t1))
         query (query-tuples subject {"type" "sub"} result lease)]
 
