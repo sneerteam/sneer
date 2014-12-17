@@ -51,6 +51,10 @@
         (.close socket)
         (catch Exception e :ignored)))))
 
+(defn on-open-error [exception]
+  (SystemReport/updateReport "network/open" exception)
+  (Thread/sleep 3000))
+
 (defn- produce-socket [port socket-atom closed?]
   (loop []
     (let [current @socket-atom]
@@ -63,8 +67,8 @@
           (do
             (try
               (reset! socket-atom (open-socket port))
-              (catch Exception e (Thread/sleep 3000)))
-            (recur))))))) ; Make sure closed? is still false.
+              (catch Exception e (on-open-error e)))
+            (recur))))))) ; Make sure closed? has not been set to true.
   
 (defn- close-on-err [verbose? socket socket-fn]
   (try

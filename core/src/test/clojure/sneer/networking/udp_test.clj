@@ -17,12 +17,14 @@
        localhost (InetSocketAddress. "localhost" echo-port)
        echo (fn [string]
               (>!! packets-out [localhost (.getBytes string)])
-              (-> (<!!? packets-in) (get 1) String.))]
+              (let [p (<!!? packets-in)]
+                (if (= p :timeout) :timeout (-> p second String.))))]
     
    (start-udp-server loopback loopback echo-port)
    (start-udp-server packets-in packets-out)
     
    (fact "Packets are sent and received"
+    (echo "Chance for loopback server to start.")
     (echo "Hello") => "Hello"
     (echo "42") => "42"
     (echo "Goodbye") => "Goodbye")
