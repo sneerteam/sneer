@@ -8,18 +8,15 @@
     [sneer.commons :refer [empty-queue loop-state]]
     [sneer.server.router :refer :all]))
 
-
-
-
 (defrecord NamedChannel [name channel]
   impl/ReadPort
   (take! [_ fn]
     (impl/take! channel fn))
-  
+
   impl/WritePort
   (put! [_ value fn]
     (impl/put! channel value fn))
-    
+
   Object
   (toString [_]
     (str "Ch" name)))
@@ -93,7 +90,7 @@
 
           {:ack author :id id}
           (ack state from [author id])
-                        
+
           :else
           state)))
     :break))
