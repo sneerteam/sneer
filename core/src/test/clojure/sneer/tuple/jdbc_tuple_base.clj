@@ -5,7 +5,7 @@
             [sneer.core :as core])
   (:import [java.sql DriverManager]))
 
-(defn create-sqlite-db [databaseFile]
+(defn create-sqlite-db [& [databaseFile]]
   (let [connection (DriverManager/getConnection (if databaseFile (str "jdbc:sqlite:" (.getAbsolutePath databaseFile)) "jdbc:sqlite::memory:"))
         db {:connection connection}]
     (reify
@@ -23,8 +23,8 @@
       (db-query [this sql-and-params]
         (sql/query db sql-and-params :result-set-fn doall :as-arrays? true))
 
-      core/Disposable
-      (dispose [this]
+      java.io.Closeable
+      (close [this]
         (.close connection)))))
 
 (defn create [& [databaseFile]]
