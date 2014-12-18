@@ -5,8 +5,14 @@
             [sneer.core :as core])
   (:import [java.sql DriverManager]))
 
+(defn- get-connection [databaseFile]
+  (DriverManager/getConnection
+   (if databaseFile
+     (str "jdbc:sqlite:" (.getAbsolutePath databaseFile))
+     "jdbc:sqlite::memory:")))
+
 (defn create-sqlite-db [& [databaseFile]]
-  (let [connection (DriverManager/getConnection (if databaseFile (str "jdbc:sqlite:" (.getAbsolutePath databaseFile)) "jdbc:sqlite::memory:"))
+  (let [connection (get-connection databaseFile)
         db {:connection connection}]
     (reify
       tuple-base/Database
