@@ -148,23 +148,34 @@
 
 (defn create [db]
   (let [new-tuples (dropping-chan)
-        new-tuples-mult (mult new-tuples)]
+        new-tuples-mult (mult new-tuples)
+        requests (chan)]
 
     (setup db)
+
+    (go-while-let [request (<! requests)]
+      (match request
+        {:store tuple}
+        (do
+          (insert-tuple db tuple)
+          (>!! new-tuples tuple))
+
+        {:query criteria :tuples-out tuples-out}
+        (>! tuples-out (query-tuples-from-db db criteria))))
 
     (reify TupleBase
 
       (store-tuple [this tuple]
-        (insert-tuple db tuple)
-        ;(dump-tuples db)
-        (>!! new-tuples tuple))
+        (>!! requests {:store tuple}))
 
       (query-tuples [this criteria tuples-out lease]
-        (let [new-tuples (dropping-tap new-tuples-mult)]
+        (let [new-tuples (dropping-tap new-tuples-mult)
+              query-result (chan)]
           (go (<! lease)
               (close! new-tuples))
           (go-loop []
-            (doseq [tuple (query-tuples-from-db db criteria)]
+            (>! requests {:query criteria :tuples-out query-result})
+            (doseq [tuple (<! query-result)]
               (>! tuples-out tuple))
             ;(>! tuples-out :wait-marker)
             (when (<! new-tuples)
