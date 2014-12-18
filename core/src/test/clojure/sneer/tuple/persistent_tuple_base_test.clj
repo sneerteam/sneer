@@ -4,13 +4,13 @@
             [sneer.test-util :refer [<!!?]]
             [midje.sweet :refer :all]
             [clojure.core.async :as async]
-            [sneer.tuple.jdbc-tuple-base :as jdbc-tuple-base]
+            [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.tuple.keys :refer [->puk]]))
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
 
 (facts "About query-tuples"
-  (with-open [db (jdbc-tuple-base/create-sqlite-db)]
+  (with-open [db (jdbc-database/create-sqlite-db)]
     (let [subject (create db)
           result (async/chan)
           lease (async/chan)

@@ -1,6 +1,6 @@
 (ns sneer.tuple.tuple-transmitter-test
   (:require [sneer.tuple.tuple-transmitter :as tuple-transmitter]
-            [sneer.tuple.jdbc-tuple-base :as jdbc-tuple-base]
+            [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.tuple.keys :refer [->puk]]
             [midje.sweet :refer :all]
             [clojure.core.async :refer [chan go >!]]
@@ -14,7 +14,7 @@
 (def C (->puk "michael"))
 
 (facts "About tuple transmitter"
-  (with-open [db (jdbc-tuple-base/create-sqlite-db)]
+  (with-open [db (jdbc-database/create-sqlite-db)]
     (let [tuple-base (tuple-base/create db)
           follower-connections (chan)
           connect-to-follower (fn [follower-puk tuples-out]
