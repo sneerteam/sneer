@@ -4,6 +4,7 @@
             [sneer.async :refer [dropping-chan go-while-let dropping-tap]]
             [clojure.core.async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
+            [clojure.core.match :refer [match]]
             [sneer.serialization :as serialization]
             [rx.lang.clojure.core :as rx]
             [rx.lang.clojure.interop :as rx-interop]))
