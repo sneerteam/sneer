@@ -11,9 +11,8 @@
      (str "jdbc:sqlite:" (.getAbsolutePath databaseFile))
      "jdbc:sqlite::memory:")))
 
-(defn create-sqlite-db [& [databaseFile]]
-  (let [connection (get-connection databaseFile)
-        db {:connection connection}]
+(defn reify-database [connection]
+  (let [db {:connection connection}]
     (reify
       tuple-base/Database
       (db-create-table [this table columns]
@@ -32,4 +31,7 @@
       java.io.Closeable
       (close [this]
         (.close connection)))))
+
+(defn create-sqlite-db [& [databaseFile]]
+  (reify-database(get-connection databaseFile)))
 
