@@ -9,17 +9,25 @@
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
 
+(def neide (->puk "neide"))
+
+(def t1 {"type" "tweet" "payload" "hi!" "author" neide})
+(def t2 {"type" "tweet" "payload" "<3" "author" neide})
+
 (facts "About query-tuples"
   (with-open [db (jdbc-database/create-sqlite-db)]
     (let [subject (create db)
           result (async/chan)
           lease (async/chan)
-          t1 {"type" "sub" "payload" "42" "author" (->puk "neide")}
-          query (query-tuples subject {"type" "sub"} result lease)]
+          _ (store-tuple subject t1)
+          query (query-tuples subject {"type" "tweet"} result lease)]
+
+      (fact "It sends stored tuples"
+        (<!!? result) => (contains t1))
 
       (fact "When query is live it sends new tuples"
-        (store-tuple subject t1)
-        (<!!? result) => (contains t1))
+        (store-tuple subject t2)
+        (<!!? result) => (contains t2))
 
       (fact "When lease channel is closed query-tuples is terminated"
         (async/close! lease)

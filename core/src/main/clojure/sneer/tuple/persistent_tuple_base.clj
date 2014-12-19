@@ -114,9 +114,10 @@
   (->> (query-all db) (map println) doall))
 
 (defn query-for [criteria]
-  (if-let [type (criteria "type")]
-    ["SELECT * FROM tuple WHERE type = ?" type]
-    ["SELECT * FROM tuple"]))
+  (let [starting-from (or (:starting-from criteria) 0)]
+    (if-let [type (criteria "type")]
+      ["SELECT * FROM tuple WHERE type = ? AND id > ?" type starting-from]
+      ["SELECT * FROM tuple WHERE id > ?" starting-from]))) 
 
 (defn query-tuples-from-db [db criteria]
   (let [rs (db-query db (query-for criteria))
@@ -171,17 +172,20 @@
 
       (query-tuples [this criteria tuples-out lease]
         (let [new-tuples (dropping-tap new-tuples-mult)
-              query-result (chan)]
+              query-result (chan)
+              previous-id (atom 0)]
           (go (<! lease)
               (close! new-tuples))
           (go-loop []
-            (>! requests {:query criteria :tuples-out query-result})
-            (doseq [tuple (<! query-result)]
-              (>! tuples-out tuple))
-            ;(>! tuples-out :wait-marker)
+            (>! requests {:query (assoc criteria :starting-from @previous-id) :tuples-out query-result})
+            (let [tuples (<! query-result)]
+              (when-not (empty? tuples)
+                (doseq [tuple tuples]
+                  (>! tuples-out tuple))
+                (reset! previous-id (-> tuples last (get "id")))))
+              ;TODO: (>! tuples-out :wait-marker)
             (when (<! new-tuples)
               (recur)))))
 
       (restarted [this]
         (create db)))))
-
