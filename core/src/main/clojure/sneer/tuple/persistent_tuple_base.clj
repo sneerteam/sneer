@@ -114,10 +114,12 @@
   (->> (query-all db) (map println) doall))
 
 (defn query-for [criteria]
-  (let [starting-from (or (:starting-from criteria) 0)]
-    (if-let [type (criteria "type")]
-      ["SELECT * FROM tuple WHERE type = ? AND id > ?" type starting-from]
-      ["SELECT * FROM tuple WHERE id > ?" starting-from]))) 
+  (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
+        filter (interpose " AND " (map #(str % " = ?") (keys columns)))
+        values (vals columns)]
+    (if-some [starting-from (:starting-from criteria)]
+      (apply vector (apply str "SELECT * FROM tuple WHERE id > ? AND " filter) starting-from values)
+      (apply vector (apply str "SELECT * FROM tuple WHERE " filter) values))))
 
 (defn query-tuples-from-db [db criteria]
   (let [rs (db-query db (query-for criteria))
@@ -170,6 +172,15 @@
       (store-tuple [this tuple]
         (>!! requests {:store tuple}))
 
+      (query-tuples [this criteria tuples-out]
+        (let [query-result (chan)]
+          (go
+            (>! requests {:query criteria :tuples-out query-result})
+            (let [tuples (<! query-result)]
+              (doseq [tuple tuples]
+                (>! tuples-out tuple)))
+            (close! tuples-out))))
+
       (query-tuples [this criteria tuples-out lease]
         (let [new-tuples (dropping-tap new-tuples-mult)
               query-result (chan)
@@ -183,7 +194,7 @@
                 (doseq [tuple tuples]
                   (>! tuples-out tuple))
                 (reset! previous-id (-> tuples last (get "id")))))
-              ;TODO: (>! tuples-out :wait-marker)
+            ;;TODO: (>! tuples-out :wait-marker)
             (when (<! new-tuples)
               (recur)))))
 
