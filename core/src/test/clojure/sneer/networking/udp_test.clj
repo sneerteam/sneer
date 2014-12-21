@@ -7,10 +7,7 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-(facts
-"UDP socket"
-
- (let [echo-port 1024
+(let [echo-port 1024
        loopback (chan)
        packets-out (chan 3)
        packets-in (chan)
@@ -30,4 +27,4 @@
     (echo "Goodbye") => "Goodbye")
    
    (close! loopback)
-   (close! packets-out)))
+   (close! packets-out))
