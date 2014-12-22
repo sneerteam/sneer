@@ -46,8 +46,14 @@
       (fact
           (<!!? result) => (contains ?expected))))
 
-  ?criteria           ?expected
-  {"author" neide}    {"payload" "n"}
-  {"author" carla}    {"payload" "c"}
-  {"audience" carla}  {"payload" "n"}
-  {"audience" neide}  {"payload" "c"})
+  ?criteria                                          ?expected
+  {"author" neide}                                   {"payload" "n"}
+  {"author" carla}                                   {"payload" "c"}
+  {"audience" carla}                                 {"payload" "n"}
+  {"audience" neide}                                 {"payload" "c"}
+  {"payload" "n"}                                    {"payload" "n"}
+  {"payload" "c"}     	                             {"payload" "c"}
+  {"author" neide "audience" carla}                  {"payload" "n"}
+  {"author" carla "audience" neide}                  {"payload" "c"}
+  {"author" neide "audience" carla "payload" "n"}    {"payload" "n"}
+  {"author" carla "audience" neide "payload" "c"}    {"payload" "c"})
