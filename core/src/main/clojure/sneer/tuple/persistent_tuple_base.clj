@@ -115,11 +115,11 @@
 
 (defn query-for [criteria]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
-        filter (interpose " AND " (map #(str % " = ?") (keys columns)))
+        filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
         values (vals columns)]
     (if-some [starting-from (:starting-from criteria)]
-      (apply vector (apply str "SELECT * FROM tuple WHERE id > ? AND " filter) starting-from values)
-      (apply vector (apply str "SELECT * FROM tuple WHERE " filter) values))))
+      (apply vector (str "SELECT * FROM tuple WHERE id > ? AND " filter " ORDER BY id") starting-from values)
+      (apply vector (str "SELECT * FROM tuple WHERE " filter " ORDER BY id") values))))
 
 (defn query-tuples-from-db [db criteria]
   (let [rs (db-query db (query-for criteria))
