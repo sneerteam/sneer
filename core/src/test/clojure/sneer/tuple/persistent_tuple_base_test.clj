@@ -7,10 +7,11 @@
             [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.tuple.keys :refer [->puk]]))
 
-;  (do (require 'midje.repl) (midje.repl/autotest))
+; (do (require 'midje.repl) (midje.repl/autotest))
 
 (def neide (->puk "neide"))
 (def carla (->puk "carla"))
+(def michael (->puk "michael"))
 
 (def t1 {"type" "tweet" "payload" "hi!" "author" neide})
 (def t2 {"type" "tweet" "payload" "<3" "author" neide})
@@ -38,8 +39,11 @@
   (with-open [db (jdbc-database/create-sqlite-db)]
     (let [subject (create db)
           result (async/chan)
-          tuples [{"author" neide "payload" "n" "audience" carla}
-                  {"author" carla "payload" "c" "audience" neide}]]
+          tuples [{"author" neide   "payload" "n"           "audience" carla}
+                  {"author" carla   "payload" "c"           "audience" neide}
+                  {"author" carla   "payload" "c"           "audience" neide}
+                  {"author" michael "payload" "hello neide" "audience" neide "type" "chat"}
+                  {"author" michael "payload" "hello carla" "audience" carla "type" "chat"}]]
       (doseq [tuple tuples]
         (store-tuple subject (assoc tuple "type" "test")))
       (query-tuples subject ?criteria result)
@@ -52,8 +56,9 @@
   {"audience" carla}                                 {"payload" "n"}
   {"audience" neide}                                 {"payload" "c"}
   {"payload" "n"}                                    {"payload" "n"}
-  {"payload" "c"}     	                             {"payload" "c"}
+  {"payload" "c"}                                    {"payload" "c"}
   {"author" neide "audience" carla}                  {"payload" "n"}
   {"author" carla "audience" neide}                  {"payload" "c"}
   {"author" neide "audience" carla "payload" "n"}    {"payload" "n"}
-  {"author" carla "audience" neide "payload" "c"}    {"payload" "c"})
+  {"author" michael "audience" neide}                {"payload" "hello neide"}
+  {"author" michael "audience" carla}                {"payload" "hello carla"})
