@@ -118,8 +118,8 @@
         filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
         values (vals columns)]
     (if-some [starting-from (:starting-from criteria)]
-      (apply vector (str "SELECT * FROM tuple WHERE id > ? AND " filter " ORDER BY id") starting-from values)
-      (apply vector (str "SELECT * FROM tuple WHERE " filter " ORDER BY id") values))))
+      (apply vector (str "SELECT * FROM tuple WHERE id > ? " (when-not (.isEmpty filter) " AND ") filter " ORDER BY id") starting-from values)
+      (apply vector (str "SELECT * FROM tuple " (when-not (.isEmpty filter) " WHERE ") filter " ORDER BY id") values))))
 
 (defn query-tuples-from-db [db criteria]
   (let [rs (db-query db (query-for criteria))
