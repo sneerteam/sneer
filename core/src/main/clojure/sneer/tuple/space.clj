@@ -80,12 +80,13 @@
             (with "audience" puk))
           (field [this field value] (with field value))
           (localTuples [this]
-            (rx-query-tuples tuple-base criteria false))
+            (rx/map reify-tuple (rx-query-tuples tuple-base criteria false)))
           (tuples [this]
             (rx/observable*
               (fn [^rx.Subscriber subscriber]
-                (store-tuple tuple-base {"type" "sub" "author" own-puk "criteria" criteria})
-                (let [^rx.Observable tuples (rx-query-tuples tuple-base criteria true)]
+                ;; Use publisher.pub instead of:
+                (store-tuple tuple-base {"type" "sub" "author" own-puk "criteria" criteria "timestampCreated" (now)})
+                (let [^rx.Observable tuples (rx/map reify-tuple (rx-query-tuples tuple-base criteria true))]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
 
