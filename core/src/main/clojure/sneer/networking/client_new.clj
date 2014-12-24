@@ -9,21 +9,20 @@
 (defn- ->ack [tuple]
   {:ack (:author tuple) :id (:id tuple)})
 
-(defn- connect! [client follower-puk]
-  (let [connection (dropping-chan)]
-    (swap! (:follower-channels client) assoc follower-puk connection)
-    connection))
+(defn- accept-packets-from! [client follower-puk packets-in]
+    (swap! (:packets-in-by-follower client) assoc follower-puk packets-in)
+    packets-in)
 
 (defn connect-to-follower [client follower-puk tuples-out & [resend-timeout-fn]]
-  (let [follower-packets (connect! client follower-puk)
+  (let [follower-packets-in (accept-packets-from! client follower-puk (dropping-chan))
         packets-out (:packets-out client)
         resend-timeout-fn (or resend-timeout-fn #(timeout 5000))]
     (go-while-let [tuple (<! tuples-out)]
       (loop [resend-timeout IMMEDIATELY]
         (alt!
-          follower-packets
-          ([packet]
-           (match packet
+          follower-packets-in
+          ([packet-in]
+           (match packet-in
              {:ack id}
              (if (= id (:id tuple))
                :break
@@ -46,7 +45,7 @@
            (recur (resend-timeout-fn))))))))
 
 (defn start-client [own-puk packets-in packets-out tuples-received]
-  (let [follower-channels (atom {})
+  (let [packets-in-by-follower (atom {})
         packets-out (map> #(assoc % :from own-puk) packets-out)]
     (go-while-let [packet (<! packets-in)]
       (match packet
@@ -55,9 +54,9 @@
             (>! packets-out (->ack tuple)))
 
         (:or {:for follower} {:cts follower})       
-        (if-some [follower-channel (get @follower-channels follower)]
-          (>! follower-channel packet)
-          (println "Dropping packet for disconnected follower"))))
+        (if-some [follower-in (get @packets-in-by-follower follower)]
+          (>! follower-in packet)
+          (println "Dropping packet from disconnected follower:" packet))))
     
     {:packets-out packets-out
-     :follower-channels follower-channels}))
+     :packets-in-by-follower packets-in-by-follower}))

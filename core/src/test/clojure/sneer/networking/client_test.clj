@@ -28,7 +28,7 @@
   (connect-to-follower subject :D toD resend-timeout-fn)
   
   (fact "A tuple is sent"
-    (>!!? toB t1) ; Non-blocking
+    (>!!? toB t1)
     (<!!? packets-out) => {:from :A :send t1 :to :B})
 
   (fact "A tuple is received"
