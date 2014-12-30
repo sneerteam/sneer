@@ -46,7 +46,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 		publisher.type("rock-paper-scissor/message")
 			.pub("hehehe");
 
-		TupleFilter subscriber = tuplesB.filter();
+		TupleFilter subscriber = tuplesB.filter().author(userA.publicKey());
 		expecting(
 			payloads(subscriber.tuples(), "paper", "rock", "hehehe"),
 			payloads(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock"),
@@ -63,7 +63,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 		publisher.type("rock-paper-scissor/message").pub("hehehe");
 
 		expecting(
-			values(tuplesB.filter().tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message"));
+			values(tuplesB.filter().author(userA.publicKey()).tuples().map(TO_TYPE), "rock-paper-scissor/move", "rock-paper-scissor/message"));
 
 	}
 
