@@ -14,6 +14,7 @@
     packets-in)
 
 (defn connect-to-follower [client follower-puk tuples-out & [resend-timeout-fn]]
+  (println "connect-to-follower:" follower-puk)
   (let [follower-packets-in (accept-packets-from! client follower-puk (dropping-chan))
         packets-out (:packets-out client)
         resend-timeout-fn (or resend-timeout-fn #(timeout 5000))]
@@ -41,6 +42,7 @@
 
           resend-timeout
           ([_]
+           (println "tuple:" tuple)
            (>! packets-out {:send tuple :to follower-puk})
            (recur (resend-timeout-fn))))))))
 

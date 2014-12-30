@@ -11,6 +11,7 @@
                               (connect-to-follower-fn follower-puk c)
                               c))]
     (go-while-let [tuple (<! tuples-in)]
+      (println "<! tuples-in:" tuple)
       (store-tuple tuple-base tuple))
     
     (let [subs (chan)
@@ -28,7 +29,7 @@
       (query-tuples tuple-base {"type" "sub" "author" own-puk} subs subs-lease)
 
       (go-while-let [sub (<! subs)]
-        (if-some [follower (sub "audience")]
+        (if-some [follower (get-in sub ["criteria" "author"])]
           (let [follower-chan (produce! chan-for-follower follower-chans follower)]
-            (go-trace (>! follower-chan sub)))
+            (go-trace (>! follower-chan (assoc sub "audience" follower))))
           (println "INVALID SUB! Audience missing:" sub))))))

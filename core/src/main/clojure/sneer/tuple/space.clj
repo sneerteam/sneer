@@ -14,7 +14,7 @@
        (get ~'tuple ~(name g))))
 
 (defn reify-tuple [tuple]
-  (.toString (get tuple "timestampCreated"))
+  (println "reify-tuple:" tuple)
   (reify+ Tuple
     (get [this key] (get tuple key))
     (tuple-getter type)
