@@ -26,4 +26,12 @@
         (let [tweet {"type" "tweet" "author" A "payload" "<3"}]
           (store-tuple tuple-base tweet)
           (let [tuples-for-b (get (<!!? follower-connections) B)]
-            (<!!? tuples-for-b) => (contains tweet)))))))
+            (<!!? tuples-for-b) => (contains tweet))))
+      
+      (fact "It sends subs to followees"
+        (let [sub {"type" "sub" "author" A "audience" C "criteria" {"type" "tweet"}}]
+          (store-tuple tuple-base sub)
+          (let [tuples-for-c (get (<!!? follower-connections) C)]
+            (<!!? tuples-for-c) => (contains sub))))
+      
+      )))
