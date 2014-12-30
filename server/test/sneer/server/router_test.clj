@@ -65,8 +65,7 @@
       (peek :B) => "A1"
       (pop! :B) => "C1"
       (pop! :B) => "C2"
-      (pop! :B) => nil
-      )
+      (pop! :B) => nil)
 
     (restart!)
     (fact "Multiple receivers can have enqueued tuples."
@@ -97,5 +96,4 @@
      (pop! :B)
      (peek :A) => {:cts :B}
      (pop! :B)
-     (peek :C) => {:cts :B}
-     )))
+     (peek :C) => {:cts :B})))
