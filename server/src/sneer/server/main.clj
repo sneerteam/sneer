@@ -1,7 +1,7 @@
 (ns sneer.server.main
   (:require [sneer.networking.udp-old :as udp]
             [sneer.server.router-old :as router]
-            [clojure.core.async :as async])
+            [clojure.core.async :as async :refer [chan filter< close! alts!! <!! timeout]])
   (:gen-class))
 
 #_(def home-dir (System/getProperty "user.home"))
@@ -11,7 +11,7 @@
      home-dir
      (first args)))
 
-(defn update-puk-address [puk->address [address payload]]
+(defn update-puk-address! [puk->address [address payload]]
   (let [puk (:from payload)]
     (swap! puk->address assoc puk address))
   payload)
@@ -34,28 +34,28 @@
 
 (defn start [port]
   (let [puk->address (atom {})
-        packets-in (async/chan)
-        packets-out (async/chan)
-        routable-packets-in (async/filter<
+        packets-in (chan)
+        packets-out (chan)
+        routable-packets-in (filter<
                              is-routable?
                              packets-in)
-        routable-packets-out (async/filter<
+        routable-packets-out (filter<
                               has-address?
                               (async/map #(with-address puk->address %) [packets-out]))
         udp-server (udp/serve-udp packets-in routable-packets-out port)]
 
     (router/start
-     (async/map #(update-puk-address puk->address %) [routable-packets-in])
-     packets-out)
+      (async/map #(update-puk-address! puk->address %) [routable-packets-in])
+      packets-out)
 
     (trace-changes "[PUK->ADDRESS]" puk->address)
 
     {:udp-server udp-server :packets-in packets-in :packets-out packets-out}))
 
 (defn stop [server]
-  (async/close! (:packets-out server))
-  (async/alts!! [(:udp-server server) (async/timeout 500)]))
+  (close! (:packets-out server))
+  (alts!! [(:udp-server server) (timeout 500)]))
 
 (defn -main [& [port]]
   (let [server (start (or (Integer/parseInt port) 4242))]
-    (println "udp-server finished with" (async/<!! (:udp-server server)))))
+    (println "udp-server finished with" (<!! (:udp-server server)))))
