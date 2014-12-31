@@ -3,19 +3,14 @@
     [sneer.commons :refer [empty-queue]]
     [clojure.set :refer [difference]]))
 
-(defn dropping-conj [xs x max-size]
+(defn- dropping-conj [xs x max-size]
   (let [full? (>= (count xs) max-size)]
     (if full? xs (conj xs x))))
 
-(defn dropping-enqueue [q element max-size]
+(defn- dropping-enqueue [q element max-size]
   (dropping-conj (or q empty-queue) element max-size))
 
-(defn pop-only [xs x]
-  (if (= x (peek xs))
-    (pop xs)
-    xs))
-
-(defn next-wrap [coll element]
+(defn- next-wrap [coll element]
   (let [count (count coll)]
     (if (zero? count)
       nil
@@ -80,9 +75,6 @@
     [(pop-cts-packet receiver-q)]
     (pop-tuple-packet receiver-q)))
 
-(defn- senders-to-notify-of [receiver qs]
-  (get-in qs [receiver :senders-to-notify-when-cts]))
-
 (defn- enqueue-cts [router sender receiver]
   (update-in router [sender :receivers-cts] (fnil conj empty-queue) receiver))
 
@@ -109,11 +101,6 @@
 (defn queue-full? [router sender receiver]
   "Returns whether the receiver/sender send queue is full."
   (sender-queue-full? (router receiver) sender (router :max-queue-size)))
-
-(defn sender-to-notify [original-router new-router receiver]
-  "If a sender queue had been full and is now empty, returns the sender to be notified."
-  (let [to-notify (partial senders-to-notify-of receiver)]
-    (-> (difference (to-notify original-router) (to-notify new-router)) first)))
 
 
 ; { :max-queue-size x

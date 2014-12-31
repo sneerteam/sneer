@@ -17,8 +17,7 @@
                                  (queue-full? from to)
                                  not))
         peek #(let [packet (peek-packet-for @subject %)]
-;                (println "> > > > > > > >" packet)
-                 (if (:send packet) (:send packet) packet))
+                (if (:send packet) (:send packet) packet))
         pop! #(do
                 (swap! subject pop-packet-for %)
                 (peek %))]
