@@ -46,8 +46,6 @@
           ))
       state)))
 
-; [{:keys [packets-in packets-out router online-clients send-round resend-timer] :as state}]
-
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
   (if-some [packet (next-packet-to-send online-clients send-round)]
     [packets-out packet]
