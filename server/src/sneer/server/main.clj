@@ -27,7 +27,7 @@
   (-> payload :from some?))
 
 (defn trace-changes [label atom]
-  (add-watch atom nil
+  (add-watch atom (Object.)
              (fn [_key _ref old-value new-value]
                (when (not= old-value new-value)
                  (println label new-value)))))
