@@ -25,7 +25,6 @@
   [nc writer]
   (.write writer (str nc)))
 
-
 (def online-count (constantly 20))
 
 (defn- next-packet-to-send [online-clients send-round]
@@ -41,9 +40,8 @@
       (let [router (-> state :router (pop-packet-for from))]
         (-> state
           (assoc :router router)
-          (update-in [:online-clients from              :pending-to-send] (constantly (peek-packet-for router from)))
-          (update-in [:online-clients (:author pending) :pending-to-send] (constantly (peek-packet-for router (:author pending))))
-          ))
+          (assoc-in [:online-clients from              :pending-to-send] (peek-packet-for router from))
+          (assoc-in [:online-clients (:author pending) :pending-to-send] (peek-packet-for router (:author pending)))))
       state)))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
