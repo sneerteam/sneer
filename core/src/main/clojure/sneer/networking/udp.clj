@@ -70,9 +70,9 @@
               (catch Exception e (on-open-error e)))
             (recur))))))) ; Make sure closed? has not been set to true.
   
-(defn- close-on-err [verbose? socket socket-fn]
+(defn- close-on-err [verbose? socket socket-operation]
   (try
-    (socket-fn socket)
+    (socket-operation socket)
     (catch Exception e (close-socket verbose? socket))))
 
 (defn start-udp-server
