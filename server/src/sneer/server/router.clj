@@ -48,7 +48,7 @@
         receiver-q (if turn
                      receiver-q
                      (assoc receiver-q :turn sender))]
-    
+
     (if (sender-queue-full? receiver-q sender queue-size)
       (mark-full receiver-q sender)
       receiver-q)))
@@ -68,7 +68,7 @@
       [receiver-q (when sender-q-empty? sender-to-notify)]))
 
 (defn- pop-cts-packet [receiver-q]
-  ())
+  (update-in receiver-q [:receivers-cts] pop))
 
 (defn- pop-packet [receiver-q]
   (if (peek-cts-for receiver-q)
@@ -77,7 +77,6 @@
 
 (defn- enqueue-cts [router sender receiver]
   (update-in router [sender :receivers-cts] (fnil conj empty-queue) receiver))
-
 
 (defn enqueue! [router sender receiver tuple]
   "Adds tuple to its receiver/sender send queue. Pre-requisite: the queue is not full."
@@ -89,7 +88,7 @@
 
 (defn pop-packet-for [router receiver]
   "Removes the next tuple to be sent to receiver from its queue."
-  (let [[receiver-q sender-cts] (-> router receiver pop-packet)
+  (let [[receiver-q sender-cts] (-> router (get receiver) pop-packet)
         router (if sender-cts
                  (enqueue-cts router sender-cts receiver)
                  router)

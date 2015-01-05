@@ -6,8 +6,14 @@
 
 (def ^:private NEVER (chan))
 
+(defn- author-for [tuple]
+  (get tuple "author"))
+
+(defn- id-for [tuple]
+  (get tuple "id"))
+
 (defn- ->ack [tuple]
-  {:ack (:author tuple) :id (:id tuple)})
+  {:ack (author-for tuple) :id (id-for tuple)})
 
 (defn- accept-packets-from! [client follower-puk packets-in]
     (swap! (:packets-in-by-follower client) assoc follower-puk packets-in)
@@ -25,12 +31,12 @@
           ([packet-in]
            (match packet-in
              {:ack id}
-             (if (= id (:id tuple))
+             (if (= id (id-for tuple))
                :break
                (recur resend-timeout))
 
              {:nak id}
-             (recur (if (= id (:id tuple)) NEVER resend-timeout))
+             (recur (if (= id (id-for tuple)) NEVER resend-timeout))
 
              {:cts _}
              (do
@@ -42,7 +48,6 @@
 
           resend-timeout
           ([_]
-           (println "tuple:" tuple)
            (>! packets-out {:send tuple :to follower-puk})
            (recur (resend-timeout-fn))))))))
 

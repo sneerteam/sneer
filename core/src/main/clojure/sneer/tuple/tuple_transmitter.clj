@@ -11,9 +11,8 @@
                               (connect-to-follower-fn follower-puk c)
                               c))]
     (go-while-let [tuple (<! tuples-in)]
-      (println "<! tuples-in:" tuple)
       (store-tuple tuple-base tuple))
-    
+
     (let [subs (chan)
           subs-lease (chan)]
       (query-tuples tuple-base {"type" "sub" "audience" own-puk} subs subs-lease)
