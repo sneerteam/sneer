@@ -36,7 +36,7 @@
              (do
                (>! packets-out {:ack follower-puk})
                (recur IMMEDIATELY))
-             
+
              :else
              (recur resend-timeout)))
 
@@ -59,6 +59,6 @@
         (if-some [follower-in (get @packets-in-by-follower follower)]
           (>! follower-in packet)
           (println "Dropping packet from disconnected follower:" packet))))
-    
+
     {:packets-out packets-out
      :packets-in-by-follower packets-in-by-follower}))

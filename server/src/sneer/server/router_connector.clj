@@ -113,5 +113,5 @@
                  :online-clients {}
                  :send-round empty-queue
                  :resend-timeout-fn resend-timeout-fn
-                 :resend-timeout (->named resend-timeout-fn)} )
+                 :resend-timeout (->named resend-timeout-fn)})
     (close! packets-out)))

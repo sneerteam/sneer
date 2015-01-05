@@ -30,7 +30,7 @@
           debug (async/merge [debug-client debug-server])]
       (go-while-let [packet (async/<! debug)]
         (println "PACKET" packet)))
-    
+
     (reify Network
       (connect [network puk tuple-base]
         (println "connect" network puk tuple-base)

@@ -33,5 +33,4 @@
           (store-tuple tuple-base sub)
           (let [tuples-for-c (get (<!!? follower-connections) C)]
             (<!!? tuples-for-c) => (contains (assoc sub "audience" C)))))
-      
       )))
