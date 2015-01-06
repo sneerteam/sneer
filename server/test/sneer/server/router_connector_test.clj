@@ -9,9 +9,9 @@
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
 
-(def t1 {:id 1 :author :A :payload "1"})
-(def t2 {:id 2 :author :A :payload "2"})
-(def t3 {:id 3 :author :A :payload "3"})
+(def t1 {"id" 1 "author" :A :payload "1"})
+(def t2 {"id" 2 "author" :A :payload "2"})
+(def t3 {"id" 3 "author" :A :payload "3"})
 
 (tabular "Router Connector"
   (fact ?fact
