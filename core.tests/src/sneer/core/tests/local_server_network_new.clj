@@ -19,12 +19,11 @@
   (let [queue-size 2
         to-server (async/chan)
         to-server-mult (async/mult to-server)
-        to-server-tap (tap-for to-server-mult)
         to-clients (async/chan)
         to-clients-mult (async/mult to-clients)
-        resend-timeout-fn #(async/timeout 50)
-        server (router/start-connector queue-size to-server-tap to-clients resend-timeout-fn)]
-    
+        resend-timeout-fn #(async/timeout 100)
+        server (router/start-connector queue-size (tap-for to-server-mult) to-clients resend-timeout-fn)]
+
     (let [debug-client (tap-for to-clients-mult)
           debug-server (tap-for to-server-mult)
           debug (async/merge [debug-client debug-server])]
@@ -35,13 +34,16 @@
       (connect [network puk tuple-base]
         (println "connect" network puk tuple-base)
 
-        (let [to-clients-tap (tap-for to-clients-mult)
-              to-me (async/map< #(dissoc % :to) (async/filter< #(= (:to %) puk) to-clients-tap))
+        (let [to-me (async/map< #(dissoc % :to) (async/filter< #(= (:to %) puk) (tap-for to-clients-mult)))
               tuples-received (async/chan)
               client (network-client/start-client puk to-me to-server tuples-received)
               connect-to-follower-fn #(network-client/connect-to-follower client %1 %2)]
 
-          ;;(async/>!! to-server {:from puk})
+          (async/go-loop [] 
+            (async/<! (async/timeout 500)) 
+            (when (async/>! to-server {:from puk})
+              (recur)))
+
           (transmitter/start puk tuple-base tuples-received connect-to-follower-fn)
 
           ))

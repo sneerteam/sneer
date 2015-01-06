@@ -25,23 +25,43 @@
   [nc writer]
   (.write writer (str nc)))
 
+(defmethod print-method clojure.lang.PersistentQueue
+  [q writer]
+  (.write writer (if-some [seq (seq q)] (str seq) "nil")))
+
 (def online-count (constantly 20))
 
 (defn- next-packet-to-send [online-clients send-round]
-  (let [client (peek send-round)]
+  (when-some [client (peek send-round)]
     (when-some [packet (get-in online-clients [client :pending-to-send])]
       (assoc packet :to client))))
 
-(def tuple-signature (juxt :author :id))
+(defn- author-for [tuple]
+  (get tuple "author"))
+
+(defn- id-for [tuple]
+  (get tuple "id"))
+
+(def tuple-signature (juxt author-for id-for))
 
 (defn- ack [state from signature]
   (let [pending (get-in state [:online-clients from :pending-to-send :send])]
     (if (= signature (tuple-signature pending))
       (let [router (-> state :router (pop-packet-for from))]
         (-> state
-          (assoc :router router)
-          (assoc-in [:online-clients from              :pending-to-send] (peek-packet-for router from))
-          (assoc-in [:online-clients (:author pending) :pending-to-send] (peek-packet-for router (:author pending)))))
+            (assoc :router router)
+            (assoc-in [:online-clients from                 :pending-to-send] (peek-packet-for router from))
+            (assoc-in [:online-clients (author-for pending) :pending-to-send] (peek-packet-for router (author-for pending)))))
+      state)))
+
+(defn- ack-cts [state from receiver]
+  (let [cts (get-in state [:router from :receivers-cts])]
+    (if (= receiver (peek cts))
+      (let [router (:router state)
+            router (update-in router [from :receivers-cts] pop)]
+        (-> state
+            (assoc :router router)
+            (assoc-in [:online-clients from :pending-to-send] (peek-packet-for router from))))
       state)))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
@@ -59,11 +79,14 @@
   (NamedChannel. :resend-timeout (resend-timeout-fn)))
 
 (defn- send-round [online-clients]
-  (->>
-    online-clients
-    keys
-    (filter #(get-in online-clients [% :pending-to-send]))
-    (into empty-queue)))
+  (let [result (->>
+                 online-clients
+                 keys
+                 (filter #(get-in online-clients [% :pending-to-send]))
+                 (into empty-queue))]
+    (when-some [round (seq result)]
+      (println "SEND-ROUND" round))
+    result))
 
 (defmulti handle (fn [_ _ channel] (:name channel)))
 
@@ -78,14 +101,17 @@
           (let [packets-out (:packets-out state)]
             (if (queue-full? router from to)
               (do
-                (>!! packets-out {:nak (:id tuple) :for to :to from})
+                (>!! packets-out {:nak (id-for tuple) :for to :to from})
                 state)
               (do
-                (>!! packets-out {:ack (:id tuple) :for to :to from})
+                (>!! packets-out {:ack (id-for tuple) :for to :to from})
                 (update-in state [:router] enqueue! from to tuple))))
 
           {:ack author :id id}
           (ack state from [author id])
+
+          {:ack author}
+          (ack-cts state from author)
 
           :else
           state)))
@@ -99,6 +125,7 @@
    :resend-timeout (->named resend-timeout-fn)})
 
 (defn- -iterate [state]
+  ;;(println "ITERATE" (select-keys state [:router]))
   (let [chosen (alts!! (channel-ops state) :priority :true)]
     #_(println "Chosen:" chosen)
     (apply handle state

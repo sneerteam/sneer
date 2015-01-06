@@ -9,9 +9,9 @@
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
 
-(def t1 {:id 1 :author :A :payload "1"})
-(def t2 {:id 2 :author :A :payload "2"})
-(def t3 {:id 3 :author :A :payload "3"})
+(def t1 {"id" 1 "author" :A :payload "1"})
+(def t2 {"id" 2 "author" :A :payload "2"})
+(def t3 {"id" 3 "author" :A :payload "3"})
 
 (tabular "Router Connector"
   (fact ?fact
@@ -60,4 +60,17 @@
    {:ack :A :id 1 :from :B} {:ack :A :id 2 :from :B}
    :resend
   ]
-  (fn [packets] (= (last packets) {:cts :B :to :A})))
+  (fn [packets] (= (last packets) {:cts :B :to :A}))
+
+  ":ack for :cts."
+  [
+   ; packets from :A to :B
+   {:send t1 :from :A :to :B} {:send t2 :from :A :to :B} {:send t3 :from :A :to :B}
+   ; acks from :B to :A
+   {:ack :A :id 1 :from :B} {:ack :A :id 2 :from :B}
+   :resend
+   {:ack :B :from :A}
+   :resend ;; Should not cause :cts to be re-sent.
+   :resend
+  ]
+  [{:ack 1, :for :B, :to :A} {:ack 2, :for :B, :to :A} {:for :B, :nak 3, :to :A} {:cts :B, :to :A}])
