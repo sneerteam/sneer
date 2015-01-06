@@ -54,6 +54,14 @@
             (assoc-in [:online-clients (author-for pending) :pending-to-send] (peek-packet-for router (author-for pending)))))
       state)))
 
+(defn- ack-cts [state from receiver]
+  (let [cts (get-in state [:router from :receivers-cts])]
+    (if (= receiver (peek cts))
+      (let [router (:router state)
+            router (update-in router [from :receivers-cts] pop)]
+        (-> state
+            (assoc :router router)
+            (assoc-in [:online-clients from :pending-to-send] (peek-packet-for router from))))
       state)))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
@@ -101,6 +109,9 @@
 
           {:ack author :id id}
           (ack state from [author id])
+
+          {:ack author}
+          (ack-cts state from author)
 
           :else
           state)))
