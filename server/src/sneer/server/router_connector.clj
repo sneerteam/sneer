@@ -27,7 +27,7 @@
 
 (defmethod print-method clojure.lang.PersistentQueue
   [q writer]
-  (.write writer (str (seq q))))
+  (.write writer (if-some [seq (seq q)] (str seq) "nil")))
 
 (def online-count (constantly 20))
 
@@ -49,9 +49,11 @@
     (if (= signature (tuple-signature pending))
       (let [router (-> state :router (pop-packet-for from))]
         (-> state
-          (assoc :router router)
-          (assoc-in [:online-clients from                 :pending-to-send] (peek-packet-for router from))
-          (assoc-in [:online-clients (author-for pending) :pending-to-send] (peek-packet-for router (author-for pending)))))
+            (assoc :router router)
+            (assoc-in [:online-clients from                 :pending-to-send] (peek-packet-for router from))
+            (assoc-in [:online-clients (author-for pending) :pending-to-send] (peek-packet-for router (author-for pending)))))
+      state)))
+
       state)))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
