@@ -72,7 +72,7 @@
 
 (defn- pop-packet [receiver-q]
   (if (peek-cts-for receiver-q)
-    [(pop-cts-packet receiver-q)]
+    (assert false)
     (pop-tuple-packet receiver-q)))
 
 (defn- enqueue-cts [router sender receiver]
