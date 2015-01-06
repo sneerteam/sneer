@@ -22,7 +22,11 @@
       SneerAdmin
       (sneer [this] sneer)
       (privateKey [this] own-prik)
-      (keys [this] (KeysImpl.)))))
+      (keys [this] (KeysImpl.))
+      
+      Restartable
+      (restart [this]
+        (new-sneer-admin own-prik (persistence/restarted tuple-base))))))
 
 (defn- produce-private-key [db]
   (if-let [existing (second (persistence/db-query db ["SELECT * FROM keys"]))]
