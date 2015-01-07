@@ -34,7 +34,7 @@ import sneer.tuples.TuplePublisher;
 
 public class ConversationsAPITest extends TestCase {
 
-	private final static Object network = newNetwork();
+	private final Object network = newNetwork();
 
 	@Override
 	protected void setUp() {
