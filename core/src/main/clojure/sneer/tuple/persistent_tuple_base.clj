@@ -115,7 +115,7 @@
 
 (defn query-for [criteria]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
-        filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
+        ^String filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
         values (vals columns)]
     (if-some [starting-from (:starting-from criteria)]
       (apply vector (str "SELECT * FROM tuple WHERE id > ? " (when-not (.isEmpty filter) " AND ") filter " ORDER BY id") starting-from values)
