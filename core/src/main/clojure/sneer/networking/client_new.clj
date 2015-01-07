@@ -15,12 +15,17 @@
 (defn- ->ack [tuple]
   {:ack (author-of tuple) :id (id-of tuple)})
 
+(defn- assoc-new [map k v]
+  (assert (not (contains? map k)))
+  (assoc map k v))
+
 (defn- accept-packets-from! [client follower-puk packets-in]
-    (swap! (:packets-in-by-follower client) assoc follower-puk packets-in)
-    packets-in)
+  (swap! (:packets-in-by-follower client) assoc-new follower-puk packets-in)
+  packets-in)
 
 (defn connect-to-follower [client follower-puk tuples-out & [resend-timeout-fn]]
-  (println "connect-to-follower:" follower-puk)
+  (println "connect-to-follower" (:own-puk client) follower-puk)
+  (assert (not= follower-puk (:own-puk client)))
   (let [follower-packets-in (accept-packets-from! client follower-puk (dropping-chan))
         packets-out (:packets-out client)
         resend-timeout-fn (or resend-timeout-fn #(timeout 5000))]
@@ -65,5 +70,6 @@
           (>! follower-in packet)
           (println "Dropping packet from disconnected follower:" packet))))
 
-    {:packets-out packets-out
+    {:own-puk own-puk
+     :packets-out packets-out
      :packets-in-by-follower packets-in-by-follower}))
