@@ -68,11 +68,11 @@
       [receiver-q (when sender-q-empty? sender-to-notify)]))
 
 (defn- pop-cts-packet [receiver-q]
-  (update-in receiver-q [:receivers-cts] pop))
+  [(update-in receiver-q [:receivers-cts] pop) nil])
 
 (defn- pop-packet [receiver-q]
   (if (peek-cts-for receiver-q)
-    (assert false)
+    (pop-cts-packet receiver-q)
     (pop-tuple-packet receiver-q)))
 
 (defn- enqueue-cts [router sender receiver]
