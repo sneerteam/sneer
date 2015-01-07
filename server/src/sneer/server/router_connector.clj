@@ -36,15 +36,15 @@
     (when-some [packet (get-in online-clients [client :pending-to-send])]
       (assoc packet :to client))))
 
-(defn- author-for [tuple]
+(defn- author-of [tuple]
   (get tuple "author"))
 
-(defn- id-for [tuple]
+(defn- id-of [tuple]
   (get tuple "id"))
 
 (defn- packet-signature [packet]
   (if-let [tuple (:send packet)]
-    [(author-for tuple) (id-for tuple)]
+    [(author-of tuple) (id-of tuple)]
     [(:cts packet)     nil          ]))
 
 (defn- ack [state from signature]
@@ -95,10 +95,10 @@
           (let [packets-out (:packets-out state)]
             (if (queue-full? router from to)
               (do
-                (>!! packets-out {:nak (id-for tuple) :for to :to from})
+                (>!! packets-out {:nak (id-of tuple) :for to :to from})
                 state)
               (do
-                (>!! packets-out {:ack (id-for tuple) :for to :to from})
+                (>!! packets-out {:ack (id-of tuple) :for to :to from})
                 (update-in state [:router] enqueue! from to tuple))))
 
           {:ack author}
