@@ -8,11 +8,11 @@
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
 
-(def t1 {:id 1 :author :A :payload "1"})
-(def t2 {:id 2 :author :A :payload "2"})
-(def t3 {:id 3 :author :A :payload "3"})
+(def t1 {"id" 1 "author" :A :payload "1"})
+(def t2 {"id" 2 "author" :A :payload "2"})
+(def t3 {"id" 3 "author" :A :payload "3"})
 
-(def tC {:id 42 :author :C :payload "42"})
+(def tC {"id" 42 "author" :C :payload "42"})
 
 (let [packets-in (chan)
       packets-out (chan)
@@ -34,10 +34,10 @@
   (fact "A tuple is received"
     (>!!? packets-in {:send tC})
     (<!!? tuples-received) => tC
-    (<!!? packets-out) => {:from :A :ack (:author tC) :id (:id tC)})
+    (<!!? packets-out) => {:from :A :ack (get tC "author") :id (get tC "id")})
 
   (fact "Pending tuple is sent when :cts"
-    (>!!? packets-in {:nak (:id t1) :for :B})
+    (>!!? packets-in {:nak (get t1 "id") :for :B})
     (>!!? packets-in {:cts :B})
     (<!!? packets-out) => {:from :A :ack :B}
     (<!!? packets-out) => {:from :A :send t1 :to :B})
@@ -48,7 +48,7 @@
   
   (fact "Next tuple is sent on :ack"
     (>!!? toB t2)
-    (>!!? packets-in {:ack (:id t1) :for :B})
+    (>!!? packets-in {:ack (get t1 "id") :for :B})
     (<!!? packets-out) => {:from :A :send t2 :to :B})
 
   (fact "Bogus packet doesn't interfere with resend"
