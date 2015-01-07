@@ -48,8 +48,8 @@
 
           resend-timeout
           ([_]
-           (>! packets-out {:send tuple :to follower-puk})
-           (recur (resend-timeout-fn))))))))
+            (>! packets-out {:send tuple :to follower-puk})
+            (recur (resend-timeout-fn))))))))
 
 (defn start-client [own-puk packets-in packets-out tuples-received]
   (let [packets-in-by-follower (atom {})

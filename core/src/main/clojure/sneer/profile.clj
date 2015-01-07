@@ -69,7 +69,7 @@
         (setCountry [this value]
           (rx/on-next country value))
         (isOwnNameLocallyAvailable [this]
-          (not (nil? (local-payloads-of "profile/own-name"))))))))
+          (some? (local-payloads-of "profile/own-name")))))))
 
 (defn produce-profile [tuple-space profiles party]
   (produce! #(reify-profile % tuple-space) profiles party))

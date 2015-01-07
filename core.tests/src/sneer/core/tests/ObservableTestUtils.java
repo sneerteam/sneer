@@ -22,7 +22,7 @@ import sneer.tuples.Tuple;
 @SuppressWarnings("deprecation")
 public class ObservableTestUtils {
 
-	private static final int BASE_TIMEOUT = 9;
+	private static final int BASE_TIMEOUT = 2;
 
 	public static void expecting(Observable<?>... expectations) {
 		Observable
