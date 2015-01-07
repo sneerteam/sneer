@@ -95,7 +95,7 @@
         empty? (-> receiver-q peek-for nil?)]
     (if empty?
       (dissoc router receiver)
-      (assoc router receiver receiver-q))))
+      (assoc  router receiver receiver-q))))
 
 (defn queue-full? [router sender receiver]
   "Returns whether the receiver/sender send queue is full."
