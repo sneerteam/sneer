@@ -32,7 +32,7 @@
 
     (reify Network
       (connect [network puk tuple-base]
-        (println "connect" network puk tuple-base)
+        (println "Network/connect" puk)
 
         (let [to-me (async/map< #(dissoc % :to) (async/filter< #(= (:to %) puk) (tap-for to-clients-mult)))
               tuples-received (async/chan)
@@ -40,13 +40,11 @@
               connect-to-follower-fn #(network-client/connect-to-follower client %1 %2)]
 
           (async/go-loop [] 
-            (async/<! (async/timeout 500)) 
+            (async/<! (async/timeout 100))
             (when (async/>! to-server {:from puk})
               (recur)))
 
-          (transmitter/start puk tuple-base tuples-received connect-to-follower-fn)
-
-          ))
+          (transmitter/start puk tuple-base tuples-received connect-to-follower-fn)))
 
       java.io.Closeable
       (close [network]
