@@ -56,12 +56,14 @@
      [:timestamp :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]
      [:author :blob "NOT NULL"]
      [:audience :blob]
+     [:original_id :integer]
      ;[:device :blob "NOT NULL"]
      ;[:sequence :integer "NOT NULL"]
      ;[:signature :blob "NOT NULL"]
      [:custom :blob]]))
 
 (defn- create-tuple-indices [db]
+  (db-create-index db :tuple "idx_tuple_uniqueness" [:author :original_id])
   (db-create-index db :tuple "idx_tuple_type" [:type]))
 
 (defn- create-prik-table [db]
@@ -130,7 +132,8 @@
 
 (defn insert-tuple [db tuple]
   (let [custom (->custom-field-map tuple)
-        row (select-keys tuple builtin-field?)]
+        row (select-keys tuple builtin-field?)
+        row (assoc row "original_id" (get tuple "id"))]
     (db-insert db :tuple (serialize-entries (assoc row "custom" custom)))))
 
 (defmacro rx-defer [& body]

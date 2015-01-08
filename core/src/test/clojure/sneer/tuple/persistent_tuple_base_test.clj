@@ -1,9 +1,9 @@
 (ns sneer.tuple.persistent-tuple-base-test
-  (:require [sneer.tuple.persistent-tuple-base :refer [query-tuples store-tuple create]]
+  (:require [sneer.tuple.persistent-tuple-base :refer [query-all query-tuples store-tuple create]]
             [sneer.core :as core]            
             [sneer.test-util :refer [<!!?]]
             [midje.sweet :refer :all]
-            [clojure.core.async :as async]
+            [clojure.core.async :as async :refer [chan]]
             [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.tuple.keys :refer [->puk]]))
 
@@ -15,6 +15,27 @@
 
 (def t1 {"type" "tweet" "payload" "hi!" "author" neide})
 (def t2 {"type" "tweet" "payload" "<3" "author" neide})
+
+(facts "About store-tuple"
+  (with-open [db (jdbc-database/create-sqlite-db)]
+    (let [subject (create db)]
+
+      (fact "It remembers original-id"
+        (let [t (assoc t1 "id" 42)]
+          (store-tuple subject t)
+          (->> (<!!? (query-all subject {"type" "tweet"})) (map #(select-keys % ["id" "original_id"]))) => [{"id" 1 "original_id" 42}]))
+
+      (println "TODO: It discards duplicates")
+      #_(fact "It discards duplicates"
+        (let [duplicate {"type" "whatever" "author" carla "id" 42}
+              unique (assoc duplicate "id" 43)]
+          (store-tuple subject duplicate)
+          (store-tuple subject duplicate)
+          (store-tuple subject unique)
+          (let [tuples (chan)]
+            (query-tuples subject {"type" "whatever"} tuples)
+            (->> (<!!? (async/into [] tuples)) (map #(get % "original_id"))) => [42 43])))
+      )))
 
 (facts "About query-tuples"
   (with-open [db (jdbc-database/create-sqlite-db)]
