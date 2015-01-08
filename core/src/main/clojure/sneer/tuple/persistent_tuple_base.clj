@@ -2,7 +2,7 @@
   (:import [sneer.crypto.impl KeysImpl])
   (:require [sneer.core :as core]
             [sneer.async :refer [dropping-chan go-while-let dropping-tap]]
-            [clojure.core.async :refer [go-loop <! >! >!! mult tap chan close! go]]
+            [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
             [clojure.core.match :refer [match]]
             [sneer.serialization :as serialization]
@@ -24,6 +24,11 @@
      emits a value.")
   
   (restarted ^TupleBase [this]))
+
+(defn query-all [tuple-base criteria]
+  (let [tuples (chan)]
+    (query-tuples tuple-base criteria tuples)
+    (async/into [] tuples)))
 
 (defprotocol Database
   (db-create-table [this table columns])
@@ -106,12 +111,6 @@
         (assoc map k v)))
     nil
     tuple))
-
-(defn query-all [db]
-  (db-query db ["SELECT * FROM tuple"]))
-
-(defn dump-tuples [db]
-  (->> (query-all db) (map println) doall))
 
 (defn query-for [criteria]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
