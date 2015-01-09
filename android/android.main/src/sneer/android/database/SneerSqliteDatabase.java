@@ -39,8 +39,8 @@ public class SneerSqliteDatabase implements Closeable, Database {
 
 
 	@Override
-	public void createIndex(String table, String indexName, List<String> columns) {
-		String sql = "CREATE INDEX " + indexName + " ON " + table + " (" + Lists.join(columns, ",") + ")";
+	public void createIndex(String table, String indexName, List<String> columns, boolean unique) {
+		String sql = "CREATE " + (unique ? "UNIQUE " : "") + "INDEX " + indexName + " ON " + table + " (" + Lists.join(columns, ",") + ")";
 		sqlite.execSQL(sql);
 	}
 

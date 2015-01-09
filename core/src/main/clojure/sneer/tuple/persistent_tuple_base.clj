@@ -41,7 +41,7 @@
   (db-create-table [this table columns]
     (.createTable this (name table) columns))
   (db-create-index [this table index-name column-names unique?]
-    (.createIndex this (name table) (name index-name) (mapv name column-names)))
+    (.createIndex this (name table) (name index-name) (mapv name column-names) unique?))
   (db-insert [this table row]
     (.insert this (name table) row))
   (db-query [this sql-and-params]
