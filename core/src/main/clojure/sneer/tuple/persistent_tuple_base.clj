@@ -1,7 +1,7 @@
 (ns sneer.tuple.persistent-tuple-base
   (:import [sneer.crypto.impl KeysImpl])
   (:require [sneer.core :as core]
-            [sneer.async :refer [dropping-chan go-while-let dropping-tap]]
+            [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
             [clojure.core.match :refer [match]]
@@ -32,7 +32,7 @@
 
 (defprotocol Database
   (db-create-table [this table columns])
-  (db-create-index [this table index-name column-names])
+  (db-create-index [this table index-name column-names unique?])
   (db-insert [this table row])
   (db-query [this sql-and-params]))
 
@@ -40,7 +40,7 @@
   sneer.admin.Database
   (db-create-table [this table columns]
     (.createTable this (name table) columns))
-  (db-create-index [this table index-name column-names]
+  (db-create-index [this table index-name column-names unique?]
     (.createIndex this (name table) (name index-name) (mapv name column-names)))
   (db-insert [this table row]
     (.insert this (name table) row))
@@ -50,7 +50,7 @@
 (defn- create-tuple-table [db]
   (db-create-table
     db :tuple
-    [[:id :integer "PRIMARY KEY AUTOINCREMENT"]
+    [[:id :integer "PRIMARY KEY"]
      [:type :varchar "NOT NULL"]
      [:payload :blob]
      [:timestamp :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]
@@ -63,8 +63,8 @@
      [:custom :blob]]))
 
 (defn- create-tuple-indices [db]
-  (db-create-index db :tuple "idx_tuple_uniqueness" [:author :original_id])
-  (db-create-index db :tuple "idx_tuple_type" [:type]))
+  (db-create-index db :tuple "idx_tuple_uniqueness" [:author :original_id] true)
+  (db-create-index db :tuple "idx_tuple_type" [:type] false))
 
 (defn- create-prik-table [db]
   (db-create-table
@@ -130,11 +130,26 @@
       (map #(deserialize-entries (zipmap field-names %)))
       (map #(merge (get % "custom") (dissoc % "custom"))))))
 
-(defn insert-tuple [db tuple]
+(defn- insert-tuple [db tuple id]
   (let [custom (->custom-field-map tuple)
         row (select-keys tuple builtin-field?)
-        row (assoc row "original_id" (get tuple "id"))]
-    (db-insert db :tuple (serialize-entries (assoc row "custom" custom)))))
+        row (assoc row
+                   "id" id
+                   "original_id" (or (get tuple "id") id)
+                   "custom" custom)]
+    (db-insert db :tuple (serialize-entries row))))
+
+(defn- try-insert-tuple [db tuple id]
+  (try
+    (insert-tuple db tuple id)
+    true
+    (catch java.sql.SQLException e
+      (. System/err println e)
+      false)))
+
+(defn max-tuple-id [db]
+  (let [rs (db-query db ["SELECT MAX(id) FROM tuple"])]
+    (or (-> rs second first) 0)))
 
 (defmacro rx-defer [& body]
   `(rx.Observable/defer
@@ -159,15 +174,22 @@
 
     (setup db)
 
-    (go-while-let [request (<! requests)]
-      (match request
-        {:store tuple}
-        (do
-          (insert-tuple db tuple)
-          (>!! new-tuples tuple))
+    (go-trace
+      (loop [prev-tuple-id (max-tuple-id db)]
+        (when-some [request (<! requests)]
+          (match request
+            {:store tuple}
+            (let [next-tuple-id (inc prev-tuple-id)]
+              (recur
+               (if (try-insert-tuple db tuple next-tuple-id)
+                 (do (>! new-tuples tuple)
+                     next-tuple-id)
+                 prev-tuple-id)))
 
-        {:query criteria :tuples-out tuples-out}
-        (>! tuples-out (query-tuples-from-db db criteria))))
+            {:query criteria :tuples-out tuples-out}
+            (do
+              (>! tuples-out (query-tuples-from-db db criteria))
+              (recur prev-tuple-id))))))
 
     (reify TupleBase
 

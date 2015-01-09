@@ -19,8 +19,8 @@
         (let [tuple-ddl (apply sql/create-table-ddl table columns)]
           (sql/execute! db [tuple-ddl])))
 
-      (db-create-index [this table index-name columns-names]
-        (sql/execute! db [(str "CREATE INDEX " index-name " ON " (name table) "(" (string/join "," (map name columns-names)) ")" )]))
+      (db-create-index [this table index-name columns-names unique?]
+        (sql/execute! db [(str "CREATE" (when unique? " UNIQUE") " INDEX " index-name " ON " (name table) "(" (string/join "," (map name columns-names)) ")" )]))
 
       (db-insert [this table row]
         (sql/insert! db table row))
