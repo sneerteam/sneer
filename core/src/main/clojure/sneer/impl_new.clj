@@ -6,8 +6,8 @@
    [sneer.contact :refer [create-contacts-state add-contact get-contacts find-contact problem-with-new-nickname]]
    [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
-  (:import 
-   [sneer Sneer PrivateKey Contact]
+  (:import
+   [sneer Sneer PrivateKey]
    [sneer.tuples TupleSpace]
    [rx.subjects BehaviorSubject]))
 

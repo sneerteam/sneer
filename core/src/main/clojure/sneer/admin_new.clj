@@ -1,14 +1,12 @@
 (ns sneer.admin-new
   (:require
-   [rx.lang.clojure.core :as rx]
    [sneer.tuple.space :as space]
    [sneer.impl-new :as impl]
    [sneer.tuple.persistent-tuple-base :as persistence])
   (:import
    [sneer PrivateKey]
    [sneer.admin SneerAdmin]
-   [sneer.crypto.impl KeysImpl]
-   [rx.subjects ReplaySubject PublishSubject]))
+   [sneer.crypto.impl KeysImpl]))
 
 (defprotocol Restartable
   (restart [this]))

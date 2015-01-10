@@ -1,12 +1,10 @@
 (ns sneer.tuple.persistent-tuple-base
   (:import [sneer.crypto.impl KeysImpl])
-  (:require [sneer.core :as core]
-            [sneer.async :refer [dropping-chan go-trace dropping-tap]]
+  (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
             [clojure.core.match :refer [match]]
             [sneer.serialization :as serialization]
-            [rx.lang.clojure.core :as rx]
             [rx.lang.clojure.interop :as rx-interop]))
 
 (defprotocol TupleBase

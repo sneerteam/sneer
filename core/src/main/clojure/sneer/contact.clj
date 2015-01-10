@@ -4,7 +4,7 @@
    [sneer.rx :refer [atom->observable]]
    [sneer.party :refer [party-puk name-subject produce-party!]])
   (:import
-   [sneer Contact Party]
+   [sneer Contact]
    [sneer.rx ObservedSubject]
    [sneer.commons.exceptions FriendlyException]
    [sneer.tuples Tuple TupleSpace]))

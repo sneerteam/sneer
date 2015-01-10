@@ -6,7 +6,6 @@
    [sneer.commons :refer [now]])
   (:import
    [sneer PrivateKey PublicKey]
-   [sneer.rx ObservedSubject]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
    [rx.schedulers TestScheduler]
    [rx.subjects ReplaySubject]))
