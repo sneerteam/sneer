@@ -37,3 +37,7 @@
   (let [tuple-base (persistence/create db)
         own-prik (produce-private-key db)]
     (new-sneer-admin own-prik tuple-base)))
+
+(defn create [db]
+  ;; TODO: Start network client and tuple-transmitter
+  (assert false))
