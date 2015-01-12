@@ -4,12 +4,15 @@
    [sneer.impl-new :as impl]
    [sneer.tuple.persistent-tuple-base :as persistence])
   (:import
-   [sneer PrivateKey]
-   [sneer.admin SneerAdmin]
-   [sneer.crypto.impl KeysImpl]))
+    [sneer PrivateKey]
+    [sneer.admin SneerAdmin]
+    [sneer.crypto.impl KeysImpl]))
 
 (defprotocol Restartable
   (restart [this]))
+
+(defprotocol TupleBaseProvider
+  (tuple-base-of [provider]))
 
 (defn new-sneer-admin
   [^PrivateKey own-prik tuple-base]
@@ -21,7 +24,10 @@
       (sneer [this] sneer)
       (privateKey [this] own-prik)
       (keys [this] (KeysImpl.))
-      
+
+      TupleBaseProvider
+      (tuple-base-of [this] tuple-base)
+
       Restartable
       (restart [this]
         (new-sneer-admin own-prik (persistence/restarted tuple-base))))))
@@ -37,7 +43,3 @@
   (let [tuple-base (persistence/create db)
         own-prik (produce-private-key db)]
     (new-sneer-admin own-prik tuple-base)))
-
-(defn create [db]
-  ;; TODO: Start network client and tuple-transmitter
-  (assert false))
