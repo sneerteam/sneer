@@ -9,11 +9,12 @@
     (or (nil? audience) (= puk audience))))
 
 (defn start [own-puk tuple-base tuples-in connect-to-follower-fn]
-  (let [follower-chans (atom {})
-        chan-for-follower (fn [follower-puk]
-                            (let [c (chan)]
-                              (connect-to-follower-fn follower-puk c)
-                              c))]
+  (let [peer-chans (atom {})
+        chan-for-peer (fn [follower-puk]
+                        (let [c (chan)]
+                          (connect-to-follower-fn follower-puk c)
+                          c))
+        produce-chan (partial produce! chan-for-peer peer-chans)]
     (go-while-let [tuple (<! tuples-in)]
       (store-tuple tuple-base tuple))
 
@@ -23,7 +24,7 @@
 
       (go-while-let [sub (<! subs)]
         (let [follower (sub "author")
-              follower-chan (produce! chan-for-follower follower-chans follower)
+              follower-chan (produce-chan follower)
               sub-lease (chan)]
           (query-tuples tuple-base (sub "criteria") (filter> (partial visible-to? follower) follower-chan) sub-lease))))
 
@@ -32,7 +33,8 @@
       (query-tuples tuple-base {"type" "sub" "author" own-puk} subs subs-lease)
 
       (go-while-let [sub (<! subs)]
-        (if-some [follower (get-in sub ["criteria" "author"])]
-          (let [follower-chan (produce! chan-for-follower follower-chans follower)]
-            (go-trace (>! follower-chan (assoc sub "audience" follower))))
-          (println "INVALID SUB! Audience missing:" sub))))))
+        (if-some [followee (get-in sub ["criteria" "author"])]
+          (when-not (= own-puk followee)
+            (let [followee-chan (produce-chan followee)]
+              (go-trace (>! followee-chan (assoc sub "audience" followee)))))
+          (println "INVALID SUB! Author missing:" sub))))))

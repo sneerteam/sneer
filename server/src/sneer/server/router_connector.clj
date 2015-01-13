@@ -122,14 +122,15 @@
     (apply handle state
       chosen)))
 
-(defn start-connector [queue-size packets-in packets-out resend-timeout-fn]
-  (thread
-    (loop-state -iterate
-                {:packets-in (NamedChannel. :packets-in packets-in)
-                 :packets-out (NamedChannel. :packets-out packets-out)
-                 :router (create-router queue-size)
-                 :online-clients {}
-                 :send-round empty-queue
-                 :resend-timeout-fn resend-timeout-fn
-                 :resend-timeout (->named resend-timeout-fn)})
-    (close! packets-out)))
+(defn start-connector [queue-size packets-in packets-out & [resend-timeout-fn]]
+  (let [resend-timeout-fn (or resend-timeout-fn #(async/timeout 100))]
+    (thread
+      (loop-state -iterate
+                  {:packets-in        (NamedChannel. :packets-in packets-in)
+                   :packets-out       (NamedChannel. :packets-out packets-out)
+                   :router            (create-router queue-size)
+                   :online-clients    {}
+                   :send-round        empty-queue
+                   :resend-timeout-fn resend-timeout-fn
+                   :resend-timeout    (->named resend-timeout-fn)})
+      (close! packets-out))))
