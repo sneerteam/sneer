@@ -1,8 +1,12 @@
 (ns sneer.tuple.tuple-transmitter
-  (:require [clojure.core.async :refer [chan go-loop >! <!]]
+  (:require [clojure.core.async :refer [chan go-loop >! <! filter>]]
             [sneer.async :refer [go-while-let go-trace]]
             [sneer.commons :refer [produce!]]
             [sneer.tuple.persistent-tuple-base :refer [query-tuples store-tuple]]))
+
+(defn- visible-to? [puk tuple]
+  (let [audience (get tuple "audience")]
+    (or (nil? audience) (= puk audience))))
 
 (defn start [own-puk tuple-base tuples-in connect-to-follower-fn]
   (let [follower-chans (atom {})
@@ -21,7 +25,7 @@
         (let [follower (sub "author")
               follower-chan (produce! chan-for-follower follower-chans follower)
               sub-lease (chan)]
-          (query-tuples tuple-base (sub "criteria") follower-chan sub-lease))))
+          (query-tuples tuple-base (sub "criteria") (filter> (partial visible-to? follower) follower-chan) sub-lease))))
 
     (let [subs (chan)
           subs-lease (chan)]
