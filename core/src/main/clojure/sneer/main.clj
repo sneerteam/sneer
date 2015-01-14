@@ -9,7 +9,7 @@
            (sneer.admin SneerAdmin)))
 
 (defn start-client [puk tuple-base & [host port]]
-  (let [server-addr (InetSocketAddress. (or host "dynamic.sneer.me") (or port 5555))
+  (let [server-addr (future (InetSocketAddress. (or host "dynamic.sneer.me") (or port 5555)))
         udp-in (chan)
         udp-out (chan)
         to-me (map< second udp-in)
