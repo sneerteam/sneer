@@ -52,6 +52,7 @@
   (close! (:packets-out server))
   (alts!! [(:udp-server server) (timeout 500)]))
 
-(defn -main [& [port]]
-  (let [server (start (or (Integer/parseInt port) 4242))]
+(defn -main [& [port-string]]
+  (let [port (when-some [p port-string] (Integer/parseInt p))
+        server (start (or port 4242))]
     (println "udp-server finished with" (<!! (:udp-server server)))))
