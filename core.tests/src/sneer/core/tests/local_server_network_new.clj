@@ -5,7 +5,8 @@
             [sneer.networking.client-new :as network-client]
             [sneer.server.main-new :as server]
             [sneer.main :as main]
-            [sneer.async :refer [go-trace]]))
+            [sneer.async :refer [go-trace]])
+  (:import (java.io Closeable)))
 
 (defprotocol Network
   (connect
@@ -26,7 +27,7 @@
             (async/<! close)
             (async/close! client))))
 
-      java.io.Closeable
+      Closeable
       (close [network]
         (async/close! close)
         (server/stop server)))))
