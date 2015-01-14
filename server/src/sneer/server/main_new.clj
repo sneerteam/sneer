@@ -54,5 +54,5 @@
 
 (defn -main [& [port-string]]
   (let [port (when-some [p port-string] (Integer/parseInt p))
-        server (start (or port 4242))]
+        server (start (or port 5555))]
     (println "udp-server finished with" (<!! (:udp-server server)))))
