@@ -60,12 +60,13 @@
   (let [packets-in-by-follower (atom {})
         packets-out (map> #(assoc % :from own-puk) packets-out)]
     (go-while-let [packet (<! packets-in)]
+      (SystemReport/updateReport "network/last-packet" packet)
       (match packet
         {:send tuple}
         (do (>! tuples-received tuple)
             (>! packets-out (->ack tuple)))
 
-        (:or {:for follower} {:cts follower})       
+        (:or {:for follower} {:cts follower})
         (if-some [follower-in (get @packets-in-by-follower follower)]
           (>! follower-in packet)
           (println "Dropping packet from disconnected follower:" packet))))
