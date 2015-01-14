@@ -1,5 +1,14 @@
 package sneer.android.database;
 
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
+import android.database.sqlite.SQLiteCursorDriver;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQuery;
+import android.os.Build;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +19,6 @@ import java.util.Map;
 
 import sneer.admin.Database;
 import sneer.commons.Lists;
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 
 public class SneerSqliteDatabase implements Closeable, Database {
@@ -52,8 +57,23 @@ public class SneerSqliteDatabase implements Closeable, Database {
 
 
 	@Override
-	public Iterable<List<?>> query(String sql, List<Object> args) {
-		Cursor cursor = sqlite.rawQuery(sql, toQueryArgs(args));
+	public Iterable<List<?>> query(String sql, final List<Object> args) {
+
+        Cursor cursor = sqlite.rawQueryWithFactory(new SQLiteDatabase.CursorFactory() {
+            @SuppressLint("NewApi")
+            @SuppressWarnings("deprecation")
+            @Override
+            public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery, String editTable, SQLiteQuery query) {
+                bindAll(query, args);
+
+                if (Build.VERSION.SDK_INT < 11) {
+                    return new SQLiteCursor(db, masterQuery, editTable, query);
+                } else {
+                    return new SQLiteCursor(masterQuery, editTable, query);
+                }
+            }
+        }, sql, null, null);
+
 		ArrayList<List<?>> ret = new ArrayList<List<?>>(cursor.getCount() + 1);
 		ret.add(Arrays.asList(cursor.getColumnNames()));
 		if (!cursor.moveToFirst()) return ret;
@@ -65,12 +85,20 @@ public class SneerSqliteDatabase implements Closeable, Database {
 		return ret;
 	}
 
-
-	private String[] toQueryArgs(List<Object> args) {
-		return args.isEmpty()
-			? null
-			: args.toArray(new String[args.size()]);
-	}
+    private void bindAll(SQLiteQuery query, List<Object> args) {
+        int i = 1;
+        for (Object arg : args) {
+            if (arg == null)
+                query.bindNull(i);
+            else if (arg instanceof Long)
+                query.bindLong(i, (Long) arg);
+            else if (arg instanceof byte[])
+                query.bindBlob(i, (byte[]) arg);
+            else
+                query.bindString(i, (String) arg);
+            i++;
+        }
+    }
 
 
 	private ContentValues toContentValues(Map<String, Object> values) {
@@ -83,7 +111,8 @@ public class SneerSqliteDatabase implements Closeable, Database {
 
 	private void accumulate(ContentValues cv, String key, Object value) {
 		if (value instanceof String) cv.put(key, (String)value);
-		else cv.put(key, (byte[])value);
+        else if (value instanceof Long) cv.put(key, (Long)value);
+        else cv.put(key, (byte[])value);
 	}
 
 	private List<?> row(Cursor cursor) {
