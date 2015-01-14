@@ -13,7 +13,7 @@
         udp-in (chan)
         udp-out (chan)
         to-me (map< second udp-in)
-        to-server (map> #(do [server-addr %]) udp-out)
+        to-server (map> #(do [@server-addr %]) udp-out)
         tuples-received (chan)
         client (network-client/start-client puk to-me to-server tuples-received)
         connect-to-follower-fn #(network-client/connect-to-follower client %1 %2)
