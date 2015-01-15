@@ -58,19 +58,11 @@ public class SneerSqliteDatabase implements Closeable, Database {
 
 	@Override
 	public Iterable<List<?>> query(String sql, final List<Object> args) {
-
         Cursor cursor = sqlite.rawQueryWithFactory(new SQLiteDatabase.CursorFactory() {
-            @SuppressLint("NewApi")
-            @SuppressWarnings("deprecation")
             @Override
             public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery, String editTable, SQLiteQuery query) {
                 bindAll(query, args);
-
-                if (Build.VERSION.SDK_INT < 11) {
-                    return new SQLiteCursor(db, masterQuery, editTable, query);
-                } else {
-                    return new SQLiteCursor(masterQuery, editTable, query);
-                }
+                return new SQLiteCursor(masterQuery, editTable, query);
             }
         }, sql, null, null);
 
