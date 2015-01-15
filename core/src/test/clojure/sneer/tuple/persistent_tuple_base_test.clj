@@ -16,8 +16,11 @@
 (def t1 {"type" "tweet" "payload" "hi!" "author" neide})
 (def t2 {"type" "tweet" "payload" "<3" "author" neide})
 
-(defn- select-ids [tuples]
-  (map #(select-keys % ["id" "original_id"]) tuples))
+(defn- selecting [keys tuples]
+  (map #(select-keys % keys) tuples))
+
+(def select-ids
+  (partial selecting ["id" "original_id"]))
 
 (facts "About store-tuple"
   (with-open [db (jdbc-database/create-sqlite-db)]
