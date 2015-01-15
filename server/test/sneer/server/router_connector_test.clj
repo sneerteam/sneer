@@ -41,8 +41,7 @@
 
   "A tuple is sent when client comes online (sends a ping)"
   [{:send t1 :from :A :to  :B} {:from :B} :resend]
-  [{:ack   1 :to   :A :for :B} {:send t1 :to :B}]
-  
+  [{:ack   1 :to   :A :for :B}            {:send t1 :to :B}]
 
   "Full queue emits NAK"
   [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:send t3 :from :A :to  :B}]
