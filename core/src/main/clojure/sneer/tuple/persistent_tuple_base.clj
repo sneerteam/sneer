@@ -142,7 +142,7 @@
     (insert-tuple db tuple id)
     true
     (catch java.sql.SQLException e
-      (. System/err println e)
+      (println "insert-tuple failed:" e)
       false)))
 
 (defn max-tuple-id [db]
