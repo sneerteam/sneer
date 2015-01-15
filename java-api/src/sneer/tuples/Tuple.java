@@ -15,13 +15,13 @@ public interface Tuple extends Map<String, Object> {
 	}};
 
 	Object payload();
-	
+
 	String type();
 
 	PublicKey audience();
 
 	PublicKey author();
-	
-	long timestampCreated();
+
+	long timestamp();
 
 }

@@ -14,21 +14,22 @@
        (get ~'tuple ~(name g))))
 
 (defn reify-tuple [tuple]
+  (assert (some? (get tuple "timestamp")))
   (reify+ Tuple
     (get [this key] (get tuple key))
     (tuple-getter type)
     (tuple-getter audience)
     (tuple-getter author)
     (tuple-getter payload)
-    (tuple-getter timestampCreated)
+    (tuple-getter timestamp)
     (toString [this] (str tuple))))
 
 (defmacro with-field [a]
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
-(defn- timestamp [proto-tuple]
-  (roundtrip (assoc proto-tuple "timestampCreated" (now))))
+(defn- timestamped [proto-tuple]
+  (roundtrip (assoc proto-tuple "timestamp" (now))))
 
 (defn new-tuple-publisher [tuples-out proto-tuple]
   (letfn
@@ -43,7 +44,7 @@
       (pub [this payload]
         (.. this (payload payload) pub))
       (pub [this]
-        (let [tuple (timestamp proto-tuple)]
+        (let [tuple (timestamped proto-tuple)]
           (store-tuple tuples-out tuple)
           (rx/return
             (reify-tuple tuple)))))))
@@ -60,6 +61,7 @@
            (query-tuples tuple-base criteria result lease)
            (.add subscriber (rx/subscription #(do (close! lease) (close! result)))))
          (query-tuples tuple-base criteria result))
+       ;; TODO: reassess use of thread here
        (thread
          (set-thread-name! (str "tuple-query: " criteria))
          (while-let [tuple (<!! result)]
@@ -86,7 +88,7 @@
           (tuples [this]
             (rx/observable*
               (fn [^rx.Subscriber subscriber]
-                (store-tuple tuple-base (timestamp {"type" "sub" "author" own-puk "criteria" criteria}))
+                (store-tuple tuple-base (timestamped {"type" "sub" "author" own-puk "criteria" criteria}))
                 (let [^rx.Observable tuples (rx/map reify-tuple (rx-query-tuples tuple-base criteria true))]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))

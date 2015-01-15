@@ -13,7 +13,7 @@ public class MessageImpl implements Message {
 	public static Func1<Tuple, Message> fromTuple(final PublicKey ownPuk) {
 		return new Func1<Tuple, Message>() { @Override public Message call(Tuple tuple) {
 			boolean isOwn = tuple.author().equals(ownPuk);
-			return new MessageImpl((Long)tuple.get("timestampCreated"), tuple.payload(), isOwn);
+			return new MessageImpl((Long)tuple.get("timestamp"), tuple.payload(), isOwn);
 		} };
 	}
 

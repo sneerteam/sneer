@@ -97,7 +97,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 		builder.setSmallIcon(R.drawable.ic_launcher)
 			.setContentText("" + ("chat".equals(tuple.get("message-type")) ? tuple.payload() : (tuple.get("text") == null ? tuple.payload() : tuple.get("text"))))
 			.setContentTitle(notificationLabel)
-			.setWhen(tuple.timestampCreated())
+			.setWhen(tuple.timestamp())
 			.setAutoCancel(true)
 			.setOngoing(false)
 			.setContentIntent(pendIntent);

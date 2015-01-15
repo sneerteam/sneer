@@ -288,11 +288,11 @@ public class PubSubTest extends TupleSpaceTestsBase {
 
 		Observable<Long> times = tuplesA.filter().tuples()
 				.map(new Func1<Tuple, Long>() {  @Override public Long call(Tuple tuple) {
-					return tuple.timestampCreated();
+					return tuple.timestamp();
 				}});
 
 		expecting(
-				values(times, tuple.timestampCreated()));
+				values(times, tuple.timestamp()));
 	}
 
 //	@Test

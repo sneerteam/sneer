@@ -77,14 +77,14 @@
        (get ~'tuple ~(name g))))
 
 (defn reify-tuple [tuple]
-  (.toString (get tuple "timestampCreated"))
+  (assert (some? (get tuple "timestamp")))
   (reify+ Tuple
     (get [this key] (get tuple key))
     (tuple-getter type)
     (tuple-getter audience)
     (tuple-getter author)
     (tuple-getter payload)
-    (tuple-getter timestampCreated)
+    (tuple-getter timestamp)
     (toString [this] (str tuple))))
 
 (defmacro with-field [a]
@@ -107,7 +107,7 @@
       (pub [this payload]
         (.. this (payload payload) pub))
       (pub [this]
-        (let [tuple (roundtrip (assoc proto-tuple "timestampCreated" (now)))]
+        (let [tuple (roundtrip (assoc proto-tuple "timestamp" (now)))]
           (store-tuple tuples-out tuple)
           (rx/return
             (reify-tuple tuple)))))))

@@ -69,7 +69,7 @@
     db :keys
     [[:prik :blob]]))
 
-(def builtin-field? #{"type" "payload" "author" "audience"})
+(def builtin-field? #{"type" "payload" "author" "audience" "timestamp"})
 
 (def puk-serializer 
   (let [keys-impl (KeysImpl.)]
