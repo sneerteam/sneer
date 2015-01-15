@@ -47,16 +47,31 @@
     [(author-of tuple) (id-of tuple)]
     [(:cts packet)     nil          ]))
 
-(defn- ack [state from signature]
+(defn- update-pending-to-send [state client]
+  (assoc-in state [:online-clients client :pending-to-send] (peek-packet-for (:router state) client)))
+
+(defn- handle-ack [state from signature]
   (let [pending (get-in state [:online-clients from :pending-to-send])]
     (if (= signature (packet-signature pending))
       (let [router (-> state :router (pop-packet-for from))
             peer (first signature)]
         (-> state
             (assoc :router router)
-            (assoc-in [:online-clients from :pending-to-send] (peek-packet-for router from))
-            (assoc-in [:online-clients peer :pending-to-send] (peek-packet-for router peer))))
+            (update-pending-to-send from)
+            (update-pending-to-send peer)))
       state)))
+
+(defn- handle-send [state from to tuple]
+  (let [packets-out (:packets-out state)]
+    (if (queue-full? (:router state) from to)
+      (do
+        (>!! packets-out {:nak (id-of tuple) :for to :to from})
+        state)
+      (do
+        (>!! packets-out {:ack (id-of tuple) :for to :to from})
+        (-> state
+          (update-in [:router] enqueue! from to tuple)
+          (update-pending-to-send to))))))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
   (if-some [packet (next-packet-to-send online-clients send-round)]
@@ -86,20 +101,13 @@
     (when-some [from (:from packet)]
       (let [router (:router state)
             state (update-in state [:online-clients from :online-countdown] online-count)
-            state (update-in state [:online-clients from :pending-to-send] #(if % % (peek-packet-for router from)))]
+            state (update-pending-to-send state from)]
         (match packet
           {:send tuple :to to}
-          (let [packets-out (:packets-out state)]
-            (if (queue-full? router from to)
-              (do
-                (>!! packets-out {:nak (id-of tuple) :for to :to from})
-                state)
-              (do
-                (>!! packets-out {:ack (id-of tuple) :for to :to from})
-                (update-in state [:router] enqueue! from to tuple))))
-
+          (handle-send state from to tuple)
+          
           {:ack author}
-          (ack state from [author (:id packet)])
+          (handle-ack state from [author (:id packet)])
 
           :else
           state)))

@@ -38,6 +38,10 @@
   "A tuple is enqueued"
   [{:send t1 :from :A :to  :B}]
   [{:ack   1 :to   :A :for :B}]
+  
+  "A tuple is sent when client is already online (had sent a ping)"
+  [{:from :B} {:send t1 :from :A :to  :B} :resend]
+  [           {:ack   1 :to   :A :for :B} {:send t1 :to :B}]
 
   "A tuple is sent when client comes online (sends a ping)"
   [{:send t1 :from :A :to  :B} {:from :B} :resend]
