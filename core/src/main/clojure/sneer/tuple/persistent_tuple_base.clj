@@ -141,7 +141,11 @@
   (try
     (insert-tuple db tuple id)
     true
-    (catch java.sql.SQLException e
+    (catch Exception e
+      ;; TODO: distiguishing between constraint violation and others
+      ;; (send others to SystemReport)
+      ;; android.database.sqlite.SQLiteConstraintException: columns author, original_id are not unique (code 19)
+      ;; java.sql.SQLException: [SQLITE_CONSTRAINT] Abort due to constraint violation (UNIQUE constraint failed: tuple.author, tuple.original_id)
       (println "insert-tuple failed:" e)
       false)))
 
