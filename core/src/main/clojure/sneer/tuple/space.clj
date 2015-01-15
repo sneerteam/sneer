@@ -27,6 +27,9 @@
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
+(defn- timestamp [proto-tuple]
+  (roundtrip (assoc proto-tuple "timestampCreated" (now))))
+
 (defn new-tuple-publisher [tuples-out proto-tuple]
   (letfn
     [(with [field value]
@@ -40,7 +43,7 @@
       (pub [this payload]
         (.. this (payload payload) pub))
       (pub [this]
-        (let [tuple (roundtrip (assoc proto-tuple "timestampCreated" (now)))]
+        (let [tuple (timestamp proto-tuple)]
           (store-tuple tuples-out tuple)
           (rx/return
             (reify-tuple tuple)))))))
@@ -83,8 +86,7 @@
           (tuples [this]
             (rx/observable*
               (fn [^rx.Subscriber subscriber]
-                ;; Use publisher.pub instead of:
-                (store-tuple tuple-base {"type" "sub" "author" own-puk "criteria" criteria "timestampCreated" (now)})
+                (store-tuple tuple-base (timestamp {"type" "sub" "author" own-puk "criteria" criteria}))
                 (let [^rx.Observable tuples (rx/map reify-tuple (rx-query-tuples tuple-base criteria true))]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
