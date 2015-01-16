@@ -157,10 +157,11 @@
   (try
     (insert-tuple db tuple id)
     true
-    (catch UniqueConstraintViolated e
+    (catch UniqueConstraintViolated _
       (println "try-insert: unique constraint violated")
       false)
     (catch Exception e
+      (println e)
       (SystemReport/updateReport "database/error" e)
       false)))
 
