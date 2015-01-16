@@ -1,14 +1,5 @@
 package sneer.android.database;
 
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
-import android.database.sqlite.SQLiteCursorDriver;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQuery;
-import android.os.Build;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 import sneer.admin.Database;
+import sneer.admin.UniqueConstraintViolated;
 import sneer.commons.Lists;
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
+import android.database.sqlite.SQLiteCursor;
+import android.database.sqlite.SQLiteCursorDriver;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQuery;
 
 
 public class SneerSqliteDatabase implements Closeable, Database {
@@ -51,8 +51,15 @@ public class SneerSqliteDatabase implements Closeable, Database {
 
 
 	@Override
-	public long insert(String tableName, Map<String, Object> values) {
-		return sqlite.insert(tableName, null, toContentValues(values));
+	public long insert(String tableName, Map<String, Object> values) throws UniqueConstraintViolated {
+		try {
+			return sqlite.insert(tableName, null, toContentValues(values));
+		} catch (SQLiteConstraintException e) {
+			// android.database.sqlite.SQLiteConstraintException: columns author, original_id are not unique (code 19)
+			if (e.getMessage().contains(" not unique "))
+				throw new UniqueConstraintViolated(e.getMessage(), e);
+			throw e;
+		}
 	}
 
 

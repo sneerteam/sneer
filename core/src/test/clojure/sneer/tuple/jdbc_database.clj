@@ -3,7 +3,8 @@
             [clojure.string :as string]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.core :as core])
-  (:import [java.sql DriverManager]))
+  (:import [java.sql DriverManager]
+           [sneer.admin UniqueConstraintViolated]))
 
 (defn- get-connection [databaseFile]
   (DriverManager/getConnection
@@ -23,7 +24,13 @@
         (sql/execute! db [(str "CREATE" (when unique? " UNIQUE") " INDEX " index-name " ON " (name table) "(" (string/join "," (map name columns-names)) ")" )]))
 
       (db-insert [this table row]
-        (sql/insert! db table row))
+        (try
+          (sql/insert! db table row)
+          (catch java.sql.SQLException e
+            ;; [SQLITE_CONSTRAINT] Abort due to constraint violation (UNIQUE constraint failed: tuple.author, tuple.original_id
+            (if (.. e getMessage (contains "UNIQUE constraint"))
+              (throw (UniqueConstraintViolated. (.getMessage e)))
+              (throw e)))))
 
       (db-query [this sql-and-params]
         (sql/query db sql-and-params :result-set-fn doall :as-arrays? true))

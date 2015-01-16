@@ -1,5 +1,7 @@
 (ns sneer.tuple.persistent-tuple-base
-  (:import [sneer.crypto.impl KeysImpl])
+  (:import [sneer.crypto.impl KeysImpl]
+           [sneer.commons SystemReport]
+           [sneer.admin UniqueConstraintViolated])
   (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
@@ -141,12 +143,11 @@
   (try
     (insert-tuple db tuple id)
     true
+    (catch UniqueConstraintViolated e
+      (println "try-insert: unique constraint violated")
+      false)
     (catch Exception e
-      ;; TODO: distiguishing between constraint violation and others
-      ;; (send others to SystemReport)
-      ;; android.database.sqlite.SQLiteConstraintException: columns author, original_id are not unique (code 19)
-      ;; java.sql.SQLException: [SQLITE_CONSTRAINT] Abort due to constraint violation (UNIQUE constraint failed: tuple.author, tuple.original_id)
-      (println "insert-tuple failed:" e)
+      (SystemReport/updateReport "database/error" e)
       false)))
 
 (defn max-tuple-id [db]
