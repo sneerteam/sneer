@@ -31,6 +31,11 @@
           (store-tuple subject t)
           (->> (<!!? (query-all subject {"type" "tweet"})) select-ids) => [{"id" 1 "original_id" 42}]))
 
+      #_(fact "It accepts an optional uniqueness criteria"
+        (let [t {"type" "unique"}]
+          (store-tuple subject t t)
+          (->> (<!!? (query-all subject {"type" "tweet"})) (selecting ["type"]) => [{"type" "unique"}])))
+      
       (fact "It discards author/id duplicates"
         (let [duplicate {"type" "whatever" "author" carla "id" 42}
               unique (assoc duplicate "id" 43)]

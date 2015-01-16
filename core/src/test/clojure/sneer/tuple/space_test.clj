@@ -25,6 +25,7 @@
     c))
 
 (def neide (->puk "neide"))
+(def carla (->puk "carla"))
 
 (def t1 {"type" "tweet" "payload" "hi!" "author" neide})
 (def t2 {"type" "tweet" "payload" "<3" "author" neide})
@@ -34,7 +35,7 @@
     (let [tuple-base (base/create db)]
 
       (base/store-tuple tuple-base t1)
-      
+
       (fact "When keep-alive is false"
         (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} false)
               tuples (->chan observable-tuples)]
@@ -54,5 +55,21 @@
               subscriber (subscribe-chan observable-tuples tuples)]
           (.unsubscribe subscriber)
           (<!!? (async/filter< nil? tuples)) => nil))
-      
+
+      )))
+
+#_(facts "About TupleFilter#tuples"
+  (with-open [db (jdbc-database/create-sqlite-db)]
+    (let [tuple-base (base/create db)
+          subject (space/new-tuple-filter tuple-base neide)]
+
+      (fact "Stores single tuple for similar sub"
+        (let [filter (.. subject (author carla) tuples)
+              tuples (async/chan)
+              subscribers [(subscribe-chan filter tuples) (subscribe-chan filter tuples)]
+              subs (async/chan)]
+          (base/query-tuples tuple-base {"type" "sub" "author" neide} subs)
+          (<!!? subs) => (contains {"criteria" {"author" carla}})
+          (<!!? subs) => nil
+          (doseq [s subscribers] (.unsubscribe s))))
       )))
