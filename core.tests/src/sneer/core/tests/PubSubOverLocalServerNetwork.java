@@ -6,7 +6,7 @@ import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.tuples.TupleSpace;
 
-public class NewPubSubOverLocalServerNetwork extends PubSubTest {
+public class PubSubOverLocalServerNetwork extends PubSubTest {
 
 	@Override
 	protected Object newNetwork() {

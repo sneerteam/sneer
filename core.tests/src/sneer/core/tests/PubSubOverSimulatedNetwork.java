@@ -7,7 +7,7 @@ import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.tuples.TupleSpace;
 
-public class NewPubSubOverSimulatedNetwork extends PubSubTest {
+public class PubSubOverSimulatedNetwork extends PubSubTest {
 
 	@Override
 	protected Object newNetwork() {
