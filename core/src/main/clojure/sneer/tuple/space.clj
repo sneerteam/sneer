@@ -88,7 +88,8 @@
           (tuples [this]
             (rx/observable*
               (fn [^rx.Subscriber subscriber]
-                (store-tuple tuple-base (timestamped {"type" "sub" "author" own-puk "criteria" criteria}))
+                (let [sub {"type" "sub" "author" own-puk "criteria" criteria}]
+                  (store-tuple tuple-base (timestamped sub) sub))
                 (let [^rx.Observable tuples (rx/map reify-tuple (rx-query-tuples tuple-base criteria true))]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))

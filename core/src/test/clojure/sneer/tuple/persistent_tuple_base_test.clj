@@ -31,18 +31,21 @@
           (store-tuple subject t)
           (->> (<!!? (query-all subject {"type" "tweet"})) select-ids) => [{"id" 1 "original_id" 42}]))
 
-      #_(fact "It accepts an optional uniqueness criteria"
-        (let [t {"type" "unique"}]
-          (store-tuple subject t t)
-          (->> (<!!? (query-all subject {"type" "tweet"})) (selecting ["type"]) => [{"type" "unique"}])))
-      
       (fact "It discards author/id duplicates"
         (let [duplicate {"type" "whatever" "author" carla "id" 42}
               unique (assoc duplicate "id" 43)]
           (store-tuple subject duplicate)
           (store-tuple subject duplicate)
           (store-tuple subject unique)
-          (->> (<!!? (query-all subject {"type" "whatever"})) select-ids) => [{"id" 2 "original_id" 42} {"id" 3 "original_id" 43}])))))
+          (->> (<!!? (query-all subject {"type" "whatever"})) select-ids) => [{"id" 2 "original_id" 42} {"id" 3 "original_id" 43}]))
+      
+      (fact "It accepts an optional uniqueness criteria"
+        (let [t {"type" "unique" "author" neide}
+              query-unique #(->> (<!!? (query-all subject t)) (selecting ["type"]))]
+          (store-tuple subject t t)
+          (query-unique) => [{"type" "unique"}]
+          (store-tuple subject t t)
+          (query-unique) => [{"type" "unique"}])))))
 
 (facts "About query-tuples"
   (with-open [db (jdbc-database/create-sqlite-db)]

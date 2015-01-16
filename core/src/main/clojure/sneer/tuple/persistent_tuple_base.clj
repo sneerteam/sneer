@@ -12,8 +12,11 @@
 (defprotocol TupleBase
   "A backing store for tuples (represented as maps)."
 
-  (store-tuple ^Void [this tuple]
-    "Stores the tuple represented as map.")
+  (store-tuple
+    ^Void [this tuple]
+    ^Void [this tuple uniqueness-criteria]
+    "Stores the tuple represented as map. When uniqueness-criteria is provided,
+     the tuple is stored only if a query by uniqueness-criteria returns an empty set.")
 
   (query-tuples
     [this criteria tuples-out]
@@ -114,21 +117,32 @@
     nil
     tuple))
 
-(defn query-for [criteria]
+(defn- query-by-builtin-fields [criteria starting-from]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
         ^String filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
         values (vals columns)]
-    (if-some [starting-from (:starting-from criteria)]
+    (if (some? starting-from)
       (apply vector (str "SELECT * FROM tuple WHERE id > ? " (when-not (.isEmpty filter) " AND ") filter " ORDER BY id") starting-from values)
       (apply vector (str "SELECT * FROM tuple " (when-not (.isEmpty filter) " WHERE ") filter " ORDER BY id") values))))
 
-(defn query-tuples-from-db [db criteria]
-  (let [rs (db-query db (query-for criteria))
-        field-names (mapv name (first rs))]
+(defn submap? [sub super]
+  (reduce-kv
+    (fn [result k v]
+      (if (= v (get super k))
+        true
+        (reduced false)))
+    true
+    sub))
+
+(defn query-tuples-from-db [db criteria & [starting-from]]
+  (let [rs (db-query db (query-by-builtin-fields criteria starting-from))
+        field-names (mapv name (first rs))
+        custom (-> criteria ->custom-field-map)]
     (->>
-      (next rs)
+      (next rs)      
       (map #(deserialize-entries (zipmap field-names %)))
-      (map #(merge (get % "custom") (dissoc % "custom"))))))
+      (map #(merge (get % "custom") (dissoc % "custom")))
+      (filter #(submap? custom %)))))
 
 (defn- insert-tuple [db tuple id]
   (let [custom (->custom-field-map tuple)
@@ -149,6 +163,10 @@
     (catch Exception e
       (SystemReport/updateReport "database/error" e)
       false)))
+
+(defn- result-empty? [db criteria]
+  (let [rs (query-tuples-from-db db criteria)]
+    (-> rs empty?)))
 
 (defn max-tuple-id [db]
   (let [rs (db-query db ["SELECT MAX(id) FROM tuple"])]
@@ -179,25 +197,30 @@
 
     (go-trace
       (loop [prev-tuple-id (max-tuple-id db)]
-        (when-some [request (<! requests)]
+        (when-some [request (<! requests)]          
           (match request
             {:store tuple}
-            (let [next-tuple-id (inc prev-tuple-id)]
+            (let [next-tuple-id (inc prev-tuple-id)
+                  uniqueness (:uniqueness request)]
               (recur
-               (if (try-insert-tuple db tuple next-tuple-id)
+               (if (and (or (nil? uniqueness) (result-empty? db uniqueness))
+                        (try-insert-tuple db tuple next-tuple-id))
                  (do (>! new-tuples tuple)
                      next-tuple-id)
                  prev-tuple-id)))
-
+            
             {:query criteria :tuples-out tuples-out}
             (do
-              (>! tuples-out (query-tuples-from-db db criteria))
+              (>! tuples-out (query-tuples-from-db db criteria (:starting-from request)))
               (recur prev-tuple-id))))))
 
     (reify TupleBase
 
       (store-tuple [this tuple]
         (>!! requests {:store tuple}))
+      
+      (store-tuple [this tuple uniqueness-criteria]
+        (>!! requests {:store tuple :uniqueness uniqueness-criteria}))
 
       (query-tuples [this criteria tuples-out]
         (let [query-result (chan)]
@@ -215,7 +238,7 @@
           (go (<! lease)
               (close! new-tuples))
           (go-loop []
-            (>! requests {:query (assoc criteria :starting-from @previous-id) :tuples-out query-result})
+            (>! requests {:query criteria :tuples-out query-result :starting-from @previous-id})
             (let [tuples (<! query-result)]
               (when-not (empty? tuples)
                 (doseq [tuple tuples]

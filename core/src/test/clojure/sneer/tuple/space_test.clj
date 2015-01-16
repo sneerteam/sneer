@@ -58,18 +58,19 @@
 
       )))
 
-#_(facts "About TupleFilter#tuples"
+(facts "About TupleFilter#tuples"
   (with-open [db (jdbc-database/create-sqlite-db)]
     (let [tuple-base (base/create db)
           subject (space/new-tuple-filter tuple-base neide)]
 
       (fact "Stores single tuple for similar sub"
         (let [filter (.. subject (author carla) tuples)
+              filter2 (.. subject (author carla) (field "f" 42) tuples)
               tuples (async/chan)
-              subscribers [(subscribe-chan filter tuples) (subscribe-chan filter tuples)]
+              subscribers [(subscribe-chan filter tuples) (subscribe-chan filter tuples) (subscribe-chan filter2 tuples)]
               subs (async/chan)]
           (base/query-tuples tuple-base {"type" "sub" "author" neide} subs)
           (<!!? subs) => (contains {"criteria" {"author" carla}})
+          (<!!? subs) => (contains {"criteria" {"author" carla, "f" 42}})
           (<!!? subs) => nil
-          (doseq [s subscribers] (.unsubscribe s))))
-      )))
+          (doseq [s subscribers] (.unsubscribe s)))))))
