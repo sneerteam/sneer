@@ -1,8 +1,8 @@
-(ns sneer.core.tests.local-server-network-new
+(ns sneer.core.tests.local-server-network
   (:require [clojure.core.async :as async]
             [sneer.server.router-connector :as router]
             [sneer.tuple.tuple-transmitter :as transmitter]
-            [sneer.networking.client-new :as network-client]
+            [sneer.networking.client :as network-client]
             [sneer.server.main :as server]
             [sneer.main :as main]
             [sneer.async :refer [go-trace]])

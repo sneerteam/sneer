@@ -4,7 +4,7 @@
    [clojure.core.async :as async :refer [thread to-chan chan close! >!!]]
    [sneer.test-util :refer :all]
    [sneer.async :refer :all]
-   [sneer.networking.client-new :refer :all]))
+   [sneer.networking.client :refer :all]))
 
 ;  (do (require 'midje.repl) (midje.repl/autotest))
 

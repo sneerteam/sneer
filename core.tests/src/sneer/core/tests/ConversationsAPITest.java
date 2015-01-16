@@ -71,12 +71,12 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	private SneerAdmin newSneerAdmin(PrivateKey prik, Object tupleBase) {
-		var("sneer.core.tests.local-server-network-new", "connect").invoke(network, prik.publicKey(), tupleBase);
-		return (SneerAdmin) var("sneer.admin-new", "new-sneer-admin").invoke(prik, tupleBase);
+		var("sneer.core.tests.local-server-network", "connect").invoke(network, prik.publicKey(), tupleBase);
+		return (SneerAdmin) var("sneer.admin", "new-sneer-admin").invoke(prik, tupleBase);
 	}
 
 	private static Object newNetwork() {
-		return var("sneer.core.tests.local-server-network-new", "start").invoke();
+		return var("sneer.core.tests.local-server-network", "start").invoke();
 	}
 
 	private static Object newTupleBase() {
@@ -457,7 +457,7 @@ public class ConversationsAPITest extends TestCase {
 
 
 	private SneerAdmin restart(SneerAdmin admin) {
-		return (SneerAdmin) var("sneer.admin-new", "restart").invoke(admin);
+		return (SneerAdmin) var("sneer.admin", "restart").invoke(admin);
 	}
 
 }

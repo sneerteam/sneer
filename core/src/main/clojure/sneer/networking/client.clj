@@ -1,4 +1,4 @@
-(ns sneer.networking.client-new
+(ns sneer.networking.client
   (:require [clojure.core.async :refer [>! <! map> timeout alt! chan]]
             [sneer.async :refer [go-while-let dropping-chan IMMEDIATELY]]
             [clojure.core.match :refer [match]])

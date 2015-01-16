@@ -1,7 +1,7 @@
-(ns sneer.admin-new
+(ns sneer.admin
   (:require
    [sneer.tuple.space :as space]
-   [sneer.impl-new :as impl]
+   [sneer.impl :as impl]
    [sneer.tuple.persistent-tuple-base :as persistence])
   (:import
     [sneer PrivateKey]

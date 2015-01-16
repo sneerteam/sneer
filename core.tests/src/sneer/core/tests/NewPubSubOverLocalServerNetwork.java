@@ -10,14 +10,14 @@ public class NewPubSubOverLocalServerNetwork extends PubSubTest {
 
 	@Override
 	protected Object newNetwork() {
-		return var("sneer.core.tests.local-server-network-new", "start").invoke();
+		return var("sneer.core.tests.local-server-network", "start").invoke();
 	}
 
 	@Override
 	protected TupleSpace newTupleSpace(PrivateKey ownPrik, Observable<PublicKey> followees) {
 		PublicKey ownPuk = ownPrik.publicKey();
 		final Object base = newTupleBase();
-		var("sneer.core.tests.local-server-network-new", "connect").invoke(network, ownPuk, base);
+		var("sneer.core.tests.local-server-network", "connect").invoke(network, ownPuk, base);
 		return (TupleSpace) var("sneer.tuple.space", "reify-tuple-space").invoke(ownPuk, base);
 	}
 

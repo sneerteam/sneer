@@ -2,7 +2,7 @@
   (:require [clojure.core.async :as async]
             [sneer.server.router-connector :as router]
             [sneer.tuple.tuple-transmitter :as transmitter]
-            [sneer.networking.client-new :as network-client]
+            [sneer.networking.client :as network-client]
             [sneer.async :refer [go-while-let]]))
 
 (defprotocol Network

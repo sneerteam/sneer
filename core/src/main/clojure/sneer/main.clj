@@ -1,7 +1,7 @@
 (ns sneer.main
   (:require [clojure.core.async :refer [chan >! <! timeout map< map>]]
-            [sneer.admin-new :as admin]
-            [sneer.networking.client-new :as network-client]
+            [sneer.admin :as admin]
+            [sneer.networking.client :as network-client]
             [sneer.networking.udp :as udp]
             [sneer.async :refer [go-trace]]
             [sneer.tuple.tuple-transmitter :as transmitter])

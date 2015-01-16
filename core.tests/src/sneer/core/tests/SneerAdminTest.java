@@ -34,7 +34,7 @@ public class SneerAdminTest extends TestCase {
 	}
 
 	private SneerAdmin newSneerAdmin(Object db) {
-		return (SneerAdmin) ClojureUtils.var("sneer.admin-new", "new-sneer-admin-over-db").invoke(db);
+		return (SneerAdmin) ClojureUtils.var("sneer.admin", "new-sneer-admin-over-db").invoke(db);
 	}
 
 }

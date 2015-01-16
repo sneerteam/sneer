@@ -1,4 +1,4 @@
-(ns sneer.impl-new
+(ns sneer.impl
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [observe-for-computation flatmapseq]]
