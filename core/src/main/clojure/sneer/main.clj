@@ -25,8 +25,10 @@
 
     ; server ping loop
     (go-trace
-      (while (>! to-server ping)
-        (<! (timeout 20000))))
+      (when (>! to-server ping)
+        (<! (timeout 200))
+        (while (>! to-server ping)
+          (<! (timeout 20000)))))
 
     udp-out))
 
