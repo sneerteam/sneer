@@ -3,7 +3,7 @@
             [sneer.server.router-connector :as router]
             [sneer.tuple.tuple-transmitter :as transmitter]
             [sneer.networking.client-new :as network-client]
-            [sneer.server.main-new :as server]
+            [sneer.server.main :as server]
             [sneer.main :as main]
             [sneer.async :refer [go-trace]])
   (:import (java.io Closeable)))

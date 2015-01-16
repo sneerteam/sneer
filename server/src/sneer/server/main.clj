@@ -1,15 +1,9 @@
 (ns sneer.server.main
-  (:require [sneer.networking.udp-old :as udp]
-            [sneer.server.router-old :as router]
-            [clojure.core.async :as async :refer [chan filter< close! alts!! <!! timeout]])
+  (:require [sneer.networking.udp :as udp]
+            [sneer.server.router-connector :as connector]
+            [clojure.core.async :as async :refer [chan filter< close! alts!! <!! timeout]]
+            [sneer.networking.udp :as udp])
   (:gen-class))
-
-#_(def home-dir (System/getProperty "user.home"))
-
-#_(defn storage-dir [args]
-   (if (nil? args)
-     home-dir
-     (first args)))
 
 (defn update-puk-address! [puk->address [address payload]]
   (let [puk (:from payload)]
@@ -33,18 +27,20 @@
                  (println label new-value)))))
 
 (defn start [port]
-  (let [puk->address (atom {})
+  (let [queue-size 10
+        puk->address (atom {})
         packets-in (chan)
         packets-out (chan)
         routable-packets-in (filter<
-                             is-routable?
-                             packets-in)
+                              is-routable?
+                              packets-in)
         routable-packets-out (filter<
-                              has-address?
-                              (async/map #(with-address puk->address %) [packets-out]))
-        udp-server (udp/serve-udp packets-in routable-packets-out port)]
+                               has-address?
+                               (async/map #(with-address puk->address %) [packets-out]))
+        udp-server (udp/start-udp-server packets-in routable-packets-out port)]
 
-    (router/start
+    (connector/start-connector
+      queue-size
       (async/map #(update-puk-address! puk->address %) [routable-packets-in])
       packets-out)
 
@@ -56,6 +52,7 @@
   (close! (:packets-out server))
   (alts!! [(:udp-server server) (timeout 500)]))
 
-(defn -main [& [port]]
-  (let [server (start (or (Integer/parseInt port) 4242))]
+(defn -main [& [port-string]]
+  (let [port (when-some [p port-string] (Integer/parseInt p))
+        server (start (or port 5555))]
     (println "udp-server finished with" (<!! (:udp-server server)))))
