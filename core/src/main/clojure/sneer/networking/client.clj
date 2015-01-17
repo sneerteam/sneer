@@ -59,6 +59,7 @@
 (defn start-client [own-puk packets-in packets-out tuples-received]
   (let [packets-in-by-follower (atom {})
         packets-out (map> #(assoc % :from own-puk) packets-out)]
+    
     (go-while-let [packet (<! packets-in)]
       (SystemReport/updateReport "network/last-packet" packet)
       (match packet

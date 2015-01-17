@@ -46,10 +46,9 @@
 (defn- close-socket [port socket]
   (when (is-open socket)
     (when port (println "Closing port" port))
-    (when socket
-      (try
-        (.close socket)
-        (catch Exception e :ignored)))))
+    (try
+      (.close socket)
+      (catch Exception e :ignored))))
 
 (defn on-open-error [exception]
   (SystemReport/updateReport "network/open" exception)

@@ -16,19 +16,19 @@
         to-server (map> #(do [@server-addr %]) udp-out)
         tuples-received (chan)
         client (network-client/start-client puk to-me to-server tuples-received)
-        connect-to-follower-fn #(network-client/connect-to-follower client %1 %2)
-        ping {:from puk}]
+        connect-to-follower-fn #(network-client/connect-to-follower client %1 %2)]
 
     (transmitter/start puk tuple-base tuples-received connect-to-follower-fn)
 
     (udp/start-udp-server udp-in udp-out)
-
+    
     ; server ping loop
-    (go-trace
-      (when (>! to-server ping)
-        (<! (timeout 200))
-        (while (>! to-server ping)
-          (<! (timeout 20000)))))
+    (let [ping {:from puk}]
+      (go-trace
+        (when (>! to-server ping)
+          (<! (timeout 200))
+          (while (>! to-server ping)
+            (<! (timeout 20000))))))
 
     udp-out))
 
