@@ -71,7 +71,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	private SneerAdmin newSneerAdmin(PrivateKey prik, Object tupleBase) {
-		var("sneer.core.tests.local-server-network", "connect").invoke(network, prik.publicKey(), tupleBase);
+		Glue.networkConnect(network, prik.publicKey(), tupleBase);
 		return (SneerAdmin) var("sneer.admin", "new-sneer-admin").invoke(prik, tupleBase);
 	}
 
@@ -80,8 +80,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	private static Object newTupleBase() {
-		final Object db = var("sneer.tuple.jdbc-database", "create-sqlite-db").invoke();
-		return var("sneer.tuple.persistent-tuple-base", "create").invoke(db);
+		return Glue.newPersistentTupleBase();
 	}
 
 	public void testSameSneer() {

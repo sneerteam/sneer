@@ -1,14 +1,10 @@
 (ns sneer.core.tests.simulated-network
   (:require [clojure.core.async :as async]
+            [sneer.core.tests.network :refer [Network]]
             [sneer.server.router-connector :as router]
             [sneer.tuple.tuple-transmitter :as transmitter]
             [sneer.networking.client :as network-client]
             [sneer.async :refer [go-while-let]]))
-
-(defprotocol Network
-  (connect
-    [network puk tuple-base]
-    "Connects tuple-base to the network."))
 
 (defn- tap-for [mult]
   (let [c (async/chan)]
@@ -38,12 +34,7 @@
               tuples-received (async/chan)
               client (network-client/start-client puk to-me to-server tuples-received)
               connect-to-follower-fn #(network-client/connect-to-follower client %1 %2)]
-
-          (async/go-loop [] 
-            (async/<! (async/timeout 100))
-            (when (async/>! to-server {:from puk})
-              (recur)))
-
+          (async/>!! to-server {:from puk})
           (transmitter/start puk tuple-base tuples-received connect-to-follower-fn)))
 
       java.io.Closeable

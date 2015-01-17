@@ -1,12 +1,11 @@
 package sneer.core.tests;
 
+import static sneer.ClojureUtils.var;
 import rx.Observable;
 import rx.functions.Func0;
-import rx.subjects.ReplaySubject;
 import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.crypto.impl.KeysImpl;
-import sneer.tuples.Tuple;
 import sneer.tuples.TupleSpace;
 
 public class TupleSpaceTestsBase extends TestWithNetwork {
@@ -30,7 +29,7 @@ public class TupleSpaceTestsBase extends TestWithNetwork {
 	
 	public TupleSpaceTestsBase() {
 		this(new Func0<Object>() {  @Override public Object call() {
-			return ReplaySubject.<Tuple>create();
+			return Glue.newPersistentTupleBase();
 		}});
 	}
 
@@ -39,7 +38,10 @@ public class TupleSpaceTestsBase extends TestWithNetwork {
 	}
 
 	protected TupleSpace newTupleSpace(PrivateKey ownPrik, Observable<PublicKey> followees) {
-		return Glue.newTupleSpace(ownPrik.publicKey(), newTupleBase(), network, followees);
+		PublicKey ownPuk = ownPrik.publicKey();
+		final Object base = newTupleBase();
+		Glue.networkConnect(network, ownPuk, base);
+		return (TupleSpace) var("sneer.tuple.space", "reify-tuple-space").invoke(ownPuk, base);
 	}
 
 	protected Object newTupleBase() {

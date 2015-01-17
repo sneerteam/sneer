@@ -5,18 +5,14 @@
             [sneer.networking.client :as network-client]
             [sneer.server.main :as server]
             [sneer.main :as main]
-            [sneer.async :refer [go-trace]])
+            [sneer.async :refer [go-trace]]
+            [sneer.core.tests.network :refer [Network]])
   (:import (java.io Closeable)))
-
-(defprotocol Network
-  (connect
-    [network puk tuple-base]
-    "Connects tuple-base to the network."))
 
 (defn start [& [unreliable]]
   (let [server-port 5454
         server (server/start server-port)
-        close (async/chan)]
+        lease (async/chan)]
 
     (reify Network
       (connect [network puk tuple-base]
@@ -24,10 +20,10 @@
 
         (let [client (main/start-client puk tuple-base "localhost" server-port)]
           (go-trace
-            (async/<! close)
+            (async/<! lease)
             (async/close! client))))
 
       Closeable
       (close [network]
-        (async/close! close)
+        (async/close! lease)
         (server/stop server)))))
