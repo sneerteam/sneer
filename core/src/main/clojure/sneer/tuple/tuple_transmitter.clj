@@ -2,7 +2,8 @@
   (:require [clojure.core.async :refer [chan go-loop >! <! filter>]]
             [sneer.async :refer [go-while-let go-trace]]
             [sneer.commons :refer [produce!]]
-            [sneer.tuple.persistent-tuple-base :refer [query-tuples store-tuple]]))
+            [sneer.tuple.persistent-tuple-base :refer [query-tuples store-tuple]])
+  (:import [sneer.commons SystemReport]))
 
 (defn- visible-to? [puk tuple]
   (let [audience (get tuple "audience")]
@@ -26,6 +27,7 @@
         (let [follower (sub "author")
               follower-chan (produce-chan follower)
               sub-lease (chan)]
+          (SystemReport/updateReport "tuples/last-sub" sub)
           (query-tuples tuple-base (sub "criteria") (filter> (partial visible-to? follower) follower-chan) sub-lease))))
 
     (let [subs (chan)

@@ -30,6 +30,10 @@
         packets-out (:packets-out client)
         resend-timeout-fn (or resend-timeout-fn #(timeout 5000))]
     (go-while-let [tuple (<! tuples-out)]
+      (SystemReport/updateReport
+        (str "tuples/last-to-send/" follower-puk)
+        tuple)
+
       (loop [resend-timeout IMMEDIATELY]
         (alt!
           follower-packets-in
@@ -58,10 +62,13 @@
 
 (defn start-client [own-puk packets-in packets-out tuples-received]
   (let [packets-in-by-follower (atom {})
-        packets-out (map> #(assoc % :from own-puk) packets-out)]
+        packets-out (map> #(do
+                             (SystemReport/updateReport "network/last-packet-out" %)
+                             (assoc % :from own-puk))
+                          packets-out)]
     
     (go-while-let [packet (<! packets-in)]
-      (SystemReport/updateReport "network/last-packet" packet)
+      (SystemReport/updateReport "network/last-packet-in" packet)
       (match packet
         {:send tuple}
         (do (>! tuples-received tuple)
