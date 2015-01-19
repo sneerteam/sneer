@@ -1,7 +1,6 @@
 (ns sneer.tuple.space-test
   (:require [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as base]
-            [sneer.core :as core]
             [sneer.test-util :refer [<!!?]]
             [midje.sweet :refer :all]
             [clojure.core.async :as async]

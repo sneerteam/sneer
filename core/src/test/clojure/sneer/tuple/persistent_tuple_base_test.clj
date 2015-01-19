@@ -1,6 +1,5 @@
 (ns sneer.tuple.persistent-tuple-base-test
   (:require [sneer.tuple.persistent-tuple-base :refer [query-all query-tuples store-tuple create]]
-            [sneer.core :as core]            
             [sneer.test-util :refer [<!!?]]
             [midje.sweet :refer :all]
             [clojure.core.async :as async :refer [chan]]
