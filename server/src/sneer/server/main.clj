@@ -26,6 +26,9 @@
                (when (not= old-value new-value)
                  (println label new-value)))))
 
+(defn- trace-in [c label]
+  (async/map< #(do (println label %) %) c))
+
 (defn start [port]
   (let [queue-size 10
         puk->address (atom {})
@@ -34,9 +37,11 @@
         routable-packets-in (filter<
                               is-routable?
                               packets-in)
+        routable-packets-in (trace-in routable-packets-in "IN ")
         routable-packets-out (filter<
                                has-address?
                                (async/map #(with-address puk->address %) [packets-out]))
+        routable-packets-out (trace-in routable-packets-out "OUT")
         udp-server (udp/start-udp-server packets-in routable-packets-out port)]
 
     (connector/start-connector
