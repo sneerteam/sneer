@@ -36,7 +36,7 @@ public class SystemReport {
 	
 	synchronized
 	private static String updateReportAndGetLatest(String tag, Object info) {
-		infosByTag.put(tag, info);
+		infosByTag.put(tag, pretty(new Date(Clock.now())) + " " + info);
 		return latestReport();
 	}
 
