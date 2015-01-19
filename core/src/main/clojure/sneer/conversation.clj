@@ -17,13 +17,13 @@
 
 (defn tuple->message [own-puk ^Tuple tuple]
   ; Use MessageImpl.fromTuple instead of reimplementing it here.
-  (let [created (.timestampCreated tuple)
+  (let [created (.timestamp tuple)
         type (.type tuple)
         jpeg-image ^bytes (.get tuple "jpeg-image")
         text (.get tuple "text")
         label (if text text (if jpeg-image "" type))
         own? (= own-puk (.author tuple))]
-    
+
     (reify Message
       (isOwn [this] own?)
       (label [this] label)
