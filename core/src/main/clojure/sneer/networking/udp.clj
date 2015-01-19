@@ -51,6 +51,8 @@
       (catch Exception e :ignored))))
 
 (defn on-open-error [exception]
+  (println "Error opening socket:")
+  (.printStackTrace exception)
   (SystemReport/updateReport "network/open" exception)
   (Thread/sleep 3000))
 
@@ -72,7 +74,9 @@
 (defn- close-on-err [verbose? socket socket-operation]
   (try
     (socket-operation socket)
-    (catch Exception e (close-socket verbose? socket))))
+    (catch Exception e
+      (.printStackTrace e)
+      (close-socket verbose? socket))))
 
 (defn start-udp-server
   "Opens a UDP socket on port, sending packets taken from packets-out and putting received packets into packets-in.
