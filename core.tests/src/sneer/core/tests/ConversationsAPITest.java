@@ -34,10 +34,38 @@ import sneer.tuples.TuplePublisher;
 
 public class ConversationsAPITest extends TestCase {
 
-	private final Object network = newNetwork();
+	protected Object network;
+	protected Object tupleBaseA;
+
+	protected SneerAdmin adminA;
+	protected SneerAdmin adminB;
+	protected SneerAdmin adminC;
+
+	protected PublicKey userA;
+	protected PublicKey userB;
+	protected PublicKey userC;
+
+	protected Sneer sneerA;
+	protected Sneer sneerB;
+	protected Sneer sneerC;
 
 	@Override
 	protected void setUp() {
+		network = newNetwork();
+		tupleBaseA = newTupleBase();
+
+		adminA = newSneerAdmin(createPrivateKey(), tupleBaseA);
+		adminB = newSneerAdmin();
+		adminC = newSneerAdmin();
+
+		userA = adminA.sneer().self().publicKey().current();
+		userB = adminB.sneer().self().publicKey().current();
+		userC = adminC.sneer().self().publicKey().current();
+
+		sneerA = adminA.sneer();
+		sneerB = adminB.sneer();
+		sneerC = adminC.sneer();
+
 		Clock.startMocking();
 	}
 
@@ -47,19 +75,6 @@ public class ConversationsAPITest extends TestCase {
 		Clock.stopMocking();
 	}
 
-	protected final Object tupleBaseA = newTupleBase();
-
-	protected final SneerAdmin adminA = newSneerAdmin(createPrivateKey(), tupleBaseA);
-	protected final SneerAdmin adminB = newSneerAdmin();
-	protected final SneerAdmin adminC = newSneerAdmin();
-
-	protected final PublicKey userA = adminA.sneer().self().publicKey().current();
-	protected final PublicKey userB = adminB.sneer().self().publicKey().current();
-	protected final PublicKey userC = adminC.sneer().self().publicKey().current();
-
-	protected final Sneer sneerA = adminA.sneer();
-	protected final Sneer sneerB = adminB.sneer();
-	protected final Sneer sneerC = adminC.sneer();
 
 
 	private SneerAdmin newSneerAdmin() {
