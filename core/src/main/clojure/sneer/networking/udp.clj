@@ -71,12 +71,13 @@
               (catch Exception e (on-open-error e)))
             (recur))))))) ; Make sure closed? has not been set to true.
   
-(defn- close-on-err [verbose? socket socket-operation]
+(defn- close-on-err [port socket socket-operation]
   (try
     (socket-operation socket)
     (catch Exception e
-      (.printStackTrace e)
-      (close-socket verbose? socket))))
+      (when (is-open socket)
+        (.printStackTrace e)
+        (close-socket port socket)))))
 
 (defn start-udp-server
   "Opens a UDP socket on port, sending packets taken from packets-out and putting received packets into packets-in.
