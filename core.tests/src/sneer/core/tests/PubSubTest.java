@@ -19,6 +19,7 @@ import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import sneer.PrivateKey;
+import sneer.commons.exceptions.FriendlyException;
 import sneer.crypto.impl.KeysImpl;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
@@ -51,6 +52,16 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			payloads(subscriber.tuples(), "paper", "rock", "hehehe"),
 			payloads(subscriber.type("rock-paper-scissor/move").tuples(), "paper", "rock"),
 			payloads(subscriber.type("rock-paper-scissor/message").tuples(), "hehehe"));
+
+	}
+
+	@Test (expected = FriendlyException.class)
+	public void largeMessage() {
+
+		TuplePublisher publisher = tuplesA.publisher()
+			.type("large-message");
+
+		publisher.pub(new byte[1000]);
 
 	}
 
