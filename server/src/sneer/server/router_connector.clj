@@ -29,7 +29,7 @@
   [q writer]
   (.write writer (if-some [seq (seq q)] (str seq) "nil")))
 
-(def online-count (constantly 20))
+(def online-count 20)
 
 (defn- next-packet-to-send [online-clients send-round]
   (when-some [client (peek send-round)]
@@ -99,7 +99,7 @@
   (if packet
     (when-some [from (:from packet)]
       (let [router (:router state)
-            state (update-in state [:online-clients from :online-countdown] online-count)
+            state (assoc-in state [:online-clients from :online-countdown] online-count)
             state (update-pending-to-send state from)]
         (match packet
           {:send tuple :to to}
@@ -112,8 +112,14 @@
           state)))
     :break))
 
-(defmethod handle :packets-out [state packet _]
-  (update-in state [:send-round] pop))
+(defmethod handle :packets-out [state _ _]
+  (let [client (-> state :send-round peek)
+        state' (-> state
+                 (update-in [:online-clients client :online-countdown] dec)
+                 (update-in [:send-round] pop))]
+    (if (zero? (get-in state' [:online-clients client :online-countdown]))
+      (update-in state' [:online-clients] dissoc client)  
+      state')))
 
 (defmethod handle :resend-timeout [{:keys [online-clients resend-timeout-fn]} _ _]
   {:send-round (send-round online-clients)
