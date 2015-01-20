@@ -79,7 +79,6 @@
     resend-timeout))
 
 (defn- channel-ops [{:keys [packets-in] :as state}]
-  #_(println "Send-op: " (send-op state))
   [(send-op state)
    packets-in
    #_offline-timer])
@@ -121,9 +120,7 @@
    :resend-timeout (->named resend-timeout-fn)})
 
 (defn- -iterate [state]
-  ;;(println "ITERATE" (select-keys state [:router]))
   (let [chosen (alts!! (channel-ops state) :priority :true)]
-    #_(println "Chosen:" chosen)
     (apply handle state
       chosen)))
 
