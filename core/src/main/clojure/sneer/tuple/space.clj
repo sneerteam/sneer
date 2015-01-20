@@ -28,8 +28,9 @@
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))
 
+(def max-size 1000)
 (defn- timestamped [proto-tuple]
-  (roundtrip (assoc proto-tuple "timestamp" (now))))
+  (roundtrip (assoc proto-tuple "timestamp" (now)) max-size))
 
 (defn new-tuple-publisher [tuples-out proto-tuple]
   (letfn

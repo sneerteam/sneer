@@ -2,7 +2,8 @@
   (:import
     [java.io ByteArrayInputStream ByteArrayOutputStream]
     [sneer PublicKey]
-    [sneer.crypto.impl KeysImpl])
+    [sneer.crypto.impl KeysImpl]
+    [sneer.commons.exceptions FriendlyException])
   (:require [cognitect.transit :as transit]))
 
 (def ^:private transit-format :json) ; other options are :json-verbose and :msgpack
@@ -36,5 +37,9 @@
            reader (transit/reader in transit-format read-opts)]
        (transit/read reader))))
 
-(defn roundtrip [value]
-  (-> value serialize deserialize))
+(defn roundtrip [value max-size]
+  (let [bytes (serialize value)
+        size (alength bytes)]
+    (when (> size max-size)
+      (throw (FriendlyException. (str "Value too large (" size " bytes). Maximum is " max-size " bytes."))))
+    (deserialize bytes)))
