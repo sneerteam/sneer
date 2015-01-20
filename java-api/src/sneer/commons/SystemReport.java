@@ -21,26 +21,28 @@ public class SystemReport {
 		return subject.asObservable();
 	}
 
-	
-	/** Causes report() above to emit an updated report with the current time associated with the given event tag. */	
+
+	/** Causes report() above to emit an updated report with the current time associated with the given event tag. */
 	public static void updateReport(String tag) {
 		updateReport(tag, new Date());
 	}
 
-	
-	/** Causes report() above to emit an updated report with the given info.toString() associated with the given tag. */	
+
+	/** Causes report() above to emit an updated report with the given info.toString() associated with the given tag. */
 	public static void updateReport(String tag, Object info) {
 		subject.onNext(updateReportAndGetLatest(tag, info));
 	}
 
-	
+
 	synchronized
 	private static String updateReportAndGetLatest(String tag, Object info) {
-		infosByTag.put(tag, pretty(new Date(Clock.now())) + " " + info);
+		final String msg = pretty(new Date(Clock.now())) + " " + info;
+		System.out.println(tag + ":" + msg);
+		infosByTag.put(tag, msg);
 		return latestReport();
 	}
 
-	
+
 	private static String latestReport() {
 		StringBuilder ret = new StringBuilder();
 		for (Entry<String, Object> entry : infosByTag.entrySet())
@@ -51,9 +53,9 @@ public class SystemReport {
 
 	private static String pretty(Object info) {
 		Object ret = info;
-		if (ret instanceof Date)  
+		if (ret instanceof Date)
 			ret = new PrettyTime().format((Date)ret);
-		
+
 		return ret.toString();
 	}
 
