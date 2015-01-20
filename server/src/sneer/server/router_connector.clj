@@ -115,7 +115,7 @@
 (defmethod handle :packets-out [state _ _]
   (let [client (-> state :send-round peek)
         state' (-> state
-                 (update-in [:online-clients client :online-countdown] dec)
+                 (update-in [:online-clients client :online-countdown] #(if % (dec %) 0))
                  (update-in [:send-round] pop))]
     (if (zero? (get-in state' [:online-clients client :online-countdown]))
       (update-in state' [:online-clients] dissoc client)  
