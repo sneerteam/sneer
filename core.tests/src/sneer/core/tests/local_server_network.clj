@@ -9,7 +9,7 @@
             [sneer.core.tests.network :refer [Network]])
   (:import (java.io Closeable)))
 
-(defn start [& [unreliable]]
+(defn start-local []
   (let [server-port 5454
         server (server/start server-port)
         lease (async/chan)]
@@ -27,3 +27,20 @@
       (close [network]
         (async/close! lease)
         (server/stop server)))))
+
+
+(defn start []
+  (let [lease (async/chan)]
+
+    (reify Network
+      (connect [network puk tuple-base]
+        (println "Network/connect" puk)
+
+        (let [client (main/start-client puk tuple-base)]
+          (go-trace
+            (async/<! lease)
+            (async/close! client))))
+
+      Closeable
+      (close [network]
+        (async/close! lease)))))
