@@ -1,3 +1,5 @@
 include 'android-api', 'android.main'
 include 'apps:sendpics', 'apps:voicemessage', 'apps:sendlocation', 'apps:sendfiles'
 include 'android.main.tests'
+include ':lizardspock'
+project(':lizardspock').projectDir=new File('../../lizardspock')
