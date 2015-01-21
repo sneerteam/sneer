@@ -13,7 +13,7 @@
         subject (atom nil)
         ; DSL:
         restart! #(reset! subject (create-router max-q-size))
-        enq! (fn [from to msg] (-> subject (swap! enqueue! from to msg)
+        enq! (fn [from to msg] (-> subject (swap! enqueue from to msg)
                                  (queue-full? from to)
                                  not))
         peek #(let [packet (peek-packet-for @subject %)]

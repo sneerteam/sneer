@@ -48,29 +48,30 @@
     [(:cts packet)     nil          ]))
 
 (defn- update-pending-to-send [state client]
-  (assoc-in state [:online-clients client :pending-to-send] (peek-packet-for (:router state) client)))
+  (assoc-in state [:online-clients client :pending-to-send] (peek-packet-for @(:router state) client)))
 
 (defn- handle-ack [state from signature]
   (let [pending (get-in state [:online-clients from :pending-to-send])]
     (if (= signature (packet-signature pending))
-      (let [router (-> state :router (pop-packet-for from))
-            peer (first signature)]
+      (let [peer (first signature)]
+        (swap! (:router state) pop-packet-for from)
         (-> state
-            (assoc :router router)
+            ;; (assoc :router router)
             (update-pending-to-send from)
             (update-pending-to-send peer)))
       state)))
 
 (defn- handle-send [state from to tuple]
-  (let [packets-out (:packets-out state)]
-    (if (queue-full? (:router state) from to)
+  (let [packets-out (:packets-out state)
+        router-atom (:router state)]
+    (if (queue-full? @router-atom from to)
       (do
         (>!! packets-out {:nak (id-of tuple) :for to :to from})
         state)
       (do
+        (swap! router-atom enqueue from to tuple)
         (>!! packets-out {:ack (id-of tuple) :for to :to from})
         (-> state
-          (update-in [:router] enqueue! from to tuple)
           (update-pending-to-send to))))))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
@@ -98,8 +99,7 @@
 (defmethod handle :packets-in [state packet _]
   (if packet
     (when-some [from (:from packet)]
-      (let [router (:router state)
-            state (assoc-in state [:online-clients from :online-countdown] online-count)
+      (let [state (assoc-in state [:online-clients from :online-countdown] online-count)
             state (update-pending-to-send state from)]
         (match packet
           {:send tuple :to to}
@@ -136,7 +136,7 @@
       (loop-state -iterate
                   {:packets-in        (NamedChannel. :packets-in packets-in)
                    :packets-out       (NamedChannel. :packets-out packets-out)
-                   :router            (create-router queue-size)
+                   :router            (atom (create-router queue-size))
                    :online-clients    {}
                    :send-round        empty-queue
                    :resend-timeout-fn resend-timeout-fn

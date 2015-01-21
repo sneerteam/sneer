@@ -78,7 +78,7 @@
 (defn- enqueue-cts [router sender receiver]
   (update-in router [sender :receivers-cts] (fnil conj empty-queue) receiver))
 
-(defn enqueue! [router sender receiver tuple]
+(defn enqueue [router sender receiver tuple]
   "Adds tuple to its receiver/sender send queue. Pre-requisite: the queue is not full."
   (update-in router [receiver] enqueue-for (router :max-queue-size) sender tuple))
 
