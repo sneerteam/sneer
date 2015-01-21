@@ -16,7 +16,7 @@ public class SystemReportTests {
 		SystemReport.updateReport("Phasers", "Stun");
 		String report = SystemReport.report().toBlocking().first();
 		Clock.stopMocking();
-		assertEquals("Phasers: Stun\n\nShields On: true\n\n", report);
+		assertEquals("Phasers: 5 decades ago Stun\n\nShields On: 5 decades ago true\n\n", report);
 	}
 
 }
