@@ -1,4 +1,5 @@
 (ns sneer.serialization
+  (:refer-clojure :exclude [read write])
   (:import
     [java.io ByteArrayInputStream ByteArrayOutputStream]
     [sneer PublicKey]
