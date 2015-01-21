@@ -23,19 +23,26 @@
 
 (def ^:private read-opts {:handlers read-handlers})
 
+(def write transit/write)
+(def read  transit/read)
+
+(defn writer [output-stream]
+  (transit/writer output-stream transit-format write-opts))
+
+(defn reader [input-stream]
+  (transit/reader input-stream  transit-format read-opts))
+
 (defn serialize [value]
-  (let [out (ByteArrayOutputStream.)
-        writer (transit/writer out transit-format write-opts)]
-    (transit/write writer value)
+  (let [out (ByteArrayOutputStream.)]
+    (write (writer out) value)
     (.toByteArray out)))
 
 (defn deserialize
   ([^bytes bytes]
      (deserialize bytes (alength bytes)))
   ([bytes length]
-     (let [in (ByteArrayInputStream. bytes 0 length)
-           reader (transit/reader in transit-format read-opts)]
-       (transit/read reader))))
+     (let [in (ByteArrayInputStream. bytes 0 length)]
+       (read (reader in)))))
 
 (defn roundtrip [value max-size]
   (let [bytes (serialize value)
