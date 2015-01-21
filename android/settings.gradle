@@ -1,5 +1,14 @@
 include 'android-api', 'android.main'
 include 'apps:sendpics', 'apps:voicemessage', 'apps:sendlocation', 'apps:sendfiles'
-include 'android.main.tests'
+
 include ':lizardspock'
 project(':lizardspock').projectDir=new File('../../lizardspock')
+
+include ':java-api'
+project(':java-api').projectDir=new File('../java-api')
+
+include ':java-api.tests'
+project(':java-api.tests').projectDir=new File('../java-api.tests')
+
+include ':crypto'
+project(':crypto').projectDir=new File('../crypto')
