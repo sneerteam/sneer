@@ -12,13 +12,23 @@
 (def ^:private write-handlers
   {PublicKey
    (transit/write-handler
-     (fn [_] "puk")
-     (fn [^PublicKey puk] (.toBytes puk)))})
+    (fn [_] "puk")
+    (fn [^PublicKey puk] (.toBytes puk)))
+
+   clojure.lang.PersistentQueue
+   (transit/write-handler
+    (fn [_] "queue")
+    (fn [^clojure.lang.PersistentQueue q] (vec q)))})
 
 (def ^:private read-handlers
   (let [keys-impl (KeysImpl.)]
-    {"puk" (transit/read-handler
-             (fn [^bytes rep] (.createPublicKey keys-impl rep)))}))
+    {"puk"
+     (transit/read-handler
+      (fn [^bytes rep] (.createPublicKey keys-impl rep)))
+
+     "queue"
+     (transit/read-handler
+      (fn [coll] (into clojure.lang.PersistentQueue/EMPTY coll)))}))
 
 (def ^:private write-opts {:handlers write-handlers})
 
