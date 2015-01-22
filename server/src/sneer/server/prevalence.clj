@@ -12,6 +12,9 @@
     (catch Exception end-of-stream
       (println "EXCEPTION AT END OF LOG:" end-of-stream))))
 
+(defn- archive [file]
+  (.renameTo file (File. (str file "-" (java.lang.System/currentTimeMillis)))))
+
 (defn replacement [file]
   (File. (str file ".replacement")))
 
@@ -19,7 +22,7 @@
   (let [rep (replacement file)]
     (with-open [out (FileOutputStream. rep)]
 	    (write (writer out) content))
-    (.delete file)
+    (archive file)
     (assert (.renameTo rep file))))
 
 (defn- atomic-recover! [file]
