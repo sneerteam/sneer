@@ -5,9 +5,6 @@ project(':android.main.tests').projectDir=new File('android.main/tests')
 
 include ':apps:sendpics', ':apps:voicemessage', ':apps:sendlocation', ':apps:sendfiles'
 
-include ':lizardspock'
-project(':lizardspock').projectDir=new File('../../lizardspock')
-
 include ':java-api'
 project(':java-api').projectDir=new File('../java-api')
 
