@@ -2,43 +2,60 @@
   (:refer-clojure :exclude [write read])
   (:require
     [sneer.serialization :refer [write writer read reader]]
-    [sneer.commons :refer :all]
-    [sneer.async :refer [go-trace]]
-    [clojure.java.io :refer [file]]
-    [clojure.core.async :refer [close! >! <!]])
+    [sneer.commons :refer :all])
   (:import
    [java.io File FileOutputStream FileInputStream]))
-
-(defn- write-single! [filename item]
-  (with-open [out-stream (FileOutputStream. filename)]
-    (write (writer out-stream) item)))
-
-(defn- replace! [^File old-file ^File new-file]
-  (assert (and (.delete old-file) (.renameTo new-file old-file))))
 
 (defn- read-ignoring-exception [reader]
   (try
     (read reader)
-    (catch Exception end-of-stream)))
+    (catch Exception end-of-stream
+      (println "EXCEPTION AT END OF LOG:" end-of-stream))))
 
-(defn logger [log-file replay log]
-  
-  (go-trace 
+(defn replacement [file]
+  (File. (str file ".replacement")))
+
+(defn- atomic-replace! [file content]
+  (let [rep (replacement file)]
+    (with-open [out (FileOutputStream. rep)]
+	    (write (writer out) content))
+    (.delete file)
+    (assert (.renameTo rep file))))
+
+(defn- atomic-recover! [file]
+  (let [rep (replacement file)]
+    (when-not (.exists file)
+      (assert
+        (if (.exists rep)
+          (.renameTo rep file)
+          (.createNewFile file))))))
+
+(defn state [prevayler]
+  @(:state prevayler))
+
+(defn handle! [prevayler event]
+  (write (:writer prevayler) event)
+  (let [handler (:handler prevayler)]
+    (swap! (:state prevayler) handler event)))
+
+(defn close! [prevayler]
+  (.close (:output-stream prevayler)))
+
+(defn prevayler-jr! [file initial-state handler]
+  (let [state (atom initial-state)]
+    (atomic-recover! file)
+    (with-open [in (FileInputStream. file)]
+      (let [r (reader in)]
+        (when-let [previous (read-ignoring-exception r)]
+          (reset! state previous))
+        (while-let [event (read-ignoring-exception r)]
+          (swap! state handler event))))
+
+  (atomic-replace! file @state)
     
-   ;; Replay
-   (let [r (reader (FileInputStream. log-file))]
-     (while-let [item (read-ignoring-exception r)]
-       (>! replay item))
-     (close! replay))
-   
-   ;; Overwrite on first write
-   (when-some [first-item (<! log)]
-     (let [tmp-file (file (str log-file ".tmp"))]
-       (write-single! tmp-file first-item)
-       (replace! log-file tmp-file)))
-   
-   ;; Append on subsequent writes
-   (with-open [out-stream (FileOutputStream. log-file true)]
-     (let [w (writer out-stream)]
-       (while-let [item (<! log)]
-         (write w item))))))
+  (let [out (FileOutputStream. file true)
+        w (writer out)]
+    {:output-stream out
+     :writer w
+     :state state
+     :handler handler})))

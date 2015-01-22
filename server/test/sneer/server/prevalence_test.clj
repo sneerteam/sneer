@@ -1,37 +1,44 @@
 (ns sneer.server.prevalence-test
   (:require
     [sneer.server.prevalence :refer :all]
-    [midje.sweet :refer :all]
-    [clojure.core.async :as async :refer [thread to-chan chan close! >!!]]
-    [clojure.core.match :refer [match]]
-    [sneer.test-util :refer :all]
-    [sneer.async :refer :all]))
+    [midje.sweet :refer :all]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-(facts "Logging"
-  (fact "Empty log"
-    (let [file (java.io.File/createTempFile "test-" "-tmp")
-          replay (chan)
-          log (chan)]
-      (logger file replay log)
-      (<!!? replay) => nil))
+(defn- tmp-file []
+  (doto 
+    (java.io.File/createTempFile "test-" ".tmp")
+    (.delete)))
 
-  (fact "Items in the log"
-    (let [file (java.io.File/createTempFile "test-" "-tmp")]
-      (let [replay (chan)
-            log (chan)]
-        (logger file replay log)
-        (<!!? replay) => nil
-        (>!!? log :a)
-        (>!!? log :b)
-        (>!!? log :c)
-        (close! log))
-      (let [replay (chan)
-            log (chan)]
-        (logger file replay log)
-        (<!!? (async/into [] replay)) => [:a :b :c]
-        (close! log))))
-  
-)
+(fact "Prevalence"
+  (let [file (tmp-file)
+        initial-state 0
+        handler +]
+    
+    (let [p1 (prevayler-jr! file initial-state handler)]
+      (state p1) => 0
+      (handle! p1 42)
+      (state p1) => 42
+      (handle! p1 100)
+      (state p1) => 142
+      (close! p1))
+    
+    ; Restart with same file (initial state saved as first item)
+    (let [p2 (prevayler-jr! file initial-state handler)]
+      (state p2) => 142
+      (handle! p2 1000)
+      (state p2) => 1142
+      (close! p2))
 
+    ; Restart with same file (previous state saved as first item)
+    (let [p3 (prevayler-jr! file initial-state handler)]
+      (state p3) => 1142
+      (handle! p3 10000)
+      (state p3) => 11142
+      (close! p3))
+    
+    ; Simulate crash during log rolling.
+    (assert (.renameTo file (replacement file)))
+    (let [p4 (prevayler-jr! file initial-state handler)]
+      (state p4) => 11142
+      (close! p4))))
