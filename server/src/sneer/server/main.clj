@@ -29,9 +29,8 @@
 (defn- trace-in [c label]
   (async/map< #(do (println label %) %) c))
 
-(defn start [port]
-  (let [queue-size 10
-        puk->address (atom {})
+(defn start [port prevalence-file]
+  (let [puk->address (atom {})
         packets-in (chan)
         packets-out (chan)
         routable-packets-in (filter<
@@ -45,7 +44,7 @@
         udp-server (udp/start-udp-server packets-in routable-packets-out port)]
 
     (connector/start-connector
-      queue-size
+      prevalence-file
       (async/map #(update-puk-address! puk->address %) [routable-packets-in])
       packets-out)
 
@@ -59,5 +58,5 @@
 
 (defn -main [& [port-string]]
   (let [port (when-some [p port-string] (Integer/parseInt p))
-        server (start (or port 5555))]
+        server (start (or port 5555) (java.io.File. "server.jr"))]
     (println "udp-server finished with" (<!! (:udp-server server)))))

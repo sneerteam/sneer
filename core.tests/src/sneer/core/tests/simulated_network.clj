@@ -18,7 +18,7 @@
         to-clients (async/chan)
         to-clients-mult (async/mult to-clients)
         resend-timeout-fn #(async/timeout 100)
-        server (router/start-connector queue-size (tap-for to-server-mult) to-clients resend-timeout-fn)]
+        server (router/start-transient-connector queue-size (tap-for to-server-mult) to-clients resend-timeout-fn)]
 
     (let [debug-client (tap-for to-clients-mult)
           debug-server (tap-for to-server-mult)

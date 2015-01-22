@@ -11,7 +11,7 @@
 
 (defn start-local []
   (let [server-port 5454
-        server (server/start server-port)
+        server (server/start server-port (java.io.File/createTempFile "server" ".tmp"))
         lease (async/chan)]
 
     (reify Network

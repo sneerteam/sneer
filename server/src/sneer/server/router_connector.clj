@@ -6,6 +6,7 @@
     [sneer.test-util :refer :all]
     [sneer.async :refer :all]
     [sneer.commons :refer [empty-queue loop-state]]
+    [sneer.server.prevalence :as p]
     [sneer.server.router :refer :all]))
 
 (defrecord NamedChannel [name channel]
@@ -60,21 +61,21 @@
   (let [pending (get-in state [:online-clients from :pending-to-send])]
     (if (= signature (packet-signature pending))
       (let [peer (first signature)]
-        (swap! (:router state) pop-packet-for from)
+        (p/handle! (:router state) [:pop-packet-for from])
         (-> state
             (update-pending-to-send from)
             (update-pending-to-send peer)))
       state)))
 
 (defn- handle-send [state from to tuple]
-  (let [packets-out (:packets-out state)
-        router-atom (:router state)]
-    (if (queue-full? @router-atom from to)
+  (let [router (:router state)
+        packets-out (:packets-out state)]
+    (if (queue-full? @router from to)
       (do
         (>!! packets-out {:nak (id-of tuple) :for to :to from})
         state)
       (do
-        (swap! router-atom enqueue from to tuple)
+        (p/handle! router [:enqueue from to tuple])
         (>!! packets-out {:ack (id-of tuple) :for to :to from})
         (-> state
           (update-pending-to-send to))))))
@@ -134,15 +135,34 @@
     (apply handle state
       chosen)))
 
-(defn start-connector [queue-size packets-in packets-out & [resend-timeout-fn]]
-  (let [resend-timeout-fn (or resend-timeout-fn #(async/timeout 100))]
-    (thread
-      (loop-state -iterate
-                  {:packets-in        (NamedChannel. :packets-in packets-in)
-                   :packets-out       (NamedChannel. :packets-out packets-out)
-                   :router            (atom (create-router queue-size))
-                   :online-clients    {}
-                   :send-round        empty-queue
-                   :resend-timeout-fn resend-timeout-fn
-                   :resend-timeout    (->named resend-timeout-fn)})
-      (close! packets-out))))
+(defmulti  handle-event (fn [router [type]] type))
+(defmethod handle-event :pop-packet-for [router [_ from]]
+  (pop-packet-for router from))
+(defmethod handle-event :enqueue [router [_ from to tuple]]
+  (enqueue router from to tuple))
+
+(defn- start [prevalent-router packets-in packets-out resend-timeout-fn]
+  (thread
+    (loop-state -iterate
+                {:packets-in        (NamedChannel. :packets-in packets-in)
+                 :packets-out       (NamedChannel. :packets-out packets-out)
+                 :router            prevalent-router
+                 :online-clients    {}
+                 :send-round        empty-queue
+                 :resend-timeout-fn resend-timeout-fn
+                 :resend-timeout    (->named resend-timeout-fn)})
+    (close! packets-out)))
+
+(defn start-connector [prevalence-file packets-in packets-out]
+  (start (p/prevayler-jr! handle-event
+                          (create-router 200)
+                          prevalence-file)
+         packets-in
+         packets-out
+         #(async/timeout 100)))
+
+(defn start-transient-connector [queue-size packets-in packets-out resend-timeout-fn]
+  (start (p/prevayler-jr! handle-event (create-router queue-size))
+         packets-in
+         packets-out
+         resend-timeout-fn))

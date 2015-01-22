@@ -6,6 +6,10 @@
   (:import
    [java.io File FileOutputStream FileInputStream]))
 
+(defprotocol Prevayler
+  (handle! [_ event])
+  (close! [_]))
+
 (defn- read-ignoring-exception [reader]
   (try
     (read reader)
@@ -33,33 +37,43 @@
           (.renameTo rep file)
           (.createNewFile file))))))
 
-(defn state [prevayler]
-  @(:state prevayler))
+(defn prevayler-jr!
+  ([handler initial-state]
+    (let [state (atom initial-state)]
+      (reify
+        Prevayler
+          (handle! [_ event]
+            (swap! state handler event))
+          (close! [_]
+            (reset! state ::closed))
+        clojure.lang.IDeref
+          (deref [_]
+            @state))))
+  
+  ([handler initial-state file]
+    (let [state (atom initial-state)
+          -handle! (partial swap! state handler)]
+      (atomic-recover! file)
+      (with-open [in (FileInputStream. file)]
+        (let [r (reader in)]
+          (when-let [previous (read-ignoring-exception r)]
+            (reset! state previous))
+          (while-let [event (read-ignoring-exception r)]
+            (-handle! event))))
 
-(defn handle! [prevayler event]
-  (write (:writer prevayler) event)
-  (let [handler (:handler prevayler)]
-    (swap! (:state prevayler) handler event)))
-
-(defn close! [prevayler]
-  (.close (:output-stream prevayler)))
-
-(defn prevayler-jr! [file initial-state handler]
-  (let [state (atom initial-state)]
-    (atomic-recover! file)
-    (with-open [in (FileInputStream. file)]
-      (let [r (reader in)]
-        (when-let [previous (read-ignoring-exception r)]
-          (reset! state previous))
-        (while-let [event (read-ignoring-exception r)]
-          (swap! state handler event))))
-
-  (atomic-replace! file @state)
+      (atomic-replace! file @state)
     
-  (let [append true
-        out (FileOutputStream. file append)
-        w (writer out)]
-    {:output-stream out
-     :writer w
-     :state state
-     :handler handler})))
+      (let [append true
+            out (FileOutputStream. file append)
+            w (writer out)]
+        (reify
+          Prevayler
+            (handle! [_ event]
+              (write w event)
+              (-handle! event))
+            (close! [_]
+              (reset! state ::closed)
+              (.close out))
+          clojure.lang.IDeref
+            (deref [_]
+              @state))))))
