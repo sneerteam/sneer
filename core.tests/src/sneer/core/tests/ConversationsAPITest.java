@@ -91,7 +91,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	private static Object newNetwork() {
-		return var("sneer.core.tests.local-server-network", "start").invoke();
+		return var("sneer.core.tests.local-server-network", "start-local").invoke();
 	}
 
 	private static Object newTupleBase() {
