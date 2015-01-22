@@ -1,6 +1,9 @@
 package sneer.core.tests;
 
 import static sneer.ClojureUtils.var;
+
+import java.util.Arrays;
+
 import rx.Observable;
 import rx.functions.Func0;
 import sneer.PrivateKey;
@@ -10,9 +13,9 @@ import sneer.tuples.TupleSpace;
 
 public class TupleSpaceTestsBase extends TestWithNetwork {
 	
-	protected final PrivateKey userA = new KeysImpl().createPrivateKey();
-	protected final PrivateKey userB = new KeysImpl().createPrivateKey();
-	protected final PrivateKey userC = new KeysImpl().createPrivateKey();
+	protected final PrivateKey userA = createPrivateKey("A");
+	protected final PrivateKey userB = createPrivateKey("B");
+	protected final PrivateKey userC = createPrivateKey("C");
 
 	protected final TupleSpace tuplesA;
 	protected final TupleSpace tuplesB;
@@ -46,5 +49,10 @@ public class TupleSpaceTestsBase extends TestWithNetwork {
 
 	protected Object newTupleBase() {
 		return tupleBaseFactory.call();
-	}	
+	}
+	
+	private PrivateKey createPrivateKey(String seed) {		
+		return new KeysImpl().createPrivateKey(Arrays.copyOf(seed.getBytes(), 32));
+	}
+	
 }
