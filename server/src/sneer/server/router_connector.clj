@@ -56,7 +56,6 @@
       (let [peer (first signature)]
         (swap! (:router state) pop-packet-for from)
         (-> state
-            ;; (assoc :router router)
             (update-pending-to-send from)
             (update-pending-to-send peer)))
       state)))
@@ -81,8 +80,7 @@
 
 (defn- channel-ops [{:keys [packets-in] :as state}]
   [(send-op state)
-   packets-in
-   #_offline-timer])
+   packets-in])
 
 (defn- ->named [resend-timeout-fn]
   (NamedChannel. :resend-timeout (resend-timeout-fn)))
