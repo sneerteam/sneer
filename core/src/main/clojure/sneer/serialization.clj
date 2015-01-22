@@ -56,7 +56,7 @@
        (read (reader in)))))
 
 (defn roundtrip [value max-size]
-  (let [bytes (serialize value)
+  (let [^bytes bytes (serialize value)
         size (alength bytes)]
     (when (> size max-size)
       (throw (FriendlyException. (str "Value too large (" size " bytes). Maximum is " max-size " bytes."))))
