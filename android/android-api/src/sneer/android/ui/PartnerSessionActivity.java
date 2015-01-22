@@ -33,10 +33,8 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 				}});
 			}
 
-			boolean replayFinished = data.getBoolean(REPLAY_FINISHED);
-			if (replayFinished) {
+            if (data.getBoolean(REPLAY_FINISHED))
 				isReplaying = false;
-			}
 
 			Object messageEnvelope = data.get(PAYLOAD);
 
