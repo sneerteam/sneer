@@ -56,7 +56,8 @@
 
   (atomic-replace! file @state)
     
-  (let [out (FileOutputStream. file true)
+  (let [append true
+        out (FileOutputStream. file append)
         w (writer out)]
     {:output-stream out
      :writer w
