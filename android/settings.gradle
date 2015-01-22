@@ -12,3 +12,12 @@ project(':java-api.tests').projectDir=new File('../java-api.tests')
 
 include ':crypto'
 project(':crypto').projectDir=new File('../crypto')
+
+include ':core'
+project(':core').projectDir=new File('../core')
+
+include ':core.tests'
+project(':core.tests').projectDir=new File('../core.tests')
+
+include ':server'
+project(':server').projectDir=new File('../server')

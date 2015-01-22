@@ -4,6 +4,7 @@ import org.gradle.api.artifacts.*;
 ext {
   external = [
     rx: [version: '0.20.3'],
+    'clojure.core.match': 'org.clojure:core.match:0.2.2',
     android: [
         sdkVersion: 21,
         minSdkVersion: 16,
