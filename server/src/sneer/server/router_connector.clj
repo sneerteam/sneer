@@ -47,8 +47,14 @@
     [(author-of tuple) (id-of tuple)]
     [(:cts packet)     nil          ]))
 
+(defn- online? [state client]
+  (get-in state [:online-clients client]))
+
 (defn- update-pending-to-send [state client]
-  (assoc-in state [:online-clients client :pending-to-send] (peek-packet-for @(:router state) client)))
+  (if (online? state client)
+    (assoc-in state [:online-clients client :pending-to-send]
+      (peek-packet-for @(:router state) client))
+    state))
 
 (defn- handle-ack [state from signature]
   (let [pending (get-in state [:online-clients from :pending-to-send])]
@@ -113,7 +119,7 @@
 (defmethod handle :packets-out [state _ _]
   (let [client (-> state :send-round peek)
         state' (-> state
-                 (update-in [:online-clients client :online-countdown] #(if % (dec %) 0))
+                 (update-in [:online-clients client :online-countdown] dec)
                  (update-in [:send-round] pop))]
     (if (zero? (get-in state' [:online-clients client :online-countdown]))
       (update-in state' [:online-clients] dissoc client)  
