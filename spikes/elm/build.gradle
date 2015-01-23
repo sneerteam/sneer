@@ -1,0 +1,16 @@
+task elm(type: Exec) {
+  inputs.source 'Main.elm'
+  outputs.file 'www/js/Main.js'
+  executable 'elm-make'
+  args inputs.files
+  args "--output=${outputs.files.singleFile}"
+}
+
+task run(type: Exec, dependsOn: elm) {
+  executable 'cordova'
+  args 'run', 'android'
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.1'
+}
