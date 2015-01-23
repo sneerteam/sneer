@@ -217,13 +217,13 @@
 
     (reify TupleBase
 
-      (store-tuple [this tuple]
+      (store-tuple [_ tuple]
         (>!! requests {:store tuple}))
       
-      (store-tuple [this tuple uniqueness-criteria]
+      (store-tuple [_ tuple uniqueness-criteria]
         (>!! requests {:store tuple :uniqueness uniqueness-criteria}))
 
-      (query-tuples [this criteria tuples-out]
+      (query-tuples [_ criteria tuples-out]
         (let [query-result (chan)]
           (go
             (>! requests {:query criteria :tuples-out query-result})
