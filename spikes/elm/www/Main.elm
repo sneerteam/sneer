@@ -11,14 +11,13 @@ import List
 import Easing
 import Easing (ease, pair, float)
 
-type alias Bee = {pos: Pos, target: Pos}
+type alias Drone = {pos: Pos, target: Pos}
 
-type alias Game = {bees: List Bee, seed: Random.Seed}
+type alias Game = {drones: List Drone, seed: Random.Seed}
 
 type alias Pos = (Float, Float)
 
-type Event = Tick Time
-           | Click (Int, Int)
+type Event = Tick Time | Click (Int, Int)
 
 swarmSize = 5
 
@@ -33,39 +32,39 @@ main =
 update e g =
   case e of
     Click clickPos ->
-      let bees = List.map2 retargetBee g.bees targets
-          retargetBee bee t = {bee | target <- t}
+      let drones = List.map2 retargetDrone g.drones targets
+          retargetDrone drone t = {drone | target <- t}
           targets = List.map aroundClickPos randomDistances
           aroundClickPos = vecToFloat << vecAdd clickPos
           (randomDistances, seed') = Random.generate randomPairs g.seed
       in {g | seed <- seed'
-            , bees <- bees}
+            , drones <- drones}
 
     Tick delta ->
-      let moveBee bee = {bee | pos <- animate bee}
+      let moveDrone drone = {drone | pos <- animate drone}
           duration = 3 * second
           interpolation = Easing.linear
           animate {pos, target} = ease interpolation (pair float) pos target duration delta
-      in {g | bees <- List.map moveBee g.bees}
+      in {g | drones <- List.map moveDrone g.drones}
 
 vecAdd (x, y) (p, q) = (x + p, y + q)
 
 vecToFloat (x, y) = (toFloat x, toFloat y)
 
-initialBee = {pos = (0, 0), target = (0, 0)}
+initialDrone = {pos = (0, 0), target = (0, 0)}
 
-initialGame = {bees = List.repeat swarmSize initialBee
+initialGame = {drones = List.repeat swarmSize initialDrone
               ,seed = Random.initialSeed 42}
 
-screen (sw, sh) {bees} =
-  collage sw sh (List.map drone bees)
+screen (sw, sh) {drones} =
+  collage sw sh (List.map drone drones)
     |> container sw sh middle
 
 drone {pos} =
   move pos <| rotate (degrees 33)
-           <| toForm <| image 21 21 beeImage
+           <| toForm <| image 21 21 droneImage
 
-beeImage = "img/abeia1.png"
+droneImage = "img/abeia1.png"
 
 --beeImage = "http://fc02.deviantart.net/fs71/f/2013/010/b/a/bab078636bf6f05e6f7fd05af518d1a6-d5r3cyw.gif"
 
