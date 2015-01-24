@@ -7,32 +7,52 @@ import Window
 import Random
 import Mouse
 import Text (asText)
+import List
 
-main = update <~ every (second / 24) ~ Window.dimensions ~ Mouse.position
+type alias Bee = {pos: Pos, target: Pos}
 
-update t (sw, sh) mp =
-  let rp = relativeMouse (center (sw, sh)) mp
-  in collage 400 400
-      [ drone t rp ]
-     |> container sw sh middle
+type alias Game = {bees: List Bee}
 
-drone : Time -> (Int, Int) -> Form
-drone t (mx, my) =
-  let (dx, dy) = randomPos (round t)
-      pos = (toFloat <| mx + dx, toFloat <| my + dy)
-  in move pos
-     <| rotate (degrees 33)
-     <| scale 0.25
-     <| toForm <| image 315 345 beeImage
-     -- <| filled yellow (circle 10)
+type alias Pos = (Float, Float)
+
+main =
+  let bee = foldp update initialGame events
+      time = fps 24
+      screenCenter = center <~ Window.dimensions
+      mouse = relativeMouse <~ screenCenter ~ clicks
+      clicks = sampleOn Mouse.clicks Mouse.position
+      events = (,) <~ time ~ mouse
+  in screen <~ Window.dimensions ~ bee
+
+swarmSize = 5
+
+update (t, (mx, my)) g =
+  let poss = List.map pos <| randomPos swarmSize (round t)
+      pos (dx, dy) = (toFloat <| mx + dx, toFloat <| my + dy)
+      bee pos = {initialBee | pos <- pos}
+  in {g | bees <- List.map bee poss}
+
+initialBee = {pos = (0, 0), target = (0, 0)}
+
+initialGame = {bees = List.repeat swarmSize initialBee}
+
+screen (sw, sh) {bees} =
+  collage 400 400 (List.map drone bees)
+    |> container sw sh middle
+
+drone {pos} =
+  move pos <| rotate (degrees 33)
+           <| scale 0.1
+           <| toForm <| image 315 345 beeImage
 
 beeImage = "http://fc02.deviantart.net/fs71/f/2013/010/b/a/bab078636bf6f05e6f7fd05af518d1a6-d5r3cyw.gif"
 
-randomPos t =
-  let range = Random.int -20 20
+randomPos n t =
+  let range = Random.int -30 30
       seed  = Random.initialSeed t
-      (pair, seed') = Random.generate (Random.pair range range) seed
-  in pair
+      pos   = Random.pair range range
+      (pairs, seed') = Random.generate (Random.list n pos) seed
+  in pairs
 
 relativeMouse : (Int, Int) -> (Int, Int) -> (Int, Int)
 relativeMouse (ox, oy) (x, y) = (x - ox, -(y - oy))
