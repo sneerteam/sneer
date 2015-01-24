@@ -10,6 +10,8 @@ import Text (asText)
 import List
 import Easing
 import Easing (ease, pair, float)
+import Html
+import Html.Attributes (class)
 
 type alias Drone = {pos: Pos, target: Pos}
 
@@ -42,14 +44,10 @@ update e g =
 
     Tick delta ->
       let moveDrone drone = {drone | pos <- animate drone}
-          duration = 3 * second
+          duration = 2 * second
           interpolation = Easing.linear
           animate {pos, target} = ease interpolation (pair float) pos target duration delta
       in {g | drones <- List.map moveDrone g.drones}
-
-vecAdd (x, y) (p, q) = (x + p, y + q)
-
-vecToFloat (x, y) = (toFloat x, toFloat y)
 
 initialDrone = {pos = (0, 0), target = (0, 0)}
 
@@ -60,19 +58,21 @@ screen (sw, sh) {drones} =
   collage sw sh (List.map drone drones)
     |> container sw sh middle
 
-drone {pos} =
-  move pos <| rotate (degrees 33)
-           <| toForm <| image 21 21 droneImage
+drone {pos, target} =
+  move pos
+    <| lookAt pos target
+    <| toForm
+    <| Html.toElement 63 64 (Html.div [class "bee"] [])
 
-droneImage = "img/abeia1.png"
-
---beeImage = "http://fc02.deviantart.net/fs71/f/2013/010/b/a/bab078636bf6f05e6f7fd05af518d1a6-d5r3cyw.gif"
+lookAt (x, y) (p, q) =
+  let angle = atan2 (x - p) (q - y)
+  in rotate angle
 
 randomPairs =
   Random.list swarmSize randomPair
 
 randomPair =
-  let range = Random.int -30 30
+  let range = Random.int -45 45
   in Random.pair range range
 
 relativeMouse : (Int, Int) -> (Int, Int) -> (Int, Int)
@@ -80,3 +80,7 @@ relativeMouse (ox, oy) (x, y) = (x - ox, -(y - oy))
 
 center : (Int, Int) -> (Int, Int)
 center (w, h) = (w // 2, h // 2)
+
+vecAdd (x, y) (p, q) = (x + p, y + q)
+
+vecToFloat (x, y) = (toFloat x, toFloat y)

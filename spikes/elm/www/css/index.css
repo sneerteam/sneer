@@ -113,3 +113,15 @@ h1 {
     animation:fade 3000ms infinite;
     -webkit-animation:fade 3000ms infinite;
 }
+
+.bee {
+  width: 63px;
+  height: 64px;
+  background-image:url(../img/bee_sheet.png);
+  -webkit-animation:play 1s steps(8) infinite;
+}
+
+@-webkit-keyframes play {
+  from { background-position:    0px 0px; }
+  to { background-position: -512px 0px; }
+}
