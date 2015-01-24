@@ -1,5 +1,5 @@
 task elm(type: Exec) {
-  inputs.source 'Main.elm'
+  inputs.source 'www/Main.elm'
   outputs.file 'www/js/Main.js'
   executable 'elm-make'
   args inputs.files
