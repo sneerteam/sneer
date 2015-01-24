@@ -37,15 +37,16 @@ initialBee = {pos = (0, 0), target = (0, 0)}
 initialGame = {bees = List.repeat swarmSize initialBee}
 
 screen (sw, sh) {bees} =
-  collage 400 400 (List.map drone bees)
+  collage sw sh (List.map drone bees)
     |> container sw sh middle
 
 drone {pos} =
   move pos <| rotate (degrees 33)
-           <| scale 0.1
-           <| toForm <| image 315 345 beeImage
+           <| toForm <| image 21 21 beeImage
 
-beeImage = "http://fc02.deviantart.net/fs71/f/2013/010/b/a/bab078636bf6f05e6f7fd05af518d1a6-d5r3cyw.gif"
+beeImage = "img/abeia1.png"
+
+--beeImage = "http://fc02.deviantart.net/fs71/f/2013/010/b/a/bab078636bf6f05e6f7fd05af518d1a6-d5r3cyw.gif"
 
 randomPos n t =
   let range = Random.int -30 30
