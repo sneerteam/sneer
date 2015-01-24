@@ -8,6 +8,7 @@
     ],
     "exposed-modules": [],
     "dependencies": {
+        "Dandandan/Easing": "1.0.1 <= v < 2.0.0",
         "elm-lang/core": "1.1.0 <= v < 2.0.0"
     }
 }
