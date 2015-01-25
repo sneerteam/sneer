@@ -1,94 +1,58 @@
 package sneer.android.ui;
 
-import static sneer.SneerAndroidClient.OWN;
-import static sneer.SneerAndroidClient.PARTNER_NAME;
-import static sneer.SneerAndroidClient.PAYLOAD;
-import static sneer.SneerAndroidClient.REPLAY_FINISHED;
-import static sneer.SneerAndroidClient.RESULT_RECEIVER;
-import static sneer.SneerAndroidClient.UNSUBSCRIBE;
-import sneer.SneerAndroidClient;
-import sneer.utils.SharedResultReceiver;
-import sneer.utils.Value;
 import android.os.Bundle;
-import android.os.ResultReceiver;
 
 public abstract class PartnerSessionActivity extends SneerActivity {
 
-	private ResultReceiver toSneer;
-	private boolean isReplaying = true;
+	private PartnerMessenger toSneer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Bundle bundle = new Bundle();
-		bundle.putParcelable(RESULT_RECEIVER, new SharedResultReceiver(new SharedResultReceiver.Callback() {  @Override public void call(Bundle data) {
+        toSneer = new PartnerMessenger(this, new PartnerMessenger.Listener() {
+            @Override
+            public void onPartnerName(String name) {
+                PartnerSessionActivity.this.onPartnerName(name);
+            }
 
-			data.setClassLoader(getApplicationContext().getClassLoader());
+            @Override
+            public void onMessageToPartner(Object message) {
+                PartnerSessionActivity.this.onMessageToPartner(message);
+            }
 
-			final String partnerName = data.getString(PARTNER_NAME);
+            @Override
+            public void onMessageFromPartner(Object message) {
+                PartnerSessionActivity.this.onMessageFromPartner(message);
+            }
 
-			if (partnerName != null) {
-				runOnUiThread(new Runnable() { @Override public void run() {
-					onPartnerName(partnerName);
-				}});
-			}
-
-            if (data.getBoolean(REPLAY_FINISHED))
-				isReplaying = false;
-
-			Object messageEnvelope = data.get(PAYLOAD);
-
-			if (messageEnvelope != null) {
-				Object message = ((Value)messageEnvelope).get();
-				boolean mine = data.getBoolean(OWN);
-
-				if (mine)
-					onMessageToPartner(message);
-				else
-					onMessageFromPartner(message);
-			}
-
-			if (!isReplaying) {
-				runOnUiThread(new Runnable() {  @Override public void run() {
-					update();
-				}});
-			}
-		}}));
-
-		toSneer = getExtra(RESULT_RECEIVER);
-		toSneer.send(0, bundle);
+            @Override
+            public void update() {
+                PartnerSessionActivity.this.update();
+            }
+        });
 	}
 
 
 	@Override
 	protected void onDestroy() {
 		if (toSneer != null) {
-			Bundle bundle = new Bundle();
-			bundle.putBoolean(UNSUBSCRIBE, true);
-			toSneer.send(0, bundle);
+			toSneer.dispose();
 		}
-
 		super.onDestroy();
 	}
-
-
-	
-	
-	
 	
 
 	/** Called in the Android main thread (UI thread).
 	 *  @param name The current name of the peer with you in this session. */
 	protected void onPartnerName(String name) {};
 
+    protected void send(String label, Object message) {
+        toSneer.send(label, message);
+    }
 
-	protected void send(String label, Object message) {
-		SneerAndroidClient.send(toSneer, label, message, null);
-	}
-	protected abstract void onMessageToPartner(Object message);
+    protected abstract void onMessageToPartner(Object message);
 
 	protected abstract void onMessageFromPartner(Object message);
-
 
 	/**
 	 * Called in the Android main thread (UI thread) after each message, if it is the most recent message in the session. This method will
