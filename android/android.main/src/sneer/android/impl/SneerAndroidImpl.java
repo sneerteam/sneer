@@ -48,6 +48,8 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	private void init(Context context) throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
+        System.out.println("YOUR PUBLIC KEY IS: " + sneerAdmin.privateKey().publicKey().toHex());
+
 		pluginManager = new PluginManager(context, sneer());
 		pluginManager.initPlugins();
 		startTupleSpaceService(context);
