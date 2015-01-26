@@ -4,6 +4,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
+
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class TupleSpaceService extends Service {
 
@@ -20,8 +27,10 @@ public class TupleSpaceService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 
-		if (intent == null || !intent.hasExtra("op"))
-			return START_STICKY;
+		if (intent == null || !intent.hasExtra("op")) {
+            logInterval();
+            return START_STICKY;
+        }
 
 //		switch(TupleSpaceFactoryClient.TupleSpaceOp.values()[intent.getIntExtra("op", -1)]) {
 //		case PUBLISH:
@@ -105,5 +114,14 @@ public class TupleSpaceService extends Service {
 		Intent startServiceIntent = new Intent(context, TupleSpaceService.class);
 	    context.startService(startServiceIntent);
 	}
+
+
+    private void logInterval() {
+        Observable.interval(1, TimeUnit.SECONDS).map(new Func1<Long, String>() { @Override public String call(Long interval) {
+            return "IT'S ALIVE: " + System.currentTimeMillis() / 1000;
+        }}).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
+            Log.d("", obj.toString());
+        }});
+    }
 
 }
