@@ -98,7 +98,8 @@
       (assoc  router receiver receiver-q))))
 
 (defn duplicated-tuple? [router sender receiver tuple]
-  (= tuple (last (get-in router [receiver :qs-by-sender sender]))))
+  (let [queue (get-in router [receiver :qs-by-sender sender])]
+    (some #(= % tuple) queue)))
 
 (defn queue-full? [router sender receiver]
   "Returns whether the receiver/sender send queue is full."
