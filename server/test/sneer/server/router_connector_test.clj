@@ -53,8 +53,12 @@
 
   "B receives a tuple with another enqueued"
   [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:from :B} :resend {:ack :A :id 1 :from :B} :resend]
-  [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B} {:send t1 :to :B}  {:send t2      :to   :B}]
+  [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B}            {:send t1 :to :B}                {:send t2      :to   :B}]
 
+  "Duplicate tuple sends are ignored."
+  [{:send t1 :from :A :to  :B} {:send t1 :from :A :to  :B} {:from :B} :resend {:ack :A :id 1 :from :B} :resend]
+  [{:ack   1 :to   :A :for :B} {:ack   1 :to   :A :for :B}            {:send t1 :to :B}                #_"Was not enqueued"]
+  
   "After N sends without reply, client is considered offline and server stops sending to it."
   [{:send t1 :from :A :to  :B} {:from :B} :resend #_1       :resend #_2       :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend #_19      :resend #_20      :resend]
   [{:ack   1 :to   :A :for :B}            {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} #_"Client offline"]

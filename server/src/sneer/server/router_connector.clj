@@ -10,6 +10,7 @@
     [sneer.server.router :refer :all]))
 
 (def resend-timeout-millis 500)
+(def online-count 20)
 
 (defrecord NamedChannel [name channel]
   impl/ReadPort
@@ -31,8 +32,6 @@
 (defmethod print-method clojure.lang.PersistentQueue
   [q writer]
   (.write writer (if-some [seq (seq q)] (str seq) "nil")))
-
-(def online-count 20)
 
 (defn- next-packet-to-send [online-clients send-round]
   (when-some [client (peek send-round)]
@@ -69,18 +68,26 @@
             (update-pending-to-send peer)))
       state)))
 
+(defn- reply [packets-out n|ack from to tuple]
+  (>!! packets-out {n|ack (id-of tuple) :for to :to from}))
+
 (defn- handle-send [state from to tuple]
   (let [router (:router state)
         packets-out (:packets-out state)]
-    (if (queue-full? @router from to)
+    (if (duplicated-tuple? @router from to tuple)
       (do
-        (>!! packets-out {:nak (id-of tuple) :for to :to from})
+        (reply packets-out :ack from to tuple)
         state)
-      (do
-        (p/handle! router [:enqueue from to tuple])
-        (>!! packets-out {:ack (id-of tuple) :for to :to from})
-        (-> state
-          (update-pending-to-send to))))))
+      (if (queue-full? @router from to)
+        (do
+          (reply packets-out :nak from to tuple)
+          state)
+        (do
+          (p/handle! router [:enqueue from to tuple])
+          (reply packets-out :ack from to tuple)
+          (-> state
+            (update-pending-to-send to))))))
+)
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
   (if-some [packet (next-packet-to-send online-clients send-round)]
