@@ -9,6 +9,8 @@
     [sneer.server.prevalence :as p]
     [sneer.server.router :refer :all]))
 
+(def resend-timeout-millis 500)
+
 (defrecord NamedChannel [name channel]
   impl/ReadPort
   (take! [_ fn]
@@ -159,7 +161,7 @@
                           prevalence-file)
          packets-in
          packets-out
-         #(async/timeout 100)))
+         #(async/timeout resend-timeout-millis)))
 
 (defn start-transient-connector [queue-size packets-in packets-out resend-timeout-fn]
   (start (p/prevayler-jr! handle-event (create-router queue-size))
