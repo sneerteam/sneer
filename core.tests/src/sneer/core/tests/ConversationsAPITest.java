@@ -141,7 +141,7 @@ public class ConversationsAPITest extends TestCase {
 		sneerA.addContact("Party Boy", sneerA.produceParty(userB));
 		try {
 			sneerA.addContact("Party Boy", sneerA.produceParty(userC));
-			fail("should have failed with "+FriendlyException.class.getSimpleName());
+			fail("should have failed with " + FriendlyException.class.getSimpleName());
 		} catch (FriendlyException expected) {}
 	}
 
@@ -180,7 +180,7 @@ public class ConversationsAPITest extends TestCase {
 		Party partyB = sneerA.produceParty(userB);
 		Party partyC = sneerA.produceParty(userC);
 
-		assertNull   (sneerA.problemWithNewNickname("Party Boy"));
+		assertNull(sneerA.problemWithNewNickname("Party Boy"));
 		sneerA.addContact("Party Boy", partyB);
 		assertNotNull(sneerA.problemWithNewNickname("Party Boy"));
 
