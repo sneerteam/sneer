@@ -2,16 +2,43 @@ package sneer.android;
 
 import sneer.android.ipc.TupleSpaceService;
 import sneer.android.utils.LogUtils;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.Calendar;
+
 public class SneerBoot extends BroadcastReceiver {
 
-	@Override
+    public static final String TIMER_TAG = "TIMER_TAG";
+    public static final int SECONDS_TIMEOUT = 30;
+
+    @Override
     public void onReceive(Context context, Intent intent) {
 		LogUtils.debug(SneerBoot.class, "Starting Sneer background service");
         TupleSpaceService.startTupleSpaceService(context);
+
+        if (intent.getBooleanExtra(TIMER_TAG, false))
+            return;
+
+        startWatchDogTimer(context);
+    }
+
+    private void startWatchDogTimer(Context context) {
+        Intent intent = new Intent(context, getClass());
+        intent.putExtra(TIMER_TAG, true);
+
+        PendingIntent pending = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, SECONDS_TIMEOUT);
+
+        AlarmManager service = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        // InexactRepeating allows Android to optimize the energy consumption
+        service.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 1000 * SECONDS_TIMEOUT, pending);
     }
 
 }
