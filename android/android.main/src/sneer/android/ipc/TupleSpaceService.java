@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import sneer.android.SneerAndroidSingleton;
 
 public class TupleSpaceService extends Service {
 
@@ -24,13 +23,7 @@ public class TupleSpaceService extends Service {
 //	private final InteractiveSerializer serializer = new InteractiveSerializer();
 
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        SneerAndroidSingleton.ensureInstance(getApplicationContext());
-    }
-
-    @Override
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 
