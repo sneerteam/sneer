@@ -1,6 +1,5 @@
 package sneer.android.impl;
 
-import static sneer.android.ipc.TupleSpaceService.startTupleSpaceService;
 import static sneer.android.ui.ConversationActivity.PARTY_PUK;
 
 import java.io.File;
@@ -52,7 +51,6 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 		pluginManager = new PluginManager(context, sneer());
 		pluginManager.initPlugins();
-		startTupleSpaceService(context);
 
 		initNotifications(context);
 	}
