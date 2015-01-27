@@ -223,8 +223,7 @@ public class ContactActivity extends Activity {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (newContact)
-					nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
+				nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
 			}
 
 			@Override
