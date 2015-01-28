@@ -85,7 +85,8 @@ public class ContactActivity extends Activity {
 	        return true;
 
 		case R.id.action_share:
-			Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
+            if (!newContact)
+			    Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
 			break;
 		}
 		return true;
