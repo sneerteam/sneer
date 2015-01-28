@@ -18,7 +18,7 @@ public interface Sneer {
 	/** @throws FriendlyException if nickname is already set for another contact or if party is already a contact. */
 	void addContact(String nickname, Party party) throws FriendlyException;
 	/** @return null if the new nickname is ok or a reason why the new nickname is not ok. */
-	String problemWithNewNickname(String newNick);
+	String problemWithNewNickname(PublicKey publicKey, String newNick);
 
 	
 	Party produceParty(PublicKey publicKey);

@@ -17,16 +17,17 @@
       (field "party" (party-puk party))
       (pub new-nick)))
 
-(defn problem-with-new-nickname-in [puk->contact new-nick]
-  (cond
-    (.isEmpty ^String new-nick) "Cannot be empty"
-    (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current)))) "Already used"))
+(defn problem-with-new-nickname-in [puk->contact puk new-nick]
+  (let [puk->contact (dissoc puk->contact puk)]
+    (cond
+      (.isEmpty ^String new-nick) "cannot be empty"
+      (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current)))) "already used")))
 
-(defn problem-with-new-nickname [contacts-state new-nick]
-  (problem-with-new-nickname-in @(:puk->contact contacts-state) new-nick))
+(defn problem-with-new-nickname [contacts-state puk new-nick]
+  (problem-with-new-nickname-in @(:puk->contact contacts-state) puk new-nick))
 
-(defn check-new-nickname [puk->contact new-nick]
-  (when-let [problem (problem-with-new-nickname-in puk->contact new-nick)]
+(defn check-new-nickname [puk->contact puk new-nick]
+  (when-let [problem (problem-with-new-nickname-in puk->contact puk new-nick)]
     (throw (FriendlyException. (str "Nickname " problem)))))
 
 (defn reify-contact [tuple-space puk->contact own-puk nickname party]
@@ -88,7 +89,7 @@
 (defn check-new-contact [puk->contact nickname party]
   (when (find-contact-in puk->contact party)
     (throw (FriendlyException. "Duplicate contact")))
-  (check-new-nickname puk->contact nickname))
+  (check-new-nickname puk->contact (.. ^Party party publicKey current) nickname))
 
 (defn add-contact [contacts-state nickname party]
   (swap! (contacts-state :puk->contact)

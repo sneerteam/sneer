@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -221,7 +222,7 @@ public class ContactActivity extends Activity {
 		textView.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {
-				nicknameEdit.setError(sneer().problemWithNewNickname(textView.getText().toString()));
+				nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), textView.getText().toString()));
 			}
 
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}

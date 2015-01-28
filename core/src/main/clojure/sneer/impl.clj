@@ -30,8 +30,8 @@
           (contacts [this]
             contacts)
          
-          (problemWithNewNickname [this new-nick]
-            (problem-with-new-nickname contacts-state new-nick))
+          (problemWithNewNickname [this puk new-nick]
+            (problem-with-new-nickname contacts-state puk new-nick))
        
           (addContact [this nickname party]
             (add-contact contacts-state nickname party))

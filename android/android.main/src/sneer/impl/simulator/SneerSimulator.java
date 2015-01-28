@@ -148,7 +148,7 @@ public class SneerSimulator implements Sneer {
 
 	static private int counter;
 	@Override
-	public String problemWithNewNickname(String newNick) {
+	public String problemWithNewNickname(PublicKey publicKey, String newNick) {
 		return (counter++ % 3 == 0) ? "Not cool" : null;
 	}
 
