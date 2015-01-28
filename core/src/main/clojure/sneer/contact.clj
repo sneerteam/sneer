@@ -1,15 +1,15 @@
 (ns sneer.contact
   (:require
-   [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [atom->observable]]
-   [sneer.party :refer [party-puk name-subject produce-party!]])
+    [rx.lang.clojure.core :as rx]
+    [sneer.rx :refer [atom->observable]]
+    [sneer.party :refer [party-puk name-subject produce-party!]])
   (:import
-   [sneer Contact]
-   [sneer.rx ObservedSubject]
-   [sneer.commons.exceptions FriendlyException]
-   [sneer.tuples Tuple TupleSpace]))
+    [sneer Contact PublicKey Party]
+    [sneer.rx ObservedSubject]
+    [sneer.commons.exceptions FriendlyException]
+    [sneer.tuples Tuple TupleSpace]))
 
-(defn publish-contact [tuple-space own-puk new-nick party]  
+(defn publish-contact [tuple-space own-puk new-nick party]
   (.. ^TupleSpace tuple-space
       publisher
       (audience own-puk)
@@ -34,15 +34,15 @@
     (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party))
     (reify Contact
       (party [this] party)
-      
+
       (nickname [this]
         (.observed nick-subject))
-      
+
       (setNickname [this new-nick]
-        (check-new-nickname @puk->contact new-nick)
+        (check-new-nickname @puk->contact (party-puk party) new-nick)
         (publish-contact tuple-space own-puk new-nick party)
         (rx/on-next nick-subject new-nick))
-      
+
       (toString [this]
         (str "#<Contact " (.current nick-subject) ">")))))
 
@@ -55,15 +55,15 @@
 
 (defn restore-contact-list [^TupleSpace tuple-space puk->contact own-puk puk->party]
   (->>
-   (.. tuple-space
-       filter
-       (author own-puk)
-       (type "contact")
-       localTuples
-       toBlocking
-       toIterable)
-   (mapcat (fn [^Tuple tuple] [(.get tuple "party") (tuple->contact tuple-space puk->contact tuple puk->party)]))
-   (apply hash-map)))
+    (.. tuple-space
+        filter
+        (author own-puk)
+        (type "contact")
+        localTuples
+        toBlocking
+        toIterable)
+    (mapcat (fn [^Tuple tuple] [(.get tuple "party") (tuple->contact tuple-space puk->contact tuple puk->party)]))
+    (apply hash-map)))
 
 (defn current-nickname [^Contact contact]
   (.. contact nickname current))
@@ -74,9 +74,9 @@
 (defn create-contacts-state [tuple-space own-puk puk->party]
   (let [puk->contact (atom {})]
     (swap! puk->contact (fn [_] (restore-contact-list tuple-space puk->contact own-puk puk->party)))
-    {:own-puk own-puk
-     :tuple-space tuple-space
-     :puk->contact puk->contact
+    {:own-puk             own-puk
+     :tuple-space         tuple-space
+     :puk->contact        puk->contact
      :observable-contacts (rx/map ->contact-list (atom->observable puk->contact))}))
 
 (defn find-contact-in [puk->contact party]
@@ -92,11 +92,11 @@
 
 (defn add-contact [contacts-state nickname party]
   (swap! (contacts-state :puk->contact)
-    (fn [cur]     
-      (check-new-contact cur nickname party)
-      (assoc cur
-        (party-puk party)
-        (reify-contact (:tuple-space contacts-state) (:puk->contact contacts-state) (:own-puk contacts-state) nickname party))))
+         (fn [cur]
+           (check-new-contact cur nickname party)
+           (assoc cur
+             (party-puk party)
+             (reify-contact (:tuple-space contacts-state) (:puk->contact contacts-state) (:own-puk contacts-state) nickname party))))
   (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party))
 
 (defn get-contacts [contacts-state]
