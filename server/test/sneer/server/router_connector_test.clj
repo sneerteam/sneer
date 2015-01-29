@@ -17,10 +17,10 @@
   (fact ?fact
      (let [max-q-size 2
            packets-in (chan)
-           packets-out (chan)
+           packets-out (chan 100)
            resend-timeout (chan)
            resend-timeout-fn (constantly resend-timeout)
-           gcm-out (chan)]
+           gcm-out (chan 100)]
        (start-transient-connector max-q-size packets-in packets-out resend-timeout-fn gcm-out)
        (thread
          (doseq [event ?packets-in]
@@ -28,41 +28,50 @@
              (>!! resend-timeout :stimulus)
              (>!! packets-in event)))
          (close! packets-in))
-       (->> packets-out (async/into []) <!!?) => ?packets-out))
+       (->> packets-out (async/into []) <!!?) => ?packets-out
+       (->> gcm-out     (async/into []) <!!?) => ?gcm-out))
   
-  ?fact ?packets-in ?packets-out
+  ?fact ?packets-in ?packets-out ?gcm-out
   
   "No packets"
   []
   []
-  
+  []
+
   "A tuple is enqueued"
   [{:send t1 :from :A :to  :B}]
   [{:ack   1 :to   :A :for :B}]
-  
+  []
+
   "A tuple is sent when client is already online (had sent a ping)"
   [{:from :B} {:send t1 :from :A :to  :B} :resend]
   [           {:ack   1 :to   :A :for :B} {:send t1 :to :B}]
+  []
 
   "A tuple is sent when client comes online (sends a ping)"
   [{:send t1 :from :A :to  :B} {:from :B} :resend]
   [{:ack   1 :to   :A :for :B}            {:send t1 :to :B}]
+  []
 
   "Full queue emits NAK"
   [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:send t3 :from :A :to  :B}]
   [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B} {:nak   3 :to   :A :for :B}]
+  []
 
   "B receives a tuple with another enqueued"
   [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:from :B} :resend {:ack :A :id 1 :from :B} :resend]
   [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B}            {:send t1 :to :B}                {:send t2      :to   :B}]
+  []
 
   "Duplicate tuple sends are ignored."
   [{:send t1 :from :A :to  :B} {:send t1 :from :A :to  :B} {:from :B} :resend {:ack :A :id 1 :from :B} :resend]
   [{:ack   1 :to   :A :for :B} {:ack   1 :to   :A :for :B}            {:send t1 :to :B}                #_"Was not enqueued"]
-  
-  "After N sends without reply, client is considered offline and server stops sending to it."
+  []
+
+  "After N sends without reply, client is considered offline and server stops sending packets to it and sends it a GCM."
   [{:send t1 :from :A :to  :B} {:from :B} :resend #_1       :resend #_2       :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend           :resend #_19      :resend #_20      :resend]
   [{:ack   1 :to   :A :for :B}            {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} {:send t1 :to :B} #_"Client offline"]
+  [:B]
 
   "A is notified when its send queue for B is empty."
   [
@@ -73,6 +82,7 @@
    :resend
   ]
   (fn [packets] (= (last packets) {:cts :B :to :A}))
+  []
 
   ":ack for :cts."
   [
@@ -85,4 +95,5 @@
    :resend ;; Should not cause :cts to be re-sent.
    :resend
   ]
-  [{:ack 1, :for :B, :to :A} {:ack 2, :for :B, :to :A} {:for :B, :nak 3, :to :A} {:cts :B, :to :A}])
+  [{:ack 1, :for :B, :to :A} {:ack 2, :for :B, :to :A} {:for :B, :nak 3, :to :A} {:cts :B, :to :A}]
+  [])

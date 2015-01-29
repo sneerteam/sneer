@@ -132,7 +132,9 @@
                  (update-in [:online-clients client :online-countdown] dec)
                  (update-in [:send-round] pop))]
     (if (zero? (get-in state' [:online-clients client :online-countdown]))
-      (update-in state' [:online-clients] dissoc client)  
+      (do
+        (>!! (:gcm-out state') client)
+        (update-in state' [:online-clients] dissoc client))
       state')))
 
 (defmethod handle :resend-timeout [{:keys [online-clients resend-timeout-fn]} _ _]
@@ -161,7 +163,8 @@
                  :resend-timeout-fn resend-timeout-fn
                  :resend-timeout    (->named resend-timeout-fn)
                  :gcm-out           gcm-out})
-    (close! packets-out)))
+    (close! packets-out)
+    (close! gcm-out)))
 
 (defn start-connector [prevalence-file packets-in packets-out & [gcm-out]]
   (let [gcm-out (or gcm-out (dropping-chan))]
