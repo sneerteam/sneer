@@ -144,13 +144,13 @@
     (apply handle state
       chosen)))
 
-(defmulti  handle-event (fn [router [type]] type))
+(defmulti  handle-event (fn [_ [type]] type))
 (defmethod handle-event :pop-packet-for [router [_ from]]
   (pop-packet-for router from))
 (defmethod handle-event :enqueue [router [_ from to tuple]]
   (enqueue router from to tuple))
 
-(defn- start [prevalent-router packets-in packets-out resend-timeout-fn]
+(defn- start [prevalent-router packets-in packets-out resend-timeout-fn gcm-out]
   (thread
     (loop-state -iterate
                 {:packets-in        (NamedChannel. :packets-in packets-in)
@@ -159,19 +159,24 @@
                  :online-clients    {}
                  :send-round        empty-queue
                  :resend-timeout-fn resend-timeout-fn
-                 :resend-timeout    (->named resend-timeout-fn)})
+                 :resend-timeout    (->named resend-timeout-fn)
+                 :gcm-out           gcm-out})
     (close! packets-out)))
 
-(defn start-connector [prevalence-file packets-in packets-out]
-  (start (p/prevayler-jr! handle-event
-                          (create-router 200)
-                          prevalence-file)
-         packets-in
-         packets-out
-         #(async/timeout resend-timeout-millis)))
+(defn start-connector [prevalence-file packets-in packets-out & [gcm-out]]
+  (let [gcm-out (or gcm-out (dropping-chan))]
+    (start (p/prevayler-jr! handle-event
+                            (create-router 200)
+                            prevalence-file)
+           packets-in
+           packets-out
+           gcm-out
+           #(async/timeout resend-timeout-millis))))
 
-(defn start-transient-connector [queue-size packets-in packets-out resend-timeout-fn]
-  (start (p/prevayler-jr! handle-event (create-router queue-size))
-         packets-in
-         packets-out
-         resend-timeout-fn))
+(defn start-transient-connector [queue-size packets-in packets-out resend-timeout-fn & [gcm-out]]
+  (let [gcm-out (or gcm-out (dropping-chan))]
+    (start (p/prevayler-jr! handle-event (create-router queue-size))
+           packets-in
+           packets-out
+           resend-timeout-fn
+           gcm-out)))

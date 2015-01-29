@@ -20,7 +20,8 @@
            packets-out (chan)
            resend-timeout (chan)
            resend-timeout-fn (constantly resend-timeout)
-           subject (start-transient-connector max-q-size packets-in packets-out resend-timeout-fn)]
+           gcm-out (chan)]
+       (start-transient-connector max-q-size packets-in packets-out resend-timeout-fn gcm-out)
        (thread
          (doseq [event ?packets-in]
            (if (= event :resend)
