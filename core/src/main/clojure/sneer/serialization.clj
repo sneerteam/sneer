@@ -3,9 +3,9 @@
   (:import
     [java.io ByteArrayInputStream ByteArrayOutputStream]
     [sneer PublicKey]
-    [sneer.crypto.impl KeysImpl]
     [sneer.commons.exceptions FriendlyException])
-  (:require [cognitect.transit :as transit]))
+  (:require [cognitect.transit :as transit]
+            [sneer.keys :as keys]))
 
 (def ^:private transit-format :json) ; other options are :json-verbose and :msgpack
 
@@ -21,14 +21,13 @@
     (fn [^clojure.lang.PersistentQueue q] (vec q)))})
 
 (def ^:private read-handlers
-  (let [keys-impl (KeysImpl.)]
-    {"puk"
-     (transit/read-handler
-      (fn [^bytes rep] (.createPublicKey keys-impl rep)))
+  {"puk"
+   (transit/read-handler
+     (fn [^bytes rep] (keys/create-puk rep)))
 
-     "queue"
-     (transit/read-handler
-      (fn [coll] (into clojure.lang.PersistentQueue/EMPTY coll)))}))
+   "queue"
+   (transit/read-handler
+     (fn [coll] (into clojure.lang.PersistentQueue/EMPTY coll)))})
 
 (def ^:private write-opts {:handlers write-handlers})
 

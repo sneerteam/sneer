@@ -1,13 +1,13 @@
 (ns sneer.tuple.persistent-tuple-base
-  (:import [sneer.crypto.impl KeysImpl]
-           [sneer.commons SystemReport]
+  (:import [sneer.commons SystemReport]
            [sneer.admin UniqueConstraintViolated])
   (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
             [clojure.core.match :refer [match]]
             [sneer.serialization :as serialization]
-            [rx.lang.clojure.interop :as rx-interop]))
+            [rx.lang.clojure.interop :as rx-interop]
+            [sneer.keys :as keys]))
 
 (defprotocol TupleBase
   "A backing store for tuples (represented as maps)."
@@ -76,10 +76,9 @@
 
 (def builtin-field? #{"type" "payload" "author" "audience" "timestamp"})
 
-(def puk-serializer 
-  (let [keys-impl (KeysImpl.)]
-    {:serialize #(.toBytes ^sneer.PublicKey %)
-     :deserialize #(.createPublicKey keys-impl ^bytes %)}))
+(def puk-serializer
+  {:serialize #(.toBytes ^sneer.PublicKey %)
+   :deserialize #(keys/create-puk %)})
 
 (def core-serializer {:serialize serialization/serialize
                       :deserialize serialization/deserialize})

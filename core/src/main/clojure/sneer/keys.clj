@@ -1,4 +1,4 @@
-(ns sneer.tuple.keys
+(ns sneer.keys
   (:import [sneer.crypto.impl KeysImpl]))
 
 (def ^:private keys-impl (KeysImpl.))
