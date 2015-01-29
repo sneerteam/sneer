@@ -58,5 +58,5 @@
 
 (defn -main [& [port-string]]
   (let [port (when-some [p port-string] (Integer/parseInt p))
-        server (start (or port 5555) (java.io.File. "jr/server.jr"))]
+        server (start (or port 5555) (java.io.File. "/root/prevalence/server.jr"))]
     (println "udp-server finished with" (<!! (:udp-server server)))))
