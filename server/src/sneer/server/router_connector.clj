@@ -71,6 +71,11 @@
 (defn- reply [packets-out n|ack from to tuple]
   (>!! packets-out {n|ack (id-of tuple) :for to :to from}))
 
+(defn- send-gcm-if-necessary! [state router to]
+  (when-not (get-in state [:online-clients to])
+    (when-not (peek-packet-for router to)
+      (>!! (:gcm-out state) to))))
+
 (defn- handle-send [state from to tuple]
   (let [router (:router state)
         packets-out (:packets-out state)]
@@ -83,11 +88,11 @@
           (reply packets-out :nak from to tuple)
           state)
         (do
+          (send-gcm-if-necessary! state @router to)
           (p/handle! router [:enqueue from to tuple])
           (reply packets-out :ack from to tuple)
           (-> state
-            (update-pending-to-send to))))))
-)
+            (update-pending-to-send to)))))))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
   (if-some [packet (next-packet-to-send online-clients send-round)]
