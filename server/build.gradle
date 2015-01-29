@@ -40,6 +40,8 @@ eclipse.project {
 
 dependencies {
     compile 'http-kit:http-kit:2.1.19'
+    compile 'ring:ring-core:1.3.2'
+    compile 'compojure:compojure:1.3.1'
     compile 'org.clojure:clojure:1.6.0'
     compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
     compile external['clojure.core.match']
