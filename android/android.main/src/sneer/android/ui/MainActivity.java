@@ -10,6 +10,7 @@ import sneer.Conversation;
 import sneer.Party;
 import sneer.Profile;
 import sneer.android.R;
+import sneer.android.SneerApp;
 import sneer.android.utils.Puk;
 import android.app.ActionBar;
 import android.app.AlertDialog;
@@ -49,6 +50,8 @@ public class MainActivity extends SneerActivity {
 		addContact.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
 			openSharePukDialog();
 		}});
+
+        ((SneerApp)getApplication()).checkPlayServices(this);
 	}
 
 

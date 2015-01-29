@@ -3,6 +3,7 @@
   :dependencies [[me.sneer/java-api "0.0.1"]
                  [me.sneer/core "0.0.1"]
                  [com.taoensso/timbre "3.2.1"] ;Logging
+                 [http-kit "2.1.16"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [org.clojure/core.match "0.2.1"]
                  [org.clojure/clojure "1.6.0"]]
