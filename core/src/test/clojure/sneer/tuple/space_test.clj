@@ -5,7 +5,7 @@
             [midje.sweet :refer :all]
             [clojure.core.async :as async]
             [sneer.tuple.jdbc-database :as jdbc-database]
-            [sneer.tuple.keys :refer [->puk]]
+            [sneer.keys :refer [->puk]]
             [rx.lang.clojure.core :as rx]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))

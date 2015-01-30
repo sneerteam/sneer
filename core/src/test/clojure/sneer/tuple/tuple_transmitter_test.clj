@@ -1,7 +1,7 @@
 (ns sneer.tuple.tuple-transmitter-test
   (:require [sneer.tuple.tuple-transmitter :as tuple-transmitter]
             [sneer.tuple.jdbc-database :as jdbc-database]
-            [sneer.tuple.keys :refer [->puk]]
+            [sneer.keys :refer [->puk]]
             [midje.sweet :refer :all]
             [clojure.core.async :refer [chan go >!]]
             [sneer.test-util :refer [>!!? <!!?]]

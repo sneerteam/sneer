@@ -4,7 +4,7 @@
             [midje.sweet :refer :all]
             [clojure.core.async :as async :refer [chan]]
             [sneer.tuple.jdbc-database :as jdbc-database]
-            [sneer.tuple.keys :refer [->puk]]))
+            [sneer.keys :refer [->puk]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
@@ -37,7 +37,7 @@
           (store-tuple subject duplicate)
           (store-tuple subject unique)
           (->> (<!!? (query-all subject {"type" "whatever"})) select-ids) => [{"id" 2 "original_id" 42} {"id" 3 "original_id" 43}]))
-      
+
       (fact "It accepts an optional uniqueness criteria"
         (let [t {"type" "unique" "author" neide}
               query-unique #(->> (<!!? (query-all subject t)) (selecting ["type"]))]
