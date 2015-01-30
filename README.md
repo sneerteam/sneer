@@ -1,7 +1,7 @@
 Getting Started
 ====
 
-- Install Oracle JDK 7 and the [Android Studio](http://developer.android.com/sdk/installing/index.html?pkg=studio)
+- Install [Oracle JDK 7](http://www.oracle.com/technetwork/pt/java/javase/downloads/index.html) and the [Android Studio](http://developer.android.com/sdk/installing/index.html?pkg=studio)
 
 - Clone this repository.
 
