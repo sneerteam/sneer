@@ -178,8 +178,8 @@
                             prevalence-file)
            packets-in
            packets-out
-           gcm-out
-           #(async/timeout resend-timeout-millis))))
+           #(async/timeout resend-timeout-millis)
+           gcm-out)))
 
 (defn start-transient-connector [queue-size packets-in packets-out resend-timeout-fn & [gcm-out]]
   (let [gcm-out (or gcm-out (dropping-chan))]
