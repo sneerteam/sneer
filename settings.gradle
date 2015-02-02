@@ -1,4 +1,20 @@
-include 'java-api', 'java-api.tests'
-include 'crypto'
-include 'core', 'core.tests'
-include 'server'
+include ':android-api'
+project(':android-api').projectDir=new File('android/android-api')
+
+include ':android:android.main'
+
+include ':android.main.tests'
+project(':android.main.tests').projectDir=new File('android/android.main/tests')
+
+include 'android:apps:sendpics',
+        'android:apps:sendpics',
+        'android:apps:voicemessage',
+        'android:apps:sendlocation',
+        'android:apps:sendfiles'
+
+include ':java-api',
+        ':crypto',
+        ':core',
+        ':server',
+        ':java-api.tests',
+        ':core.tests'

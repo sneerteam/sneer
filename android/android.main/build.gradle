@@ -13,7 +13,6 @@ buildscript {
 }
 
 dependencies {
-//    compile 'com.google.android:support-v4:r7' //play-services-base below includes support-v4:22
     compile 'com.google.android.gms:play-services-base:6.5.87' //For GCM (Google Cloud Messaging)
     compile project(':android-api')
     compile(project(':core')) {
