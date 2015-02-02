@@ -20,12 +20,7 @@ echo "-------------------> Preparing the workspace"
 
 rm ~/.m2/repository/me/sneer/ -rf
 
-#./gradlew clean check install || exit -1
-
-cd android && ./gradlew clean check install jarNodeps && cd - || exit -1
-
-#Removing unnecessary .project file that makes eclipse mistakenly load "apps" as a project. Todo: tweak gradle build to not generate this file.
-#rm android/apps/.project
+./gradlew clean check install jarNodeps || exit -1
 
 if [ -d "../lizardspock" ]; then
 	echo COPYING NODEPS JAR...
