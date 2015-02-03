@@ -83,6 +83,11 @@
       (>! puk->gcm-id [(keys/from-hex hex-puk) id]))
     (str "id for " hex-puk " set to " id)))
 
+(defn log-requests [f]
+  (fn [req]
+    (println req)
+    (f req)))
+
 (defn start [port puks-in & [async-gcm-notify-fn]]
 
   (let [puk->gcm-id-out (async/chan)
@@ -92,7 +97,7 @@
       (GET "/gcm/register" req (gcm-register puk->gcm-id-out req))
       (route/not-found "<h1>page not found</h1>"))
 
-    (let [server (http/run-server (-> app params/wrap-params) {:port port})]
+    (let [server (http/run-server (-> app log-requests params/wrap-params) {:port port})]
       (async/go
         (<! (start-gcm-notifier puk->gcm-id-out puks-in async-gcm-notify-fn))
         (async/close! puk->gcm-id-out)
