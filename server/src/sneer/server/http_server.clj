@@ -21,6 +21,7 @@
         (let [gcm-id (first round)
               response (<! (async-gcm-notify-fn gcm-id))
               status (:status response)]
+          (println "GCM RESPONSE:" response)
           (if (= 200 status)
             (>! gcm-ids-notified gcm-id)
             (when-some [retry-after-secs (-> response :headers :retry-after)]
