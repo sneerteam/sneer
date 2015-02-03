@@ -1,14 +1,14 @@
 package sneer.android.videomessage;
 
-import java.io.FileNotFoundException;
-
-import sneer.android.videomessage.R;
-import sneer.android.ui.MessageActivity;
-import sneer.commons.exceptions.FriendlyException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import java.io.FileNotFoundException;
+
+import sneer.android.ui.MessageActivity;
+import sneer.commons.exceptions.FriendlyException;
 
 public class ComposeVideoMessageActivity extends MessageActivity {
 
@@ -52,7 +52,7 @@ public class ComposeVideoMessageActivity extends MessageActivity {
 			finish();
 		}
 		if (bytes != null)
-			send("video message", bytes);
+			send("video message", bytes, null);
 	}
 	
 }

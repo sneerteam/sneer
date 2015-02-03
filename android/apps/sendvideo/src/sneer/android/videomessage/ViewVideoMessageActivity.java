@@ -1,15 +1,15 @@
 package sneer.android.videomessage;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import sneer.android.videomessage.R;
-import sneer.android.ui.MessageActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import sneer.android.ui.MessageActivity;
 
 public class ViewVideoMessageActivity extends MessageActivity {
 
@@ -27,7 +27,7 @@ public class ViewVideoMessageActivity extends MessageActivity {
 	
 	
 	private void playVideoMessage() {
-		byte[] message = (byte[])message();
+		byte[] message = (byte[])messagePayload();
 
 		try {
 			FileOutputStream fos = new FileOutputStream(TEMP_VIDEO);
