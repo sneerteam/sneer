@@ -28,6 +28,13 @@
          (println "GO ERROR" ~'e)
          (. ~'^Throwable e printStackTrace)))))
 
+(defmacro go-loop-trace
+  "Same as go-loop but prints unhandled exception stack trace"
+  [binding & forms]
+  `(go-trace
+    (loop ~binding
+      ~@forms)))
+
 (defmacro go-while-let
   "Makes it easy to continue processing data from a channel until it closes"
   [binding & forms]
