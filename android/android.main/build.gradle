@@ -1,3 +1,5 @@
+apply plugin: 'com.android.application'
+
 version = '0.0.1'
 
 buildscript {
@@ -7,13 +9,8 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
-      //classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
     }
 }
-
-apply plugin: 'android-sdk-manager'
-apply plugin: 'com.android.application'
 
 dependencies {
 //  compile 'com.google.android.gms:play-services-base:6.5.87' //For GCM (Google Cloud Messaging)
