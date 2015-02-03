@@ -29,7 +29,7 @@ if(shouldPublish) {
 afterEvaluate {
 	uploadArchives {
 	
-		onlyIf { ourJar.didWork || javadocJar.didWork || sourcesJar.didWork }
+		//onlyIf { ourJar.didWork || javadocJar.didWork || sourcesJar.didWork }
 		
 		repositories {
 			if (!shouldPublish) {
