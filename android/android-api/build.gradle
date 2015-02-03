@@ -26,7 +26,7 @@ configurations {
 dependencies {
     libs 'com.netflix.rxjava:rxjava-android:' + external.rx.version
     compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
-    compile project(':java-api')
+    compile project(':sneer-java-api')
 }
 
 android {

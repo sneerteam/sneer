@@ -62,7 +62,7 @@ dependencies {
     provided 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
     provided 'junit:junit:4.11'
     optional 'org.xerial:sqlite-jdbc:3.7.15-M1'
-    provided project(':java-api')
+    provided project(':sneer-java-api')
     provided project(':core')
     optional project(':server')
     provided 'midje:midje:1.6.3'

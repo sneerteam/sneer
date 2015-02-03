@@ -12,8 +12,10 @@ include 'android:apps:sendpics',
         'android:apps:sendfiles',
         'android:apps:sendvideo'
 
-include ':java-api',
-        ':crypto',
+include ':sneer-java-api'
+project(':sneer-java-api').projectDir = new File('java-api')
+
+include ':crypto',
         ':core',
         ':server',
         ':java-api.tests',

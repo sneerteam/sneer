@@ -64,7 +64,7 @@ dependencies {
     	exclude group: 'org.apache.directory.studio', module: 'org.apache.commons.codec'
     }
     compile project(':crypto')
-    compile project(':java-api')
+    compile project(':sneer-java-api')
     testCompile 'midje:midje:1.6.3'
     compile 'org.clojure:java.jdbc:0.3.6'
     optional 'org.xerial:sqlite-jdbc:3.8.6'
