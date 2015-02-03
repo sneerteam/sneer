@@ -4,7 +4,7 @@
             [compojure.route :as route]
             [ring.middleware.params :as params]
             [clojure.core.async :as async :refer [<! >! >!! go-loop alt!]]
-            [sneer.async :refer [go-while-let sliding-chan]]
+            [sneer.async :refer [go-while-let go-loop-trace sliding-chan]]
             [sneer.keys :as keys]
             [sneer.server.gcm :as gcm]))
 
@@ -14,14 +14,13 @@
                  (fn [response] (>!! result response)))
     result))
 
-(defn- start-gcm-notification-rounds [gcm-ids gcm-ids-notified]
+(defn- start-gcm-notification-rounds [gcm-ids gcm-ids-notified async-gcm-notify-fn]
   (go-while-let [round (<! gcm-ids)]
     (loop [round round]
       (when-not (empty? round)
         (let [gcm-id (first round)
-              response (<! (async-gcm-notify gcm-id))
+              response (<! (async-gcm-notify-fn gcm-id))
               status (:status response)]
-          (println "GCM: " response)
           (if (= 200 status)
             (>! gcm-ids-notified gcm-id)
             (when-some [retry-after-secs (-> response :headers :retry-after)]
@@ -29,18 +28,18 @@
               (<! (async/timeout (* 1000 (Integer/valueOf retry-after-secs))))))
           (recur (rest round)))))))
 
-(defn- start-gcm-notifier [puk->gcm-id-in puks-in]
+(defn- start-gcm-notifier [puk->gcm-id-in puks-in async-gcm-notify-fn]
 
   (let [gcm-ids-out (sliding-chan)
         gcm-ids-notified (async/chan)]
 
-    (start-gcm-notification-rounds gcm-ids-out gcm-ids-notified)
+    (start-gcm-notification-rounds gcm-ids-out gcm-ids-notified async-gcm-notify-fn)
 
-    (go-loop [puk->gcm-id {}
-              gcm-id->puk {}
-              puks-to-notify #{}
-              ids-to-notify #{}
-              previous-ids-to-notify ids-to-notify]
+    (go-loop-trace [puk->gcm-id {}
+                    gcm-id->puk {}
+                    puks-to-notify #{}
+                    ids-to-notify #{}
+                    previous-ids-to-notify ids-to-notify]
 
       (when-not (identical? previous-ids-to-notify ids-to-notify)
         (>! gcm-ids-out ids-to-notify))
@@ -59,7 +58,7 @@
 
         puk->gcm-id-in
         ([[puk gcm-id]]
-         (recur (assoc puk->gcm-id-in puk gcm-id)
+         (recur (assoc puk->gcm-id puk gcm-id)
                 (assoc gcm-id->puk gcm-id puk)
                 puks-to-notify
                 (if (contains? puks-to-notify puk)
@@ -77,16 +76,17 @@
 
 (defn- gcm-register [puk->gcm-id req]
   (let [params (:query-params req)
-        puk (get params "puk")
+        hex-puk (get params "puk")
         id (get params "id")]
-    (assert (not (or (empty? puk) (empty? id))))
+    (assert (not (or (empty? hex-puk) (empty? id))))
     (async/go
-      (>! puk->gcm-id [(keys/->puk puk) id]))
-    (str "id for " puk " set to " id)))
+      (>! puk->gcm-id [(keys/from-hex hex-puk) id]))
+    (str "id for " hex-puk " set to " id)))
 
-(defn start [port puks-in]
+(defn start [port puks-in & [async-gcm-notify-fn]]
 
-  (let [puk->gcm-id-out (async/chan)]
+  (let [puk->gcm-id-out (async/chan)
+        async-gcm-notify-fn (or async-gcm-notify-fn async-gcm-notify)]
 
     (defroutes app
       (GET "/gcm/register" req (gcm-register puk->gcm-id-out req))
@@ -94,7 +94,7 @@
 
     (let [server (http/run-server (-> app params/wrap-params) {:port port})]
       (async/go
-        (<! (start-gcm-notifier puk->gcm-id-out puks-in))
+        (<! (start-gcm-notifier puk->gcm-id-out puks-in async-gcm-notify-fn))
         (async/close! puk->gcm-id-out)
         (server)))))
 
