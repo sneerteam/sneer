@@ -171,15 +171,14 @@
     (close! packets-out)
     (close! gcm-out)))
 
-(defn start-connector [prevalence-file packets-in packets-out & [gcm-out]]
-  (let [gcm-out (or gcm-out (dropping-chan))]
-    (start (p/prevayler-jr! handle-event
-                            (create-router 200)
-                            prevalence-file)
-           packets-in
-           packets-out
-           #(async/timeout resend-timeout-millis)
-           gcm-out)))
+(defn start-connector [prevalence-file packets-in packets-out gcm-out]
+  (start (p/prevayler-jr! handle-event
+                          (create-router 200)
+                          prevalence-file)
+         packets-in
+         packets-out
+         #(async/timeout resend-timeout-millis)
+         gcm-out))
 
 (defn start-transient-connector [queue-size packets-in packets-out resend-timeout-fn & [gcm-out]]
   (let [gcm-out (or gcm-out (dropping-chan))]
