@@ -1,11 +1,12 @@
 apply plugin: 'android-library'
-apply from: '../../sonatype.gradle'
 
 def originalVersion = '0.1.2'
 
 version = originalVersion
 description = 'API for Sneer, the sovereign platform.'
 ext.packaging = 'jar'
+
+apply from: '../../sonatype.gradle'
 
 buildscript {
     repositories {

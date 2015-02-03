@@ -52,8 +52,8 @@ afterEvaluate {
 					    url 'http://sneer.me'
 
 				        scm {
-				            url 'https://github.com/sneerteam/snapi'
-				            connection 'git@github.com:sneerteam/snapi.git'
+				            url 'https://github.com/sneerteam/sneer'
+				            connection 'git@github.com:sneerteam/sneer.git'
 				        }
 
 				        licenses {
