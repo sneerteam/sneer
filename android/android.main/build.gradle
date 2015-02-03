@@ -13,9 +13,8 @@ buildscript {
 }
 
 dependencies {
-//  compile 'com.google.android.gms:play-services-base:6.5.87' //For GCM (Google Cloud Messaging)
     compile 'com.google.android.gms:play-services-base:6+' //For GCM (Google Cloud Messaging)
-    compile project(':android-api')
+    compile project(':sneer-android-api')
     compile(project(':core')) {
         exclude group: 'org.bouncycastle'
     }

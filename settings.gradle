@@ -1,5 +1,5 @@
-include ':android-api'
-project(':android-api').projectDir = new File('android/android-api')
+include ':sneer-android-api'
+project(':sneer-android-api').projectDir = new File('android/android-api')
 
 include ':android:android.main'
 
