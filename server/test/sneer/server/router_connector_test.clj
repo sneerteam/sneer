@@ -1,7 +1,7 @@
 (ns sneer.server.router-connector-test
   (:require
     [midje.sweet :refer :all]
-    [clojure.core.async :as async :refer [thread to-chan chan close! >!!]]
+    [clojure.core.async :as async :refer [thread to-chan chan close! >!! <!]]
     [clojure.core.match :refer [match]]
     [sneer.test-util :refer :all]
     [sneer.async :refer :all]
@@ -21,7 +21,9 @@
            resend-timeout (chan)
            resend-timeout-fn (constantly resend-timeout)
            gcm-out (chan 100)]
-       (start-transient-connector max-q-size packets-in packets-out resend-timeout-fn gcm-out)
+       (go-trace
+        (<! (start-transient-connector max-q-size packets-in packets-out resend-timeout-fn gcm-out))
+        (close! gcm-out))
        (thread
          (doseq [event ?packets-in]
            (if (= event :resend)

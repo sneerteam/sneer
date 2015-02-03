@@ -1,7 +1,9 @@
 (ns sneer.server.main
   (:require [sneer.networking.udp :as udp]
             [sneer.server.router-connector :as connector]
-            [clojure.core.async :as async :refer [chan filter< close! alts!! <!! timeout]]
+            [sneer.server.http-server :as http-server]
+            [sneer.async :refer [go-trace]]
+            [clojure.core.async :as async :refer [chan filter< close! alts!! <! <!! timeout]]
             [sneer.networking.udp :as udp])
   (:gen-class))
 
@@ -43,10 +45,17 @@
         routable-packets-out (trace-in routable-packets-out "OUT")
         udp-server (udp/start-udp-server packets-in routable-packets-out port)]
 
-    (connector/start-connector
-      prevalence-file
-      (async/map #(update-puk-address! puk->address %) [routable-packets-in])
-      packets-out)
+    (let [puks-to-notify (async/chan)]
+
+      (go-trace
+       (<! (connector/start-connector
+            prevalence-file
+            (async/map #(update-puk-address! puk->address %) [routable-packets-in])
+            packets-out
+            puks-to-notify))
+       (close! puks-to-notify))
+
+      (http-server/start 80 puks-to-notify))
 
     (trace-changes "[PUK->ADDRESS]" puk->address)
 
