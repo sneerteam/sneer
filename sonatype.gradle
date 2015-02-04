@@ -7,7 +7,7 @@ def SONATYPE_SNAPSHOT_URL = "https://oss.sonatype.org/content/repositories/snaps
 def shouldPublish
 def isReleaseBuild
 
-if(hasProperty("release")) {
+if (hasProperty("release")) {
     shouldPublish = true
     isReleaseBuild = true
 } else if (hasProperty("ci")) {
@@ -16,7 +16,7 @@ if(hasProperty("release")) {
 }
 
 
-if(shouldPublish) {
+if (shouldPublish) {
     signing {
         sign configurations.archives
     }
@@ -27,74 +27,74 @@ if(shouldPublish) {
 }
 
 afterEvaluate {
-	uploadArchives {
-	
-		//onlyIf { ourJar.didWork || javadocJar.didWork || sourcesJar.didWork }
-		
-		repositories {
-			if (!shouldPublish) {
-			    mavenLocal()
-			} else {
-		        mavenDeployer {
+    uploadArchives {
 
-					if(shouldPublish) {
-					    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-					}
+        //onlyIf { ourJar.didWork || javadocJar.didWork || sourcesJar.didWork }
 
-					repository(url: (isReleaseBuild ? SONATYPE_RELEASE_URL : SONATYPE_SNAPSHOT_URL)) {
-					  authentication(userName: nexusUsername, password: nexusPassword)
-					}
+        repositories {
+            if (!shouldPublish) {
+                mavenLocal()
+            } else {
+                mavenDeployer {
 
-					pom.project {
-					    name project.name
-					    packaging 'jar'
-					    description project.description
-					    url 'http://sneer.me'
+                    if (shouldPublish) {
+                        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                    }
 
-				        scm {
-				            url 'https://github.com/sneerteam/sneer'
-				            connection 'git@github.com:sneerteam/sneer.git'
-				        }
+                    repository(url: (isReleaseBuild ? SONATYPE_RELEASE_URL : SONATYPE_SNAPSHOT_URL)) {
+                        authentication(userName: nexusUsername, password: nexusPassword)
+                    }
 
-				        licenses {
-				            license {
-					            name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
-				                url 'http://opensource.org/licenses/lgpl-3.0.html'
-				                distribution 'repo'
-				            }
-				        }
+                    pom.project {
+                        name project.name
+                        packaging 'jar'
+                        description project.description
+                        url 'http://sneer.me'
 
-						developers {
-						    developer {
-							    id 'klauswuestefeld'
-							    name 'Klaus Wuestefeld'
-							    email 'klauswuestefeld@gmail.com'
-						    }
-							developer {
-							    id 'fabioroger'
-							    name 'Fabio Roger Manera'
-							    email 'fabioroger@gmail.com'
-							}
-							developer {
-							    id 'bamboo'
-							    name 'Rodrigo B. de Oliveira'
-							    email 'rbo@acm.org'
-							}
-							developer {
-							    id 'felipebueno'
-							    name 'Felipe Bueno'
-							    email 'bueno.felipe@gmail.com'
-							}
-							developer {
-							    id 'dhmendes'
-							    name 'Diego Mendes'
-							    email 'dhmendes@gmail.com'
-							}
-						}
-			        }
+                        scm {
+                            url 'https://github.com/sneerteam/sneer'
+                            connection 'git@github.com:sneerteam/sneer.git'
+                        }
 
-			    }
-		    }
-	    }
-	}
+                        licenses {
+                            license {
+                                name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
+                                url 'http://opensource.org/licenses/lgpl-3.0.html'
+                                distribution 'repo'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'klauswuestefeld'
+                                name 'Klaus Wuestefeld'
+                                email 'klauswuestefeld@gmail.com'
+                            }
+                            developer {
+                                id 'fabioroger'
+                                name 'Fabio Roger Manera'
+                                email 'fabioroger@gmail.com'
+                            }
+                            developer {
+                                id 'bamboo'
+                                name 'Rodrigo B. de Oliveira'
+                                email 'rbo@acm.org'
+                            }
+                            developer {
+                                id 'felipebueno'
+                                name 'Felipe Bueno'
+                                email 'bueno.felipe@gmail.com'
+                            }
+                            developer {
+                                id 'dhmendes'
+                                name 'Diego Mendes'
+                                email 'dhmendes@gmail.com'
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
 }
