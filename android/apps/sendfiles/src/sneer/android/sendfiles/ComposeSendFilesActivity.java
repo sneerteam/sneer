@@ -1,8 +1,11 @@
 package sneer.android.sendfiles;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 import sneer.android.ui.MessageActivity;
@@ -11,6 +14,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 public class ComposeSendFilesActivity extends MessageActivity {
 
@@ -77,5 +81,23 @@ public class ComposeSendFilesActivity extends MessageActivity {
 			send(fileName, map, null);
 		}
 	}
-	
+
+    public byte[] readFully(InputStream inputStream) throws FriendlyException {
+        byte[] b = new byte[8192];
+        int read;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            while ((read = inputStream.read(b)) != -1) {
+                out.write(b, 0, read);
+            }
+        } catch (IOException e) {
+            throw new FriendlyException("Failed to read file");
+        }
+        return out.toByteArray();
+    }
+
+    private void toast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+
 }

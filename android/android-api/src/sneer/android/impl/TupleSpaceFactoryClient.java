@@ -69,6 +69,7 @@
 //			intent.putExtra("op", op.ordinal());
 //			log("tupleSpace: subscribe: " + criteria);
 //			intent.putExtra("criteria", serializer.serialize(criteria));
+//          int useSharedResultReceiverInsteadOfTheBelow;
 //			intent.putExtra("resultReceiver", new ResultReceiver(null) {  @SuppressWarnings("unchecked") @Override protected void onReceiveResult(int resultCode, Bundle resultData) {
 //				switch (TupleSpaceFactoryClient.SubscriptionOp.values()[resultCode]) {
 //				case ON_COMPLETED:
@@ -76,13 +77,13 @@
 //					subscriber.onCompleted();
 //					break;
 //				case ON_NEXT: {
-//					Tuple tuple = newTupleFromMap((Map<String, Object>) serializer.deserialize((byte[]) SneerAndroidClient.unbundle(resultData)));
+//					Tuple tuple = newTupleFromMap((Map<String, Object>) serializer.deserialize((byte[]) IPCProtocol.unbundle(resultData)));
 //					log("tupleSpace: tuple: " + tuple);
 //					subscriber.onNext(tuple);
 //					break;
 //				}
 //				case SUBSCRIPTION_ID: {
-//					final int subscriptionId = (Integer) SneerAndroidClient.unbundle(resultData);
+//					final int subscriptionId = (Integer) IPCProtocol.unbundle(resultData);
 //					log("tupleSpace: subscriptionId: " + subscriptionId);
 //					subscriber.add(Subscriptions.create(new Action0() { @Override public void call() {
 //						Intent intent = new Intent(TUPLE_SPACE_SERVICE);

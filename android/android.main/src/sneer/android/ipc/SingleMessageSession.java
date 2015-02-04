@@ -1,9 +1,9 @@
 package sneer.android.ipc;
 
-import static sneer.SneerAndroidClient.JPEG_IMAGE;
-import static sneer.SneerAndroidClient.PAYLOAD;
-import static sneer.SneerAndroidClient.RESULT_RECEIVER;
-import static sneer.SneerAndroidClient.TEXT;
+import static sneer.android.impl.IPCProtocol.JPEG_IMAGE;
+import static sneer.android.impl.IPCProtocol.PAYLOAD;
+import static sneer.android.impl.IPCProtocol.RESULT_RECEIVER;
+import static sneer.android.impl.IPCProtocol.LABEL;
 import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.android.impl.SneerAndroidImpl;
@@ -36,7 +36,7 @@ public class SingleMessageSession implements PluginSession {
 		Intent intent = plugin.createIntent();
 
 		intent.putExtra(PAYLOAD, Value.of(tuple.payload()));
-		intent.putExtra(TEXT, (String)tuple.get(TEXT));
+		intent.putExtra(LABEL, (String)tuple.get(LABEL));
 		intent.putExtra(JPEG_IMAGE, (byte[])tuple.get(JPEG_IMAGE));
 
 		return intent;
@@ -50,14 +50,14 @@ public class SingleMessageSession implements PluginSession {
 		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() { @Override public void call(Bundle bundle) {
 			try {
 				bundle.setClassLoader(context.getClassLoader());
-				String text = bundle.getString(TEXT);
+				String text = bundle.getString(LABEL);
 				byte[] jpegImage = bundle.getByteArray(JPEG_IMAGE);
 				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' text '" + text + "' jpeg-image " + jpegImage + "' from " + plugin);
 				sneer.tupleSpace().publisher()
 					.field("message-type", plugin.tupleType())
 					.type("message")
 					.audience(partner)
-					.field(TEXT, text)
+					.field(LABEL, text)
 					.field(JPEG_IMAGE, jpegImage)
 					.pub(getPayload(bundle));
 			} catch (final Throwable t) {

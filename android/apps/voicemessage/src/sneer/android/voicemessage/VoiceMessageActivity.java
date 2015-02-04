@@ -1,9 +1,11 @@
 package sneer.android.voicemessage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import sneer.android.ui.MessageActivity;
 import sneer.commons.exceptions.FriendlyException;
@@ -11,6 +13,8 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class VoiceMessageActivity extends MessageActivity {
@@ -39,6 +43,9 @@ public class VoiceMessageActivity extends MessageActivity {
 		startRecording();	
 	}
 
+    private Button button(int id) {
+        return (Button)findViewById(id);
+    }
 
 	@Override
 	public void onPause() {
@@ -68,7 +75,7 @@ public class VoiceMessageActivity extends MessageActivity {
 		try {
 			initRecorder();
 		} catch (IOException e) {
-			toast("Voice recorder failed", Toast.LENGTH_LONG);
+			toast("Voice recorder failed");
 			finish();
 			return;
 		}
@@ -104,10 +111,10 @@ public class VoiceMessageActivity extends MessageActivity {
 		try {
 			bytes = readFully((new FileInputStream(audioFileName)));
 		} catch (FriendlyException e) {
-			toast(e);
+			toast(e.getMessage());
 			finish();
 		} catch (FileNotFoundException e) {
-			toast(e);
+			toast(e.getMessage());
 			finish();
 		}
 		if (bytes != null)
@@ -148,5 +155,29 @@ public class VoiceMessageActivity extends MessageActivity {
 	static private long now() {
 		return System.currentTimeMillis();
 	}
-	
+
+
+    private void toast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+
+
+    protected TextView textView(int id) {
+        return (TextView)findViewById(id);
+    }
+
+
+    public byte[] readFully(InputStream inputStream) throws FriendlyException {
+        byte[] b = new byte[8192];
+        int read;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            while ((read = inputStream.read(b)) != -1) {
+                out.write(b, 0, read);
+            }
+        } catch (IOException e) {
+            throw new FriendlyException("Failed to read file");
+        }
+        return out.toByteArray();
+    }
 }

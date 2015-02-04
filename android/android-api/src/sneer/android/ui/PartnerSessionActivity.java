@@ -1,18 +1,23 @@
 package sneer.android.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
 
-public abstract class PartnerSessionActivity extends SneerActivity {
+import sneer.android.PartnerSession;
 
-	private PartnerMessenger toSneer;
+public abstract class PartnerSessionActivity extends Activity {
+
+	private PartnerSession toPartner;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        toSneer = new PartnerMessenger(this, new PartnerMessenger.Listener() {
+        toPartner = new PartnerSession(this.getApplicationContext(), getIntent(), new PartnerSession.Listener() {
             @Override
-            public void onPartnerName(String name) {
-                PartnerSessionActivity.this.onPartnerName(name);
+            public void onPartnerName(final String name) {
+                runOnUiThread(new Runnable() { @Override public void run() {
+                    PartnerSessionActivity.this.onPartnerName(name);
+                }});
             }
 
             @Override
@@ -27,7 +32,12 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 
             @Override
             public void update() {
-                PartnerSessionActivity.this.update();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PartnerSessionActivity.this.update();
+                    }
+                });
             }
         });
 	}
@@ -35,8 +45,8 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 
 	@Override
 	protected void onDestroy() {
-		if (toSneer != null) {
-			toSneer.dispose();
+		if (toPartner != null) {
+			toPartner.dispose();
 		}
 		super.onDestroy();
 	}
@@ -44,10 +54,10 @@ public abstract class PartnerSessionActivity extends SneerActivity {
 
 	/** Called in the Android main thread (UI thread).
 	 *  @param name The current name of the peer with you in this session. */
-	protected void onPartnerName(String name) {};
+	protected void onPartnerName(String name) {}
 
     protected void send(String label, Object message) {
-        toSneer.send(label, message);
+        toPartner.send(label, message);
     }
 
     protected abstract void onMessageToPartner(Object message);

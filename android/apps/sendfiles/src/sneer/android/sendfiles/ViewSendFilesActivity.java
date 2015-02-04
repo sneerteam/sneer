@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
 public class ViewSendFilesActivity extends MessageActivity {
 
@@ -76,4 +77,8 @@ public class ViewSendFilesActivity extends MessageActivity {
 			return;
 		}
 	}
+
+    private void toast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
 }

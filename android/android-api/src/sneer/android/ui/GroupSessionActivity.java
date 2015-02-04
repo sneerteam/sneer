@@ -1,9 +1,11 @@
 package sneer.android.ui;
 
 import sneer.Message;
+
+import android.app.Activity;
 import android.os.Bundle;
 
-public abstract class GroupSessionActivity extends SneerActivity {
+public abstract class GroupSessionActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

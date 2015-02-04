@@ -1,13 +1,13 @@
 package sneer.android.ipc;
 
-import static sneer.SneerAndroidClient.ERROR;
-import static sneer.SneerAndroidClient.OWN;
-import static sneer.SneerAndroidClient.PARTNER_NAME;
-import static sneer.SneerAndroidClient.PAYLOAD;
-import static sneer.SneerAndroidClient.REPLAY_FINISHED;
-import static sneer.SneerAndroidClient.RESULT_RECEIVER;
-import static sneer.SneerAndroidClient.TEXT;
-import static sneer.SneerAndroidClient.UNSUBSCRIBE;
+import static sneer.android.impl.IPCProtocol.ERROR;
+import static sneer.android.impl.IPCProtocol.OWN;
+import static sneer.android.impl.IPCProtocol.PARTNER_NAME;
+import static sneer.android.impl.IPCProtocol.PAYLOAD;
+import static sneer.android.impl.IPCProtocol.REPLAY_FINISHED;
+import static sneer.android.impl.IPCProtocol.RESULT_RECEIVER;
+import static sneer.android.impl.IPCProtocol.LABEL;
+import static sneer.android.impl.IPCProtocol.UNSUBSCRIBE;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -51,7 +51,7 @@ public final class PartnerSession implements PluginSession {
 
 	private void sendMessage(ResultReceiver toClient, Tuple tuple) {
 		Bundle data = new Bundle();
-		data.putString(TEXT, (String) tuple.get("text"));
+		data.putString(LABEL, (String) tuple.get("text"));
 		data.putBoolean(OWN, tuple.author().equals(sneer.self().publicKey().current()));
 		data.putParcelable(PAYLOAD, Value.of(tuple.payload()));
 		toClient.send(0, data);
@@ -89,7 +89,7 @@ public final class PartnerSession implements PluginSession {
 			else if (resultData.getBoolean(UNSUBSCRIBE))
 				subscriptions.unsubscribe();
 			else
-				publish(resultData.getString(TEXT), ((Value)resultData.getParcelable(PAYLOAD)).get());
+				publish(resultData.getString(LABEL), ((Value)resultData.getParcelable(PAYLOAD)).get());
 		}});
 	}
 

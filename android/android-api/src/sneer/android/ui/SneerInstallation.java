@@ -10,7 +10,7 @@ import android.net.Uri;
 
 public class SneerInstallation {
 
-    public static void showSneerInstallationMessageIfNecessary(final Activity activity) {
+    public static void showInstallSneerDialogIfNecessary(final Activity activity) {
         PackageManager pm = activity.getPackageManager();
         try {
            pm.getPackageInfo("sneer.android.main", PackageManager.GET_ACTIVITIES);

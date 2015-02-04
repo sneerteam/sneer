@@ -8,7 +8,11 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import java.io.ByteArrayOutputStream;
 
 public class SendLocationActivity extends MessageActivity implements LocationListener {
 
@@ -55,5 +59,25 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	@Override public void onProviderDisabled(String arg0) {}
 	@Override public void onProviderEnabled(String arg0) {}
 	@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+
+
+    public static byte[] scaledDownTo(Bitmap original, int maximumLength) {
+        int side = Math.min(original.getHeight(), original.getWidth());
+        Bitmap reduced = original;
+        while (true) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            reduced.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            final byte[] bytes = out.toByteArray();
+            if (bytes.length <= maximumLength)
+                return bytes;
+            side = (int) (side * 0.9f);
+            reduced = ThumbnailUtils.extractThumbnail(original, side, side);
+        }
+    }
+
+
+    private void toast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
 
 }

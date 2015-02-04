@@ -9,7 +9,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.Message;
 import sneer.Sneer;
-import sneer.SneerAndroidClient;
 import sneer.admin.SneerAdmin;
 import sneer.android.R;
 import sneer.android.SneerAndroid;
@@ -83,7 +82,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 					intent = plugin.resume(tuple);
 				}
 
-				log("-------------> " + tuple.type() + ": " + intent.getExtras().getParcelable(SneerAndroidClient.RESULT_RECEIVER));
+				log("-------------> " + tuple.type() + ": " + intent.getExtras().getParcelable(IPCProtocol.RESULT_RECEIVER));
 
 //				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
