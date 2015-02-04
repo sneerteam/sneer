@@ -20,12 +20,6 @@ echo "-------------------> Preparing the workspace"
 
 rm ~/.m2/repository/me/sneer/ -rf
 
-./gradlew clean check install jarNodeps || exit -1
-
-if [ -d "../lizardspock" ]; then
-	echo COPYING NODEPS JAR...
-	rm -f ../lizardspock/libs/sneer-android-api-nodeps-*.jar || exit -1
-	cp -f android/android-api/build/libs/sneer-android-api-nodeps-*.jar ../lizardspock/libs/ || exit -1
-fi
+./gradlew clean check install || exit -1
 
 echo "Reset environment sucessful"
