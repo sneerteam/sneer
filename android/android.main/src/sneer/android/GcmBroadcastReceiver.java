@@ -11,7 +11,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 public class GcmBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-       // Bundle extras = intent.getExtras();
+        // Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
 
         String messageType = gcm.getMessageType(intent);
