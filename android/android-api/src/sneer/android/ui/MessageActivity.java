@@ -5,7 +5,7 @@ import static sneer.SneerAndroidClient.PAYLOAD;
 import static sneer.SneerAndroidClient.RESULT_RECEIVER;
 import static sneer.SneerAndroidClient.TEXT;
 import sneer.SneerAndroidClient;
-import sneer.utils.Value;
+import sneer.android.impl.Value;
 import android.content.Intent;
 import android.os.ResultReceiver;
 

@@ -11,7 +11,7 @@ import rx.subjects.ReplaySubject;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.tuples.TupleSpace;
-import sneer.utils.Value;
+import sneer.android.impl.Value;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;

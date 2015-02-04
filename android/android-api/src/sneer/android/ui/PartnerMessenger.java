@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 
 import sneer.SneerAndroidClient;
-import sneer.utils.SharedResultReceiver;
-import sneer.utils.Value;
+import sneer.android.impl.SharedResultReceiver;
+import sneer.android.impl.Value;
 
 import static sneer.SneerAndroidClient.OWN;
 import static sneer.SneerAndroidClient.PARTNER_NAME;

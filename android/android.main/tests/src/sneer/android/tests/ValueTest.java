@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
-import sneer.utils.Value;
+import sneer.android.impl.Value;
 import android.os.Parcel;
 
 public class ValueTest extends TestCase {

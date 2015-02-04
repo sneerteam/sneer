@@ -1,4 +1,4 @@
-package sneer.utils;
+package sneer.android.impl;
 
 import android.os.Bundle;
 import android.os.ResultReceiver;
