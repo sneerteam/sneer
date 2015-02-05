@@ -106,6 +106,8 @@ public class SneerApp extends Application {
         } catch (IOException e) {
             e.printStackTrace();
             log("GCM: failed to send registration (exception was reported)");
+        } finally {
+            client.close();
         }
     }
 
