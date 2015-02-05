@@ -6,11 +6,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+
+import sneer.PrivateKey;
+import sneer.PublicKey;
+import sneer.admin.SneerAdmin;
 import sneer.android.impl.SneerAndroidImpl;
 
 import java.io.IOException;
@@ -49,33 +57,55 @@ public class SneerApp extends Application {
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
                     }
-                    String regid = gcm.register(SENDER_ID);
-                    msg = "Device registered, registration ID=" + regid;
-                    Log.d(getClass().getName(), msg);
+                    String gcmId = gcm.register(SENDER_ID);
+                    msg = "Device registered, registration ID=" + gcmId;
+                    log(msg);
 
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-                    // The request to your server should be authenticated if your app
-                    // is using accounts.
-//                    sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the
-                    // message using the 'from' address in the message.
+                    sendRegistrationIdToBackend(gcmId);
 
                     // Persist the regID - no need to register again.
-                    storeRegistrationId(getApplicationContext(), regid);
+                    storeRegistrationId(getApplicationContext(), gcmId);
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
                     // If there is an error, don't just keep trying to register.
                     // Require the user to click a button again, or perform
                     // exponential back-off.
-                    Log.d(getClass().getName(), msg);
+                    log(msg);
                 }
                 return null;
             }
 
         }.execute(null, null, null);
+    }
+
+    private void log(String msg) {
+        Log.d(getClass().getName(), msg);
+    }
+
+    private void sendRegistrationIdToBackend(String gcmId) {
+        AndroidHttpClient client = AndroidHttpClient.newInstance("sneer.android.main", getApplicationContext());
+        try {
+            HttpResponse response = client.execute(new HttpGet(registrationUriFor(gcmId)));
+            log("GCM server registration response: " + response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String registrationUriFor(String gcmId) {
+        return "http://dynamic.sneer.me/gcm/register?id=" + gcmId + "&puk=" + puk().toHex();
+    }
+
+    private PublicKey puk() {
+        return prik().publicKey();
+    }
+
+    private PrivateKey prik() {
+        return admin().privateKey();
+    }
+
+    private SneerAdmin admin() {
+        return SneerAndroidSingleton.admin();
     }
 
 
