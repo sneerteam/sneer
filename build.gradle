@@ -1,6 +1,3 @@
-import java.nio.file.*;
-import org.gradle.api.artifacts.*;
-
 ext {
   external = [
     rx: [version: '0.20.3'],
