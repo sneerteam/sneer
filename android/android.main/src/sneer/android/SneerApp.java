@@ -45,8 +45,11 @@ public class SneerApp extends Application {
 
         SneerAndroidSingleton.setInstance(new SneerAndroidImpl(getApplicationContext()));
 
-        if (getRegistrationId(getApplicationContext()).isEmpty())
+        String registrationId = getRegistrationId(getApplicationContext());
+        if (registrationId.isEmpty())
             registerInBackground();
+        else
+            sendRegistrationIdToBackendInBackground(registrationId);
 	}
 
     private void registerInBackground() {
@@ -76,6 +79,17 @@ public class SneerApp extends Application {
             }
 
         }.execute(null, null, null);
+    }
+
+    private void sendRegistrationIdToBackendInBackground(final String registrationId) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                sendRegistrationIdToBackend(registrationId);
+                return null;
+            }
+        }.execute();
     }
 
     private void log(String msg) {
