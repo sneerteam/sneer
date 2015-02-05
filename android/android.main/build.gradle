@@ -14,17 +14,17 @@ buildscript {
 
 dependencies {
     compile 'com.google.android.gms:play-services-base:6+' //For GCM (Google Cloud Messaging)
+    compile 'com.netflix.rxjava:rxjava-android:' + external.rx.version
     compile project(':sneer-android-api')
-    compile(project(':core')) {
-        exclude group: 'org.bouncycastle'
-    }
+    compile project(':sneer-java-api')
+    compile(project(':core')) { exclude group: 'org.bouncycastle' }
 }
 
 android {
 
-	lintOptions {
-		abortOnError false
-	}
+    lintOptions {
+        abortOnError false
+    }
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
