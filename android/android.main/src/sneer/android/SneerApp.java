@@ -52,21 +52,20 @@ public class SneerApp extends Application {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                String msg = "";
+
                 try {
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
                     }
                     String gcmId = gcm.register(SENDER_ID);
-                    msg = "Device registered, registration ID=" + gcmId;
-                    log(msg);
+                    log("Device registered, registration ID=" + gcmId);
+
+                    storeRegistrationId(getApplicationContext(), gcmId);
 
                     sendRegistrationIdToBackend(gcmId);
 
-                    // Persist the regID - no need to register again.
-                    storeRegistrationId(getApplicationContext(), gcmId);
                 } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
+                    String msg = "Error :" + ex.getMessage();
                     // If there is an error, don't just keep trying to register.
                     // Require the user to click a button again, or perform
                     // exponential back-off.
