@@ -1,5 +1,6 @@
 package sneer.android.videomessage;
 
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import sneer.android.ui.MessageActivity;
-import sneer.commons.exceptions.FriendlyException;
 
 public class ComposeVideoMessageActivity extends MessageActivity {
 
@@ -48,33 +48,28 @@ public class ComposeVideoMessageActivity extends MessageActivity {
 		byte[] bytes = null;
 		try {
 			bytes = readFully((getContentResolver().openInputStream(videoUri)));
-		} catch (FriendlyException e) {
-			toast(e);
-			finish();
 		} catch (FileNotFoundException e) {
-			toast(e);
+			toast(e.getMessage());
+			finish();
+		} catch (IOException e) {
+            toast("Unable to read file");
 			finish();
 		}
 		if (bytes != null)
 			send("video message", bytes, null);
 	}
 
-    private void toast(Exception e) {
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+    private void toast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
 
-    public byte[] readFully(InputStream inputStream) throws FriendlyException {
+    public byte[] readFully(InputStream inputStream) throws IOException {
         byte[] b = new byte[8192];
         int read;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            while ((read = inputStream.read(b)) != -1) {
-                out.write(b, 0, read);
-            }
-        } catch (IOException e) {
-            throw new FriendlyException("Failed to read file");
-        }
+        while ((read = inputStream.read(b)) != -1)
+            out.write(b, 0, read);
         return out.toByteArray();
     }
 

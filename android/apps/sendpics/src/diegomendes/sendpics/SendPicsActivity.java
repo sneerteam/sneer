@@ -1,7 +1,6 @@
 package diegomendes.sendpics;
 
 import sneer.android.ui.MessageActivity;
-import sneer.commons.exceptions.FriendlyException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +12,7 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static android.widget.Toast.*;
 
@@ -50,8 +50,8 @@ public class SendPicsActivity extends MessageActivity {
         Bitmap bitmap;
 		try {
 			bitmap = loadBitmap(intent);
-		} catch (FriendlyException e) {
-			toast(e);
+		} catch (IOException e) {
+			toast("Unable to read file");
 			return;
 		}
 
@@ -60,25 +60,19 @@ public class SendPicsActivity extends MessageActivity {
 		finish();
     }
 
-    private void toast(FriendlyException e) {
-        Toast.makeText(this, e.getMessage(), LENGTH_LONG).show();
+    private void toast(String text) {
+        Toast.makeText(this, text, LENGTH_LONG).show();
     }
 
 
-    protected Bitmap loadBitmap(Intent intent) throws FriendlyException {
+    protected Bitmap loadBitmap(Intent intent) throws IOException {
         final Bundle extras = intent.getExtras();
         if (extras != null && extras.get("data") != null)
-            return (Bitmap)extras.get("data");
+            return (Bitmap) extras.get("data");
 
         Uri uri = intent.getData();
-        if (uri == null)
-            throw new FriendlyException("No image found.");
 
-        try {
-            return BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
-        } catch (FileNotFoundException e) {
-            throw new FriendlyException("Unable to load image: " + uri);
-        }
+        return BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
     }
 
 

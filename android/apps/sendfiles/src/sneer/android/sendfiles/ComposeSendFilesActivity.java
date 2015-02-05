@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import sneer.android.ui.MessageActivity;
-import sneer.commons.exceptions.FriendlyException;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -62,12 +61,12 @@ public class ComposeSendFilesActivity extends MessageActivity {
 		byte[] ret = null;
 		try {
 			ret = readFully(new FileInputStream(file));
-		} catch (FriendlyException e) {
-			toast("Error reading file");
-			finish();
 		} catch (FileNotFoundException e) {
-			toast("File not found. (" + e.getMessage() + ").");
+            toast("File not found. (" + e.getMessage() + ").");
 			finish();
+        } catch (IOException e) {
+            toast("Error reading file");
+            finish();
 		}
 		return ret;
 	}
@@ -82,17 +81,12 @@ public class ComposeSendFilesActivity extends MessageActivity {
 		}
 	}
 
-    public byte[] readFully(InputStream inputStream) throws FriendlyException {
+    public byte[] readFully(InputStream inputStream) throws IOException {
         byte[] b = new byte[8192];
         int read;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            while ((read = inputStream.read(b)) != -1) {
-                out.write(b, 0, read);
-            }
-        } catch (IOException e) {
-            throw new FriendlyException("Failed to read file");
-        }
+        while ((read = inputStream.read(b)) != -1)
+            out.write(b, 0, read);
         return out.toByteArray();
     }
 

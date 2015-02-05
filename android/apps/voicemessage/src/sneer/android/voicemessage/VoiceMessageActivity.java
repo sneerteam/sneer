@@ -1,14 +1,5 @@
 package sneer.android.voicemessage;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
-import sneer.android.ui.MessageActivity;
-import sneer.commons.exceptions.FriendlyException;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.View;
@@ -17,30 +8,37 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import sneer.android.ui.MessageActivity;
+
 public class VoiceMessageActivity extends MessageActivity {
 
-	static final String LOG_TAG = "----> Sneer VoiceMessage";
-	
 	private final String audioFileName = new File(System.getProperty("java.io.tmpdir"), "voicemessage.3gp").getAbsolutePath();
 
 	private volatile MediaRecorder recorder = null;
-	
+
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
-		
+
 		setContentView(R.layout.activity_voice_message);
-		
+
 		button(R.id.btnSend).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			send();
 			finish();
 		}});
-		
+
 		button(R.id.btnCancel).setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			finish();
 		}});
-		
-		startRecording();	
+
+		startRecording();
 	}
 
     private Button button(int id) {
@@ -50,7 +48,7 @@ public class VoiceMessageActivity extends MessageActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		finish();	
+		finish();
 	}
 
 
@@ -71,7 +69,7 @@ public class VoiceMessageActivity extends MessageActivity {
 
 	private void startRecording() {
 		startTimer();
-		
+
 		try {
 			initRecorder();
 		} catch (IOException e) {
@@ -91,8 +89,8 @@ public class VoiceMessageActivity extends MessageActivity {
 			}
 		}}.start();
 	}
-	
-	
+
+
 	private void initRecorder() throws IOException {
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -102,22 +100,22 @@ public class VoiceMessageActivity extends MessageActivity {
 		recorder.prepare();
 		recorder.start();
 	}
-	
+
 
 	private void send() {
 		stopRecording();
-		
+
 		byte[] bytes = null;
-		try {
-			bytes = readFully((new FileInputStream(audioFileName)));
-		} catch (FriendlyException e) {
-			toast(e.getMessage());
-			finish();
-		} catch (FileNotFoundException e) {
-			toast(e.getMessage());
-			finish();
-		}
-		if (bytes != null)
+        try {
+            bytes = readFully((new FileInputStream(audioFileName)));
+        } catch (FileNotFoundException e) {
+            toast(e.getMessage());
+            finish();
+        } catch (IOException e) {
+            toast("Unable to read file.");
+            finish();
+        }
+        if (bytes != null)
 			send("audiofile", bytes, null);
 	}
 
@@ -132,7 +130,7 @@ public class VoiceMessageActivity extends MessageActivity {
 		recorder.release();
 		recorder = null;
 	}
-	
+
 
 	private void updateRecordingTimeSince(final long t0) {
 		runOnUiThread(new Runnable() { @Override public void run() {
@@ -167,17 +165,12 @@ public class VoiceMessageActivity extends MessageActivity {
     }
 
 
-    public byte[] readFully(InputStream inputStream) throws FriendlyException {
+    public byte[] readFully(InputStream inputStream) throws IOException {
         byte[] b = new byte[8192];
         int read;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            while ((read = inputStream.read(b)) != -1) {
-                out.write(b, 0, read);
-            }
-        } catch (IOException e) {
-            throw new FriendlyException("Failed to read file");
-        }
+        while ((read = inputStream.read(b)) != -1)
+            out.write(b, 0, read);
         return out.toByteArray();
     }
 }
