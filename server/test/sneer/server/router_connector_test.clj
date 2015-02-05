@@ -13,7 +13,7 @@
 (def t2 {"id" 2 "author" :A :payload "2"})
 (def t3 {"id" 3 "author" :A :payload "3"})
 
-(tabular "Router Connector"
+#_(tabular "Router Connector"
   (fact ?fact
      (let [max-q-size 2
            packets-in (chan)
