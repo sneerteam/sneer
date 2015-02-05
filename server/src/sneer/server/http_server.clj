@@ -19,6 +19,7 @@
     (loop [round round]
       (when-not (empty? round)
         (let [gcm-id (first round)
+              banana (println "GCM To notify" gcm-id)
               response (<! (async-gcm-notify-fn gcm-id))
               status (:status response)]
           (println "GCM RESPONSE:" response)

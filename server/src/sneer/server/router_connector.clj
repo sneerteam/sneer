@@ -75,6 +75,7 @@
   #_(when-not (get-in state [:online-clients to]) ;Sends gcm for every message, for testing purposes.
     (when-not (peek-packet-for router to)
       (>!! (:gcm-out state) to)))
+  (println "Connector GCM-OUT:" to)
   (>!! (:gcm-out state) to))
 
 (defn- handle-send [state from to tuple]
