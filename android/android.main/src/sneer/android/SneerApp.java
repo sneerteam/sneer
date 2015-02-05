@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -20,8 +21,10 @@ import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.admin.SneerAdmin;
 import sneer.android.impl.SneerAndroidImpl;
+import sneer.commons.Streams;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class SneerApp extends Application {
 
@@ -45,8 +48,6 @@ public class SneerApp extends Application {
         if (getRegistrationId(getApplicationContext()).isEmpty())
             registerInBackground();
 	}
-
-
 
     private void registerInBackground() {
         new AsyncTask<Void, Void, Void>() {
@@ -84,15 +85,22 @@ public class SneerApp extends Application {
     private void sendRegistrationIdToBackend(String gcmId) {
         AndroidHttpClient client = AndroidHttpClient.newInstance("sneer.android.main", getApplicationContext());
         try {
+            log("GCM: sending id to server...");
             HttpResponse response = client.execute(new HttpGet(registrationUriFor(gcmId)));
-            log("GCM server registration response: " + response);
+            InputStream content = response.getEntity().getContent();
+            log("GCM: server registration response: (" + response.getStatusLine() + ") - " + readString(content));
         } catch (IOException e) {
             e.printStackTrace();
+            log("GCM: failed to send registration (exception was reported)");
         }
     }
 
+    private String readString(InputStream content) throws IOException {
+        return new String(Streams.readFully(content));
+    }
+
     private String registrationUriFor(String gcmId) {
-        return "http://dynamic.sneer.me/gcm/register?id=" + gcmId + "&puk=" + puk().toHex();
+        return "http://dynamic.sneer.me/gcm/register?id=" + Uri.encode(gcmId) + "&puk=" + Uri.encode(puk().toHex());
     }
 
     private PublicKey puk() {
