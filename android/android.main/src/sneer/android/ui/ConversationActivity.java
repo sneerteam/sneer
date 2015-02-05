@@ -126,7 +126,7 @@ public class ConversationActivity extends SneerActivity {
 
 	private void handleClick(String text) {
 		if (!text.isEmpty())
-			conversation.sendText(text);
+			conversation.sendMessage(text);
 		else
 			openInteractionMenu();
 		editText.setText("");

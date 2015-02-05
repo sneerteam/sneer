@@ -20,8 +20,8 @@
   (let [created (.timestamp tuple)
         type (.type tuple)
         jpeg-image ^bytes (.get tuple "jpeg-image")
-        text (.get tuple "text")
-        label (if text text (if jpeg-image "" type))
+        label (.get tuple "label")
+        label (if label label (if jpeg-image "" type))
         own? (= own-puk (.author tuple))]
 
     (reify Message
@@ -63,14 +63,14 @@
       (messages [this]
         observable-messages)
       
-      (sendText [this text]
+      (sendMessage [this label]
         (..
           tuple-space
           publisher
           (audience party-puk)
           (field "message-type" "chat")
           (type "message")
-          (field "text" text)
+          (field "label" label)
           (pub)))
       
       (mostRecentMessageContent [this]

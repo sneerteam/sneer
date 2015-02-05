@@ -361,13 +361,13 @@ public class ConversationsAPITest extends TestCase {
 		sneerB.addContact("a", pBA);
 		Conversation cBA = sneerB.produceConversationWith(pBA);
 
-		cAB.sendText("Hello1");
+		cAB.sendMessage("Hello1");
 		messagesEventually(cBA, "Hello1");
 		Clock.tick();
-		cBA.sendText("Hello2");
+		cBA.sendMessage("Hello2");
 		messagesEventually(cAB, "Hello1", "Hello2");
 		Clock.tick();
-		cAB.sendText("Hello3");
+		cAB.sendMessage("Hello3");
 		messagesEventually(cBA, "Hello1", "Hello2", "Hello3");
 
 		//Restart
@@ -390,17 +390,17 @@ public class ConversationsAPITest extends TestCase {
 
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 
-		cAB.sendText("Hello1");
+		cAB.sendMessage("Hello1");
 		expecting(eventually(cBA.unreadMessageCount(), 1L));
 
 		cBA.setBeingRead(true);
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
-		cAB.sendText("Hello2");
+		cAB.sendMessage("Hello2");
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 
 		cBA.setBeingRead(false);
-		cAB.sendText("Hello3");
-		cAB.sendText("Hello4");
+		cAB.sendMessage("Hello3");
+		cAB.sendMessage("Hello4");
 		expecting(eventually(cBA.unreadMessageCount(), 2L));
 
 	}
