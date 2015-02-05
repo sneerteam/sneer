@@ -1,10 +1,5 @@
 package sneer.android;
 
-import static sneer.android.impl.SneerAndroidImpl.isCoreAvailable;
-import sneer.android.impl.SneerAndroidImpl;
-import sneer.android.impl.SneerAndroidSimulator;
-import sneer.android.ui.MainActivity;
-
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -13,10 +8,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.util.Log;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import sneer.android.impl.SneerAndroidImpl;
 
 import java.io.IOException;
 
@@ -33,9 +28,11 @@ public class SneerApp extends Application {
     @Override
 	public void onCreate() {
 		super.onCreate();
-		SneerAndroidSingleton.setInstance(isCoreAvailable()
-			? new SneerAndroidImpl(getApplicationContext())
-			: new SneerAndroidSimulator(getApplicationContext()));
+//		SneerAndroidSingleton.setInstance(isCoreAvailable()
+//			? new SneerAndroidImpl(getApplicationContext())
+//			: new SneerAndroidSimulator(getApplicationContext()));
+
+        SneerAndroidSingleton.setInstance(new SneerAndroidImpl(getApplicationContext()));
 
         if (getRegistrationId(getApplicationContext()).isEmpty())
             registerInBackground();

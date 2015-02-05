@@ -1,18 +1,5 @@
 package sneer.android.ui;
 
-import static sneer.android.SneerAndroidSingleton.sneerAndroid;
-import static sneer.android.ui.SneerActivity.findImageView;
-import static sneer.android.ui.SneerActivity.findTextView;
-
-import java.util.List;
-import java.util.Random;
-
-import rx.functions.Action1;
-import sneer.Message;
-import sneer.Party;
-import sneer.android.R;
-import sneer.android.ui.drawable.TriangleLeftDrawable;
-import sneer.android.ui.drawable.TriangleRightDrawable;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.BitmapFactory;
@@ -30,6 +17,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import rx.functions.Action1;
+import sneer.Message;
+import sneer.Party;
+import sneer.android.R;
+import sneer.android.ui.drawable.TriangleLeftDrawable;
+import sneer.android.ui.drawable.TriangleRightDrawable;
+
+import java.util.List;
+import java.util.Random;
+
+import static sneer.android.SneerAndroidSingleton.sneerAndroid;
+import static sneer.android.ui.SneerActivity.findImageView;
+import static sneer.android.ui.SneerActivity.findTextView;
 
 class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
 

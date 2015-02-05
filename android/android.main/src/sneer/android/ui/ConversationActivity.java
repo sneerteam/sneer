@@ -1,24 +1,5 @@
 package sneer.android.ui;
 
-import static sneer.android.SneerAndroidSingleton.sneer;
-import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import sneer.Conversation;
-import sneer.ConversationMenuItem;
-import sneer.Message;
-import sneer.Party;
-import sneer.PublicKey;
-import sneer.android.R;
-import sneer.commons.Comparators;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -41,6 +22,21 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnDismissListener;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.*;
+import sneer.android.R;
+import sneer.commons.Comparators;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 
 public class ConversationActivity extends SneerActivity {
 
@@ -68,9 +64,10 @@ public class ConversationActivity extends SneerActivity {
 		setContentView(R.layout.activity_conversation);
 		justOpened = true;
 		actionBar = getActionBar();
-		actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null)
+            actionBar.setHomeButtonEnabled(true);
 
-		party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+        party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
 
 		plugActionBarTitle(actionBar, party.name());
 		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
@@ -98,7 +95,7 @@ public class ConversationActivity extends SneerActivity {
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (editText.getText().toString().trim() != null && !editText.getText().toString().trim().isEmpty())
+				if (!editText.getText().toString().trim().isEmpty())
 					actionButton.setImageResource(R.drawable.ic_action_send);
 				else
 					actionButton.setImageResource(R.drawable.ic_action_new);
@@ -131,12 +128,12 @@ public class ConversationActivity extends SneerActivity {
 		if (!text.isEmpty())
 			conversation.sendText(text);
 		else
-			openIteractionMenu();
+			openInteractionMenu();
 		editText.setText("");
 	}
 
 
-	private void openIteractionMenu() {
+	private void openInteractionMenu() {
 		final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
 
 		final Subscription s = conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")

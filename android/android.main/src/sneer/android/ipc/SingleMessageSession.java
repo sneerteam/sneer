@@ -1,21 +1,19 @@
 package sneer.android.ipc;
 
-import static sneer.android.impl.IPCProtocol.JPEG_IMAGE;
-import static sneer.android.impl.IPCProtocol.PAYLOAD;
-import static sneer.android.impl.IPCProtocol.RESULT_RECEIVER;
-import static sneer.android.impl.IPCProtocol.LABEL;
-import sneer.PublicKey;
-import sneer.Sneer;
-import sneer.android.impl.SneerAndroidImpl;
-import sneer.android.utils.AndroidUtils;
-import sneer.android.utils.LogUtils;
-import sneer.tuples.Tuple;
-import sneer.android.impl.SharedResultReceiver;
-import sneer.android.impl.Value;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+import sneer.PublicKey;
+import sneer.Sneer;
+import sneer.android.impl.SharedResultReceiver;
+import sneer.android.impl.SneerAndroidImpl;
+import sneer.android.impl.Value;
+import sneer.android.utils.AndroidUtils;
+import sneer.android.utils.LogUtils;
+import sneer.tuples.Tuple;
+
+import static sneer.android.impl.IPCProtocol.*;
 
 public class SingleMessageSession implements PluginSession {
 
@@ -50,14 +48,14 @@ public class SingleMessageSession implements PluginSession {
 		SharedResultReceiver resultReceiver = new SharedResultReceiver(new SharedResultReceiver.Callback() { @Override public void call(Bundle bundle) {
 			try {
 				bundle.setClassLoader(context.getClassLoader());
-				String text = bundle.getString(LABEL);
+				String label = bundle.getString(LABEL);
 				byte[] jpegImage = bundle.getByteArray(JPEG_IMAGE);
-				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' text '" + text + "' jpeg-image " + jpegImage + "' from " + plugin);
+				LogUtils.info(SingleMessageSession.class, "Receiving message of type '" + plugin.tupleType() + "' label '" + label + "' jpeg-image " + jpegImage + "' from " + plugin);
 				sneer.tupleSpace().publisher()
 					.field("message-type", plugin.tupleType())
 					.type("message")
 					.audience(partner)
-					.field(LABEL, text)
+					.field(LABEL, label)
 					.field(JPEG_IMAGE, jpegImage)
 					.pub(getPayload(bundle));
 			} catch (final Throwable t) {

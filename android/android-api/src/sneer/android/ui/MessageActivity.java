@@ -1,18 +1,12 @@
 package sneer.android.ui;
 
-import static sneer.android.impl.IPCProtocol.JPEG_IMAGE;
-import static sneer.android.impl.IPCProtocol.PAYLOAD;
-
-import sneer.android.Messages;
-import sneer.android.impl.Value;
-
 import android.app.Activity;
-import android.content.Intent;
+import sneer.android.Messages;
 
 public abstract class MessageActivity extends Activity {
 
 	protected void send(String label, Object payload, byte[] jpegImage) {
-		Messages.send(getIntent(), label, payload, jpegImage);
+		Messages.send(getIntent(), label, payload, null);
 	}
 
 
