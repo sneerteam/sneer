@@ -13,25 +13,26 @@ import java.util.Calendar;
 
 public class SneerBoot extends BroadcastReceiver {
 
-    public static final String TIMER_TAG = "TIMER_TAG";
-    public static final int SECONDS_TIMEOUT = 30;
-
     @Override
     public void onReceive(Context context, Intent intent) {
 		LogUtils.debug(SneerBoot.class, "Starting Sneer background service");
         TupleSpaceService.startTupleSpaceService(context);
 
+        // This is an attempt to make the CPU and network wake up periodically to fetch new tuples.
+        // It can be used if Google Cloud Messaging (GCM) doesn't work.
+//      startWatchDogTimer(context, intent);
+    }
+
+    public static final String TIMER_TAG = "TIMER_TAG";
+    public static final int SECONDS_TIMEOUT = 30;
+    private void startWatchDogTimer(Context context, Intent intent) {
         if (intent.getBooleanExtra(TIMER_TAG, false))
             return;
 
-        startWatchDogTimer(context);
-    }
+        Intent newIntent = new Intent(context, getClass());
+        newIntent.putExtra(TIMER_TAG, true);
 
-    private void startWatchDogTimer(Context context) {
-        Intent intent = new Intent(context, getClass());
-        intent.putExtra(TIMER_TAG, true);
-
-        PendingIntent pending = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pending = PendingIntent.getBroadcast(context, 0, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, SECONDS_TIMEOUT);

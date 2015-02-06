@@ -5,42 +5,60 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import java.util.Date;
+
 import sneer.commons.Clock;
+import sneer.commons.Threads;
 
 public class GcmBroadcastReceiver extends BroadcastReceiver {
 
-    private static int next_id = (int)Clock.now();
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		// Bundle extras = intent.getExtras();
+		GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
+		String messageType = gcm.getMessageType(intent);
+		Log.d(getClass().getName(), messageType);
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        // Bundle extras = intent.getExtras();
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-        String messageType = gcm.getMessageType(intent);
-        Log.d(getClass().getName(), messageType);
+		acquireWakeLock(context);
+		createNotificationIfNecessary(context);
 
-        createNotificationIfNecessary(context);
+		setResultCode(Activity.RESULT_OK);
+	}
 
-        setResultCode(Activity.RESULT_OK);
-    }
+	private static void acquireWakeLock(Context context) {
+		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		final PowerManager.WakeLock hopeForTuples = powerManager.newWakeLock(
+			    PowerManager.FULL_WAKE_LOCK, // For testing. Use PARTIAL_LOCK later.
+				"MyWakelockTag");
+		hopeForTuples.acquire();
 
-    private void createNotificationIfNecessary(Context context) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("This is the Notification Title")
-                .setContentText("This is the notification text. Bla bla bla")
-                .setWhen(Clock.now())
-                .setAutoCancel(true)
+		new Thread() { @Override public void run() {
+			Threads.sleepFor(30 * 1000);
+			hopeForTuples.release();
+		}}.start();
+	}
+
+	static int count = 1;
+
+	private static void createNotificationIfNecessary(Context context) {
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+		builder.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle("GCM Received")
+				.setContentText("Count: " + count++ + " on " + new Date())
+				.setWhen(Clock.now())
+				.setAutoCancel(true)
 //              .setContentIntent(pendIntent)
-                .setOngoing(false);
+				.setOngoing(false);
 
 		NotificationManager man = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		man.notify("sneer notification", next_id++, builder.build());
-    }
+		man.notify("gcm notification", 0, builder.build());
+	}
 
 
 }
