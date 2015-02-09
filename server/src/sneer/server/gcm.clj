@@ -1,7 +1,11 @@
 (ns sneer.server.gcm
   (:require [org.httpkit.client :as http]))
 
-(def api-key "AIzaSyAT0UYFeLE1M6NwGOx1ZRZX0uD7gEwEGRY")
+(def api-key
+  (let [currentDir (-> "." java.io.File. .getName)]
+    (if (= currentDir "sneer-live")
+      (-> "google-api.key" slurp .trim)
+      "CGM-is-not-authorized-outside-the-server")))
 
 (defn send-to [id callback]
   (http/post "https://android.googleapis.com/gcm/send"
