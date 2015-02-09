@@ -22,40 +22,32 @@ dependencies {
 
 android {
 
-    lintOptions {
-        abortOnError false
-    }
-    packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-    }
+  lintOptions {
+      abortOnError false
+  }
 
-    compileSdkVersion external.android.sdkVersion
-    buildToolsVersion external.android.buildToolsVersion
+  packagingOptions {
+      exclude 'META-INF/LICENSE'
+      exclude 'META-INF/NOTICE'
+  }
 
-    defaultConfig {
-        minSdkVersion external.android.minSdkVersion
-        targetSdkVersion external.android.sdkVersion
-        //testPackageName "sneer.android"
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
-    }
+  compileSdkVersion external.android.sdkVersion
+  buildToolsVersion external.android.buildToolsVersion
 
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-        }
-        instrumentTest {
-            java.srcDirs = ['tests/src']
-            manifest.srcFile file('tests/AndroidManifest.xml')
-            resources.srcDirs = ['tests/src']
-            res.srcDirs = ['tests/res']
-            assets.srcDirs = ['tests/assets']
-        }
+  defaultConfig {
+      minSdkVersion external.android.minSdkVersion
+      targetSdkVersion external.android.sdkVersion
+  }
+
+  sourceSets {
+    main {
+        manifest.srcFile 'AndroidManifest.xml'
+        java.srcDirs = ['src']
+        resources.srcDirs = ['src']
+        aidl.srcDirs = ['src']
+        renderscript.srcDirs = ['src']
+        res.srcDirs = ['res']
+        assets.srcDirs = ['assets']
     }
+  }
 }
