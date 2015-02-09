@@ -29,12 +29,11 @@ import java.io.InputStream;
 public class SneerApp extends Application {
 
     public static final String PROPERTY_REG_ID = "registration_id";
+
     private static final String PROPERTY_APP_VERSION = "appVersion";
 
     private static final String SENDER_ID = "670346118517";
-//  private static final String SENDER_ID = "maximal-journey-839";
 
-    private GoogleCloudMessaging gcm;
 
     @Override
 	public void onCreate() {
@@ -58,9 +57,7 @@ public class SneerApp extends Application {
             protected Void doInBackground(Void... params) {
 
                 try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-                    }
+                    GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
                     String gcmId = gcm.register(SENDER_ID);
                     log("Device registered, registration ID=" + gcmId);
 
@@ -78,7 +75,7 @@ public class SneerApp extends Application {
                 return null;
             }
 
-        }.execute(null, null, null);
+        }.execute();
     }
 
     private void sendRegistrationIdToBackendInBackground(final String registrationId) {
