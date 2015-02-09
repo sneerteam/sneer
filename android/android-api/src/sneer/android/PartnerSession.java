@@ -30,7 +30,7 @@ public class PartnerSession {
          * Called after each message, if it is the most recent message in the session. This method will
          * not be called, therefore, when previous messages in the session are being replayed.
          */
-        void update();
+        void refresh();
     }
 
 
@@ -82,7 +82,7 @@ public class PartnerSession {
             isReplaying = false;
 
         if (!isReplaying)
-            listener.update();
+            listener.refresh();
     }
 
     private ResultReceiver resultReceiver(Intent intent) {

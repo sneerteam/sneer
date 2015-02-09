@@ -31,13 +31,10 @@ public abstract class PartnerSessionActivity extends Activity {
             }
 
             @Override
-            public void update() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        PartnerSessionActivity.this.update();
-                    }
-                });
+            public void refresh() {
+                runOnUiThread(new Runnable() { @Override public void run() {
+                    PartnerSessionActivity.this.refresh();
+                }});
             }
         });
 	}
@@ -67,6 +64,6 @@ public abstract class PartnerSessionActivity extends Activity {
 	 * Called in the Android main thread (UI thread) after each message, if it is the most recent message in the session. This method will
 	 * not be called, therefore, when previous messages in the session are being replayed.
 	 */
-	protected abstract void update();
+	protected abstract void refresh();
 
 }
