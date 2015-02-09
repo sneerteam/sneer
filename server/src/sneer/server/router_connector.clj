@@ -72,11 +72,10 @@
   (>!! packets-out {n|ack (id-of tuple) :for to :to from}))
 
 (defn- send-gcm-if-necessary! [state router to]
-  #_(when-not (get-in state [:online-clients to]) ;Sends gcm for every message, for testing purposes.
+  (when-not (get-in state [:online-clients to])
     (when-not (peek-packet-for router to)
-      (>!! (:gcm-out state) to)))
-  (println "Connector GCM-OUT:" to)
-  (>!! (:gcm-out state) to))
+      (println "Connector GCM-OUT:" to)
+      (>!! (:gcm-out state) to))))
 
 (defn- handle-send [state from to tuple]
   (let [router (:router state)
