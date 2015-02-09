@@ -1,29 +1,10 @@
 package sneer.core.tests;
 
-import static sneer.ClojureUtils.var;
-import static sneer.commons.Arrays.asList;
-import static sneer.core.tests.ObservableTestUtils.eventually;
-import static sneer.core.tests.ObservableTestUtils.expecting;
-import static sneer.core.tests.ObservableTestUtils.payloads;
-import static sneer.core.tests.ObservableTestUtils.same;
-import static sneer.core.tests.ObservableTestUtils.values;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import junit.framework.TestCase;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.observables.ConnectableObservable;
-import sneer.Contact;
-import sneer.Conversation;
-import sneer.Message;
-import sneer.Party;
-import sneer.PrivateKey;
-import sneer.Profile;
-import sneer.PublicKey;
-import sneer.Sneer;
+import sneer.*;
 import sneer.admin.SneerAdmin;
 import sneer.commons.Arrays;
 import sneer.commons.Clock;
@@ -31,6 +12,14 @@ import sneer.commons.exceptions.FriendlyException;
 import sneer.crypto.impl.KeysImpl;
 import sneer.tuples.Tuple;
 import sneer.tuples.TuplePublisher;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static sneer.ClojureUtils.var;
+import static sneer.commons.Arrays.asList;
+import static sneer.core.tests.ObservableTestUtils.*;
 
 public class ConversationsAPITest extends TestCase {
 
@@ -434,11 +423,11 @@ public class ConversationsAPITest extends TestCase {
 			.audience(userB)
 			.type("message");
 
-		publisher.field("text", "mytext").pub();
+		publisher.field("label", "mylabel").pub();
 		Clock.tick();
-		publisher.field("text", "mytext2").pub();
+		publisher.field("label", "mylabel2").pub();
 		Clock.tick();
-		publisher.field("text", "mytext3").pub();
+		publisher.field("label", "mylabel3").pub();
 
 		Observable<String> contents = sneerA
 			.produceConversationWith(sneerA.produceParty(userB))

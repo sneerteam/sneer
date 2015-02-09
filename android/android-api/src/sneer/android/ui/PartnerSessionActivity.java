@@ -45,9 +45,8 @@ public abstract class PartnerSessionActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		if (toPartner != null) {
+		if (toPartner != null)
 			toPartner.dispose();
-		}
 		super.onDestroy();
 	}
 	

@@ -1,10 +1,11 @@
 package sneer.android.impl;
 
-import static sneer.android.ui.ConversationActivity.PARTY_PUK;
-
-import java.io.File;
-import java.io.IOException;
-
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.Message;
@@ -21,12 +22,11 @@ import sneer.android.utils.LogUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+
+import java.io.File;
+import java.io.IOException;
+
+import static sneer.android.ui.ConversationActivity.PARTY_PUK;
 
 public class SneerAndroidImpl implements SneerAndroid {
 
@@ -94,7 +94,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 	private static void notifyUser(Context context, Tuple tuple, String notificationLabel, PendingIntent pendIntent) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		builder.setSmallIcon(R.drawable.ic_launcher)
-			.setContentText("" + ("chat".equals(tuple.get("message-type")) ? tuple.payload() : (tuple.get("text") == null ? tuple.payload() : tuple.get("text"))))
+			.setContentText("" + ("chat".equals(tuple.get("message-type")) ? tuple.payload() : (tuple.get("label") == null ? tuple.payload() : tuple.get("label"))))
 			.setContentTitle(notificationLabel)
 			.setWhen(tuple.timestamp())
 			.setAutoCancel(true)

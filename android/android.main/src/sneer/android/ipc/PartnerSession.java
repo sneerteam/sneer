@@ -1,32 +1,25 @@
 package sneer.android.ipc;
 
-import static sneer.android.impl.IPCProtocol.ERROR;
-import static sneer.android.impl.IPCProtocol.OWN;
-import static sneer.android.impl.IPCProtocol.PARTNER_NAME;
-import static sneer.android.impl.IPCProtocol.PAYLOAD;
-import static sneer.android.impl.IPCProtocol.REPLAY_FINISHED;
-import static sneer.android.impl.IPCProtocol.RESULT_RECEIVER;
-import static sneer.android.impl.IPCProtocol.LABEL;
-import static sneer.android.impl.IPCProtocol.UNSUBSCRIBE;
-
-import java.util.concurrent.atomic.AtomicLong;
-
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import sneer.PublicKey;
 import sneer.Sneer;
+import sneer.android.impl.SharedResultReceiver;
+import sneer.android.impl.Value;
 import sneer.commons.Clock;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
-import sneer.android.impl.SharedResultReceiver;
-import sneer.android.impl.Value;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.ResultReceiver;
+
+import java.util.concurrent.atomic.AtomicLong;
+
+import static sneer.android.impl.IPCProtocol.*;
 
 public final class PartnerSession implements PluginSession {
 
@@ -51,7 +44,7 @@ public final class PartnerSession implements PluginSession {
 
 	private void sendMessage(ResultReceiver toClient, Tuple tuple) {
 		Bundle data = new Bundle();
-		data.putString(LABEL, (String) tuple.get("text"));
+		data.putString(LABEL, (String) tuple.get("label"));
 		data.putBoolean(OWN, tuple.author().equals(sneer.self().publicKey().current()));
 		data.putParcelable(PAYLOAD, Value.of(tuple.payload()));
 		toClient.send(0, data);
@@ -130,7 +123,7 @@ public final class PartnerSession implements PluginSession {
 			.audience(partner)
 			.field("session", sessionId)
 			.field("host", host)
-			.field("text", text)
+			.field("label", text)
 			.pub(message);
 	}
 
