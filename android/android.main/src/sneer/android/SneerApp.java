@@ -1,6 +1,6 @@
 package sneer.android;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,6 +20,7 @@ import sneer.PublicKey;
 import sneer.admin.SneerAdmin;
 import sneer.android.gcm.RegistrationController;
 import sneer.android.impl.SneerAndroidImpl;
+import sneer.android.ui.SneerActivity;
 import sneer.commons.Streams;
 
 import java.io.IOException;
@@ -132,18 +133,20 @@ public class SneerApp extends Application {
         }
     }
 
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-    public void checkPlayServices(Activity activity) {
+    public void checkPlayServices(SneerActivity activity) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+                new AlertDialog.Builder(activity)
+                    .setTitle("Missing Google Play services")
+                    .setMessage("Some features such as using maps and receiving notifications when idle will not work without Google Play Services, which are missing from this phone.")
+                    .setPositiveButton("OK", null)
+                    .show();
             } else {
                 Log.i(getClass().getName(), "This device is not supported.");
                 activity.finish();
             }
         }
     }
+
 }
