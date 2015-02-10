@@ -203,7 +203,7 @@ public class SneerActivity extends Activity {
 	}
 
 
-	protected void alert(String title, CharSequence[] items, DialogInterface.OnClickListener onClickListener) {
+    public void alert(String title, CharSequence[] items, DialogInterface.OnClickListener onClickListener) {
 		new AlertDialog.Builder(this)
 			.setTitle(title)
 			.setItems(items, onClickListener)

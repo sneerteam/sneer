@@ -1,5 +1,6 @@
 package sneer.android;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
@@ -20,7 +21,6 @@ import sneer.PublicKey;
 import sneer.admin.SneerAdmin;
 import sneer.android.gcm.RegistrationController;
 import sneer.android.impl.SneerAndroidImpl;
-import sneer.android.ui.SneerActivity;
 import sneer.commons.Streams;
 
 import java.io.IOException;
@@ -133,7 +133,7 @@ public class SneerApp extends Application {
         }
     }
 
-    public void checkPlayServices(SneerActivity activity) {
+    public void checkPlayServices(Activity activity) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
