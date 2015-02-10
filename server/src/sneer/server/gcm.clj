@@ -2,7 +2,7 @@
   (:require [org.httpkit.client :as http]))
 
 (def api-key
-  (let [currentDir (-> "." java.io.File. .getName)]
+  (let [currentDir (-> "whatever" java.io.File. .getCanonicalFile .getParentFile .getName)]
     (if (= currentDir "sneer-live")
       (-> "google-api.key" slurp .trim)
       "CGM-is-not-authorized-outside-the-server")))
