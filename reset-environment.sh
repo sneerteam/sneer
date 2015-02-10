@@ -9,4 +9,4 @@ rm ~/.m2/repository/me/sneer/ -rf
 
 ./gradlew clean check install || exit -1
 
-echo "Reset environment sucessful"
+#Reset environment sucessful
