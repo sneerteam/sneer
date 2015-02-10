@@ -1,15 +1,15 @@
 package sneer.core.tests;
 
-import static sneer.ClojureUtils.var;
-
-import java.util.Arrays;
-
 import rx.Observable;
 import rx.functions.Func0;
 import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.crypto.impl.KeysImpl;
 import sneer.tuples.TupleSpace;
+
+import java.util.Arrays;
+
+import static sneer.ClojureUtils.var;
 
 public class TupleSpaceTestsBase extends TestWithNetwork {
 	

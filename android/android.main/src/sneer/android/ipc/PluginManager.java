@@ -1,10 +1,9 @@
 package sneer.android.ipc;
 
-import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -12,10 +11,11 @@ import sneer.ConversationMenuItem;
 import sneer.Message;
 import sneer.Sneer;
 import sneer.tuples.Tuple;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PluginManager {
 

@@ -6,13 +6,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Toast;
+import sneer.android.ui.MessageActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
-import sneer.android.ui.MessageActivity;
 
 public class ComposeVideoMessageActivity extends MessageActivity {
 

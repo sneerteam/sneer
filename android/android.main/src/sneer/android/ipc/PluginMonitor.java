@@ -1,16 +1,5 @@
 package sneer.android.ipc;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import sneer.Sneer;
-import sneer.android.utils.LogUtils;
-import sneer.commons.SystemReport;
-import sneer.commons.exceptions.FriendlyException;
-import sneer.rx.ObservedSubject;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +8,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import sneer.Sneer;
+import sneer.android.utils.LogUtils;
+import sneer.commons.SystemReport;
+import sneer.commons.exceptions.FriendlyException;
+import sneer.rx.ObservedSubject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PluginMonitor extends BroadcastReceiver {
 

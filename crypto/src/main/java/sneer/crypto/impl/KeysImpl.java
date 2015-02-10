@@ -1,35 +1,22 @@
 package sneer.crypto.impl;
 
-import static java.lang.System.arraycopy;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.System.nanoTime;
-import static java.util.Locale.US;
-import static sneer.commons.Codec.fromHex;
-import static sneer.commons.exceptions.Exceptions.check;
-import static sneer.crypto.impl.Hashes.sha256;
-
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
-import java.security.Provider;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.ECFieldFp;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
-import java.security.spec.ECPublicKeySpec;
-import java.security.spec.EllipticCurve;
-import java.util.Arrays;
-
 import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.commons.SystemReport;
 import sneer.crypto.Keys;
+
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.security.*;
+import java.security.spec.*;
+import java.util.Arrays;
+
+import static java.lang.System.*;
+import static java.util.Locale.US;
+import static sneer.commons.Codec.fromHex;
+import static sneer.commons.exceptions.Exceptions.check;
+import static sneer.crypto.impl.Hashes.sha256;
 
 public class KeysImpl implements Keys {
 

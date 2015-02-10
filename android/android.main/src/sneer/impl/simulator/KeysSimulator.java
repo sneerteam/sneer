@@ -1,9 +1,9 @@
 package sneer.impl.simulator;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import sneer.PrivateKey;
 import sneer.PublicKey;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class KeysSimulator {
 	

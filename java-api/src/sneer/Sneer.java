@@ -1,10 +1,10 @@
 package sneer;
 
-import java.util.List;
-
 import rx.Observable;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.TupleSpace;
+
+import java.util.List;
 
 public interface Sneer {
 	

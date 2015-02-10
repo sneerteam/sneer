@@ -1,11 +1,10 @@
 package sneer.commons.tests;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-
 import sneer.commons.Clock;
 import sneer.commons.SystemReport;
+
+import static org.junit.Assert.assertEquals;
 
 public class SystemReportTests {
 

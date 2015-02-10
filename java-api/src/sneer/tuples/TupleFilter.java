@@ -1,10 +1,10 @@
 package sneer.tuples;
 
-import java.util.Map;
-
 import rx.Observable;
 import sneer.PrivateKey;
 import sneer.PublicKey;
+
+import java.util.Map;
 
 public interface TupleFilter {
 

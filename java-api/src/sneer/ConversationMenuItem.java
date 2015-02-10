@@ -1,8 +1,8 @@
 package sneer;
 
-import java.util.Comparator;
-
 import rx.functions.Action1;
+
+import java.util.Comparator;
 
 public interface ConversationMenuItem extends Action1<PublicKey> {
 

@@ -2,7 +2,6 @@ package sneer.android.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-
 import sneer.android.PartnerSession;
 
 public abstract class PartnerSessionActivity extends Activity {

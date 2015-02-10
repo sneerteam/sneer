@@ -1,8 +1,8 @@
 package sneer.android.ipc;
 
-import static sneer.android.utils.EnumUtils.names;
-
 import java.util.Set;
+
+import static sneer.android.utils.EnumUtils.names;
 
 public enum PluginType {
 	PARTNER_SESSION(PartnerSessionFactory.singleton, true, true),

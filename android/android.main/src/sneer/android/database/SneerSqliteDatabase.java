@@ -1,5 +1,13 @@
 package sneer.android.database;
 
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.*;
+import sneer.admin.Database;
+import sneer.admin.UniqueConstraintViolated;
+import sneer.commons.Lists;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -7,18 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import sneer.admin.Database;
-import sneer.admin.UniqueConstraintViolated;
-import sneer.commons.Lists;
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteConstraintException;
-import android.database.sqlite.SQLiteCursor;
-import android.database.sqlite.SQLiteCursorDriver;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQuery;
 
 
 public class SneerSqliteDatabase implements Closeable, Database {

@@ -1,16 +1,15 @@
 package sneer.commons.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import org.junit.Test;
+import sneer.commons.InteractiveSerializer;
+import sneer.commons.ObjectReplacer;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-
-import sneer.commons.InteractiveSerializer;
-import sneer.commons.ObjectReplacer;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class InteractiveSerializerTests {
 

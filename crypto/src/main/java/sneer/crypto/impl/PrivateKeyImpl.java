@@ -1,10 +1,10 @@
 package sneer.crypto.impl;
 
-import java.util.Arrays;
-
 import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.commons.Codec;
+
+import java.util.Arrays;
 
 class PrivateKeyImpl implements PrivateKey { private static final long serialVersionUID = 1L;
 

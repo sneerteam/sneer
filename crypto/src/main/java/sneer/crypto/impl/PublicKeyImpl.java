@@ -1,9 +1,9 @@
 package sneer.crypto.impl;
 
-import java.util.Arrays;
-
 import sneer.PublicKey;
 import sneer.commons.Codec;
+
+import java.util.Arrays;
 
 class PublicKeyImpl implements PublicKey {
 	

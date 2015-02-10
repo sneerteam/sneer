@@ -1,9 +1,9 @@
 package sneer.tuples;
 
-import java.util.Map;
-
 import rx.functions.Func1;
 import sneer.PublicKey;
+
+import java.util.Map;
 
 public interface Tuple extends Map<String, Object> {
 

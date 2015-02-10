@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
-
-import java.util.concurrent.TimeUnit;
-
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.subscriptions.SerialSubscription;
+
+import java.util.concurrent.TimeUnit;
 
 public class TupleSpaceService extends Service {
 

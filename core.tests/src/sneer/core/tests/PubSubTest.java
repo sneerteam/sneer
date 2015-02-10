@@ -1,19 +1,7 @@
 package sneer.core.tests;
 
-import static junit.framework.Assert.assertEquals;
-import static sneer.core.tests.ObservableTestUtils.assertList;
-import static sneer.core.tests.ObservableTestUtils.expecting;
-import static sneer.core.tests.ObservableTestUtils.field;
-import static sneer.core.tests.ObservableTestUtils.notifications;
-import static sneer.core.tests.ObservableTestUtils.payloads;
-import static sneer.core.tests.ObservableTestUtils.values;
-import static sneer.tuples.Tuple.TO_TYPE;
-
-import java.util.List;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Func0;
@@ -25,6 +13,12 @@ import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 import sneer.tuples.TuplePublisher;
 import sneer.tuples.TupleSpace;
+
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static sneer.core.tests.ObservableTestUtils.*;
+import static sneer.tuples.Tuple.TO_TYPE;
 
 public class PubSubTest extends TupleSpaceTestsBase {
 

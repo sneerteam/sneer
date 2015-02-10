@@ -1,7 +1,6 @@
 package sneer.crypto.tests;
 
 import org.junit.Test;
-
 import sneer.crypto.impl.KeysImpl;
 
 public class KeysTests {

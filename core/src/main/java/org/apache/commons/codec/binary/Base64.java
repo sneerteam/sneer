@@ -1,8 +1,7 @@
 package org.apache.commons.codec.binary;
 
-import java.nio.charset.Charset;
-
 import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.Charset;
 
 /** Replacement for apache.commons.codec.Base64 class used by transit-java. The original apache.commons.codec lib includes native libs and Android doesn't like that. :( */
 public class Base64 {

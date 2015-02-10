@@ -13,10 +13,8 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-
 import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.admin.SneerAdmin;

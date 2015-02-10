@@ -1,12 +1,5 @@
 package sneer.android.ui;
 
-import static sneer.android.SneerAndroidSingleton.sneer;
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Action1;
-import sneer.Profile;
-import sneer.android.R;
-import sneer.commons.exceptions.FriendlyException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -18,6 +11,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
+import sneer.Profile;
+import sneer.android.R;
+import sneer.commons.exceptions.FriendlyException;
+
+import static sneer.android.SneerAndroidSingleton.sneer;
 
 public class ProfileActivity extends SneerActivity {
 

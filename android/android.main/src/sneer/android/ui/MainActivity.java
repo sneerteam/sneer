@@ -1,17 +1,5 @@
 package sneer.android.ui;
 
-import static sneer.android.SneerAndroidSingleton.sneer;
-import static sneer.android.SneerAndroidSingleton.sneerAndroid;
-
-import java.util.Collection;
-
-import rx.functions.Action1;
-import sneer.Conversation;
-import sneer.Party;
-import sneer.Profile;
-import sneer.android.R;
-import sneer.android.SneerApp;
-import sneer.android.utils.Puk;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -25,6 +13,18 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import rx.functions.Action1;
+import sneer.Conversation;
+import sneer.Party;
+import sneer.Profile;
+import sneer.android.R;
+import sneer.android.SneerApp;
+import sneer.android.utils.Puk;
+
+import java.util.Collection;
+
+import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 
 public class MainActivity extends SneerActivity {
 

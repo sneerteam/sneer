@@ -1,7 +1,7 @@
 package sneer.android.ipc;
 
-import sneer.Sneer;
 import android.content.Context;
+import sneer.Sneer;
 
 public final class PartnerSessionFactory implements PluginSessionFactory {
 

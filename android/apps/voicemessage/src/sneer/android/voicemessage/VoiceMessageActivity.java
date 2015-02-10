@@ -7,15 +7,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
 import sneer.android.ui.MessageActivity;
+
+import java.io.*;
 
 public class VoiceMessageActivity extends MessageActivity {
 

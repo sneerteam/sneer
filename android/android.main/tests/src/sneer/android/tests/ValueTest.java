@@ -1,11 +1,11 @@
 package sneer.android.tests;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import android.os.Parcel;
 import junit.framework.TestCase;
 import sneer.android.impl.Value;
-import android.os.Parcel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ValueTest extends TestCase {
 

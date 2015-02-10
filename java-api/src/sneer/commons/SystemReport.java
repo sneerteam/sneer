@@ -1,14 +1,13 @@
 package sneer.commons;
 
+import org.ocpsoft.prettytime.PrettyTime;
+import rx.Observable;
+import rx.subjects.BehaviorSubject;
+
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.ocpsoft.prettytime.PrettyTime;
-
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 /** A simple monitoring tool. A single place for classes to report useful monitoring info and for that information to be consumed in a report. */
 public class SystemReport {

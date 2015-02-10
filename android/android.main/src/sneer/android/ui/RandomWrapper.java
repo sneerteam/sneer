@@ -1,10 +1,10 @@
 package sneer.android.ui;
 
-import static sneer.commons.exceptions.Exceptions.check;
+import sneer.commons.SystemReport;
 
 import java.security.SecureRandom;
 
-import sneer.commons.SystemReport;
+import static sneer.commons.exceptions.Exceptions.check;
 
 /**
  * Using SecureRandom instances provided by the java security mechanism is a

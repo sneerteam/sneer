@@ -1,19 +1,14 @@
 package sneer.android.sendfiles;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-
-import sneer.android.ui.MessageActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
+import sneer.android.ui.MessageActivity;
+
+import java.io.*;
+import java.util.HashMap;
 
 public class ComposeSendFilesActivity extends MessageActivity {
 

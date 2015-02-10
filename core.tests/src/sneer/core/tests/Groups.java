@@ -1,13 +1,12 @@
 package sneer.core.tests;
 
-import static sneer.core.tests.ObservableTestUtils.assertCount;
-import static sneer.core.tests.TupleTestUtils.expectValues;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
 import sneer.PrivateKey;
 import sneer.crypto.impl.KeysImpl;
+
+import static sneer.core.tests.ObservableTestUtils.assertCount;
+import static sneer.core.tests.TupleTestUtils.expectValues;
 
 @Ignore("wip")
 public class Groups extends TupleSpaceTestsBase {

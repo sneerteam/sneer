@@ -1,14 +1,14 @@
 package sneer.android.ui;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import sneer.android.R;
-import sneer.commons.SystemReport;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.android.R;
+import sneer.commons.SystemReport;
 
 public class SystemReportActivity extends Activity {
 

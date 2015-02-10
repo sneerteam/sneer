@@ -1,21 +1,17 @@
 package sneer.impl.simulator;
 
-import static sneer.Contact.TO_NICKNAME;
-import static sneer.commons.Streams.readFully;
-import static sneer.commons.exceptions.Exceptions.check;
+import rx.Observable;
+import rx.functions.Func1;
+import sneer.*;
+import sneer.rx.Observed;
+import sneer.rx.ObservedSubject;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.functions.Func1;
-import sneer.Contact;
-import sneer.Party;
-import sneer.Profile;
-import sneer.PublicKey;
-import sneer.Sneer;
-import sneer.rx.Observed;
-import sneer.rx.ObservedSubject;
+import static sneer.Contact.TO_NICKNAME;
+import static sneer.commons.Streams.readFully;
+import static sneer.commons.exceptions.Exceptions.check;
 
 
 public class PartySimulator implements Party, Profile {

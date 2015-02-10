@@ -1,17 +1,5 @@
 package sneer.android.ui;
 
-import static sneer.android.SneerAndroidSingleton.sneer;
-import static sneer.android.ui.SneerActivity.deferUI;
-import static sneer.android.ui.SneerActivity.findView;
-import static sneer.android.ui.SneerActivity.plug;
-import static sneer.android.ui.SneerActivity.plugDate;
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
-import rx.subscriptions.Subscriptions;
-import sneer.Conversation;
-import sneer.android.R;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -23,6 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
+import sneer.Conversation;
+import sneer.android.R;
+
+import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.ui.SneerActivity.*;
 
 public class MainAdapter extends ArrayAdapter<Conversation> {
 

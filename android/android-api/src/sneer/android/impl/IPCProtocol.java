@@ -1,9 +1,5 @@
 package sneer.android.impl;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.ResultReceiver;
-
 public class IPCProtocol {
 
 	//Message

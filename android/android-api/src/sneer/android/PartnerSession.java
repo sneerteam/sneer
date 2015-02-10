@@ -4,17 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-
 import sneer.android.impl.SharedResultReceiver;
 import sneer.android.impl.Utils;
 import sneer.android.impl.Value;
 
-import static sneer.android.impl.IPCProtocol.OWN;
-import static sneer.android.impl.IPCProtocol.PARTNER_NAME;
-import static sneer.android.impl.IPCProtocol.PAYLOAD;
-import static sneer.android.impl.IPCProtocol.REPLAY_FINISHED;
-import static sneer.android.impl.IPCProtocol.RESULT_RECEIVER;
-import static sneer.android.impl.IPCProtocol.UNSUBSCRIBE;
+import static sneer.android.impl.IPCProtocol.*;
 
 public class PartnerSession {
 

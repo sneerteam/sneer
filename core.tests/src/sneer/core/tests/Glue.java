@@ -1,12 +1,11 @@
 package sneer.core.tests;
 
-import static sneer.ClojureUtils.adminVar;
-import static sneer.ClojureUtils.dispose;
-import static sneer.ClojureUtils.var;
 import sneer.ClojureUtils;
 import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.admin.SneerAdmin;
+
+import static sneer.ClojureUtils.*;
 
 public class Glue {
 

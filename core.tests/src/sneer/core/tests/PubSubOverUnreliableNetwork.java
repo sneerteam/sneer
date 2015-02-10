@@ -1,7 +1,6 @@
 package sneer.core.tests;
 
 import org.junit.Ignore;
-
 import sneer.ClojureUtils;
 
 @Ignore("wip")

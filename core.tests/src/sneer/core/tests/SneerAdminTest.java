@@ -1,15 +1,15 @@
 package sneer.core.tests;
 
-import static sneer.ClojureUtils.dispose;
-import static sneer.ClojureUtils.var;
-
-import java.io.File;
-import java.io.IOException;
-
 import junit.framework.TestCase;
 import sneer.ClojureUtils;
 import sneer.PrivateKey;
 import sneer.admin.SneerAdmin;
+
+import java.io.File;
+import java.io.IOException;
+
+import static sneer.ClojureUtils.dispose;
+import static sneer.ClojureUtils.var;
 
 public class SneerAdminTest extends TestCase {
 

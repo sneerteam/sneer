@@ -1,8 +1,8 @@
 package sneer.crypto.impl;
 
-import static sneer.commons.exceptions.Exceptions.check;
-
 import java.security.SecureRandom;
+
+import static sneer.commons.exceptions.Exceptions.check;
 
 /**
  * Using SecureRandom instances provided by the java security mechanism is a

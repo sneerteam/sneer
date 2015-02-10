@@ -4,11 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-
-import static sneer.android.impl.IPCProtocol.*;
-
 import sneer.android.impl.Utils;
 import sneer.android.impl.Value;
+
+import static sneer.android.impl.IPCProtocol.*;
 
 public class Messages {
 

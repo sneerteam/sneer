@@ -1,9 +1,18 @@
 package sneer.android.ui;
 
-import static sneer.android.SneerAndroidSingleton.admin;
-import static sneer.android.SneerAndroidSingleton.sneer;
-import static sneer.android.SneerAndroidSingleton.sneerAndroid;
-import static sneer.android.ui.SneerActivity.plug;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -15,20 +24,9 @@ import sneer.PublicKey;
 import sneer.android.R;
 import sneer.android.utils.Puk;
 import sneer.commons.exceptions.FriendlyException;
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import static sneer.android.SneerAndroidSingleton.*;
+import static sneer.android.ui.SneerActivity.plug;
 
 public class ContactActivity extends Activity {
 
@@ -177,9 +175,7 @@ public class ContactActivity extends Activity {
 		profile = sneer().profileFor(party);
 		contact = sneer().findContact(party);
 
-		newContact = contact == null
-				? true
-				: false;
+		newContact = contact == null;
 	}
 
 

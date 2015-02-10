@@ -1,16 +1,5 @@
 package sneer.core.tests;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertSame;
-import static junit.framework.Assert.fail;
-import static sneer.tuples.Tuple.TO_PAYLOAD;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
@@ -18,6 +7,15 @@ import rx.functions.Action2;
 import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import sneer.tuples.Tuple;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.Assert.*;
+import static sneer.tuples.Tuple.TO_PAYLOAD;
 
 @SuppressWarnings("deprecation")
 public class ObservableTestUtils {

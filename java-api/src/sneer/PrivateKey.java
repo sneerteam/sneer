@@ -1,8 +1,8 @@
 package sneer;
 
-import java.io.Serializable;
-
 import rx.functions.Func1;
+
+import java.io.Serializable;
 
 public interface PrivateKey extends Serializable {
 

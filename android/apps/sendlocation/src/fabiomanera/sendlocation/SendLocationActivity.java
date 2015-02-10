@@ -1,7 +1,5 @@
 package fabiomanera.sendlocation;
 
-import static android.location.LocationManager.GPS_PROVIDER;
-import sneer.android.ui.MessageActivity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,8 +9,11 @@ import android.location.LocationManager;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.widget.Toast;
+import sneer.android.ui.MessageActivity;
 
 import java.io.ByteArrayOutputStream;
+
+import static android.location.LocationManager.GPS_PROVIDER;
 
 public class SendLocationActivity extends MessageActivity implements LocationListener {
 
