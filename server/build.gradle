@@ -1,7 +1,6 @@
 version = "0.0.1"
 
 apply plugin: "clojure"
-apply plugin: "eclipse"
 
 buildscript {
     repositories {
@@ -15,7 +14,6 @@ buildscript {
 }
 
 repositories {
-    mavenCentral()
     maven { url "https://clojars.org/repo" }
 }
 
@@ -31,11 +29,6 @@ sourceSets {
     		srcDir 'test'
     	}
     }
-}
-
-eclipse.project {
-    natures 'ccw.nature'
-    buildCommand 'ccw.builder'
 }
 
 dependencies {

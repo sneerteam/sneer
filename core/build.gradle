@@ -1,16 +1,11 @@
-version = "0.0.1"
+version = "0.1.4"
 
 apply plugin: "clojure"
 apply plugin: "java"
-apply plugin: "eclipse"
 apply plugin: "maven"
-
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
 
 buildscript {
     repositories {
-        mavenCentral()
         maven { url "https://clojars.org/repo" }
     }
 
@@ -20,7 +15,6 @@ buildscript {
 }
 
 repositories {
-    mavenCentral()
     maven { url "https://clojars.org/repo" }
 }
 

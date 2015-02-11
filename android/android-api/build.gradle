@@ -6,22 +6,9 @@ ext.packaging = 'jar'
 
 apply from: '../../sonatype.gradle'
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
-    }
-}
-
 configurations {
     libs
     compile.extendsFrom libs
-}
-
-dependencies {
 }
 
 android {
@@ -41,7 +28,6 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            aidl.srcDir 'src'
             java.srcDir 'src'
             res.srcDir 'res'
         }
