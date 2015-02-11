@@ -149,12 +149,12 @@ public class ContactActivity extends Activity {
 
 	private void loadProfile() {
 		if (newContact) {
-            ownNameSubscription = plugNickname(nicknameEdit, profile.ownName());
+            ownNameSubscription = plug(nicknameEdit, profile.ownName());
             if (nicknameEdit.getText().toString().isEmpty()) {
-                preferredNicknameSubscription = plugNickname(nicknameEdit, profile.preferredNickname());
+                preferredNicknameSubscription = plug(nicknameEdit, profile.preferredNickname());
             }
         } else {
-            plugNickname(nicknameEdit, contact.nickname().observable());
+            plug(nicknameEdit, contact.nickname().observable());
 		}
 
 		plug(fullNameView, profile.ownName());
