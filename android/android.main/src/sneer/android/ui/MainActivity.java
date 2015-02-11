@@ -57,10 +57,11 @@ public class MainActivity extends SneerActivity {
 
 	private void makeConversationList() {
 		final ActionBar actionBar = getActionBar();
-		actionBar.setHomeButtonEnabled(true);
-
-		plugActionBarTitle(actionBar, ownProfile.ownName());
-		plugActionBarIcon(actionBar, ownProfile.selfie());
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(true);
+            plugActionBarTitle(actionBar, ownProfile.ownName());
+            plugActionBarIcon(actionBar, ownProfile.selfie());
+        }
 
 		conversations = (ListView) findViewById(R.id.conversationList);
 		adapter = new MainAdapter(this);

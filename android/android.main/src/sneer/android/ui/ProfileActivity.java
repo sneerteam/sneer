@@ -1,5 +1,6 @@
 package sneer.android.ui;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -40,7 +41,9 @@ public class ProfileActivity extends SneerActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
 
 		profile = sneer().profileFor(sneer().self());
 
