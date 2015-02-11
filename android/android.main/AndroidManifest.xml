@@ -34,11 +34,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".gcm.GcmRegistrationAlarmReceiver">
+        </receiver>
+
         <receiver android:name=".SneerBoot">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".ipc.PluginMonitor"
             android:enabled="true"
@@ -72,6 +76,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.ConversationActivity"
             android:label="@string/title_conversation"></activity>
