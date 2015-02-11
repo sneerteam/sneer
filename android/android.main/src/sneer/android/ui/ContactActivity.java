@@ -1,5 +1,6 @@
 package sneer.android.ui;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -26,12 +28,15 @@ import sneer.android.utils.Puk;
 import sneer.commons.exceptions.FriendlyException;
 
 import static sneer.android.SneerAndroidSingleton.*;
-import static sneer.android.ui.SneerActivity.plug;
+import static sneer.android.ui.SneerActivity.*;
 
 public class ContactActivity extends Activity {
 
 	static final String PARTY_PUK = "partyPuk";
 	static final String CURRENT_NICKNAME = "currentNickname";
+
+    private ActionBar actionBar;
+
 	private boolean newContact = false;
 	private Profile profile;
 	private ImageView selfieImage;
@@ -45,8 +50,11 @@ public class ContactActivity extends Activity {
 	private PublicKey partyPuk;
 	private Contact contact;
 	private boolean isOwn;
+    private boolean nicknameChanged;
+    private Subscription ownNameSubscription;
+    private Subscription preferredNicknameSubscription;
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -63,10 +71,12 @@ public class ContactActivity extends Activity {
 
 		load();
 
-		getActionBar().setTitle(activityTitle());
+        actionBar = getActionBar();
+        if (actionBar != null)
+            actionBar.setTitle(activityTitle());
 
 		validationOnTextChanged(nicknameEdit);
-	}
+    }
 
 
 	@Override
@@ -98,7 +108,8 @@ public class ContactActivity extends Activity {
 
 		if (Intent.ACTION_VIEW.equals(action)){
 			try {
-				getActionBar().setDisplayHomeAsUpEnabled(true);
+                if (actionBar != null)
+				    actionBar.setDisplayHomeAsUpEnabled(true);
 				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));
 			} catch (RuntimeException e) {
 				toast("Invalid public key");
@@ -138,11 +149,12 @@ public class ContactActivity extends Activity {
 
 	private void loadProfile() {
 		if (newContact) {
-			plug(nicknameEdit, profile.ownName());
-			if (nicknameEdit.getText().toString().isEmpty())
-				plug(nicknameEdit, profile.preferredNickname());
-		} else {
-			plug(nicknameEdit, contact.nickname().observable());
+            ownNameSubscription = plugNickname(nicknameEdit, profile.ownName());
+            if (nicknameEdit.getText().toString().isEmpty()) {
+                preferredNicknameSubscription = plugNickname(nicknameEdit, profile.preferredNickname());
+            }
+        } else {
+            plugNickname(nicknameEdit, contact.nickname().observable());
 		}
 
 		plug(fullNameView, profile.ownName());
@@ -214,15 +226,20 @@ public class ContactActivity extends Activity {
 	}
 
 
-	private void validationOnTextChanged(final EditText textView) {
-		textView.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void afterTextChanged(Editable s) {
-				nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), textView.getText().toString()));
-			}
+	private void validationOnTextChanged(final EditText editText) {
+		editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                ownNameSubscription.unsubscribe();
+                preferredNicknameSubscription.unsubscribe();
+                nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), editText.getText().toString()));
+            }
 
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
         });
 	}
 
