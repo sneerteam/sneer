@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 import sneer.android.gcm.RegistrationController;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RegistrationControllerTest extends AndroidTestCase {
@@ -12,7 +13,7 @@ public class RegistrationControllerTest extends AndroidTestCase {
     public void testWhenUnregisteredWillRegisterAndNotifyBackend() throws Exception {
         SharedPreferences prefs = sharedPrefs();
 
-        new RegistrationController(prefs, appVersion(1), successfulGcmClient("42"), successfulBackendClient()).run();
+        runWith(prefs, appVersion(1), successfulGcmClient("42"), successfulBackendClient());
 
         assertEquals("42", prefs.getString("id", ""));
         assertEquals(1, prefs.getInt("registered-app-version", 0));
@@ -20,31 +21,36 @@ public class RegistrationControllerTest extends AndroidTestCase {
     }
 
     public void testWhenRegisteredWillNotRegisterButWillNotifyBackend() throws Exception {
-        SharedPreferences prefs = sharedPrefs();
-        prefs.edit()
-            .putString("id", "42")
-            .putInt("registered-app-version", 1)
-            .apply();
+        SharedPreferences prefs = registeredPrefs();
 
-        new RegistrationController(prefs, appVersion(1), failingGcmClient(), successfulBackendClient()).run();
+        runWith(prefs, appVersion(1), failingGcmClient(), successfulBackendClient());
 
         assertEquals("42", prefs.getString("id", ""));
         assertIdSentToBackend("42");
     }
 
     public void testWhenRegisteredAndAppVersionChangesWillRegisterAgain() throws Exception {
-        SharedPreferences prefs = sharedPrefs();
-        prefs.edit()
-            .putString("id", "42")
-            .putInt("registered-app-version", 1)
-            .apply();
+        SharedPreferences prefs = registeredPrefs();
 
         String newId = "43";
-        new RegistrationController(prefs, appVersion(2), successfulGcmClient(newId), successfulBackendClient()).run();
+        runWith(prefs, appVersion(2), successfulGcmClient(newId), successfulBackendClient());
 
         assertEquals(newId, prefs.getString("id", ""));
         assertEquals(2, prefs.getInt("registered-app-version", 0));
         assertIdSentToBackend("43");
+    }
+
+    private void runWith(SharedPreferences prefs, RegistrationController.AppVersionProvider appVersionProvider, RegistrationController.GcmClient gcmClient, RegistrationController.BackendClient backendClient) throws IOException {
+        new RegistrationController(prefs, appVersionProvider, gcmClient, backendClient).run();
+    }
+
+    private SharedPreferences registeredPrefs() {
+        SharedPreferences prefs = sharedPrefs();
+        prefs.edit()
+                .putString("id", "42")
+                .putInt("registered-app-version", 1)
+                .apply();
+        return prefs;
     }
 
     private RegistrationController.GcmClient failingGcmClient() {
@@ -71,6 +77,15 @@ public class RegistrationControllerTest extends AndroidTestCase {
             @Override
             public void register(String gcmId) {
                 idsSentToBackend.add(gcmId);
+            }
+        };
+    }
+
+    private RegistrationController.BackendClient failingBackendClient() {
+        return new RegistrationController.BackendClient() {
+            @Override
+            public void register(String gcmId) {
+                throw new IllegalStateException("backend is offline");
             }
         };
     }
