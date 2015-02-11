@@ -35,7 +35,7 @@ public class SystemReport {
 
 	synchronized
 	private static String updateReportAndGetLatest(String tag, Object info) {
-		final String msg = pretty(new Date(Clock.now())) + " " + info;
+		final String msg = new Date(Clock.now()) + " - " + info;
 		System.out.println(tag + ":" + msg);
 		infosByTag.put(tag, msg);
 		return latestReport();
