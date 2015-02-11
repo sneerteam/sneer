@@ -6,7 +6,11 @@ import java.io.InputStream;
 
 public class Streams {
 
-	public static byte[] readFully(InputStream in) throws IOException {
+    public static String readString(InputStream content) throws IOException {
+        return new String(readFully(content));
+    }
+
+    public static byte[] readFully(InputStream in) throws IOException {
 		byte[] b = new byte[8192];
 		int read;
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

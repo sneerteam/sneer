@@ -26,8 +26,9 @@ import sneer.PrivateKey;
 import sneer.PublicKey;
 import sneer.admin.SneerAdmin;
 import sneer.android.SneerAndroidSingleton;
-import sneer.commons.Streams;
 import sneer.commons.SystemReport;
+
+import static sneer.commons.Streams.readString;
 
 public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
 
@@ -118,10 +119,6 @@ public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
         public String register() throws IOException {
             GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(applicationContext);
             return gcm.register(SENDER_ID);
-        }
-
-        String readString(InputStream content) throws IOException {
-            return new String(Streams.readFully(content));
         }
 
         String registrationUriFor(String gcmId) {
