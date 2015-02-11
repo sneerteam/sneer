@@ -14,20 +14,22 @@
                  (fn [response] (>!! result response)))
     result))
 
+(defn- wait [secs-string]
+  (println "GCM: WAITING" secs-string "SECONDS")
+  (async/timeout (* 1000 (Integer/valueOf secs-string))))
+
 (defn- start-gcm-notification-rounds [gcm-ids gcm-ids-notified async-gcm-notify-fn]
   (go-while-let [round (<! gcm-ids)]
     (loop [round round]
       (when-not (empty? round)
         (let [gcm-id (first round)
-              banana (println "GCM To notify" gcm-id)
               response (<! (async-gcm-notify-fn gcm-id))
               status (:status response)]
           (println "GCM RESPONSE:" response)
           (if (= 200 status)
             (>! gcm-ids-notified gcm-id)
             (when-some [retry-after-secs (-> response :headers :retry-after)]
-              (println "GCM: WAITING" retry-after-secs "SECONDS")
-              (<! (async/timeout (* 1000 (Integer/valueOf retry-after-secs))))))
+              (<! (wait retry-after-secs))))
           (recur (rest round)))))))
 
 (defn- start-gcm-notifier [puk->gcm-id-in puks-in async-gcm-notify-fn]
@@ -85,10 +87,10 @@
       (>! puk->gcm-id [(keys/from-hex hex-puk) id]))
     (str "id for " hex-puk " set to " id)))
 
-(defn log-requests [f]
-  (fn [req]
-    (println req)
-    (f req)))
+(defn log-calls [function]
+  (fn [arg]
+    (println arg)
+    (function arg)))
 
 (defn start [port puks-in & [async-gcm-notify-fn]]
 
@@ -99,7 +101,7 @@
       (GET "/gcm/register" req (gcm-register puk->gcm-id-out req))
       (route/not-found "<h1>page not found</h1>"))
 
-    (let [server (http/run-server (-> app log-requests params/wrap-params) {:port port})]
+    (let [server (http/run-server (-> app log-calls params/wrap-params) {:port port})]
       (async/go
         (<! (start-gcm-notifier puk->gcm-id-out puks-in async-gcm-notify-fn))
         (async/close! puk->gcm-id-out)

@@ -1,5 +1,5 @@
 (ns sneer.server.http-server-test
-  (:require [sneer.server.http-server :as server]
+  (:require [sneer.server.http-server :as subject]
             [sneer.keys :as keys]
             [sneer.test-util :refer [>!!? <!!?]]
             [clojure.core.async :as async]
@@ -19,7 +19,7 @@
             gcm-notify   (fn [id] (do (>!!? notified id)
                                      gcm-response))]
 
-        (server/start 4242 puks-out gcm-notify)
+        (subject/start 4242 puks-out gcm-notify)
 
         (>!!? puks-out puk)
 
