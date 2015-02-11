@@ -4,7 +4,7 @@
             [compojure.route :as route]
             [ring.middleware.params :as params]
             [clojure.core.async :as async :refer [<! >! >!! go-loop alt!]]
-            [sneer.async :refer [go-while-let go-loop-trace sliding-chan]]
+            [sneer.async :refer [go-while-let go-loop-trace sliding-chan #_non-repeating<]]
             [sneer.keys :as keys]
             [sneer.server.gcm :as gcm]))
 
@@ -18,65 +18,49 @@
   (println "GCM: WAITING" secs-string "SECONDS")
   (async/timeout (* 1000 (Integer/valueOf secs-string))))
 
-(defn- start-gcm-notification-rounds [gcm-ids gcm-ids-notified async-gcm-notify-fn]
-  (go-while-let [round (<! gcm-ids)]
-    (loop [round round]
+(defn- start-gcm-notification-rounds [rounds-to-notify puks-notified async-gcm-notify-fn]
+  (go-while-let [round-fn (<! rounds-to-notify)]
+    (loop [round (-> (round-fn) seq)]
       (when-not (empty? round)
-        (let [gcm-id (first round)
+        (let [[puk gcm-id] (first round)
               response (<! (async-gcm-notify-fn gcm-id))
               status (:status response)]
           (println "GCM RESPONSE:" response)
           (if (= 200 status)
-            (>! gcm-ids-notified gcm-id)
+            (>! puks-notified puk)
             (when-some [retry-after-secs (-> response :headers :retry-after)]
               (<! (wait retry-after-secs))))
           (recur (rest round)))))))
 
 (defn- start-gcm-notifier [puk->gcm-id-in puks-in async-gcm-notify-fn]
 
-  (let [gcm-ids-out (sliding-chan)
-        gcm-ids-notified (async/chan)]
+  (let [rounds-to-notify (async/chan)
+        puks-notified (async/chan 10)]
 
-    (start-gcm-notification-rounds gcm-ids-out gcm-ids-notified async-gcm-notify-fn)
+    (start-gcm-notification-rounds rounds-to-notify puks-notified async-gcm-notify-fn)
 
     (go-loop-trace [puk->gcm-id {}
-                    gcm-id->puk {}
-                    puks-to-notify #{}
-                    ids-to-notify #{}
-                    previous-ids-to-notify ids-to-notify]
-
-      (when-not (identical? previous-ids-to-notify ids-to-notify)
-        (>! gcm-ids-out ids-to-notify))
+                    puks-to-notify #{}]
 
       (alt!
+        [[rounds-to-notify #(select-keys puk->gcm-id puks-to-notify)]]
+          (recur puk->gcm-id puks-to-notify)
+
         puks-in
         ([puk]
-         (when (some? puk)
-           (recur puk->gcm-id
-                  gcm-id->puk
-                  (conj puks-to-notify puk)
-                  (if-some [gcm-id (get puk->gcm-id puk)]
-                    (conj ids-to-notify gcm-id)
-                    ids-to-notify)
-                  ids-to-notify)))
+          (when (some? puk)
+            (recur puk->gcm-id
+                   (conj puks-to-notify puk))))
 
         puk->gcm-id-in
         ([[puk gcm-id]]
-         (recur (assoc puk->gcm-id puk gcm-id)
-                (assoc gcm-id->puk gcm-id puk)
-                puks-to-notify
-                (if (contains? puks-to-notify puk)
-                  (conj ids-to-notify gcm-id)
-                  ids-to-notify)
-                ids-to-notify))
+          (recur (assoc puk->gcm-id puk gcm-id)
+                 puks-to-notify))
 
-        gcm-ids-notified
-        ([gcm-id]
+        puks-notified
+        ([puk]
          (recur puk->gcm-id
-                gcm-id->puk
-                (disj puks-to-notify (get gcm-id->puk gcm-id))
-                (disj ids-to-notify gcm-id)
-                ids-to-notify))))))
+                (disj puks-to-notify puk)))))))
 
 (defn- gcm-register [puk->gcm-id req]
   (let [params (:query-params req)
