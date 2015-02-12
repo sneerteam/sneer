@@ -3,14 +3,14 @@ project(':sneer-android-api').projectDir = new File('android/android-api')
 
 include ':android:android.main'
 
-include ':android.main.tests'
-project(':android.main.tests').projectDir = new File('android/android.main/tests')
+//include ':android.main.tests'
+//project(':android.main.tests').projectDir = new File('android/android.main/tests')
 
-include 'android:apps:sendpics',
-        'android:apps:voicemessage',
-        'android:apps:sendlocation',
-        'android:apps:sendfiles',
-        'android:apps:sendvideo'
+include 'android:apps:sendlocation'
+//        'android:apps:sendpics',
+//        'android:apps:voicemessage',
+//        'android:apps:sendfiles',
+//        'android:apps:sendvideo'
 
 include ':sneer-java-api'
 project(':sneer-java-api').projectDir = new File('java-api')
