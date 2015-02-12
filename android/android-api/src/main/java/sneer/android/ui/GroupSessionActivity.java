@@ -1,4 +1,4 @@
-//package sneer.android.ui;
+package sneer.android.ui;//package sneer.android.ui;
 //
 //import sneer.Message;
 //

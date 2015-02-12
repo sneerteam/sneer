@@ -30,7 +30,7 @@ public class Value implements Parcelable {
 	}
 
 	
-	public static final Parcelable.Creator<Value> CREATOR = new Parcelable.Creator<Value>() {
+	public static final Creator<Value> CREATOR = new Creator<Value>() {
 		public Value createFromParcel(Parcel in) {
 			return Value.of(in.readValue(null));
 		}

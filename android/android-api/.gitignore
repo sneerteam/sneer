@@ -1,7 +1,1 @@
-.DS_Store
-bin/
-gen/
-/build/
-/libs
-/.gradle
-local.properties
+/build

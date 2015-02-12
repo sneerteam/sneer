@@ -1,4 +1,4 @@
-//package sneer;
+package sneer.android.impl;//package sneer;
 //
 //import java.util.*;
 //
