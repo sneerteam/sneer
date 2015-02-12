@@ -55,7 +55,7 @@
             puks-to-notify))
        (close! puks-to-notify))
 
-      (http-server/start 80 puks-to-notify))
+      #_(http-server/start 80 puks-to-notify))
 
     (trace-changes "[PUK->ADDRESS]" puk->address)
 
