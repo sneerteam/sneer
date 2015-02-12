@@ -230,8 +230,8 @@ public class ContactActivity extends Activity {
 		editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                ownNameSubscription.unsubscribe();
-                preferredNicknameSubscription.unsubscribe();
+				if (ownNameSubscription != null) ownNameSubscription.unsubscribe();
+				if (preferredNicknameSubscription != null) preferredNicknameSubscription.unsubscribe();
                 nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), editText.getText().toString()));
             }
 
