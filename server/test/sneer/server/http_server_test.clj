@@ -6,29 +6,29 @@
             [org.httpkit.client :as http]
             [midje.sweet :refer :all]))
 
-(def puk (keys/->puk "neide"))
-
-(def gcm-id "101010")
-
-(fact "Pending notification is sent after registration"
-  (let [puks-out (async/chan)]
+(tabular "Pending notification is sent after registration"
+  (let [puks-to-notify (async/chan)]
     (try
+      (let [to-google (async/chan)
+            from-google (async/chan)
+            gcm-notify (fn [id] (do (>!!? to-google id)
+                                    from-google))
+            puk (keys/->puk name?)]
 
-      (let [notified     (async/chan 1)
-            gcm-response (async/chan)
-            gcm-notify   (fn [id] (do (>!!? notified id)
-                                     gcm-response))]
+        (subject/start 4242 puks-to-notify gcm-notify)
 
-        (subject/start 4242 puks-out gcm-notify)
+        (>!!? puks-to-notify puk)
 
-        (>!!? puks-out puk)
-
-        (let [uri (str "http://localhost:4242/gcm/register?id=" gcm-id "&puk=" (.toHex puk))
+        (let [uri (str "http://localhost:4242/gcm/register?id=" gcm-id? "&puk=" (.toHex puk))
               response @(http/get uri)]
           (:status response) => 200)
 
-        (<!!? notified) => gcm-id
-        (>!!? gcm-response {:status 200}))
+        (<!!? to-google) => gcm-id?
+        (>!!? from-google {:status 200}))
 
       (finally
-        (async/close! puks-out)))))
+        (async/close! puks-to-notify))))
+
+  name?     gcm-id?
+  "neide"   "101010"
+  "maicon"  "202020")
