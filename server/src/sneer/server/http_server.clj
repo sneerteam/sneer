@@ -35,20 +35,23 @@
                 (<! (wait retry-after-secs))))
             (recur (rest round))))))))
 
+(defn- contains-any [keys coll]
+  (some #(contains? coll %) keys))
 
 (defn- start-gcm-notifier [puk->gcm-id-in puks-in async-gcm-notify-fn]
 
   (let [rounds-to-notify (async/chan)
-        puks-notified (async/chan 10)]
+        puks-notified (async/chan 10)
+        input-channels [puks-in, puk->gcm-id-in, puks-notified]]
 
     (start-gcm-notification-rounds rounds-to-notify puks-notified async-gcm-notify-fn)
 
     (go-loop-trace [puk->gcm-id {}
                     puks-to-notify #{}]
 
-      (let [[val ch] (alts! (if (empty? puks-to-notify)
-                              [puks-in, puk->gcm-id-in, puks-notified]
-                              [puks-in, puk->gcm-id-in, puks-notified, [rounds-to-notify #(select-keys puk->gcm-id puks-to-notify)]]))]
+      (let [[val ch] (alts! (if (contains-any puks-to-notify puk->gcm-id)
+                              (conj input-channels [rounds-to-notify #(select-keys puk->gcm-id puks-to-notify)])
+                              input-channels))]
         (match ch
           puks-in (when (some? val)
                     (recur puk->gcm-id

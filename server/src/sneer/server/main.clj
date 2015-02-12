@@ -55,10 +55,7 @@
             puks-to-notify))
        (close! puks-to-notify))
 
-      (go-while-let [puk (<! puks-to-notify)]
-        (println "GCM temporarily disabled:" puk))
-
-      #_(http-server/start 80 puks-to-notify))
+      (http-server/start 80 puks-to-notify))
 
     (trace-changes "[PUK->ADDRESS]" puk->address)
 
