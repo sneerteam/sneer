@@ -21,17 +21,20 @@
 
 (defn- start-gcm-notification-rounds [rounds-to-notify puks-notified async-gcm-notify-fn]
   (go-while-let [round-fn (<! rounds-to-notify)]
-    (loop [round (-> (round-fn) seq)]
-      (when-not (empty? round)
-        (let [[puk gcm-id] (first round)
-              response (<! (async-gcm-notify-fn gcm-id))
-              status (:status response)]
-          (println "GCM RESPONSE:" response)
-          (if (= 200 status)
-            (>! puks-notified puk)
-            (when-some [retry-after-secs (-> response :headers :retry-after)]
-              (<! (wait retry-after-secs))))
-          (recur (rest round)))))))
+    (let [round (-> (round-fn) seq)]
+      (println "GCM ROUND STARTED:" round)
+      (loop [round round]
+        (when-not (empty? round)
+          (let [[puk gcm-id] (first round)
+                response (<! (async-gcm-notify-fn gcm-id))
+                status (:status response)]
+            (println "GCM RESPONSE:" response)
+            (if (= 200 status)
+              (>! puks-notified puk)
+              (when-some [retry-after-secs (-> response :headers :retry-after)]
+                (<! (wait retry-after-secs))))
+            (recur (rest round))))))))
+
 
 (defn- start-gcm-notifier [puk->gcm-id-in puks-in async-gcm-notify-fn]
 
