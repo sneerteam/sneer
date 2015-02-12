@@ -3,7 +3,8 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.params :as params]
-            [clojure.core.async :as async :refer [<! >! >!! go-loop alt!]]
+            [clojure.core.async :as async :refer [<! >! >!! go-loop alts!]]
+            [clojure.core.match :refer [match]]
             [sneer.async :refer [go-while-let go-loop-trace sliding-chan]]
             [sneer.keys :as keys]
             [sneer.server.gcm :as gcm]))
@@ -42,25 +43,22 @@
     (go-loop-trace [puk->gcm-id {}
                     puks-to-notify #{}]
 
-      (alt!
-        [[rounds-to-notify #(select-keys puk->gcm-id puks-to-notify)]]
-          (recur puk->gcm-id puks-to-notify)
+      (let [[val ch] (alts! (if (empty? puks-to-notify)
+                              [puks-in, puk->gcm-id-in, puks-notified]
+                              [puks-in, puk->gcm-id-in, puks-notified, [rounds-to-notify #(select-keys puk->gcm-id puks-to-notify)]]))]
+        (match ch
+          puks-in (when (some? val)
+                    (recur puk->gcm-id
+                           (conj puks-to-notify val)))
 
-        puks-in
-        ([puk]
-          (when (some? puk)
-            (recur puk->gcm-id
-                   (conj puks-to-notify puk))))
+          puk->gcm-id-in (let [[puk gcm-id] val]
+                           (recur (assoc puk->gcm-id puk gcm-id)
+                                  puks-to-notify))
 
-        puk->gcm-id-in
-        ([[puk gcm-id]]
-          (recur (assoc puk->gcm-id puk gcm-id)
-                 puks-to-notify))
+          puks-notified (recur puk->gcm-id
+                               (disj puks-to-notify val))
 
-        puks-notified
-        ([puk]
-         (recur puk->gcm-id
-                (disj puks-to-notify puk)))))))
+          :else (recur puk->gcm-id puks-to-notify))))))
 
 (defn- gcm-register [puk->gcm-id req]
   (let [params (:query-params req)
