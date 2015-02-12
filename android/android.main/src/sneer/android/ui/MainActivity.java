@@ -140,6 +140,7 @@ public class MainActivity extends SneerActivity {
 	@Override
 	protected void onRestart() {
 		super.onRestart();
+		adapter.notifyDataSetChanged();
 		if (isOwnNameLocallyAvailable()) return;
 		finish();
 		toast("First and last name must be filled in");
