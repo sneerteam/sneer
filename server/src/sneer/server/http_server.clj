@@ -4,11 +4,11 @@
             [compojure.route :as route]
             [ring.middleware.params :as params]
             [clojure.core.async :as async :refer [<! >! >!! go-loop alt!]]
-            [sneer.async :refer [go-while-let go-loop-trace sliding-chan #_non-repeating<]]
+            [sneer.async :refer [go-while-let go-loop-trace sliding-chan]]
             [sneer.keys :as keys]
             [sneer.server.gcm :as gcm]))
 
-(defn async-gcm-notify [gcm-id]
+(defn- async-gcm-notify [gcm-id]
   (let [result (async/chan)]
     (gcm/send-to gcm-id
                  (fn [response] (>!! result response)))
@@ -71,7 +71,7 @@
       (>! puk->gcm-id [(keys/from-hex hex-puk) id]))
     (str "id for " hex-puk " set to " id)))
 
-(defn log-calls [function]
+(defn- log-calls [function]
   (fn [arg]
     (println arg)
     (function arg)))
