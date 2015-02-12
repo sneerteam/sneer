@@ -2,7 +2,7 @@
   (:require [sneer.networking.udp :as udp]
             [sneer.server.router-connector :as connector]
             [sneer.server.http-server :as http-server]
-            [sneer.async :refer [go-trace]]
+            [sneer.async :refer [go-trace go-while-let]]
             [clojure.core.async :as async :refer [chan filter< close! alts!! <! <!! timeout]]
             [sneer.networking.udp :as udp])
   (:gen-class))
@@ -54,6 +54,9 @@
             packets-out
             puks-to-notify))
        (close! puks-to-notify))
+
+      (go-while-let [puk (<! puks-to-notify)]
+        (println "GCM temporarily disabled:" puk))
 
       #_(http-server/start 80 puks-to-notify))
 
