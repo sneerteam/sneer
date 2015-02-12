@@ -5,27 +5,27 @@ apply plugin: "java"
 apply plugin: "maven"
 
 buildscript {
-    repositories {
-        maven { url "https://clojars.org/repo" }
-    }
+  repositories {
+    maven { url "https://clojars.org/repo" }
+  }
 
-    dependencies {
-        classpath "clojuresque:clojuresque:1.7.0"
-    }
+  dependencies {
+    classpath "clojuresque:clojuresque:1.7.0"
+  }
 }
 
 repositories {
-    maven { url "https://clojars.org/repo" }
+  maven { url "https://clojars.org/repo" }
 }
 
 buildscript {
-    repositories {
-        maven { url 'https://repo.spring.io/plugins-release' }
-    }
+  repositories {
+    maven { url 'https://repo.spring.io/plugins-release' }
+  }
 
-    dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
-    }
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
+  }
 }
 
 apply plugin: 'propdeps'
@@ -35,37 +35,37 @@ apply plugin: 'propdeps-eclipse'
 clojure.warnOnReflection = true
 
 sourceSets {
-    main {
-        clojure {
-            aotCompile = true
-        }
+  main {
+    clojure {
+      aotCompile = true
     }
+  }
 }
 
 eclipse.project {
-    natures 'ccw.nature'
-    buildCommand 'ccw.builder'
+  natures 'ccw.nature'
+  buildCommand 'ccw.builder'
 }
 
 dependencies {
-    compile 'org.clojure:clojure:1.6.0'
-    compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
-    compile external['clojure.core.match']
-    compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
-    compile('com.cognitect:transit-clj:0.8.229') {
-    	exclude group: 'org.msgpack', module: 'msgpack'
-    	exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
-    	exclude group: 'org.apache.directory.studio', module: 'org.apache.commons.codec'
-    }
-    compile project(':crypto')
-    compile project(':sneer-java-api')
-    testCompile 'midje:midje:1.6.3'
-    compile 'org.clojure:java.jdbc:0.3.6'
-    optional 'org.xerial:sqlite-jdbc:3.8.6'
+  compile 'org.clojure:clojure:1.6.0'
+  compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
+  compile external['clojure.core.match']
+  compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
+  compile('com.cognitect:transit-clj:0.8.229') {
+    exclude group: 'org.msgpack', module: 'msgpack'
+    exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+    exclude group: 'org.apache.directory.studio', module: 'org.apache.commons.codec'
+  }
+  compile project(':crypto')
+  compile project(':sneer-java-api')
+  testCompile 'midje:midje:1.6.3'
+  compile 'org.clojure:java.jdbc:0.3.6'
+  optional 'org.xerial:sqlite-jdbc:3.8.6'
 }
 
 uploadArchives {
-    repositories {
-        mavenLocal()
-    }
+  repositories {
+    mavenLocal()
+  }
 }

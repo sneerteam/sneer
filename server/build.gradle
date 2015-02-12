@@ -3,41 +3,41 @@ version = "0.0.1"
 apply plugin: "clojure"
 
 buildscript {
-    repositories {
-        mavenCentral()
-        maven { url "https://clojars.org/repo" }
-    }
+  repositories {
+    mavenCentral()
+    maven { url "https://clojars.org/repo" }
+  }
 
-    dependencies {
-        classpath "clojuresque:clojuresque:1.7.0"
-    }
+  dependencies {
+    classpath "clojuresque:clojuresque:1.7.0"
+  }
 }
 
 repositories {
-    maven { url "https://clojars.org/repo" }
+  maven { url "https://clojars.org/repo" }
 }
 
 sourceSets {
-    main {
-        clojure {
-            srcDir 'src'
-            aotCompile = true
-        }
+  main {
+    clojure {
+      srcDir 'src'
+      aotCompile = true
     }
-    test {
-    	clojure {
-    		srcDir 'test'
-    	}
+  }
+  test {
+    clojure {
+      srcDir 'test'
     }
+  }
 }
 
 dependencies {
-    compile 'http-kit:http-kit:2.1.19'
-    compile 'ring:ring-core:1.3.2'
-    compile 'compojure:compojure:1.3.1'
-    compile 'org.clojure:clojure:1.6.0'
-    compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
-    compile external['clojure.core.match']
-    compile project(':core')
-    testCompile 'midje:midje:1.6.3'
+  compile 'http-kit:http-kit:2.1.19'
+  compile 'ring:ring-core:1.3.2'
+  compile 'compojure:compojure:1.3.1'
+  compile 'org.clojure:clojure:1.6.0'
+  compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
+  compile external['clojure.core.match']
+  compile project(':core')
+  testCompile 'midje:midje:1.6.3'
 }

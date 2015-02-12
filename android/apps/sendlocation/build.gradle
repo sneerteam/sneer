@@ -2,31 +2,31 @@ apply plugin: 'com.android.application'
 
 android {
 
-    lintOptions {
-        abortOnError false
-    }
+  lintOptions {
+    abortOnError false
+  }
 
-    compileSdkVersion external.android.sdkVersion
-    buildToolsVersion external.android.buildToolsVersion
+  compileSdkVersion external.android.sdkVersion
+  buildToolsVersion external.android.buildToolsVersion
 
-    defaultConfig {
-        minSdkVersion external.android.minSdkVersion
-        targetSdkVersion external.android.sdkVersion
-        applicationId "fabiomanera.sendlocation"
-        versionCode 1
-        versionName "1.0"
+  defaultConfig {
+    minSdkVersion external.android.minSdkVersion
+    targetSdkVersion external.android.sdkVersion
+    applicationId "fabiomanera.sendlocation"
+    versionCode 1
+    versionName "1.0"
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
-   
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+  }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile project(':sneer-android-api')
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  compile 'com.android.support:appcompat-v7:21.0.3'
+  compile project(':sneer-android-api')
 }

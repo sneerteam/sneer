@@ -1,55 +1,55 @@
 buildscript {
-    repositories {
-        maven { url 'https://clojars.org/repo' }
-    }
+  repositories {
+    maven { url 'https://clojars.org/repo' }
+  }
 
-    dependencies {
-        classpath 'clojuresque:clojuresque:1.7.0'
-    }
+  dependencies {
+    classpath 'clojuresque:clojuresque:1.7.0'
+  }
 }
 
 repositories {
-    maven { url "https://clojars.org/repo" }
+  maven { url "https://clojars.org/repo" }
 }
 
 apply plugin: 'java'
 apply plugin: 'clojure'
 
 buildscript {
-    repositories {
-        maven { url 'https://repo.spring.io/plugins-release' }
-    }
+  repositories {
+    maven { url 'https://repo.spring.io/plugins-release' }
+  }
 
-    dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
-    }
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
+  }
 }
 
 apply plugin: 'propdeps'
 apply plugin: 'propdeps-maven'
 
 sourceSets {
-    main {
-        clojure {
-            srcDir 'src'
-            aotCompile = true
-        }
-        java {
-            srcDir 'src'
-        }
+  main {
+    clojure {
+      srcDir 'src'
+      aotCompile = true
     }
+    java {
+      srcDir 'src'
+    }
+  }
 }
 
 dependencies {
-    provided 'org.clojure:clojure:1.6.0'
-    provided 'org.clojure:core.async:0.1.303.0-886421-alpha'
-    provided external['clojure.core.match']
-    optional 'org.clojure:java.jdbc:0.3.4'
-    provided 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
-    provided 'junit:junit:4.11'
-    optional 'org.xerial:sqlite-jdbc:3.7.15-M1'
-    provided project(':sneer-java-api')
-    provided project(':core')
-    optional project(':server')
-    provided 'midje:midje:1.6.3'
+  provided 'org.clojure:clojure:1.6.0'
+  provided 'org.clojure:core.async:0.1.303.0-886421-alpha'
+  provided external['clojure.core.match']
+  optional 'org.clojure:java.jdbc:0.3.4'
+  provided 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
+  provided 'junit:junit:4.11'
+  optional 'org.xerial:sqlite-jdbc:3.7.15-M1'
+  provided project(':sneer-java-api')
+  provided project(':core')
+  optional project(':server')
+  provided 'midje:midje:1.6.3'
 }

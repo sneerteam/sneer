@@ -8,93 +8,91 @@ def shouldPublish
 def isReleaseBuild
 
 if (hasProperty("release")) {
-    shouldPublish = true
-    isReleaseBuild = true
+  shouldPublish = true
+  isReleaseBuild = true
 } else if (hasProperty("ci")) {
-    shouldPublish = true
-    version += "-SNAPSHOT"
+  shouldPublish = true
+  version += "-SNAPSHOT"
 }
 
-
 if (shouldPublish) {
-    signing {
-        sign configurations.archives
-    }
+  signing {
+    sign configurations.archives
+  }
 } else {
-    task signArchives {
-        // do nothing
-    }
+  task signArchives {
+    // do nothing
+  }
 }
 
 afterEvaluate {
-    uploadArchives {
+  uploadArchives {
 
-        //onlyIf { ourJar.didWork || javadocJar.didWork || sourcesJar.didWork }
+    //onlyIf { ourJar.didWork || javadocJar.didWork || sourcesJar.didWork }
 
-        repositories {
-            if (!shouldPublish) {
-                mavenLocal()
-            } else {
-                mavenDeployer {
+    repositories {
+      if (!shouldPublish) {
+        mavenLocal()
+      } else {
+        mavenDeployer {
 
-                    if (shouldPublish) {
-                        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-                    }
+          if (shouldPublish) {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+          }
 
-                    repository(url: (isReleaseBuild ? SONATYPE_RELEASE_URL : SONATYPE_SNAPSHOT_URL)) {
-                        authentication(userName: nexusUsername, password: nexusPassword)
-                    }
+          repository(url: (isReleaseBuild ? SONATYPE_RELEASE_URL : SONATYPE_SNAPSHOT_URL)) {
+            authentication(userName: nexusUsername, password: nexusPassword)
+          }
 
-                    pom.project {
-                        name project.name
-                        packaging 'jar'
-                        description project.description
-                        url 'http://sneer.me'
+          pom.project {
+            name project.name
+            packaging 'jar'
+            description project.description
+            url 'http://sneer.me'
 
-                        scm {
-                            url 'https://github.com/sneerteam/sneer'
-                            connection 'git@github.com:sneerteam/sneer.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
-                                url 'http://opensource.org/licenses/lgpl-3.0.html'
-                                distribution 'repo'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'klauswuestefeld'
-                                name 'Klaus Wuestefeld'
-                                email 'klauswuestefeld@gmail.com'
-                            }
-                            developer {
-                                id 'fabioroger'
-                                name 'Fabio Roger Manera'
-                                email 'fabioroger@gmail.com'
-                            }
-                            developer {
-                                id 'bamboo'
-                                name 'Rodrigo B. de Oliveira'
-                                email 'rbo@acm.org'
-                            }
-                            developer {
-                                id 'felipebueno'
-                                name 'Felipe Bueno'
-                                email 'bueno.felipe@gmail.com'
-                            }
-                            developer {
-                                id 'dhmendes'
-                                name 'Diego Mendes'
-                                email 'dhmendes@gmail.com'
-                            }
-                        }
-                    }
-
-                }
+            scm {
+              url 'https://github.com/sneerteam/sneer'
+              connection 'git@github.com:sneerteam/sneer.git'
             }
+
+            licenses {
+              license {
+                name 'The GNU Lesser General Public License, version 3.0 (LGPL-3.0)'
+                url 'http://opensource.org/licenses/lgpl-3.0.html'
+                distribution 'repo'
+              }
+            }
+
+            developers {
+              developer {
+                id 'klauswuestefeld'
+                name 'Klaus Wuestefeld'
+                email 'klauswuestefeld@gmail.com'
+              }
+              developer {
+                id 'fabioroger'
+                name 'Fabio Roger Manera'
+                email 'fabioroger@gmail.com'
+              }
+              developer {
+                id 'bamboo'
+                name 'Rodrigo B. de Oliveira'
+                email 'rbo@acm.org'
+              }
+              developer {
+                id 'felipebueno'
+                name 'Felipe Bueno'
+                email 'bueno.felipe@gmail.com'
+              }
+              developer {
+                id 'dhmendes'
+                name 'Diego Mendes'
+                email 'dhmendes@gmail.com'
+              }
+            }
+          }
         }
+      }
     }
+  }
 }

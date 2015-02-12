@@ -2,38 +2,38 @@ apply plugin: 'com.android.application'
 
 android {
 
-    lintOptions {
-        abortOnError false
-    }
-    
-    packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-    }
+  lintOptions {
+    abortOnError false
+  }
 
-    compileSdkVersion external.android.sdkVersion
-    buildToolsVersion external.android.buildToolsVersion
+  packagingOptions {
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/NOTICE'
+  }
 
-    defaultConfig {
-        minSdkVersion external.android.minSdkVersion
-        targetSdkVersion external.android.sdkVersion
-        applicationId "sneer.android"
-        versionCode 1
-        versionName "1.0"
-    }
+  compileSdkVersion external.android.sdkVersion
+  buildToolsVersion external.android.buildToolsVersion
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+  defaultConfig {
+    minSdkVersion external.android.minSdkVersion
+    targetSdkVersion external.android.sdkVersion
+    applicationId "sneer.android"
+    versionCode 1
+    versionName "1.0"
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
+  }
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-base:6+' //For GCM (Google Cloud Messaging)
-    compile 'com.netflix.rxjava:rxjava-android:' + external.rx.version
-    compile project(':sneer-android-api')
-    compile project(':sneer-java-api')
-    compile(project(':core')) { exclude group: 'org.bouncycastle' }
+  compile 'com.google.android.gms:play-services-base:6+' //For GCM (Google Cloud Messaging)
+  compile 'com.netflix.rxjava:rxjava-android:' + external.rx.version
+  compile project(':sneer-android-api')
+  compile project(':sneer-java-api')
+  compile(project(':core')) { exclude group: 'org.bouncycastle' }
 }

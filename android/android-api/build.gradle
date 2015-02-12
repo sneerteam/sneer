@@ -7,70 +7,70 @@ ext.packaging = 'jar'
 apply from: '../../sonatype.gradle'
 
 configurations {
-    libs
-    compile.extendsFrom libs
+  libs
+  compile.extendsFrom libs
 }
 
 android {
   lintOptions {
-        abortOnError false
-    }
+    abortOnError false
+  }
 
-    compileSdkVersion external.android.sdkVersion
-    buildToolsVersion external.android.buildToolsVersion
+  compileSdkVersion external.android.sdkVersion
+  buildToolsVersion external.android.buildToolsVersion
 
-    defaultConfig {
-        minSdkVersion external.android.minSdkVersion
-        targetSdkVersion external.android.sdkVersion
-        versionCode 1
-        versionName "1.0"
+  defaultConfig {
+    minSdkVersion external.android.minSdkVersion
+    targetSdkVersion external.android.sdkVersion
+    versionCode 1
+    versionName "1.0"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+  }
 }
 
 task copyLibs(type: Copy) {
-    into "libs"
-    from configurations.libs
+  into "libs"
+  from configurations.libs
 }
 
 android.libraryVariants.all { variant ->
-    if (!variant.name.equals("release")) return
+  if (!variant.name.equals("release")) return
 
-    task javadocRelease(type: Javadoc) {
-        description = "Generates javadoc for release"
-        destinationDir = new File(destinationDir, variant.baseName)
-        source = variant.javaCompile.source
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-        options.links("http://docs.oracle.com/javase/7/docs/api/");
-        exclude '**/BuildConfig.java'
-        exclude '**/R.java'
-    }
+  task javadocRelease(type: Javadoc) {
+    description = "Generates javadoc for release"
+    destinationDir = new File(destinationDir, variant.baseName)
+    source = variant.javaCompile.source
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+    options.links("http://docs.oracle.com/javase/7/docs/api/");
+    exclude '**/BuildConfig.java'
+    exclude '**/R.java'
+  }
 
-    task ourJar(type: Jar) {
-        from variant.javaCompile.destinationDir
-    }
+  task ourJar(type: Jar) {
+    from variant.javaCompile.destinationDir
+  }
 
-    task javadocJar(type: Jar, dependsOn: javadocRelease) {
-        from javadocRelease.destinationDir
-        classifier = 'javadoc'
-    }
+  task javadocJar(type: Jar, dependsOn: javadocRelease) {
+    from javadocRelease.destinationDir
+    classifier = 'javadoc'
+  }
 
-    task sourcesJar(type: Jar) {
-        from variant.javaCompile.source
-        classifier = 'sources'
-    }
+  task sourcesJar(type: Jar) {
+    from variant.javaCompile.source
+    classifier = 'sources'
+  }
 
-    artifacts {
-        archives ourJar
-        archives javadocJar
-        archives sourcesJar
-    }
+  artifacts {
+    archives ourJar
+    archives javadocJar
+    archives sourcesJar
+  }
 
 }
 

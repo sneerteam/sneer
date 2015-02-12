@@ -4,13 +4,13 @@ apply plugin: "java"
 apply plugin: "maven"
 
 dependencies {
-    compile project(':sneer-java-api')
-    testCompile 'junit:junit:4.11'
-    runtime ('org.bouncycastle:bcprov-jdk16:1.46')
+  compile project(':sneer-java-api')
+  testCompile 'junit:junit:4.11'
+  runtime('org.bouncycastle:bcprov-jdk16:1.46')
 }
 
 uploadArchives {
-    repositories {
-        mavenLocal()
-    }
+  repositories {
+    mavenLocal()
+  }
 }
