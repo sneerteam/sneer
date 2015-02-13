@@ -124,7 +124,7 @@
       (route/not-found "<h1>page not found</h1>"))
 
     (let [server (http/run-server (-> app log-calls params/wrap-params) {:port port})]
-      (async/go
+      (go
         (<! (start-gcm-notifier prevalence-file puk->gcm-id-out puks-in async-gcm-notify-fn))
         (async/close! puk->gcm-id-out)
         (server)))))
