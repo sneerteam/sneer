@@ -26,11 +26,11 @@
     (str "Ch" name)))
 
 (defmethod print-method NamedChannel
-  [nc writer]
+  [nc ^java.io.Writer writer]
   (.write writer (str nc)))
 
 (defmethod print-method clojure.lang.PersistentQueue
-  [q writer]
+  [q ^java.io.Writer writer]
   (.write writer (if-some [seq (seq q)] (str seq) "nil")))
 
 (defn- next-packet-to-send [online-clients send-round]

@@ -14,7 +14,7 @@
   (let [count (count coll)]
     (if (zero? count)
       nil
-      (let [vec (vec coll)
+      (let [^java.util.List vec (vec coll)
             index (.indexOf vec element)]
         (get vec (mod (inc index) count))))))
 

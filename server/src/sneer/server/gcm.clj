@@ -1,10 +1,11 @@
 (ns sneer.server.gcm
-  (:require [org.httpkit.client :as http]))
+  (:require [org.httpkit.client :as http]
+            [clojure.string :refer [trim]]))
 
 (def api-key
   (let [currentDir (-> "whatever" java.io.File. .getCanonicalFile .getParentFile .getName)]
     (if (= currentDir "sneer-live")
-      (-> "google-api.key" slurp .trim)
+      (-> "google-api.key" slurp trim)
       "CGM-is-not-authorized-outside-the-server")))
 
 (defn send-to [id callback]
