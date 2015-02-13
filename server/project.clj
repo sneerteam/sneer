@@ -1,7 +1,7 @@
 (defproject sneer.server "0.1.0-SNAPSHOT"
   :description "The Sneer Temporary Server"
-  :dependencies [[me.sneer/sneer-java-api "0.1.4"]
-                 [me.sneer/core "0.1.4"]
+  :dependencies [[me.sneer/sneer-java-api "0.1.5"]
+                 [me.sneer/core "0.1.5"]
                  [com.taoensso/timbre "3.2.1"] ;Logging
                  [http-kit "2.1.16"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]

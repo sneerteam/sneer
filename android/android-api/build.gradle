@@ -1,15 +1,10 @@
 apply plugin: 'com.android.library'
 
-version = '0.1.4'
+version = '0.1.5'
 description = 'API for Sneer, the sovereign platform.'
 ext.packaging = 'jar'
 
 apply from: '../../sonatype.gradle'
-
-configurations {
-  libs
-  compile.extendsFrom libs
-}
 
 android {
   lintOptions {
@@ -31,11 +26,6 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
-}
-
-task copyLibs(type: Copy) {
-  into "libs"
-  from configurations.libs
 }
 
 android.libraryVariants.all { variant ->
@@ -73,5 +63,3 @@ android.libraryVariants.all { variant ->
   }
 
 }
-
-defaultTasks 'copyLibs'
