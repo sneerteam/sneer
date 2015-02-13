@@ -3,7 +3,7 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.params :as params]
-            [clojure.core.async :as async :refer [<! >! >!! go-loop alts!]]
+            [clojure.core.async :as async :refer [go <! >! >!! go-loop alts!]]
             [clojure.core.match :refer [match]]
             [sneer.async :refer [go-while-let go-trace]]
             [sneer.keys :as keys]
@@ -105,8 +105,8 @@
         hex-puk (get params "puk")
         id (get params "id")]
     (assert (not (or (empty? hex-puk) (empty? id))))
-    (async/go
-      (>! puk->gcm-id [(keys/from-hex hex-puk) id]))
+    (let [puk (keys/from-hex hex-puk)]
+      (go (>! puk->gcm-id [puk id])))
     (str "id for " hex-puk " set to " id)))
 
 (defn- log-calls [function]
