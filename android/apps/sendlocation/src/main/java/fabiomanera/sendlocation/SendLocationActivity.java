@@ -24,9 +24,9 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
-			toast("No GPS available");
+			Toast.makeText(this, "No GPS available", Toast.LENGTH_LONG).show();
 			finish();
 			return;
 		}
@@ -57,28 +57,23 @@ public class SendLocationActivity extends MessageActivity implements LocationLis
 	}
 
 
-	@Override public void onProviderDisabled(String arg0) {}
-	@Override public void onProviderEnabled(String arg0) {}
-	@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+	private static byte[] scaledDownTo(Bitmap original, int maximumLength) {
+		int side = Math.min(original.getHeight(), original.getWidth());
+		Bitmap reduced = original;
+		while (true) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			reduced.compress(Bitmap.CompressFormat.JPEG, 100, out);
+			final byte[] bytes = out.toByteArray();
+			if (bytes.length <= maximumLength)
+				return bytes;
+			side = (int) (side * 0.9f);
+			reduced = ThumbnailUtils.extractThumbnail(original, side, side);
+		}
+	}
 
 
-    public static byte[] scaledDownTo(Bitmap original, int maximumLength) {
-        int side = Math.min(original.getHeight(), original.getWidth());
-        Bitmap reduced = original;
-        while (true) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            reduced.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            final byte[] bytes = out.toByteArray();
-            if (bytes.length <= maximumLength)
-                return bytes;
-            side = (int) (side * 0.9f);
-            reduced = ThumbnailUtils.extractThumbnail(original, side, side);
-        }
-    }
-
-
-    private void toast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-    }
+	@Override public void onProviderDisabled(String arg0) { }
+	@Override public void onProviderEnabled(String arg0) { }
+	@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) { }
 
 }
