@@ -63,7 +63,7 @@
         receiver-q (if sender-q-empty?
                      (-> receiver-q
                        (update-in [:qs-by-sender] dissoc turn)
-                       (update-in [:senders-to-notify-when-cts] disj turn)) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs. 
+                       (update-in [:senders-to-notify-when-cts] disj turn)) ; If there was only one sender, :turn will point to it (removed sender) but that's ok because receiver-q will be empty and will be removed from qs.
                      receiver-q)]
       [receiver-q (when sender-q-empty? sender-to-notify)]))
 

@@ -49,7 +49,7 @@
         clojure.lang.IDeref
           (deref [_]
             @state))))
-  
+
   ([handler initial-state file]
     (let [state (atom initial-state)
           -handle! (partial swap! state handler)]
@@ -62,7 +62,7 @@
             (-handle! event))))
 
       (atomic-replace! file @state)
-    
+
       (let [append true
             out (FileOutputStream. file append)
             w (writer out)]

@@ -124,7 +124,7 @@
         (match packet
           {:send tuple :to to}
           (handle-send state from to tuple)
-          
+
           {:ack author}
           (handle-ack state from [author (:id packet)])
 
