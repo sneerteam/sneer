@@ -10,9 +10,10 @@
       from-google (async/chan)
       gcm-notify (fn [id] (do (>!!? to-google id)
                               from-google))
-      puks-to-notify (async/chan)]
+      puks-to-notify (async/chan)
+      no-prevalence-file nil]
 
-  (subject/start 4242 puks-to-notify gcm-notify)
+  (subject/start no-prevalence-file 4242 puks-to-notify gcm-notify)
 
   (try
     (tabular "Pending notification is sent after registration"

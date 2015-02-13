@@ -58,10 +58,17 @@
     [:enqueue puk] (gcm-enqueue gcm-q puk)
     [:dequeue puk] (gcm-dequeue gcm-q puk)))
 
-(defn- start-gcm-queue-coordinator [gcm-qs puks-notified puk->gcm-id-in puks-in]
+(defn- gcm-queue-prevayler! [prevalence-file]
+  (let [prevayler-jr! (partial p/prevayler-jr! handle-gcm-event (gcm-notification-queue))]
+    (if (some? prevalence-file)
+      (prevayler-jr! prevalence-file)
+      (prevayler-jr!))))
+
+(defn- start-gcm-queue-coordinator
+  [prevalence-file gcm-qs puks-notified puk->gcm-id-in puks-in]
 
   (let [input-channels [puks-in puks-notified puk->gcm-id-in]
-        gcm-q (p/prevayler-jr! handle-gcm-event (gcm-notification-queue))
+        gcm-q (gcm-queue-prevayler! prevalence-file)
         handle! #(let [previous @gcm-q]
                    (p/handle! gcm-q [%1 %2])
                    previous)]
@@ -87,11 +94,11 @@
 
             :else          (recur @gcm-q)))))))
 
-(defn- start-gcm-notifier [puk->gcm-id-in puks-in async-gcm-notify-fn]
+(defn- start-gcm-notifier [prevalence-file puk->gcm-id-in puks-in async-gcm-notify-fn]
   (let [gcm-qs (async/chan)
         puks-notified (async/chan 10)]
     (start-gcm-notification-rounds gcm-qs puks-notified async-gcm-notify-fn)
-    (start-gcm-queue-coordinator gcm-qs puks-notified puk->gcm-id-in puks-in)))
+    (start-gcm-queue-coordinator prevalence-file gcm-qs puks-notified puk->gcm-id-in puks-in)))
 
 (defn- gcm-register [puk->gcm-id req]
   (let [params (:query-params req)
@@ -107,7 +114,7 @@
     (println arg)
     (function arg)))
 
-(defn start [port puks-in & [async-gcm-notify-fn]]
+(defn start [prevalence-file port puks-in & [async-gcm-notify-fn]]
 
   (let [puk->gcm-id-out (async/chan)
         async-gcm-notify-fn (or async-gcm-notify-fn async-gcm-notify)]
@@ -118,7 +125,7 @@
 
     (let [server (http/run-server (-> app log-calls params/wrap-params) {:port port})]
       (async/go
-        (<! (start-gcm-notifier puk->gcm-id-out puks-in async-gcm-notify-fn))
+        (<! (start-gcm-notifier prevalence-file puk->gcm-id-out puks-in async-gcm-notify-fn))
         (async/close! puk->gcm-id-out)
         (server)))))
 

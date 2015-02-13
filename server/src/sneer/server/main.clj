@@ -5,6 +5,7 @@
             [sneer.async :refer [go-trace go-while-let]]
             [clojure.core.async :as async :refer [chan filter< close! alts!! <! <!! timeout]]
             [sneer.networking.udp :as udp])
+  (:import [java.io File])
   (:gen-class))
 
 (defn update-puk-address! [puk->address [address payload]]
@@ -31,8 +32,10 @@
 (defn- trace-in [c label]
   (async/map< #(do (println label %) %) c))
 
-(defn start [port prevalence-file]
-  (let [puk->address (atom {})
+(defn start [udp-port http-port prevalence-dir]
+  (let [connector-prevalence-file (File. prevalence-dir "server.jr")
+        gcm-prevalence-file (File. prevalence-dir "gcm.jr")
+        puk->address (atom {})
         packets-in (chan)
         packets-out (chan)
         routable-packets-in (filter<
@@ -43,19 +46,19 @@
                                has-address?
                                (async/map #(with-address puk->address %) [packets-out]))
         routable-packets-out (trace-in routable-packets-out "OUT")
-        udp-server (udp/start-udp-server packets-in routable-packets-out port)]
+        udp-server (udp/start-udp-server packets-in routable-packets-out udp-port)]
 
     (let [puks-to-notify (async/chan)]
 
       (go-trace
        (<! (connector/start-connector
-            prevalence-file
+            connector-prevalence-file
             (async/map #(update-puk-address! puk->address %) [routable-packets-in])
             packets-out
             puks-to-notify))
        (close! puks-to-notify))
 
-      (http-server/start 80 puks-to-notify))
+      (http-server/start gcm-prevalence-file http-port puks-to-notify))
 
     (trace-changes "[PUK->ADDRESS]" puk->address)
 
@@ -67,5 +70,5 @@
 
 (defn -main [& [port-string]]
   (let [port (when-some [p port-string] (Integer/parseInt p))
-        server (start (or port 5555) (java.io.File. "server.jr"))]
+        server (start (or port 5555) 80 (File. "."))]
     (println "udp-server finished with" (<!! (:udp-server server)))))

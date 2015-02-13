@@ -7,18 +7,26 @@
             [sneer.main :as main]
             [sneer.async :refer [go-trace]]
             [sneer.core.tests.network :refer [Network]])
-  (:import (java.io Closeable)))
+  (:import (java.io Closeable File)))
+
+
+(defn- create-temp-dir [prefix]
+  (let [temp (File/createTempFile prefix ".tmp")]
+    (assert (.delete temp))
+    (assert (.mkdir temp))
+    temp))
 
 (defn start-local []
-  (let [server-port 5454
-        server (server/start server-port (java.io.File/createTempFile "server" ".tmp"))
+  (let [udp-port 5454
+        http-port 5480
+        server (server/start udp-port http-port (create-temp-dir "local-server-network"))
         lease (async/chan)]
 
     (reify Network
       (connect [network puk tuple-base]
         (println "Network/connect" puk)
 
-        (let [client (main/start-client puk tuple-base "localhost" server-port)]
+        (let [client (main/start-client puk tuple-base "localhost" udp-port)]
           (go-trace
             (async/<! lease)
             (async/close! client))))
