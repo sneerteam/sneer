@@ -5,8 +5,9 @@
             [ring.middleware.params :as params]
             [clojure.core.async :as async :refer [<! >! >!! go-loop alts!]]
             [clojure.core.match :refer [match]]
-            [sneer.async :refer [go-while-let go-loop-trace]]
+            [sneer.async :refer [go-while-let go-trace]]
             [sneer.keys :as keys]
+            [sneer.server.prevalence :as p]
             [sneer.server.gcm :as gcm]))
 
 (defn- gcm-notification-queue []
@@ -51,32 +52,46 @@
                 (<! (wait retry-after-secs))))
             (recur (rest round))))))))
 
+(defn- handle-gcm-event [gcm-q event]
+  (match event
+    [:assoc [puk gcm-id]] (gcm-assoc gcm-q puk gcm-id)
+    [:enqueue puk] (gcm-enqueue gcm-q puk)
+    [:dequeue puk] (gcm-dequeue gcm-q puk)))
+
+(defn- start-gcm-queue-coordinator [gcm-qs puks-notified puk->gcm-id-in puks-in]
+
+  (let [input-channels [puks-in puks-notified puk->gcm-id-in]
+        gcm-q (p/prevayler-jr! handle-gcm-event (gcm-notification-queue))
+        handle! #(let [previous @gcm-q]
+                   (p/handle! gcm-q [%1 %2])
+                   previous)]
+    (go-trace
+
+      ;; when recovering emit previous round
+      (>! gcm-qs @gcm-q)
+
+      (loop [previous-gcm-q @gcm-q]
+        (let [[val ch] (alts! (if (identical? previous-gcm-q @gcm-q)
+                                input-channels
+                                (conj input-channels [gcm-qs @gcm-q]))
+                              ;; prioritized so puks-notified is handled before gcm-qs
+                              :priority true)]
+          (match ch
+            puk->gcm-id-in (when (some? val)
+                             (recur (handle! :assoc val)))
+
+            puks-in        (when (some? val)
+                             (recur (handle! :enqueue val)))
+
+            puks-notified  (recur (handle! :dequeue val))
+
+            :else          (recur @gcm-q)))))))
+
 (defn- start-gcm-notifier [puk->gcm-id-in puks-in async-gcm-notify-fn]
-
   (let [gcm-qs (async/chan)
-        puks-notified (async/chan 10)
-        input-channels [puks-in puks-notified puk->gcm-id-in]]
-
+        puks-notified (async/chan 10)]
     (start-gcm-notification-rounds gcm-qs puks-notified async-gcm-notify-fn)
-
-    (go-loop-trace [gcm-q (gcm-notification-queue)
-                    previous-gcm-q gcm-q]
-
-      (let [[val ch] (alts! (if (identical? previous-gcm-q gcm-q)
-                              input-channels
-                              (conj input-channels [gcm-qs gcm-q]))
-                            ;; prioritized so puks-notified is handled before gcm-qs
-                            :priority true)]
-        (match ch
-          puk->gcm-id-in (when-some [[puk gcm-id] val]
-                           (recur (gcm-assoc gcm-q puk gcm-id) gcm-q))
-
-          puks-in        (when-some [puk val]
-                           (recur (gcm-enqueue gcm-q puk) gcm-q))
-
-          puks-notified  (recur (gcm-dequeue gcm-q val) gcm-q)
-
-          :else          (recur gcm-q gcm-q))))))
+    (start-gcm-queue-coordinator gcm-qs puks-notified puk->gcm-id-in puks-in)))
 
 (defn- gcm-register [puk->gcm-id req]
   (let [params (:query-params req)
