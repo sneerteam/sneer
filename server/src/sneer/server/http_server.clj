@@ -81,10 +81,7 @@
                    previous)]
     (go-trace
 
-      ;; when recovering emit previous round
-      (>! gcm-qs @gcm-q)
-
-      (loop [previous-gcm-q @gcm-q]
+      (loop [previous-gcm-q nil]
         (let [[val ch] (alts! (if (identical? previous-gcm-q @gcm-q)
                                 input-channels
                                 (conj input-channels [gcm-qs @gcm-q]))
