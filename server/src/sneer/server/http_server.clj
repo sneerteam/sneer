@@ -88,13 +88,13 @@
                               ;; prioritized so puks-notified is handled before gcm-qs
                               :priority true)]
           (match ch
-            puk->gcm-id-in (when (some? val)
-                             (recur (-handle! :assoc val)))
-
             puks-in        (when (some? val)
                              (recur (-handle! :enqueue val)))
 
             puks-notified  (recur (-handle! :dequeue val))
+
+            puk->gcm-id-in (when (some? val)
+                             (recur (-handle! :assoc val)))
 
             gcm-qs         (recur @gcm-q)))))))
 
