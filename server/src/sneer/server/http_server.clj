@@ -76,7 +76,7 @@
 
   (let [input-channels [puks-in puks-notified puk->gcm-id-in]
         gcm-q (gcm-queue-prevayler! prevalence-file)
-        handle! #(let [previous @gcm-q]
+        -handle! #(let [previous @gcm-q]
                    (p/handle! gcm-q [%1 %2])
                    previous)]
     (go-trace
@@ -89,12 +89,12 @@
                               :priority true)]
           (match ch
             puk->gcm-id-in (when (some? val)
-                             (recur (handle! :assoc val)))
+                             (recur (-handle! :assoc val)))
 
             puks-in        (when (some? val)
-                             (recur (handle! :enqueue val)))
+                             (recur (-handle! :enqueue val)))
 
-            puks-notified  (recur (handle! :dequeue val))
+            puks-notified  (recur (-handle! :dequeue val))
 
             :else          (recur @gcm-q)))))))
 
