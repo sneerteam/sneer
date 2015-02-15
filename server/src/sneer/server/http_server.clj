@@ -3,7 +3,7 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.params :as params]
-            [clojure.core.async :as async :refer [go <! >! >!! go-loop alts!]]
+            [clojure.core.async :as async :refer [go <! >! >!! alts!]]
             [clojure.core.match :refer [match]]
             [sneer.async :refer [go-while-let go-trace]]
             [sneer.keys :as keys]
