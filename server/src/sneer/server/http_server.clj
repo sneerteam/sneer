@@ -32,25 +32,32 @@
                  (fn [response] (>!! result response)))
     result))
 
-(defn- wait [secs-string]
-  (println "GCM: WAITING" secs-string "SECONDS")
-  (async/timeout (* 1000 (Integer/valueOf secs-string))))
+(defn- timeout-secs [secs]
+  (when-not (zero? secs)
+    (println "GCM: WAITING" secs "SECONDS"))
+  (async/timeout (* 1000 secs)))
+
+(defn- retry-after [response]
+  (if-let [retry-after-secs (-> response :headers :retry-after)]
+    (Integer/valueOf retry-after-secs)
+    0))
 
 (defn- start-gcm-notification-rounds [gcm-qs puks-notified async-gcm-notify-fn]
   (go-while-let [gcm-q (<! gcm-qs)]
     (let [round (gcm-round gcm-q)]
       (println "GCM ROUND STARTED:" round)
-      (loop [round round]
-        (when-not (empty? round)
+      (loop [round round
+             wait-after-round 0]
+        (if (empty? round)
+          (<! (timeout-secs wait-after-round))
           (let [[puk gcm-id] (first round)
                 response (<! (async-gcm-notify-fn gcm-id))
                 status (:status response)]
             (println "GCM RESPONSE:" response)
-            (if (= 200 status)
-              (>! puks-notified puk)
-              (when-some [retry-after-secs (-> response :headers :retry-after)]
-                (<! (wait retry-after-secs))))
-            (recur (rest round))))))))
+            (when (= 200 status)
+              (>! puks-notified puk))
+            (recur (rest round)
+                   (max wait-after-round (retry-after response)))))))))
 
 (defn- handle-gcm-event [gcm-q event]
   (match event
