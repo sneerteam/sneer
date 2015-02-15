@@ -3,9 +3,9 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.params :as params]
-            [clojure.core.async :as async :refer [go <! >! >!! alts!]]
+            [clojure.core.async :as async :refer [go <! >! >!! alt!]]
             [clojure.core.match :refer [match]]
-            [sneer.async :refer [go-while-let go-trace]]
+            [sneer.async :refer [go-while-let go-trace sliding-chan]]
             [sneer.keys :as keys]
             [sneer.server.prevalence :as p]
             [sneer.server.gcm :as gcm]))
@@ -74,32 +74,30 @@
 (defn- start-gcm-queue-coordinator
   [prevalence-file gcm-qs puks-notified puk->gcm-id-in puks-in]
 
-  (let [input-channels [puks-in puks-notified puk->gcm-id-in]
-        gcm-q (gcm-queue-prevayler! prevalence-file)
-        -handle! #(let [previous @gcm-q]
-                   (p/handle! gcm-q [%1 %2])
-                   previous)]
+  (let [gcm-q (gcm-queue-prevayler! prevalence-file)
+        -handle! #(p/handle! gcm-q [%1 %2])]
+
     (go-trace
+      (loop []
+        (>! gcm-qs @gcm-q)
 
-      (loop [previous-gcm-q nil]
-        (let [[val ch] (alts! (if (identical? previous-gcm-q @gcm-q)
-                                input-channels
-                                (conj input-channels [gcm-qs @gcm-q]))
-                              ;; prioritized so puks-notified is handled before gcm-qs
-                              :priority true)]
-          (match ch
-            puks-in        (when (some? val)
-                             (recur (-handle! :enqueue val)))
+        (alt!
+          puks-in ([puk]
+                   (when puk
+                     (-handle! :enqueue puk)
+                     (recur)))
 
-            puks-notified  (recur (-handle! :dequeue val))
+          puks-notified ([puk]
+                         (-handle! :dequeue puk)
+                         (recur))
 
-            puk->gcm-id-in (when (some? val)
-                             (recur (-handle! :assoc val)))
-
-            gcm-qs         (recur @gcm-q)))))))
+          puk->gcm-id-in ([puk->gcm-id]
+                          (when puk->gcm-id
+                            (-handle! :assoc puk->gcm-id)
+                            (recur))))))))
 
 (defn- start-gcm-notifier [prevalence-file puk->gcm-id-in puks-in async-gcm-notify-fn]
-  (let [gcm-qs (async/chan)
+  (let [gcm-qs (sliding-chan)
         puks-notified (async/chan 10)]
     (start-gcm-notification-rounds gcm-qs puks-notified async-gcm-notify-fn)
     (start-gcm-queue-coordinator prevalence-file gcm-qs puks-notified puk->gcm-id-in puks-in)))
