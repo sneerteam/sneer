@@ -71,8 +71,7 @@
       (prevayler-jr! prevalence-file)
       (prevayler-jr!))))
 
-(defn- start-gcm-queue-coordinator
-  [prevalence-file gcm-qs puks-notified puk->gcm-id-in puks-in]
+(defn- start-gcm-queue-coordinator [prevalence-file gcm-qs puks-notified puk->gcm-id-in puks-in]
 
   (let [gcm-q (gcm-queue-prevayler! prevalence-file)
         -handle! #(p/handle! gcm-q [%1 %2])]
@@ -80,16 +79,15 @@
     (go-trace
       (loop []
         (>! gcm-qs @gcm-q)
-
         (alt!
-          puks-in ([puk]
-                   (when puk
-                     (-handle! :enqueue puk)
-                     (recur)))
+          puks-notified  ([puk]
+                           (-handle! :dequeue puk)
+                           (recur))
 
-          puks-notified ([puk]
-                         (-handle! :dequeue puk)
-                         (recur))
+          puks-in        ([puk]
+                          (when puk
+                            (-handle! :enqueue puk)
+                            (recur)))
 
           puk->gcm-id-in ([puk->gcm-id]
                           (when puk->gcm-id
