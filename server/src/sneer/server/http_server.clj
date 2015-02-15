@@ -96,7 +96,7 @@
 
             puks-notified  (recur (-handle! :dequeue val))
 
-            :else          (recur @gcm-q)))))))
+            gcm-qs         (recur @gcm-q)))))))
 
 (defn- start-gcm-notifier [prevalence-file puk->gcm-id-in puks-in async-gcm-notify-fn]
   (let [gcm-qs (async/chan)
