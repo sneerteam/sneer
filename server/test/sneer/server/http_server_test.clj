@@ -6,6 +6,8 @@
             [org.httpkit.client :as http]
             [midje.sweet :refer :all]))
 
+; (do (require 'midje.repl) (midje.repl/autotest))
+
 (let [to-google (async/chan)
       from-google (async/chan)
       gcm-notify (fn [id] (do (>!!? to-google id)
