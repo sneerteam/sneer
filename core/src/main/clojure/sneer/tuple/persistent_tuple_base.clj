@@ -1,6 +1,7 @@
 (ns sneer.tuple.persistent-tuple-base
   (:import [sneer.commons SystemReport]
-           [sneer.admin UniqueConstraintViolated])
+           [sneer.admin UniqueConstraintViolated]
+           (java.sql SQLException))
   (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
@@ -25,7 +26,12 @@
      field/value. When a lease channel is passed the result
      channel will keep receiving new tuples until the lease
      emits a value.")
-  
+
+  (set-attribute
+    ^Void [this attribute value tuple-id])
+  (get-attribute
+    ^Void [this attribute tuple-id response-ch])
+
   (restarted ^TupleBase [this]))
 
 (defn query-all [tuple-base criteria]
@@ -64,6 +70,14 @@
      ;[:sequence :integer "NOT NULL"]
      ;[:signature :blob "NOT NULL"]
      [:custom :blob]]))
+
+(defn- create-attribute-table [db]
+  (db-create-table
+    db :attribute
+    [[:id :integer "PRIMARY KEY" "AUTOINCREMENT"]
+     [:attribute :varchar "NOT NULL"]
+     [:tuple_id :integer "NOT NULL"]
+     [:value :blob]]))
 
 (defn- create-tuple-indices [db]
   (db-create-index db :tuple "idx_tuple_uniqueness" [:author :original_id] true)
@@ -185,6 +199,7 @@
 
 (defn setup [db]
   (idempotently #(create-tuple-table db))
+  (idempotently #(create-attribute-table db))
   (idempotently #(create-prik-table db))
   (idempotently #(create-tuple-indices db)))
 
@@ -212,7 +227,28 @@
             {:query criteria :tuples-out tuples-out}
             (do
               (>! tuples-out (query-tuples-from-db db criteria (:starting-from request)))
-              (recur prev-tuple-id))))))
+              (recur prev-tuple-id))
+
+            {:set-attribute attribute :value value :tuple-id tuple-id}
+            (do
+              (try
+                (db-insert db :attribute {"attribute" attribute "value" (serialization/serialize value) "tuple_id" tuple-id})
+                (catch Exception e
+                  (.printStackTrace e)))
+              (recur prev-tuple-id))
+
+            {:get-attribute attribute :tuple-id tuple-id :response-ch ch}
+            (do
+              (println ">>>>> CHANGE TO USE UPDATE <<<<<")
+              (let [result-set (db-query db ["SELECT VALUE FROM ATTRIBUTE WHERE TUPLE_ID = ? AND ATTRIBUTE = ? ORDER BY ID DESC LIMIT 1"
+                                             tuple-id
+                                             attribute])
+                    value (-> result-set rest first first)]
+                (>! ch (if value
+                         (serialization/deserialize value)
+                         :null)))
+              (recur prev-tuple-id))
+            ))))
 
     (reify TupleBase
 
@@ -231,7 +267,7 @@
                 (>! tuples-out tuple)))
             (close! tuples-out))))
 
-      (query-tuples [this criteria tuples-out lease]
+      (query-tuples [_ criteria tuples-out lease]
         (let [new-tuples (dropping-tap new-tuples-mult)
               query-result (chan)
               previous-id (atom 0)]
@@ -247,6 +283,16 @@
             ;;TODO: (>! tuples-out :wait-marker)
             (when (<! new-tuples)
               (recur)))))
+
+      (set-attribute [_ attribute value tuple-id]
+        (>!! requests {:set-attribute attribute
+                       :value value
+                       :tuple-id tuple-id}))
+
+      (get-attribute [_ attribute tuple-id response-ch]
+        (>!! requests {:get-attribute attribute
+                       :tuple-id tuple-id
+                       :response-ch response-ch}))
 
       (restarted [this]
         (create db)))))

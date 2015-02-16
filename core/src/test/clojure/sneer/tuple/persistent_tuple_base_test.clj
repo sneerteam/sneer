@@ -1,5 +1,5 @@
 (ns sneer.tuple.persistent-tuple-base-test
-  (:require [sneer.tuple.persistent-tuple-base :refer [query-all query-tuples store-tuple create]]
+  (:require [sneer.tuple.persistent-tuple-base :refer :all]
             [sneer.test-util :refer [<!!?]]
             [midje.sweet :refer :all]
             [clojure.core.async :as async :refer [chan]]
@@ -92,3 +92,27 @@
   {"author" neide "audience" carla "payload" "n"}    {"payload" "n"}
   {"author" michael "audience" neide}                {"payload" "hello neide"}
   {"author" michael "audience" carla}                {"payload" "hello carla"})
+
+(facts "About tuple attributes"
+  (with-open [db (jdbc-database/create-sqlite-db)]
+    (let [subject (create db)
+          tuple {"type" "test" "author" neide}
+          tuple-response (chan)]
+      (store-tuple subject tuple)
+      (query-tuples subject tuple tuple-response)
+      (let [tuple-id (get (<!!? tuple-response) "id")
+            attr-response  (chan)]
+
+        (fact "Absent value is :null"
+          (get-attribute subject :some-tag tuple-id attr-response)
+          (<!!? attr-response) => :null)
+
+        (fact "value can be set"
+          (set-attribute subject :some-tag 42 tuple-id)
+          (get-attribute subject :some-tag tuple-id attr-response)
+          (<!!? attr-response) => 42)
+
+        (fact "value can be updated"
+          (set-attribute subject :some-tag "foo" tuple-id)
+          (get-attribute subject :some-tag tuple-id attr-response)
+          (<!!? attr-response) => "foo")))))
