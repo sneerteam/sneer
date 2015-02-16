@@ -16,4 +16,4 @@ before_script:
   - adb devices
   - adb shell input keyevent 82 &
 
-script: ./gradlew check assemble connectedAndroidTest
+script: ./gradlew check connectedAndroidTest
