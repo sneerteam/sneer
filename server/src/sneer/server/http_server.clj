@@ -109,7 +109,7 @@
 
 (defn- start-gcm-notifier [prevalence-file puk->gcm-id-in puks-in async-gcm-notify-fn]
   (let [gcm-qs (sliding-chan)
-        puks-notified (async/chan 10)]
+        puks-notified (async/chan)]
     (start-gcm-notification-rounds gcm-qs puks-notified async-gcm-notify-fn)
     (start-gcm-queue-coordinator prevalence-file gcm-qs puks-notified puk->gcm-id-in puks-in)))
 
