@@ -60,15 +60,15 @@
                    (max wait-after-round (retry-after response)))))))))
 
 (defn- handle-gcm-event [gcm-q event]
-  (let [ret (match event
-              [:assoc [puk gcm-id]] (gcm-assoc gcm-q puk gcm-id)
-              [:enqueue puk] (gcm-enqueue gcm-q puk)
-              [:dequeue puk] (gcm-dequeue gcm-q puk))]
-    (try
-      (gcm-dequeue ret :something-to-force-the-exception)
-      (catch Exception e
-        (.printStackTrace e)))
-    ret))
+  (try
+    (gcm-dequeue gcm-q :something-to-force-the-exception)
+    (match event
+      [:assoc [puk gcm-id]] (gcm-assoc gcm-q puk gcm-id)
+      [:enqueue puk] (gcm-enqueue gcm-q puk)
+      [:dequeue puk] (gcm-dequeue gcm-q puk))
+    (catch Exception e
+      (.printStackTrace e)
+      (println "> > > > > > >" gcm-q event))))
 
 (defn- gcm-queue-prevayler! [prevalence-file]
   (let [prevayler-jr! (partial p/prevayler-jr! handle-gcm-event (gcm-notification-queue))]
