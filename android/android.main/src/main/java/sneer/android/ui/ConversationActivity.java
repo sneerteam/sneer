@@ -21,8 +21,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.PopupMenu.OnDismissListener;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.*;
@@ -54,9 +52,11 @@ public class ConversationActivity extends SneerActivity {
 	private Party party;
 	private Conversation conversation;
 
+	private PopupMenu menu;
 	private ImageButton actionButton;
 	protected boolean justOpened;
 	private EditText editText;
+	private int icAction;
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
@@ -98,7 +98,7 @@ public class ConversationActivity extends SneerActivity {
 				if (!editText.getText().toString().trim().isEmpty())
 					actionButton.setImageResource(R.drawable.ic_action_send);
 				else
-					actionButton.setImageResource(R.drawable.ic_action_new);
+					actionButton.setImageResource(icAction);
 			}
 
 			@Override
@@ -117,9 +117,33 @@ public class ConversationActivity extends SneerActivity {
 		}});
 
 		actionButton = (ImageButton)findViewById(R.id.actionButton);
-		actionButton.setImageResource(R.drawable.ic_action_new);
+		icAction = R.drawable.ic_action_send;
+
+		actionButton.setImageResource(icAction);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			handleClick(editText.getText().toString().trim());
+		}});
+
+		menu = new PopupMenu(ConversationActivity.this, actionButton);
+		conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() { @SuppressWarnings("deprecation")
+		@Override public void call(List<ConversationMenuItem> menuItems) {
+			menu.getMenu().close();
+			menu.getMenu().clear();
+			if (menuItems.size() > 0) {
+				icAction = R.drawable.ic_action_new;
+				actionButton.setImageResource(icAction);
+			} else {
+				icAction = R.drawable.ic_action_send;
+				actionButton.setImageResource(icAction);
+			}
+
+			for (final ConversationMenuItem item : menuItems) {
+				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
+					menu.getMenu().close();
+					item.call(party.publicKey().current());
+					return true;
+				}}).setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
+			}
 		}});
 	}
 
@@ -134,24 +158,7 @@ public class ConversationActivity extends SneerActivity {
 
 
 	private void openInteractionMenu() {
-		final PopupMenu menu = new PopupMenu(ConversationActivity.this, actionButton);
-
-		final Subscription s = conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() {  @SuppressWarnings("deprecation")
-		@Override public void call(List<ConversationMenuItem> menuItems) {
-			menu.getMenu().close();
-			menu.getMenu().clear();
-			for (final ConversationMenuItem item : menuItems) {
-				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
-					menu.getMenu().close();
-					item.call(party.publicKey().current());
-					return true;
-				}}).setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
-			}
-			menu.show();
-		}});
-		menu.setOnDismissListener(new OnDismissListener() {  @Override public void onDismiss(PopupMenu menu) {
-			s.unsubscribe();
-		}});
+		menu.show();
 	}
 
 
