@@ -75,7 +75,8 @@
       (println (str "> > > > > > >" gcm-q event " < < < < <"))
       (println (str "> > > > > > >" gcm-q event " < < < < <"))
       (println (str "> > > > > > >" gcm-q event " < < < < <"))
-      (println (str "> > > > > > >" gcm-q event " < < < < <")))))
+      (println (str "> > > > > > >" gcm-q event " < < < < <"))
+      gcm-q)))
 
 (defn- gcm-queue-prevayler! [prevalence-file]
   (let [prevayler-jr! (partial p/prevayler-jr! handle-gcm-event (gcm-notification-queue))]
