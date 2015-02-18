@@ -8,7 +8,7 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-(let [to-google (async/chan)
+#_(let [to-google (async/chan)
       from-google (async/chan)
       gcm-notify (fn [id] (do (>!!? to-google id)
                               from-google))
@@ -31,13 +31,11 @@
         (<!!? to-google) => gcm-id?
         (>!!? from-google {:status 200}))
 
-      (println "REMOVE COMMENT BELOW")
+
 
       name? gcm-id?
       "neide" "101010"
-
-      ;"maicon"  "202020"
-      )
+      "maicon"  "202020")
 
     (finally
       (async/close! puks-to-notify))))
