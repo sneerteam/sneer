@@ -203,6 +203,45 @@
   (idempotently #(create-prik-table db))
   (idempotently #(create-tuple-indices db)))
 
+(defn- store! [db new-tuples request next-tuple-id tuple]
+  (let [uniqueness (:uniqueness request)]
+    (when (and (or (nil? uniqueness) (result-empty? db uniqueness))
+               (try-insert-tuple db tuple next-tuple-id))
+      {:channel new-tuples :response tuple :bump-id true})))
+
+(defn- set-attr! [db attribute value tuple-id]
+  (try
+    (db-insert db :attribute {"attribute" attribute
+                              "value"     (serialization/serialize value)
+                              "tuple_id"  tuple-id})
+    (catch Exception e
+      (.printStackTrace e)))
+  {})
+
+(defn- get-attr! [db attribute tuple-id]
+  (println ">>>>> CHANGE TO USE UPDATE <<<<<")
+  (let [result-set (db-query db ["SELECT VALUE FROM ATTRIBUTE WHERE TUPLE_ID = ? AND ATTRIBUTE = ? ORDER BY ID DESC LIMIT 1"
+                                 tuple-id
+                                 attribute])
+        value (-> result-set rest first first)]
+    (if value
+      (serialization/deserialize value)
+      :null)))
+
+(defn- response-for! [db new-tuples request next-tuple-id]
+  (match request
+    {:store tuple}
+      (store! db new-tuples request next-tuple-id tuple)
+
+    {:query criteria :tuples-out tuples-out}
+      {:channel tuples-out :response (query-tuples-from-db db criteria (:starting-from request))}
+
+    {:set-attribute attribute :value value :tuple-id tuple-id}
+      (set-attr! db attribute value tuple-id)
+
+    {:get-attribute attribute :tuple-id tuple-id :response-ch response-ch}
+      (assoc {:channel response-ch} :response (get-attr! db attribute tuple-id))))
+
 (defn create [db]
   (let [new-tuples (dropping-chan)
         new-tuples-mult (mult new-tuples)
@@ -211,44 +250,12 @@
     (setup db)
 
     (go-trace
-      (loop [prev-tuple-id (max-tuple-id db)]
-        (when-some [request (<! requests)]          
-          (match request
-            {:store tuple}
-            (let [next-tuple-id (inc prev-tuple-id)
-                  uniqueness (:uniqueness request)]
-              (recur
-               (if (and (or (nil? uniqueness) (result-empty? db uniqueness))
-                        (try-insert-tuple db tuple next-tuple-id))
-                 (do (>! new-tuples tuple)
-                     next-tuple-id)
-                 prev-tuple-id)))
-            
-            {:query criteria :tuples-out tuples-out}
-            (do
-              (>! tuples-out (query-tuples-from-db db criteria (:starting-from request)))
-              (recur prev-tuple-id))
-
-            {:set-attribute attribute :value value :tuple-id tuple-id}
-            (do
-              (try
-                (db-insert db :attribute {"attribute" attribute "value" (serialization/serialize value) "tuple_id" tuple-id})
-                (catch Exception e
-                  (.printStackTrace e)))
-              (recur prev-tuple-id))
-
-            #_{:get-attribute attribute :tuple-id tuple-id :response-ch ch}
-            #_(do
-              (println ">>>>> CHANGE TO USE UPDATE <<<<<")
-              (let [result-set (db-query db ["SELECT VALUE FROM ATTRIBUTE WHERE TUPLE_ID = ? AND ATTRIBUTE = ? ORDER BY ID DESC LIMIT 1"
-                                             tuple-id
-                                             attribute])
-                    value (-> result-set rest first first)]
-                (>! ch (if value
-                         (serialization/deserialize value)
-                         :null)))
-              (recur prev-tuple-id))
-            ))))
+      (loop [next-tuple-id (-> db max-tuple-id inc)]
+        (when-some [request (<! requests)]
+          (let [{:keys [channel response bump-id]} (response-for! db new-tuples request next-tuple-id)]
+            (when response
+              (>! channel response))
+            (recur (cond-> next-tuple-id bump-id inc))))))
 
     (reify TupleBase
 
