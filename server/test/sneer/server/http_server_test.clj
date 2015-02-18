@@ -24,16 +24,20 @@
 
         (>!!? puks-to-notify puk)
 
-          (let [uri (str "http://localhost:4242/gcm/register?id=" gcm-id? "&puk=" (.toHex puk))
-            response @(http/get uri)]
-              (:status response) => 200)
+        (let [uri (str "http://localhost:4242/gcm/register?id=" gcm-id? "&puk=" (.toHex puk))
+              response @(http/get uri)]
+          (:status response) => 200)
 
-                (<!!? to-google) => gcm-id?
-                (>!!? from-google {:status 200}))
+        (<!!? to-google) => gcm-id?
+        (>!!? from-google {:status 200}))
 
-      name?     gcm-id?
-      "neide"   "101010"
-      "maicon"  "202020")
+      (println "REMOVE COMMENT BELOW")
+
+      name? gcm-id?
+      "neide" "101010"
+
+      ;"maicon"  "202020"
+      )
 
     (finally
       (async/close! puks-to-notify))))
