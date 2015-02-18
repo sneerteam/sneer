@@ -68,7 +68,11 @@
       [:dequeue puk] (gcm-dequeue gcm-q puk))
     (catch Exception e
       (.printStackTrace e)
-      (println "> > > > > > >" gcm-q event))))
+      (println (str "> > > > > > >" gcm-q event " < < < < <"))
+      (println (str "> > > > > > >" gcm-q event " < < < < <"))
+      (println (str "> > > > > > >" gcm-q event " < < < < <"))
+      (println (str "> > > > > > >" gcm-q event " < < < < <"))
+      (println (str "> > > > > > >" gcm-q event " < < < < <")))))
 
 (defn- gcm-queue-prevayler! [prevalence-file]
   (let [prevayler-jr! (partial p/prevayler-jr! handle-gcm-event (gcm-notification-queue))]
