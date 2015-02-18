@@ -8,7 +8,7 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-#_(let [to-google (async/chan)
+(let [to-google (async/chan)
       from-google (async/chan)
       gcm-notify (fn [id] (do (>!!? to-google id)
                               from-google))
@@ -33,9 +33,9 @@
 
 
 
-      name? gcm-id?
-      "neide" "101010"
-      "maicon"  "202020")
+      name?    gcm-id?
+      "neide"  "101010"
+      "maicon" "202020")
 
     (finally
       (async/close! puks-to-notify))))

@@ -45,7 +45,7 @@
 (defn- start-gcm-notification-rounds [gcm-qs puks-notified async-gcm-notify-fn]
   (go-while-let [gcm-q (<! gcm-qs)]
     (let [round (gcm-round gcm-q)]
-      (println "GCM ROUND STARTED:" round)
+      (println (str "GCM ROUND STARTED: " round))
       (loop [round round
              wait-after-round 0]
         (if (empty? round)
