@@ -62,10 +62,13 @@
 (defn- handle-gcm-event [gcm-q event]
   (try
     (gcm-dequeue gcm-q :something-to-force-the-exception)
-    (match event
-      [:assoc [puk gcm-id]] (gcm-assoc gcm-q puk gcm-id)
-      [:enqueue puk] (gcm-enqueue gcm-q puk)
-      [:dequeue puk] (gcm-dequeue gcm-q puk))
+    (let [ret (match event
+                [:assoc [puk gcm-id]] (gcm-assoc gcm-q puk gcm-id)
+                [:enqueue puk] (gcm-enqueue gcm-q puk)
+                [:dequeue puk] (gcm-dequeue gcm-q puk))]
+      (gcm-dequeue ret :something-to-force-the-exception)
+      ret
+      )
     (catch Exception e
       (.printStackTrace e)
       (println (str "> > > > > > >" gcm-q event " < < < < <"))
