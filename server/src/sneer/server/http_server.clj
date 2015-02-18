@@ -68,14 +68,9 @@
       [:enqueue puk] (gcm-enqueue gcm-q puk)
       [:dequeue puk] (gcm-dequeue gcm-q puk))
     (catch Exception e
-      (if-not (-> gcm-q :puks-to-notify set?)   ; It was actually a list once in the prevalent state possibly due to some old bug using disj on nil.
-        (do
-          (println "MAKING :puks-to-notify A SET AGAIN")
-          (assoc gcm-q :puks-to-notify #{}))
-        (do
-          (.printStackTrace e)
-          (println (str "GCM QUEUE: " gcm-q "EVENT:" event))
-          gcm-q)))))
+      (.printStackTrace e)
+      (println (str "GCM QUEUE: " gcm-q "EVENT:" event))
+      gcm-q)))
 
 (defn- gcm-queue-prevayler! [prevalence-file]
   (let [prevayler-jr! (partial p/prevayler-jr! handle-gcm-event (gcm-notification-queue))]
