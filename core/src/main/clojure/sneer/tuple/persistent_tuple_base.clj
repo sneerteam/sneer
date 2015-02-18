@@ -237,8 +237,8 @@
                   (.printStackTrace e)))
               (recur prev-tuple-id))
 
-            {:get-attribute attribute :tuple-id tuple-id :response-ch ch}
-            (do
+            #_{:get-attribute attribute :tuple-id tuple-id :response-ch ch}
+            #_(do
               (println ">>>>> CHANGE TO USE UPDATE <<<<<")
               (let [result-set (db-query db ["SELECT VALUE FROM ATTRIBUTE WHERE TUPLE_ID = ? AND ATTRIBUTE = ? ORDER BY ID DESC LIMIT 1"
                                              tuple-id
