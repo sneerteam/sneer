@@ -61,22 +61,19 @@
 
 (defn- handle-gcm-event [gcm-q event]
   (try
-    (gcm-dequeue gcm-q :something-to-force-the-exception)
-    (let [ret (match event
-                [:assoc [puk gcm-id]] (gcm-assoc gcm-q puk gcm-id)
-                [:enqueue puk] (gcm-enqueue gcm-q puk)
-                [:dequeue puk] (gcm-dequeue gcm-q puk))]
-      (gcm-dequeue ret :something-to-force-the-exception)
-      ret
-      )
+    (match event
+      [:assoc [puk gcm-id]] (gcm-assoc gcm-q puk gcm-id)
+      [:enqueue puk] (gcm-enqueue gcm-q puk)
+      [:dequeue puk] (gcm-dequeue gcm-q puk))
     (catch Exception e
-      (.printStackTrace e)
-      (println (str "> > > > > > >" gcm-q event " < < < < <"))
-      (println (str "> > > > > > >" gcm-q event " < < < < <"))
-      (println (str "> > > > > > >" gcm-q event " < < < < <"))
-      (println (str "> > > > > > >" gcm-q event " < < < < <"))
-      (println (str "> > > > > > >" gcm-q event " < < < < <"))
-      gcm-q)))
+      (if-not (-> gcm-q :puks-to-notify set?)   ; It was actually a list once in the prevalent state possibly due to some old bug using disj on nil.
+        (do
+          (println "MAKING :puks-to-notify A SET AGAIN")
+          (assoc gcm-q :puks-to-notify #{}))
+        (do
+          (.printStackTrace e)
+          (println (str "GCM QUEUE: " gcm-q "EVENT:" event))
+          gcm-q)))))
 
 (defn- gcm-queue-prevayler! [prevalence-file]
   (let [prevayler-jr! (partial p/prevayler-jr! handle-gcm-event (gcm-notification-queue))]
