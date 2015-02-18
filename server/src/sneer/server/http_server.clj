@@ -58,7 +58,8 @@
               (>! puks-notified puk))
             (recur (rest round)
                    (max wait-after-round (retry-after response))))))
-      (>! puks-notified :end-of-round-sync-signal))))
+      (when-not (empty? round)
+        (>! puks-notified :end-of-round)))))
 
 (defn- handle-gcm-event [gcm-q event]
   (try
@@ -92,7 +93,7 @@
         (>! gcm-qs @gcm-q)
         (alt!
           puks-notified  ([puk]
-                           (when-not (= puk :end-of-round-sync-signal)
+                           (when-not (= puk :end-of-round)
                              (-handle! :dequeue puk))
                            (recur))
 
