@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/core.match "0.2.2"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
-                 [com.cognitect/transit-clj "0.8.229"]
+                 [com.cognitect/transit-clj "0.8.259"]
                  [midje "1.6.3"]
                  [com.netflix.rxjava/rxjava-clojure "0.20.3"]
                  [me.sneer/sneer-java-api "0.1.5"]
