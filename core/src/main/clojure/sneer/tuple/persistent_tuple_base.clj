@@ -9,6 +9,8 @@
             [rx.lang.clojure.interop :as rx-interop]
             [sneer.keys :as keys]))
 
+(def after-id ::after-id)
+
 (defprotocol TupleBase
   "A backing store for tuples (represented as maps)."
 
@@ -129,25 +131,27 @@
     nil
     tuple))
 
-(defn- query-by-builtin-fields [criteria starting-from]
+(defn- query-by-builtin-fields [criteria after-id]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
         ^String filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
         values (vals columns)]
-    (if (some? starting-from)
-      (apply vector (str "SELECT * FROM tuple WHERE id > ? " (when-not (.isEmpty filter) " AND ") filter " ORDER BY id") starting-from values)
+    (if (some? after-id)
+      (apply vector (str "SELECT * FROM tuple WHERE id > ? " (when-not (.isEmpty filter) " AND ") filter " ORDER BY id") after-id values)
       (apply vector (str "SELECT * FROM tuple " (when-not (.isEmpty filter) " WHERE ") filter " ORDER BY id") values))))
 
 (defn submap? [sub super]
   (reduce-kv
-    (fn [result k v]
+    (fn [_ k v]
       (if (= v (get super k))
         true
         (reduced false)))
     true
     sub))
 
-(defn query-tuples-from-db [db criteria & [starting-from]]
-  (let [rs (db-query db (query-by-builtin-fields criteria starting-from))
+(defn query-tuples-from-db [db criteria]
+  (let [after-id (::after-id criteria)
+        criteria (dissoc criteria ::after-id)
+        rs (db-query db (query-by-builtin-fields criteria after-id))
         field-names (mapv name (first rs))
         custom (-> criteria ->custom-field-map)]
     (->>
@@ -233,7 +237,7 @@
       (store! db new-tuples request next-tuple-id tuple)
 
     {:query criteria :tuples-out tuples-out}
-      {:channel tuples-out :response (query-tuples-from-db db criteria (:starting-from request))}
+      {:channel tuples-out :response (query-tuples-from-db db criteria)}
 
     {:set-attribute attribute :value value :tuple-id tuple-id}
       (set-attr! db attribute value tuple-id)
@@ -267,28 +271,28 @@
       (query-tuples [_ criteria tuples-out]
         (let [query-result (chan)]
           (go
-            (>! requests {:query criteria :tuples-out query-result})
-            (let [tuples (<! query-result)]
-              (doseq [tuple tuples]
-                (>! tuples-out tuple)))
+            (when (>! requests {:query criteria :tuples-out query-result})
+              (let [tuples (<! query-result)]
+                (doseq [tuple tuples]
+                  (>! tuples-out tuple))))
             (close! tuples-out))))
 
       (query-tuples [_ criteria tuples-out lease]
         (let [new-tuples (dropping-tap new-tuples-mult)
               query-result (chan)
-              previous-id (atom 0)]
+              criteria (atom criteria)]
           (go (<! lease)
               (close! new-tuples))
           (go-loop []
-            (>! requests {:query criteria :tuples-out query-result :starting-from @previous-id})
-            (let [tuples (<! query-result)]
-              (when-not (empty? tuples)
-                (doseq [tuple tuples]
-                  (>! tuples-out tuple))
-                (reset! previous-id (-> tuples last (get "id")))))
-            ;;TODO: (>! tuples-out :wait-marker)
-            (when (<! new-tuples)
-              (recur)))))
+            (when (>! requests {:query @criteria :tuples-out query-result})
+              (let [tuples (<! query-result)]
+                (when-not (empty? tuples)
+                  (doseq [tuple tuples]
+                    (>! tuples-out tuple))
+                  (swap! criteria assoc ::after-id (-> tuples last (get "id")))))
+              ;;TODO: (>! tuples-out :wait-marker)
+              (when (<! new-tuples)
+                (recur))))))
 
       (set-local-attribute [_ attribute value tuple-id]
         (>!! requests {:set-attribute attribute
