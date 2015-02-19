@@ -340,7 +340,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
-	public void ignreTestConversationMessageSequence() throws Exception {
+	public void testConversationMessageSequence() throws Exception {
 
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
@@ -362,8 +362,8 @@ public class ConversationsAPITest extends TestCase {
 		//Restart
 		Sneer newSneer = newSneerAdmin(adminA.privateKey(), tupleBaseA).sneer();
 		Party newB = newSneer.produceParty(userB);
-		Conversation newConvo = sneerA.produceConversationWith(newB);
-		messagesEventually(newConvo, "Hello1", "Hello2", "Hello3");
+		Conversation newConversation = sneerA.produceConversationWith(newB);
+		messagesEventually(newConversation, "Hello1", "Hello2", "Hello3");
 	}
 
 
@@ -395,8 +395,8 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
-	private void messagesEventually(Conversation convo, String... msgsExpected) {
-		expecting(eventually(convo.messages().map(toMessageContentList()), asList(msgsExpected)));
+	private void messagesEventually(Conversation conversation, String... msgsExpected) {
+		expecting(eventually(conversation.messages().map(toMessageContentList()), asList(msgsExpected)));
 	}
 
 

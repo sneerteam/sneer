@@ -16,7 +16,7 @@ include ':sneer-java-api'
 project(':sneer-java-api').projectDir = new File('java-api')
 
 include ':crypto',
-    ':core',
-    ':server',
-    ':java-api.tests',
-    ':core.tests'
+        ':core',
+        ':server',
+        ':java-api.tests',
+        ':core.tests'

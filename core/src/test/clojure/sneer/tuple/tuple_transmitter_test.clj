@@ -39,7 +39,7 @@
           (let [tuples-for-c (get (<!!? follower-connections) C)
                 _ (assert tuples-for-c "tuples-for-c")
                 [sub _] (<!!? tuples-for-c)]
-             sub => (contains (assoc sub "audience" C)))))
+            sub => (contains (assoc sub "audience" C)))))
 
       (fact "It wont resend tuples upon restart"
         (close! tuples-in)
@@ -52,4 +52,4 @@
             (let [tuples-for-b (get (<!!? follower-connections) B)
                   _ (assert tuples-for-b "tuples-for-b second time")
                   [tuple _] (<!!? tuples-for-b)]
-               tuple => (contains new-tweet))))))))
+              tuple => (contains new-tweet))))))))

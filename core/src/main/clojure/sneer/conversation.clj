@@ -33,7 +33,7 @@
       (timeCreated [this] (format-date created))
       (tuple [this] tuple))))
 
-(defn values-to-compare [^Message msg] [(.timestampCreated msg) (.label msg)])
+(defn values-to-compare [^Message msg] [(-> msg .tuple (get "id"))])
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
 (defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
@@ -45,24 +45,24 @@
         being-read (atom nil)
         msg-tuples-out (.. message-filter (author own-puk) (audience party-puk) tuples)
         msg-tuples-in  (.. message-filter (author party-puk) (audience own-puk) tuples)]
-    
+
     (subscribe-on-io
       (rx/merge msg-tuples-out msg-tuples-in)
       (fn [tuple]
         (swap! messages conj (tuple->message own-puk tuple))))
-    
+
     (subscribe-on-io
       msg-tuples-in
       (fn [_]
         (if-not @being-read (swap! unread-message-counter 0))))
-    
+
     (reify
       Conversation
       (party [this] party)
-      
+
       (messages [this]
         observable-messages)
-      
+
       (sendMessage [this label]
         (..
           tuple-space
@@ -72,18 +72,18 @@
           (type "message")
           (field "label" label)
           (pub)))
-      
+
       (mostRecentMessageContent [this]
         (.observed (ObservedSubject/create "")))
-      
+
       (mostRecentMessageTimestamp [this]
         (.observed (ObservedSubject/create (now))))
-    
+
       (menu [this] conversation-menu-items)
-    
+
       (unreadMessageCount [this]
         (atom->observable unread-message-counter))
-    
+
       (setBeingRead [this is-being-read]
         (swap! being-read (fn [_] is-being-read))
         (if @being-read (swap! unread-message-counter (fn [_] 0)))))))

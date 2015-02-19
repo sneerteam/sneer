@@ -25,12 +25,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.*;
 import sneer.android.R;
-import sneer.commons.Comparators;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
@@ -41,9 +38,9 @@ public class ConversationActivity extends SneerActivity {
 	public static final String PARTY_PUK = "partyPuk";
 	private static final String ACTIVITY_TITLE = "activityTitle";
 
-	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
-		return Comparators.compare(lhs.timestampReceived(), rhs.timestampReceived());
-	}};
+//	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
+//		return Comparators.compare(lhs.timestampReceived(), rhs.timestampReceived());
+//	}};
 
 	private final List<Message> messages = new ArrayList<Message>();
 	private ConversationAdapter adapter;
@@ -184,14 +181,14 @@ public class ConversationActivity extends SneerActivity {
 
 
 	@SuppressWarnings("unused")
-	private void onMessage(Message msg) {
-		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
-		if (insertionPointHint < 0) {
-			int insertionPoint = Math.abs(insertionPointHint) - 1;
-			messages.add(insertionPoint, msg);
-			adapter.notifyDataSetChanged();
-		}
-	}
+//	private void onMessage(Message msg) {
+//		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
+//		if (insertionPointHint < 0) {
+//			int insertionPoint = Math.abs(insertionPointHint) - 1;
+//			messages.add(insertionPoint, msg);
+//			adapter.notifyDataSetChanged();
+//		}
+//	}
 
 
 	private void hideKeyboard() {
