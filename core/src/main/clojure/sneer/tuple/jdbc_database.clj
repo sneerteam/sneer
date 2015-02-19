@@ -12,7 +12,8 @@
      "jdbc:sqlite::memory:")))
 
 (defn reify-database [connection]
-  (let [db {:connection connection}]
+  (let [db {:connection connection}
+        open (atom true)]
     (reify
       tuple-base/Database
       (db-create-table [_ table columns]
@@ -31,11 +32,13 @@
               (throw (UniqueConstraintViolated. (.getMessage e)))
               (throw e)))))
 
-      (db-query [this sql-and-params]
+      (db-query [_ sql-and-params]
+        (assert @open)  ;For debugging in 2015/FEB.
         (sql/query db sql-and-params :result-set-fn doall :as-arrays? true))
 
       java.io.Closeable
-      (close [this]
+      (close [_]
+        (reset! open false)
         (.close connection)))))
 
 (defn create-sqlite-db [& [databaseFile]]
