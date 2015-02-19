@@ -135,7 +135,8 @@
       (go
         (<! (start-gcm-notifier prevalence-file puk->gcm-id-out puks-in async-gcm-notify-fn))
         (async/close! puk->gcm-id-out)
-        (server)))))
+        (server)
+        (println "http-server closed.")))))
 
 ;; for REPL usage
 ;(def puks-in (async/chan))

@@ -46,27 +46,27 @@
                                has-address?
                                (async/map #(with-address puk->address %) [packets-out]))
         routable-packets-out (trace-in routable-packets-out "OUT")
-        udp-server (udp/start-udp-server packets-in routable-packets-out udp-port)]
+        udp-server (udp/start-udp-server packets-in routable-packets-out udp-port)
+        puks-to-notify (async/chan)
+        http-server (http-server/start gcm-prevalence-file http-port puks-to-notify)]
 
-    (let [puks-to-notify (async/chan)]
-
-      (go-trace
-       (<! (connector/start-connector
+    (go-trace
+      (<! (connector/start-connector
             connector-prevalence-file
             (async/map #(update-puk-address! puk->address %) [routable-packets-in])
             packets-out
             puks-to-notify))
-       (close! puks-to-notify))
-
-      (http-server/start gcm-prevalence-file http-port puks-to-notify))
+      (close! puks-to-notify))
 
     (trace-changes "[PUK->ADDRESS]" puk->address)
 
-    {:udp-server udp-server :packets-in packets-in :packets-out packets-out}))
+    {:udp-server udp-server :http-server http-server :packets-in packets-in :packets-out packets-out}))
 
 (defn stop [server]
-  (close! (:packets-out server))
-  (alts!! [(:udp-server server) (timeout 500)]))
+  (close! (:packets-in server))
+  (let [timeout (timeout 2000)]
+    (alts!! [(:udp-server server) timeout])
+    (alts!! [(:http-server server) timeout])))
 
 (defn -main [& [port-string]]
   (let [port (when-some [p port-string] (Integer/parseInt p))
