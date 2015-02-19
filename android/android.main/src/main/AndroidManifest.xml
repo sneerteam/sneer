@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="sneer.android"
-    android:installLocation="internalOnly"
-    android:versionCode="4"
-    android:versionName="1.0">
+    android:installLocation="internalOnly">
+
+    <!-- Superceded by the gradle build:
+        android:versionCode="999"
+        android:versionName="99.99"  -->
 
     <uses-feature android:name="android.hardware.camera" />
 
