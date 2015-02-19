@@ -79,7 +79,7 @@
 
         <activity
             android:name=".ui.ConversationActivity"
-            android:label="@string/title_conversation"></activity>
+            android:label="@string/title_conversation"/>
         <activity
             android:name=".ui.ProfileActivity"
             android:label="@string/title_activity_profile">

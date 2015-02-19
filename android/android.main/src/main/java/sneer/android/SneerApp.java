@@ -16,6 +16,8 @@ public class SneerApp extends Application {
     @Override
 	public void onCreate() {
 		super.onCreate();
+
+	    //Do not delete this. We must revive the simulator for rapid UI development.
 //		SneerAndroidSingleton.setInstance(isCoreAvailable()
 //			? new SneerAndroidImpl(getApplicationContext())
 //			: new SneerAndroidSimulator(getApplicationContext()));
