@@ -84,6 +84,9 @@
   (db-create-index db :tuple "idx_tuple_uniqueness" [:author :original_id] true)
   (db-create-index db :tuple "idx_tuple_type" [:type] false))
 
+(defn- create-attribute-indices [db]
+  (db-create-index db :attribute "idx_attribute_tuple" [:tuple_id] false))
+
 (defn- create-prik-table [db]
   (db-create-table
     db :keys
@@ -203,6 +206,7 @@
 (defn setup [db]
   (idempotently #(create-tuple-table db))
   (idempotently #(create-attribute-table db))
+  (idempotently #(create-attribute-indices db))
   (idempotently #(create-prik-table db))
   (idempotently #(create-tuple-indices db)))
 
