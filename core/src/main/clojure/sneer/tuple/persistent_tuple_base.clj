@@ -1,6 +1,7 @@
 (ns sneer.tuple.persistent-tuple-base
   (:import [sneer.commons SystemReport]
-           [sneer.admin UniqueConstraintViolated])
+           [sneer.admin UniqueConstraintViolated]
+           [java.lang AutoCloseable])
   (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
@@ -309,7 +310,11 @@
                        :tuple-id tuple-id
                        :response-ch response-ch}))
 
-      (restarted [_]
+      (restarted [this]
+        (.close ^AutoCloseable this)
+        (create db))
+
+      AutoCloseable
+      (close [_]
         (close! requests)
-        (close! new-tuples)
-        (create db)))))
+        (close! new-tuples)))))
