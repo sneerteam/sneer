@@ -1,7 +1,6 @@
 (ns sneer.tuple.persistent-tuple-base
   (:import [sneer.commons SystemReport]
-           [sneer.admin UniqueConstraintViolated]
-           (java.sql SQLException))
+           [sneer.admin UniqueConstraintViolated])
   (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
