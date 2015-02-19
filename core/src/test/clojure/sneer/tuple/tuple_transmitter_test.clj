@@ -28,6 +28,7 @@
         (let [tweet {"type" "tweet" "author" A "payload" "<3"}]
           (store-tuple tuple-base tweet)
           (let [tuples-for-b (get (<!!? follower-connections) B)
+                _ (assert tuples-for-b "tuples-for-b")
                 [tuple ack-chan] (<!!? tuples-for-b)]
             tuple => (contains tweet)
             (>!!? ack-chan tuple))))
@@ -36,6 +37,7 @@
         (let [sub {"type" "sub" "author" A "criteria" {"type" "tweet" "author" C}}]
           (store-tuple tuple-base sub)
           (let [tuples-for-c (get (<!!? follower-connections) C)
+                _ (assert tuples-for-c "tuples-for-c")
                 [sub _] (<!!? tuples-for-c)]
              sub => (contains (assoc sub "audience" C)))))
 
@@ -48,5 +50,6 @@
           (let [new-tweet {"type" "tweet" "author" A "payload" "S2"}]
             (store-tuple tuple-base new-tweet)
             (let [tuples-for-b (get (<!!? follower-connections) B)
+                  _ (assert tuples-for-b "tuples-for-b second time")
                   [tuple _] (<!!? tuples-for-b)]
                tuple => (contains new-tweet))))))))
