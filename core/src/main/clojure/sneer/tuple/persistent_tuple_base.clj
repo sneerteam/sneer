@@ -29,7 +29,7 @@
   (set-local-attribute
     ^Void [this attribute value tuple-id])
   (get-local-attribute
-    ^Void [this attribute tuple-id response-ch])
+    ^Void [this attribute default-value tuple-id response-ch])
 
   (restarted ^TupleBase [this]))
 
@@ -217,7 +217,7 @@
       (.printStackTrace e)))
   {})
 
-(defn- get-attr! [db attribute tuple-id]
+(defn- get-attr! [db attribute default-value tuple-id]
   (println ">>>>> CHANGE TO USE UPDATE <<<<<")
   (let [result-set (db-query db ["SELECT VALUE FROM ATTRIBUTE WHERE TUPLE_ID = ? AND ATTRIBUTE = ? ORDER BY ID DESC LIMIT 1"
                                  tuple-id
@@ -225,7 +225,7 @@
         value (-> result-set rest first first)]
     (if value
       (serialization/deserialize value)
-      :null)))
+      default-value)))
 
 (defn- response-for! [db new-tuples request next-tuple-id]
   (match request
@@ -238,8 +238,8 @@
     {:set-attribute attribute :value value :tuple-id tuple-id}
       (set-attr! db attribute value tuple-id)
 
-    {:get-attribute attribute :tuple-id tuple-id :response-ch response-ch}
-      (assoc {:channel response-ch} :response (get-attr! db attribute tuple-id))))
+    {:get-attribute attribute :default-value default-value :tuple-id tuple-id :response-ch response-ch}
+      (assoc {:channel response-ch} :response (get-attr! db attribute default-value tuple-id))))
 
 (defn create [db]
   (let [new-tuples (dropping-chan)
@@ -295,8 +295,9 @@
                        :value value
                        :tuple-id tuple-id}))
 
-      (get-local-attribute [_ attribute tuple-id response-ch]
+      (get-local-attribute [_ attribute default-value tuple-id response-ch]
         (>!! requests {:get-attribute attribute
+                       :default-value default-value
                        :tuple-id tuple-id
                        :response-ch response-ch}))
 

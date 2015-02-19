@@ -104,15 +104,15 @@
             attr-response  (chan)]
 
         (fact "Absent value is :null"
-          (get-local-attribute subject :some-tag tuple-id attr-response)
+          (get-local-attribute subject :some-tag :null tuple-id attr-response)
           (<!!? attr-response) => :null)
 
         (fact "value can be set"
           (set-local-attribute subject :some-tag 42 tuple-id)
-          (get-local-attribute subject :some-tag tuple-id attr-response)
+          (get-local-attribute subject :some-tag :null tuple-id attr-response)
           (<!!? attr-response) => 42)
 
         (fact "value can be updated"
           (set-local-attribute subject :some-tag "foo" tuple-id)
-          (get-local-attribute subject :some-tag tuple-id attr-response)
+          (get-local-attribute subject :some-tag :null tuple-id attr-response)
           (<!!? attr-response) => "foo")))))
