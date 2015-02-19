@@ -26,9 +26,9 @@
      channel will keep receiving new tuples until the lease
      emits a value.")
 
-  (set-attribute
+  (set-local-attribute
     ^Void [this attribute value tuple-id])
-  (get-attribute
+  (get-local-attribute
     ^Void [this attribute tuple-id response-ch])
 
   (restarted ^TupleBase [this]))
@@ -290,12 +290,12 @@
             (when (<! new-tuples)
               (recur)))))
 
-      (set-attribute [_ attribute value tuple-id]
+      (set-local-attribute [_ attribute value tuple-id]
         (>!! requests {:set-attribute attribute
                        :value value
                        :tuple-id tuple-id}))
 
-      (get-attribute [_ attribute tuple-id response-ch]
+      (get-local-attribute [_ attribute tuple-id response-ch]
         (>!! requests {:get-attribute attribute
                        :tuple-id tuple-id
                        :response-ch response-ch}))
