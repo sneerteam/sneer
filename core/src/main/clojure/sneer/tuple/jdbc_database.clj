@@ -15,14 +15,14 @@
   (let [db {:connection connection}]
     (reify
       tuple-base/Database
-      (db-create-table [this table columns]
+      (db-create-table [_ table columns]
         (let [tuple-ddl (apply sql/create-table-ddl table columns)]
           (sql/execute! db [tuple-ddl])))
 
-      (db-create-index [this table index-name columns-names unique?]
+      (db-create-index [_ table index-name columns-names unique?]
         (sql/execute! db [(str "CREATE" (when unique? " UNIQUE") " INDEX " index-name " ON " (name table) "(" (string/join "," (map name columns-names)) ")" )]))
 
-      (db-insert [this table row]
+      (db-insert [_ table row]
         (try
           (sql/insert! db table row)
           (catch java.sql.SQLException e
