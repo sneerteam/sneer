@@ -305,5 +305,7 @@
                        :tuple-id tuple-id
                        :response-ch response-ch}))
 
-      (restarted [this]
+      (restarted [_]
+        (close! requests)
+        (close! new-tuples)
         (create db)))))

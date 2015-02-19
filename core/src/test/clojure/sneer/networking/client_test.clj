@@ -1,7 +1,7 @@
 (ns sneer.networking.client-test
   (:require
    [midje.sweet :refer :all]
-   [clojure.core.async :as async :refer [thread to-chan chan close! >!!]]
+   [clojure.core.async :as async :refer [thread to-chan chan close! >!! map>]]
    [sneer.test-util :refer :all]
    [sneer.async :refer :all]
    [sneer.networking.client :refer :all]))
@@ -20,9 +20,12 @@
       subject (start-client :A packets-in packets-out tuples-received)
       resend-timeout (chan)
       resend-timeout-fn (constantly resend-timeout)
-      toB (chan 2)
-      toC (chan 2)
-      toD (chan 2)]
+      ack-ch (sliding-chan)
+      follower-chan #(->> (chan 2) (map> (fn [tuple] [tuple ack-ch])))
+      toB (follower-chan)
+      toC (follower-chan)
+      toD (follower-chan)]
+
   (connect-to-follower subject :B toB resend-timeout-fn)
   (connect-to-follower subject :C toC resend-timeout-fn)
   (connect-to-follower subject :D toD resend-timeout-fn)

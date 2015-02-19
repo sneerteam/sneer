@@ -29,7 +29,7 @@
   (let [follower-packets-in (accept-packets-from! client follower-puk (dropping-chan))
         packets-out (:packets-out client)
         resend-timeout-fn (or resend-timeout-fn #(timeout 5000))]
-    (go-while-let [tuple (<! tuples-out)]
+    (go-while-let [[tuple ack-ch] (<! tuples-out)]
       (SystemReport/updateReport
         (str "tuples/last-to-send/" follower-puk)
         tuple)
@@ -41,7 +41,9 @@
            (match packet-in
              {:ack id}
              (if (= id (id-of tuple))
-               :break
+               (do
+                 (>! ack-ch tuple)
+                 :break)
                (recur resend-timeout))
 
              {:nak id}
