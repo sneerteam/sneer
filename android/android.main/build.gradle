@@ -18,8 +18,8 @@ android {
     minSdkVersion external.android.minSdkVersion
     targetSdkVersion external.android.sdkVersion
     applicationId "sneer.android"
-    versionCode 1
-    versionName "1.0"
+    versionCode 4
+    versionName "0.1"
   }
 
   buildTypes {
@@ -31,6 +31,7 @@ android {
 }
 
 dependencies {
+    // Please replace this 6+ with a specific number:
   compile 'com.google.android.gms:play-services-base:6+' //For GCM (Google Cloud Messaging)
   compile 'com.netflix.rxjava:rxjava-android:' + external.rx.version
   compile project(':sneer-android-api')
