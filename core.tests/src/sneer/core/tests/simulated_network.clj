@@ -27,7 +27,7 @@
         (println "PACKET" packet)))
 
     (reify Network
-      (connect [network puk tuple-base]
+      (connect [_ puk tuple-base]
         (println "Network/connect" puk)
 
         (let [to-me (async/map< #(dissoc % :to) (async/filter< #(= (:to %) puk) (tap-for to-clients-mult)))
@@ -38,6 +38,6 @@
           (transmitter/start puk tuple-base tuples-received connect-to-follower-fn)))
 
       java.io.Closeable
-      (close [network]
+      (close [_]
         (async/close! to-server)
         (async/close! to-clients)))))
