@@ -34,12 +34,12 @@
   (let [nick-subject (ObservedSubject/create nickname)]
     (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party))
     (reify Contact
-      (party [this] party)
+      (party [_] party)
 
-      (nickname [this]
+      (nickname [_]
         (.observed nick-subject))
 
-      (setNickname [this new-nick]
+      (setNickname [_ new-nick]
         (check-new-nickname @puk->contact (party-puk party) new-nick)
         (publish-contact tuple-space own-puk new-nick party)
         (rx/on-next nick-subject new-nick))
