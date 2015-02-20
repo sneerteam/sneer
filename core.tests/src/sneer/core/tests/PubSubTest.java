@@ -73,7 +73,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 	}
 
 	@Test
-	public void targetUser() {
+	public void accessControlByAudience() {
 
 		tuplesA.publisher()
 			.audience(userC.publicKey())
