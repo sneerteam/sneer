@@ -51,13 +51,20 @@
 
     (let [subs (chan)
           subs-lease (chan)
-          subs-acks (dropping-chan)]
+          subs-acks (chan)
+          sent? (chan)]
 
       (query-tuples tuple-base {"type" "sub" "author" own-puk} subs subs-lease)
+
+      (go-while-let [ack (<! subs-acks)]
+        (set-local-attribute tuple-base "sent?" true (ack "id")))
 
       (go-while-let [sub (<! subs)]
         (if-some [followee (get-in sub ["criteria" "author"])]
           (when-not (= own-puk followee)
-            (let [followee-chan (produce-chan followee)]
-              (go-trace (>! followee-chan [(assoc sub "audience" followee) subs-acks]))))
+            (get-local-attribute tuple-base "sent?" false (sub "id") sent?)
+            (if (<! sent?)
+              (println "SUB ALREADY SENT: " sub)
+              (let [followee-chan (produce-chan followee)]
+                (go-trace (>! followee-chan [(assoc sub "audience" followee) subs-acks])))))
           (println "INVALID SUB! Author missing:" sub))))))

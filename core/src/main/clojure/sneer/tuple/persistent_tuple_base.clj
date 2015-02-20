@@ -261,8 +261,9 @@
       (loop [next-tuple-id (-> db max-tuple-id inc)]
         (when-some [request (<! requests)]
           (let [{:keys [channel response bump-id]} (response-for! db new-tuples request next-tuple-id)]
-            (when response
-              (>! channel response))
+            (when (some? response)
+              (assert (some? channel))
+              (go (>! channel response)))
             (recur (cond-> next-tuple-id bump-id inc))))))
 
     (reify TupleBase
