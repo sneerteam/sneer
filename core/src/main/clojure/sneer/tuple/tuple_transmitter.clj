@@ -63,8 +63,7 @@
         (if-some [followee (get-in sub ["criteria" "author"])]
           (when-not (= own-puk followee)
             (get-local-attribute tuple-base "sent?" false (sub "id") sent?)
-            (if (<! sent?)
-              (println "SUB ALREADY SENT: " sub)
+            (when-not (<! sent?)
               (let [followee-chan (produce-chan followee)]
                 (go-trace (>! followee-chan [(assoc sub "audience" followee) subs-acks])))))
           (println "INVALID SUB! Author missing:" sub))))))
