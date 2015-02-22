@@ -171,7 +171,7 @@ public class ConversationsAPITest extends TestCase {
 
 		assertNull   (sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
 		sneerA.addContact("Party Boy", partyB);
-		assertNotNull(sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
+		assertNull   (sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
 
 		try {
 			sneerA.addContact("Party Boy", partyC);
