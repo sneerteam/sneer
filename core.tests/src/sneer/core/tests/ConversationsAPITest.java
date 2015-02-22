@@ -169,7 +169,7 @@ public class ConversationsAPITest extends TestCase {
 		Party partyB = sneerA.produceParty(userB);
 		Party partyC = sneerA.produceParty(userC);
 
-		assertNull(sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
+		assertNull   (sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
 		sneerA.addContact("Party Boy", partyB);
 		assertNotNull(sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
 
