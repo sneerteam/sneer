@@ -22,37 +22,37 @@
     
     (let [self (new-party own-puk)]
         (reify Sneer
-          (self [this] self)
+          (self [_] self)
 
-          (profileFor [this party]
+          (profileFor [_ party]
             (produce-profile tuple-space profiles party))
 
-          (contacts [this]
+          (contacts [_]
             contacts)
          
-          (problemWithNewNickname [this puk new-nick]
+          (problemWithNewNickname [_ puk new-nick]
             (problem-with-new-nickname contacts-state puk new-nick))
        
-          (addContact [this nickname party]
+          (addContact [_ nickname party]
             (add-contact contacts-state nickname party))
          
-          (findContact [this party]
+          (findContact [_ party]
             (find-contact contacts-state party))
 
-          (conversationsContaining [this type]
+          (conversationsContaining [_ type]
             (rx/never))
         
-          (conversations [this]
+          (conversations [_]
             (conversations conversations-state))
           
-          (produceConversationWith [this party]
+          (produceConversationWith [_ party]
             (produce-conversation-with conversations-state party))
           
-          (setConversationMenuItems [this menu-item-list]
+          (setConversationMenuItems [_ menu-item-list]
             (rx/on-next conversation-menu-items menu-item-list))
 
-          (produceParty [this puk]
+          (produceParty [_ puk]
             (produce-party! puk->party puk))
         
-          (tupleSpace [this]
+          (tupleSpace [_]
             tuple-space)))))
