@@ -44,8 +44,8 @@
         message-filter (.. tuple-space filter (type "message"))
         unread-message-counter (atom 0)
         being-read (atom nil)
-        msg-tuples-out (.. message-filter (author own-puk) (audience party-puk) tuples)
-        msg-tuples-in  (.. message-filter (author party-puk) (audience own-puk) tuples)]
+        msg-tuples-out (.. message-filter (author own-puk  ) (audience party-puk) tuples)
+        msg-tuples-in  (.. message-filter (author party-puk) (audience own-puk  ) tuples)]
 
     (subscribe-on-io
       (rx/merge msg-tuples-out msg-tuples-in)
@@ -55,7 +55,7 @@
     (subscribe-on-io
       msg-tuples-in
       (fn [_]
-        (if-not @being-read (swap! unread-message-counter 0))))
+        (if-not @being-read (swap! unread-message-counter inc))))
 
     (reify
       Conversation
@@ -86,8 +86,9 @@
         (atom->observable unread-message-counter))
 
       (setBeingRead [_ is-being-read]
-        (swap! being-read (fn [_] is-being-read))
-        (if @being-read (swap! unread-message-counter (fn [_] 0)))))))
+        (reset! being-read is-being-read)
+        (when is-being-read
+          (reset! unread-message-counter 0))))))
 
 (defn produce-conversation [tuple-space conversation-menu-items own-puk party]
   (reify-conversation tuple-space (.asObservable ^BehaviorSubject conversation-menu-items) own-puk party))
