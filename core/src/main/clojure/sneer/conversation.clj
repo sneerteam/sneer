@@ -5,11 +5,12 @@
    [sneer.party :refer [party-puk]]
    [sneer.commons :refer [now]])
   (:import
-   [sneer PublicKey Party Contact Conversation Message]
-   [sneer.rx ObservedSubject]
-   [sneer.tuples Tuple TupleSpace]
-   [java.text SimpleDateFormat]
-   [rx.subjects BehaviorSubject]))
+    [sneer PublicKey Party Contact Conversation Message]
+    [sneer.rx ObservedSubject]
+    [sneer.tuples Tuple TupleSpace]
+    [java.text SimpleDateFormat]
+    [rx.subjects BehaviorSubject]
+    [rx Observable]))
 
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 
@@ -25,18 +26,18 @@
         own? (= own-puk (.author tuple))]
 
     (reify Message
-      (isOwn [this] own?)
-      (label [this] label)
-      (jpegImage [this] jpeg-image)
-      (timestampCreated [this] created)
-      (timestampReceived [this] 0)
-      (timeCreated [this] (format-date created))
-      (tuple [this] tuple))))
+      (isOwn [_] own?)
+      (label [_] label)
+      (jpegImage [_] jpeg-image)
+      (timestampCreated [_] created)
+      (timestampReceived [_] 0)
+      (timeCreated [_] (format-date created))
+      (tuple [_] tuple))))
 
 (defn values-to-compare [^Message msg] [(-> msg .tuple (get "id"))])
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
-(defn reify-conversation [^TupleSpace tuple-space ^rx.Observable conversation-menu-items ^PublicKey own-puk ^Party party]
+(defn reify-conversation [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Party party]
   (let [^PublicKey party-puk (party-puk party)
         messages (atom (sorted-set-by message-comparator))
         observable-messages (rx/map vec (atom->observable messages))
@@ -58,12 +59,12 @@
 
     (reify
       Conversation
-      (party [this] party)
+      (party [_] party)
 
-      (messages [this]
+      (messages [_]
         observable-messages)
 
-      (sendMessage [this label]
+      (sendMessage [_ label]
         (..
           tuple-space
           publisher
@@ -73,18 +74,18 @@
           (field "label" label)
           (pub)))
 
-      (mostRecentMessageContent [this]
+      (mostRecentMessageContent [_]
         (.observed (ObservedSubject/create "")))
 
-      (mostRecentMessageTimestamp [this]
+      (mostRecentMessageTimestamp [_]
         (.observed (ObservedSubject/create (now))))
 
-      (menu [this] conversation-menu-items)
+      (menu [_] conversation-menu-items)
 
-      (unreadMessageCount [this]
+      (unreadMessageCount [_]
         (atom->observable unread-message-counter))
 
-      (setBeingRead [this is-being-read]
+      (setBeingRead [_ is-being-read]
         (swap! being-read (fn [_] is-being-read))
         (if @being-read (swap! unread-message-counter (fn [_] 0)))))))
 
@@ -103,5 +104,5 @@
     (rx/map
       (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c)))))))
 
-(defn produce-conversation-with [{:keys [own-puk tuple-space contacts conversation-menu-items]} party]
+(defn produce-conversation-with [{:keys [own-puk tuple-space conversation-menu-items]} party]
   (produce-conversation tuple-space conversation-menu-items own-puk party))
