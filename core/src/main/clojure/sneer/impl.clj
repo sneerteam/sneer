@@ -18,41 +18,41 @@
         conversation-menu-items (BehaviorSubject/create [])
         contacts-state (create-contacts-state tuple-space own-puk puk->party)        
         contacts (get-contacts contacts-state)
-        conversations-state (create-conversations-state own-puk tuple-space contacts conversation-menu-items)]
-    
-    (let [self (new-party own-puk)]
-        (reify Sneer
-          (self [_] self)
+        conversations-state (create-conversations-state own-puk tuple-space contacts conversation-menu-items)
+        self (new-party own-puk)]
 
-          (profileFor [_ party]
-            (produce-profile tuple-space profiles party))
+    (reify Sneer
+      (self [_] self)
 
-          (contacts [_]
-            contacts)
-         
-          (problemWithNewNickname [_ puk new-nick]
-            (problem-with-new-nickname contacts-state puk new-nick))
-       
-          (addContact [_ nickname party]
-            (add-contact contacts-state nickname party))
-         
-          (findContact [_ party]
-            (find-contact contacts-state party))
+      (profileFor [_ party]
+        (produce-profile tuple-space profiles party))
 
-          (conversationsContaining [_ type]
-            (rx/never))
-        
-          (conversations [_]
-            (conversations conversations-state))
-          
-          (produceConversationWith [_ party]
-            (produce-conversation-with conversations-state party))
-          
-          (setConversationMenuItems [_ menu-item-list]
-            (rx/on-next conversation-menu-items menu-item-list))
+      (contacts [_]
+        contacts)
 
-          (produceParty [_ puk]
-            (produce-party! puk->party puk))
-        
-          (tupleSpace [_]
-            tuple-space)))))
+      (problemWithNewNickname [_ puk new-nick]
+        (problem-with-new-nickname contacts-state puk new-nick))
+
+      (addContact [_ nickname party]
+        (add-contact contacts-state nickname party))
+
+      (findContact [_ party]
+        (find-contact contacts-state party))
+
+      (conversationsContaining [_ type]
+        (rx/never))
+
+      (conversations [_]
+        (conversations conversations-state))
+
+      (produceConversationWith [_ party]
+        (produce-conversation-with conversations-state party))
+
+      (setConversationMenuItems [_ menu-item-list]
+        (rx/on-next conversation-menu-items menu-item-list))
+
+      (produceParty [_ puk]
+        (produce-party! puk->party puk))
+
+      (tupleSpace [_]
+        tuple-space))))
