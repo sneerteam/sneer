@@ -24,10 +24,6 @@ public class PubSubTest extends TupleSpaceTestsBase {
 
 	public PubSubTest() {}
 
-	protected PubSubTest(Func0<Object> tupleBaseFactory) {
-		super(tupleBaseFactory);
-	}
-
 	@Test
 	public void messagePassing() {
 
