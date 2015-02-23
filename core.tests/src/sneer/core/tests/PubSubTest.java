@@ -4,7 +4,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import rx.Notification;
 import rx.Observable;
-import rx.functions.Func0;
 import rx.functions.Func1;
 import sneer.PrivateKey;
 import sneer.commons.exceptions.FriendlyException;
@@ -115,7 +114,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 			.pub(name);
 
 		PrivateKey userD = new KeysImpl().createPrivateKey();
-		TupleSpace tuplesD = newTupleSpace(userD, followees(userA));
+		TupleSpace tuplesD = newTupleSpace(userD);
 
 		expecting(
 			payloads(tuplesD.filter().author(userA.publicKey()).tuples(), name));
