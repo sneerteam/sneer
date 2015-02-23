@@ -263,6 +263,9 @@
     {:get-attribute attribute :default-value default-value :tuple-id tuple-id :response-ch response-ch}
       (assoc {:channel response-ch} :response (get-attr! db attribute default-value tuple-id))))
 
+(defn- go-put-in-separate-fn-to-avoid-class-name-too-long [channel response]
+  (go (>! channel response)))
+
 (defn create [db]
   (let [new-tuples (dropping-chan)
         new-tuples-mult (mult new-tuples)
@@ -276,8 +279,7 @@
           (let [{:keys [channel response bump-id]} (response-for! db new-tuples request next-tuple-id)]
             (when (some? response)
               (assert (some? channel))
-              #_(go (>! channel response))
-              (>! channel response))
+              (go-put-in-separate-fn-to-avoid-class-name-too-long channel response))
             (recur (cond-> next-tuple-id bump-id inc))))))
 
     (reify TupleBase
