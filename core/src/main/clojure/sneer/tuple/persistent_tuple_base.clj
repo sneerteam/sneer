@@ -138,10 +138,23 @@
 (defn- query-by-builtin-fields [criteria after-id]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
         ^String filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
-        values (vals columns)]
-    (if (some? after-id)
-      (apply vector (str "SELECT * FROM tuple WHERE id > ? " (when-not (.isEmpty filter) " AND ") filter " ORDER BY id") after-id values)
-      (apply vector (str "SELECT * FROM tuple " (when-not (.isEmpty filter) " WHERE ") filter " ORDER BY id") values))))
+        values (vals columns)
+        select (cond
+                (nil? after-id)
+                (str "SELECT * FROM tuple"
+                     (when-not (.isEmpty filter) " WHERE ") filter
+                     " ORDER BY id")
+
+                (= after-id :second-to-last)
+                (str "SELECT * FROM tuple"
+                     (when-not (.isEmpty filter) " WHERE ") filter
+                     " ORDER BY id DESC LIMIT 1")
+
+                :else
+                (str "SELECT * FROM tuple WHERE id > " after-id
+                     (when-not (.isEmpty filter) " AND ") filter
+                     " ORDER BY id"))]
+    (apply vector select values)))
 
 (defn submap? [sub super]
   (reduce-kv
@@ -159,7 +172,7 @@
         field-names (mapv name (first rs))
         custom (-> criteria ->custom-field-map)]
     (->>
-      (next rs)      
+      (next rs)
       (map #(deserialize-entries (zipmap field-names %)))
       (map #(merge (get % "custom") (dissoc % "custom")))
       (filter #(submap? custom %)))))
@@ -270,7 +283,7 @@
 
       (store-tuple [_ tuple]
         (>!! requests {:store tuple}))
-      
+
       (store-tuple [_ tuple uniqueness-criteria]
         (>!! requests {:store tuple :uniqueness uniqueness-criteria}))
 

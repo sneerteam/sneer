@@ -4,7 +4,7 @@
    [sneer.serialization :refer [roundtrip]]
    [sneer.commons :refer [now reify+ while-let]]
    [clojure.core.async :refer [thread chan <!! close!]]
-   [sneer.tuple.persistent-tuple-base :refer [store-tuple query-tuples]])
+   [sneer.tuple.persistent-tuple-base :refer [store-tuple query-tuples after-id]])
   (:import
    [sneer PrivateKey PublicKey]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]))
@@ -84,6 +84,8 @@
           (^TupleFilter audience [this ^PublicKey puk]
             (with "audience" puk))
           (field [this field value] (with field value))
+          (last [_]
+            (with after-id :second-to-last))
           (localTuples [this]
             (rx/map reify-tuple (rx-query-tuples tuple-base criteria false)))
           (tuples [this]
