@@ -48,7 +48,8 @@
         routable-packets-out (trace-in routable-packets-out "OUT")
         udp-server (udp/start-udp-server packets-in routable-packets-out udp-port)
         puks-to-notify (async/chan)
-        http-server (http-server/start gcm-prevalence-file http-port puks-to-notify)]
+        http-server (when http-port
+                      (http-server/start gcm-prevalence-file http-port puks-to-notify))]
 
     (go-trace
       (<! (connector/start-connector
@@ -64,9 +65,13 @@
 
 (defn stop [server]
   (close! (:packets-in server))
-  (let [timeout (timeout 2000)]
-    (alts!! [(:udp-server server) timeout])
-    (alts!! [(:http-server server) timeout])))
+  (let [udp-server  (:udp-server  server)
+        http-server (:http-server server)
+        timeout (timeout 2000)]
+
+    (alts!! [udp-server timeout])
+    (when http-server
+      (alts!! [http-server timeout]))))
 
 (defn -main [& [port-string]]
   (let [port (when-some [p port-string] (Integer/parseInt p))

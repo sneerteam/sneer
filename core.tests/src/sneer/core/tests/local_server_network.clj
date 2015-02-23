@@ -15,8 +15,7 @@
 
 (defn start-local []
   (let [udp-port 5454
-        some-random-number 9876
-        http-port some-random-number
+        http-port nil
         server (server/start udp-port http-port (create-temp-dir "local-server-network"))
         lease (async/chan)]
 
