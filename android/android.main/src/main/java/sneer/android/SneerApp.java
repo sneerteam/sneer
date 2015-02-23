@@ -3,17 +3,33 @@ package sneer.android;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import java.util.Collection;
+import java.util.Date;
+
+import rx.functions.Action1;
+import sneer.Conversation;
 import sneer.android.gcm.GcmRegistrationAlarmReceiver;
 import sneer.android.impl.SneerAndroidImpl;
+import sneer.android.ui.MainActivity;
+import sneer.commons.Clock;
+
+import static sneer.android.SneerAndroidSingleton.sneer;
 
 public class SneerApp extends Application {
 
-    @Override
+	@Override
 	public void onCreate() {
 		super.onCreate();
 
@@ -25,9 +41,12 @@ public class SneerApp extends Application {
         SneerAndroidSingleton.setInstance(new SneerAndroidImpl(getApplicationContext()));
 
         GcmRegistrationAlarmReceiver.schedule(this);
+
+//		Notifier.resume();
 	}
 
-    public void checkPlayServices(Activity activity) {
+
+	public void checkPlayServices(Activity activity) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {

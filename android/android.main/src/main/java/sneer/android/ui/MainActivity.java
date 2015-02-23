@@ -17,6 +17,7 @@ import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Party;
 import sneer.Profile;
+import sneer.android.Notifier;
 import sneer.android.R;
 import sneer.android.SneerApp;
 import sneer.android.utils.Puk;
@@ -136,6 +137,11 @@ public class MainActivity extends SneerActivity {
 		super.onDestroy();
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+//		Notifier.pause();
+	}
 
 	@Override
 	protected void onRestart() {
@@ -146,6 +152,11 @@ public class MainActivity extends SneerActivity {
 		toast("First and last name must be filled in");
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+//		Notifier.resume();
+	}
 
 	private void startProfileActivityIfFirstTime() {
 		if (!isOwnNameLocallyAvailable())

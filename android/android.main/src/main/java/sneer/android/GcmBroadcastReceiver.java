@@ -24,7 +24,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		Log.d(getClass().getName(), messageType);
 
 		acquireWakeLock(context);
-		createNotificationIfNecessary(context);
+//		createNotificationIfNecessary(context);
 
 		setResultCode(Activity.RESULT_OK);
 	}
