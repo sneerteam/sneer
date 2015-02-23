@@ -28,8 +28,7 @@
         (when (>! to-server ping)
           (<! (timeout 200)) ; Second ping right after the first is good for local test runs.
           (while (>! to-server ping)
-;           (<! (timeout 20000))))))
-            (<! (timeout  5000))))))
+           (<! (timeout 20000))))))
 
     udp-out))
 
