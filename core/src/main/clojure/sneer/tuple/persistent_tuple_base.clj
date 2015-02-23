@@ -276,7 +276,8 @@
           (let [{:keys [channel response bump-id]} (response-for! db new-tuples request next-tuple-id)]
             (when (some? response)
               (assert (some? channel))
-              (go (>! channel response)))
+              #_(go (>! channel response))
+              (>! channel response))
             (recur (cond-> next-tuple-id bump-id inc))))))
 
     (reify TupleBase
