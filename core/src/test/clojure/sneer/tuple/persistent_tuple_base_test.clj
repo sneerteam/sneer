@@ -93,6 +93,19 @@
   {"author" michael "audience" neide}                {"payload" "hello neide"}
   {"author" michael "audience" carla}                {"payload" "hello carla"})
 
+(facts "About after-id query criterion"
+  (with-open [db (jdbc-database/create-sqlite-db)
+              subject (create db)]
+
+    (doseq [tuple [t1 t2]]
+      (store-tuple subject tuple))
+
+    (fact "given :second-to-last will emit from the last tuple on"
+      (->>
+        (<!!? (query-all subject {"type" "tweet"
+                                  after-id :second-to-last}))
+        (selecting ["payload"])) => [(select-keys t2 ["payload"])])))
+
 (facts "About tuple attributes"
   (with-open [db (jdbc-database/create-sqlite-db)]
     (let [subject (create db)

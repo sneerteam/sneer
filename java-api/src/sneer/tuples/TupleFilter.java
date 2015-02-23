@@ -15,6 +15,9 @@ public interface TupleFilter {
 	TupleFilter field(String field, Object value);
 	TupleFilter putFields(Map<String, Object> fields);
 
+	/** Causes the filter to emit tuples starting from the last known one to satisfy this filter. */
+	TupleFilter last();
+
 	/** @return An observable that emits tuples satisfying this filter. The returned Observable does not complete. */
 	Observable<Tuple> tuples();
 	
