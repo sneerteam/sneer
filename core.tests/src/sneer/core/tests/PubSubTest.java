@@ -73,6 +73,7 @@ public class PubSubTest extends TupleSpaceTestsBase {
 	}
 
 	@Test
+	@Ignore // https://trello.com/c/w6dCeSCS/288-access-control
 	public void accessControlByAudience() {
 
 		tuplesA.publisher()
