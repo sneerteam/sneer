@@ -3,9 +3,9 @@ ext {
     rx: [version: '0.20.3'],
     'clojure.core.match': 'org.clojure:core.match:0.2.2',
     android: [
-        sdkVersion: 21,
-        minSdkVersion: 16,
-        buildToolsVersion: '21.1.1'
+        sdkVersion: 21,               // When you change these numbers,
+        minSdkVersion: 16,            // please revise this entire page:
+        buildToolsVersion: '21.1.1'   // https://github.com/sneerteam/sneer/wiki/Android-Development-Environment-Installation
     ]
   ]
 }
