@@ -138,12 +138,6 @@ public class MainActivity extends SneerActivity {
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-//		Notifier.pause();
-	}
-
-	@Override
 	protected void onRestart() {
 		super.onRestart();
 		adapter.notifyDataSetChanged();
@@ -152,11 +146,8 @@ public class MainActivity extends SneerActivity {
 		toast("First and last name must be filled in");
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-//		Notifier.resume();
-	}
+	@Override protected void onPause()  { super.onPause();  Notifier.resume(); }
+	@Override protected void onResume() { super.onResume(); Notifier.pause(); }
 
 	private void startProfileActivityIfFirstTime() {
 		if (!isOwnNameLocallyAvailable())

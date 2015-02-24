@@ -38,11 +38,11 @@ public class SneerApp extends Application {
 //			? new SneerAndroidImpl(getApplicationContext())
 //			: new SneerAndroidSimulator(getApplicationContext()));
 
-        SneerAndroidSingleton.setInstance(new SneerAndroidImpl(getApplicationContext()));
 
-        GcmRegistrationAlarmReceiver.schedule(this);
-
-//		Notifier.resume();
+		Context app = getApplicationContext();
+		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
+		Notifier.start(app);
+		GcmRegistrationAlarmReceiver.schedule(app);
 	}
 
 
