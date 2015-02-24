@@ -83,11 +83,14 @@ public class Notifier {
 
 
 	private static void doPause() {
-		notificationManager.cancel(NOTIFICATION_ID);
 		if (isUnsubscribed()) return;
 
 		subscription.unsubscribe();
 		subscription = null;
+
+		handler.post(new Runnable() { public void run() {
+			notificationManager.cancel(NOTIFICATION_ID);
+		}});
 	}
 
 
