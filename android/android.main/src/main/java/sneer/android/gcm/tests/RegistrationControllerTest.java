@@ -110,5 +110,5 @@ public class RegistrationControllerTest extends AndroidTestCase {
         };
     }
 
-    final ArrayList<String> idsSentToBackend = new ArrayList<>();
+    final ArrayList<String> idsSentToBackend = new ArrayList<String>();
 }
