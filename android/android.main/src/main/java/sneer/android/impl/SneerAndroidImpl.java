@@ -51,7 +51,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 		pluginManager = new PluginManager(context, sneer());
 		pluginManager.initPlugins();
 
-		initNotifications(context);
+//		initNotifications(context);
 	}
 
 
