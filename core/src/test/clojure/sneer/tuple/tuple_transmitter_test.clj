@@ -19,7 +19,9 @@
           tuples-in (chan)
           follower-connections (chan)
           connect-to-follower (fn [follower-puk tuples-out]
-                                (go (>! follower-connections {follower-puk tuples-out})))]
+                                (go (>! follower-connections {follower-puk tuples-out})))
+          tuples-for! (fn [follower-puk]
+                        (get (<!!? follower-connections 500) follower-puk))]
 
       (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
 
@@ -27,8 +29,7 @@
         (>!!? tuples-in {"type" "sub" "author" B "audience" A "criteria" {"type" "tweet"}})
         (let [tweet {"type" "tweet" "author" A "payload" "<3"}]
           (store-tuple tuple-base tweet)
-          (let [tuples-for-b (get (<!!? follower-connections) B)
-                _ (assert tuples-for-b "tuples-for-b")
+          (let [tuples-for-b (tuples-for! B)
                 [tuple ack-chan] (<!!? tuples-for-b)]
             tuple => (contains tweet)
             (>!!? ack-chan tuple))))
@@ -36,8 +37,7 @@
       (fact "It sends subs to followees"
         (let [sub {"type" "sub" "author" A "criteria" {"type" "tweet" "author" C}}]
           (store-tuple tuple-base sub)
-          (let [tuples-for-c (get (<!!? follower-connections) C)
-                _ (assert tuples-for-c "tuples-for-c")
+          (let [tuples-for-c (tuples-for! C)
                 [sub _] (<!!? tuples-for-c)]
             sub => (contains (assoc sub "audience" C)))))
 
@@ -49,7 +49,7 @@
 
           (let [new-tweet {"type" "tweet" "author" A "payload" "S2"}]
             (store-tuple tuple-base new-tweet)
-            (let [tuples-for-b (get (<!!? follower-connections) B)
+            (let [tuples-for-b (tuples-for! B)
                   _ (assert tuples-for-b "tuples-for-b second time")
                   [tuple _] (<!!? tuples-for-b)]
               tuple => (contains new-tweet))))))))
