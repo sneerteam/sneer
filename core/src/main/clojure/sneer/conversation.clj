@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [atom->observable subscribe-on-io]]
    [sneer.party :refer [party-puk]]
-   [sneer.commons :refer [now]])
+   [sneer.commons :refer [now produce!]])
   (:import
     [sneer PublicKey Party Contact Conversation Message]
     [sneer.rx ObservedSubject]
@@ -90,8 +90,8 @@
         (when is-being-read
           (reset! unread-message-counter 0))))))
 
-(defn produce-conversation [tuple-space conversation-menu-items own-puk party]
-  (reify-conversation tuple-space (.asObservable ^BehaviorSubject conversation-menu-items) own-puk party))
+(defn produce-conversation [tuple-space conversation-menu-items own-puk party convos]
+  (produce! #(reify-conversation tuple-space (.asObservable ^BehaviorSubject conversation-menu-items) own-puk %) convos party))
 
 (defn create-conversations-state [own-puk tuple-space contacts conversation-menu-items]
   {:own-puk own-puk
@@ -99,11 +99,11 @@
    :contacts contacts
    :conversation-menu-items conversation-menu-items})
 
-(defn conversations [{:keys [own-puk tuple-space contacts conversation-menu-items]}]
+(defn conversations [{:keys [own-puk tuple-space contacts conversation-menu-items]} convos]
   (->>
     contacts
     (rx/map
-      (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c)))))))
+      (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c) convos))))))
 
-(defn produce-conversation-with [{:keys [own-puk tuple-space conversation-menu-items]} party]
-  (produce-conversation tuple-space conversation-menu-items own-puk party))
+(defn produce-conversation-with [{:keys [own-puk tuple-space conversation-menu-items]} party convos]
+  (produce-conversation tuple-space conversation-menu-items own-puk party convos))
