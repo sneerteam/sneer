@@ -139,7 +139,8 @@ public class ConversationActivity extends SneerActivity {
 					menu.getMenu().close();
 					item.call(party.publicKey().current());
 					return true;
-				}}).setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
+				}});
+//				.setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
 			}
 		}});
 	}
