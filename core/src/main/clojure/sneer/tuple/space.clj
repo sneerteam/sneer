@@ -24,6 +24,9 @@
     (tuple-getter timestamp)
     (toString [this] (str tuple))))
 
+(defn payload [^Tuple tuple]
+  (.payload tuple))
+
 (defmacro with-field [a]
   `(~a [~'this ~a]
        (~'with ~(name a) ~a)))

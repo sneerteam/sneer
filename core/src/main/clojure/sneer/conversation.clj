@@ -1,9 +1,11 @@
 (ns sneer.conversation
   (:require
    [rx.lang.clojure.core :as rx]
+   [rx.lang.clojure.interop :as interop]
    [sneer.rx :refer [atom->observable subscribe-on-io]]
    [sneer.party :refer [party-puk]]
-   [sneer.commons :refer [now produce!]])
+   [sneer.commons :refer [now produce!]
+   [sneer.tuple.space :refer [payload]])
   (:import
     [sneer PublicKey Party Contact Conversation Message]
     [sneer.rx ObservedSubject]
@@ -32,9 +34,18 @@
       (timestampCreated [_] created)
       (timestampReceived [_] 0)
       (timeCreated [_] (format-date created))
-      (tuple [_] tuple))))
+      (tuple [_] tuple)
+      Object
+      (toString [_] label))))
+
+(defn original-id [^Message message]
+  (get (.tuple message) "original_id"))
+
+(defn own? [^Message message]
+  (.isOwn message))
 
 (defn values-to-compare [^Message msg] [(-> msg .tuple (get "id"))])
+
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
 (defn reify-conversation [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Party party]
@@ -42,20 +53,24 @@
         messages (atom (sorted-set-by message-comparator))
         observable-messages (rx/map vec (atom->observable messages))
         message-filter (.. tuple-space filter (type "message"))
-        unread-message-counter (atom 0)
-        being-read (atom nil)
         msg-tuples-out (.. message-filter (author own-puk  ) (audience party-puk) tuples)
-        msg-tuples-in  (.. message-filter (author party-puk) (audience own-puk  ) tuples)]
+        msg-tuples-in  (.. message-filter (author party-puk) (audience own-puk  ) tuples)
+        last-read-pub (.. tuple-space
+                          publisher
+                          (type "message-read")
+                          (audience party-puk))
+        last-read-filter (.. tuple-space
+                              filter
+                              (type "message-read")
+                              (audience party-puk)
+                              (author own-puk)
+                              tuples)]
 
     (subscribe-on-io
-      (rx/merge msg-tuples-out msg-tuples-in)
+      (rx/merge msg-tuples-out
+                msg-tuples-in)
       (fn [tuple]
         (swap! messages conj (tuple->message own-puk tuple))))
-
-    (subscribe-on-io
-      msg-tuples-in
-      (fn [_]
-        (if-not @being-read (swap! unread-message-counter inc))))
 
     (reify
       Conversation
@@ -83,12 +98,21 @@
       (menu [_] conversation-menu-items)
 
       (unreadMessageCount [_]
-        (atom->observable unread-message-counter))
+        (let [last-read-ids (rx/map payload last-read-filter)]
+          (rx.Observable/combineLatest
+            observable-messages
+            (rx/cons 0 last-read-ids)
+            (interop/fn [messages last-read-id]
+              (println "COMBINING" messages last-read-id)
+              (->> messages
+                   reverse
+                   (remove own?)
+                   (take-while #(> (original-id %) last-read-id))
+                   count
+                   long)))))
 
-      (setBeingRead [_ is-being-read]
-        (reset! being-read is-being-read)
-        (when is-being-read
-          (reset! unread-message-counter 0))))))
+      (setRead [_ message]
+        (.pub last-read-pub (original-id message))))))
 
 (defn produce-conversation [tuple-space conversation-menu-items own-puk party convos]
   (produce! #(reify-conversation tuple-space (.asObservable ^BehaviorSubject conversation-menu-items) own-puk %) convos party))

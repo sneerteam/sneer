@@ -74,6 +74,7 @@ public class Notifier {
 
 
 	private static void subscribeToUnreadMessageCount(Conversation c, CompositeSubscription currentSub) {
+            // TODO: debounce
 		currentSub.add(
 			c.unreadMessageCount().subscribe(new Action1<Long>() { @Override public void call(final Long unreadMessageCount) {
 				if (unreadMessageCount > 0) handler.post(new Runnable() { public void run() {

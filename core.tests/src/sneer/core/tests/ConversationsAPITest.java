@@ -2,6 +2,7 @@ package sneer.core.tests;
 
 import junit.framework.TestCase;
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.observables.ConnectableObservable;
 import sneer.*;
@@ -368,7 +369,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
-	public void ignoreTestUnreadMessageCount() throws Exception {
+	public void testUnreadMessageCount() throws Exception {
 
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
@@ -376,22 +377,32 @@ public class ConversationsAPITest extends TestCase {
 
 		Party pBA = sneerB.produceParty(userA);
 		sneerB.addContact("a", pBA);
-		Conversation cBA = sneerB.produceConversationWith(pBA);
+		final Conversation cBA = sneerB.produceConversationWith(pBA);
 
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 
-		cAB.sendMessage("Hello1");
+		cAB.sendMessage("Hello1 - read");
 		expecting(eventually(cBA.unreadMessageCount(), 1L));
 
-		cBA.setBeingRead(true);
-		expecting(eventually(cBA.unreadMessageCount(), 0L));
-		cAB.sendMessage("Hello2");
+		cBA.messages().subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> messages) {
+			if (messages.isEmpty())
+				return;
+			Message last = messages.get(messages.size() - 1);
+			if (last.label().contains("read"))
+				cBA.setRead(last);
+		}});
+
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 
-		cBA.setBeingRead(false);
+		cAB.sendMessage("Hello2");
+		expecting(eventually(cBA.unreadMessageCount(), 1L));
+
 		cAB.sendMessage("Hello3");
 		cAB.sendMessage("Hello4");
-		expecting(eventually(cBA.unreadMessageCount(), 2L));
+		expecting(eventually(cBA.unreadMessageCount(), 3L));
+
+		cAB.sendMessage("Hello5 - read");
+		expecting(eventually(cBA.unreadMessageCount(), 0L));
 
 	}
 

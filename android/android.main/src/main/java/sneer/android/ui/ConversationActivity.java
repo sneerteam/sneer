@@ -70,7 +70,6 @@ public class ConversationActivity extends SneerActivity {
 		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
 
 		conversation = sneer().produceConversationWith(party);
-		conversation.setBeingRead(true);
 
 		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),
@@ -208,16 +207,8 @@ public class ConversationActivity extends SneerActivity {
 
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		conversation.setBeingRead(false);
-	}
-
-
-	@Override
 	protected void onResume() {
 		super.onResume();
-		conversation.setBeingRead(true);
 		hideKeyboard();
 	}
 
