@@ -4,6 +4,9 @@ apply plugin: "clojure"
 apply plugin: "java"
 apply plugin: "maven"
 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
 buildscript {
   repositories {
     maven { url "https://clojars.org/repo" }

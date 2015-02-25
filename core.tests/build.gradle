@@ -15,6 +15,9 @@ repositories {
 apply plugin: 'java'
 apply plugin: 'clojure'
 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
 buildscript {
   repositories {
     maven { url 'https://repo.spring.io/plugins-release' }
