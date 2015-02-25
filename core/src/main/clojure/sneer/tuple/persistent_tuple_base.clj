@@ -12,6 +12,8 @@
 
 (def after-id ::after-id)
 
+(def last-by-id ::last-by-id)
+
 (defprotocol TupleBase
   "A backing store for tuples (represented as maps)."
 
@@ -135,26 +137,18 @@
     nil
     tuple))
 
-(defn- query-by-builtin-fields [criteria after-id]
+(defn- query-by-builtin-fields [criteria after-id last-by-id]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
-        ^String filter (apply str (interpose " AND " (map #(str % " = ?") (keys columns))))
+        clauses (cond-> (map #(str % " = ?") (keys columns))
+                        (some? after-id) (conj (str "ID > " after-id)))
+        ^String filter (apply str (interpose " AND " clauses))
         values (vals columns)
-        select (cond
-                (nil? after-id)
-                (str "SELECT * FROM tuple"
-                     (when-not (.isEmpty filter) " WHERE ") filter
-                     " ORDER BY id")
-
-                (= after-id :second-to-last)
-                (str "SELECT * FROM tuple"
-                     (when-not (.isEmpty filter) " WHERE ") filter
-                     " ORDER BY id DESC LIMIT 1")
-
-                :else
-                (str "SELECT * FROM tuple WHERE id > " after-id
-                     (when-not (.isEmpty filter) " AND ") filter
-                     " ORDER BY id"))]
+        select (str "SELECT * FROM tuple"
+                    (when-not (.isEmpty filter) " WHERE ") filter
+                    " ORDER BY id"
+                    (when last-by-id " DESC LIMIT 1"))]
     (apply vector select values)))
+
 
 (defn submap? [sub super]
   (reduce-kv
@@ -168,7 +162,9 @@
 (defn query-tuples-from-db [db criteria]
   (let [after-id (::after-id criteria)
         criteria (dissoc criteria ::after-id)
-        rs (db-query db (query-by-builtin-fields criteria after-id))
+        last-by-id (::last-by-id criteria)
+        criteria (dissoc criteria ::last-by-id)
+        rs (db-query db (query-by-builtin-fields criteria after-id last-by-id))
         field-names (mapv name (first rs))
         custom (-> criteria ->custom-field-map)]
     (->>
