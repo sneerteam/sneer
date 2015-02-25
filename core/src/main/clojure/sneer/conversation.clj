@@ -4,7 +4,7 @@
    [rx.lang.clojure.interop :as interop]
    [sneer.rx :refer [atom->observable subscribe-on-io]]
    [sneer.party :refer [party-puk]]
-   [sneer.commons :refer [now produce!]
+   [sneer.commons :refer [now produce!]]
    [sneer.tuple.space :refer [payload]])
   (:import
     [sneer PublicKey Party Contact Conversation Message]
