@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [rx.lang.clojure.interop :as interop]
-   [sneer.rx :refer [atom->observable subscribe-on-io]]
+   [sneer.rx :refer [atom->observable subscribe-on-io latest]]
    [sneer.party :refer [party-puk]]
    [sneer.commons :refer [now produce!]]
    [sneer.tuple.space :refer [payload]])
@@ -44,6 +44,21 @@
 (defn own? [^Message message]
   (.isOwn message))
 
+(defn- latest-unread-message-count
+  [^rx.Observable observable-messages ^rx.Observable last-read-filter]
+  (let [last-read-ids (rx/map payload last-read-filter)]
+    (latest
+     (rx.Observable/combineLatest
+      observable-messages
+      (rx/cons 0 last-read-ids)
+      (interop/fn [messages last-read-id]
+        (->> messages
+             reverse
+             (remove own?)
+             (take-while #(> (original-id %) last-read-id))
+             count
+             long))))))
+
 (defn values-to-compare [^Message msg] [(-> msg .tuple (get "id"))])
 
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
@@ -60,11 +75,13 @@
                           (type "message-read")
                           (audience party-puk))
         last-read-filter (.. tuple-space
-                              filter
-                              (type "message-read")
-                              (audience party-puk)
-                              (author own-puk)
-                              tuples)]
+                             filter
+                             last
+                             (type "message-read")
+                             (audience party-puk)
+                             (author own-puk)
+                             tuples)
+        unread-message-count (latest-unread-message-count observable-messages last-read-filter)]
 
     (subscribe-on-io
       (rx/merge msg-tuples-out
@@ -98,18 +115,7 @@
       (menu [_] conversation-menu-items)
 
       (unreadMessageCount [_]
-        (let [last-read-ids (rx/map payload last-read-filter)]
-          (rx.Observable/combineLatest
-            observable-messages
-            (rx/cons 0 last-read-ids)
-            (interop/fn [messages last-read-id]
-              (println "COMBINING" messages last-read-id)
-              (->> messages
-                   reverse
-                   (remove own?)
-                   (take-while #(> (original-id %) last-read-id))
-                   count
-                   long)))))
+        unread-message-count)
 
       (setRead [_ message]
         (.pub last-read-pub (original-id message))))))
