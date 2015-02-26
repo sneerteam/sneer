@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -15,7 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
+import sneer.Contact;
 import sneer.Conversation;
+import sneer.Party;
+import sneer.android.ui.ConversationActivity;
 import sneer.android.ui.MainActivity;
 import sneer.commons.Clock;
 import sneer.commons.SystemReport;
@@ -31,7 +33,8 @@ public class Notifier {
 	private static Handler handler;
 	private static NotificationManager notificationManager;
 	private static CompositeSubscription subscription;
-
+	private static boolean hasManyUnreadConversations = false;
+	private static Party unreadConversationParty;
 
 	public static void start(Context context) {
 		Notifier.context = context;
@@ -57,9 +60,10 @@ public class Notifier {
 		}}.execute();
 	}
 
-
 	private static void doResume() {
 		if (isSubscribed()) return;
+		hasManyUnreadConversations = false;
+		unreadConversationParty = null;
 
 		final CompositeSubscription currentSub = new CompositeSubscription();
 		subscription = currentSub;
@@ -74,16 +78,21 @@ public class Notifier {
 	}
 
 
-	private static void subscribeToUnreadMessageCount(Conversation c, CompositeSubscription currentSub) {
+	private static void subscribeToUnreadMessageCount(final Conversation c, CompositeSubscription currentSub) {
 		currentSub.add(
 			c.unreadMessageCount().debounce(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Long>() {
 				@Override
 				public void call(final Long unreadMessageCount) {
-					if (unreadMessageCount > 0) handler.post(new Runnable() {
-							public void run() {
-								createNotification();
-							}
-						});
+					if (unreadMessageCount > 0) handler.post(new Runnable() { public void run() {
+						if (unreadConversationParty == c.party()) return;
+						if (unreadConversationParty == null)
+							unreadConversationParty = c.party();
+						else {
+							hasManyUnreadConversations = true;
+							unreadConversationParty = null;
+						}
+						createNotification(unreadMessageCount);
+					}});
 				}
 			})
 		);
@@ -95,6 +104,7 @@ public class Notifier {
 
 		subscription.unsubscribe();
 		subscription = null;
+		hasManyUnreadConversations = false;
 
 		handler.post(new Runnable() { public void run() {
 			notificationManager.cancel(NOTIFICATION_ID);
@@ -120,14 +130,35 @@ public class Notifier {
 	}
 
 
-	private static void createNotification() {
+	private static void createNotification(final Long unreadMessageCount) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
+		Intent intent = new Intent();
+
+		String title = "New Messages";
+		String contentInfo = "";
+
+		if (hasManyUnreadConversations) {
+			intent.setClass(context, MainActivity.class);
+		} else {
+			Contact contact = sneer().findContact(unreadConversationParty);
+			contentInfo = unreadMessageCount.toString();
+			String nickname = "";
+			if (contact == null)
+				nickname = sneer().profileFor(unreadConversationParty).preferredNickname().toBlocking().first().toString();
+			else
+				nickname = contact.nickname().current().toString();
+
+			title = "Messages from " + nickname;
+			intent.setClass(context, ConversationActivity.class);
+			intent.putExtra("partyPuk", unreadConversationParty.publicKey().current());
+		}
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
 		builder.setSmallIcon(R.drawable.ic_launcher)
 				.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_large))
-				.setContentTitle("New Messages")
-				//.setContentText("You have new messages")
+				.setContentTitle(title)
+				.setContentInfo("" + contentInfo)
 				.setWhen(Clock.now())
 				.setAutoCancel(true)
 				.setContentIntent(pendingIntent)
