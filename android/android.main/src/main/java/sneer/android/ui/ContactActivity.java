@@ -50,8 +50,7 @@ public class ContactActivity extends Activity {
 	private PublicKey partyPuk;
 	private Contact contact;
 	private boolean isOwn;
-    private boolean nicknameChanged;
-    private Subscription ownNameSubscription;
+	private Subscription ownNameSubscription;
     private Subscription preferredNicknameSubscription;
 
     @Override
