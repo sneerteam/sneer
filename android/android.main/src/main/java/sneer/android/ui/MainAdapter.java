@@ -66,8 +66,9 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 				plug(holder.conversationParty, conversation.party().name()),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
 				plug(holder.conversationPicture, sneer().profileFor(conversation.party()).selfie()),
-				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
-				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
+				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount())
+		//		,plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable())
+		);
 	}
 
 
