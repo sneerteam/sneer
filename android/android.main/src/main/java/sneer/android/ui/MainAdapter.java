@@ -35,17 +35,12 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        final ConversationtHolder holder;
-
-        if (row != null) {
-            holder = (ConversationtHolder)row.getTag();
-        } else {
+    public View getView(int position, View row, ViewGroup parent) {
+        if (row == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
             row = inflater.inflate(R.layout.list_item_main, parent, false);
 
-            holder = new ConversationtHolder();
+			ConversationtHolder holder = new ConversationtHolder();
             holder.conversationParty = findView(row, R.id.conversationParty);
             holder.conversationSummary = findView(row, R.id.conversationSummary);
             holder.conversationDate = findView(row, R.id.conversationDate);
@@ -58,21 +53,25 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
             holder.conversationSummary.getPaint().setShader(textShader);
 
             row.setTag(holder);
+
+			subscriptions.add(subscribeToConversationAt(position, holder));
         }
 
+        return row;
+    }
+
+	private Subscription subscribeToConversationAt(int position, ConversationtHolder holder) {
 		Conversation conversation = getItem(position);
-		Subscription subscription = Subscriptions.from(
+		return Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
 				plug(holder.conversationPicture, sneer().profileFor(conversation.party()).selfie()),
 				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
 				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable()));
-		subscriptions.add(subscription);
-        return row;
-    }
+	}
 
 
-    static class ConversationtHolder {
+	static class ConversationtHolder {
 		TextView conversationParty;
 		TextView conversationSummary;
 		TextView conversationDate;
