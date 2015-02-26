@@ -4,8 +4,6 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,9 +24,9 @@ import rx.functions.Action1;
 import sneer.*;
 import sneer.android.R;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
@@ -78,11 +76,15 @@ public class ConversationActivity extends SneerActivity {
 			messages,
 			party);
 
-		deferUI(conversation.messages())
+		deferUI(conversation.messages().debounce(200, TimeUnit.MILLISECONDS))
 			.subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
 				messages.clear();
 				messages.addAll(msgs);
 				adapter.notifyDataSetChanged();
+
+				Message last = lastMessageReceived(msgs);
+				if (last != null)
+					conversation.setRead(last);
 			}});
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
@@ -142,6 +144,15 @@ public class ConversationActivity extends SneerActivity {
 //				.setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
 			}
 		}});
+	}
+
+	private Message lastMessageReceived(List<Message> ms) {
+		for (int i = ms.size() - 1; i >= 0; --i) {
+			Message message = ms.get(i);
+			if (!message.isOwn())
+				return message;
+		}
+		return null;
 	}
 
 

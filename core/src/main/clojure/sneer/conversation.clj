@@ -118,6 +118,7 @@
         unread-message-count)
 
       (setRead [_ message]
+        (assert (-> message own? not))
         (.pub last-read-pub (original-id message))))))
 
 (defn produce-conversation [tuple-space conversation-menu-items own-puk party convos]
