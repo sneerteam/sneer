@@ -123,10 +123,9 @@ public class Notifier {
 	private static void createNotification() {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
-		Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 
 		builder.setSmallIcon(R.drawable.ic_launcher)
-				.setLargeIcon(Bitmap.createScaledBitmap(bitmap , 64, 64, false)) // mdpi
+				.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_large))
 				.setContentTitle("New Messages")
 				//.setContentText("You have new messages")
 				.setWhen(Clock.now())
