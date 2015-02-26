@@ -6,11 +6,6 @@ import sneer.Party;
 
 public class Puk {
 
-	public static void sendYourPublicKey(Activity activity, Party party, boolean self) {
-		sendYourPublicKey(activity, party, self, null);
-	}
-
-
 	public static void sendYourPublicKey(Activity activity, Party party, boolean self, String nickname) {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
