@@ -19,8 +19,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 import sneer.*;
 import sneer.android.R;
 
@@ -52,6 +55,8 @@ public class ConversationActivity extends SneerActivity {
 	protected boolean justOpened;
 	private EditText editText;
 	private int icAction;
+	private CompositeSubscription subscriptions;
+
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
@@ -76,16 +81,6 @@ public class ConversationActivity extends SneerActivity {
 			messages,
 			party);
 
-		deferUI(conversation.messages().debounce(200, TimeUnit.MILLISECONDS))
-			.subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> msgs) {
-				messages.clear();
-				messages.addAll(msgs);
-				adapter.notifyDataSetChanged();
-
-				Message last = lastMessageReceived(msgs);
-				if (last != null)
-					conversation.setRead(last);
-			}});
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
@@ -123,27 +118,6 @@ public class ConversationActivity extends SneerActivity {
 		}});
 
 		menu = new PopupMenu(ConversationActivity.this, actionButton);
-		conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<ConversationMenuItem>>() { @SuppressWarnings("deprecation")
-		@Override public void call(List<ConversationMenuItem> menuItems) {
-			menu.getMenu().close();
-			menu.getMenu().clear();
-			if (menuItems.size() > 0) {
-				icAction = R.drawable.ic_action_new;
-				actionButton.setImageResource(icAction);
-			} else {
-				icAction = R.drawable.ic_action_send;
-				actionButton.setImageResource(icAction);
-			}
-
-			for (final ConversationMenuItem item : menuItems) {
-				menu.getMenu().add(item.caption()).setOnMenuItemClickListener(new OnMenuItemClickListener() { @Override public boolean onMenuItemClick(MenuItem ignored) {
-					menu.getMenu().close();
-					item.call(party.publicKey().current());
-					return true;
-				}});
-//				.setIcon(new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(item.icon()))));
-			}
-		}});
 	}
 
 	private Message lastMessageReceived(List<Message> ms) {
@@ -191,17 +165,6 @@ public class ConversationActivity extends SneerActivity {
 	}
 
 
-	@SuppressWarnings("unused")
-//	private void onMessage(Message msg) {
-//		int insertionPointHint = Collections.binarySearch(messages, msg, BY_TIMESTAMP);
-//		if (insertionPointHint < 0) {
-//			int insertionPoint = Math.abs(insertionPointHint) - 1;
-//			messages.add(insertionPoint, msg);
-//			adapter.notifyDataSetChanged();
-//		}
-//	}
-
-
 	private void hideKeyboard() {
 		if (justOpened) {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -216,11 +179,69 @@ public class ConversationActivity extends SneerActivity {
 		return getResources().getConfiguration().keyboard != Configuration.KEYBOARD_NOKEYS;
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		subscriptions.unsubscribe();
+	}
+
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		hideKeyboard();
+
+		subscriptions = new CompositeSubscription(
+				subscribeToMessages(),
+				subscribeToMenu());
+	}
+
+	private Subscription subscribeToMenu() {
+		return conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(
+				new Action1<List<ConversationMenuItem>>() {
+					@SuppressWarnings("deprecation")
+					@Override
+					public void call(List<ConversationMenuItem> menuItems) {
+						menu.getMenu().close();
+						menu.getMenu().clear();
+						if (menuItems.size() > 0) {
+							icAction = R.drawable.ic_action_new;
+							actionButton.setImageResource(icAction);
+						} else {
+							icAction = R.drawable.ic_action_send;
+							actionButton.setImageResource(icAction);
+						}
+
+						for (final ConversationMenuItem item : menuItems) {
+							menu.getMenu().add(item.caption()).setOnMenuItemClickListener(
+									new OnMenuItemClickListener() {
+										@Override
+										public boolean onMenuItemClick(MenuItem ignored) {
+											menu.getMenu().close();
+											item.call(party.publicKey().current());
+											return true;
+										}
+									});
+						}
+					}
+				});
+	}
+
+	private Subscription subscribeToMessages() {
+		return deferUI(conversation.messages().debounce(200, TimeUnit.MILLISECONDS))
+			.subscribe(
+					new Action1<List<Message>>() {
+						@Override
+						public void call(List<Message> msgs) {
+							messages.clear();
+							messages.addAll(msgs);
+							adapter.notifyDataSetChanged();
+
+							Message last = lastMessageReceived(msgs);
+							if (last != null)
+								conversation.setRead(last);
+						}
+					});
 	}
 
 }
