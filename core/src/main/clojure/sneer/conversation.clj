@@ -18,8 +18,7 @@
 
 (defn format-date [time] (.format ^SimpleDateFormat simple-date-format time))
 
-(defn tuple->message [own-puk ^Tuple tuple]
-  ; Use MessageImpl.fromTuple instead of reimplementing it here.
+(defn reify-message [own-puk ^Tuple tuple]
   (let [created (.timestamp tuple)
         type (.type tuple)
         jpeg-image ^bytes (.get tuple "jpeg-image")
@@ -87,7 +86,7 @@
       (rx/merge msg-tuples-out
                 msg-tuples-in)
       (fn [tuple]
-        (swap! messages conj (tuple->message own-puk tuple))))
+        (swap! messages conj (reify-message own-puk tuple))))
 
     (reify
       Conversation
