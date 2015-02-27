@@ -5,8 +5,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Vibrator;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Collection;
@@ -134,21 +137,21 @@ public class Notifier {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		Intent intent = new Intent();
 
-		String title = "New Messages";
+		String title = "New messages";
 		String contentInfo = "";
 
 		if (hasManyUnreadConversations) {
 			intent.setClass(context, MainActivity.class);
 		} else {
 			Contact contact = sneer().findContact(unreadConversationParty);
-			contentInfo = unreadMessageCount.toString();
+			contentInfo = unreadMessageCount.toString() + " new nessages";
 			String nickname = "";
 			if (contact == null)
 				nickname = sneer().profileFor(unreadConversationParty).preferredNickname().toBlocking().first().toString();
 			else
 				nickname = contact.nickname().current().toString();
 
-			title = "Messages from " + nickname;
+			title = nickname;
 			intent.setClass(context, ConversationActivity.class);
 			intent.putExtra("partyPuk", unreadConversationParty.publicKey().current());
 		}
@@ -158,7 +161,13 @@ public class Notifier {
 		builder.setSmallIcon(R.drawable.ic_launcher)
 				.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_large))
 				.setContentTitle(title)
-				.setContentInfo("" + contentInfo)
+				.setTicker("mostRecentMessageContent goes here :)")
+				.setContentText("mostRecentMessageContent goes here :)")
+				.setSubText(contentInfo)
+				.setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+				.setVibrate(new long[]{0, 200, 200, 200, 0, -1})
+				.setLights(Color.MAGENTA, 1, 1)
+				.setOnlyAlertOnce(true)
 				.setWhen(Clock.now())
 				.setAutoCancel(true)
 				.setContentIntent(pendingIntent)
