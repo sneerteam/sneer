@@ -29,8 +29,13 @@
           ^Party        carla-party (reify-party carla)
           ^Conversation subject (reify-conversation tuple-space menu-items neide carla-party)
           most-recent-timestamps (observable->chan (subscribe-on-io (.mostRecentMessageTimestamp subject)))
-          message {"type" "message" "author" carla "audience" neide "timestamp" (long 42)}]
+          timestamp (long 42)
+          message {"type" "message" "author" carla "audience" neide "timestamp" timestamp}]
 
-      (base/store-tuple tuple-base message)
+      (fact "mostRecentMessageTimestamp includes message received"
+        (base/store-tuple tuple-base message)
+        (<!!? most-recent-timestamps) => timestamp)
 
-      (<!!? most-recent-timestamps) => (message "timestamp"))))
+      (fact "mostRecentMessageTimestamp includes message sent"
+        (.sendMessage subject "hi")
+        (<!!? most-recent-timestamps) => #(> % timestamp)))))

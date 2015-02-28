@@ -54,7 +54,7 @@
 (defn- most-recent-message [^Observable observable-messages]
   (rx/flatmap
    (fn [messages]
-     (if-some [message (-> messages reverse-party-messages first)]
+     (if-some [message (-> messages reverse first)]
        (rx/return message)
        (rx/empty)))
    observable-messages))
