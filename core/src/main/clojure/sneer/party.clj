@@ -12,13 +12,14 @@
   (let [name (ObservedSubject/create (str "? PublicKey: " (-> ^PublicKey puk .toHex (subs 0 7)) "..."))]
     (reify
       Party
-        (name [this] (.observable name))
-        (publicKey [this]
+        (name [_]
+          (.observable name))
+        (publicKey [_]
           (.observed (ObservedSubject/create puk)))
-        (toString [this]
+        (toString [_]
           (str "#<Party " puk ">"))
       PartyImpl
-        (name-subject [this] name))))
+        (name-subject [_] name))))
 
 (defn party-puk [^Party party]
   (.. party publicKey current))
