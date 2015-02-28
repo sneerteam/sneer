@@ -4,7 +4,7 @@
    [sneer.rx :refer [observe-for-computation flatmapseq]]
    [sneer.conversation :refer [create-conversations-state conversations produce-conversation-with]]
    [sneer.contact :refer [create-contacts-state add-contact get-contacts find-contact problem-with-new-nickname]]
-   [sneer.party :refer [party-puk new-party produce-party! create-puk->party]]
+   [sneer.party :refer [party-puk reify-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import
    [sneer Sneer PrivateKey]
@@ -20,7 +20,7 @@
         contacts (get-contacts contacts-state)
         conversations-state (create-conversations-state own-puk tuple-space contacts conversation-menu-items)
         convos (atom {})
-        self (new-party own-puk)]
+        self (reify-party own-puk)]
 
     (reify Sneer
       (self [_] self)

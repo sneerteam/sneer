@@ -8,7 +8,7 @@
 (defprotocol PartyImpl
   (name-subject [this]))
 
-(defn new-party [puk]
+(defn reify-party [puk]
   (let [name (ObservedSubject/create (str "? PublicKey: " (-> ^PublicKey puk .toHex (subs 0 7)) "..."))]
     (reify
       Party
@@ -28,4 +28,4 @@
 
 (defn create-puk->party []
   (let [puk->party (atom {})]
-    #(produce! new-party puk->party %)))
+    #(produce! reify-party puk->party %)))
