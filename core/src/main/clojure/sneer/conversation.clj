@@ -193,19 +193,19 @@
       (notifications [this]
         (->> (.all this)
 
-             ;; List<Conversation>
+             ;; [Conversation]
              (rx/map (fn [conversations]
                        (->> conversations
                             (mapv (fn [^Conversation c]
                                     (->> (.unreadMessages c)
                                          (rx/map (partial vector c))))))))
 
-             ;; List<Observable<Pair<Conversation, List<Message>>>>
+             ;; [Observable (Conversation, [Message])]
              (rx/flatmap
               (partial combine-latest
                        (partial filterv (comp not empty? second))))
 
-             ;; List<Pair<Conversation, List<Message>>> -- unread only
+             ;; [(Conversation, [Message])]
              (rx/flatmap
               (fn [unread-pairs]
                 (case (count unread-pairs)
