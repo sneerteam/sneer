@@ -81,8 +81,6 @@ public class Notifier {
 						}));
 	}
 
-	}
-
 
 	private static void subscribeToUnreadMessageCount(final Conversation c, CompositeSubscription currentSub) {
 		currentSub.add(
