@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
@@ -134,35 +133,38 @@ public class Notifier {
 
 
 	private static void createNotification(final Long unreadMessageCount) {
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		Intent intent = new Intent();
-
-		String title = "New messages";
-		String contentInfo = "";
+		String contentText = "mostRecentMessageContent goes here :)";
 
 		if (hasManyUnreadConversations) {
+			Intent intent = new Intent();
 			intent.setClass(context, MainActivity.class);
-		} else {
-			Contact contact = sneer().findContact(unreadConversationParty);
-			contentInfo = unreadMessageCount.toString() + " new nessages";
-			String nickname = "";
-			if (contact == null)
-				nickname = sneer().profileFor(unreadConversationParty).preferredNickname().toBlocking().first().toString();
-			else
-				nickname = contact.nickname().current().toString();
-
-			title = nickname;
-			intent.setClass(context, ConversationActivity.class);
-			intent.putExtra("partyPuk", unreadConversationParty.publicKey().current());
+			notify(intent, "New messages", "", contentText);
+			return;
 		}
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+		Intent intent = new Intent();
+		intent.setClass(context, ConversationActivity.class);
+		intent.putExtra("partyPuk", unreadConversationParty.publicKey().current());
 
+		Contact contact = sneer().findContact(unreadConversationParty);
+		String contentInfo = unreadMessageCount.toString() + " new nessages";
+		String nickname = "";
+		if (contact == null)
+			nickname = sneer().profileFor(unreadConversationParty).preferredNickname().toBlocking().first().toString();
+		else
+			nickname = contact.nickname().current().toString();
+
+		notify(intent, nickname, contentInfo, contentText);
+	}
+
+	private static void notify(Intent intent, String title, String contentInfo, String contentText) {
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		builder.setSmallIcon(R.drawable.ic_launcher)
 				.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_large))
 				.setContentTitle(title)
-				.setTicker("mostRecentMessageContent goes here :)")
-				.setContentText("mostRecentMessageContent goes here :)")
+				.setTicker(contentText)
+				.setContentText(contentText)
 				.setSubText(contentInfo)
 				.setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
 				.setVibrate(new long[]{0, 200, 200, 200, 0, -1})
@@ -172,7 +174,6 @@ public class Notifier {
 				.setAutoCancel(true)
 				.setContentIntent(pendingIntent)
 				.setOngoing(false);
-
 		notificationManager.notify(NOTIFICATION_ID, builder.build());
 	}
 
