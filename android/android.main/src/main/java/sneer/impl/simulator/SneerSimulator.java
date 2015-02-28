@@ -207,7 +207,7 @@
 //	}
 //
 //	@Override
-//	public Observable<List<Conversation>> conversationsContaining(String messageType) {
+//	public Observable<List<Conversation>> ofType(String messageType) {
 //		return conversations();
 //	}
 //

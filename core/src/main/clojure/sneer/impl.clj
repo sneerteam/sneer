@@ -7,7 +7,7 @@
    [sneer.party :refer [party-puk reify-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import
-   [sneer Sneer PrivateKey]
+   [sneer Sneer PrivateKey Conversations]
    [sneer.tuples TupleSpace]
    [rx.subjects BehaviorSubject]))
 
@@ -16,13 +16,14 @@
         puk->party (create-puk->party)
         profiles (atom {})
         conversation-menu-items (BehaviorSubject/create [])
-        contacts-state (create-contacts-state tuple-space own-puk puk->party)        
+        contacts-state (create-contacts-state tuple-space own-puk puk->party)
         contacts (get-contacts contacts-state)
         conversations-state (create-conversations-state own-puk tuple-space contacts conversation-menu-items)
         convos (atom {})
         self (reify-party own-puk)]
 
-    (reify Sneer
+    (reify
+      Sneer
       (self [_] self)
 
       (profileFor [_ party]
@@ -40,20 +41,24 @@
       (findContact [_ party]
         (find-contact contacts-state party))
 
-      (conversationsContaining [_ type]
-        (rx/never))
-
-      (conversations [_]
-        (conversations conversations-state convos))
-
-      (produceConversationWith [_ party]
-        (produce-conversation-with conversations-state party convos))
-
-      (setConversationMenuItems [_ menu-item-list]
-        (rx/on-next conversation-menu-items menu-item-list))
-
       (produceParty [_ puk]
         (produce-party! puk->party puk))
 
       (tupleSpace [_]
-        tuple-space))))
+        tuple-space)
+
+      (conversations [this]
+        this)
+
+      Conversations
+      (all [_]
+        (conversations conversations-state convos))
+
+      (ofType [_ type]
+        (rx/never))
+
+      (with [_ party]
+        (produce-conversation-with conversations-state party convos))
+
+      (setMenuItems [_ menu-item-list]
+        (rx/on-next conversation-menu-items menu-item-list)))))

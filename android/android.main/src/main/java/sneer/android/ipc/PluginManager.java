@@ -55,7 +55,7 @@ public class PluginManager {
 		PluginMonitor.plugins()
 			.flatMap(fromSneerPluginInfoList)
 			.subscribe(new Action1<List<ConversationMenuItem>>() { @Override public void call(List<ConversationMenuItem> menuItems) {
-				sneer.setConversationMenuItems(menuItems);
+				sneer.conversations().setMenuItems(menuItems);
 			}});
 
 		PluginMonitor.plugins()

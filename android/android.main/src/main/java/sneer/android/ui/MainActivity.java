@@ -73,7 +73,7 @@ public class MainActivity extends SneerActivity {
 			onClicked(conversation);
 		}});
 
-		deferUI(sneer().conversations()).subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
+		deferUI(sneer().conversations().all()).subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
 			adapter.clear();
 			adapter.addAll(conversations);
 			adapter.notifyDataSetChanged();

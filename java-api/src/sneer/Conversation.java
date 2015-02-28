@@ -9,6 +9,7 @@ public interface Conversation {
 	Party party();
 		
 	Observable<List<Message>> messages();
+	Observable<List<Message>> unreadMessages();
 	Observable<Long> mostRecentMessageTimestamp();
 	Observable<String> mostRecentMessageContent();
 	

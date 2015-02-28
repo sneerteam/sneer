@@ -70,13 +70,17 @@ public class Notifier {
 		final CompositeSubscription currentSub = new CompositeSubscription();
 		subscription = currentSub;
 
-		currentSub.add(sneer().conversations().subscribe(new Action1<Collection<Conversation>>() {
-			@Override
-			public void call(Collection<Conversation> conversations) {
-				for (Conversation c : conversations)
-					subscribeToUnreadMessageCount(c, currentSub);
-			}
-		}));
+		currentSub.add(
+				sneer().conversations().all().subscribe(
+						new Action1<Collection<Conversation>>() {
+							@Override
+							public void call(Collection<Conversation> conversations) {
+								for (Conversation c : conversations)
+									subscribeToUnreadMessageCount(c, currentSub);
+							}
+						}));
+	}
+
 	}
 
 

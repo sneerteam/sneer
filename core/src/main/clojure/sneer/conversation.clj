@@ -112,6 +112,9 @@
       (messages [_]
         observable-messages)
 
+      (unreadMessages [_]
+        (rx/never))
+
       (sendMessage [_ label]
         (..
           tuple-space

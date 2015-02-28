@@ -335,10 +335,14 @@ public class ConversationsAPITest extends TestCase {
 
 
 	private Observable<Conversation> flatMapConversationsOf(Sneer sneer) {
-		return sneer.conversations()
-			.flatMapIterable(new Func1<List<Conversation>, Iterable<? extends Conversation>>() {  @Override public Iterable<? extends Conversation> call(List<Conversation> conversations) {
-				return conversations;
-			}});
+		return sneer.conversations().all()
+			.flatMapIterable(
+					new Func1<List<Conversation>, Iterable<? extends Conversation>>() {
+						@Override
+						public Iterable<? extends Conversation> call(List<Conversation> conversations) {
+							return conversations;
+						}
+					});
 	}
 
 
@@ -346,11 +350,11 @@ public class ConversationsAPITest extends TestCase {
 
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
-		Conversation cAB = sneerA.produceConversationWith(pAB);
+		Conversation cAB = conversationWith(pAB, sneerA);
 
 		Party pBA = sneerB.produceParty(userA);
 		sneerB.addContact("a", pBA);
-		Conversation cBA = sneerB.produceConversationWith(pBA);
+		Conversation cBA = conversationWith(pBA, sneerB);
 
 		cAB.sendMessage("Hello1");
 		messagesEventually(cBA, "Hello1");
@@ -364,8 +368,12 @@ public class ConversationsAPITest extends TestCase {
 		//Restart
 		Sneer newSneer = newSneerAdmin(adminA.privateKey(), tupleBaseA).sneer();
 		Party newB = newSneer.produceParty(userB);
-		Conversation newConversation = sneerA.produceConversationWith(newB);
+		Conversation newConversation = conversationWith(newB, sneerA);
 		messagesEventually(newConversation, "Hello1", "Hello2", "Hello3");
+	}
+
+	private Conversation conversationWith(Party party, Sneer sneer) {
+		return sneer.conversations().with(party);
 	}
 
 
@@ -373,11 +381,11 @@ public class ConversationsAPITest extends TestCase {
 
 		Party pAB = sneerA.produceParty(userB);
 		sneerA.addContact("b", pAB);
-		Conversation cAB = sneerA.produceConversationWith(pAB);
+		Conversation cAB = conversationWith(pAB, sneerA);
 
 		Party pBA = sneerB.produceParty(userA);
 		sneerB.addContact("a", pBA);
-		final Conversation cBA = sneerB.produceConversationWith(pBA);
+		final Conversation cBA = conversationWith(pBA, sneerB);
 
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 
@@ -441,8 +449,7 @@ public class ConversationsAPITest extends TestCase {
 		Clock.tick();
 		publisher.field("label", "mylabel3").pub();
 
-		Observable<String> contents = sneerA
-			.produceConversationWith(sneerA.produceParty(userB))
+		Observable<String> contents = conversationWith(sneerA.produceParty(userB), sneerA)
 			.messages()
 			.flatMapIterable(new Func1<List<Message>, Iterable<? extends Message>>() { @Override public Iterable<? extends Message> call(List<Message> messages) {
 				return messages;

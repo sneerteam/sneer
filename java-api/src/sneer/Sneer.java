@@ -24,15 +24,9 @@ public interface Sneer {
 	Party produceParty(PublicKey publicKey);
 	/** @return One of the following, if available, in order of priority: Nickname (if party is a Contact); "? " + party's name, if name is available; "? PUK: " + publicKey. */
 
-	/** All Conversations you have had, ordered by most recent first. */
-	Observable<List<Conversation>> conversations();
-	/** All Conversations of messageType have had, ordered by most recent first. */
-	Observable<List<Conversation>> conversationsContaining(String messageType);
-	/** @return an existing Conversation with party or a new one if it doesn't exist. */
-	Conversation produceConversationWith(Party party);
-	
-	void setConversationMenuItems(List<ConversationMenuItem> menuItems);
-	
+	Conversations conversations();
+
 	TupleSpace tupleSpace();
 
 }
+
