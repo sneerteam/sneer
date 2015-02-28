@@ -106,10 +106,10 @@
           (pub)))
 
       (mostRecentMessageContent [_]
-        (.observed (ObservedSubject/create "")))
+        (rx/return ""))
 
       (mostRecentMessageTimestamp [_]
-        (.observed (ObservedSubject/create (now))))
+        (rx/return (now)))
 
       (menu [_] conversation-menu-items)
 
