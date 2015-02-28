@@ -30,37 +30,35 @@
 (def t2 {"type" "tweet" "payload" "<3" "author" neide})
 
 (facts "#rx-query-tuples"
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [tuple-base (base/create db)]
+  (with-open [db (jdbc-database/create-sqlite-db)
+              tuple-base (base/create db)]
 
-      (base/store-tuple tuple-base t1)
+    (base/store-tuple tuple-base t1)
 
-      (fact "When keep-alive is false"
-        (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} false)
-              tuples (->chan observable-tuples)]
-          (<!!? tuples) => (contains t1)
-          (<!!? tuples) => nil))
+    (fact "When keep-alive is false"
+      (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} false)
+            tuples (->chan observable-tuples)]
+        (<!!? tuples) => (contains t1)
+        (<!!? tuples) => nil))
 
-      (fact "When keep-alive is true"
-        (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} true)
-              tuples (->chan observable-tuples)]
-          (<!!? tuples) => (contains t1)
-          (base/store-tuple tuple-base t2)
-          (<!!? tuples) => (contains t2)))
+    (fact "When keep-alive is true"
+      (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} true)
+            tuples (->chan observable-tuples)]
+        (<!!? tuples) => (contains t1)
+        (base/store-tuple tuple-base t2)
+        (<!!? tuples) => (contains t2)))
 
-      (fact "When unsubscribe it closes the channel"
-        (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} true)
-              tuples (async/chan)
-              subscriber (subscribe-chan observable-tuples tuples)]
-          (.unsubscribe subscriber)
-          (<!!? (async/filter< nil? tuples)) => nil))
-
-      )))
+    (fact "When unsubscribe it closes the channel"
+      (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} true)
+            tuples (async/chan)
+            subscriber (subscribe-chan observable-tuples tuples)]
+        (.unsubscribe subscriber)
+        (<!!? (async/filter< nil? tuples)) => nil))))
 
 (facts "About TupleFilter#tuples"
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [tuple-base (base/create db)
-          subject (space/new-tuple-filter tuple-base neide)]
+  (with-open [db (jdbc-database/create-sqlite-db)
+              tuple-base (base/create db)]
+    (let [subject (space/new-tuple-filter tuple-base neide)]
 
       (fact "Stores single tuple for similar sub"
         (let [filter (.. subject (author carla) tuples)
