@@ -17,4 +17,17 @@ public interface Conversations {
 
 	void setMenuItems(List<ConversationMenuItem> menuItems);
 
+	Observable<Notification> notifications();
+
+	interface Notification {
+		/** Zero or more conversations related to this notification */
+		List<Conversation> conversations();
+
+		String title();
+
+		String text();
+
+		String subText();
+	}
+
 }

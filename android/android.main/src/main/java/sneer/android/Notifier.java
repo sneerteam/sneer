@@ -11,14 +11,15 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
-import java.util.Collection;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
-import sneer.Contact;
 import sneer.Conversation;
-import sneer.Party;
+import sneer.Conversations;
+import sneer.PublicKey;
 import sneer.android.ui.ConversationActivity;
 import sneer.android.ui.MainActivity;
 import sneer.commons.Clock;
@@ -35,8 +36,6 @@ public class Notifier {
 	private static Handler handler;
 	private static NotificationManager notificationManager;
 	private static CompositeSubscription subscription;
-	private static boolean hasManyUnreadConversations = false;
-	private static Party unreadConversationParty;
 
 	public static void start(Context context) {
 		Notifier.context = context;
@@ -64,51 +63,51 @@ public class Notifier {
 
 	private static void doResume() {
 		if (isSubscribed()) return;
-		hasManyUnreadConversations = false;
-		unreadConversationParty = null;
 
-		final CompositeSubscription currentSub = new CompositeSubscription();
-		subscription = currentSub;
-
-		currentSub.add(
-				sneer().conversations().all().subscribe(
-						new Action1<Collection<Conversation>>() {
-							@Override
-							public void call(Collection<Conversation> conversations) {
-								for (Conversation c : conversations)
-									subscribeToUnreadMessageCount(c, currentSub);
-							}
-						}));
+		subscription = new CompositeSubscription(
+			notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Conversations.Notification>() { @Override public void call(Conversations.Notification notification) {
+				createNotification(notification);
+			}}));
 	}
 
-
-	private static void subscribeToUnreadMessageCount(final Conversation c, CompositeSubscription currentSub) {
-		currentSub.add(
-			c.unreadMessageCount().debounce(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Long>() {
-				@Override
-				public void call(final Long unreadMessageCount) {
-					if (unreadMessageCount > 0) handler.post(new Runnable() { public void run() {
-						if (unreadConversationParty == c.party()) return;
-						if (unreadConversationParty == null)
-							unreadConversationParty = c.party();
-						else {
-							hasManyUnreadConversations = true;
-							unreadConversationParty = null;
-						}
-						createNotification(unreadMessageCount);
-					}});
-				}
-			})
-		);
+	private static Observable<Conversations.Notification> notifications() {
+		return sneer().conversations().notifications();
 	}
 
+	private static void createNotification(Conversations.Notification notification) {
+		List<Conversation> conversations = notification.conversations();
+		Intent intent = conversations.size() == 1
+				? conversationActivityIntent(conversations.get(0))
+				: mainActivityIntent();
+		notify(notification, intent);
+	}
+
+	private static Intent mainActivityIntent() {
+		Intent intent = new Intent();
+		intent.setClass(context, MainActivity.class);
+		return intent;
+	}
+
+	private static Intent conversationActivityIntent(Conversation conversation) {
+		Intent intent = new Intent();
+		intent.setClass(context, ConversationActivity.class);
+		intent.putExtra("partyPuk", partyPuk(conversation));
+		return intent;
+	}
+
+	private static PublicKey partyPuk(Conversation conversation) {
+		return conversation.party().publicKey().current();
+	}
+
+	private static void notify(Conversations.Notification notification, Intent intent) {
+		notify(intent, notification.title(), notification.subText(), notification.text());
+	}
 
 	private static void doPause() {
 		if (isUnsubscribed()) return;
 
 		subscription.unsubscribe();
 		subscription = null;
-		hasManyUnreadConversations = false;
 
 		handler.post(new Runnable() { public void run() {
 			notificationManager.cancel(NOTIFICATION_ID);
@@ -133,31 +132,6 @@ public class Notifier {
 		return false;
 	}
 
-
-	private static void createNotification(final Long unreadMessageCount) {
-		String contentText = "mostRecentMessageContent goes here :)";
-
-		if (hasManyUnreadConversations) {
-			Intent intent = new Intent();
-			intent.setClass(context, MainActivity.class);
-			notify(intent, "New messages", "", contentText);
-			return;
-		}
-
-		Intent intent = new Intent();
-		intent.setClass(context, ConversationActivity.class);
-		intent.putExtra("partyPuk", unreadConversationParty.publicKey().current());
-
-		Contact contact = sneer().findContact(unreadConversationParty);
-		String contentInfo = unreadMessageCount.toString() + " new nessages";
-		String nickname = "";
-		if (contact == null)
-			nickname = sneer().profileFor(unreadConversationParty).preferredNickname().toBlocking().first().toString();
-		else
-			nickname = contact.nickname().current().toString();
-
-		notify(intent, nickname, contentInfo, contentText);
-	}
 
 	private static void notify(Intent intent, String title, String contentInfo, String contentText) {
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);

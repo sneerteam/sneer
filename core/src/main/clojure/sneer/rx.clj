@@ -66,3 +66,11 @@
 (defn latest [^rx.Observable o]
   (doto (. o (replay 1))
     .connect))
+
+(defn func-n [f]
+  (reify rx.functions.FuncN
+    (call [_ args] (f args))))
+
+(defn combine-latest [f ^java.util.List list]
+  (let [^rx.functions.FuncN fn (func-n f)]
+    (rx.Observable/combineLatest list fn)))
