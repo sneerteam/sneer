@@ -145,38 +145,23 @@
         (assert (-> message own? not))
         (.pub last-read-pub (original-id message))))))
 
-(defn produce-conversation [tuple-space conversation-menu-items own-puk party convos]
-  (produce! #(reify-conversation tuple-space (.asObservable ^BehaviorSubject conversation-menu-items) own-puk %) convos party))
-
-(defn create-conversations-state [own-puk tuple-space contacts conversation-menu-items]
-  {:own-puk own-puk
-   :tuple-space tuple-space
-   :contacts contacts
-   :conversation-menu-items conversation-menu-items})
-
-(defn conversations [{:keys [own-puk tuple-space contacts conversation-menu-items]} convos]
-  (->>
-    contacts
-    (rx/map
-     (partial map (fn [^Contact c]
-                    (produce-conversation tuple-space conversation-menu-items own-puk (.party c) convos))))))
-
-(defn produce-conversation-with [{:keys [own-puk tuple-space conversation-menu-items]} party convos]
-  (produce-conversation tuple-space conversation-menu-items own-puk party convos))
 
 (defn reify-conversations [own-puk tuple-space contacts]
   (let [menu-items (BehaviorSubject/create [])
-        conversations-state (create-conversations-state own-puk tuple-space contacts menu-items)
-        convos (atom {})]
+        convos (atom {})
+        reify-conversation (partial reify-conversation tuple-space (.asObservable menu-items) own-puk)
+        produce-conversation (partial produce! reify-conversation convos)]
     (reify Conversations
       (all [_]
-        (conversations conversations-state convos))
+        (rx/map
+         (partial map (fn [^Contact c] (produce-conversation (.party c))))
+         contacts))
 
       (ofType [_ type]
         (rx/never))
 
       (with [_ party]
-        (produce-conversation-with conversations-state party convos))
+        (produce-conversation party))
 
       (setMenuItems [_ menu-item-list]
         (rx/on-next menu-items menu-item-list)))))

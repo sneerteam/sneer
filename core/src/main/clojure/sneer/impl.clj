@@ -1,15 +1,12 @@
 (ns sneer.impl
   (:require
-   [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [observe-for-computation flatmapseq]]
    [sneer.conversation :refer [reify-conversations]]
    [sneer.contact :refer [create-contacts-state add-contact get-contacts find-contact problem-with-new-nickname]]
    [sneer.party :refer [party-puk reify-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import
-   [sneer Sneer PrivateKey Conversations]
-   [sneer.tuples TupleSpace]
-   [rx.subjects BehaviorSubject]))
+   [sneer Sneer PrivateKey]
+   [sneer.tuples TupleSpace]))
 
 (defn new-sneer [^TupleSpace tuple-space ^PrivateKey own-prik]
   (let [own-puk (.publicKey own-prik)
@@ -20,8 +17,7 @@
         conversations (reify-conversations own-puk tuple-space contacts)
         self (reify-party own-puk)]
 
-    (reify
-      Sneer
+    (reify Sneer
       (self [_] self)
 
       (profileFor [_ party]
@@ -45,5 +41,5 @@
       (tupleSpace [_]
         tuple-space)
 
-      (conversations [this]
+      (conversations [_]
         conversations))))
