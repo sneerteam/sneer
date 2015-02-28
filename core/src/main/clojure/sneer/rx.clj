@@ -1,5 +1,5 @@
 (ns sneer.rx
-  (:require 
+  (:require
     [rx.lang.clojure.core :as rx]
     [rx.lang.clojure.interop :as interop])
   (:import [rx.subjects Subject BehaviorSubject]
@@ -50,10 +50,13 @@
 (defn observe-for-io [^rx.Observable o]
   (.observeOn o (Schedulers/io)))
 
-(defn subscribe-on-io [^rx.Observable o on-next-action]
-  (rx/subscribe
-    (rx/subscribe-on (rx.schedulers.Schedulers/io) o)
+(defn subscribe-on-io
+  ([^rx.Observable o on-next-action]
+   (rx/subscribe
+    (subscribe-on-io o)
     on-next-action))
+  ([^rx.Observable o]
+   (rx/subscribe-on (Schedulers/io) o)))
 
 (defn shared-latest [^rx.Observable o]
   "Returns a `rx.Observable' that publishes the latest value of the source sequence

@@ -7,12 +7,11 @@
    [sneer.commons :refer [now produce!]]
    [sneer.tuple.space :refer [payload]])
   (:import
-    [sneer PublicKey Party Contact Conversation Message]
-    [sneer.rx ObservedSubject]
-    [sneer.tuples Tuple TupleSpace]
-    [java.text SimpleDateFormat]
-    [rx.subjects BehaviorSubject]
-    [rx Observable]))
+   [sneer PublicKey Party Contact Conversation Message]
+   [sneer.tuples Tuple TupleSpace]
+   [java.text SimpleDateFormat]
+   [rx.subjects BehaviorSubject]
+   [rx Observable]))
 
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 
@@ -43,20 +42,37 @@
 (defn own? [^Message message]
   (.isOwn message))
 
+(defn- message-label [^Message message]
+  (.label message))
+
+(defn- message-timestamp [^Message message]
+  (.timestampCreated message))
+
+(defn- reverse-party-messages [messages]
+  (->> messages reverse (remove own?)))
+
+(defn- most-recent-message [^Observable observable-messages]
+  (rx/flatmap
+   (fn [messages]
+     (if-some [message (-> messages reverse-party-messages first)]
+       (rx/return message)
+       (rx/empty)))
+   observable-messages))
+
+(defn- unread-message-count [messages last-read-id]
+  (->> (reverse-party-messages messages)
+       (take-while #(> (original-id %) last-read-id))
+       count
+       long))
+
 (defn- latest-unread-message-count
-  [^rx.Observable observable-messages ^rx.Observable last-read-filter]
+  [^Observable observable-messages ^Observable last-read-filter]
   (let [last-read-ids (rx/map payload last-read-filter)]
     (latest
-     (rx.Observable/combineLatest
-      observable-messages
-      (rx/cons 0 last-read-ids)
-      (interop/fn [messages last-read-id]
-        (->> messages
-             reverse
-             (remove own?)
-             (take-while #(> (original-id %) last-read-id))
-             count
-             long))))))
+     (Observable/combineLatest observable-messages
+                               (rx/cons 0 last-read-ids)
+                               (interop/fn [messages last-read-id]
+                                 (unread-message-count messages last-read-id))))))
 
 (defn values-to-compare [^Message msg] [(-> msg .tuple (get "id"))])
 
@@ -80,7 +96,8 @@
                              (audience party-puk)
                              (author own-puk)
                              tuples)
-        unread-message-count (latest-unread-message-count observable-messages last-read-filter)]
+        unread-message-count (latest-unread-message-count observable-messages last-read-filter)
+        most-recent-message (most-recent-message observable-messages)]
 
     (subscribe-on-io
       (rx/merge msg-tuples-out
@@ -106,12 +123,15 @@
           (pub)))
 
       (mostRecentMessageContent [_]
-        (rx/return ""))
+        (rx/map message-label
+                most-recent-message))
 
       (mostRecentMessageTimestamp [_]
-        (rx/return (now)))
+        (rx/map message-timestamp
+                most-recent-message))
 
-      (menu [_] conversation-menu-items)
+      (menu [_]
+        conversation-menu-items)
 
       (unreadMessageCount [_]
         unread-message-count)

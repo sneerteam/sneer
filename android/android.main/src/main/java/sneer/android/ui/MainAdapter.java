@@ -64,10 +64,10 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		Conversation conversation = getItem(position);
 		return Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
-				plug(holder.conversationSummary, conversation.mostRecentMessageContent().observable()),
+				plug(holder.conversationSummary, conversation.mostRecentMessageContent()),
 				plug(holder.conversationPicture, sneer().profileFor(conversation.party()).selfie()),
-				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount())
-		//		,plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp().observable())
+				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
+				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp())
 		);
 	}
 
