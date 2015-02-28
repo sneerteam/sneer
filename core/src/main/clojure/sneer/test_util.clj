@@ -1,5 +1,7 @@
 (ns sneer.test-util
-  (:require [clojure.core.async :refer [alt!! timeout filter>]]))
+  (:require
+   [clojure.core.async :refer [alt!! timeout filter> >!! close! chan]]
+   [rx.lang.clojure.core :as rx]))
 
 (defn <!!?
   ([ch]
@@ -8,7 +10,7 @@
     (alt!!
       (timeout timeout-millis) :timeout
       ch ([v] v))))
-         
+
 (defn >!!?
   ([ch v]
     (>!!? ch v 200))
@@ -26,3 +28,16 @@
   (if unreliable
     (compromised ch)
     ch))
+
+
+(defn subscribe-chan [c observable]
+  (rx/subscribe observable
+                #(>!! c %)
+                #(do
+                   (println "Rx Error:" %)
+                   (close! c))
+                #(close! c)))
+
+(defn observable->chan [observable]
+  (doto (chan)
+    (subscribe-chan observable)))

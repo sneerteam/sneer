@@ -1,7 +1,7 @@
 (ns sneer.tuple.space-test
   (:require [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as base]
-            [sneer.test-util :refer [<!!?]]
+            [sneer.test-util :refer [<!!? subscribe-chan observable->chan]]
             [midje.sweet :refer :all]
             [clojure.core.async :as async]
             [sneer.tuple.jdbc-database :as jdbc-database]
@@ -9,19 +9,6 @@
             [rx.lang.clojure.core :as rx]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
-
-(defn- subscribe-chan [observable c]
-  (rx/subscribe observable
-                #(async/>!! c %)
-                #(do
-                   (println "Rx Error:" %)
-                   (async/close! c))
-                #(async/close! c)))
-
-(defn- ->chan [observable]
-  (let [c (async/chan)]
-    (subscribe-chan observable c)
-    c))
 
 (def neide (->puk "neide"))
 (def carla (->puk "carla"))
@@ -37,13 +24,13 @@
 
     (fact "When keep-alive is false"
       (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} false)
-            tuples (->chan observable-tuples)]
+            tuples (observable->chan observable-tuples)]
         (<!!? tuples) => (contains t1)
         (<!!? tuples) => nil))
 
     (fact "When keep-alive is true"
       (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} true)
-            tuples (->chan observable-tuples)]
+            tuples (observable->chan observable-tuples)]
         (<!!? tuples) => (contains t1)
         (base/store-tuple tuple-base t2)
         (<!!? tuples) => (contains t2)))
@@ -51,7 +38,7 @@
     (fact "When unsubscribe it closes the channel"
       (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} true)
             tuples (async/chan)
-            subscriber (subscribe-chan observable-tuples tuples)]
+            subscriber (subscribe-chan tuples observable-tuples)]
         (.unsubscribe subscriber)
         (<!!? (async/filter< nil? tuples)) => nil))))
 
@@ -64,7 +51,7 @@
         (let [filter (.. subject (author carla) tuples)
               filter2 (.. subject (author carla) (field "f" 42) tuples)
               tuples (async/chan)
-              subscribers [(subscribe-chan filter tuples) (subscribe-chan filter tuples) (subscribe-chan filter2 tuples)]
+              subscribers [(subscribe-chan tuples filter) (subscribe-chan tuples filter) (subscribe-chan tuples filter2)]
               subs (async/chan)]
           (base/query-tuples tuple-base {"type" "sub" "author" neide} subs)
           (<!!? subs) => (contains {"criteria" {"author" carla}})
