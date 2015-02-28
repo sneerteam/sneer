@@ -7,7 +7,7 @@
    [sneer.commons :refer [now produce!]]
    [sneer.tuple.space :refer [payload]])
   (:import
-   [sneer PublicKey Party Contact Conversation Message]
+   [sneer PublicKey Party Contact Conversations Conversation Message]
    [sneer.tuples Tuple TupleSpace]
    [java.text SimpleDateFormat]
    [rx.subjects BehaviorSubject]
@@ -78,7 +78,9 @@
 
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
-(defn reify-conversation [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Party party]
+(defn reify-conversation
+  [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Party party]
+
   (let [^PublicKey party-puk (party-puk party)
         messages (atom (sorted-set-by message-comparator))
         observable-messages (rx/map vec (atom->observable messages))
@@ -156,7 +158,25 @@
   (->>
     contacts
     (rx/map
-      (partial map (fn [^Contact c] (produce-conversation tuple-space conversation-menu-items own-puk (.party c) convos))))))
+     (partial map (fn [^Contact c]
+                    (produce-conversation tuple-space conversation-menu-items own-puk (.party c) convos))))))
 
 (defn produce-conversation-with [{:keys [own-puk tuple-space conversation-menu-items]} party convos]
   (produce-conversation tuple-space conversation-menu-items own-puk party convos))
+
+(defn reify-conversations [own-puk tuple-space contacts]
+  (let [menu-items (BehaviorSubject/create [])
+        conversations-state (create-conversations-state own-puk tuple-space contacts menu-items)
+        convos (atom {})]
+    (reify Conversations
+      (all [_]
+        (conversations conversations-state convos))
+
+      (ofType [_ type]
+        (rx/never))
+
+      (with [_ party]
+        (produce-conversation-with conversations-state party convos))
+
+      (setMenuItems [_ menu-item-list]
+        (rx/on-next menu-items menu-item-list)))))
