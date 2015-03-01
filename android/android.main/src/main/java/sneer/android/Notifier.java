@@ -14,9 +14,9 @@ import android.support.v4.app.NotificationCompat;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
 import sneer.Conversation;
 import sneer.Conversations;
 import sneer.PublicKey;
@@ -35,7 +35,7 @@ public class Notifier {
 	private static Context context;
 	private static Handler handler;
 	private static NotificationManager notificationManager;
-	private static CompositeSubscription subscription;
+	private static Subscription subscription;
 
 	public static void start(Context context) {
 		Notifier.context = context;
@@ -45,7 +45,6 @@ public class Notifier {
 		resume();
 	}
 
-
 	public static void resume() {
 		Exceptions.check(context != null);
 
@@ -53,7 +52,6 @@ public class Notifier {
 			doResume(); return null;
 		}}.execute();
 	}
-
 
 	public static void pause() {
 		new AsyncTask<Void, Void, Void>() { @Override protected Void doInBackground(Void[] ignored) {
@@ -64,10 +62,9 @@ public class Notifier {
 	private static void doResume() {
 		if (isSubscribed()) return;
 
-		subscription = new CompositeSubscription(
-			notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Conversations.Notification>() { @Override public void call(Conversations.Notification notification) {
-				createNotification(notification);
-			}}));
+		subscription = notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Conversations.Notification>() { @Override public void call(Conversations.Notification notification) {
+			createNotification(notification);
+		}});
 	}
 
 	private static Observable<Conversations.Notification> notifications() {
@@ -106,14 +103,20 @@ public class Notifier {
 	private static void doPause() {
 		if (isUnsubscribed()) return;
 
-		subscription.unsubscribe();
-		subscription = null;
-
-		handler.post(new Runnable() { public void run() {
-			notificationManager.cancel(NOTIFICATION_ID);
-		}});
+		unsubscribe();
+		cancelNotification();
 	}
 
+    private static void cancelNotification() {
+        handler.post(new Runnable() { public void run() {
+            notificationManager.cancel(NOTIFICATION_ID);
+        }});
+    }
+
+	private static void unsubscribe() {
+		subscription.unsubscribe();
+		subscription = null;
+	}
 
 	private static boolean isSubscribed() {
 		if (subscription != null) {
@@ -123,7 +126,6 @@ public class Notifier {
 		return false;
 	}
 
-
 	private static boolean isUnsubscribed() {
 		if (subscription == null) {
 			SystemReport.updateReport("notifications/redundant-unsubscribe");
@@ -131,7 +133,6 @@ public class Notifier {
 		}
 		return false;
 	}
-
 
 	private static void notify(Intent intent, String title, String contentInfo, String contentText) {
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
