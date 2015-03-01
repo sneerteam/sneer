@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [rx.lang.clojure.interop :as interop]
-   [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest]]
+   [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map]]
    [sneer.party :refer [party-puk]]
    [sneer.commons :refer [now produce!]]
    [sneer.tuple.space :refer [payload]])
@@ -201,12 +201,12 @@
                                          (rx/map (partial vector c))))))))
 
              ;; [Observable (Conversation, [Message])]
-             (rx/flatmap
+             (switch-map
               (partial combine-latest
                        (partial filterv (comp not empty? second))))
 
              ;; [(Conversation, [Message])]
-             (rx/flatmap
+             (switch-map
               (fn [unread-pairs]
                 (case (count unread-pairs)
                   0 (rx/empty)

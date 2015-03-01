@@ -74,3 +74,6 @@
 (defn combine-latest [f ^java.util.List list]
   (let [^rx.functions.FuncN fn (func-n f)]
     (rx.Observable/combineLatest list fn)))
+
+(defn switch-map [f ^rx.Observable o]
+  (.switchMap o (interop/fn [x] (f x))))
