@@ -40,7 +40,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
             LayoutInflater inflater = activity.getLayoutInflater();
             row = inflater.inflate(R.layout.list_item_main, parent, false);
 
-			ConversationtHolder holder = new ConversationtHolder();
+			ConversationHolder holder = new ConversationHolder();
             holder.conversationParty = findView(row, R.id.conversationParty);
             holder.conversationSummary = findView(row, R.id.conversationSummary);
             holder.conversationDate = findView(row, R.id.conversationDate);
@@ -60,7 +60,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
         return row;
     }
 
-	private Subscription subscribeToConversationAt(int position, ConversationtHolder holder) {
+	private Subscription subscribeToConversationAt(int position, ConversationHolder holder) {
 		Conversation conversation = getItem(position);
 		return Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
@@ -72,7 +72,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 	}
 
 
-	static class ConversationtHolder {
+	static class ConversationHolder {
 		TextView conversationParty;
 		TextView conversationSummary;
 		TextView conversationDate;
