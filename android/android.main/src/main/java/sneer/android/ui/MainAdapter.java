@@ -35,12 +35,15 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 
     @Override
-    public View getView(int position, View row, ViewGroup parent) {
-        if (row == null) {
+    public View getView(int position, View convertView, ViewGroup parent) {
+		View row = convertView;
+		final ConversationHolder holder;
+
+		if (row == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
             row = inflater.inflate(R.layout.list_item_main, parent, false);
 
-			ConversationHolder holder = new ConversationHolder();
+			holder = new ConversationHolder();
             holder.conversationParty = findView(row, R.id.conversationParty);
             holder.conversationSummary = findView(row, R.id.conversationSummary);
             holder.conversationDate = findView(row, R.id.conversationDate);
@@ -54,10 +57,13 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
             row.setTag(holder);
 
-			subscriptions.add(subscribeToConversationAt(position, holder));
-        }
+        } else {
+			holder = (ConversationHolder)row.getTag();
+		}
 
-        return row;
+		subscriptions.add(subscribeToConversationAt(position, holder));
+
+		return row;
     }
 
 	private Subscription subscribeToConversationAt(int position, ConversationHolder holder) {
