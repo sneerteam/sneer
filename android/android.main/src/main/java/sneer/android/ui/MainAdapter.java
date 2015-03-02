@@ -27,6 +27,9 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 	private final Activity activity;
 	private final CompositeSubscription subscriptions;
+	private final Shader textShader = new LinearGradient(200, 0, 650, 0,
+			new int[] {Color.DKGRAY, Color.LTGRAY},
+			new float[] {0, 1}, TileMode.CLAMP);
 
 	public MainAdapter(Activity activity) {
         super(activity, R.layout.list_item_main);
@@ -34,45 +37,43 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		subscriptions = new CompositeSubscription();
     }
 
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-		View row = convertView;
-		final ConversationHolder holder;
 
-		if (row == null) {
+		Conversation conversation = getItem(position);
+		if (convertView == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
-            row = inflater.inflate(R.layout.list_item_main, parent, false);
-
-			holder = new ConversationHolder();
+            View row = inflater.inflate(R.layout.list_item_main, parent, false);
+			final ConversationHolder holder = new ConversationHolder();
             holder.conversationParty = findView(row, R.id.conversationParty);
             holder.conversationSummary = findView(row, R.id.conversationSummary);
             holder.conversationDate = findView(row, R.id.conversationDate);
             holder.conversationPicture = findView(row, R.id.conversationPicture);
             holder.conversationUnread = findView(row, R.id.conversationUnread);
-			subscriptions.add(holder.subscription);
-
-            Shader textShader = new LinearGradient(200, 0, 650, 0,
-            		new int[] {Color.DKGRAY, Color.LTGRAY},
-            		new float[] {0, 1}, TileMode.CLAMP);
-            holder.conversationSummary.getPaint().setShader(textShader);
-
+			holder.conversationSummary.getPaint().setShader(textShader);
             row.setTag(holder);
 
+			subscriptions.add(holder.subscription);
+			subscribeToConversation(holder, conversation);
+			return row;
         } else {
-			holder = (ConversationHolder)row.getTag();
+			ConversationHolder holder = (ConversationHolder) convertView.getTag();
+			if (conversation != holder.conversation) {
+				holder.conversationSummary.setText("");
+				holder.conversationDate.setText("");
+				subscribeToConversation(holder, conversation);
+			}
+			return convertView;
 		}
 
-		Conversation conversation = getItem(position);
-		if (conversation != holder.conversation) {
-			holder.conversation = conversation;
-			holder.subscription.set(subscribeToConversation(holder, conversation));
-		}
-
-		return row;
     }
 
-	private Subscription subscribeToConversation(ConversationHolder holder, Conversation conversation) {
+	private void subscribeToConversation(ConversationHolder holder, Conversation conversation) {
+		holder.conversation = conversation;
+		holder.subscription.set(plugConversation(holder, conversation));
+	}
+
+	private Subscription plugConversation(ConversationHolder holder, Conversation conversation) {
 		return Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent()),
