@@ -15,6 +15,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.SerialSubscription;
 import rx.subscriptions.Subscriptions;
 import sneer.Conversation;
 import sneer.android.R;
@@ -49,6 +50,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
             holder.conversationDate = findView(row, R.id.conversationDate);
             holder.conversationPicture = findView(row, R.id.conversationPicture);
             holder.conversationUnread = findView(row, R.id.conversationUnread);
+			subscriptions.add(holder.subscription);
 
             Shader textShader = new LinearGradient(200, 0, 650, 0,
             		new int[] {Color.DKGRAY, Color.LTGRAY},
@@ -61,13 +63,16 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 			holder = (ConversationHolder)row.getTag();
 		}
 
-		subscriptions.add(subscribeToConversationAt(position, holder));
+		Conversation conversation = getItem(position);
+		if (conversation != holder.conversation) {
+			holder.conversation = conversation;
+			holder.subscription.set(subscribeToConversation(holder, conversation));
+		}
 
 		return row;
     }
 
-	private Subscription subscribeToConversationAt(int position, ConversationHolder holder) {
-		Conversation conversation = getItem(position);
+	private Subscription subscribeToConversation(ConversationHolder holder, Conversation conversation) {
 		return Subscriptions.from(
 				plug(holder.conversationParty, conversation.party().name()),
 				plug(holder.conversationSummary, conversation.mostRecentMessageContent()),
@@ -79,6 +84,8 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 
 	static class ConversationHolder {
+		Conversation conversation;
+		final SerialSubscription subscription = new SerialSubscription();
 		TextView conversationParty;
 		TextView conversationSummary;
 		TextView conversationDate;
