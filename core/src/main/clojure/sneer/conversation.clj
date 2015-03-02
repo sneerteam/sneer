@@ -54,7 +54,7 @@
 (defn- most-recent-message [^Observable observable-messages]
   (switch-map
    (fn [messages]
-     (if-some [message (-> messages reverse first)]
+     (if-some [message (last messages)]
        (rx/return message)
        (rx/empty)))
    observable-messages))
