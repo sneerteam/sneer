@@ -8,7 +8,7 @@
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [com.cognitect/transit-clj "0.8.259"]
                  [midje "1.6.3"]
-                 [com.netflix.rxjava/rxjava-clojure "0.20.3"]
+                 [com.netflix.rxjava/rxjava-clojure "0.20.7"]
                  [me.sneer/sneer-java-api "0.1.5"]
                  [me.sneer/crypto "0.1.5"]
                  [org.clojure/java.jdbc "0.3.6"]
