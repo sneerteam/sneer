@@ -52,7 +52,7 @@
   (->> messages reverse (remove own?)))
 
 (defn- most-recent-message [^Observable observable-messages]
-  (rx/flatmap
+  (switch-map
    (fn [messages]
      (if-some [message (-> messages reverse first)]
        (rx/return message)
