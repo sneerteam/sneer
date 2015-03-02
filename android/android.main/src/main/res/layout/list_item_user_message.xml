@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="right"
-    android:padding="10dp" >
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:padding="10dp">
 
     <View
         android:id="@+id/speechBubbleArrowRight"
@@ -10,7 +10,7 @@
         android:layout_height="20dp"
         android:layout_alignBottom="@+id/speechBubble"
         android:layout_alignParentRight="true"
-        android:background="@drawable/drawble_dummy" />
+        android:background="@drawable/drawble_dummy"/>
 
     <RelativeLayout
         android:id="@+id/speechBubble"
@@ -18,13 +18,13 @@
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/speechBubbleArrowRight"
         android:background="@drawable/user_speech_bubble"
-        android:padding="10dp" >
+        android:padding="10dp">
 
         <ImageView
             android:id="@+id/img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone" >
+            android:visibility="gone">
         </ImageView>
 
         <TextView
@@ -34,7 +34,8 @@
             android:layout_toRightOf="@+id/img"
             android:minWidth="40dp"
             android:paddingLeft="5dp"
-            android:textSize="15sp" />
+            android:textIsSelectable="true"
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/messageTime"
@@ -45,7 +46,7 @@
             android:layout_below="@+id/messageContent"
             android:paddingLeft="5dp"
             android:textColor="#777"
-            android:textSize="12sp" />
+            android:textSize="12sp"/>
     </RelativeLayout>
 
 </RelativeLayout>
