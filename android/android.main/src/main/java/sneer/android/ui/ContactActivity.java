@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -14,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -24,18 +24,21 @@ import sneer.Party;
 import sneer.Profile;
 import sneer.PublicKey;
 import sneer.android.R;
-import sneer.android.utils.Puk;
 import sneer.commons.exceptions.FriendlyException;
 
-import static sneer.android.SneerAndroidSingleton.*;
-import static sneer.android.ui.SneerActivity.*;
+import static android.support.v4.app.NavUtils.navigateUpFromSameTask;
+import static sneer.android.SneerAndroidSingleton.admin;
+import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.SneerAndroidSingleton.sneerAndroid;
+import static sneer.android.ui.SneerActivity.plug;
+import static sneer.android.utils.Puk.sendYourPublicKey;
 
 public class ContactActivity extends Activity {
 
 	static final String PARTY_PUK = "partyPuk";
 	static final String CURRENT_NICKNAME = "currentNickname";
 
-    private ActionBar actionBar;
+	private ActionBar actionBar;
 
 	private boolean newContact = false;
 	private Profile profile;
@@ -51,9 +54,9 @@ public class ContactActivity extends Activity {
 	private Contact contact;
 	private boolean isOwn;
 	private Subscription ownNameSubscription;
-    private Subscription preferredNicknameSubscription;
+	private Subscription preferredNicknameSubscription;
 
-    @Override
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -70,12 +73,12 @@ public class ContactActivity extends Activity {
 
 		load();
 
-        actionBar = getActionBar();
-        if (actionBar != null)
-            actionBar.setTitle(activityTitle());
+		actionBar = getActionBar();
+		if (actionBar != null)
+			actionBar.setTitle(activityTitle());
 
 		validationOnTextChanged(nicknameEdit);
-    }
+	}
 
 
 	@Override
@@ -88,14 +91,14 @@ public class ContactActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-	    case android.R.id.home:
-            NavUtils.navigateUpFromSameTask(this);
-	        return true;
+			case android.R.id.home:
+				navigateUpFromSameTask(this);
+				return true;
 
-		case R.id.action_share:
-            if (!newContact)
-			    Puk.sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
-			break;
+			case R.id.action_share:
+				if (!newContact)
+					sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
+				break;
 		}
 		return true;
 	}
@@ -105,10 +108,10 @@ public class ContactActivity extends Activity {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 
-		if (Intent.ACTION_VIEW.equals(action)){
+		if (Intent.ACTION_VIEW.equals(action)) {
 			try {
-                if (actionBar != null)
-				    actionBar.setDisplayHomeAsUpEnabled(true);
+				if (actionBar != null)
+					actionBar.setDisplayHomeAsUpEnabled(true);
 				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));
 			} catch (RuntimeException e) {
 				toast("Invalid public key");
@@ -148,36 +151,34 @@ public class ContactActivity extends Activity {
 
 	private void loadProfile() {
 		if (newContact) {
-            ownNameSubscription = plug(nicknameEdit, profile.ownName());
-            if (nicknameEdit.getText().toString().isEmpty()) {
-                preferredNicknameSubscription = plug(nicknameEdit, profile.preferredNickname());
-            }
-        } else {
-            plug(nicknameEdit, contact.nickname().observable());
+			ownNameSubscription = plug(nicknameEdit, profile.ownName());
+			if (nicknameEdit.getText().toString().isEmpty()) {
+				preferredNicknameSubscription = plug(nicknameEdit, profile.preferredNickname());
+			}
+		} else {
+			plug(nicknameEdit, contact.nickname().observable());
 		}
 
 		plug(fullNameView, profile.ownName());
 		plug(preferredNickNameView, profile.preferredNickname().map(new Func1<Object, String>() { @Override public String call(Object obj) {
 			return "(" + obj.toString() + ")";
-		}}));
+		}
+		}));
 		plug(countryView, profile.country());
 		plug(cityView, profile.city());
 		plug(selfieImage, profile.selfie());
 
 		if (!newContact)
-			Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>(){ @Override public Boolean call(String preferredNickname, String ownName) {
-				if (preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current()))
-					return true;
-				else
-					return false;
-				}}).subscribe(new Action1<Boolean>(){ @Override public void call(Boolean validation) {
-					if (validation)
-						preferredNickNameView.setVisibility(View.GONE);
-				}});
+			Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>() { @Override public Boolean call(String preferredNickname, String ownName) {
+				return preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current());
+			}}).subscribe(new Action1<Boolean>() { @Override public void call(Boolean validation) {
+				if (validation)
+					preferredNickNameView.setVisibility(View.GONE);
+			}});
 
 	}
 
-	private void loadContact(PublicKey puk){
+	private void loadContact(PublicKey puk) {
 		partyPuk = puk == null
 				? partyPuk()
 				: puk;
@@ -227,19 +228,17 @@ public class ContactActivity extends Activity {
 
 	private void validationOnTextChanged(final EditText editText) {
 		editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
+			@Override
+			public void afterTextChanged(Editable s) {
 				if (ownNameSubscription != null) ownNameSubscription.unsubscribe();
-				if (preferredNicknameSubscription != null) preferredNicknameSubscription.unsubscribe();
-                nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), editText.getText().toString()));
-            }
+				if (preferredNicknameSubscription != null)
+					preferredNicknameSubscription.unsubscribe();
+				nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), editText.getText().toString()));
+			}
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-        });
+			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
+			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+		});
 	}
 
 }

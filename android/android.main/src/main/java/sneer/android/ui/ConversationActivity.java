@@ -39,10 +39,6 @@ public class ConversationActivity extends SneerActivity {
 	public static final String PARTY_PUK = "partyPuk";
 	private static final String ACTIVITY_TITLE = "activityTitle";
 
-//	private static final Comparator<? super Message> BY_TIMESTAMP = new Comparator<Message>() { @Override public int compare(Message lhs, Message rhs) {
-//		return Comparators.compare(lhs.timestampReceived(), rhs.timestampReceived());
-//	}};
-
 	private final List<Message> messages = new ArrayList<Message>();
 	private ConversationAdapter adapter;
 
@@ -80,7 +76,6 @@ public class ConversationActivity extends SneerActivity {
 			R.layout.list_item_party_message,
 			messages,
 			party);
-
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
