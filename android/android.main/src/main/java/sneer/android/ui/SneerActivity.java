@@ -17,8 +17,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import org.ocpsoft.prettytime.PrettyTime;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -27,13 +40,6 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import sneer.commons.exceptions.FriendlyException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static android.widget.Toast.LENGTH_SHORT;
@@ -92,14 +98,13 @@ public class SneerActivity extends Activity {
 
 
 	public static Subscription plugDate(final TextView textView, Observable<Long> date) {
-		return plug(textView, Observable.combineLatest(EVERY_MINUTE, date, new Func2<Long, Long, String>() { @Override public String call(Long tickIgnored, Long date) {
-			return prettyTime(date);
-		}}));
+		return plug(textView, prettyTime(date));
 	}
 
-
-	public static String prettyTime(Long timestamp) {
-		return new PrettyTime().format(new Date(timestamp));
+	public static Observable<String> prettyTime(Observable<Long> date) {
+		return Observable.combineLatest(EVERY_MINUTE, date, new Func2<Long, Long, String>() { @Override public String call(Long tickIgnored, Long date) {
+			return new PrettyTime().format(new Date(date));
+		}});
 	}
 
 
