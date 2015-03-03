@@ -45,7 +45,7 @@ public class SneerActivity extends Activity {
 	}};
 
 
-	public static Observable<Long> EVERY_MINUTE = Observable.timer(0, 1, TimeUnit.MINUTES).share();
+	public static Observable<Long> EVERY_MINUTE = Observable.timer(0, 1, TimeUnit.MINUTES).replay(1).refCount();
 
 
 	public static Subscription plug(final TextView textView, Observable<?> observable) {
