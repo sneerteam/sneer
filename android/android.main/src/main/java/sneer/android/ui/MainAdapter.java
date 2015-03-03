@@ -58,10 +58,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 			return view;
         } else {
 			ConversationWidget existing = (ConversationWidget) convertView.getTag();
-			if (existing.conversation != conversation) {
-				existing.recycle();
-				existing.bind(conversation);
-			}
+			existing.bind(conversation);
 			return convertView;
 		}
     }
@@ -79,7 +76,6 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		widget.conversationPicture = findView(view, R.id.conversationPicture);
 		widget.conversationSummary.getPaint().setShader(textShader);
 		widget.conversationUnread = findView(view, R.id.conversationUnread);
-		hide(widget.conversationUnread);
 		view.setTag(widget);
 		return widget;
 	}
@@ -111,12 +107,8 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		ImageView conversationPicture;
 		final SerialSubscription subscription = new SerialSubscription();
 
-		void recycle() {
-			conversation = null;
-		}
-
 		void bind(Conversation conversation) {
-			if (this.conversation != null) throw new IllegalStateException();
+			if (this.conversation == conversation) return;
 			this.conversation = conversation;
 			ObservedConversation oc = observe(conversation);
 			subscription.set(
