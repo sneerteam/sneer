@@ -62,7 +62,6 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 			}
 			return convertView;
 		}
-
     }
 
 	private View inflateConversationView(ViewGroup parent) {
@@ -131,12 +130,12 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 
 	public static Subscription plugUnreadMessage(final TextView textView, Observable<Long> observable) {
-		return deferUI(observable).subscribe(new Action1<Long>() { @Override public void call(Long obj) {
-			if (obj == 0)
+		return deferUI(observable).subscribe(new Action1<Long>() { @Override public void call(Long unread) {
+			if (unread == 0)
 				hide(textView);
 			else
 				show(textView);
-			textView.setText(obj.toString());
+			textView.setText(unread.toString());
 		}});
 	}
 
