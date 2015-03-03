@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.graphics.Shader.TileMode;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,13 +84,16 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		return widget;
 	}
 
-	private ObservedConversation observe(Conversation c) {
+	private ObservedConversation observe(final Conversation c) {
 		ObservedConversation existing = observedConversations.get(c);
 		if (existing != null)
 			return existing;
 
-		ObservedConversation oc = new ObservedConversation();
-		subscriptions.add(oc.subscribe(c));
+		final ObservedConversation oc = new ObservedConversation();
+		new AsyncTask<Void, Void, Void>() { @Override protected Void doInBackground(Void... voids) {
+			subscriptions.add(oc.subscribe(c));
+			return null;
+		}}.execute();
 
 		observedConversations.put(c, oc);
 		return oc;
