@@ -11,9 +11,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.observables.ConnectableObservable;
 import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.SerialSubscription;
 import rx.subscriptions.Subscriptions;
@@ -78,8 +83,20 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		return widget;
 	}
 
+	private Observable<String> mostRecentTimestampFor(Conversation c) {
+		Observable<String> existing = mostRecentTimestampPerConversation.get(c);
+		if (existing != null)
+			return existing;
+
+		ConnectableObservable<String> mostRecentTimestamp = prettyTime(c.mostRecentMessageTimestamp()).replay(1);
+		subscriptions.add(mostRecentTimestamp.connect());
+
+		mostRecentTimestampPerConversation.put(c, mostRecentTimestamp);
+		return mostRecentTimestamp;
 	}
 
+	private final Map<Conversation, Observable<String>> mostRecentTimestampPerConversation
+			= new HashMap<Conversation, Observable<String>>();
 
 	class ConversationWidget {
 		Conversation conversation;
@@ -107,7 +124,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 					plug(conversationSummary, conversation.mostRecentMessageContent()),
 					plug(conversationPicture, sneer().profileFor(conversation.party()).selfie()),
 					plugUnreadMessage(conversationUnread, conversation.unreadMessageCount()),
-					plug(conversationDate, prettyTime(conversation.mostRecentMessageTimestamp()))
+					plug(conversationDate, mostRecentTimestampFor(conversation))
 				));
 		}
 	}
