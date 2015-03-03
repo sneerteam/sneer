@@ -31,9 +31,10 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 
 	private static void acquireWakeLock(Context context) {
 		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		@SuppressWarnings("deprecation")
 		final PowerManager.WakeLock hopeForTuples = powerManager.newWakeLock(
 			    PowerManager.FULL_WAKE_LOCK, // For testing. Use PARTIAL_LOCK later.
-				"MyWakelockTag");
+				"SneerWakelockTag");
 		hopeForTuples.acquire();
 
 		new Thread() { @Override public void run() {
