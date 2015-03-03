@@ -98,13 +98,20 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 	public static Subscription plugUnreadMessage(final TextView textView, Observable<Long> observable) {
 		return deferUI(observable).subscribe(new Action1<Long>() { @Override public void call(Long obj) {
 			if (obj == 0)
-				textView.setVisibility(View.GONE);
+				hide(textView);
 			else
-				textView.setVisibility(View.VISIBLE);
+				show(textView);
 			textView.setText(obj.toString());
 		}});
 	}
 
+	private static void show(View textView) {
+		textView.setVisibility(View.VISIBLE);
+	}
+
+	private static void hide(View textView) {
+		textView.setVisibility(View.GONE);
+	}
 
 	public void dispose() {
 		subscriptions.unsubscribe();
