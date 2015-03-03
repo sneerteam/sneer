@@ -73,6 +73,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		widget.conversationPicture = findView(view, R.id.conversationPicture);
 		widget.conversationSummary.getPaint().setShader(textShader);
 		widget.conversationUnread = findView(view, R.id.conversationUnread);
+		hide(widget.conversationUnread);
 		view.setTag(widget);
 		return widget;
 	}
