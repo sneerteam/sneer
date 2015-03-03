@@ -1,6 +1,7 @@
 package sneer.android.ui;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
@@ -18,12 +19,12 @@ import java.util.Map;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
-import rx.observables.ConnectableObservable;
 import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.SerialSubscription;
 import rx.subscriptions.Subscriptions;
 import sneer.Conversation;
 import sneer.android.R;
+import sneer.rx.ObservedSubject;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.SneerActivity.*;
@@ -82,20 +83,20 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		return widget;
 	}
 
-	private Observable<String> mostRecentTimestampFor(Conversation c) {
-		Observable<String> existing = mostRecentTimestampPerConversation.get(c);
+	private ObservedConversation observe(Conversation c) {
+		ObservedConversation existing = observedConversations.get(c);
 		if (existing != null)
 			return existing;
 
-		ConnectableObservable<String> mostRecentTimestamp = prettyTime(c.mostRecentMessageTimestamp()).replay(1);
-		subscriptions.add(mostRecentTimestamp.connect());
+		ObservedConversation oc = new ObservedConversation();
+		subscriptions.add(oc.subscribe(c));
 
-		mostRecentTimestampPerConversation.put(c, mostRecentTimestamp);
-		return mostRecentTimestamp;
+		observedConversations.put(c, oc);
+		return oc;
 	}
 
-	private final Map<Conversation, Observable<String>> mostRecentTimestampPerConversation
-			= new HashMap<Conversation, Observable<String>>();
+	private final Map<Conversation, ObservedConversation> observedConversations
+			= new HashMap<Conversation, ObservedConversation>();
 
 	class ConversationWidget {
 		Conversation conversation;
@@ -108,35 +109,79 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 		void recycle() {
 			conversation = null;
-			conversationParty.setText("");
-			conversationSummary.setText("");
-			conversationDate.setText("");
-			hide(conversationUnread);
 		}
 
 		void bind(Conversation conversation) {
 			if (this.conversation != null) throw new IllegalStateException();
 			this.conversation = conversation;
+			ObservedConversation oc = observe(conversation);
 			subscription.set(
 				Subscriptions.from(
-					plug(conversationParty, conversation.party().name()),
-					plug(conversationSummary, conversation.mostRecentMessageContent()),
-					plug(conversationPicture, sneer().profileFor(conversation.party()).selfie()),
-					plugUnreadMessage(conversationUnread, conversation.unreadMessageCount()),
-					plug(conversationDate, mostRecentTimestampFor(conversation))
+					bind(conversationParty, oc.party),
+					bind(conversationSummary, oc.summary),
+					bind(conversationDate, oc.timestamp),
+					bindPicture(oc.picture),
+					bindUnread(oc.unread)
 				));
+		}
+
+		private Subscription bindPicture(ObservedSubject<Bitmap> picture) {
+			setPicture(picture.current());
+			return deferUI(picture.observable()).subscribe(new Action1<Bitmap>() { @Override public void call(Bitmap bitmap) {
+				setPicture(bitmap);
+			}});
+		}
+
+		private void setPicture(Bitmap bitmap) {
+			if (bitmap == null) {
+				hide(conversationPicture);
+			} else {
+				conversationPicture.setImageBitmap(bitmap);
+				show(conversationPicture);
+			}
+		}
+
+		private Subscription bind(TextView view, ObservedSubject<String> subject) {
+			view.setText(subject.current());
+			return plug(view, subject.observable());
+		}
+
+		private Subscription bindUnread(ObservedSubject<Long> subject) {
+			setMessageUnread(subject.current());
+			return deferUI(subject.observable()).subscribe(new Action1<Long>() {@Override public void call(Long unread) {
+				setMessageUnread(unread);
+			}});
+		}
+
+		private void setMessageUnread(Long unread) {
+			if (unread == 0)
+				hide(conversationUnread);
+			else
+				show(conversationUnread);
+			conversationUnread.setText(unread.toString());
 		}
 	}
 
+	private Observable<byte[]> pictureFor(Conversation conversation) {
+		return sneer().profileFor(conversation.party()).selfie();
+	}
 
-	public static Subscription plugUnreadMessage(final TextView textView, Observable<Long> observable) {
-		return deferUI(observable).subscribe(new Action1<Long>() { @Override public void call(Long unread) {
-			if (unread == 0)
-				hide(textView);
-			else
-				show(textView);
-			textView.setText(unread.toString());
-		}});
+	class ObservedConversation {
+		public final ObservedSubject<String> party = ObservedSubject.create("");
+		public final ObservedSubject<String> summary = ObservedSubject.create("");
+		public final ObservedSubject<Bitmap> picture = ObservedSubject.create(null);
+		public final ObservedSubject<Long> unread = ObservedSubject.create(0L);
+		public final ObservedSubject<String> timestamp = ObservedSubject.create("");
+
+		public Subscription subscribe(Conversation conversation) {
+			return Subscriptions.from(
+					conversation.party().name().subscribe(party),
+					conversation.mostRecentMessageContent().subscribe(summary),
+					pictureFor(conversation).map(TO_BITMAP).subscribe(picture),
+					conversation.unreadMessageCount().subscribe(unread),
+					prettyTime(conversation.mostRecentMessageTimestamp()).subscribe(timestamp)
+			);
+		}
 	}
 
 	private static void show(View textView) {

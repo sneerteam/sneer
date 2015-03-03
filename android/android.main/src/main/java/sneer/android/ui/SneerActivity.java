@@ -69,11 +69,14 @@ public class SneerActivity extends Activity {
 
 
 	public static Subscription plug(final ImageView imageView, Observable<byte[]> observable) {
-		return deferUI(observable.map(TO_BITMAP)).subscribe(new Action1<Bitmap>() { @Override public void call(Bitmap bitmap) {
+		return plugBitmap(imageView, observable.map(TO_BITMAP));
+	}
+
+	public static Subscription plugBitmap(final ImageView imageView, Observable<Bitmap> bitmaps) {
+		return deferUI(bitmaps).subscribe(new Action1<Bitmap>() { @Override public void call(Bitmap bitmap) {
 			imageView.setImageBitmap(bitmap);
 		}});
 	}
-
 
 	protected Subscription plugActionBarIcon(ActionBar actionBar, Observable<byte[]> observable) {
 		return plugActionBarIcon(actionBar, observable, getResources());
