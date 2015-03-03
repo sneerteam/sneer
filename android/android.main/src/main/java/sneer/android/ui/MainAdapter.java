@@ -42,56 +42,73 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 		Conversation conversation = getItem(position);
 		if (convertView == null) {
-            LayoutInflater inflater = activity.getLayoutInflater();
-            View row = inflater.inflate(R.layout.list_item_main, parent, false);
-			final ConversationHolder holder = new ConversationHolder();
-            holder.conversationParty = findView(row, R.id.conversationParty);
-            holder.conversationSummary = findView(row, R.id.conversationSummary);
-            holder.conversationDate = findView(row, R.id.conversationDate);
-            holder.conversationPicture = findView(row, R.id.conversationPicture);
-            holder.conversationUnread = findView(row, R.id.conversationUnread);
-			holder.conversationSummary.getPaint().setShader(textShader);
-            row.setTag(holder);
+			View view = inflateConversationView(parent);
 
-			subscriptions.add(holder.subscription);
-			subscribeToConversation(holder, conversation);
-			return row;
+			final ConversationWidget widget = conversationWidgetFor(view);
+			widget.bind(conversation);
+
+			subscriptions.add(widget.subscription);
+			return view;
         } else {
-			ConversationHolder holder = (ConversationHolder) convertView.getTag();
-			if (conversation != holder.conversation) {
-				holder.conversationSummary.setText("");
-				holder.conversationDate.setText("");
-				subscribeToConversation(holder, conversation);
+			ConversationWidget existing = (ConversationWidget) convertView.getTag();
+			if (existing.conversation != conversation) {
+				existing.recycle();
+				existing.bind(conversation);
 			}
 			return convertView;
 		}
 
     }
 
-	private void subscribeToConversation(ConversationHolder holder, Conversation conversation) {
-		holder.conversation = conversation;
-		holder.subscription.set(plugConversation(holder, conversation));
+	private View inflateConversationView(ViewGroup parent) {
+		LayoutInflater inflater = activity.getLayoutInflater();
+		return inflater.inflate(R.layout.list_item_main, parent, false);
 	}
 
-	private Subscription plugConversation(ConversationHolder holder, Conversation conversation) {
-		return Subscriptions.from(
-				plug(holder.conversationParty, conversation.party().name()),
-				plug(holder.conversationSummary, conversation.mostRecentMessageContent()),
-				plug(holder.conversationPicture, sneer().profileFor(conversation.party()).selfie()),
-				plugUnreadMessage(holder.conversationUnread, conversation.unreadMessageCount()),
-				plugDate(holder.conversationDate, conversation.mostRecentMessageTimestamp())
-		);
+	private ConversationWidget conversationWidgetFor(View view) {
+		final ConversationWidget widget = new ConversationWidget();
+		widget.conversationParty = findView(view, R.id.conversationParty);
+		widget.conversationSummary = findView(view, R.id.conversationSummary);
+		widget.conversationDate = findView(view, R.id.conversationDate);
+		widget.conversationPicture = findView(view, R.id.conversationPicture);
+		widget.conversationSummary.getPaint().setShader(textShader);
+		widget.conversationUnread = findView(view, R.id.conversationUnread);
+		view.setTag(widget);
+		return widget;
+	}
+
 	}
 
 
-	static class ConversationHolder {
+	class ConversationWidget {
 		Conversation conversation;
-		final SerialSubscription subscription = new SerialSubscription();
 		TextView conversationParty;
 		TextView conversationSummary;
 		TextView conversationDate;
 		TextView conversationUnread;
 		ImageView conversationPicture;
+		final SerialSubscription subscription = new SerialSubscription();
+
+		void recycle() {
+			conversation = null;
+			conversationParty.setText("");
+			conversationSummary.setText("");
+			conversationDate.setText("");
+			hide(conversationUnread);
+		}
+
+		void bind(Conversation conversation) {
+			if (this.conversation != null) throw new IllegalStateException();
+			this.conversation = conversation;
+			subscription.set(
+				Subscriptions.from(
+					plug(conversationParty, conversation.party().name()),
+					plug(conversationSummary, conversation.mostRecentMessageContent()),
+					plug(conversationPicture, sneer().profileFor(conversation.party()).selfie()),
+					plugUnreadMessage(conversationUnread, conversation.unreadMessageCount()),
+					plug(conversationDate, prettyTime(conversation.mostRecentMessageTimestamp()))
+				));
+		}
 	}
 
 
