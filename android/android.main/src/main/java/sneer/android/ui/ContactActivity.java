@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,6 +65,8 @@ public class ContactActivity extends Activity {
 
 		setContentView(R.layout.activity_contact);
 
+		actionBar = getActionBar();
+
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
 		preferredNickNameView = (TextView) findViewById(R.id.preferredNickName);
@@ -72,10 +75,6 @@ public class ContactActivity extends Activity {
 		cityView = (TextView) findViewById(R.id.city);
 
 		load();
-
-		actionBar = getActionBar();
-		if (actionBar != null)
-			actionBar.setTitle(activityTitle());
 
 		validationOnTextChanged(nicknameEdit);
 	}
@@ -96,8 +95,8 @@ public class ContactActivity extends Activity {
 				return true;
 
 			case R.id.action_share:
-				if (!newContact)
-					sharePublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
+				if (newContact) return false;
+				sharePublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
 				break;
 		}
 		return true;
@@ -131,16 +130,6 @@ public class ContactActivity extends Activity {
 		}
 	}
 
-	private String activityTitle() {
-		if (getIntent().getExtras().get(PARTY_PUK) == null) {
-			newContact = true;
-			return "New Contact";
-		}
-
-		return "Contact";
-	}
-
-
 	private PublicKey partyPuk() {
 		Bundle extras = getIntent().getExtras();
 		if (extras == null)
@@ -152,9 +141,8 @@ public class ContactActivity extends Activity {
 	private void loadProfile() {
 		if (newContact) {
 			ownNameSubscription = plug(nicknameEdit, profile.ownName());
-			if (nicknameEdit.getText().toString().isEmpty()) {
+			if (nicknameEdit.getText().toString().isEmpty())
 				preferredNicknameSubscription = plug(nicknameEdit, profile.preferredNickname());
-			}
 		} else {
 			plug(nicknameEdit, contact.nickname().observable());
 		}
@@ -162,20 +150,18 @@ public class ContactActivity extends Activity {
 		plug(fullNameView, profile.ownName());
 		plug(preferredNickNameView, profile.preferredNickname().map(new Func1<Object, String>() { @Override public String call(Object obj) {
 			return "(" + obj.toString() + ")";
-		}
-		}));
+		}}));
 		plug(countryView, profile.country());
 		plug(cityView, profile.city());
 		plug(selfieImage, profile.selfie());
 
-		if (!newContact)
-			Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>() { @Override public Boolean call(String preferredNickname, String ownName) {
-				return preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current());
-			}}).subscribe(new Action1<Boolean>() { @Override public void call(Boolean validation) {
-				if (validation)
-					preferredNickNameView.setVisibility(View.GONE);
-			}});
-
+		if (newContact) return;
+		Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>() { @Override public Boolean call(String preferredNickname, String ownName) {
+			return preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current());
+		}}).subscribe(new Action1<Boolean>() { @Override public void call(Boolean validation) {
+			if (validation)
+				preferredNickNameView.setVisibility(View.GONE);
+		}});
 	}
 
 	private void loadContact(PublicKey puk) {
@@ -184,18 +170,24 @@ public class ContactActivity extends Activity {
 				: puk;
 
 		party = sneer().produceParty(partyPuk);
+
 		profile = sneer().profileFor(party);
+
 		contact = sneer().findContact(party);
 
 		newContact = contact == null;
+
+		if (actionBar == null) return;
+		if (newContact)	actionBar.setTitle("New Contact");
 	}
 
 
 	private void saveContact() {
 		final String nickName = nicknameEdit.getText().toString();
 		try {
-			if (newContact)
+			if (newContact) {
 				sneer().addContact(nickName, party);
+			}
 
 			if (!nickName.equals(getIntent().getExtras().getString(CURRENT_NICKNAME)))
 				sneer().findContact(party).setNickname(nickName);
@@ -214,15 +206,14 @@ public class ContactActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		if (!isOwn)
-			saveContact();
 		super.onPause();
+		if (isOwn) return;
+		saveContact();
 	}
 
 
 	private void toast(String message) {
-		Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-		toast.show();
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
 
