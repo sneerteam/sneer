@@ -116,7 +116,7 @@ public class MainActivity extends SneerActivity {
 		alert.setMessage("To add contacts, send them your public key and they must send you theirs.")
 			.setIcon(android.R.drawable.ic_dialog_info)
 			.setPositiveButton("Send Public Key", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {
-				Puk.sendYourPublicKey(MainActivity.this, self, true, null);
+				Puk.sharePublicKey(MainActivity.this, self, true, null);
 			}})
 			.show();
 	}

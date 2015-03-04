@@ -6,11 +6,14 @@ import sneer.Party;
 
 public class Puk {
 
-	public static void sendYourPublicKey(Activity activity, Party party, boolean self, String nickname) {
+	public static void sharePublicKey(Activity activity, Party party, boolean self, String nickname) {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
-		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, (self ? "My" : nickname + "'s") + " Sneer public key");
-		sharingIntent.putExtra(Intent.EXTRA_TEXT, buildSneerUri(party.publicKey().current().toHex()));
+		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, (self ? "My" : nickname + "'s") + " Sneer Public Key");
+		sharingIntent.putExtra(Intent.EXTRA_TEXT,
+				"\n\nIf you don't have the Sneer app, install it using the Play Store: https://play.google.com/store/apps/details?id=sneer.android.main\n\n" +
+				"Then, tap to add " + (self ? "me" : nickname) + " as a Sneer contact: " +
+				buildSneerUri(party.publicKey().current().toHex()));
 
 		String title = self
 				? "Share Your Public Key"

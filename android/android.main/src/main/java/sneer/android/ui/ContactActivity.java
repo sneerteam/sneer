@@ -31,7 +31,7 @@ import static sneer.android.SneerAndroidSingleton.admin;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.plug;
-import static sneer.android.utils.Puk.sendYourPublicKey;
+import static sneer.android.utils.Puk.sharePublicKey;
 
 public class ContactActivity extends Activity {
 
@@ -97,7 +97,7 @@ public class ContactActivity extends Activity {
 
 			case R.id.action_share:
 				if (!newContact)
-					sendYourPublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
+					sharePublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
 				break;
 		}
 		return true;
