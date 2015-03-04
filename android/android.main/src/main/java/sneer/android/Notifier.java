@@ -135,7 +135,9 @@ public class Notifier {
 	}
 
 	private static void notify(Intent intent, String title, String contentInfo, String contentText) {
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		builder.setSmallIcon(R.drawable.ic_launcher)
 				.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_large))
