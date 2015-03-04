@@ -63,7 +63,7 @@ public class Notifier {
 		if (isSubscribed()) return;
 
 		subscription = notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Conversations.Notification>() { @Override public void call(Conversations.Notification notification) {
-			createNotification(notification);
+			refresh(notification);
 		}});
 	}
 
@@ -71,8 +71,12 @@ public class Notifier {
 		return sneer().conversations().notifications();
 	}
 
-	private static void createNotification(Conversations.Notification notification) {
+	private static void refresh(Conversations.Notification notification) {
 		List<Conversation> conversations = notification.conversations();
+		if (conversations.size() == 0) {
+			cancelNotification();
+			return;
+		}
 		Intent intent = conversations.size() == 1
 				? conversationActivityIntent(conversations.get(0))
 				: mainActivityIntent();

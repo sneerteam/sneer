@@ -171,6 +171,10 @@
     (rx/return
      (reify-notification conversations "New messages" text subText))))
 
+(defn notification-for-none []
+  (rx/return
+    (reify-notification [] nil nil nil)))
+
 (defn reify-conversations [own-puk tuple-space contacts]
   (let [menu-items (BehaviorSubject/create [])
         convos (atom {})
@@ -209,7 +213,7 @@
              (switch-map
               (fn [unread-pairs]
                 (case (count unread-pairs)
-                  0 (rx/empty)
+                  0 (notification-for-none)
                   1 (notification-for-single (first unread-pairs))
                   (notification-for-many unread-pairs))))))
 
