@@ -143,6 +143,7 @@
 
       (setRead [_ message]
         (assert (-> message own? not))
+        (println "Publishing message read tuple.")          ;; Klaus: I suspect this might be happening too often, redundantly for already read messages.
         (.pub last-read-pub (original-id message))))))
 
 (defn- reify-notification [conversations title text subText]
