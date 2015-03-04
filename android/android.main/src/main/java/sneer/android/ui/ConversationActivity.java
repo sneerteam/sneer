@@ -24,7 +24,9 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 import sneer.*;
+import sneer.android.Notifier;
 import sneer.android.R;
 
 import java.util.ArrayList;
@@ -185,7 +187,6 @@ public class ConversationActivity extends SneerActivity {
 	protected void onResume() {
 		super.onResume();
 		hideKeyboard();
-
 		subscriptions = new CompositeSubscription(
 				subscribeToMessages(),
 				subscribeToMenu());
@@ -223,20 +224,17 @@ public class ConversationActivity extends SneerActivity {
 	}
 
 	private Subscription subscribeToMessages() {
-		return deferUI(conversation.messages().debounce(200, TimeUnit.MILLISECONDS))
-			.subscribe(
-					new Action1<List<Message>>() {
-						@Override
-						public void call(List<Message> msgs) {
-							messages.clear();
-							messages.addAll(msgs);
-							adapter.notifyDataSetChanged();
-
-							Message last = lastMessageReceived(msgs);
-							if (last != null)
-								conversation.setRead(last);
-						}
-					});
+		return deferUI(conversation.messages().debounce(200, TimeUnit.MILLISECONDS)).subscribe(new Action1<List<Message>>() {
+			@Override
+			public void call(List<Message> msgs) {
+				messages.clear();
+				messages.addAll(msgs);
+				adapter.notifyDataSetChanged();
+				Message last = lastMessageReceived(msgs);
+				if (last != null)
+					conversation.setRead(last);
+			}
+		});
 	}
 
 }
