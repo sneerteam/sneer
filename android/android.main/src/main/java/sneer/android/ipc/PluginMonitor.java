@@ -77,12 +77,12 @@ public class PluginMonitor extends BroadcastReceiver {
 		PluginMonitor.sneer = sneer;
 		LogUtils.info(PluginMonitor.class, "Searching for Sneer plugins...");
 
-		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
+//		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
 
-		filterPlugins(Observable.from(packages))
-			.flatMap(fromActivity(context))
-			.toList()
-			.subscribe(pluginsListPublisher());
+//		filterPlugins(Observable.from(packages))
+//			.flatMap(fromActivity(context))
+//			.toList()
+//			.subscribe(pluginsListPublisher());
 
 		LogUtils.info(PluginMonitor.class, "Done.");
 	}
