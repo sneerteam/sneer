@@ -188,7 +188,7 @@
 
       (all [_]
         (->> contacts
-             (rx/map (partial map (fn [^Contact c] (produce-conversation (.party c)))))
+             (rx/map (partial mapv (fn [^Contact c] (produce-conversation (.party c)))))
              shared-latest))
 
       (ofType [_ _type]
