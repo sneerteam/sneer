@@ -9,6 +9,8 @@ import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import sneer.R;
 import sneer.commons.Clock;
 import sneer.commons.Threads;
 

@@ -17,7 +17,7 @@ android {
   defaultConfig {
     minSdkVersion external.android.minSdkVersion
     targetSdkVersion external.android.sdkVersion
-    applicationId "sneer"
+    applicationId "me.sneer"
     versionCode 5
     versionName "0.1.1"
   }

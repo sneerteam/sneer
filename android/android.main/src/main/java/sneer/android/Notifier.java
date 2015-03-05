@@ -20,6 +20,7 @@ import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Conversations;
 import sneer.PublicKey;
+import sneer.R;
 import sneer.android.ui.ConversationActivity;
 import sneer.android.ui.MainActivity;
 import sneer.commons.Clock;
