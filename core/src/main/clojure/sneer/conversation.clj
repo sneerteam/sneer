@@ -198,10 +198,8 @@
         (produce-conversation party))
 
       (notifications [this]
-        (->> #_(combine-latest (fn [all ignored] (remove #(identical? % ignored) all))
+        (->> (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all))
                              [(.all this) ignored-conversation])
-
-             (.all this)
 
              ;; [Conversation]
 
