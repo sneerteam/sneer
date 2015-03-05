@@ -180,7 +180,9 @@
   (let [menu-items (BehaviorSubject/create [])
         convos (atom {})
         reify-conversation (partial reify-conversation tuple-space (.asObservable menu-items) own-puk)
-        produce-conversation (partial produce! reify-conversation convos)]
+        produce-conversation (partial produce! reify-conversation convos)
+        null nil
+        ignored-conversation (BehaviorSubject/create ^Object null)]
 
     (reify Conversations
 
@@ -196,9 +198,14 @@
         (produce-conversation party))
 
       (notifications [this]
-        (->> (.all this)
+        (->> #_(combine-latest (fn [all ignored] (remove #(identical? % ignored) all))
+                             [(.all this) ignored-conversation])
+
+             (.all this)
 
              ;; [Conversation]
+
+
              (rx/map (fn [conversations]
                        (->> conversations
                             (mapv (fn [^Conversation c]
@@ -217,6 +224,9 @@
                   0 (notification-for-none)
                   1 (notification-for-single (first unread-pairs))
                   (notification-for-many unread-pairs))))))
+
+      (notificationsStartIgnoring [_ conversation] (.onNext ignored-conversation conversation))
+      (notificationsStopIgnoring  [_]              (.onNext ignored-conversation nil))
 
       (setMenuItems [_ menu-item-list]
         (rx/on-next menu-items menu-item-list)))))

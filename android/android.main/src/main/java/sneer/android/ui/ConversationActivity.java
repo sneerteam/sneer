@@ -177,14 +177,21 @@ public class ConversationActivity extends SneerActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+
 		subscriptions.unsubscribe();
+
+		sneer().conversations().notificationsStopIgnoring();
 	}
 
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		hideKeyboard();
+
+		sneer().conversations().notificationsStartIgnoring(conversation);
+
 		subscriptions = new CompositeSubscription(
 				subscribeToMessages(),
 				subscribeToMenu());
