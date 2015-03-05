@@ -24,9 +24,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
-import rx.subscriptions.Subscriptions;
 import sneer.*;
-import sneer.android.Notifier;
 import sneer.android.R;
 
 import java.util.ArrayList;
