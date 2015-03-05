@@ -158,7 +158,7 @@ public class Notifier {
 				.setAutoCancel(true)
 				.setContentIntent(pendingIntent)
 				.setOngoing(false);
-		notificationManager.notify(NOTIFICATION_ID, builder.build());
+		notificationManager.notify("unread conversations", NOTIFICATION_ID, builder.build());
 	}
 
 }

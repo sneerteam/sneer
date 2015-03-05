@@ -199,7 +199,7 @@
 
       (notifications [this]
         (->> (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all))
-                             [(.all this) ignored-conversation])
+                               [(.all this) ignored-conversation])
 
              ;; [Conversation]
 
