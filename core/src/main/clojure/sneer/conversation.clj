@@ -7,11 +7,11 @@
    [sneer.commons :refer [now produce!]]
    [sneer.tuple.space :refer [payload]])
   (:import
-   [sneer PublicKey Party Contact Conversations Conversation Message Conversations$Notification]
-   [sneer.tuples Tuple TupleSpace]
-   [java.text SimpleDateFormat]
-   [rx.subjects BehaviorSubject]
-   [rx Observable]))
+    [sneer PublicKey Party Contact Conversations Conversation Message Conversations$Notification]
+    [sneer.tuples Tuple TupleSpace]
+    [java.text SimpleDateFormat]
+    [rx.subjects BehaviorSubject]
+    [rx Observable]))
 
 (def simple-date-format (SimpleDateFormat. "HH:mm"))
 
@@ -189,7 +189,7 @@
              (rx/map (partial map (fn [^Contact c] (produce-conversation (.party c)))))
              shared-latest))
 
-      (ofType [_ type]
+      (ofType [_ _type]
         (rx/never))
 
       (with [_ party]
