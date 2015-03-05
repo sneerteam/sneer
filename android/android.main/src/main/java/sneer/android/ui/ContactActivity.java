@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import me.sneer.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -24,10 +24,10 @@ import sneer.Contact;
 import sneer.Party;
 import sneer.Profile;
 import sneer.PublicKey;
-import me.sneer.R;
 import sneer.commons.exceptions.FriendlyException;
 
 import static android.support.v4.app.NavUtils.navigateUpFromSameTask;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static sneer.android.SneerAndroidSingleton.admin;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
