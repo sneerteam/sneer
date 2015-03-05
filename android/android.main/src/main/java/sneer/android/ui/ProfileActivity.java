@@ -16,7 +16,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import sneer.Profile;
-import sneer.android.R;
+import sneer.R;
 import sneer.commons.exceptions.FriendlyException;
 
 import static sneer.android.SneerAndroidSingleton.sneer;

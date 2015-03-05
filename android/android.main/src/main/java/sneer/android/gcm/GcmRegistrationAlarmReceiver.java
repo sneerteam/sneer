@@ -79,7 +79,7 @@ public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
     }
 
     SharedPreferences getGCMPreferences(Context context) {
-        return context.getSharedPreferences("sneer.android.gcm", Context.MODE_PRIVATE);
+        return context.getSharedPreferences("sneer.gcm", Context.MODE_PRIVATE);
     }
 
     void log(String msg) {

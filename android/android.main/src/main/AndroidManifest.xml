@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="sneer.android"
+    package="sneer"
     android:installLocation="internalOnly">
 
     <!-- Superceded by the gradle build:
@@ -18,35 +18,35 @@
     <!-- GCM (Google Cloud Messages) -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <permission
-        android:name="sneer.android.permission.C2D_MESSAGE"
+        android:name="sneer.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission android:name="sneer.android.permission.C2D_MESSAGE" />
+    <uses-permission android:name="sneer.permission.C2D_MESSAGE" />
 
     <application
-        android:name=".SneerApp"
+        android:name=".android.SneerApp"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <receiver android:name=".GcmBroadcastReceiver">
+        <receiver android:name=".android.GcmBroadcastReceiver">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="sneer.android" />
+                <category android:name="sneer" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".gcm.GcmRegistrationAlarmReceiver">
+        <receiver android:name=".android.gcm.GcmRegistrationAlarmReceiver">
         </receiver>
 
-        <receiver android:name=".SneerBoot">
+        <receiver android:name=".android.SneerBoot">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <receiver
-            android:name=".ipc.PluginMonitor"
+            android:name=".android.ipc.PluginMonitor"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -58,7 +58,7 @@
         </receiver>
 
         <service
-            android:name=".ipc.TupleSpaceService"
+            android:name=".android.ipc.TupleSpaceService"
             android:exported="true">
             <intent-filter>
                 <action android:name="sneer.android.service.TUPLE_SPACE" />
@@ -70,7 +70,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".android.ui.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -80,29 +80,29 @@
         </activity>
 
         <activity
-            android:name=".ui.ConversationActivity"
+            android:name=".android.ui.ConversationActivity"
             android:label="@string/title_conversation"/>
         <activity
-            android:name=".ui.ProfileActivity"
+            android:name=".android.ui.ProfileActivity"
             android:label="@string/title_activity_profile">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.MainActivity" />
+                android:value=".android.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.SystemReportActivity"
+            android:name=".android.ui.SystemReportActivity"
             android:label="@string/title_activity_system_report"
-            android:parentActivityName=".ui.MainActivity">
+            android:parentActivityName=".android.ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.MainActivity" />
+                android:value=".android.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.ContactActivity"
+            android:name=".android.ui.ContactActivity"
             android:label="@string/title_activity_contact">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.MainActivity" />
+                android:value=".android.ui.MainActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

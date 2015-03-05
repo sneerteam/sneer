@@ -18,7 +18,7 @@ import sneer.Conversation;
 import sneer.Party;
 import sneer.Profile;
 import sneer.android.Notifier;
-import sneer.android.R;
+import sneer.R;
 import sneer.android.SneerApp;
 import sneer.android.utils.Puk;
 

@@ -24,7 +24,7 @@ import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.SerialSubscription;
 import rx.subscriptions.Subscriptions;
 import sneer.Conversation;
-import sneer.android.R;
+import sneer.R;
 import sneer.rx.ObservedSubject;
 
 import static sneer.android.SneerAndroidSingleton.sneer;

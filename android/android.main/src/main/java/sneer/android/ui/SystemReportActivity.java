@@ -7,7 +7,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import sneer.android.R;
+import sneer.R;
 import sneer.commons.SystemReport;
 
 public class SystemReportActivity extends Activity {
