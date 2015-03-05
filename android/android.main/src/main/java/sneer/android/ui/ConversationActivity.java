@@ -225,12 +225,12 @@ public class ConversationActivity extends SneerActivity {
 		return deferUI(conversation.messages().debounce(200, TimeUnit.MILLISECONDS)).subscribe(new Action1<List<Message>>() {
 			@Override
 			public void call(List<Message> msgs) {
-				messages.clear();
-				messages.addAll(msgs);
-				adapter.notifyDataSetChanged();
-				Message last = lastMessageReceived(msgs);
-				if (last != null)
-					conversation.setRead(last);
+			messages.clear();
+			messages.addAll(msgs);
+			adapter.notifyDataSetChanged();
+			Message last = lastMessageReceived(msgs);
+			if (last != null)
+				conversation.setRead(last);
 			}
 		});
 	}
