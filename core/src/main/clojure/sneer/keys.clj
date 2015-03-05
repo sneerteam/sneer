@@ -2,6 +2,10 @@
   (:import [sneer.crypto.impl KeysImpl]))
 
 (let [keys-impl (KeysImpl.)]
+
+  (defn create-prik []
+    (.createPrivateKey keys-impl))
+
   (defn create-puk [^bytes rep]
     (.createPublicKey keys-impl rep))
 
