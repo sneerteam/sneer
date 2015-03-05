@@ -140,7 +140,11 @@ public class ContactActivity extends Activity {
 
 	private void loadProfile() {
 		if (newContact) {
-			ownNameSubscription = plug(nicknameEdit, profile.ownName());
+			ownNameSubscription = plug(nicknameEdit,
+				profile.preferredNickname().mergeWith(
+					profile.ownName().delay(100, MILLISECONDS)
+				).first()
+			);
 			if (nicknameEdit.getText().toString().isEmpty())
 				preferredNicknameSubscription = plug(nicknameEdit, profile.preferredNickname());
 		} else {
