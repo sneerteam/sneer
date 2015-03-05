@@ -11,7 +11,7 @@ import rx.functions.Func1;
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
-import sneer.R;
+import me.sneer.R;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
 import sneer.android.ipc.PluginHandler;

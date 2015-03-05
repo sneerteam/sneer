@@ -24,7 +24,7 @@ import sneer.Contact;
 import sneer.Party;
 import sneer.Profile;
 import sneer.PublicKey;
-import sneer.R;
+import me.sneer.R;
 import sneer.commons.exceptions.FriendlyException;
 
 import static android.support.v4.app.NavUtils.navigateUpFromSameTask;

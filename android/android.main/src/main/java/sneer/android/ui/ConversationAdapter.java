@@ -20,7 +20,7 @@ import android.widget.TextView;
 import rx.functions.Action1;
 import sneer.Message;
 import sneer.Party;
-import sneer.R;
+import me.sneer.R;
 import sneer.android.ui.drawable.TriangleLeftDrawable;
 import sneer.android.ui.drawable.TriangleRightDrawable;
 
