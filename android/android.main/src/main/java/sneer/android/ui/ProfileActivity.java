@@ -158,8 +158,9 @@ public class ProfileActivity extends SneerActivity {
 
 
 	public void checkNameLength(EditText edit) {
-		if (text(edit).length() <= 1)
-			edit.setError("Name too short");
+		edit.setError(text(edit).length() == 1
+			? "Name too short"
+			: null); //Setting null necessary because of a bug on some Android versions.
 	}
 
 	public static Subscription plugOwnName(final TextView textView1, final TextView textView2, Observable<?> observable) {
