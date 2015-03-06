@@ -29,9 +29,9 @@
               (subject*
                latest
                (reify rx.Observer
-                 (onNext [this value]
+                 (onNext [_ value]
                    (publish value))))))
-          
+
           (local-payloads-of [type]
             (.. tuple-space
                 filter
@@ -48,27 +48,27 @@
           ^Subject country (payload-subject "profile/country")]
 
       (reify Profile
-        (ownName [this]
+        (ownName [_]
           (.asObservable own-name))
-        (setOwnName [this value]
+        (setOwnName [_ value]
           (rx/on-next own-name value))
-        (selfie [this]
+        (selfie [_]
           (.asObservable selfie))
-        (setSelfie [this value]
+        (setSelfie [_ value]
           (rx/on-next selfie value))
-        (preferredNickname [this]
+        (preferredNickname [_]
           (.asObservable preferred-nickname))
-        (setPreferredNickname [this value]
+        (setPreferredNickname [_ value]
           (rx/on-next preferred-nickname value))
-        (city [this]
+        (city [_]
           (.asObservable city))
-        (setCity [this value]
+        (setCity [_ value]
           (rx/on-next city value))
-        (country [this]
+        (country [_]
           (.asObservable country))
-        (setCountry [this value]
+        (setCountry [_ value]
           (rx/on-next country value))
-        (isOwnNameLocallyAvailable [this]
+        (isOwnNameLocallyAvailable [_]
           (some? (local-payloads-of "profile/own-name")))))))
 
 (defn produce-profile [tuple-space profiles party]
