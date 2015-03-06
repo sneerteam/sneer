@@ -16,6 +16,7 @@
              (fn [^Tuple tuple] (.payload tuple))
              (.. tuple-space
                  filter
+                 last
                  (type type)
                  (author (party-puk party))
                  tuples)))
@@ -35,6 +36,7 @@
           (local-payloads-of [type]
             (.. tuple-space
                 filter
+                last
                 (author (party-puk party))
                 (type type)
                 localTuples
