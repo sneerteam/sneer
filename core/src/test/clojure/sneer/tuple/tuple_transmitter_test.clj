@@ -5,7 +5,8 @@
             [midje.sweet :refer :all]
             [clojure.core.async :refer [chan go >! close!]]
             [sneer.test-util :refer [>!!? <!!?]]
-            [sneer.tuple.persistent-tuple-base :as tuple-base :refer [store-tuple restarted]]))
+            [sneer.tuple.persistent-tuple-base :as tuple-base]
+            [sneer.tuple.protocols :refer [store-tuple restarted]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 

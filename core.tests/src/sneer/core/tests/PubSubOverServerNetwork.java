@@ -2,7 +2,7 @@ package sneer.core.tests;
 
 import org.junit.Ignore;
 
-import static sneer.ClojureUtils.var;
+import static sneer.core.tests.ClojureUtils.var;
 
 @Ignore("avoid polluting the server")
 public class PubSubOverServerNetwork extends PubSubTest {

@@ -1,6 +1,7 @@
 (ns sneer.tuple.space-test
   (:require [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as base]
+            [sneer.tuple.protocols :refer [store-tuple query-tuples]]
             [sneer.test-util :refer [<!!? subscribe-chan observable->chan]]
             [midje.sweet :refer :all]
             [clojure.core.async :as async]
@@ -20,7 +21,7 @@
   (with-open [db (jdbc-database/create-sqlite-db)
               tuple-base (base/create db)]
 
-    (base/store-tuple tuple-base t1)
+    (store-tuple tuple-base t1)
 
     (fact "When keep-alive is false"
       (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} false)
@@ -32,7 +33,7 @@
       (let [observable-tuples (space/rx-query-tuples tuple-base {"type" "tweet"} true)
             tuples (observable->chan observable-tuples)]
         (<!!? tuples) => (contains t1)
-        (base/store-tuple tuple-base t2)
+        (store-tuple tuple-base t2)
         (<!!? tuples) => (contains t2)))
 
     (fact "When unsubscribe it closes the channel"
@@ -53,7 +54,7 @@
               tuples (async/chan)
               subscribers [(subscribe-chan tuples filter) (subscribe-chan tuples filter) (subscribe-chan tuples filter2)]
               subs (async/chan)]
-          (base/query-tuples tuple-base {"type" "sub" "author" neide} subs)
+          (query-tuples tuple-base {"type" "sub" "author" neide} subs)
           (<!!? subs) => (contains {"criteria" {"author" carla}})
           (<!!? subs) => (contains {"criteria" {"author" carla, "f" 42}})
           (<!!? subs) => nil

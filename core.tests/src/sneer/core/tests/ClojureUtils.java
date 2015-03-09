@@ -1,4 +1,4 @@
-package sneer;
+package sneer.core.tests;
 
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;

@@ -2,7 +2,6 @@ package sneer.core.tests;
 
 import org.junit.Assert;
 import org.junit.Test;
-import sneer.ClojureUtils;
 
 import java.io.Closeable;
 

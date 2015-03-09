@@ -1,12 +1,10 @@
 (ns sneer.party
   (:require
-   [sneer.commons :refer [produce!]])
+   [sneer.commons :refer [produce!]]
+   [sneer.party-impl :refer :all])
   (:import
    [sneer Party PublicKey]
    [sneer.rx ObservedSubject]))
-
-(defprotocol PartyImpl
-  (name-subject [this]))
 
 (defn reify-party [puk]
   (let [name (ObservedSubject/create (str "? PublicKey: " (-> ^PublicKey puk .toHex (subs 0 7)) "..."))]

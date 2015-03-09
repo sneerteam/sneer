@@ -1,11 +1,20 @@
 package sneer.admin;
 
-import clojure.java.api.Clojure;
-
 public class SneerAdminFactory {
-	
+
 	public static SneerAdmin create(Object db) {
-        Clojure.var("clojure.core/require").invoke(Clojure.read("sneer.main"));
-        return (SneerAdmin) Clojure.var("sneer.main" + "/" + "start").invoke(db);
+		return serviceProvider().create(db);
+	}
+
+	public interface ServiceProvider {
+		SneerAdmin create(Object db);
+	}
+
+	private static ServiceProvider serviceProvider() {
+		try {
+			return ((ServiceProvider)Class.forName("sneer.main.SneerAdminFactoryServiceProvider").newInstance());
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

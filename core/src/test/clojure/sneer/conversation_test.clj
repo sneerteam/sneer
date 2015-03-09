@@ -5,6 +5,7 @@
             [sneer.tuple.persistent-tuple-base :as base]
             [sneer.test-util :refer [<!!? observable->chan]]
             [sneer.tuple.jdbc-database :as jdbc-database]
+            [sneer.tuple.protocols :refer :all]
             [sneer.rx :refer [subscribe-on-io]]
             [sneer.keys :refer [->puk]]
             [sneer.party :refer [reify-party]]
@@ -33,7 +34,7 @@
           message {"type" "message" "author" carla "audience" neide "timestamp" timestamp}]
 
       (fact "mostRecentMessageTimestamp includes message received"
-        (base/store-tuple tuple-base message)
+        (store-tuple tuple-base message)
         (<!!? most-recent-timestamps) => timestamp)
 
       (fact "mostRecentMessageTimestamp includes message sent"

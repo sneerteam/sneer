@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static sneer.ClojureUtils.var;
+import static sneer.core.tests.ClojureUtils.var;
 import static sneer.commons.Arrays.asList;
 import static sneer.core.tests.ObservableTestUtils.*;
 
@@ -479,7 +479,7 @@ public class ConversationsAPITest extends TestCase {
 
 
 	private SneerAdmin restart(SneerAdmin admin) {
-		return (SneerAdmin) var("sneer.admin", "restart").invoke(admin);
+		return (SneerAdmin) var("sneer.restartable", "restart").invoke(admin);
 	}
 
 }

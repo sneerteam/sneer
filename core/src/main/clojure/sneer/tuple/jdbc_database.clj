@@ -1,7 +1,7 @@
 (ns sneer.tuple.jdbc-database
   (:require [clojure.java.jdbc :as sql]
             [clojure.string :as string]
-            [sneer.tuple.persistent-tuple-base :as tuple-base])
+            [sneer.tuple.protocols :as tuple-base])
   (:import [java.sql DriverManager]
            [sneer.admin UniqueConstraintViolated]))
 

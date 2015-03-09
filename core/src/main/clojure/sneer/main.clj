@@ -1,6 +1,7 @@
 (ns sneer.main
   (:require [clojure.core.async :refer [chan >! <! timeout map< map>]]
             [sneer.admin :as admin]
+            [sneer.tuple-base-provider :refer :all]
             [sneer.networking.client :as network-client]
             [sneer.networking.udp :as udp]
             [sneer.async :refer [go-trace]]
@@ -21,7 +22,7 @@
     (transmitter/start puk tuple-base tuples-received connect-to-follower-fn)
 
     (udp/start-udp-server udp-in udp-out)
-    
+
     ; server ping loop
     (let [ping {:from puk}]
       (go-trace
@@ -34,10 +35,19 @@
 
 (defn start [db]
   (let [^SneerAdmin admin (admin/new-sneer-admin-over-db db)
-        tuple-base (admin/tuple-base-of admin)
+        tuple-base (tuple-base-of admin)
         own-prik (. admin privateKey)
         puk (. own-prik publicKey)]
 
     (start-client puk tuple-base)
 
     (admin/new-sneer-admin own-prik tuple-base)))
+
+(gen-class
+  :name "sneer.main.SneerAdminFactoryServiceProvider"
+  :implements [sneer.admin.SneerAdminFactory$ServiceProvider]
+  :prefix "-service-provider-")
+
+(defn -service-provider-create [_ db]
+  (start db))
+

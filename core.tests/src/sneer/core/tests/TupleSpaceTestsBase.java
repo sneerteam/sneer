@@ -8,7 +8,7 @@ import sneer.PublicKey;
 import sneer.crypto.impl.KeysImpl;
 import sneer.tuples.TupleSpace;
 
-import static sneer.ClojureUtils.var;
+import static sneer.core.tests.ClojureUtils.var;
 
 public class TupleSpaceTestsBase extends TestWithNetwork {
 

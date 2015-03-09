@@ -2,17 +2,14 @@
   (:require
    [sneer.tuple.space :as space]
    [sneer.impl :as impl]
-   [sneer.tuple.persistent-tuple-base :as persistence])
+   [sneer.tuple.protocols :refer :all]
+   [sneer.tuple.persistent-tuple-base :as persistence]
+   [sneer.restartable :refer :all]
+   [sneer.tuple-base-provider :refer :all])
   (:import
     [sneer PrivateKey]
     [sneer.admin SneerAdmin]
     [sneer.crypto.impl KeysImpl]))
-
-(defprotocol Restartable
-  (restart [this]))
-
-(defprotocol TupleBaseProvider
-  (tuple-base-of [provider]))
 
 (defn new-sneer-admin
   [^PrivateKey own-prik tuple-base]
@@ -30,13 +27,13 @@
 
       Restartable
       (restart [this]
-        (new-sneer-admin own-prik (persistence/restarted tuple-base))))))
+        (new-sneer-admin own-prik (restarted tuple-base))))))
 
 (defn- produce-private-key [db]
-  (if-let [existing (second (persistence/db-query db ["SELECT * FROM keys"]))]
+  (if-let [existing (second (db-query db ["SELECT * FROM keys"]))]
     (.createPrivateKey (KeysImpl.) ^bytes (first existing))
     (let [new-key (.createPrivateKey (KeysImpl.))]
-      (persistence/db-insert db :keys {"prik" (.toBytes new-key)})
+      (db-insert db :keys {"prik" (.toBytes new-key)})
       new-key)))
 
 (defn new-sneer-admin-over-db [db]

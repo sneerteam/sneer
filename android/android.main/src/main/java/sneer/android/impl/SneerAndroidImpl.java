@@ -12,6 +12,7 @@ import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import me.sneer.R;
+import sneer.admin.SneerAdminFactory;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
 import sneer.android.ipc.PluginHandler;
@@ -123,11 +124,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 
 	private static SneerAdmin newSneerAdmin(SneerSqliteDatabase db) {
-		try {
-			return (SneerAdmin) sneerAdminFactory().getMethod("create", Object.class).invoke(null, db);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+		return SneerAdminFactory.create(db);
 	}
 
 

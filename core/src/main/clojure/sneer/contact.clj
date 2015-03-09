@@ -2,7 +2,8 @@
   (:require
     [rx.lang.clojure.core :as rx]
     [sneer.rx :refer [atom->observable]]
-    [sneer.party :refer [party-puk name-subject produce-party!]])
+    [sneer.party :refer [party-puk produce-party!]]
+    [sneer.party-impl :refer [name-subject]])
   (:import
     [sneer Contact PublicKey Party]
     [sneer.rx ObservedSubject]

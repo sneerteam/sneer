@@ -2,7 +2,8 @@
   (:require [clojure.core.async :refer [chan go-loop >! <! filter> map>]]
             [sneer.async :refer [go-while-let go-trace sliding-chan dropping-chan]]
             [sneer.commons :refer [produce!]]
-            [sneer.tuple.persistent-tuple-base :as ptb :refer [query-tuples store-tuple get-local-attribute set-local-attribute]])
+            [sneer.tuple.persistent-tuple-base :as ptb]
+            [sneer.tuple.protocols :refer [query-tuples store-tuple get-local-attribute set-local-attribute]])
   (:import [sneer.commons SystemReport]))
 
 (defn- visible-to? [puk tuple]

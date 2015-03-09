@@ -45,6 +45,8 @@ sourceSets {
   }
 }
 
+compileClojure.mustRunAfter compileJava
+
 eclipse.project {
   natures 'ccw.nature'
   buildCommand 'ccw.builder'

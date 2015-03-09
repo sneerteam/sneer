@@ -4,14 +4,12 @@
    [sneer.serialization :refer [roundtrip]]
    [sneer.commons :refer [now reify+ while-let]]
    [clojure.core.async :refer [thread chan <!! close!]]
-   [sneer.tuple.persistent-tuple-base :refer [store-tuple query-tuples last-by-id]])
+   [sneer.tuple.persistent-tuple-base :refer [last-by-id]]
+   [sneer.tuple.protocols :refer [store-tuple query-tuples]]
+   [sneer.tuple.macros :refer :all])
   (:import
    [sneer PrivateKey PublicKey]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]))
-
-(defmacro tuple-getter [g]
-  `(~g [~'this]
-       (get ~'tuple ~(name g))))
 
 (defn reify-tuple [tuple]
   (assert (some? (get tuple "timestamp")))
@@ -26,10 +24,6 @@
 
 (defn payload [^Tuple tuple]
   (.payload tuple))
-
-(defmacro with-field [a]
-  `(~a [~'this ~a]
-       (~'with ~(name a) ~a)))
 
 (def max-size 1000)
 (defn- timestamped [proto-tuple]
