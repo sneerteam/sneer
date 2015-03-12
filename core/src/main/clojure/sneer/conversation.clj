@@ -144,7 +144,15 @@
       (setRead [_ message]
         (assert (-> message own? not))
         (println "Publishing message read tuple.")          ;; Klaus: I suspect this might be happening too often, redundantly for already read messages.
-        (.pub last-read-pub (original-id message))))))
+        (.pub last-read-pub (original-id message)))
+
+      Object
+      (toString [_]
+        (str "Conversation with " party)))))
+
+(defn conversation-timestamp [^Conversation c]
+  (rx/cons (long 0)
+           (.mostRecentMessageTimestamp c)))
 
 (defn- reify-notification [conversations title text subText]
   (reify Conversations$Notification
@@ -182,14 +190,35 @@
         reify-conversation (partial reify-conversation tuple-space (.asObservable menu-items) own-puk)
         produce-conversation (partial produce! reify-conversation convos)
         null nil
-        ignored-conversation (BehaviorSubject/create ^Object null)]
+        ignored-conversation (BehaviorSubject/create ^Object null)
+        conversation-for-contact (fn [^Contact c] (produce-conversation (.party c)))
+        all-conversations (->> contacts
+                               (rx/map (partial mapv conversation-for-contact))
+                               shared-latest)]
 
     (reify Conversations
 
       (all [_]
-        (->> contacts
-             (rx/map (partial mapv (fn [^Contact c] (produce-conversation (.party c)))))
-             shared-latest))
+        (->> all-conversations
+             (rx/do #(println "all:" %))
+             (rx/map
+              (partial mapv (fn [^Conversation c]
+                              (rx/map (partial vector c)
+                                      (conversation-timestamp c)))))
+
+             (switch-map
+              (partial combine-latest
+                       (fn [pairs]
+                         (->> pairs
+                              (sort-by second #(compare %2 %1))
+                              (mapv first)))))
+
+             .distinctUntilChanged
+             (rx/do #(println "SM:" %))
+
+             shared-latest
+
+             (rx/cons [])))
 
       (ofType [_ _type]
         (rx/never))
@@ -199,16 +228,13 @@
 
       (notifications [this]
         (->> (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all))
-                             [(.all this) ignored-conversation])
+                             [all-conversations ignored-conversation])
 
              ;; [Conversation]
-
-
-             (rx/map (fn [conversations]
-                       (->> conversations
-                            (mapv (fn [^Conversation c]
-                                    (->> (.unreadMessages c)
-                                         (rx/map (partial vector c))))))))
+             (rx/map
+              (partial mapv (fn [^Conversation c]
+                              (rx/map (partial vector c)
+                                      (.unreadMessages c)))))
 
              ;; [Observable (Conversation, [Message])]
              (switch-map

@@ -4,13 +4,13 @@
             [rx.lang.clojure.core :as rx]
             [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as base]
-            [sneer.test-util :refer [<!!? observable->chan]]
+            [sneer.test-util :refer [<!!? observable->chan subscribe-chan]]
             [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.rx :refer [observe-for-io]]
             [sneer.keys :refer [->puk create-prik]]
             [sneer.impl :refer [new-sneer]])
   (:import [rx Observable]
-           [sneer Sneer Party Conversations]
+           [sneer Sneer Party Conversation Conversations]
            [sneer.tuples TupleSpace]))
 
 (defn- ->chan [^Observable o]
@@ -31,14 +31,27 @@
             ^Party         neide       (produce-party "neide")
             ^Party         carla       (produce-party "carla")
 
-            all-conversations (->chan (->> (.all subject)
-                                           (rx/map (partial mapv #(.party %)))))]
-        (fact "is initially empty"
-          (<!!? all-conversations) => [])
+            ->chan #(doto (async/chan 10) (subscribe-chan %))
+            poke           #(.. subject (with %) (sendMessage "ha!"))
+            all            (->> (.all subject)
+                                (rx/do #(println "TST:" %))
+                                (rx/map (partial mapv (fn [^Conversation c] (.party c))))
+                                (rx/do #(println "CHA:" %))
+                                ->chan)]
 
-        (fact "a new contact implies a new converstation"
+        (fact "is initially empty"
+          (<!!? all) => [])
+
+        (fact "a new contact implies a new conversation"
           (. sneer addContact "neide" neide)
-          (<!!? all-conversations) => [neide]
+          (<!!? all) => [neide]
 
           (. sneer addContact "carla" carla)
-          (<!!? all-conversations) => [carla neide])))))
+          (<!!? all) => [carla neide])
+
+        (fact "gets sorted by most recent conversation timestamp"
+          (poke neide)
+          (<!!? all) => [neide carla]
+
+          (poke carla)
+          (<!!? all) => [carla neide])))))

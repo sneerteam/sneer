@@ -30,13 +30,13 @@
     ch))
 
 
-(defn subscribe-chan [c observable]
+(defn subscribe-chan [ch observable]
   (rx/subscribe observable
-                #(>!! c %)
+                #(>!! ch %)
                 #(do
                    (println "Rx Error:" %)
-                   (close! c))
-                #(close! c)))
+                   (close! ch))
+                #(close! ch)))
 
 (defn observable->chan [observable]
   (doto (chan)
