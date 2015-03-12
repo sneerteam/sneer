@@ -51,7 +51,7 @@
     <string name="title_activity_system_report">System Report</string>
 
     <!-- This appears on the menu for url viewing -->
-    <string name="title_activity_contact">Contact</string>
+    <string name="title_activity_contact">Sneer Contact</string>
     <string name="action_share">Share Public Key</string>
     <string name="action_add_contact">Add Sovereign Contact</string>
 

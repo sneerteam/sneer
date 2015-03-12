@@ -182,7 +182,10 @@ public class ContactActivity extends Activity {
 		newContact = contact == null;
 
 		if (actionBar == null) return;
-		if (newContact)	actionBar.setTitle("New Contact");
+
+		String title = "Contact";
+		if (newContact)	title = "New Contact";
+		actionBar.setTitle(title);
 	}
 
 
