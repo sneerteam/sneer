@@ -203,18 +203,20 @@
              (rx/do #(println "all:" %))
              (rx/map
               (partial mapv (fn [^Conversation c]
-                              (rx/map (partial vector c)
+                              (rx/map #(do [c %])
                                       (conversation-timestamp c)))))
 
+             (rx/do #(println "BSM:" %))
              (switch-map
               (partial combine-latest
                        (fn [pairs]
+                         (println "PAIRS:" pairs)
                          (->> pairs
                               (sort-by second #(compare %2 %1))
                               (mapv first)))))
 
-             .distinctUntilChanged
-             (rx/do #(println "SM:" %))
+;             .distinctUntilChanged
+             (rx/do #(println "ASM:" %))
 
              shared-latest
 
