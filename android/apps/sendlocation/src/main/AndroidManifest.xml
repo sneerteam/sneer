@@ -32,6 +32,9 @@
                 android:name="sneer:menu-icon"
                 android:resource="@drawable/ic_launcher" />
         </activity>
-    </application>
 
+        <meta-data
+            android:name="sneer:app-type"
+            android:value="plugin"/>
+    </application>
 </manifest>

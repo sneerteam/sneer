@@ -4,10 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -16,9 +21,6 @@ import sneer.android.utils.LogUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.rx.ObservedSubject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PluginMonitor extends BroadcastReceiver {
 
@@ -77,12 +79,24 @@ public class PluginMonitor extends BroadcastReceiver {
 		PluginMonitor.sneer = sneer;
 		LogUtils.info(PluginMonitor.class, "Searching for Sneer plugins...");
 
-//		List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(PACKAGE_INFO_FLAGS);
+		final PackageManager pm = context.getPackageManager();
+		List<ApplicationInfo> apps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 
-//		filterPlugins(Observable.from(packages))
-//			.flatMap(fromActivity(context))
-//			.toList()
-//			.subscribe(pluginsListPublisher());
+		Observable<PackageInfo> packages = Observable.from(apps).filter(new Func1<ApplicationInfo, Boolean>() { @Override public Boolean call(ApplicationInfo ai) {
+			return (ai.metaData != null && ai.metaData.get("sneer:app-type") != null);
+		}}).flatMap(new Func1<ApplicationInfo, Observable<PackageInfo>>() { @Override public Observable<PackageInfo> call(ApplicationInfo applicationInfo) {
+			try {
+				return Observable.just(pm.getPackageInfo(applicationInfo.packageName, PACKAGE_INFO_FLAGS));
+			} catch (NameNotFoundException e) {
+				SystemReport.updateReport(applicationInfo.packageName, "Failed to read application information: " + e.getMessage());
+				return Observable.empty();
+			}
+		}});
+
+		filterPlugins(packages)
+			.flatMap(fromActivity(context))
+			.toList()
+			.subscribe(pluginsListPublisher());
 
 		LogUtils.info(PluginMonitor.class, "Done.");
 	}
