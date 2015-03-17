@@ -5,9 +5,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import me.sneer.R;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import me.sneer.R;
 import sneer.commons.SystemReport;
 
 public class SystemReportActivity extends Activity {

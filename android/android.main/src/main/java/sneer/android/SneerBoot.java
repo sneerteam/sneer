@@ -5,10 +5,11 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import sneer.android.ipc.TupleSpaceService;
-import sneer.android.utils.LogUtils;
 
 import java.util.Calendar;
+
+import sneer.android.ipc.TupleSpaceService;
+import sneer.android.utils.LogUtils;
 
 public class SneerBoot extends BroadcastReceiver {
 

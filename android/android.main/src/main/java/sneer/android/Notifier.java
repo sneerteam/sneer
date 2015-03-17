@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat;
 
 import java.util.List;
 
+import me.sneer.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -20,7 +21,6 @@ import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Conversations;
 import sneer.PublicKey;
-import me.sneer.R;
 import sneer.android.ui.ConversationActivity;
 import sneer.android.ui.MainActivity;
 import sneer.commons.Clock;

@@ -7,12 +7,13 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+
+import java.io.Serializable;
+
 import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
-
-import java.io.Serializable;
 
 public class PluginHandler implements Serializable {
 

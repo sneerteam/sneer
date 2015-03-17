@@ -2,6 +2,7 @@ package sneer.android.utils;
 
 import android.app.Activity;
 import android.content.Intent;
+
 import sneer.Party;
 
 public class Puk {

@@ -12,11 +12,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import me.sneer.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import sneer.Profile;
-import me.sneer.R;
 import sneer.commons.exceptions.FriendlyException;
 
 import static sneer.android.SneerAndroidSingleton.sneer;

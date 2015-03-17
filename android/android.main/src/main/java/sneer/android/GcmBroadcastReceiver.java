@@ -8,13 +8,14 @@ import android.content.Intent;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.util.Date;
 
 import me.sneer.R;
 import sneer.commons.Clock;
 import sneer.commons.Threads;
-
-import java.util.Date;
 
 public class GcmBroadcastReceiver extends BroadcastReceiver {
 

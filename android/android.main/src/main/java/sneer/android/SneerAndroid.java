@@ -1,6 +1,7 @@
 package sneer.android;
 
 import android.app.Activity;
+
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;

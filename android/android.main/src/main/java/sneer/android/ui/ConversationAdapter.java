@@ -17,15 +17,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import rx.functions.Action1;
-import sneer.Message;
-import sneer.Party;
-import me.sneer.R;
-import sneer.android.ui.drawable.TriangleLeftDrawable;
-import sneer.android.ui.drawable.TriangleRightDrawable;
 
 import java.util.List;
 import java.util.Random;
+
+import me.sneer.R;
+import rx.functions.Action1;
+import sneer.Message;
+import sneer.Party;
+import sneer.android.ui.drawable.TriangleLeftDrawable;
+import sneer.android.ui.drawable.TriangleRightDrawable;
 
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findImageView;

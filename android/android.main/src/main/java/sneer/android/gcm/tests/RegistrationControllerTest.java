@@ -3,10 +3,11 @@ package sneer.android.gcm.tests;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
-import sneer.android.gcm.RegistrationController;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import sneer.android.gcm.RegistrationController;
 
 public class RegistrationControllerTest extends AndroidTestCase {
 

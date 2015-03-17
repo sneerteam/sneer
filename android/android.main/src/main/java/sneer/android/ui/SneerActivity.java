@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.Button;
@@ -234,11 +233,6 @@ public class SneerActivity extends Activity {
 			throw new FriendlyException("Failed to read file");
 		}
 		return out.toByteArray();
-	}
-
-
-	public static void log(Activity activity, Object obj) {
-		Log.d(activity.getClass().getSimpleName(), obj.toString());
 	}
 
 }

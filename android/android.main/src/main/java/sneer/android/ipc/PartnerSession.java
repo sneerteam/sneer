@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+
+import java.util.concurrent.atomic.AtomicLong;
+
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -17,9 +20,14 @@ import sneer.commons.Clock;
 import sneer.tuples.Tuple;
 import sneer.tuples.TupleFilter;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import static sneer.android.impl.IPCProtocol.*;
+import static sneer.android.impl.IPCProtocol.ERROR;
+import static sneer.android.impl.IPCProtocol.LABEL;
+import static sneer.android.impl.IPCProtocol.OWN;
+import static sneer.android.impl.IPCProtocol.PARTNER_NAME;
+import static sneer.android.impl.IPCProtocol.PAYLOAD;
+import static sneer.android.impl.IPCProtocol.REPLAY_FINISHED;
+import static sneer.android.impl.IPCProtocol.RESULT_RECEIVER;
+import static sneer.android.impl.IPCProtocol.UNSUBSCRIBE;
 
 public final class PartnerSession implements PluginSession {
 

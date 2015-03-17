@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+
 import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.android.impl.SharedResultReceiver;
@@ -13,7 +14,10 @@ import sneer.android.utils.AndroidUtils;
 import sneer.android.utils.LogUtils;
 import sneer.tuples.Tuple;
 
-import static sneer.android.impl.IPCProtocol.*;
+import static sneer.android.impl.IPCProtocol.JPEG_IMAGE;
+import static sneer.android.impl.IPCProtocol.LABEL;
+import static sneer.android.impl.IPCProtocol.PAYLOAD;
+import static sneer.android.impl.IPCProtocol.RESULT_RECEIVER;
 
 public class SingleMessageSession implements PluginSession {
 

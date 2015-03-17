@@ -6,12 +6,16 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+
+import java.io.File;
+import java.io.IOException;
+
+import me.sneer.R;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
-import me.sneer.R;
 import sneer.admin.SneerAdminFactory;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
@@ -23,9 +27,6 @@ import sneer.android.utils.LogUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.tuples.Tuple;
-
-import java.io.File;
-import java.io.IOException;
 
 import static sneer.android.ui.ConversationActivity.PARTY_PUK;
 

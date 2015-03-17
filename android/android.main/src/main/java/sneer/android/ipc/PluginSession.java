@@ -1,6 +1,7 @@
 package sneer.android.ipc;
 
 import android.content.Intent;
+
 import sneer.PublicKey;
 import sneer.tuples.Tuple;
 
