@@ -2,6 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
 
+  dexOptions {
+    javaMaxHeapSize "4g"
+    jumboMode true
+  }
+
   lintOptions {
     abortOnError false
   }
@@ -35,6 +40,5 @@ dependencies {
   compile 'com.google.android.gms:play-services-base:6+' //For GCM (Google Cloud Messaging)
   compile 'com.netflix.rxjava:rxjava-android:' + external.rx.version
   compile project(':sneer-android-api')
-  compile project(':sneer-java-api')
-  compile(project(':core')) { exclude group: 'org.bouncycastle' }
+  compile 'me.sneer:core:+'
 }

@@ -1,0 +1,10 @@
+include 'sneer-android-api'
+project(':sneer-android-api').projectDir = new File('android-api')
+
+include 'android.main'
+
+include 'apps:sendlocation'
+//        'apps:sendpics',
+//        'apps:voicemessage',
+//        'apps:sendfiles',
+//        'apps:sendvideo'
