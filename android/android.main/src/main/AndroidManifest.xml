@@ -118,7 +118,8 @@
         </activity>
         <activity
             android:name="sneer.android.ui.AddContactActivity"
-            android:label="@string/action_add_contact" >
+            android:label="@string/action_add_contact"
+            android:theme="@android:style/Theme.Holo.Light.Dialog">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
