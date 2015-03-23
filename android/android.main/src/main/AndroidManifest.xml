@@ -112,7 +112,7 @@
 
                 <data
                     android:host="sneer.me"
-                    android:pathPrefix="/public-key*/invite"
+                    android:pathPrefix="/public-key"
                     android:scheme="http" />
             </intent-filter>
         </activity>
