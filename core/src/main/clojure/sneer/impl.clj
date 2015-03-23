@@ -5,8 +5,9 @@
    [sneer.party :refer [party-puk reify-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import
-   [sneer Sneer PrivateKey]
-   [sneer.tuples TupleSpace]))
+    [sneer Sneer PrivateKey]
+    [sneer.tuples TupleSpace]
+    (java.util Random)))
 
 (defn new-sneer [^TupleSpace tuple-space ^PrivateKey own-prik]
   (let [own-puk (.publicKey own-prik)
@@ -15,7 +16,8 @@
         contacts-state (create-contacts-state tuple-space own-puk puk->party)
         contacts (get-contacts contacts-state)
         conversations (reify-conversations own-puk tuple-space contacts)
-        self (reify-party own-puk)]
+        self (reify-party own-puk)
+        invites []]
 
     (reify Sneer
       (self [_] self)
@@ -42,4 +44,16 @@
         tuple-space)
 
       (conversations [_]
-        conversations))))
+        conversations)
+
+      (invites [_]
+        ;; TODO
+        invites)
+
+      (findInvite [_ party]
+        ;; TODO:
+        #_(find-invite party))
+
+      (generateContactInvite [_]
+        (let [^Random rnd (Random.)]
+          (.nextLong rnd))))))

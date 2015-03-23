@@ -1,8 +1,6 @@
 package sneer.android.ui;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +21,6 @@ import sneer.Party;
 import sneer.Profile;
 import sneer.android.Notifier;
 import sneer.android.SneerApp;
-import sneer.android.utils.Puk;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
@@ -50,7 +47,7 @@ public class MainActivity extends SneerActivity {
 
 		Button addContact = (Button)findViewById(R.id.image_button_add_contact);
 		addContact.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
-			openSharePukDialog();
+			addContact();
 		}});
 
         ((SneerApp)getApplication()).checkPlayServices(this);
@@ -96,7 +93,7 @@ public class MainActivity extends SneerActivity {
 			navigateTo(ProfileActivity.class);
 			break;
 		case R.id.action_add_contact:
-			openSharePukDialog();
+			addContact();
 			break;
 		case R.id.action_search_for_apps:
 			Intent viewIntent =
@@ -112,14 +109,8 @@ public class MainActivity extends SneerActivity {
 	}
 
 
-	private void openSharePukDialog() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		alert.setMessage("To add contacts, send them your public key and they must send you theirs.")
-			.setIcon(android.R.drawable.ic_dialog_info)
-			.setPositiveButton("Send Public Key", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {
-				Puk.sharePublicKey(MainActivity.this, self, true, null);
-			}})
-			.show();
+	private void addContact() {
+		navigateTo(AddContactActivity.class);
 	}
 
 

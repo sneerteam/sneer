@@ -7,28 +7,25 @@ import sneer.Party;
 
 public class Puk {
 
-	public static void sharePublicKey(Activity activity, Party party, boolean self, String nickname) {
+	public static void shareOwnPublicKey(Activity activity, Party self, long inviteCode, String receiver) {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
-		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, (self ? "My" : nickname + "'s") + " Sneer Public Key");
+		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "My Sneer Public Key");
 		sharingIntent.putExtra(Intent.EXTRA_TEXT,
 				"\n\nIf you don't have the Sneer app, install it using the Play Store: https://play.google.com/store/apps/details?id=me.sneer\n\n" +
-				"Then, tap to add " + (self ? "me" : nickname) + " as a Sneer contact: " +
-				buildSneerUri(party.publicKey().current().toHex()));
+				"Then, tap to add me as a Sneer contact: " +
+				buildSneerUri(self.publicKey().current().toHex(), inviteCode));
 
-		String title = self
-				? "Share Your Public Key"
-				: "Share " + nickname  + "'s Public Key";
+		String title = "Share Your Public Key with " + receiver;
 		Intent chooser = Intent.createChooser(sharingIntent, title);
 
-		if (sharingIntent.resolveActivity(activity.getPackageManager()) != null) {
+		if (sharingIntent.resolveActivity(activity.getPackageManager()) != null)
 		    activity.startActivity(chooser);
-		}
 	}
 
 
-	public static String buildSneerUri(String puk) {
-		return "http://sneer.me/public-key?" + puk;
+	public static String buildSneerUri(String puk, long inviteCode) {
+		return "http://sneer.me/public-key?" + puk + "&invite=" + inviteCode;
 	}
 
 }

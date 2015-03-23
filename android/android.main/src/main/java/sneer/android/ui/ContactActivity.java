@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,13 +24,11 @@ import sneer.Profile;
 import sneer.PublicKey;
 import sneer.commons.exceptions.FriendlyException;
 
-import static android.support.v4.app.NavUtils.navigateUpFromSameTask;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static sneer.android.SneerAndroidSingleton.admin;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.plug;
-import static sneer.android.utils.Puk.sharePublicKey;
 
 public class ContactActivity extends Activity {
 
@@ -195,36 +191,13 @@ public class ContactActivity extends Activity {
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (ownNameSubscription != null) ownNameSubscription.unsubscribe();
-				if (preferredNicknameSubscription != null)
-					preferredNicknameSubscription.unsubscribe();
+				if (preferredNicknameSubscription != null) preferredNicknameSubscription.unsubscribe();
 				nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), editText.getText().toString()));
 			}
 
 			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
 			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 		});
-	}
-
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.profile, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				navigateUpFromSameTask(this);
-				return true;
-
-			case R.id.action_share:
-				sharePublicKey(ContactActivity.this, party, false, sneer().findContact(party).nickname().current());
-				break;
-		}
-		return true;
 	}
 
 }
