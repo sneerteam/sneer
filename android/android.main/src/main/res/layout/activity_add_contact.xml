@@ -26,25 +26,15 @@
             android:textAppearance="@android:style/TextAppearance.Large">
         </EditText>
 
-        <TextView
-            android:id="@+id/lbl_not_connected_yet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/nickname"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp"
-            android:text="@string/add_contact_not_connected_yet"
-            android:visibility="gone"/>
-
         <Button
             android:id="@+id/btn_send_invite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lbl_not_connected_yet"
+            android:layout_below="@+id/nickname"
             android:padding="5dp"
-            android:text="@string/add_contact_send_invite"
-            android:visibility="gone" />
+            android:enabled="false"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/add_contact_send_invite" />
     </RelativeLayout>
 
 </RelativeLayout>

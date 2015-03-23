@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import me.sneer.R;
 import sneer.Party;
@@ -20,7 +19,6 @@ public class AddContactActivity extends Activity {
 	private Party party;
 
 	private EditText nicknameEdit;
-	private TextView txtNotConnectedYet;
 	private Button btnSendInvite;
 
 	private String nickname;
@@ -31,7 +29,6 @@ public class AddContactActivity extends Activity {
 		setContentView(R.layout.activity_add_contact);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
-		txtNotConnectedYet = (TextView) findViewById(R.id.lbl_not_connected_yet);
 		btnSendInvite = (Button) findViewById(R.id.btn_send_invite);
 		btnSendInvite.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -53,18 +50,16 @@ public class AddContactActivity extends Activity {
 				nickname = nicknameEdit.getText().toString();
 				String error = sneer().problemWithNewNickname(sneer().self().publicKey().current(), nickname);
 
-				txtNotConnectedYet.setVisibility(View.GONE);
-				btnSendInvite.setVisibility(View.GONE);
+				btnSendInvite.setEnabled(false);
 
 				if (nickname.length() == 0) return;
 
 				if (error != null) {
-					editText.setError("Already connected");
+					editText.setError(error);
 					return;
 				}
 
-				txtNotConnectedYet.setVisibility(View.VISIBLE);
-				btnSendInvite.setVisibility(View.VISIBLE);
+				btnSendInvite.setEnabled(true);
 			}
 
 			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
