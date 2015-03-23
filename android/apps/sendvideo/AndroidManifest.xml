@@ -35,9 +35,10 @@
             <meta-data android:name="sneer:tuple-type" android:value="video" />
             <meta-data android:name="sneer:menu-icon" android:resource="@drawable/ic_launcher" />
         </activity>
+        
         <meta-data
-            android:name="sneer:app-type"
-            android:value="plugin"/>
+            android:name="SneerApp"
+            android:value=""/>
     </application>
 
 </manifest>

@@ -83,7 +83,7 @@ public class PluginMonitor extends BroadcastReceiver {
 		List<ApplicationInfo> apps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 
 		Observable<PackageInfo> packages = Observable.from(apps).filter(new Func1<ApplicationInfo, Boolean>() { @Override public Boolean call(ApplicationInfo ai) {
-			return (ai.metaData != null && ai.metaData.get("sneer:app-type") != null);
+			return (ai.metaData != null && ai.metaData.get("SneerApp") != null);
 		}}).flatMap(new Func1<ApplicationInfo, Observable<PackageInfo>>() { @Override public Observable<PackageInfo> call(ApplicationInfo applicationInfo) {
 			try {
 				return Observable.just(pm.getPackageInfo(applicationInfo.packageName, PACKAGE_INFO_FLAGS));

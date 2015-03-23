@@ -34,7 +34,7 @@
         </activity>
 
         <meta-data
-            android:name="sneer:app-type"
-            android:value="plugin"/>
+            android:name="SneerApp"
+            android:value=""/>
     </application>
 </manifest>
