@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.Collection;
@@ -44,11 +43,6 @@ public class MainActivity extends SneerActivity {
 		startProfileActivityIfFirstTime();
 
 		makeConversationList();
-
-		Button addContact = (Button)findViewById(R.id.image_button_add_contact);
-		addContact.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
-			addContact();
-		}});
 
         ((SneerApp)getApplication()).checkPlayServices(this);
 	}
@@ -93,7 +87,7 @@ public class MainActivity extends SneerActivity {
 			navigateTo(ProfileActivity.class);
 			break;
 		case R.id.action_add_contact:
-			addContact();
+			navigateTo(AddContactActivity.class);
 			break;
 		case R.id.action_search_for_apps:
 			Intent viewIntent =
@@ -106,11 +100,6 @@ public class MainActivity extends SneerActivity {
 		}
 
 		return true;
-	}
-
-
-	private void addContact() {
-		navigateTo(AddContactActivity.class);
 	}
 
 

@@ -12,13 +12,4 @@
         android:layout_weight="1"
         android:padding="5dp" />
 
-    <Button
-        android:id="@+id/image_button_add_contact"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:background="#eee"
-        style="?android:attr/buttonBarButtonStyle"
-        android:text="Add Sovereign Contact" />
-
 </LinearLayout>
