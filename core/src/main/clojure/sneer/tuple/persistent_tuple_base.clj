@@ -20,17 +20,6 @@
     (query-tuples tuple-base criteria tuples)
     (async/into [] tuples)))
 
-(extend-protocol Database
-  sneer.admin.Database
-  (db-create-table [this table columns]
-    (.createTable this (name table) columns))
-  (db-create-index [this table index-name column-names unique?]
-    (.createIndex this (name table) (name index-name) (mapv name column-names) unique?))
-  (db-insert [this table row]
-    (.insert this (name table) row))
-  (db-query [this sql-and-params]
-    (.query this (first sql-and-params) (subvec sql-and-params 1))))
-
 (defn- create-tuple-table [db]
   (db-create-table
     db :tuple

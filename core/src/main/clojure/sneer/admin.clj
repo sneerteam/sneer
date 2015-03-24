@@ -36,7 +36,22 @@
       (db-insert db :keys {"prik" (.toBytes new-key)})
       new-key)))
 
+(defn- ensure-protocol [db]
+  (if (instance? sneer.admin.Database db)
+    (let [^sneer.admin.Database db db]
+      (reify Database
+        (db-create-table [this table columns]
+          (.createTable db (name table) columns))
+        (db-create-index [this table index-name column-names unique?]
+          (.createIndex db (name table) (name index-name) (mapv name column-names) unique?))
+        (db-insert [this table row]
+          (.insert db (name table) row))
+        (db-query [this sql-and-params]
+          (.query db (first sql-and-params) (subvec sql-and-params 1)))))
+    db))
+
 (defn new-sneer-admin-over-db [db]
-  (let [tuple-base (persistence/create db)
+  (let [db (ensure-protocol db)
+        tuple-base (persistence/create db)
         own-prik (produce-private-key db)]
     (new-sneer-admin own-prik tuple-base)))
