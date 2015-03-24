@@ -19,42 +19,44 @@
   :skummet-skip-vars [
                       ;"#'sneer.async/go-while-let"
                       ]
-                                        ;  :aot :all
-  :aot [
-    sneer.main
-;    sneer.tuple.protocols
-    sneer.tuple.persistent-tuple-base
-    sneer.tuple.space
-    sneer.tuple.queue
-    sneer.tuple.tuple-transmitter
-    sneer.commons
-    sneer.rx
-    sneer.rx-macros
-    sneer.admin
-    sneer.contact
-    sneer.impl
-    sneer.conversation
-    sneer.impl
-    sneer.keys
-    sneer.party
-    sneer.profile
-    sneer.serialization
-    sneer.networking.client
-    sneer.networking.udp
-    sneer.networking.client
-    #"clojure.+"
-  ]
 
-  :uberjar-exclusions [
-    #"META-INF/DUMMY.SF"
-    #"^org/(apache|bouncycastle|json)"
-    #"^rx/(exceptions|functions|internal|observables|observers|plugins|schedulers|subjects|subscriptions)"
-    #"^rx/Notification"
-    #"^rx/Observ"
-    #"^rx/Produc"
-    #"^rx/Sched"
-    #"^rx/Subs"
-  ]
+  :aot [sneer.restartable
+        sneer.party-impl
+        sneer.commons
+        sneer.tuple.protocols
+        sneer.rx-macros
+        sneer.rx
+        sneer.async
+        sneer.tuple-base-provider
+        sneer.tuple.persistent-tuple-base
+        sneer.tuple.space
+        sneer.tuple.queue
+        sneer.tuple.tuple-transmitter
+        sneer.admin
+        sneer.contact
+        sneer.conversation
+        sneer.impl
+        sneer.keys
+        sneer.party
+        sneer.profile
+        sneer.serialization
+        sneer.networking.udp
+        sneer.networking.client
+        sneer.main
+        ]
+
+  :uberjar-exclusions [#"META-INF/DUMMY.SF"
+                       #"^org/(apache|bouncycastle|json|msgpack|objectweb)"
+                       #"^javassist"
+                       #"^clojure/test/"
+                       #"^com/fasterxml"
+                       #"^rx/(exceptions|functions|internal|observables|observers|plugins|schedulers|subjects|subscriptions)/"
+                       #"^rx/Notification"
+                       #"^rx/Observ"
+                       #"^rx/Produc"
+                       #"^rx/Sched"
+                       #"^rx/Subs"]
+
   :profiles {:default []}
 ;  :profiles  {:dev {:plugins [[cider/cider-nrepl "0.8.2"][refactor-nrepl "0.2.2"]]}}
   :plugins [;[lein-midje "3.0.0"]
