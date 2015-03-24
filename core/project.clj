@@ -3,22 +3,19 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [
-                 [org.skummet/clojure "1.7.0-alpha5-r1"]
+  :dependencies [[org.skummet/clojure "1.7.0-alpha5-r1"]
                  [me.sneer/sneer-java-api "0.1.5" :exclusions [org.clojure/clojure]]
                  [me.sneer/crypto "0.1.5" :exclusions [org.clojure/clojure]]
                  [org.clojure/core.match "0.2.2" :exclusions [org.clojure/clojure]]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha" :exclusions [org.clojure/clojure]]
                  [com.cognitect/transit-clj "0.8.259" :exclusions [org.clojure/clojure ]]
-;                 [midje "1.6.3" :exclusions [org.clojure/clojure]]
                  [com.netflix.rxjava/rxjava-clojure "0.20.7" :exclusions [org.clojure/clojure]]
                  [org.clojure/java.jdbc "0.3.6" :exclusions [org.clojure/clojure]]
-                 ;[org.xerial/sqlite-jdbc "3.8.6" :exclusions [org.clojure/clojure]]
+                                        ;[midje "1.6.3" :exclusions [org.clojure/clojure]]
+                                        ;[org.xerial/sqlite-jdbc "3.8.6" :exclusions [org.clojure/clojure]]
                  ]
 
-  :skummet-skip-vars [
-                      ;"#'sneer.async/go-while-let"
-                      ]
+  :skummet-skip-vars []
 
   :aot [sneer.restartable
         sneer.party-impl
@@ -57,9 +54,10 @@
                        #"^rx/Sched"
                        #"^rx/Subs"]
 
+  :jvm-opts ["-Dclojure.compile.ignore-lean-classes=true"]
   :profiles {:default []}
-;  :profiles  {:dev {:plugins [[cider/cider-nrepl "0.8.2"][refactor-nrepl "0.2.2"]]}}
-  :plugins [;[lein-midje "3.0.0"]
+                                        ;  :profiles  {:dev {:plugins [[cider/cider-nrepl "0.8.2"][refactor-nrepl "0.2.2"]]}}
+  :plugins [                            ;[lein-midje "3.0.0"]
             [org.skummet/lein-skummet "0.2.1"]]
   :source-paths ["src/main/clojure"]
   :java-source-paths ["src/main/java"]
