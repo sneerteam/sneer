@@ -56,7 +56,6 @@ dependencies {
   compile 'org.clojure:clojure:1.6.0'
   compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
   compile external['clojure.core.match']
-  compile 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version
   compile('com.cognitect:transit-clj:0.8.259') {
     exclude group: 'org.msgpack', module: 'msgpack'
     exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'

@@ -11,7 +11,6 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [com.cognitect/transit-clj "0.8.259"]
                  [com.netflix.rxjava/rxjava-core "0.20.7"]
-                 [com.netflix.rxjava/rxjava-clojure "0.21.0"]
                  [org.clojure/java.jdbc "0.3.6"]
                                         ;[midje "1.6.3"]
                                         ;[org.xerial/sqlite-jdbc "3.8.6"]
