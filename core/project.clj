@@ -3,21 +3,33 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.skummet/clojure "1.7.0-alpha5-r1"]
-                 [me.sneer/sneer-java-api "0.1.5" :exclusions [org.clojure/clojure]]
-                 [me.sneer/crypto "0.1.5" :exclusions [org.clojure/clojure]]
-                 [org.clojure/core.match "0.2.2" :exclusions [org.clojure/clojure]]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha" :exclusions [org.clojure/clojure]]
-                 [com.cognitect/transit-clj "0.8.259" :exclusions [org.clojure/clojure ]]
-                 [com.netflix.rxjava/rxjava-clojure "0.20.7" :exclusions [org.clojure/clojure]]
-                 [org.clojure/java.jdbc "0.3.6" :exclusions [org.clojure/clojure]]
-                                        ;[midje "1.6.3" :exclusions [org.clojure/clojure]]
-                                        ;[org.xerial/sqlite-jdbc "3.8.6" :exclusions [org.clojure/clojure]]
+  :dependencies [
+                 [org.skummet/clojure "1.7.0-alpha5-r1"]
+                 [me.sneer/sneer-java-api "0.1.5"]
+                 [me.sneer/crypto "0.1.5"]
+                 [org.clojure/core.match "0.2.2"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [com.cognitect/transit-clj "0.8.259"]
+                 [com.netflix.rxjava/rxjava-core "0.20.7"]
+                 [com.netflix.rxjava/rxjava-clojure "0.21.0"]
+                 [org.clojure/java.jdbc "0.3.6"]
+                                        ;[midje "1.6.3"]
+                                        ;[org.xerial/sqlite-jdbc "3.8.6"]
                  ]
+
+
+  :exclusions [[org.clojure/clojure]]
+
+  :omit-source true
+
+  :global-vars {clojure.core/*warn-on-reflection* true}
 
   :skummet-skip-vars []
 
-  :aot [sneer.restartable
+  :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
+
+  :aot [
+        sneer.restartable
         sneer.party-impl
         sneer.commons
         sneer.tuple.protocols
@@ -41,18 +53,9 @@
         sneer.networking.client
         sneer.main
         ]
-
   :uberjar-exclusions [#"META-INF/DUMMY.SF"
                        #"^org/(apache|bouncycastle|json|msgpack|objectweb)"
-                       #"^javassist"
-                       #"^clojure/test/"
-                       #"^com/fasterxml"
-                       #"^rx/(exceptions|functions|internal|observables|observers|plugins|schedulers|subjects|subscriptions)/"
-                       #"^rx/Notification"
-                       #"^rx/Observ"
-                       #"^rx/Produc"
-                       #"^rx/Sched"
-                       #"^rx/Subs"]
+                       #"^clojure/test/"]
 
   :jvm-opts ["-Dclojure.compile.ignore-lean-classes=true"]
   :profiles {:default []}
