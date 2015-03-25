@@ -74,3 +74,26 @@ uploadArchives {
     mavenLocal()
   }
 }
+
+task leinSkummet(type: Exec) {
+  inputs.source sourceSets.main.clojure
+  outputs.dir 'target'
+  executable 'lein'
+  args 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
+}
+
+configurations {
+  skummet {
+    extendsFrom archives
+  }
+}
+
+artifacts {
+  skummet(file("target/core-$version-standalone.jar")) {
+     builtBy leinSkummet
+  }
+}
+
+uploadSkummet {
+  repositories { mavenLocal() }
+}
