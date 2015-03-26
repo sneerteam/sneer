@@ -7,30 +7,29 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault.Dialog">
         <activity
             android:name=".SendLocationActivity"
             android:excludeFromRecents="true"
-            android:label="Searching for GPS...">
+            android:label="Location">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW" />  <!-- Eliminate? -->
             </intent-filter>
 
             <meta-data
                 android:name="sneer:plugin-type"
-                android:value="MESSAGE/COMPOSE" />
+                android:value="MESSAGE/COMPOSE" />  <!-- Eliminate? -->
             <meta-data
                 android:name="sneer:tuple-type"
-                android:value="location" />
+                android:value="location" />  <!-- Eliminate? -->
             <meta-data
                 android:name="sneer:menu-caption"
-                android:value="Location" />
+                android:value="Location" />  <!-- Eliminate: Use Activity Label or App Label? -->
             <meta-data
                 android:name="sneer:menu-icon"
-                android:resource="@drawable/ic_launcher" />
+                android:resource="@drawable/ic_launcher" />  <!-- Eliminate: Use app icon declared above? -->
         </activity>
 
         <meta-data
