@@ -86,16 +86,15 @@ public class ContactActivity extends Activity {
 
 		setContentView(R.layout.activity_contact);
 
+		actionBar = getActionBar();
+		if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
+
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
 		preferredNicknameView = (TextView) findViewById(R.id.preferredNickName);
 		selfieImage = (ImageView) findViewById(R.id.selfie);
 		countryView = (TextView) findViewById(R.id.country);
 		cityView = (TextView) findViewById(R.id.city);
-
-		actionBar = getActionBar();
-		if (actionBar != null)
-			actionBar.setDisplayHomeAsUpEnabled(true);
 
 		loadContact();
 		plugProfile();
