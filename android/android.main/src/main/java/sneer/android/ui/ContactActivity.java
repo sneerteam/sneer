@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
@@ -46,8 +47,10 @@ public class ContactActivity extends Activity {
 	private TextView preferredNicknameView;
 	private TextView countryView;
 	private TextView cityView;
-	private Party party;
+	private Party party = null;
 	private PublicKey partyPuk;
+	private String inviteCode;
+	private Intent intent;
 	private Contact contact;
 	private boolean isOwn;
 	private Subscription ownNameSubscription;
@@ -59,9 +62,28 @@ public class ContactActivity extends Activity {
 
 		if (!sneerAndroid().checkOnCreate(this)) return;
 
-		setContentView(R.layout.activity_contact);
+		intent = getIntent();
 
-		actionBar = getActionBar();
+		if (!validPuk()) {
+			toast("Invalid public key");
+			finish();
+			return;
+		}
+
+		if (!validInviteCode()) {
+			toast("Invalid invite code");
+			finish();
+			return;
+		}
+
+		if (partyPuk.toHex().equals(sneer().self().publicKey().current().toHex())) {
+			isOwn = true;
+			startActivity(new Intent().setClass(this, ProfileActivity.class));
+			finish();
+			return;
+		}
+
+		setContentView(R.layout.activity_contact);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		fullNameView = (TextView) findViewById(R.id.fullName);
@@ -70,44 +92,61 @@ public class ContactActivity extends Activity {
 		countryView = (TextView) findViewById(R.id.country);
 		cityView = (TextView) findViewById(R.id.city);
 
-		load();
+		actionBar = getActionBar();
+		if (actionBar != null)
+			actionBar.setDisplayHomeAsUpEnabled(true);
 
+		loadContact();
+		plugProfile();
 		hidePreferredNicknameWhenNeeded();
 		validationOnTextChanged(nicknameEdit);
 	}
 
 
-	private void load() {
-		final Intent intent = getIntent();
-
+	private boolean validPuk() {
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+			String[] query = intent.getData().getQuery().split("&invite=");
 			try {
-				if (actionBar != null)
-					actionBar.setDisplayHomeAsUpEnabled(true);
-				loadContact(admin().keys().createPublicKey(intent.getData().getQuery()));
+				partyPuk = admin().keys().createPublicKey(query[0]);
 			} catch (RuntimeException e) {
-				toast("Invalid public key");
-				finish();
-				return;
+				return false;
 			}
 		} else {
-			loadContact(null);
+			Bundle extras = intent.getExtras();
+			partyPuk = (PublicKey) extras.getSerializable(PARTY_PUK);
 		}
-
-		if (partyPuk.toHex().equals(sneer().self().publicKey().current().toHex())) {
-			isOwn = true;
-			startActivity(new Intent().setClass(this, ProfileActivity.class));
-			finish();
-		} else {
-			plugProfile();
-		}
+		return true;
 	}
 
 
-	private PublicKey partyPuk() {
-		Bundle extras = getIntent().getExtras();
-		return (PublicKey) extras.getSerializable(PARTY_PUK);
+	private boolean validInviteCode() {
+		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+			String[] query = intent.getData().getQuery().split("&invite=");
+
+			inviteCode = "";
+			if (query.length > 1)
+				inviteCode = query[1];
+
+			if (TextUtils.isEmpty(inviteCode))
+				return false;
+
+			// TODO: check on database
+		}
+		return true;
 	}
+
+
+	private void loadContact() {
+		party = sneer().produceParty(partyPuk);
+
+		profile = sneer().profileFor(party);
+		contact = sneer().findContact(party);
+		newContact = contact == null;
+
+		if (actionBar == null) return;
+		actionBar.setTitle(newContact ? "New Contact" : "Contact");
+	}
+
 
 	private void plugProfile() {
 		if (newContact) {
@@ -125,50 +164,6 @@ public class ContactActivity extends Activity {
 		plug(countryView, profile.country());
 		plug(cityView, profile.city());
 		plug(selfieImage, profile.selfie());
-	}
-
-
-	private void loadContact(PublicKey puk) {
-		partyPuk = puk == null
-				? partyPuk()
-				: puk;
-
-		party = sneer().produceParty(partyPuk);
-
-		profile = sneer().profileFor(party);
-		contact = sneer().findContact(party);
-		newContact = contact == null;
-
-		if (actionBar == null) return;
-		actionBar.setTitle(newContact ? "New Contact" : "Contact");
-	}
-
-
-	private void saveContact() {
-		final String nickName = nicknameEdit.getText().toString();
-		try {
-			if (newContact)
-				sneer().addContact(nickName, party);
-
-			if (!nickName.equals(getIntent().getExtras().getString(CURRENT_NICKNAME)))
-				sneer().findContact(party).setNickname(nickName);
-		} catch (FriendlyException e) {
-			toast(e.getMessage());
-		}
-		toast("Contact saved");
-	}
-
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		if (isOwn) return;
-		saveContact();
-	}
-
-
-	private void toast(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
 
@@ -198,6 +193,34 @@ public class ContactActivity extends Activity {
 			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
 			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 		});
+	}
+
+
+	private void saveContact() {
+		final String nickName = nicknameEdit.getText().toString();
+		try {
+			if (newContact)
+				sneer().addContact(nickName, party);
+
+			if (!nickName.equals(intent.getExtras().getString(CURRENT_NICKNAME)))
+				sneer().findContact(party).setNickname(nickName);
+		} catch (FriendlyException e) {
+			toast(e.getMessage());
+		}
+		toast("Contact saved");
+	}
+
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (isOwn) return;
+		saveContact();
+	}
+
+
+	private void toast(String message) {
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
 }
