@@ -3,7 +3,7 @@
             [sneer.async :refer [go-trace]]
             [clojure.core.async :as async :refer [>! <! >!! <!!]]
             [sneer.commons :refer :all])
-  (:import [java.net DatagramPacket DatagramSocket SocketAddress InetAddress InetSocketAddress SocketException]
+  (:import [java.net DatagramPacket DatagramSocket]
            [sneer.commons SystemReport]))
 
 (def MTU 1400)  ; Anecdotal suggestions on the web.
