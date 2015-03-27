@@ -6,7 +6,7 @@
                  [http-kit "2.1.16"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [org.clojure/core.match "0.2.1"]
-                 [org.clojure/clojure "1.6.0"]
+                 [org.clojure/clojure "1.7.0-alpha5"]
                  [compojure "1.3.1"]
                  [ring/ring-core "1.3.2"]]
   :main ^:skip-aot sneer.server.main
