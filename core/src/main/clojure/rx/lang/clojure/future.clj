@@ -6,7 +6,6 @@
             [rx.lang.clojure.core :as rx]))
 
 (def ^:private -ns- *ns*)
-(set! *warn-on-reflection* true)
 
 (defn future*
   "Exerimental/Possibly a bad idea

@@ -3,7 +3,6 @@
   (:require [rx.lang.clojure.core :as rx]))
 
 (def ^:private -ns- *ns*)
-(set! *warn-on-reflection* true)
 
 (defn chunk
   "EXTREMELY EXPERIMENTAL AND SUBJECT TO CHANGE OR DELETION

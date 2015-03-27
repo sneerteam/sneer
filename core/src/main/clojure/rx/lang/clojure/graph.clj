@@ -5,7 +5,6 @@
   (:require [clojure.set :as set]))
 
 (def ^:private -ns- *ns*)
-(set! *warn-on-reflection* true)
 
 (defn ^:private ->let-o*-observable
   [^rx.Observable o n name]

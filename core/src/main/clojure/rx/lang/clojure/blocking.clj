@@ -11,7 +11,6 @@
            [rx.observables BlockingObservable]))
 
 (def ^:private -ns- *ns*)
-(set! *warn-on-reflection* true)
 
 (defmacro ^:private with-ex-unwrap
   "The blocking ops wrap errors stuff in RuntimeException because of stupid Java.

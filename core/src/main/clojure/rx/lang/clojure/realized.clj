@@ -2,7 +2,6 @@
   (:require [rx.lang.clojure.interop :as iop]))
 
 (def ^:private -ns- *ns*)
-(set! *warn-on-reflection* true)
 
 (defrecord ^:private PostProc [o f])
 

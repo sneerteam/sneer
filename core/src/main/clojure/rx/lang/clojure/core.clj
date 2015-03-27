@@ -24,8 +24,6 @@
            [rx.subscriptions Subscriptions]
            [rx.functions Action0 Action1 Func0 Func1 Func2]))
 
-(set! *warn-on-reflection* true)
-
 (declare concat* concat map* map map-indexed reduce take take-while)
 
 (defn ^Func1 fn->predicate

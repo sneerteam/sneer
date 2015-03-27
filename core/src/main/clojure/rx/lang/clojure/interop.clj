@@ -3,7 +3,6 @@
   (:refer-clojure :exclude [fn]))
 
 (def ^:private -ns- *ns*)
-(set! *warn-on-reflection* true)
 
 (defmacro ^:private reify-callable
   "Reify a bunch of Callable-like interfaces
