@@ -44,3 +44,7 @@ dependencies {
   compile project(':sneer-android-api')
   compile 'me.sneer:core:+'
 }
+
+repositories {
+  ivy { url '../../artifacts' }
+}

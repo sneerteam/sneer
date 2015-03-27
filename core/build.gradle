@@ -68,12 +68,6 @@ dependencies {
   optional 'org.xerial:sqlite-jdbc:3.8.6'
 }
 
-uploadArchives {
-  repositories {
-    mavenLocal()
-  }
-}
-
 task leinSkummet(type: Exec) {
   inputs.source sourceSets.main.clojure
   outputs.dir 'target'
@@ -81,32 +75,43 @@ task leinSkummet(type: Exec) {
   args 'with-profile', 'lean', 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
 }
 
+task skummetJar(type: Copy, dependsOn: leinSkummet) {
+  from('target') {
+    include "core-$version-standalone.jar"
+  }
+  into "$buildDir/skummet"
+  rename { fileName ->
+    fileName.replace("-standalone", "")
+  }
+}
+
 task leinClean(type: Exec) {
   executable 'lein'
   args 'clean'
 }
 
-def userHome = System.properties['user.home']
-
-task deleteCoreFromMavenLocal(type: Delete) {
-  delete "$userHome/.m2/repository/me/sneer/core"
-}
-
 clean.dependsOn leinClean
 
-configurations {
-  skummet {
-    extendsFrom archives
+apply plugin: 'ivy-publish'
+
+def artifacts = file('../artifacts')
+
+publishing {
+  repositories {
+    ivy { url artifacts }
+  }
+  publications {
+    jar(IvyPublication) {
+      artifact(file("$buildDir/skummet/core-${version}.jar")) {
+        builtBy skummetJar
+      }
+    }
   }
 }
 
-artifacts {
-  skummet(file("target/core-$version-standalone.jar")) {
-     builtBy leinSkummet
+uploadArchives {
+  repositories {
+    ivy { url artifacts }
   }
 }
 
-uploadSkummet {
-  repositories { mavenLocal() }
-  dependsOn deleteCoreFromMavenLocal
-}
