@@ -86,6 +86,12 @@ task leinClean(type: Exec) {
   args 'clean'
 }
 
+def userHome = System.properties['user.home']
+
+task deleteCoreFromMavenLocal(type: Delete) {
+  delete "$userHome/.m2/repository/me/sneer/core"
+}
+
 clean.dependsOn leinClean
 
 configurations {
@@ -102,4 +108,5 @@ artifacts {
 
 uploadSkummet {
   repositories { mavenLocal() }
+  dependsOn deleteCoreFromMavenLocal
 }
