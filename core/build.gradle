@@ -81,6 +81,13 @@ task leinSkummet(type: Exec) {
   args 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
 }
 
+task leinClean(type: Exec) {
+  executable 'lein'
+  args 'clean'
+}
+
+clean.dependsOn leinClean
+
 configurations {
   skummet {
     extendsFrom archives
