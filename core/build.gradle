@@ -78,7 +78,7 @@ task leinSkummet(type: Exec) {
   inputs.source sourceSets.main.clojure
   outputs.dir 'target'
   executable 'lein'
-  args 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
+  args 'with-profile', 'lean', 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
 }
 
 task leinClean(type: Exec) {
