@@ -42,9 +42,21 @@ dependencies {
     exclude group: 'com.netflix.rxjava'
   }
   compile project(':sneer-android-api')
-  compile 'me.sneer:core:+'
 }
 
-repositories {
-  ivy { url '../../artifacts' }
+def skummetArtifactsDir = '../../skummet-artifacts'
+if (file("$skummetArtifactsDir/me.sneer/core").exists()) {
+  println "skummet jar detected!"
+  dependencies {
+    compile 'me.sneer:core:+:skummet'
+  }
+  repositories {
+    ivy { url skummetArtifactsDir }
+  }
+  repositories.remove(
+    repositories.getByName('MavenLocal'))
+} else {
+  dependencies {
+    compile 'me.sneer:core:+'
+  }
 }

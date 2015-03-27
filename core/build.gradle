@@ -47,11 +47,6 @@ sourceSets {
 
 compileClojure.mustRunAfter compileJava
 
-eclipse.project {
-  natures 'ccw.nature'
-  buildCommand 'ccw.builder'
-}
-
 dependencies {
   compile 'org.clojure:clojure:1.7.0-alpha5'
   compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
@@ -75,13 +70,15 @@ task leinSkummet(type: Exec) {
   args 'with-profile', 'lean', 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
 }
 
+def skummetBuildDir = "$buildDir/skummet"
+
 task skummetJar(type: Copy, dependsOn: leinSkummet) {
   from('target') {
     include "core-$version-standalone.jar"
   }
-  into "$buildDir/skummet"
+  into skummetBuildDir
   rename { fileName ->
-    fileName.replace("-standalone", "")
+    fileName.replace("standalone", "skummet")
   }
 }
 
@@ -94,15 +91,14 @@ clean.dependsOn leinClean
 
 apply plugin: 'ivy-publish'
 
-def artifacts = file('../artifacts')
-
 publishing {
   repositories {
-    ivy { url artifacts }
+    ivy { url '../skummet-artifacts' }
   }
   publications {
-    jar(IvyPublication) {
-      artifact(file("$buildDir/skummet/core-${version}.jar")) {
+    skummet(IvyPublication) {
+      artifact(file("$skummetBuildDir/core-${version}-skummet.jar")) {
+        classifier 'skummet'
         builtBy skummetJar
       }
     }
@@ -111,7 +107,7 @@ publishing {
 
 uploadArchives {
   repositories {
-    ivy { url artifacts }
+    mavenLocal()
   }
 }
 
