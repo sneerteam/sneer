@@ -7,10 +7,20 @@
             [sneer.async :refer [go-trace]]
             [sneer.tuple.tuple-transmitter :as transmitter])
   (:import [java.net InetSocketAddress]
+           [sneer.commons SystemReport]
            [sneer.admin SneerAdmin]))
 
+(defn- resolved-address!! [host port]
+  (let [ret (InetSocketAddress. host port)]
+    (if (.isUnresolved ret)
+      (do
+        (SystemReport/updateReport "network/dns-unresolved" ret)
+        (Thread/sleep 4000)          ;; Use some sort of network availability lease instead of just polling.
+        (recur host port))
+      ret)))
+
 (defn start-client [puk tuple-base & [host port]]
-  (let [server-addr (future (InetSocketAddress. (or host "dynamic.sneer.me") (or port 5555)))
+  (let [server-addr (future (resolved-address!! (or host "dynamic.sneer.me") (or port 5555)))
         udp-in (chan)
         udp-out (chan)
         to-me (map< second udp-in)
