@@ -42,6 +42,5 @@ dependencies {
     exclude group: 'com.netflix.rxjava'
   }
   compile project(':sneer-android-api')
-  //compile 'me.sneer:core:+'
-  compile 'me.sneer:core:+:standalone'
+  compile 'me.sneer:core:+'
 }
