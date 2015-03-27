@@ -16,6 +16,7 @@ import android.widget.Toast;
 import me.sneer.R;
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -169,12 +170,9 @@ public class ContactActivity extends Activity {
 
 	private void hidePreferredNicknameWhenNeeded() {
 		if (newContact) return;
-		Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>() {
-			@Override
-			public Boolean call(String preferredNickname, String ownName) {
-				return preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current());
-			}
-		}).subscribe(new Action1<Boolean>() { @Override public void call(Boolean hidePreferredNickname) {
+		Observable.zip(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>() { @Override public Boolean call(String preferredNickname, String ownName) {
+			return preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current());
+		}}).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() { @Override public void call(Boolean hidePreferredNickname) {
 			if (hidePreferredNickname)
 				preferredNicknameView.setVisibility(View.GONE);
 		}});
@@ -183,8 +181,8 @@ public class ContactActivity extends Activity {
 
 	private void validationOnTextChanged(final EditText editText) {
 		editText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void afterTextChanged(Editable s) {
+
+			@Override public void afterTextChanged(Editable s) {
 				if (ownNameSubscription != null) ownNameSubscription.unsubscribe();
 				if (preferredNicknameSubscription != null) preferredNicknameSubscription.unsubscribe();
 				nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), editText.getText().toString()));
