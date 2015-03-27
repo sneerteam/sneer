@@ -6,8 +6,8 @@
             [sneer.networking.udp :as udp]
             [sneer.async :refer [go-trace]]
             [sneer.tuple.tuple-transmitter :as transmitter])
-  (:import (java.net InetSocketAddress)
-           (sneer.admin SneerAdmin)))
+  (:import [java.net InetSocketAddress]
+           [sneer.admin SneerAdmin]))
 
 (defn start-client [puk tuple-base & [host port]]
   (let [server-addr (future (InetSocketAddress. (or host "dynamic.sneer.me") (or port 5555)))
