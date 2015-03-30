@@ -12,8 +12,7 @@
                             rest seq some sort sort-by split-with
                             take take-while throw])
   (:require [rx.lang.clojure.interop :as iop]
-            [rx.lang.clojure.graph :as graph]
-            [rx.lang.clojure.realized :as realized])
+            [rx.lang.clojure.graph :as graph])
   (:import [rx
             Observable
             Observer Observable$Operator Observable$OnSubscribe
@@ -982,8 +981,3 @@
 (intern *ns* (with-meta 'let-o (meta #'graph/let-o)) @#'graph/let-o)
 
 ;################################################################################;
-
-; Import some public realized symbols here. I want them in this namespace, but implementing
-; them here with all the clojure.core symbols excluded is a pain.
-(intern *ns* (with-meta 'let-realized (meta #'realized/let-realized)) @#'realized/let-realized)
-
