@@ -36,10 +36,10 @@
   (rx.Observable/from iterable))
 
 (defn atom->observable [atom]
-    (let [subject (BehaviorSubject/create @atom)]
-      (add-watch atom (Object.) (fn [_key _ref _old-value new-value]
+  (let [subject (BehaviorSubject/create @atom)]
+    (add-watch atom (Object.) (fn [_key _ref _old-value new-value]
                                 (rx/on-next subject new-value)))
-      (.asObservable subject)))
+    (.asObservable subject)))
 
 (defn flatmapseq [^rx.Observable o]
   (.flatMapIterable o (interop/fn [seq] seq)))
