@@ -36,6 +36,7 @@ public class ContactActivity extends Activity {
 
 	static final String PARTY_PUK = "partyPuk";
 	static final String CURRENT_NICKNAME = "currentNickname";
+	private static final boolean USE_INVITES = false;
 
 	private ActionBar actionBar;
 
@@ -71,7 +72,7 @@ public class ContactActivity extends Activity {
 			return;
 		}
 
-		if (!validInviteCode()) {
+		if (!validInviteCode() && USE_INVITES) {
 			toast("Invalid invite code");
 			finish();
 			return;
@@ -203,6 +204,7 @@ public class ContactActivity extends Activity {
 				sneer().findContact(party).setNickname(nickName);
 		} catch (FriendlyException e) {
 			toast(e.getMessage());
+			return;
 		}
 		toast("Contact saved");
 	}
