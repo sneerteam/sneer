@@ -65,6 +65,7 @@ dependencies {
 
 task leinSkummet(type: Exec) {
   inputs.source sourceSets.main.clojure
+  inputs.source 'project.clj'
   outputs.dir 'target'
   executable 'lein'
   args 'with-profile', 'lean', 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
