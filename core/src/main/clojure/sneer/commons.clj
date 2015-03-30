@@ -29,14 +29,18 @@
 (defn produce! [fn-if-absent map-atom key]
   (if-some [existing (get @map-atom key)]
     existing
-    (locking map-atom
-      ;; this supports functions with side-effects
-      (let [state @map-atom]
-        (if-some [existing (get state key)]
-          existing
-          (let [new-value (fn-if-absent key)]
-            (reset! map-atom (assoc state key new-value))
-            new-value))))))
+    (do
+      (monitor-enter map-atom)
+      (try
+        ;; this supports functions with side-effects
+        (let [state @map-atom]
+          (if-some [existing (get state key)]
+            existing
+            (let [new-value (fn-if-absent key)]
+              (reset! map-atom (assoc state key new-value))
+              new-value)))
+        (finally
+          (monitor-exit map-atom))))))
 
 (defn now [] (sneer.commons.Clock/now))
 
