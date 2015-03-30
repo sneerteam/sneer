@@ -124,7 +124,6 @@ public class ContactActivity extends Activity {
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
 			String[] query = intent.getData().getQuery().split("&invite=");
 
-			inviteCode = "";
 			if (query.length > 1)
 				inviteCode = query[1];
 
@@ -139,7 +138,6 @@ public class ContactActivity extends Activity {
 
 	private void loadContact() {
 		party = sneer().produceParty(partyPuk);
-
 		profile = sneer().profileFor(party);
 		contact = sneer().findContact(party);
 		newContact = contact == null;
