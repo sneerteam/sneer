@@ -32,9 +32,12 @@
 
     <!-- ContactActivity -->
     <string name="add_contact_not_connected_yet">Not connected yet</string>
-    <string name="add_contact_send_invite">Send Invite</string>
     <!-- ContactActivity -->
 
+    <!-- ContactActivity -->
+    <string name="action_add_contact">Add Sovereign Contact</string>
+    <string name="add_contact_send_invite">Next ></string>
+    <!-- ContactActivity -->
 
     <!-- ProfileActivity -->
     <string name="profile_view_content_description">Your Picture</string>
@@ -59,5 +62,4 @@
     <!-- This appears on the menu for url viewing -->
     <string name="title_activity_contact">Sneer Contact</string>
     <string name="action_share">Share Public Key</string>
-    <string name="action_add_contact">Add Sovereign Contact</string>
 </resources>

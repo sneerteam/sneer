@@ -28,13 +28,15 @@
 
         <Button
             android:id="@+id/btn_send_invite"
-            android:layout_width="match_parent"
+            android:layout_width="96dip"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/nickname"
             android:padding="5dp"
             android:enabled="false"
             style="?android:attr/buttonBarButtonStyle"
-            android:text="@string/add_contact_send_invite" />
+            android:text="@string/add_contact_send_invite"
+            android:layout_below="@+id/nickname"
+            android:layout_alignRight="@+id/nickname"
+            android:layout_alignEnd="@+id/nickname"/>
     </RelativeLayout>
 
 </RelativeLayout>
