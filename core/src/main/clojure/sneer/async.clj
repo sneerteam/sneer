@@ -1,5 +1,6 @@
 (ns sneer.async
   (:require [clojure.core.async :as async :refer [chan go remove< >! <! tap]]
+            [clojure.stacktrace :refer [print-throwable]]
             [sneer.commons :refer :all]))
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
@@ -26,7 +27,7 @@
        ~@forms
        (catch java.lang.Throwable ~'e
          (println "GO ERROR" ~'e)
-         (. ~'^Throwable e printStackTrace)))))
+         (print-throwable ~'e)))))
 
 (defmacro go-loop-trace
   "Same as go-loop but prints unhandled exception stack trace"
