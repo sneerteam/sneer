@@ -18,7 +18,7 @@ public class Puk {
 				"Then, tap to add me as a Sneer contact: " +
 				buildSneerUri(self.publicKey().current().toHex(), inviteCode));
 
-		String title = (USE_INVITES ? "Send invite to " : "Share your Public-key with ") + receiver;
+		String title = (USE_INVITES ? "Send invite to " : "Share your Public-key") + receiver;
 		Intent chooser = Intent.createChooser(sharingIntent, title);
 
 		if (sharingIntent.resolveActivity(activity.getPackageManager()) != null)

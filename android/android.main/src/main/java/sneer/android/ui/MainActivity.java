@@ -23,6 +23,7 @@ import sneer.android.SneerApp;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
+import static sneer.android.utils.Puk.shareOwnPublicKey;
 
 public class MainActivity extends SneerActivity {
 
@@ -87,7 +88,10 @@ public class MainActivity extends SneerActivity {
 			navigateTo(ProfileActivity.class);
 			break;
 		case R.id.action_add_contact:
-			navigateTo(AddContactActivity.class);
+			if (ContactActivity.USE_INVITES)
+				navigateTo(AddContactActivity.class);
+			else
+				shareOwnPublicKey(this, sneer().self(), 0, "");
 			break;
 		case R.id.action_search_for_apps:
 			Intent viewIntent =
