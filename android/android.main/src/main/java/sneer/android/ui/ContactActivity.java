@@ -34,9 +34,10 @@ import static sneer.android.ui.SneerActivity.plug;
 
 public class ContactActivity extends Activity {
 
+	public static final boolean USE_INVITES = false;
+
 	static final String PARTY_PUK = "partyPuk";
 	static final String CURRENT_NICKNAME = "currentNickname";
-	private static final boolean USE_INVITES = false;
 
 	private ActionBar actionBar;
 
