@@ -73,7 +73,13 @@
     (when http-server
       (alts!! [http-server timeout]))))
 
-(defn -main [& [port-string]]
-  (let [port (when-some [p port-string] (Integer/parseInt p))
-        server (start (or port 5555) 80 (File. "."))]
+(defn- optional-int [string default-value]
+  (if (some? string)
+    (Integer/parseInt string)
+    default-value))
+
+(defn -main [& [udp-port http-port]]
+  (let [server (start (optional-int udp-port 5555)
+                      (optional-int http-port 80)
+                      (File. "."))]
     (println "udp-server finished with" (<!! (:udp-server server)))))
