@@ -11,11 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import me.sneer.R;
-import rx.Observable;
-import rx.Subscription;
 import rx.functions.Action1;
 import sneer.Profile;
 import sneer.commons.exceptions.FriendlyException;
@@ -34,6 +31,12 @@ public class ProfileActivity extends SneerActivity {
 	private EditText countryEdit;
 	private EditText cityEdit;
 	private ImageView selfieImage;
+
+	private static String ownName;
+	private static String preferredNickname;
+	private static String country;
+	private static String city;
+	private static Bitmap selfie;
 
 	private byte[] selfieBytes;
 
@@ -86,37 +89,72 @@ public class ProfileActivity extends SneerActivity {
 
 
 	private void loadProfile() {
-		plugOwnName(firstNameEdit, lastNameEdit, profile.ownName());
-		plug(preferredNickNameEdit, profile.preferredNickname());
-		plug(countryEdit, profile.country());
-		plug(cityEdit, profile.city());
-		plug(selfieImage, profile.selfie());
+		deferUI(profile.ownName()).subscribe(new Action1<String>() { @Override public void call(String ownName) {
+			ProfileActivity.ownName = ownName;
+			firstNameEdit.setText(ownName);
+			lastNameEdit.setVisibility(View.GONE);
+		}});
+
+		deferUI(profile.preferredNickname()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
+			ProfileActivity.preferredNickname = preferredNickname;
+			preferredNickNameEdit.setText(preferredNickname);
+		}});
+
+		deferUI(profile.country()).subscribe(new Action1<String>() { @Override public void call(String country) {
+			ProfileActivity.country = country;
+			countryEdit.setText(country);
+		}});
+
+		deferUI(profile.city()).subscribe(new Action1<String>() { @Override public void call(String city) {
+			ProfileActivity.city = city;
+			cityEdit.setText(city);
+		}});
+
+		deferUI(profile.selfie().map(TO_BITMAP)).subscribe(new Action1<Bitmap>() { @Override public void call(Bitmap selfie) {
+			ProfileActivity.selfie = selfie;
+			selfieImage.setImageBitmap(selfie);
+		}});
 	}
 
 
 	public void saveProfile() {
+		boolean changed = false;
+
 		if (text(firstNameEdit).length() < 2) return;
 
-		if (lastNameEdit.getVisibility() == View.GONE) {
-			profile.setOwnName(text(firstNameEdit));
-		} else {
-			if (text(lastNameEdit).length() < 2) return;
-			profile.setOwnName(text(firstNameEdit) + " " + text(lastNameEdit));
+		if (!text(firstNameEdit).equals(ownName)) {
+			if (lastNameEdit.getVisibility() == View.GONE) {
+				profile.setOwnName(text(firstNameEdit));
+				changed = true;
+			} else {
+				if (text(lastNameEdit).length() < 2) return;
+				profile.setOwnName(text(firstNameEdit) + " " + text(lastNameEdit));
+				changed = true;
+			}
 		}
 
-		String preferredNickname = text(preferredNickNameEdit);
-		profile.setPreferredNickname(preferredNickname);
+		if (!text(preferredNickNameEdit).equals(preferredNickname)) {
+			profile.setPreferredNickname(text(preferredNickNameEdit));
+			changed = true;
+		}
 
-		String country = text(countryEdit);
-		profile.setCountry(country);
+		if (!text(countryEdit).equals(country)) {
+			profile.setCountry(text(countryEdit));
+			changed = true;
+		}
 
-		String city = text(cityEdit);
-		profile.setCity(city);
+		if (!text(cityEdit).equals(city)) {
+			profile.setCity(text(cityEdit));
+			changed = true;
+		}
 
-		if (selfieBytes != null)
+		if (selfieBytes != null) {
 			profile.setSelfie(selfieBytes);
+			changed = true;
+		}
 
-		toast("Profile saved");
+		if (changed)
+			toast("Profile saved");
 	}
 
 
@@ -162,13 +200,6 @@ public class ProfileActivity extends SneerActivity {
 		edit.setError(text(edit).length() == 1
 			? "Name too short"
 			: null); //Setting null necessary because of a bug on some Android versions.
-	}
-
-	public static Subscription plugOwnName(final TextView textView1, final TextView textView2, Observable<?> observable) {
-		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			textView1.setText(obj.toString());
-			textView2.setVisibility(View.GONE);
-		}});
 	}
 
 
