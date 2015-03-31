@@ -28,7 +28,7 @@ import static sneer.android.utils.Puk.shareOwnPublicKey;
 public class MainActivity extends SneerActivity {
 
 	private MainAdapter adapter;
-	private ListView conversations;
+	private ListView conversationList;
 
 	private final Party self = sneer().self();
 	private final Profile ownProfile = sneer().profileFor(self);
@@ -57,20 +57,22 @@ public class MainActivity extends SneerActivity {
             plugActionBarIcon(actionBar, ownProfile.selfie());
         }
 
-		conversations = (ListView) findViewById(R.id.conversationList);
 		adapter = new MainAdapter(this);
-		conversations.setAdapter(adapter);
-
-		conversations.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
-			Conversation conversation = adapter.getItem(position);
-			onClicked(conversation);
-		}});
-
 		deferUI(sneer().conversations().all()).subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
 			adapter.clear();
 			adapter.addAll(conversations);
 			adapter.notifyDataSetChanged();
 		}});
+
+		conversationList = (ListView) findViewById(R.id.conversationList);
+		conversationList.setAdapter(adapter);
+		conversationList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
+				Conversation conversation = adapter.getItem(position);
+				onClicked(conversation);
+			}
+		});
 	}
 
 
