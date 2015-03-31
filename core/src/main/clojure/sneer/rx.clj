@@ -19,10 +19,7 @@
 (defn subject* [^rx.Observable observable ^rx.Observer observer]
   "Creates a rx.Subject from an `observable' part and an `observer' part."
   (let [subscriber (on-subscribe-for observable)]
-    (proxy [Subject] [subscriber]
-      (onNext [value] (.onNext observer value))
-      (onError [error] (.onError observer error))
-      (onCompleted [] (.onCompleted observer)))))
+    (sneer.rx.CompositeSubject. subscriber observer)))
 
 (defn filter-by [criteria observable]
   "Filters an `observable' of maps by `criteria' represented as a map.
