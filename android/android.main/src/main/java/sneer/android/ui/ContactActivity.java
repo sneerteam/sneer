@@ -194,18 +194,25 @@ public class ContactActivity extends Activity {
 
 
 	private void saveContact() {
-		final String nickName = nicknameEdit.getText().toString();
+		boolean changed = false;
+		final String nickName = text(nicknameEdit);
 		try {
-			if (newContact)
+			if (newContact) {
 				sneer().addContact(nickName, party);
+				changed = true;
+			}
 
-			if (!nickName.equals(intent.getExtras().getString(CURRENT_NICKNAME)))
+			if (!nickName.equals(intent.getExtras().getString(CURRENT_NICKNAME))) {
 				sneer().findContact(party).setNickname(nickName);
+				changed = true;
+			}
 		} catch (FriendlyException e) {
 			toast(e.getMessage());
 			return;
 		}
-		toast("Contact saved");
+
+		if (changed)
+			toast("Contact saved");
 	}
 
 
@@ -219,6 +226,11 @@ public class ContactActivity extends Activity {
 
 	private void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+	}
+
+
+	private String text(EditText editText) {
+		return editText.getText().toString().trim();
 	}
 
 }
