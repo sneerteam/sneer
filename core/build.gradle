@@ -49,9 +49,9 @@ compileClojure.mustRunAfter compileJava
 
 dependencies {
   compile 'org.clojure:clojure:1.7.0-alpha5'
-  compile 'org.clojure:core.async:0.1.303.0-886421-alpha'
+  compile 'org.clojure:core.async:0.1.346.0-17112a-alpha'
   compile external['clojure.core.match']
-  compile('com.cognitect:transit-clj:0.8.259') {
+  compile('com.cognitect:transit-clj:0.8.269') {
     exclude group: 'org.msgpack', module: 'msgpack'
     exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
     exclude group: 'org.apache.directory.studio', module: 'org.apache.commons.codec'

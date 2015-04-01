@@ -4,27 +4,29 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
+  :warn-on-reflection false
+
   :dependencies [[me.sneer/sneer-java-api "0.1.5"]
                  [me.sneer/crypto "0.1.5"]
                  [org.clojure/core.match "0.2.2"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [com.cognitect/transit-clj "0.8.259"]
+                 [com.cognitect/transit-clj "0.8.269"]
                  [com.netflix.rxjava/rxjava-core "0.20.7"]
                  [org.clojure/java.jdbc "0.3.6"]]
 
   :profiles {:lean
-             {:dependencies [[org.skummet/clojure "1.7.0-alpha5-r1"]]
+             {:dependencies [[org.skummet/clojure-android "1.7.0-alpha5-r1" :use-resources true]]
               :exclusions [[org.clojure/clojure]]
               :omit-source true
               :skummet-skip-vars []
               :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
-              :aot [sneer.restartable
+              :aot [sneer.commons
+                    sneer.async
+                    sneer.restartable
                     sneer.party-impl
-                    sneer.commons
                     sneer.tuple.protocols
                     sneer.rx-macros
                     sneer.rx
-                    sneer.async
                     sneer.tuple-base-provider
                     sneer.tuple.persistent-tuple-base
                     sneer.tuple.space
@@ -42,7 +44,7 @@
                     sneer.networking.client
                     sneer.main]
               :uberjar-exclusions [#"META-INF/DUMMY.SF"
-                                   #"^org/(apache|bouncycastle|json|msgpack|objectweb)"
+                                   #"^org/(apache|bouncycastle|json|msgpack)"
                                    #"^cljs"
                                    #"^clojure/test/"
                                    #"^javassist"]
@@ -56,9 +58,7 @@
                              [org.xerial/sqlite-jdbc "3.8.6"]]
               :plugins [[cider/cider-nrepl "0.8.2"]
                         [refactor-nrepl "0.2.2"]
-                        [lein-midje "3.0.0"]]
-              }
-            }
+                        [lein-midje "3.0.0"]]}}
 
 
   :source-paths ["src/main/clojure"]
