@@ -17,7 +17,7 @@
     <string name="title_activity_profile">Public Profile</string>
     <string name="action_new_conversation">New Message</string>
 
-    <string name="empty_contact_list">Tap the \"Add contact\" icon at the top of your screen to invite your friends to use Sneer and start a conversation with them.</string>
+    <string name="empty_contact_list">Tap the \"Add contact\" icon to invite a friend to a conversation using Sneer.</string>
 
     <!-- ConversationActivity -->
     <string name="conversation_activity_action_button">Action</string>
