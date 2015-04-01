@@ -16,8 +16,7 @@
         contacts-state (create-contacts-state tuple-space own-puk puk->party)
         contacts (get-contacts contacts-state)
         conversations (reify-conversations own-puk tuple-space contacts)
-        self (reify-party own-puk)
-        invites []]
+        self (reify-party own-puk)]
 
     (reify Sneer
       (self [_] self)
@@ -45,14 +44,6 @@
 
       (conversations [_]
         conversations)
-
-      (invites [_]
-        ;; TODO
-        invites)
-
-      (findInvite [_ party]
-        ;; TODO:
-        #_(find-invite party))
 
       (generateContactInvite [_]
         (let [^Random rnd (Random.)]
