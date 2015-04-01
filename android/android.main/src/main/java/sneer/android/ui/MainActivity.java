@@ -21,6 +21,7 @@ import sneer.Party;
 import sneer.Profile;
 import sneer.android.Notifier;
 import sneer.android.SneerApp;
+import sneer.android.ui.adapters.MainAdapter;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;

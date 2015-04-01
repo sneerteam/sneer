@@ -1,4 +1,4 @@
-package sneer.android.ui;
+package sneer.android.ui.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -32,14 +32,14 @@ import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findImageView;
 import static sneer.android.ui.SneerActivity.findTextView;
 
-class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
+public class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
 
 	private final int layoutUserResourceId;
     private final int listContactResourceId;
 	private final LayoutInflater inflater;
 	private final Party party;
 
-    ConversationAdapter(Context context,
+    public ConversationAdapter(Context context,
     		LayoutInflater inflater,
     		int layoutUserResourceId,
     		int listContactResourceId,

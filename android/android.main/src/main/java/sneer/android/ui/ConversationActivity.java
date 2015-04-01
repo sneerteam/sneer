@@ -34,6 +34,7 @@ import sneer.ConversationMenuItem;
 import sneer.Message;
 import sneer.Party;
 import sneer.PublicKey;
+import sneer.android.ui.adapters.ConversationAdapter;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;

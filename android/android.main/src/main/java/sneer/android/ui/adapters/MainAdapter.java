@@ -1,4 +1,4 @@
-package sneer.android.ui;
+package sneer.android.ui.adapters;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
