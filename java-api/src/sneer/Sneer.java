@@ -11,10 +11,6 @@ public interface Sneer {
 	Party self();
 	Profile profileFor(Party party);
 
-	/** All invites codes that you have sent.*/
-	Observable<List<Invite>> invites();
-	/** @return null if invite doesn't exist. */
-	Invite findInvite(Party party);
 	/** @return a pseudorandomly generated long. */
 	long generateContactInvite();
 
