@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import java.util.Collection;
 
@@ -57,11 +58,18 @@ public class MainActivity extends SneerActivity {
             plugActionBarIcon(actionBar, ownProfile.selfie());
         }
 
+		final RelativeLayout addContactTutorial = (RelativeLayout) findViewById(R.id.add_contact_tutorial);
+
 		adapter = new MainAdapter(this);
 		deferUI(sneer().conversations().all()).subscribe(new Action1<Collection<Conversation>>() { @Override public void call(Collection<Conversation> conversations) {
 			adapter.clear();
 			adapter.addAll(conversations);
 			adapter.notifyDataSetChanged();
+
+			if (adapter.getCount() == 0)
+				addContactTutorial.setVisibility(View.VISIBLE);
+			else
+				addContactTutorial.setVisibility(View.GONE);
 		}});
 
 		conversationList = (ListView) findViewById(R.id.conversationList);
