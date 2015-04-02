@@ -45,6 +45,7 @@
                     sneer.main]
               :uberjar-exclusions [#"META-INF/DUMMY.SF"
                                    #"^org/(apache|bouncycastle|json|msgpack)"
+                                   #"^lib/commons-codec"
                                    #"^cljs"
                                    #"^clojure/test/"
                                    #"^javassist"]
