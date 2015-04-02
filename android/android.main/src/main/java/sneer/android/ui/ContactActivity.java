@@ -4,9 +4,13 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -102,6 +106,34 @@ public class ContactActivity extends Activity {
 		plugProfile();
 		hidePreferredNicknameWhenNeeded();
 		validationOnTextChanged(nicknameEdit);
+	}
+
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				Intent upIntent = NavUtils.getParentActivityIntent(this);
+				if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+					// This activity is NOT part of this app's task, so create a new task
+					// when navigating up, with a synthesized back stack.
+					TaskStackBuilder.create(this)
+							// Add all of this activity's parents to the back stack
+							.addNextIntentWithParentStack(upIntent)
+							// Navigate up to the closest parent
+							.startActivities();
+				}
+				finish();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 
