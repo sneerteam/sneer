@@ -1,6 +1,8 @@
 package sneer.android.ui;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -67,10 +69,11 @@ public class MainActivity extends SneerActivity {
 			adapter.addAll(conversations);
 			adapter.notifyDataSetChanged();
 
-			if (adapter.getCount() == 0)
-				addContactTutorial.setVisibility(View.VISIBLE);
-			else
-				addContactTutorial.setVisibility(View.GONE);
+			if (ContactActivity.USE_INVITES)
+				if (adapter.getCount() == 0)
+					addContactTutorial.setVisibility(View.VISIBLE);
+				else
+					addContactTutorial.setVisibility(View.GONE);
 		}});
 
 		conversationList = (ListView) findViewById(R.id.conversationList);
@@ -102,7 +105,7 @@ public class MainActivity extends SneerActivity {
 			if (ContactActivity.USE_INVITES)
 				navigateTo(AddContactActivity.class);
 			else
-				shareOwnPublicKey(this, sneer().self(), 0, "");
+				openSharePukDialog();
 			break;
 		case R.id.action_search_for_apps:
 			Intent viewIntent =
@@ -115,6 +118,17 @@ public class MainActivity extends SneerActivity {
 		}
 
 		return true;
+	}
+
+
+	private void openSharePukDialog() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		alert.setMessage("To add contacts, send them your public key and they must send you theirs.")
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.setPositiveButton("Send Public Key", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {
+					shareOwnPublicKey(MainActivity.this, sneer().self(), 0, "");
+				}})
+				.show();
 	}
 
 
