@@ -57,7 +57,7 @@
              {:dependencies [[org.clojure/clojure "1.7.0-alpha5"]
                              [midje "1.6.3"]
                              [org.xerial/sqlite-jdbc "3.8.6"]]
-              :plugins [[cider/cider-nrepl "0.8.2"]
+              :plugins [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
                         [refactor-nrepl "0.2.2"]
                         [lein-midje "3.0.0"]]}}
 
