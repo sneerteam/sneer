@@ -39,25 +39,47 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	private void init(Context context) throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
-        System.out.println("YOUR PUBLIC KEY IS: " + sneerAdmin.privateKey().publicKey().toHex());
+		logPublicKey();
+		initPlugins(context);
+	}
 
+
+	private void logPublicKey() {
+		System.out.println("YOUR PUBLIC KEY IS: " + pukAddress());
+	}
+
+
+	private String pukAddress() {
+		return sneerAdmin.privateKey().publicKey().toHex();
+	}
+
+
+	private void initPlugins(Context context) {
 		pluginManager = new PluginManager(context, sneer());
 		pluginManager.initPlugins();
 	}
 
 
 	private SneerAdmin newSneerAdmin(Context context) throws FriendlyException {
-
-		File adminDir = new File(context.getFilesDir(), "admin");
-		adminDir.mkdirs();
-		File secureFile = new File(adminDir, "tupleSpace.sqlite");
+		File dbFile = secureFile(context, "tupleSpace.sqlite");
 		try {
-			SneerSqliteDatabase db = SneerSqliteDatabase.openDatabase(secureFile);
-			return newSneerAdmin(db);
+			return newSneerAdmin(SneerSqliteDatabase.openDatabase(dbFile));
 		} catch (IOException e) {
 			SystemReport.updateReport("Error starting Sneer", e);
 			throw new FriendlyException("Error starting Sneer", e);
 		}
+	}
+
+
+	private File secureFile(Context context, String name) {
+		return new File(secureDir(context), name);
+	}
+
+
+	private File secureDir(Context context) {
+		File adminDir = new File(context.getFilesDir(), "admin");
+		adminDir.mkdirs();
+		return adminDir;
 	}
 
 
