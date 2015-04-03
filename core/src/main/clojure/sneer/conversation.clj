@@ -79,7 +79,75 @@
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
 (defn reify-conversation
-  ([^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Observed nickname]
+  [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Observed nickname ^Party party]
+  (if party
+    (let [^PublicKey party-puk (party-puk party)
+          messages (atom (sorted-set-by message-comparator))
+          observable-messages (rx/map vec (atom->observable messages))
+          message-filter (.. tuple-space filter (type "message"))
+          msg-tuples-out (.. message-filter (author own-puk) (audience party-puk) tuples)
+          msg-tuples-in (.. message-filter (author party-puk) (audience own-puk) tuples)
+          last-read-pub (.. tuple-space
+                            publisher
+                            (type "message-read")
+                            (audience party-puk))
+          last-read-filter (.. tuple-space
+                               filter
+                               last
+                               (type "message-read")
+                               (audience party-puk)
+                               (author own-puk)
+                               tuples)
+          unread-messages (latest-unread-messages observable-messages last-read-filter)
+          most-recent-message (most-recent-message observable-messages)]
+
+      (subscribe-on-io
+        (rx/merge msg-tuples-out
+                  msg-tuples-in)
+        (fn [tuple]
+          (swap! messages conj (reify-message own-puk tuple))))
+
+      (reify
+        Conversation
+        (party [_] party)
+
+        (nickname [_] nickname)
+
+        (messages [_]
+          observable-messages)
+
+        (unreadMessages [_]
+          unread-messages)
+
+        (sendMessage [_ label]
+          (..
+            tuple-space
+            publisher
+            (audience party-puk)
+            (field "message-type" "chat")
+            (type "message")
+            (field "label" label)
+            (pub)))
+
+        (mostRecentMessageContent [_]
+          (rx/map message-label
+                  most-recent-message))
+
+        (mostRecentMessageTimestamp [_]
+          (rx/map message-timestamp
+                  most-recent-message))
+
+        (menu [_]
+          conversation-menu-items)
+
+        (unreadMessageCount [_]
+          (->> unread-messages
+               (rx/map (comp long count))))
+
+        (setRead [_ message]
+          (assert (-> message own? not))
+          (println "Publishing message read tuple.")        ;; Klaus: I suspect this might be happening too often, redundantly for already read messages.
+          (.pub last-read-pub (original-id message)))))
     (reify Conversation
       Conversation
       (party [_] nil)
@@ -100,75 +168,7 @@
 
       (unreadMessageCount [_] (rx/return 0))
 
-      (setRead [_ _] (assert false))))
-  ([^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Observed nickname ^Party party]
-   (let [^PublicKey party-puk (party-puk party)
-         messages (atom (sorted-set-by message-comparator))
-         observable-messages (rx/map vec (atom->observable messages))
-         message-filter (.. tuple-space filter (type "message"))
-         msg-tuples-out (.. message-filter (author own-puk  ) (audience party-puk) tuples)
-         msg-tuples-in  (.. message-filter (author party-puk) (audience own-puk  ) tuples)
-         last-read-pub (.. tuple-space
-                           publisher
-                           (type "message-read")
-                           (audience party-puk))
-         last-read-filter (.. tuple-space
-                              filter
-                              last
-                              (type "message-read")
-                              (audience party-puk)
-                              (author own-puk)
-                              tuples)
-         unread-messages (latest-unread-messages observable-messages last-read-filter)
-         most-recent-message (most-recent-message observable-messages)]
-
-     (subscribe-on-io
-       (rx/merge msg-tuples-out
-                 msg-tuples-in)
-       (fn [tuple]
-         (swap! messages conj (reify-message own-puk tuple))))
-
-     (reify
-       Conversation
-       (party [_] party)
-
-       (nickname [_] nickname)
-
-       (messages [_]
-         observable-messages)
-
-       (unreadMessages [_]
-         unread-messages)
-
-       (sendMessage [_ label]
-         (..
-           tuple-space
-           publisher
-           (audience party-puk)
-           (field "message-type" "chat")
-           (type "message")
-           (field "label" label)
-           (pub)))
-
-       (mostRecentMessageContent [_]
-         (rx/map message-label
-                 most-recent-message))
-
-       (mostRecentMessageTimestamp [_]
-         (rx/map message-timestamp
-                 most-recent-message))
-
-       (menu [_]
-         conversation-menu-items)
-
-       (unreadMessageCount [_]
-         (->> unread-messages
-              (rx/map (comp long count))))
-
-       (setRead [_ message]
-         (assert (-> message own? not))
-         (println "Publishing message read tuple.")          ;; Klaus: I suspect this might be happening too often, redundantly for already read messages.
-         (.pub last-read-pub (original-id message)))))))
+      (setRead [_ _] (assert false)))))
 
 (defn- reify-notification [conversations title text subText]
   (reify Conversations$Notification

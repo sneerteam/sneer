@@ -68,9 +68,9 @@
   (reify rx.functions.FuncN
     (call [_ args] (f args))))
 
-(defn combine-latest [f ^java.util.List list]
+(defn combine-latest [f ^java.util.List os]
   (let [^rx.functions.FuncN fn (func-n f)]
-    (rx.Observable/combineLatest list fn)))
+    (rx.Observable/combineLatest os fn)))
 
 (defn switch-map [f ^rx.Observable o]
   (.switchMap o (interop/fn [x] (f x))))

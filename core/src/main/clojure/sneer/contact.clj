@@ -1,7 +1,7 @@
 (ns sneer.contact
   (:require
     [rx.lang.clojure.core :as rx]
-    [sneer.rx :refer [atom->observable]]
+    [sneer.rx :refer [atom->observable combine-latest]]
     [sneer.party :refer [party-puk produce-party!]]
     [sneer.party-impl :refer [name-subject]])
   (:import
@@ -10,12 +10,13 @@
     [sneer.commons.exceptions FriendlyException]
     [sneer.tuples Tuple TupleSpace]))
 
-(defn publish-contact [tuple-space own-puk new-nick party]
+(defn publish-contact [tuple-space own-puk new-nick party invite-code]
   (.. ^TupleSpace tuple-space
       publisher
       (audience own-puk)
       (type "contact")
-      (field "party" (party-puk party))
+      (field "party" (when party (party-puk party)))
+      (field "invite-code" invite-code)
       (pub new-nick)))
 
 (defn problem-with-new-nickname-in [puk->contact puk new-nick]
@@ -31,9 +32,11 @@
   (when-let [problem (problem-with-new-nickname-in puk->contact puk new-nick)]
     (throw (FriendlyException. (str "Nickname " problem)))))
 
-(defn reify-contact [tuple-space puk->contact own-puk nickname party]
+(defn reify-contact
+  [tuple-space puk->contact own-puk nickname party invite-code]
   (let [nick-subject (ObservedSubject/create nickname)]
-    (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party))
+    (when party
+      (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party)))
     (reify Contact
       (party [_] party)
 
@@ -41,8 +44,9 @@
         (.observed nick-subject))
 
       (setNickname [_ new-nick]
-        (check-new-nickname @puk->contact (party-puk party) new-nick)
-        (publish-contact tuple-space own-puk new-nick party)
+        (when party
+          (check-new-nickname @puk->contact (party-puk party) new-nick))
+        (publish-contact tuple-space own-puk new-nick party invite-code)
         (rx/on-next nick-subject new-nick))
 
       (toString [this]
@@ -53,7 +57,8 @@
                  puk->contact
                  (.author tuple)
                  (.payload tuple)
-                 (produce-party! puk->party (.get tuple "party"))))
+                 (produce-party! puk->party (.get tuple "party"))
+                 nil))
 
 (defn restore-contact-list [^TupleSpace tuple-space puk->contact own-puk puk->party]
   (->>
@@ -70,16 +75,22 @@
 (defn current-nickname [^Contact contact]
   (.. contact nickname current))
 
-(defn- ->contact-list [contact-map]
-  (->> contact-map vals (sort-by current-nickname) vec))
+(defn- ->contact-list [[puk->contact nick->contact]]
+  (->> (concat (vals puk->contact) (vals nick->contact))
+       (sort-by current-nickname)
+       vec))
 
 (defn create-contacts-state [tuple-space own-puk puk->party]
-  (let [puk->contact (atom {})]
+  (let [puk->contact (atom {})
+        nick->contact (atom {})]
     (swap! puk->contact (fn [_] (restore-contact-list tuple-space puk->contact own-puk puk->party)))
     {:own-puk             own-puk
      :tuple-space         tuple-space
      :puk->contact        puk->contact
-     :observable-contacts (rx/map ->contact-list (atom->observable puk->contact))}))
+     :nick->contact       nick->contact
+     :observable-contacts (combine-latest ->contact-list
+                                          [(atom->observable puk->contact)
+                                           (atom->observable nick->contact)])}))
 
 (defn find-contact-in [puk->contact party]
   (get puk->contact (party-puk party)))
@@ -98,8 +109,23 @@
            (check-new-contact cur nickname party)
            (assoc cur
              (party-puk party)
-             (reify-contact (:tuple-space contacts-state) (:puk->contact contacts-state) (:own-puk contacts-state) nickname party))))
-  (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party))
+             (reify-contact (:tuple-space contacts-state)
+                            (:puk->contact contacts-state)
+                            (:own-puk contacts-state)
+                            nickname
+                            party
+                            nil))))
+  (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party nil))
+
+(defn add-contact-without-party [contacts-state nickname invite-code]
+  (swap! (contacts-state :nick->contact)
+         (fn [cur]
+           (assoc cur nickname (reify-contact (:tuple-space contacts-state)
+                                              (:puk->contact contacts-state)
+                                              (:own-puk contacts-state)
+                                              nickname
+                                              nil
+                                              invite-code)))))
 
 (defn get-contacts [contacts-state]
   (:observable-contacts contacts-state))

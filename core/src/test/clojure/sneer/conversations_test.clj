@@ -32,17 +32,16 @@
             ^Party         carla       (produce-party "carla")
 
             all-conversations (->chan (->> (.all subject)
-                                           (rx/map (partial mapv #(.party %)))))]
+                                           (rx/map (partial mapv #(-> % .nickname .current)))))]
         (fact "is initially empty"
           (<!!? all-conversations) => [])
 
         (fact "a new contact implies a new converstation"
           (. sneer addContact "neide" neide)
-          (<!!? all-conversations) => [neide]
+          (<!!? all-conversations) => ["neide"]
 
           (. sneer addContact "carla" carla)
-          (<!!? all-conversations) => [carla neide]
+          (<!!? all-conversations) => ["carla" "neide"]
 
-          ;(. sneer addContactWithoutParty "zach" 1234)
-          ;(<!!? all-conversations) => [carla neide zach]
-          )))))
+          (. sneer addContactWithoutParty "anna" 1234)
+          (<!!? all-conversations) => ["anna" "carla" "neide"])))))
