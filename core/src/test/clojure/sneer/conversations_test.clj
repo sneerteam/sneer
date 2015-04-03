@@ -30,6 +30,8 @@
             produce-party  #(.produceParty sneer (->puk %))
             ^Party         neide       (produce-party "neide")
             ^Party         carla       (produce-party "carla")
+                           invite-code (. sneer generateContactInvite)
+                           anna        "anna"
 
             all-conversations (->chan (->> (.all subject)
                                            (rx/map (partial mapv #(.party %)))))]
@@ -41,4 +43,8 @@
           (<!!? all-conversations) => [neide]
 
           (. sneer addContact "carla" carla)
-          (<!!? all-conversations) => [carla neide])))))
+          (<!!? all-conversations) => [carla neide])
+
+        (fact "we can add a contact without a puk"
+          (. sneer addContactWithoutParty "anna" invite-code)
+          (<!!? all-conversations) => [carla neide anna])))))

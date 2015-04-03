@@ -1,7 +1,7 @@
 (ns sneer.impl
   (:require
    [sneer.conversation :refer [reify-conversations]]
-   [sneer.contact :refer [create-contacts-state add-contact get-contacts find-contact problem-with-new-nickname]]
+   [sneer.contact :refer [create-contacts-state add-contact add-contact-without-party get-contacts find-contact problem-with-new-nickname]]
    [sneer.party :refer [party-puk reify-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
   (:import
@@ -29,6 +29,9 @@
 
       (problemWithNewNickname [_ puk new-nick]
         (problem-with-new-nickname contacts-state puk new-nick))
+
+      (addContactWithoutParty [_ nickname invite-code]
+        (add-contact-without-party contacts-state nickname invite-code))
 
       (addContact [_ nickname party]
         (add-contact contacts-state nickname party))

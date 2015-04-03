@@ -32,7 +32,6 @@ import static sneer.android.utils.Puk.shareOwnPublicKey;
 public class MainActivity extends SneerActivity {
 
 	private MainAdapter adapter;
-	private ListView conversationList;
 
 	private final Party self = sneer().self();
 	private final Profile ownProfile = sneer().profileFor(self);
@@ -76,7 +75,7 @@ public class MainActivity extends SneerActivity {
 					addContactTutorial.setVisibility(View.GONE);
 		}});
 
-		conversationList = (ListView) findViewById(R.id.conversationList);
+		ListView conversationList = (ListView) findViewById(R.id.conversationList);
 		conversationList.setAdapter(adapter);
 		conversationList.setOnItemClickListener(new OnItemClickListener() {
 			@Override

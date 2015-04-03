@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import me.sneer.R;
 import sneer.Party;
+import sneer.commons.exceptions.FriendlyException;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.utils.Puk.shareOwnPublicKey;
@@ -22,6 +24,7 @@ public class AddContactActivity extends Activity {
 	private Button btnSendInvite;
 
 	private String nickname;
+	private long inviteCode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +36,23 @@ public class AddContactActivity extends Activity {
 		btnSendInvite.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				final long inviteCode = sneer().generateContactInvite();
+				inviteCode = sneer().generateContactInvite();
 				// TODO: persist inviteCode
 				shareOwnPublicKey(AddContactActivity.this, sneer().self(), inviteCode, nickname);
+				addContactWithoutParty();
 				finish();
 			}
 		});
 
 		validationOnTextChanged(nicknameEdit);
+	}
+
+	private void addContactWithoutParty() {
+		try {
+			sneer().addContactWithoutParty(nickname, inviteCode);
+		} catch (FriendlyException e) {
+			Log.d("addContactWithoutParty", e.getMessage());
+		}
 	}
 
 	private void validationOnTextChanged(final EditText editText) {

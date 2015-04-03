@@ -10,6 +10,14 @@
     [sneer.commons.exceptions FriendlyException]
     [sneer.tuples Tuple TupleSpace]))
 
+(defn publish-contact-without-party [tuple-space own-puk new-nick invite-code]
+  (.. ^TupleSpace tuple-space
+      publisher
+      (audience own-puk)
+      (type "contact")
+      (field "invite-code" invite-code)
+      (pub new-nick)))
+
 (defn publish-contact [tuple-space own-puk new-nick party]
   (.. ^TupleSpace tuple-space
       publisher
@@ -74,12 +82,15 @@
   (->> contact-map vals (sort-by current-nickname) vec))
 
 (defn create-contacts-state [tuple-space own-puk puk->party]
-  (let [puk->contact (atom {})]
-    (swap! puk->contact (fn [_] (restore-contact-list tuple-space puk->contact own-puk puk->party)))
+  (let [puk->contact (atom {})
+        nick->contact (atom (restore-contact-list tuple-space puk->contact own-puk puk->party))
+        nicks-without-puk (map first (remove #(-> % second .party) @nick->contact))]
+    (reset! puk->contact (apply dissoc @nick->contact nicks-without-puk))
     {:own-puk             own-puk
      :tuple-space         tuple-space
      :puk->contact        puk->contact
-     :observable-contacts (rx/map ->contact-list (atom->observable puk->contact))}))
+     :nick->contact       nick->contact
+     :observable-contacts (rx/map ->contact-list (atom->observable nick->contact))}))
 
 (defn find-contact-in [puk->contact party]
   (get puk->contact (party-puk party)))
@@ -91,6 +102,10 @@
   (when (find-contact-in puk->contact party)
     (throw (FriendlyException. "Duplicate contact")))
   (check-new-nickname puk->contact (.. ^Party party publicKey current) nickname))
+
+(defn add-contact-without-party [contacts-state nickname invite-code]
+  (println nickname "was added to your contacts. Invite code =>" invite-code)
+  (publish-contact-without-party (:tuple-space contacts-state) (:own-puk contacts-state) nickname invite-code))
 
 (defn add-contact [contacts-state nickname party]
   (swap! (contacts-state :puk->contact)

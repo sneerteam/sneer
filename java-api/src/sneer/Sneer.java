@@ -18,6 +18,8 @@ public interface Sneer {
 	Observable<List<Contact>> contacts();
 	/** @return null if party is not a contact. */
 	Contact findContact(Party party);
+	/** @throws FriendlyException if nickname is already set for another contact */
+	void addContactWithoutParty(String nickname, long inviteCode) throws FriendlyException;
 	/** @throws FriendlyException if nickname is already set for another contact or if party is already a contact. */
 	void addContact(String nickname, Party party) throws FriendlyException;
 
