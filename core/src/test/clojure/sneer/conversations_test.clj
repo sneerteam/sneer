@@ -41,4 +41,8 @@
           (<!!? all-conversations) => [neide]
 
           (. sneer addContact "carla" carla)
-          (<!!? all-conversations) => [carla neide])))))
+          (<!!? all-conversations) => [carla neide]
+
+          ;(. sneer addContactWithoutParty "zach" 1234)
+          ;(<!!? all-conversations) => [carla neide zach]
+          )))))

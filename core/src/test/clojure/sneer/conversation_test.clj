@@ -28,7 +28,7 @@
     (let [^TupleSpace   tuple-space (space/reify-tuple-space neide tuple-base)
           ^Observable   menu-items (PublishSubject/create)
           ^Party        carla-party (reify-party carla)
-          ^Conversation subject (reify-conversation tuple-space menu-items neide carla-party)
+          ^Conversation subject (reify-conversation tuple-space menu-items neide nil carla-party)
           most-recent-timestamps (observable->chan (subscribe-on-io (.mostRecentMessageTimestamp subject)))
           timestamp (long 42)
           message {"type" "message" "author" carla "audience" neide "timestamp" timestamp}]

@@ -3,10 +3,12 @@ package sneer;
 import java.util.List;
 
 import rx.Observable;
+import sneer.rx.Observed;
 
 public interface Conversation {
 
 	Party party();
+    Observed<String> nickname();
 		
 	Observable<List<Message>> messages();
 	Observable<List<Message>> unreadMessages();
