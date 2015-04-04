@@ -41,3 +41,12 @@ dependencies {
   compile project(':core')
   testCompile 'midje:midje:1.6.3'
 }
+
+apply plugin: 'application'
+mainClassName = 'sneer.server.main'
+run {
+  def serverOptions = project.properties.get('server-options', '')
+  if (!serverOptions.empty) {
+    args Eval.me(serverOptions)
+  }
+}
