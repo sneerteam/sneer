@@ -5,6 +5,7 @@
     [sneer.party :refer [party-puk produce-party!]]
     [sneer.party-impl :refer [name-subject]])
   (:import
+    [java.util UUID]
     [sneer Contact PublicKey Party]
     [sneer.rx ObservedSubject]
     [sneer.commons.exceptions FriendlyException]
@@ -46,7 +47,7 @@
 
       (setParty [_ party] (assert false))
 
-      (inviteCode [_] (assert false))
+      (inviteCode [_] invite-code)
 
       (nickname [_]
         (.observed nick-subject))
@@ -66,7 +67,7 @@
                  (.author tuple)
                  (.payload tuple)
                  (some->> (.get tuple "party") (produce-party! puk->party))
-                 nil))
+                 (.get tuple "invite-code")))
 
 (defn restore-contact-list [^TupleSpace tuple-space puk->contact own-puk puk->party]
   (->>
@@ -117,12 +118,13 @@
                                (:own-puk contacts-state)
                                nickname
                                party
-                               invite-code-received)]
+                               invite-code-received)
+        invite-code (when-not party (-> (UUID/randomUUID) .toString (.replaceAll "-" "")))]
     (swap! (contacts-state (if party :puk->contact :nick->contact))
            (fn [cur]
              (check-new-contact cur nickname party)
              (assoc cur (if party (party-puk party) nickname) contact)))
-    (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party invite-code-received)
+    (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party invite-code)
     contact))
 
 (defn get-contacts [contacts-state]
