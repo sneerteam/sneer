@@ -23,8 +23,11 @@
   (let [puk (some-> ^Party party .publicKey .current)
         puk->contact (dissoc puk->contact puk)]
     (cond
-      (.isEmpty ^String new-nick) "cannot be empty"
-      (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current)))) "already used")))
+      (.isEmpty ^String new-nick)
+      "cannot be empty"
+
+      (when party (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current)))))
+      "already used")))
 
 (defn problem-with-new-nickname [contacts-state new-nick party]
   (problem-with-new-nickname-in @(:puk->contact contacts-state) new-nick party))
@@ -40,6 +43,10 @@
       (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party)))
     (reify Contact
       (party [_] party)
+
+      (setParty [_ party] (assert false))
+
+      (inviteCode [_] (assert false))
 
       (nickname [_]
         (.observed nick-subject))
@@ -105,18 +112,18 @@
   (check-new-nickname puk->contact nickname party))
 
 (defn add-contact [contacts-state nickname party invite-code-received]
-  (swap! (contacts-state (if party :puk->contact :nick->contact))
-         (fn [cur]
-           (check-new-contact cur nickname party)
-           (assoc cur
-             (if party (party-puk party) nickname)
-             (reify-contact (:tuple-space contacts-state)
-                            (:puk->contact contacts-state)
-                            (:own-puk contacts-state)
-                            nickname
-                            party
-                            invite-code-received))))
-  (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party invite-code-received))
+  (let [contact (reify-contact (:tuple-space contacts-state)
+                               (:puk->contact contacts-state)
+                               (:own-puk contacts-state)
+                               nickname
+                               party
+                               invite-code-received)]
+    (swap! (contacts-state (if party :puk->contact :nick->contact))
+           (fn [cur]
+             (check-new-contact cur nickname party)
+             (assoc cur (if party (party-puk party) nickname) contact)))
+    (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party invite-code-received)
+    contact))
 
 (defn get-contacts [contacts-state]
   (:observable-contacts contacts-state))

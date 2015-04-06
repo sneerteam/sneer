@@ -43,8 +43,4 @@
         tuple-space)
 
       (conversations [_]
-        conversations)
-
-      (generateContactInvite [_]
-        (let [^Random rnd (Random.)]
-          (.nextLong rnd))))))
+        conversations))))

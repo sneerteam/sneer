@@ -9,7 +9,7 @@ import static sneer.android.ui.ContactActivity.USE_INVITES;
 
 public class Puk {
 
-	public static void shareOwnPublicKey(Activity activity, Party self, long inviteCode, String receiver) {
+	public static void shareOwnPublicKey(Activity activity, Party self, String inviteCode, String receiver) {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Sneer Invite");
@@ -26,9 +26,11 @@ public class Puk {
 	}
 
 
-	public static String buildSneerUri(String puk, long inviteCode) {
-		String invite = "&invite=" + inviteCode;
-		return "http://sneer.me/public-key?" + puk + (USE_INVITES ? invite : "");
+	public static String buildSneerUri(String puk, String inviteCode) {
+		String ret = "http://sneer.me/public-key?" + puk;
+		if (USE_INVITES && inviteCode != null)
+			ret += "&invite=" + inviteCode;
+		return ret;
 	}
 
 }

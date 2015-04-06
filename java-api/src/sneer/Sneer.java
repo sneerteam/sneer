@@ -14,11 +14,6 @@ public interface Sneer {
 
 	Profile profileFor(Party party);
 
-	// INVITES-TODO: Remove this:
-	/** @return a pseudorandomly generated long. */
-	@Deprecated
-	long generateContactInvite();
-
 	/** All Individual contacts that you have and all Groups you are a member of ordered alphabetically.*/
 	Observable<List<Contact>> contacts();
 	/** @return null if party is not a contact. */
@@ -31,7 +26,7 @@ public interface Sneer {
 	/** @party Can be null if we are inviting someone and do not have their puk yet.
      * @param inviteCodeReceived The code used by the contact to add us back automatically. Can be null if we didn't receive a code to add this contact.
 	 * @throws FriendlyException if there is a problemWithNewNickname(nickname) or if party is already a contact. */
-	void addContact(String nickname, Party party, String inviteCodeReceived) throws FriendlyException;
+	Contact addContact(String nickname, Party party, String inviteCodeReceived) throws FriendlyException;
 
 	Conversations conversations();
 

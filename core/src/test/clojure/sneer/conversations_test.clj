@@ -33,6 +33,7 @@
               produce-party  #(.produceParty sneer (->puk %))
               ^Party         neide       (produce-party "neide")
               ^Party         carla       (produce-party "carla")
+              ^Party         anna       (produce-party "anna")
 
               all-conversations (->chan (->> (.all subject)
                                              (rx/map (partial mapv #(-> % .nickname .current)))))]
@@ -49,14 +50,20 @@
                 (. sneer addContact "anna" nil "1234")
                 (<!!? all-conversations) => ["anna" "carla" "neide"])
 
-          (fact "new nicknames in contacts with a party are checked"
-                (.problemWithNewNickname sneer "neide" neide) => nil
-                (try (. sneer addContact "neide" carla nil)
-                     (catch FriendlyException _ true)) => true)
+          (fact "same nickname for same party is ok"
+                (.problemWithNewNickname sneer "neide" neide) => nil)
 
-          (fact "new nicknames in contacts without a party are checked"
-                (try (. sneer addContact "anna" nil "1234")
-                     (catch FriendlyException _ true)) => true))
+          (fact "same nickname without a party is ok"
+                (.problemWithNewNickname sneer "neide" nil) => nil)
+
+          (fact "same nickname for different party is not ok"
+                (. sneer addContact "neide" carla nil) => (throws FriendlyException))
+
+          (fact "same nickname for non-existent party is not ok"
+                (. sneer addContact "neide" anna nil) => (throws FriendlyException))
+
+          #_(fact "new nickname for non-existent party is ok"
+                (. sneer addContact "anna" anna nil) => some?))
 
         (let [^Sneer         sneer-2  (new-sneer tuple-space own-prik)
               ^Conversations subject-2   (.conversations sneer-2)

@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import sneer.android.utils.AndroidUtils;
+import sneer.Contact;
 
 import me.sneer.R;
 import sneer.Party;
@@ -37,10 +37,16 @@ public class AddContactActivity extends Activity {
 		btnSendInvite.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				final long inviteCode = sneer().generateContactInvite();
-				// TODO: persist inviteCode
-				shareOwnPublicKey(AddContactActivity.this, sneer().self(), inviteCode, nickname);
-				finish();
+				Contact c = null;
+				try {
+					c = sneer().addContact(nickname, null, null);
+				} catch (FriendlyException e) {
+					AndroidUtils.toast(AddContactActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+				}
+				if (c != null) {
+					shareOwnPublicKey(AddContactActivity.this, sneer().self(), c.inviteCode(), nickname);
+					finish();
+				}
 			}
 		});
 
@@ -52,8 +58,7 @@ public class AddContactActivity extends Activity {
 			@Override
 			public void afterTextChanged(Editable s) {
 				nickname = nicknameEdit.getText().toString();
-				//INVITES-TODO: Pass null instead of self. Passing self does not make sense.
-				String error = sneer().problemWithNewNickname(nickname, sneer().self());
+				String error = sneer().problemWithNewNickname(nickname, null);
 
 				btnSendInvite.setEnabled(false);
 
