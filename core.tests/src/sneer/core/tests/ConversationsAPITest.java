@@ -121,16 +121,16 @@ public class ConversationsAPITest extends TestCase {
 		Contact contact = sneerA.findContact(partyB);
 		assertNull(contact);
 
-		sneerA.addContact("Party Boy", partyB);
+		sneerA.addContact("Party Boy", partyB, null);
 		assertSame(partyB, sneerA.findContact(partyB).party());
 	}
 
 
 	public void testExceptionOnDuplicatedNickname() throws FriendlyException {
 
-		sneerA.addContact("Party Boy", sneerA.produceParty(userB));
+		sneerA.addContact("Party Boy", sneerA.produceParty(userB), null);
 		try {
-			sneerA.addContact("Party Boy", sneerA.produceParty(userC));
+			sneerA.addContact("Party Boy", sneerA.produceParty(userC), null);
 			fail("should have failed with " + FriendlyException.class.getSimpleName());
 		} catch (FriendlyException expected) {}
 	}
@@ -139,7 +139,7 @@ public class ConversationsAPITest extends TestCase {
 	public void testChangeContactNickname() throws FriendlyException {
 		Party party = sneerA.produceParty(userB);
 
-		sneerA.addContact("Party Boy", party);
+		sneerA.addContact("Party Boy", party, null);
 
 		Observable<String> nicks = sneerA.findContact(party).nickname().observable();
 		expecting(
@@ -153,7 +153,7 @@ public class ConversationsAPITest extends TestCase {
 
 	public void testChangeContactNicknamePersistence() throws FriendlyException {
 		Party party = sneerA.produceParty(userB);
-		sneerA.addContact("Party Boy", party);
+		sneerA.addContact("Party Boy", party, null);
 
 		Contact contact = sneerA.findContact(party);
 		contact.setNickname("Party Man");
@@ -170,22 +170,22 @@ public class ConversationsAPITest extends TestCase {
 		Party partyB = sneerA.produceParty(userB);
 		Party partyC = sneerA.produceParty(userC);
 
-		assertNull   (sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
-		sneerA.addContact("Party Boy", partyB);
-		assertNull   (sneerA.problemWithNewNickname(partyB.publicKey().current(), "Party Boy"));
-		assertNotNull(sneerA.problemWithNewNickname(partyC.publicKey().current(), "Party Boy"));
+		assertNull   (sneerA.problemWithNewNickname("Party Boy", partyB));
+		sneerA.addContact("Party Boy", partyB, null);
+		assertNull   (sneerA.problemWithNewNickname("Party Boy", partyB));
+		assertNotNull(sneerA.problemWithNewNickname("Party Boy", partyC));
 
 		try {
-			sneerA.addContact("Party Boy", partyC);
+			sneerA.addContact("Party Boy", partyC, null);
 			fail();
 		} catch (FriendlyException expected) {}
 
 		try {
-			sneerA.addContact("Party Boy2", partyB);
+			sneerA.addContact("Party Boy2", partyB, null);
 			fail();
 		} catch (FriendlyException expected) {}
 
-		sneerA.addContact("Party Chick", partyC);
+		sneerA.addContact("Party Chick", partyC, null);
 		Contact chick = sneerA.findContact(partyC);
 		try {
 			chick.setNickname("Party Boy");
@@ -204,12 +204,12 @@ public class ConversationsAPITest extends TestCase {
 		expecting(
 			values(sneerA.contacts(), Collections.emptyList()));
 
-		sneerA.addContact("Party Boy", partyB);
+		sneerA.addContact("Party Boy", partyB, null);
 
 		expecting(
 			contactsOf(sneerA, partyB));
 
-		sneerA.addContact("Party Chick", partyC);
+		sneerA.addContact("Party Chick", partyC, null);
 
 		expecting(
 			contactsOf(sneerA, partyB, partyC));
@@ -219,8 +219,8 @@ public class ConversationsAPITest extends TestCase {
 
 		final Party partyB = sneerA.produceParty(userB);
 		final Party partyC = sneerA.produceParty(userC);
-		sneerA.addContact("Party Boy", partyB);
-		sneerA.addContact("Party Chick", partyC);
+		sneerA.addContact("Party Boy", partyB, null);
+		sneerA.addContact("Party Chick", partyC, null);
 
 		expecting(
 			contactsOf(restart(adminA).sneer(), partyB, partyC));
@@ -289,7 +289,7 @@ public class ConversationsAPITest extends TestCase {
 
 	public void ignoreTestTuplesFromContactsAreVisible() throws FriendlyException {
 
-		sneerA.addContact("little b", sneerA.produceParty(userB));
+		sneerA.addContact("little b", sneerA.produceParty(userB), null);
 
 		sneerB.tupleSpace().publisher()
 			.type("tweet")
@@ -311,7 +311,7 @@ public class ConversationsAPITest extends TestCase {
 			.pub("hello");
 
 		// it becomes a contact
-		sneerA.addContact("little b", sneerA.produceParty(userB));
+		sneerA.addContact("little b", sneerA.produceParty(userB), null);
 
 		// tweets should be visible
 		expecting(payloads(tweets, "hello"));
@@ -322,7 +322,7 @@ public class ConversationsAPITest extends TestCase {
 	public void testEmitConversationForEveryContact() throws FriendlyException {
 
 		Party partyBOfA = sneerA.produceParty(userB);
-		sneerA.addContact("little b", partyBOfA);
+		sneerA.addContact("little b", partyBOfA, null);
 
 		expecting(
 			same(
@@ -349,11 +349,11 @@ public class ConversationsAPITest extends TestCase {
 	public void testConversationMessageSequence() throws Exception {
 
 		Party pAB = sneerA.produceParty(userB);
-		sneerA.addContact("b", pAB);
+		sneerA.addContact("b", pAB, null);
 		Conversation cAB = conversationWith(pAB, sneerA);
 
 		Party pBA = sneerB.produceParty(userA);
-		sneerB.addContact("a", pBA);
+		sneerB.addContact("a", pBA, null);
 		Conversation cBA = conversationWith(pBA, sneerB);
 
 		cAB.sendMessage("Hello1");
@@ -380,11 +380,11 @@ public class ConversationsAPITest extends TestCase {
 	public void testUnreadMessageCount() throws Exception {
 
 		Party pAB = sneerA.produceParty(userB);
-		sneerA.addContact("b", pAB);
+		sneerA.addContact("b", pAB, null);
 		Conversation cAB = conversationWith(pAB, sneerA);
 
 		Party pBA = sneerB.produceParty(userA);
-		sneerB.addContact("a", pBA);
+		sneerB.addContact("a", pBA, null);
 		final Conversation cBA = conversationWith(pBA, sneerB);
 
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
@@ -430,7 +430,7 @@ public class ConversationsAPITest extends TestCase {
 		// TODO
 
 		Party partyBOfA = sneerA.produceParty(userB);
-		sneerA.addContact("little b", partyBOfA);
+		sneerA.addContact("little b", partyBOfA, null);
 
 		expecting(
 			values(partyBOfA.name(), "little b"));

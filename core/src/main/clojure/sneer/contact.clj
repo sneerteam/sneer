@@ -19,17 +19,18 @@
       (field "invite-code" invite-code)
       (pub new-nick)))
 
-(defn problem-with-new-nickname-in [puk->contact puk new-nick]
-  (let [puk->contact (dissoc puk->contact puk)]
+(defn problem-with-new-nickname-in [puk->contact new-nick party]
+  (let [puk (some-> ^Party party .publicKey .current)
+        puk->contact (dissoc puk->contact puk)]
     (cond
       (.isEmpty ^String new-nick) "cannot be empty"
       (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current)))) "already used")))
 
-(defn problem-with-new-nickname [contacts-state puk new-nick]
-  (problem-with-new-nickname-in @(:puk->contact contacts-state) puk new-nick))
+(defn problem-with-new-nickname [contacts-state new-nick party]
+  (problem-with-new-nickname-in @(:puk->contact contacts-state) new-nick party))
 
-(defn check-new-nickname [puk->contact puk new-nick]
-  (when-let [problem (problem-with-new-nickname-in puk->contact puk new-nick)]
+(defn check-new-nickname [puk->contact new-nick party]
+  (when-let [problem (problem-with-new-nickname-in puk->contact new-nick party)]
     (throw (FriendlyException. (str "Nickname " problem)))))
 
 (defn reify-contact
@@ -45,7 +46,7 @@
 
       (setNickname [_ new-nick]
         (when party
-          (check-new-nickname @puk->contact (party-puk party) new-nick))
+          (check-new-nickname @puk->contact new-nick party))
         (publish-contact tuple-space own-puk new-nick party invite-code)
         (rx/on-next nick-subject new-nick))
 
@@ -99,34 +100,23 @@
   (find-contact-in @(:puk->contact contacts-state) party))
 
 (defn check-new-contact [puk->contact nickname party]
-  (when (find-contact-in puk->contact party)
+  (when (some->> party (find-contact-in puk->contact))
     (throw (FriendlyException. "Duplicate contact")))
-  (check-new-nickname puk->contact (.. ^Party party publicKey current) nickname))
+  (check-new-nickname puk->contact nickname party))
 
-(defn add-contact [contacts-state nickname party]
-  (swap! (contacts-state :puk->contact)
+(defn add-contact [contacts-state nickname party invite-code-received]
+  (swap! (contacts-state (if party :puk->contact :nick->contact))
          (fn [cur]
            (check-new-contact cur nickname party)
            (assoc cur
-             (party-puk party)
+             (if party (party-puk party) nickname)
              (reify-contact (:tuple-space contacts-state)
                             (:puk->contact contacts-state)
                             (:own-puk contacts-state)
                             nickname
                             party
-                            nil))))
-  (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party nil))
-
-(defn add-contact-without-party [contacts-state nickname invite-code]
-  (swap! (contacts-state :nick->contact)
-         (fn [cur]
-           (assoc cur nickname (reify-contact (:tuple-space contacts-state)
-                                              (:puk->contact contacts-state)
-                                              (:own-puk contacts-state)
-                                              nickname
-                                              nil
-                                              invite-code))))
-  (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname nil invite-code))
+                            invite-code-received))))
+  (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname party invite-code-received))
 
 (defn get-contacts [contacts-state]
   (:observable-contacts contacts-state))

@@ -11,6 +11,7 @@
             [sneer.impl :refer [new-sneer]])
   (:import [rx Observable]
            [sneer Sneer Party Conversations]
+           [sneer.commons.exceptions FriendlyException]
            [sneer.tuples TupleSpace]))
 
 (defn- ->chan [^Observable o]
@@ -39,14 +40,23 @@
                 (<!!? all-conversations) => [])
 
           (fact "a new contact implies a new converstation"
-                (. sneer addContact "neide" neide)
+                (. sneer addContact "neide" neide nil)
                 (<!!? all-conversations) => ["neide"]
 
-                (. sneer addContact "carla" carla)
+                (. sneer addContact "carla" carla nil)
                 (<!!? all-conversations) => ["carla" "neide"]
 
-                (. sneer addContactWithoutParty "anna" 1234)
-                (<!!? all-conversations) => ["anna" "carla" "neide"]))
+                (. sneer addContact "anna" nil "1234")
+                (<!!? all-conversations) => ["anna" "carla" "neide"])
+
+          (fact "new nicknames in contacts with a party are checked"
+                (.problemWithNewNickname sneer "neide" neide) => nil
+                (try (. sneer addContact "neide" carla nil)
+                     (catch FriendlyException _ true)) => true)
+
+          (fact "new nicknames in contacts without a party are checked"
+                (try (. sneer addContact "anna" nil "1234")
+                     (catch FriendlyException _ true)) => true))
 
         (let [^Sneer         sneer-2  (new-sneer tuple-space own-prik)
               ^Conversations subject-2   (.conversations sneer-2)

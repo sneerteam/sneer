@@ -49,7 +49,7 @@ public class AddContactActivity extends Activity {
 			public void afterTextChanged(Editable s) {
 				nickname = nicknameEdit.getText().toString();
 				//INVITES-TODO: Pass null instead of self. Passing self does not make sense.
-				String error = sneer().problemWithNewNickname(sneer().self().publicKey().current(), nickname);
+				String error = sneer().problemWithNewNickname(nickname, sneer().self());
 
 				btnSendInvite.setEnabled(false);
 
