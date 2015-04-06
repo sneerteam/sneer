@@ -368,7 +368,7 @@ public class ConversationsAPITest extends TestCase {
 		//Restart
 		Sneer newSneer = newSneerAdmin(adminA.privateKey(), tupleBaseA).sneer();
 		Party newB = newSneer.produceParty(userB);
-		Conversation newConversation = conversationWith(newB, sneerA);
+		Conversation newConversation = conversationWith(newB, newSneer);
 		messagesEventually(newConversation, "Hello1", "Hello2", "Hello3");
 	}
 
