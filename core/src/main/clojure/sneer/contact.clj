@@ -57,7 +57,7 @@
                  puk->contact
                  (.author tuple)
                  (.payload tuple)
-                 (produce-party! puk->party (.get tuple "party"))
+                 (some->> (.get tuple "party") (produce-party! puk->party))
                  nil))
 
 (defn restore-contact-list [^TupleSpace tuple-space puk->contact own-puk puk->party]
@@ -125,7 +125,8 @@
                                               (:own-puk contacts-state)
                                               nickname
                                               nil
-                                              invite-code)))))
+                                              invite-code))))
+  (publish-contact (:tuple-space contacts-state) (:own-puk contacts-state) nickname nil invite-code))
 
 (defn get-contacts [contacts-state]
   (:observable-contacts contacts-state))
