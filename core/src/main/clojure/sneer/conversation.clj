@@ -220,8 +220,9 @@
       (ofType [_ _type]
         (rx/never))
 
-      (with [_ party]
-        (get convos party))
+      (with [this party]
+        (-> this .all .toBlocking .first) ; forces convos to load. this is ugly, please remove.
+        (get @convos party))
 
       (notifications [this]
         (->> (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all))
