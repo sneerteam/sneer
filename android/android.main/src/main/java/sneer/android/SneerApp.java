@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -14,9 +15,18 @@ import sneer.android.impl.SneerAndroidImpl;
 
 public class SneerApp extends Application {
 
+	private static final boolean DEVELOPER_MODE = false;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		if (DEVELOPER_MODE) {
+			StrictMode.setThreadPolicy(
+					new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+			StrictMode.setVmPolicy(
+					new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
+		}
 
 		//Do not delete this. We must revive the simulator for rapid UI development.
 //		SneerAndroidSingleton.setInstance(isCoreAvailable()
