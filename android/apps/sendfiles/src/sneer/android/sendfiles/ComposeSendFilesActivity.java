@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 import sneer.android.ui.MessageActivity;
+import sneer.android.utils.AndroidUtils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -57,10 +58,10 @@ public class ComposeSendFilesActivity extends MessageActivity {
 		try {
 			ret = readFully(new FileInputStream(file));
 		} catch (FileNotFoundException e) {
-            toast("File not found. (" + e.getMessage() + ").");
+            AndroidUtils.toast(ComposeSendFilesActivity.this, "File not found. (" + e.getMessage() + ").", Toast.LENGTH_LONG);
 			finish();
         } catch (IOException e) {
-            toast("Error reading file");
+            AndroidUtils.toast(ComposeSendFilesActivity.this, "Error reading file", Toast.LENGTH_LONG);
             finish();
 		}
 		return ret;
@@ -83,10 +84,6 @@ public class ComposeSendFilesActivity extends MessageActivity {
         while ((read = inputStream.read(b)) != -1)
             out.write(b, 0, read);
         return out.toByteArray();
-    }
-
-    private void toast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
 }

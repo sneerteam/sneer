@@ -7,9 +7,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import sneer.android.utils.AndroidUtils;
 
 import me.sneer.R;
 import sneer.Party;
+import sneer.commons.exceptions.FriendlyException;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.utils.Puk.shareOwnPublicKey;

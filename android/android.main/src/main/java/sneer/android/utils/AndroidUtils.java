@@ -28,7 +28,7 @@ public class AndroidUtils {
 	}
 
 
-	private static void toast(Context context, final String message, final int length) {
+	public static void toast(Context context, final String message, final int length) {
 		Toast.makeText(context, message, length).show();
 	}
 

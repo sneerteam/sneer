@@ -216,7 +216,7 @@ public class ContactActivity extends Activity {
 			@Override public void afterTextChanged(Editable s) {
 				if (ownNameSubscription != null) ownNameSubscription.unsubscribe();
 				if (preferredNicknameSubscription != null) preferredNicknameSubscription.unsubscribe();
-				nicknameEdit.setError(sneer().problemWithNewNickname(party.publicKey().current(), editText.getText().toString()));
+				nicknameEdit.setError(sneer().problemWithNewNickname(editText.getText().toString(), party));
 			}
 
 			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
@@ -230,7 +230,7 @@ public class ContactActivity extends Activity {
 		final String nickName = text(nicknameEdit);
 		try {
 			if (newContact) {
-				sneer().addContact(nickName, party);
+				sneer().addContact(nickName, party, null);
 				changed = true;
 			}
 
