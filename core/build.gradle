@@ -63,13 +63,18 @@ dependencies {
   optional 'org.xerial:sqlite-jdbc:3.8.6'
 }
 
-def onWindows = System.properties['os.name'].toLowerCase().contains('windows')
 
-task leinSkummet(type: Exec) {
+class Lein extends Exec {
+  static def onWindows = System.properties['os.name'].toLowerCase().contains('windows')
+  Lein() {
+    executable (onWindows ? 'lein.bat' : 'lein')
+  }
+}
+
+task leinSkummet(type: Lein) {
   inputs.source sourceSets.main.clojure
   inputs.source 'project.clj'
   outputs.dir 'target'
-  executable (onWindows ? 'lein.bat' : 'lein')
   args 'with-profile', 'lean', 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
 }
 
@@ -85,8 +90,7 @@ task skummetJar(type: Copy, dependsOn: leinSkummet) {
   }
 }
 
-task leinClean(type: Exec) {
-  executable 'lein'
+task leinClean(type: Lein) {
   args 'clean'
 }
 
