@@ -66,23 +66,30 @@ public class SneerSqliteDatabase implements Closeable, Database {
 
 	@Override
 	public Iterable<List<?>> query(String sql, final List<Object> args) {
-        Cursor cursor = sqlite.rawQueryWithFactory(new SQLiteDatabase.CursorFactory() {
-            @Override
-            public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery, String editTable, SQLiteQuery query) {
-                bindAll(query, args);
-                return new SQLiteCursor(masterQuery, editTable, query);
-            }
-        }, sql, null, null);
+		Cursor cursor = sqlite.rawQueryWithFactory(cursorFactoryFor(args), sql, null, null);
+		try {
+			ArrayList<List<?>> ret = new ArrayList<List<?>>(cursor.getCount() + 1);
+			ret.add(Arrays.asList(cursor.getColumnNames()));
+			if (!cursor.moveToFirst()) return ret;
 
-		ArrayList<List<?>> ret = new ArrayList<List<?>>(cursor.getCount() + 1);
-		ret.add(Arrays.asList(cursor.getColumnNames()));
-		if (!cursor.moveToFirst()) return ret;
+			do {
+				ret.add(row(cursor));
+			} while (cursor.moveToNext());
 
-		do {
-			ret.add(row(cursor));
-		} while (cursor.moveToNext());
+			return ret;
+		} finally {
+			cursor.close();
+		}
+	}
 
-		return ret;
+	private SQLiteDatabase.CursorFactory cursorFactoryFor(final List<Object> args) {
+		return new SQLiteDatabase.CursorFactory() {
+			@Override
+			public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery, String editTable, SQLiteQuery query) {
+				bindAll(query, args);
+				return new SQLiteCursor(masterQuery, editTable, query);
+			}
+		};
 	}
 
     private void bindAll(SQLiteQuery query, List<Object> args) {
