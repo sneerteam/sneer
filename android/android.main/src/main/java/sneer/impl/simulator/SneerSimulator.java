@@ -52,9 +52,9 @@
 //		tupleSpace = null;
 ////		tupleSpace = cloud.newTupleSpace(prik);
 ////
-////		setupMockupRPSPlayer(cloud, addContact("Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("selfie_002.png")), "SCISSORS");
-////		setupMockupRPSPlayer(cloud, addContact("Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("selfie_002.png")), "ROCK");
-////		setupMockupRPSPlayer(cloud, addContact("Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("selfie_002.png")), "PAPER");
+////		setupMockupRPSPlayer(cloud, produceContact("Tesourinha", "maicon", "Paraguay", "Ciudad del Este", selfieFromFileSystem("selfie_002.png")), "SCISSORS");
+////		setupMockupRPSPlayer(cloud, produceContact("Pedreira", "snypes", "USA", "Los Angeles", selfieFromFileSystem("selfie_002.png")), "ROCK");
+////		setupMockupRPSPlayer(cloud, produceContact("Folhada", "carlinha", "Brasil", "Florianopolis", selfieFromFileSystem("selfie_002.png")), "PAPER");
 ////
 ////		addUnknownContact("Ze Ninguem", "dude", "World", "Unknown", selfieFromFileSystem("selfie_002.png"));
 //	}
@@ -121,7 +121,7 @@
 //
 //
 //	@Override
-//	public void addContact(final String nickname, final Party party) {
+//	public void produceContact(final String nickname, final Party party) {
 //		synchronized (contactsByParty) {
 //			if (contactsByParty.get(party) != null)
 //				throw new RuntimeException("The party you tried to add was already a contact.");
@@ -178,10 +178,10 @@
 //	}
 //
 //
-////	private PrivateKey addContact(String name, String preferredNicknane, String coutry, String city, byte[] selfie) {
+////	private PrivateKey produceContact(String name, String preferredNicknane, String coutry, String city, byte[] selfie) {
 ////		PrivateKey prik = KeysSimulator.createPrivateKey();
 ////		PartySimulator party = produceParty(prik.publicKey());
-////		addContact(name, party);
+////		produceContact(name, party);
 ////		return prik;
 ////	}
 ////

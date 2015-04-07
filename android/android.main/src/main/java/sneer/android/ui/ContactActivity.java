@@ -230,7 +230,7 @@ public class ContactActivity extends Activity {
 		final String nickName = text(nicknameEdit);
 		try {
 			if (newContact) {
-				sneer().addContact(nickName, party, null);
+				sneer().produceContact(nickName, party, null);
 				changed = true;
 			}
 

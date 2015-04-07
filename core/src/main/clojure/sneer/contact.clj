@@ -27,7 +27,7 @@
       (.isEmpty ^String new-nick)
       "cannot be empty"
 
-      (when party (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current)))))
+      (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current))))
       "already used")))
 
 (defn problem-with-new-nickname [contacts-state new-nick party]
@@ -112,7 +112,7 @@
     (throw (FriendlyException. "Duplicate contact")))
   (check-new-nickname puk->contact nickname party))
 
-(defn add-contact [contacts-state nickname party invite-code-received]
+(defn produce-contact [contacts-state nickname party invite-code-received]
   (let [contact (reify-contact (:tuple-space contacts-state)
                                (:puk->contact contacts-state)
                                (:own-puk contacts-state)

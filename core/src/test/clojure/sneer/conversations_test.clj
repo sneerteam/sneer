@@ -37,35 +37,36 @@
       (start-sneer! db tuple-base-atom))
     sneer1))
 
-(defn- test-add-contact [sneer nick party]
+(defn- test-produce-contact [sneer nick party]
   (let [->party #(.produceParty sneer (->puk (str % "Party")))]
-    (.addContact sneer nick (->party party) nil)))
+    (.produceContact sneer nick (when party (->party party)) nil)))
 
-(defn- test-add-contacts [restart nick party nick2 party2]
+(defn- test-produce-contacts [restart nick party nick2 party2]
   (with-open [db (jdbc-database/create-sqlite-db)]
     (let [tuple-base  (atom nil)
           sneer1      (start-sneer!  db tuple-base)
           sneer2     #(start-sneer2! db tuple-base restart sneer1)]
-      (test-add-contact  sneer1  nick  party )
-      (test-add-contact (sneer2) nick2 party2))))
+      (test-produce-contact  sneer1  nick  party )
+      (test-produce-contact (sneer2) nick2 party2))))
 
 (def ok   truthy)
 (def nope (throws FriendlyException))
 
-#_(tabular "Transient and persistent addContact scenarios."
-  (tabular
+(tabular "Transient and persistent produceContact scenarios."
+         (tabular
 
-    (fact
-      (test-add-contacts ?restart  ?nick ?party  ?nick2 ?party2)
-        => ?result)
+           (fact
+             (test-produce-contacts ?restart ?nick ?party ?nick2 ?party2)
+             => ?result)
 
-    ?nick ?party ?nick2 ?party2 ?result ?obs
-    "Ann" nil    "Ann"  "A"     ok      "Invited then added"
-    "Ann" "A"    "Ann"  "A"     ok      "Same contact"
-    "Ann" "A"    "Bob"  "B"     ok      "Diferent contacts"
-    "Ann" "A"    "Ann"  "B"     nope    "Nickname already used"
-    "Ann" "A"    "Ann"  nil     nope    "Nickname already used 2"
-    "Ann" "A"    "Bob"  "A"     nope    "Contact already has a nick")
+           ?nick ?party ?nick2 ?party2 ?result ?obs
+           "Ann" nil "Ann" "A" ok "Invited then added"
+           ;"Ann" "A"    "Ann"  "A"     ok      "Same contact"
+           "Ann" "A"    "Bob"  "B"     ok      "Diferent contacts"
+           ;"Ann" "A"    "Ann"  "B"     nope    "Nickname already used"
+           ;"Ann" "A"    "Ann"  nil     nope    "Nickname already used 2"
+           ;"Ann" "A"    "Bob"  "A"     nope    "Contact already has a nick"
+           )
 
   ?restart
   false
@@ -94,13 +95,13 @@
                 (<!!? all-conversations) => [])
 
           (fact "a new contact implies a new converstation"
-                (. sneer addContact "neide" neide nil)
+                (. sneer produceContact "neide" neide nil)
                 (<!!? all-conversations) => ["neide"]
 
-                (. sneer addContact "carla" carla nil)
+                (. sneer produceContact "carla" carla nil)
                 (<!!? all-conversations) => ["carla" "neide"]
 
-                (. sneer addContact "anna" nil nil)
+                (. sneer produceContact "anna" nil nil)
                 (<!!? all-conversations) => ["anna" "carla" "neide"]))
 
         (let [^Sneer         sneer-2   (new-sneer tuple-space own-prik)

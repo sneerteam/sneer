@@ -18,7 +18,7 @@ public interface Contact {
 	/** @throws FriendlyException if this Contact's party is already set or if party is already set for another Contact. */
 	void setParty(Party party) throws FriendlyException;
 
-	//INVITES-TODO: Add this: (generated when Sneer.addContact is called with a null party)
+	//INVITES-TODO: Add this: (generated when Sneer.produceContact is called with a null party)
 	/** @return A code that can be sent to the party adding us that will cause Sneer to add that party back automatically as this Contact's party (null if this Contact's party is already set). */
 	String inviteCode();
 

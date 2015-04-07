@@ -39,7 +39,7 @@ public class AddContactActivity extends Activity {
 			public void onClick(View v) {
 				Contact c = null;
 				try {
-					c = sneer().addContact(nickname, null, null);
+					c = sneer().produceContact(nickname, null, null);
 				} catch (FriendlyException e) {
 					AndroidUtils.toast(AddContactActivity.this, e.getMessage(), Toast.LENGTH_LONG);
 				}
