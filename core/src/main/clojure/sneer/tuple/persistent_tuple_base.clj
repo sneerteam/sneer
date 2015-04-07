@@ -3,7 +3,7 @@
            [sneer.admin UniqueConstraintViolated]
            [java.lang AutoCloseable])
   (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
-            [clojure.core.async :as async :refer [go-loop <! >! >!! mult tap chan close! go]]
+            [clojure.core.async :as async :refer [go-loop <! >! >!! <!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
             [sneer.rx-macros :refer :all]
             [clojure.core.match :refer [match]]
@@ -219,20 +219,19 @@
   (go (>! channel response)))
 
 (defn create [db]
+  (setup db)
+
   (let [new-tuples (dropping-chan)
         new-tuples-mult (mult new-tuples)
-        requests (chan)]
-
-    (setup db)
-
-    (go-trace
-      (loop [next-tuple-id (-> db max-tuple-id inc)]
-        (when-some [request (<! requests)]
-          (let [{:keys [channel response bump-id]} (response-for! db new-tuples request next-tuple-id)]
-            (when (some? response)
-              (assert (some? channel))
-              (go-put-in-separate-fn-to-avoid-class-name-too-long channel response))
-            (recur (cond-> next-tuple-id bump-id inc))))))
+        requests (chan)
+        running (go-trace
+                  (loop [next-tuple-id (-> db max-tuple-id inc)]
+                    (when-some [request (<! requests)]
+                      (let [{:keys [channel response bump-id]} (response-for! db new-tuples request next-tuple-id)]
+                        (when (some? response)
+                          (assert (some? channel))
+                          (go-put-in-separate-fn-to-avoid-class-name-too-long channel response))
+                        (recur (cond-> next-tuple-id bump-id inc))))))]
 
     (reify TupleBase
 
@@ -286,4 +285,5 @@
       AutoCloseable
       (close [_]
         (close! requests)
-        (close! new-tuples)))))
+        (close! new-tuples)
+        (<!! running)))))
