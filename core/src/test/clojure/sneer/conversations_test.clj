@@ -3,7 +3,7 @@
             [clojure.core.async :as async :refer [thread]]
             [rx.lang.clojure.core :as rx]
             [sneer.tuple.space :as space]
-            [sneer.tuple.persistent-tuple-base :as base]
+            [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.test-util :refer [<!!? observable->chan]]
             [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.rx :refer [observe-for-io]]
@@ -23,9 +23,57 @@
 (defn- ->chan [^Observable o]
   (->> o observe-for-io observable->chan))
 
+(defn- start-sneer! [db tuple-base-atom]
+  (reset! tuple-base-atom (tuple-base/create db))
+  (let [own-prik (create-prik)
+        own-puk  (.publicKey own-prik)
+        space    (space/reify-tuple-space own-puk @tuple-base-atom)]
+    (new-sneer space own-prik)))
+
+(defn- start-sneer2! [db tuple-base-atom restart sneer1]
+  (if restart
+    (do
+      (.close @tuple-base-atom)
+      (start-sneer! db tuple-base-atom))
+    sneer1))
+
+(defn- test-add-contact [sneer nick party]
+  (let [->party #(.produceParty sneer (->puk (str % "Party")))]
+    (.addContact sneer nick (->party party) nil)))
+
+(defn- test-add-contacts [restart nick party nick2 party2]
+  (with-open [db (jdbc-database/create-sqlite-db)]
+    (let [tuple-base  (atom nil)
+          sneer1      (start-sneer!  db tuple-base)
+          sneer2     #(start-sneer2! db tuple-base restart sneer1)]
+      (test-add-contact  sneer1  nick  party )
+      (test-add-contact (sneer2) nick2 party2))))
+
+(def ok   truthy)
+(def nope (throws FriendlyException))
+
+#_(tabular "Transient and persistent addContact scenarios."
+  (tabular
+
+    (fact
+      (test-add-contacts ?restart  ?nick ?party  ?nick2 ?party2)
+        => ?result)
+
+    ?nick ?party ?nick2 ?party2 ?result ?obs
+    "Ann" nil    "Ann"  "A"     ok      "Invited then added"
+    "Ann" "A"    "Ann"  "A"     ok      "Same contact"
+    "Ann" "A"    "Bob"  "B"     ok      "Diferent contacts"
+    "Ann" "A"    "Ann"  "B"     nope    "Nickname already used"
+    "Ann" "A"    "Ann"  nil     nope    "Nickname already used 2"
+    "Ann" "A"    "Bob"  "A"     nope    "Contact already has a nick")
+
+  ?restart
+  false
+  true)
+
 (facts "About reify-conversations"
   (with-open [db (jdbc-database/create-sqlite-db)
-              tuple-base (base/create db)]
+              tuple-base (tuple-base/create db)]
 
     (facts "#all"
       (let [own-prik       (create-prik)
@@ -39,7 +87,6 @@
               produce-party  #(.produceParty sneer (->puk %))
               ^Party         neide       (produce-party "neide")
               ^Party         carla       (produce-party "carla")
-              ^Party         anna       (produce-party "anna")
 
               all-conversations (->chan (->> (.all subject)
                                              (rx/map (partial mapv #(-> % .nickname .current)))))]
@@ -53,23 +100,8 @@
                 (. sneer addContact "carla" carla nil)
                 (<!!? all-conversations) => ["carla" "neide"]
 
-                (. sneer addContact "anna" nil "1234")
-                (<!!? all-conversations) => ["anna" "carla" "neide"])
-
-          (fact "same nickname for same party is ok"
-                (.problemWithNewNickname sneer "neide" neide) => nil)
-
-          (fact "same nickname without a party is ok"
-                (.problemWithNewNickname sneer "neide" nil) => nil)
-
-          (fact "same nickname for different party is not ok"
-                (. sneer addContact "neide" carla nil) => (throws FriendlyException))
-
-          (fact "same nickname for non-existent party is not ok"
-                (. sneer addContact "neide" anna nil) => (throws FriendlyException))
-
-          #_(fact "new nickname for non-existent party is ok"
-                (. sneer addContact "anna" anna nil) => some?))
+                (. sneer addContact "anna" nil nil)
+                (<!!? all-conversations) => ["anna" "carla" "neide"]))
 
         (let [^Sneer         sneer-2   (new-sneer tuple-space own-prik)
               ^Conversations subject-2 (.conversations sneer-2)
