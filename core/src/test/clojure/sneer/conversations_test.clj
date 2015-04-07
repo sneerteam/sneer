@@ -60,7 +60,7 @@
            "Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
            "Ann" "A"    "Bob"  "B"     ok      2      "Diferent contacts"
            "Ann" "A"    "Ann"  "B"     nope    1      "Nickname already used"
-           ;"Ann" "A"    "Ann"  nil     nope    1      "Nickname already used 2"
+           "Ann" "A"    "Ann"  nil     nope    1      "Nickname already used 2"
            "Ann" "A"    "Bob"  "A"     nope    1      "Ann already has a nick")
 
   ?restart
