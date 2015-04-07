@@ -14,6 +14,12 @@
            [sneer.commons.exceptions FriendlyException]
            [sneer.tuples TupleSpace]))
 
+; (do (require 'midje.repl) (midje.repl/autotest))
+
+(defn- pst [fn]
+  (try (fn)
+       (catch Exception e (.printStackTrace e))))
+
 (defn- ->chan [^Observable o]
   (->> o observe-for-io observable->chan))
 
