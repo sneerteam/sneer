@@ -65,8 +65,8 @@
           #_(fact "new nickname for non-existent party is ok"
                 (. sneer addContact "anna" anna nil) => some?))
 
-        (let [^Sneer         sneer-2  (new-sneer tuple-space own-prik)
-              ^Conversations subject-2   (.conversations sneer-2)
+        (let [^Sneer         sneer-2   (new-sneer tuple-space own-prik)
+              ^Conversations subject-2 (.conversations sneer-2)
               all-conversations-2 (->chan (->> (.all subject-2)
                                                (rx/map (partial mapv #(-> % .nickname .current)))))]
           (fact "contacts are published to the database"
