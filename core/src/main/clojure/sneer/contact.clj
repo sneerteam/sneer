@@ -72,7 +72,7 @@
                  (some->> (.get tuple "party") (produce-party! puk->party))
                  (.get tuple "invite-code")))
 
-(defn restore-contact-list [^TupleSpace tuple-space puk->contact own-puk puk->party]
+(defn restore-contacts [^TupleSpace tuple-space nick->contact puk->contact own-puk puk->party]
   (->>
     (.. tuple-space
         filter
@@ -81,25 +81,36 @@
         localTuples
         toBlocking
         toIterable)
-    (mapcat (fn [^Tuple tuple] [(.get tuple "party") (tuple->contact tuple-space puk->contact tuple puk->party)]))
-    (apply hash-map)))
+    #_(mapcat (fn [^Tuple tuple]
+              [(.get tuple "party") (tuple->contact tuple-space puk->contact tuple puk->party)]))
+    #_(apply hash-map)
+    (map (fn [^Tuple tuple]
+              (tuple->contact tuple-space puk->contact tuple puk->party)))))
 
 (defn current-nickname [^Contact contact]
   (.. contact nickname current))
 
 (defn- ->contact-list [[puk->contact nick->contact]]
   (->> (concat (vals puk->contact) (vals nick->contact))
-       (sort-by current-nickname)
-       vec))
+       set
+       vec
+       (sort-by current-nickname)))
 
 (defn create-contacts-state [tuple-space own-puk puk->party]
-  (let [puk->contact (atom {})
-        nick->contact (atom {})]
-    (swap! puk->contact (fn [_] (restore-contact-list tuple-space puk->contact own-puk puk->party)))
+  (let [nick->contact (atom {})
+        puk->contact (atom {})
+        contacts (restore-contacts tuple-space nick->contact puk->contact own-puk puk->party)]
+
+     (reset! nick->contact (apply hash-map (mapcat (fn [c] [(.nickname c) c])
+                                                contacts)))
+     (reset! puk->contact  (apply hash-map (->> contacts
+                                                (filter #(.party %))
+                                                (mapcat (fn [c] [(.. c party publicKey current) c])))))
+
     {:own-puk             own-puk
      :tuple-space         tuple-space
-     :puk->contact        puk->contact
      :nick->contact       nick->contact
+     :puk->contact        puk->contact
      :observable-contacts (combine-latest ->contact-list
                                           [(atom->observable puk->contact)
                                            (atom->observable nick->contact)])}))

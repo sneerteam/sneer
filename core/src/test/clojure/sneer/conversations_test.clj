@@ -38,7 +38,7 @@
       (let [result (async/chan)
             contact (test-produce-contact  sneer  nick  party)]
         (query-tuples tuple-base {"type" "contact"} result)
-        (println "FIRST" (<!!? result))
+        ;(println "FIRST" (<!!? result))
         (when restart (.close tuple-base))
         contact)
       (let [tuple-base (if restart (tuple-base/create db) tuple-base)
@@ -47,7 +47,7 @@
             result (async/chan)
             contact (test-produce-contact sneer nick2 party2)]
         (query-tuples tuple-base {"type" "contact"} result)
-        (println "SECOND" (<!!? result))
+        ;(println "SECOND" (<!!? result))
         (.close tuple-base)
         contact))))
 
