@@ -36,7 +36,6 @@
           tuple-space (space/reify-tuple-space own-puk tuple-base)
           sneer (new-sneer tuple-space own-prik)]
       (let [contact (test-produce-contact  sneer  nick  party)]
-        (query-tuples tuple-base {"type" "contact"} result)
         (when restart (.close tuple-base))
         contact)
       (let [tuple-base (if restart (tuple-base/create db) tuple-base)
