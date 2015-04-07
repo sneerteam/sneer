@@ -67,7 +67,7 @@
            "Ann" "A"    "Bob"  "B"     ok      2      "Diferent contacts"
            "Ann" "A"    "Ann"  "B"     nope    1      "Nickname already used"
            ;"Ann" "A"    "Ann"  nil     nope    1      "Nickname already used 2"
-           "Ann" "A"    "Bob"  "A"     nope    1      "Contact already has a nick")
+           "Ann" "A"    "Bob"  "A"     nope    1      "Ann already has a nick")
 
   ?restart
   false
@@ -105,8 +105,7 @@
                 (.produceContact sneer "anna" nil nil)
                 (<!!? all-conversations) => ["anna" "carla" "neide"]
 
-                ;(.problemWithNewNickname sneer "anna" carla) => (throws FriendlyException)
-                ))
+                (.problemWithNewNickname sneer "anna" carla) => some?))
 
         (let [^Sneer         sneer-2   (new-sneer tuple-space own-prik)
               ^Conversations subject-2 (.conversations sneer-2)

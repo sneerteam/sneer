@@ -20,7 +20,7 @@
         (name-subject [_] name))))
 
 (defn party-puk [^Party party]
-  (.. party publicKey current))
+  (some-> party .publicKey .current))
 
 (defn produce-party! [parties puk]
   (parties puk))
