@@ -20,4 +20,4 @@ before_script:
 
 script:
   - ./gradlew check install :core:publish
-  - android/gradlew --build-file android/build.gradlew connectedAndroidTest
+  - android/gradlew --build-file android/build.gradle connectedAndroidTest
