@@ -27,7 +27,10 @@
       (.isEmpty ^String new-nick)
       "cannot be empty"
 
-      (->> puk->contact vals (some #(= new-nick (.. ^Contact % nickname current))))
+      (->> puk->contact
+           vals
+           (some #(and (some? (.party %))
+                       (= new-nick (.. ^Contact % nickname current)))))
       "already used")))
 
 (defn problem-with-new-nickname [contacts-state new-nick party]
