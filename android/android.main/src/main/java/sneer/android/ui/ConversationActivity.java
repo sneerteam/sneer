@@ -73,7 +73,7 @@ public class ConversationActivity extends SneerActivity {
 		plugActionBarTitle(actionBar, party.name());
 		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
 
-		conversation = sneer().conversations().with(party);
+		conversation = sneer().conversations().withParty(party);
 
 		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),

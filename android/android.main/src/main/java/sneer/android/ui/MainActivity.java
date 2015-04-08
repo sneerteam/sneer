@@ -135,7 +135,7 @@ public class MainActivity extends SneerActivity {
 	protected void onClicked(Conversation conversation) {
 		Intent intent = new Intent();
 		intent.setClass(this, ConversationActivity.class);
-		intent.putExtra("partyPuk", conversation.party().publicKey().current());
+		intent.putExtra("partyPuk", conversation.contact().party().current().publicKey().current());
 		startActivity(intent);
 	}
 

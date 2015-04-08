@@ -19,8 +19,8 @@ public class ContactSimulator implements Contact {
 
 
 	@Override
-	public Party party() {
-		return party;
+	public Observed<Party> party() {
+		return ObservedSubject.create(party).observed();
 	}
 
 	@Override

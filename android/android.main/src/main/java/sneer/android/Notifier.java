@@ -98,7 +98,7 @@ public class Notifier {
 	}
 
 	private static PublicKey partyPuk(Conversation conversation) {
-		return conversation.party().publicKey().current();
+		return conversation.contact().party().current().publicKey().current();
 	}
 
 	private static void notify(Conversations.Notification notification, Intent intent) {

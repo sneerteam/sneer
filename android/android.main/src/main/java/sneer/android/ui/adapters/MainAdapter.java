@@ -163,7 +163,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 	}
 
 	private Observable<byte[]> pictureFor(Conversation conversation) {
-		return sneer().profileFor(conversation.party()).selfie();
+		return sneer().profileFor(conversation.contact().party().current()).selfie();
 	}
 
 	class ObservedConversation {
@@ -175,7 +175,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 		public Subscription subscribe(Conversation conversation) {
 			return Subscriptions.from(
-					conversation.party().name().subscribe(party),
+					conversation.contact().party().current().name().subscribe(party),
 					conversation.mostRecentMessageContent().subscribe(summary),
 					pictureFor(conversation).map(TO_BITMAP).subscribe(picture),
 					conversation.unreadMessageCount().subscribe(unread),
