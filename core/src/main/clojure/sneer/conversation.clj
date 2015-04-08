@@ -127,8 +127,8 @@
           tuple-space
           publisher
           (audience party-puk)
-          (field "message-type" "chat")
           (type "message")
+          (field "message-type" "chat")
           (field "label" label)
           (pub)))
 
@@ -175,7 +175,7 @@
     (rx/return
      (reify-notification conversations "New messages" text subText))))
 
-(defn notification-for-none []
+(defn- notification-for-none []
   (rx/return
     (reify-notification [] nil nil nil)))
 
