@@ -15,7 +15,7 @@
         profiles (atom {})
         contacts-state (create-contacts-state tuple-space own-puk puk->party)
         contacts (get-contacts contacts-state)
-        conversations (reify-conversations own-puk tuple-space contacts)
+        conversations (reify-conversations own-puk tuple-space contacts-state)
         self (reify-party own-puk)]
 
     (reify Sneer

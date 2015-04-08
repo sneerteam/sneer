@@ -156,3 +156,6 @@
 
 (defn get-contacts [contacts-state]
   (:observable-contacts contacts-state))
+
+(defn puk->contact [contacts-state puk]
+  (get @(:puk->contact contacts-state) puk))

@@ -34,7 +34,7 @@
   (rx/subscribe observable
                 #(>!! c %)
                 #(do
-                   (println "Rx Error:" %)
+                   (.printStackTrace %)
                    (close! c))
                 #(close! c)))
 

@@ -5,6 +5,7 @@
    [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map]]
    [sneer.party :refer [party-puk]]
    [sneer.commons :refer [now produce!]]
+   [sneer.contact :refer [get-contacts puk->contact]]
    [sneer.tuple.space :refer [payload]])
   (:import
     [sneer PublicKey Party Contact Conversations Conversation Message Conversations$Notification]
@@ -79,9 +80,9 @@
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
 (defn reify-conversation
-  [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Observed nickname ^Party party]
-  (if party
-    (let [^PublicKey party-puk (party-puk party)
+  [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
+  (if (some-> contact .party)
+    (let [^PublicKey party-puk (-> contact .party .current party-puk)
           messages (atom (sorted-set-by message-comparator))
           observable-messages (rx/map vec (atom->observable messages))
           message-filter (.. tuple-space filter (type "message"))
@@ -109,9 +110,7 @@
 
       (reify
         Conversation
-        (party [_] party)
-
-        (nickname [_] nickname)
+        (contact [_] contact)
 
         (messages [_]
           observable-messages)
@@ -150,9 +149,7 @@
           (.pub last-read-pub (original-id message)))))
     (reify Conversation
       Conversation
-      (party [_] nil)
-
-      (nickname [_] nickname)
+      (contact [_] contact)
 
       (messages [_] (rx/never))
 
@@ -200,21 +197,20 @@
   (rx/return
     (reify-notification [] nil nil nil)))
 
-(defn reify-conversations [own-puk tuple-space contacts]
+(defn reify-conversations [own-puk tuple-space contacts-state]
   (let [menu-items (BehaviorSubject/create [])
         convos (atom {})
         reify-conversation (partial reify-conversation tuple-space (.asObservable menu-items) own-puk)
         null nil
-        ignored-conversation (BehaviorSubject/create ^Object null)]
+        ignored-conversation (BehaviorSubject/create ^Object null)
+        contacts (get-contacts contacts-state)
+        produce-convo (fn [contact] (produce! reify-conversation convos contact))]
 
     (reify Conversations
 
       (all [_]
         (->> contacts
-             (rx/map (partial mapv (fn [^Contact c]
-                                     (produce! (partial reify-conversation (.nickname c))
-                                               convos
-                                               (some-> c .party .current)))))
+             (rx/map (partial mapv produce-convo))
              shared-latest))
 
       (ofType [_ _type]
@@ -222,7 +218,8 @@
 
       (with [this party]
         (-> this .all .toBlocking .first) ; forces convos to load. this is ugly, please remove.
-        (get @convos party))
+        (when-let [contact (puk->contact contacts-state (-> party .publicKey .current))]
+          (produce-convo contact)))
 
       (notifications [this]
         (->> (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all))

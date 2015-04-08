@@ -327,7 +327,7 @@ public class ConversationsAPITest extends TestCase {
 		expecting(
 			same(
 				flatMapConversationsOf(sneerA).map(new Func1<Conversation, Party>() {  @Override public Party call(Conversation conversation) {
-					return conversation.party();
+					return conversation.contact().party().current();
 				}}),
 				partyBOfA));
 

@@ -84,7 +84,7 @@
               ^Party         carla       (produce-party "carla")
 
               all-conversations (->chan (->> (.all subject)
-                                             (rx/map (partial mapv #(-> % .nickname .current)))))]
+                                             (rx/map (partial mapv #(some-> % .contact .nickname .current)))))]
           (fact "is initially empty"
                 (<!!? all-conversations) => [])
 
@@ -103,6 +103,6 @@
         (let [^Sneer         sneer-2   (new-sneer tuple-space own-prik)
               ^Conversations subject-2 (.conversations sneer-2)
               all-conversations-2 (->chan (->> (.all subject-2)
-                                               (rx/map (partial mapv #(-> % .nickname .current)))))]
+                                               (rx/map (partial mapv #(some-> % .contact .nickname .current)))))]
           (fact "contacts are published to the database"
                 (<!!? all-conversations-2) => ["anna" "carla" "neide"]))))))
