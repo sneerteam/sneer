@@ -10,7 +10,10 @@ public interface Conversations {
 	Observable<List<Conversation>> all();
 
 	/** @return an existing Conversation with party or a new one if it doesn't exist. */
-	Conversation with(Party party);
+	Conversation withParty(Party party);
+
+	/** @return an existing Conversation with party or a new one if it doesn't exist. */
+	Conversation withContact(Contact contact);
 
 	/** All Conversations of messageType have had, ordered by most recent first. */
 	Observable<List<Conversation>> ofType(String messageType);

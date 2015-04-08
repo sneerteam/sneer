@@ -10,7 +10,6 @@
   (:import
     [sneer PublicKey Party Contact Conversations Conversation Message Conversations$Notification]
     [sneer.tuples Tuple TupleSpace]
-    [sneer.rx Observed]
     [java.text SimpleDateFormat]
     [rx.subjects BehaviorSubject]
     [rx Observable]))
@@ -112,6 +111,8 @@
         Conversation
         (contact [_] contact)
 
+        (canSendMessages [_] (rx/return false))
+
         (messages [_]
           observable-messages)
 
@@ -150,6 +151,8 @@
     (reify Conversation
       Conversation
       (contact [_] contact)
+
+      (canSendMessages [_] (rx/return false))
 
       (messages [_] (rx/never))
 
@@ -216,10 +219,15 @@
       (ofType [_ _type]
         (rx/never))
 
-      (with [this party]
-        (-> this .all .toBlocking .first) ; forces convos to load. this is ugly, please remove.
-        (when-let [contact (puk->contact contacts-state (-> party .publicKey .current))]
-          (produce-convo contact)))
+      (withParty [this party]
+        (some->> party
+                 .publicKey
+                 .current
+                 (puk->contact contacts-state)
+                 (.withContact this)))
+
+      (withContact [_ contact]
+        (produce-convo contact))
 
       (notifications [this]
         (->> (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all))

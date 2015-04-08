@@ -373,7 +373,7 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 	private Conversation conversationWith(Party party, Sneer sneer) {
-		return sneer.conversations().with(party);
+		return sneer.conversations().withParty(party);
 	}
 
 
