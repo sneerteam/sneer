@@ -30,8 +30,7 @@
       old-by-puk
       "party already is a contact"
 
-      (and old-by-nick
-           (some? (.party old-by-nick)))
+      (some-> old-by-nick .party .current)
       "already used")))
 
 (defn problem-with-new-nickname [contacts-state new-nick party]
@@ -47,18 +46,18 @@
 (defn reify-contact
   [tuple-space nick->contact-atom puk->contact-atom own-puk nickname party invite-code]
   (let [nick-subject (ObservedSubject/create nickname)
-        party-subject (atom (some-> party ObservedSubject/create))]
+        party-subject (ObservedSubject/create party)]
     (when party
       (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party)))
     (reify Contact
-      (party [_] (some-> @party-subject .observed))
+      (party [_] (.observed party-subject))
 
       (setParty [_ party]
-        (when @party-subject
+        (when (.current party-subject)
           (throw (FriendlyException. "This contact already has a party.")))
         (when (get @puk->contact-atom (.publicKey party))
           (throw (FriendlyException. "Another contact already has this party.")))
-        (reset! party-subject (ObservedSubject/create party)))
+        (.onNext party-subject party))
 
       (inviteCode [_] invite-code)
 
@@ -113,7 +112,7 @@
      (reset! nick->contact (apply hash-map (mapcat (fn [c] [(.. c nickname current) c])
                                                 contacts)))
      (reset! puk->contact  (apply hash-map (->> contacts
-                                                (filter #(.party %))
+                                                (filter #(.. % party current))
                                                 (mapcat (fn [c] [(.. c party current publicKey current) c])))))
 
      {:own-puk             own-puk
