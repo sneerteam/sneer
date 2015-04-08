@@ -35,9 +35,8 @@
           tuple-base (tuple-base/create db)
           tuple-space (space/reify-tuple-space own-puk tuple-base)
           sneer (new-sneer tuple-space own-prik)]
-      (let [contact (test-produce-contact  sneer  nick  party)]
-        (when restart (.close tuple-base))
-        contact)
+      (test-produce-contact sneer nick party)
+      (when restart (.close tuple-base))
       (let [tuple-base (if restart (tuple-base/create db) tuple-base)
             tuple-space (if restart (space/reify-tuple-space own-puk tuple-base) tuple-space)
             sneer (if restart (new-sneer tuple-space own-prik) sneer)
@@ -55,7 +54,7 @@
              (test-produce-contacts ?restart ?nick ?party ?nick2 ?party2)
              => ?result)
 
-           ?nick ?party ?nick2 ?party2 ?result count? ?obs
+           ?nick ?party ?nick2 ?party2 ?result ?count ?obs
            "Ann" nil    "Ann"  "A"     ok      1      "Invited then added"
            "Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
            "Ann" "A"    "Bob"  "B"     ok      2      "Diferent contacts"
