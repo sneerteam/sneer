@@ -214,7 +214,7 @@
              (rx/map (partial mapv (fn [^Contact c]
                                      (produce! (partial reify-conversation (.nickname c))
                                                convos
-                                               (.party c)))))
+                                               (some-> c .party .current)))))
              shared-latest))
 
       (ofType [_ _type]

@@ -46,13 +46,19 @@
 
 (defn reify-contact
   [tuple-space nick->contact-atom puk->contact-atom own-puk nickname party invite-code]
-  (let [nick-subject (ObservedSubject/create nickname)]
+  (let [nick-subject (ObservedSubject/create nickname)
+        party-subject (atom (some-> party ObservedSubject/create))]
     (when party
       (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party)))
     (reify Contact
-      (party [_] party)
+      (party [_] (some-> @party-subject .observed))
 
-      (setParty [_ party] (assert false))
+      (setParty [_ party]
+        (when @party-subject
+          (throw (FriendlyException. "This contact already has a party.")))
+        (when (get @puk->contact-atom (.publicKey party))
+          (throw (FriendlyException. "Another contact already has this party.")))
+        (reset! party-subject (ObservedSubject/create party)))
 
       (inviteCode [_] invite-code)
 
@@ -108,7 +114,7 @@
                                                 contacts)))
      (reset! puk->contact  (apply hash-map (->> contacts
                                                 (filter #(.party %))
-                                                (mapcat (fn [c] [(.. c party publicKey current) c])))))
+                                                (mapcat (fn [c] [(.. c party current publicKey current) c])))))
 
      {:own-puk             own-puk
       :tuple-space         tuple-space
