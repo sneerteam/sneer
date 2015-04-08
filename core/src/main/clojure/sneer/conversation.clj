@@ -117,7 +117,7 @@
                                      (rx/never)))
                                (.. contact party observable))]
           (rx/map (fn [puk]) puks))
-        observable-messages)g
+        observable-messages)
 
       (unreadMessages [_]
         unread-messages)
