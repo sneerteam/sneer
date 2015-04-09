@@ -101,16 +101,9 @@
 
       (canSendMessages [_] (rx/map some? (.. contact party observable)))
 
-      (messages [_]
-        #_(let [puks (switch-map (fn [party]
-                                 (or (some-> party .publicKey)
-                                     (rx/never)))
-                               (.. contact party observable))]
-          (rx/map (fn [puk]) puks))
-        messages)
+      (messages [_] messages)
 
-      (unreadMessages [_]
-        unread-messages)
+      (unreadMessages [_] unread-messages)
 
       (sendMessage [_ label]
         (..
