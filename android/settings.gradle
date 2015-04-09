@@ -1,3 +1,4 @@
+include ':ipc-prototype-server'
 include 'sneer-android-api'
 project(':sneer-android-api').projectDir = new File('android-api')
 
