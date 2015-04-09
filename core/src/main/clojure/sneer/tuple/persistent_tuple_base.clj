@@ -1,7 +1,8 @@
 (ns sneer.tuple.persistent-tuple-base
   (:import [sneer.commons SystemReport]
            [sneer.admin UniqueConstraintViolated]
-           [java.lang AutoCloseable])
+           [java.lang AutoCloseable]
+           (sneer PublicKey))
   (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! <!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
@@ -58,7 +59,7 @@
 (def builtin-field? #{"type" "payload" "author" "audience" "timestamp"})
 
 (def puk-serializer
-  {:serialize #(.toBytes ^sneer.PublicKey %)
+  {:serialize   #(.toBytes ^PublicKey %)
    :deserialize #(keys/create-puk %)})
 
 (def core-serializer {:serialize serialization/serialize
@@ -75,8 +76,7 @@
       row
       (assoc row field ((op serializer) v)))))
 
-(def serialize-entry (partial apply-serializer :serialize))
-
+(def serialize-entry   (partial apply-serializer :serialize  ))
 (def deserialize-entry (partial apply-serializer :deserialize))
 
 (defn apply-serializers [f row]
