@@ -1,3 +1,11 @@
+*~
+
+/skummet-artifacts
+build
+classes
+
+hs_err*
+
 .metadata/
 .project
 .classpath
@@ -14,8 +22,4 @@ project.properties
 local.properties
 
 .byke
-build
 
-*~
-
-/skummet-artifacts
