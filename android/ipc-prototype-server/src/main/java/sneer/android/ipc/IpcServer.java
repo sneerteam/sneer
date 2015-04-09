@@ -1,9 +1,13 @@
 package sneer.android.ipc;
 
+import android.content.Intent;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 
 public class IpcServer extends ActionBarActivity {
@@ -36,4 +40,14 @@ public class IpcServer extends ActionBarActivity {
 
 		return super.onOptionsItemSelected(item);
 	}
+
+
+    public void sendLocation(View view) {
+
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setClassName("com.ppeccin.sneer.location", "location.LocationActivity");
+        view.getContext().startActivity(intent);
+
+    }
 }

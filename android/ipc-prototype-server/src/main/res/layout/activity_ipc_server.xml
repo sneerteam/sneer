@@ -11,6 +11,18 @@
     <TextView
         android:text="@string/hello_world"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/textView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Location"
+        android:id="@+id/bManda"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="167dp"
+        android:clickable="true"
+        android:onClick="sendLocation" />
 
 </RelativeLayout>

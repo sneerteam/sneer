@@ -12,8 +12,9 @@
         <meta-data android:name="SneerApp" android:value=""/>
 
         <activity
-            android:name="location.MainActivity"
-            android:excludeFromRecents="true">
+            android:name="location.LocationActivity"
+            android:excludeFromRecents="true"
+            android:exported="true">
         </activity>
 
     </application>
