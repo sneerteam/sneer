@@ -2,6 +2,7 @@
   (:require [midje.sweet :refer :all]
             [clojure.core.async :as async :refer [thread]]
             [rx.lang.clojure.core :as rx]
+            [sneer.admin :refer [new-sneer-admin-over-db]]
             [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
@@ -9,7 +10,8 @@
             [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.rx :refer [observe-for-io]]
             [sneer.keys :refer [->puk create-prik]]
-            [sneer.impl :refer [new-sneer]])
+            [sneer.impl :refer [new-sneer]]
+            [sneer.restartable :refer [restart]])
   (:import [rx Observable]
            [sneer Sneer Party Conversations]
            [sneer.commons.exceptions FriendlyException]
@@ -28,21 +30,12 @@
   (let [->party #(.produceParty sneer (->puk (str % "Party")))]
     (.produceContact sneer nick (when party (->party party)) nil)))
 
-(defn- test-produce-contacts [db restart nick party nick2 party2]
-  (let [own-prik (create-prik)
-        own-puk (.publicKey own-prik)]
-    ; create first contact
-    (let [tuple-base (tuple-base/create db)
-          tuple-space (space/reify-tuple-space own-puk tuple-base)
-          sneer (new-sneer tuple-space own-prik)]
-      (test-produce-contact sneer nick party)
-      (when restart (.close tuple-base))
-      ; create second contact
-      (let [tuple-base (if restart (tuple-base/create db) tuple-base)
-            tuple-space (if restart (space/reify-tuple-space own-puk tuple-base) tuple-space)
-            sneer (if restart (new-sneer tuple-space own-prik) sneer)]
-        (test-produce-contact sneer nick2 party2)
-        (.close tuple-base))))
+(defn- test-produce-contacts [db restart? nick party nick2 party2]
+  (let [sneer-admin (atom (new-sneer-admin-over-db db))]
+    (test-produce-contact (.sneer @sneer-admin) nick party)
+    (when restart?
+      (swap! sneer-admin restart))
+    (test-produce-contact (.sneer @sneer-admin) nick2 party2))
   true)
 
 (def ok   truthy)
@@ -56,14 +49,17 @@
                (test-produce-contacts db ?restart ?nick ?party ?nick2 ?party2)
                => ?result)
              (fact "count contacts"
-               (-> (db-query db ["SELECT * FROM tuple"])
-                   count
-                   (- 1))
+               (->> (new-sneer-admin-over-db db)
+                    .sneer
+                    .contacts
+                    .toBlocking
+                    .first
+                    .size)
                => ?count))
 
            ?nick ?party ?nick2 ?party2 ?result ?count ?obs
-           ;"Ann" nil    "Ann"  "A"     ok      1      "Invited then added"
-           ;"Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
+           "Ann" nil    "Ann"  "A"     ok      1      "Invited then added"
+           "Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
            "Ann" "A"    "Bob"  "B"     ok      2      "Diferent contacts"
            "Ann" "A"    "Ann"  "B"     nope    1      "Nickname already used"
            "Ann" "A"    "Ann"  nil     nope    1      "Nickname already used 2"
