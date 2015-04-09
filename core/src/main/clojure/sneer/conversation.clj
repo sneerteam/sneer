@@ -36,6 +36,9 @@
       Object
       (toString [_] label))))
 
+(defn- message-id [^Message msg]
+  (-> msg .tuple (get "id")))
+
 (defn original-id [^Message message]
   (get (.tuple message) "original_id"))
 
@@ -73,9 +76,9 @@
                                (interop/fn [messages last-read-id]
                                  (unread-messages messages last-read-id))))))
 
-(defn values-to-compare [^Message msg] [(-> msg .tuple (get "id"))])
-
-(def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
+(defn- message-ids [m1 m2]
+  (compare (message-id m1)
+           (message-id m2)))
 
 (defn- messages [tuple-space own-puk party-puk]
   (let [filter (.. tuple-space filter (type "message"))
@@ -83,7 +86,7 @@
         tuples-in  (.. filter (author party-puk) (audience own-puk  ) tuples)]
     (->> (rx/merge tuples-in tuples-out)
          (rx/map #(reify-message own-puk %))
-         (rx/reductions conj (sorted-set-by message-comparator))
+         (rx/reductions conj (sorted-set-by message-ids))
          (rx/map vec))))
 
 (defn reify-conversation
