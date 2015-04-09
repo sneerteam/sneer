@@ -65,8 +65,8 @@
        vec))
 
 (defn- latest-unread-messages
-  [^Observable observable-messages ^Observable last-read-filter]
-  (let [last-read-ids (rx/map payload last-read-filter)]
+  [^Observable observable-messages ^Observable acks]
+  (let [last-read-ids (rx/map payload acks)]
     (latest
      (Observable/combineLatest observable-messages
                                (rx/cons 0 last-read-ids)
@@ -90,18 +90,9 @@
   [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
   (let [^PublicKey party-puk (-> contact .party .current party-puk)
         messages (messages tuple-space own-puk party-puk)
-        last-read-pub (.. tuple-space
-                          publisher
-                          (type "message-read")
-                          (audience party-puk))
-        last-read-filter (.. tuple-space
-                             filter
-                             (type "message-read")
-                             (audience party-puk)
-                             (author own-puk)
-                             last
-                             tuples)
-        unread-messages (latest-unread-messages messages last-read-filter)
+        ack-pub  (.. tuple-space publisher (type "message-read") (audience party-puk))
+        acks     (.. tuple-space filter    (type "message-read") (audience party-puk) (author own-puk) last tuples)
+        unread-messages (latest-unread-messages messages acks)
         most-recent-message (most-recent-message messages)]
 
     (reify
@@ -146,4 +137,4 @@
       (setRead [_ message]
         (assert (-> message own? not))
         (println "Publishing message read tuple.")          ;; Klaus: I suspect this might be happening too often, redundantly for already read messages.
-        (.pub last-read-pub (original-id message))))))
+        (.pub ack-pub (original-id message))))))
