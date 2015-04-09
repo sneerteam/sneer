@@ -77,11 +77,11 @@
 
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
-(defn- observable-messages [tuple-space own-puk party-puk]
-  (let [message-filter (.. tuple-space filter (type "message"))
-        msg-tuples-out (.. message-filter (author own-puk) (audience party-puk) tuples)
-        msg-tuples-in (.. message-filter (author party-puk) (audience own-puk) tuples)]
-    (->> (rx/merge msg-tuples-in msg-tuples-out)
+(defn- messages [tuple-space own-puk party-puk]
+  (let [filter (.. tuple-space filter (type "message"))
+        tuples-out (.. filter (author own-puk  ) (audience party-puk) tuples)
+        tuples-in  (.. filter (author party-puk) (audience own-puk  ) tuples)]
+    (->> (rx/merge tuples-in tuples-out)
          (rx/map #(reify-message own-puk %))
          (rx/reductions conj (sorted-set-by message-comparator))
          (rx/map vec))))
@@ -89,20 +89,20 @@
 (defn reify-conversation
   [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
   (let [^PublicKey party-puk (-> contact .party .current party-puk)
-        observable-messages (observable-messages tuple-space own-puk party-puk)
+        messages (messages tuple-space own-puk party-puk)
         last-read-pub (.. tuple-space
                           publisher
                           (type "message-read")
                           (audience party-puk))
         last-read-filter (.. tuple-space
                              filter
-                             last
                              (type "message-read")
                              (audience party-puk)
                              (author own-puk)
+                             last
                              tuples)
-        unread-messages (latest-unread-messages observable-messages last-read-filter)
-        most-recent-message (most-recent-message observable-messages)]
+        unread-messages (latest-unread-messages messages last-read-filter)
+        most-recent-message (most-recent-message messages)]
 
     (reify
       Conversation
@@ -116,7 +116,7 @@
                                      (rx/never)))
                                (.. contact party observable))]
           (rx/map (fn [puk]) puks))
-        observable-messages)
+        messages)
 
       (unreadMessages [_]
         unread-messages)
