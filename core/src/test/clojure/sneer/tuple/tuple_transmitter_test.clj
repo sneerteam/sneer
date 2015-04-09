@@ -6,7 +6,8 @@
             [clojure.core.async :refer [chan go >! close!]]
             [sneer.test-util :refer [>!!? <!!?]]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
-            [sneer.tuple.protocols :refer [store-tuple restarted]]))
+            [sneer.tuple.protocols :refer [store-tuple restarted]])
+  (:import (java.lang AutoCloseable)))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
@@ -15,9 +16,9 @@
 (def C (->puk "michael"))
 
 (facts "About tuple transmitter"
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [tuple-base (tuple-base/create db)
-          tuples-in (chan)
+  (with-open [db (jdbc-database/create-sqlite-db)
+              tuple-base (tuple-base/create db)]
+    (let [tuples-in (chan)
           follower-connections (chan)
           connect-to-follower (fn [follower-puk tuples-out]
                                 (go (>! follower-connections {follower-puk tuples-out})))
@@ -44,13 +45,13 @@
 
       (fact "It wont resend tuples upon restart"
         (close! tuples-in)
-        (let [tuple-base (restarted tuple-base)
-              tuples-in (chan)]
-          (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
+        (with-open [^AutoCloseable tuple-base (restarted tuple-base)]
+          (let [tuples-in (chan)]
+            (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
 
-          (let [new-tweet {"type" "tweet" "author" A "payload" "S2"}]
-            (store-tuple tuple-base new-tweet)
-            (let [tuples-for-b (tuples-for! B)
-                  _ (assert tuples-for-b "tuples-for-b second time")
-                  [tuple _] (<!!? tuples-for-b)]
-              tuple => (contains new-tweet))))))))
+            (let [new-tweet {"type" "tweet" "author" A "payload" "S2"}]
+              (store-tuple tuple-base new-tweet)
+              (let [tuples-for-b (tuples-for! B)
+                    _ (assert tuples-for-b "tuples-for-b second time")
+                    [tuple _] (<!!? tuples-for-b)]
+                tuple => (contains new-tweet)))))))))

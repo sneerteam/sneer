@@ -23,34 +23,34 @@
   (partial selecting ["id" "original_id"]))
 
 (facts "About store-tuple"
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [subject (create db)]
+  (with-open [db (jdbc-database/create-sqlite-db)
+              subject (create db)]
 
-      (fact "It remembers original-id"
-        (let [t (assoc t1 "id" 42)]
-          (store-tuple subject t)
-          (->> (<!!? (query-all subject {"type" "tweet"})) select-ids) => [{"id" 1 "original_id" 42}]))
+    (fact "It remembers original-id"
+      (let [t (assoc t1 "id" 42)]
+        (store-tuple subject t)
+        (->> (<!!? (query-all subject {"type" "tweet"})) select-ids) => [{"id" 1 "original_id" 42}]))
 
-      (fact "It discards author/id duplicates"
-        (let [duplicate {"type" "whatever" "author" carla "id" 42}
-              unique (assoc duplicate "id" 43)]
-          (store-tuple subject duplicate)
-          (store-tuple subject duplicate)
-          (store-tuple subject unique)
-          (->> (<!!? (query-all subject {"type" "whatever"})) select-ids) => [{"id" 2 "original_id" 42} {"id" 3 "original_id" 43}]))
+    (fact "It discards author/id duplicates"
+      (let [duplicate {"type" "whatever" "author" carla "id" 42}
+            unique (assoc duplicate "id" 43)]
+        (store-tuple subject duplicate)
+        (store-tuple subject duplicate)
+        (store-tuple subject unique)
+        (->> (<!!? (query-all subject {"type" "whatever"})) select-ids) => [{"id" 2 "original_id" 42} {"id" 3 "original_id" 43}]))
 
-      (fact "It accepts an optional uniqueness criteria"
-        (let [t {"type" "unique" "author" neide}
-              query-unique #(->> (<!!? (query-all subject t)) (selecting ["type"]))]
-          (store-tuple subject t t)
-          (query-unique) => [{"type" "unique"}]
-          (store-tuple subject t t)
-          (query-unique) => [{"type" "unique"}])))))
+    (fact "It accepts an optional uniqueness criteria"
+      (let [t {"type" "unique" "author" neide}
+            query-unique #(->> (<!!? (query-all subject t)) (selecting ["type"]))]
+        (store-tuple subject t t)
+        (query-unique) => [{"type" "unique"}]
+        (store-tuple subject t t)
+        (query-unique) => [{"type" "unique"}]))))
 
 (facts "About query-tuples"
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [subject (create db)
-          result (async/chan)
+  (with-open [db (jdbc-database/create-sqlite-db)
+              subject (create db)]
+    (let [result (async/chan)
           lease (async/chan)
           _ (store-tuple subject t1)
           query (query-tuples subject {"type" "tweet"} result lease)]
@@ -67,9 +67,9 @@
         (<!!? query) => nil))))
 
 (tabular "About query criteria"
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [subject (create db)
-          result (async/chan)
+  (with-open [db (jdbc-database/create-sqlite-db)
+              subject (create db)]
+    (let [result (async/chan)
           tuples [{"author" neide   "payload" "n"           "audience" carla}
                   {"author" carla   "payload" "c"           "audience" neide}
                   {"author" carla   "payload" "c"           "audience" neide}
@@ -118,9 +118,9 @@
           (<!!? result) => (contains t3))))))
 
 (facts "About tuple attributes"
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [subject (create db)
-          tuple {"type" "test" "author" neide}
+  (with-open [db (jdbc-database/create-sqlite-db)
+              subject (create db)]
+    (let [tuple {"type" "test" "author" neide}
           tuple-response (chan)]
       (store-tuple subject tuple)
       (query-tuples subject tuple tuple-response)
