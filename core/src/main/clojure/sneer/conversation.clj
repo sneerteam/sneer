@@ -89,14 +89,22 @@
          (rx/reductions conj (sorted-set-by message-ids))
          (rx/map vec))))
 
-(defn reify-conversation
-  [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
-  (let [^PublicKey party-puk (-> contact .party .current party-puk)
-        messages (messages tuple-space own-puk party-puk)
+(defn- get-conversation-state [tuple-space own-puk party-puk]
+  (let [messages (messages tuple-space own-puk party-puk)
         ack-pub  (.. tuple-space publisher (type "message-read") (audience party-puk))
         acks     (.. tuple-space filter    (type "message-read") (audience party-puk) (author own-puk) last tuples)
         unread-messages (latest-unread-messages messages acks)
         most-recent-message (most-recent-message messages)]
+    {:messages messages
+     :ack-pub ack-pub
+     :unread-messages unread-messages
+     :most-recent-message most-recent-message}))
+
+(defn reify-conversation
+  [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
+  (let [^PublicKey party-puk (-> contact .party .current party-puk)
+        {:keys [messages ack-pub unread-messages most-recent-message]}
+        (some->> party-puk (get-conversation-state tuple-space own-puk))]
 
     (reify
       Conversation
@@ -132,5 +140,6 @@
 
       (setRead [_ message]
         (assert (-> message own? not))
+        (assert (some? ack-pub))
         (println "Publishing message read tuple.")          ;; Klaus: I suspect this might be happening too often, redundantly for already read messages.
         (.pub ack-pub (original-id message))))))
