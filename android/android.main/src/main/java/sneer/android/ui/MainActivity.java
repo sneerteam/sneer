@@ -194,7 +194,7 @@ public class MainActivity extends SneerActivity {
 	private void sendMessageIfPresent(final Conversation conversation) {
 		if (subjectToSend == null && textToSend == null) return;
 		String separator = (subjectToSend != null && textToSend != null)
-				? "/n/n" : "";
+				? "\n\n" : "";
 		final String message = ensure(subjectToSend) + separator + ensure(textToSend);
 		subjectToSend = null;
 		textToSend = null;
