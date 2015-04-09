@@ -1,6 +1,5 @@
 (ns sneer.conversation-test
   (:require [midje.sweet :refer :all]
-            [clojure.core.async :as async]
             [sneer.contact :refer [produce-contact create-contacts-state]]
             [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as base]
