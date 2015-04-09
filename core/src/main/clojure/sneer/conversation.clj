@@ -77,17 +77,14 @@
 
 (def message-comparator (fn [m1 m2] (compare (values-to-compare m1) (values-to-compare m2))))
 
-(defn observable-messages [tuple-space own-puk party-puk]
-  (let [messages (atom (sorted-set-by message-comparator))
-        message-filter (.. tuple-space filter (type "message"))
+(defn- observable-messages [tuple-space own-puk party-puk]
+  (let [message-filter (.. tuple-space filter (type "message"))
         msg-tuples-out (.. message-filter (author own-puk) (audience party-puk) tuples)
         msg-tuples-in (.. message-filter (author party-puk) (audience own-puk) tuples)]
-    (subscribe-on-io
-      (rx/merge msg-tuples-out msg-tuples-in)
-      (fn [tuple]
-        (swap! messages conj (reify-message own-puk tuple))))
-
-    (rx/map vec (atom->observable messages))))
+    (->> (rx/merge msg-tuples-in msg-tuples-out)
+         (rx/map #(reify-message own-puk %))
+         (rx/reductions conj (sorted-set-by message-comparator))
+         (rx/map vec))))
 
 (defn reify-conversation
   [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
