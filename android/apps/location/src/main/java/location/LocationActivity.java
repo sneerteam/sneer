@@ -17,8 +17,10 @@ public class LocationActivity extends Activity {
 
         Intent intent = new Intent();
         intent.putExtra("MESSAGE", "LOCATION: " + System.currentTimeMillis());
-        intent.setClassName("sneer.android.ipc", "sneer.android.ipc.IpcServer");
-        ComponentName ser = startService(intent);
+        intent.setClassName("sneer.android.ipc", "sneer.android.ipc.SendMessage");
+        ComponentName compName = startService(intent);
+
+        System.out.println("ComponentName: " + compName);
     }
 
 }
