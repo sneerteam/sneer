@@ -1,6 +1,6 @@
 (ns sneer.impl
   (:require
-   [sneer.conversation :refer [reify-conversations]]
+   [sneer.conversations :refer [reify-conversations]]
    [sneer.contact :refer [create-contacts-state produce-contact get-contacts find-contact problem-with-new-nickname]]
    [sneer.party :refer [party-puk reify-party produce-party! create-puk->party]]
    [sneer.profile :refer [produce-profile]])
