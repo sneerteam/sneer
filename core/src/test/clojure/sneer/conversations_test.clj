@@ -42,9 +42,8 @@
             tuple-space (if restart (space/reify-tuple-space own-puk tuple-base) tuple-space)
             sneer (if restart (new-sneer tuple-space own-prik) sneer)]
         (test-produce-contact sneer nick2 party2)
-        (.close tuple-base)
-        ; return a truthy value
-        true))))
+        (.close tuple-base))))
+  true)
 
 (def ok   truthy)
 (def nope (throws FriendlyException))
@@ -64,7 +63,7 @@
 
            ?nick ?party ?nick2 ?party2 ?result ?count ?obs
            ;"Ann" nil    "Ann"  "A"     ok      1      "Invited then added"
-           "Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
+           ;"Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
            "Ann" "A"    "Bob"  "B"     ok      2      "Diferent contacts"
            "Ann" "A"    "Ann"  "B"     nope    1      "Nickname already used"
            "Ann" "A"    "Ann"  nil     nope    1      "Nickname already used 2"
