@@ -118,9 +118,22 @@ public class ConversationActivity extends SneerActivity {
 		}});
 
 		menu = new PopupMenu(ConversationActivity.this, actionButton);
+
+        sendMessageIfPresent();
 	}
 
-	private Message lastMessageReceived(List<Message> ms) {
+    private void sendMessageIfPresent() {
+        Bundle extras = getIntent().getExtras();
+        String subject = extras.getString("message_subject", "");
+        String text    = extras.getString("message_text", "");
+        String message = !subject.isEmpty() && !text.isEmpty()
+                ? subject + "\n\n" + text
+                : subject + text;
+        if (!message.isEmpty())
+            conversation.sendMessage(message);
+    }
+
+    private Message lastMessageReceived(List<Message> ms) {
 		for (int i = ms.size() - 1; i >= 0; --i) {
 			Message message = ms.get(i);
 			if (!message.isOwn())

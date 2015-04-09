@@ -36,18 +36,24 @@ public class MainActivity extends SneerActivity {
 
 	private final Party self = sneer().self();
 	private final Profile ownProfile = sneer().profileFor(self);
+    private String subject;
+    private String text;
 
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
 
-		if (!sneerAndroid().checkOnCreate(this)) return;
+        if (!sneerAndroid().checkOnCreate(this)) return;
+        setContentView(R.layout.activity_main);
+        startProfileActivityIfFirstTime();
+        makeConversationList();
 
-		startProfileActivityIfFirstTime();
-
-		makeConversationList();
+        Intent intent = getIntent();
+        if (intent.getAction() == Intent.ACTION_SEND && intent.getType() == "text/plain") {
+            subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+            text = intent.getStringExtra(Intent.EXTRA_TEXT);
+        }
 
         ((SneerApp)getApplication()).checkPlayServices(this);
 	}
@@ -136,6 +142,10 @@ public class MainActivity extends SneerActivity {
 		Intent intent = new Intent();
 		intent.setClass(this, ConversationActivity.class);
 		intent.putExtra("partyPuk", conversation.contact().party().current().publicKey().current());
+        intent.putExtra("message_subject", subject);
+        intent.putExtra("message_text", text);
+        subject = null;
+        text = null;
 		startActivity(intent);
 	}
 
