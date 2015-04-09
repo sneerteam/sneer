@@ -28,37 +28,42 @@
   (let [->party #(.produceParty sneer (->puk (str % "Party")))]
     (.produceContact sneer nick (when party (->party party)) nil)))
 
-(defn- test-produce-contacts [restart nick party nick2 party2]
-  (with-open [db (jdbc-database/create-sqlite-db)]
-    (let [own-prik (create-prik)
-          own-puk  (.publicKey own-prik)]
-      ; create first contact
-      (let [tuple-base (tuple-base/create db)
-            tuple-space (space/reify-tuple-space own-puk tuple-base)
-            sneer (new-sneer tuple-space own-prik)]
-        (test-produce-contact sneer nick party)
-        (when restart (.close tuple-base))
-        ; create second contact
-        (let [tuple-base (if restart (tuple-base/create db) tuple-base)
-              tuple-space (if restart (space/reify-tuple-space own-puk tuple-base) tuple-space)
-              sneer (if restart (new-sneer tuple-space own-prik) sneer)]
-          (test-produce-contact sneer nick2 party2)
-          (.close tuple-base)
-          ; return a truthy value
-          true)))))
+(defn- test-produce-contacts [db restart nick party nick2 party2]
+  (let [own-prik (create-prik)
+        own-puk (.publicKey own-prik)]
+    ; create first contact
+    (let [tuple-base (tuple-base/create db)
+          tuple-space (space/reify-tuple-space own-puk tuple-base)
+          sneer (new-sneer tuple-space own-prik)]
+      (test-produce-contact sneer nick party)
+      (when restart (.close tuple-base))
+      ; create second contact
+      (let [tuple-base (if restart (tuple-base/create db) tuple-base)
+            tuple-space (if restart (space/reify-tuple-space own-puk tuple-base) tuple-space)
+            sneer (if restart (new-sneer tuple-space own-prik) sneer)]
+        (test-produce-contact sneer nick2 party2)
+        (.close tuple-base)
+        ; return a truthy value
+        true))))
 
 (def ok   truthy)
 (def nope (throws FriendlyException))
 
-(tabular "Transient and persistent produceContact scenarios."
+(tabular "Transient and persistent produceContact scenarios"
          (tabular
 
-           (fact
-             (test-produce-contacts ?restart ?nick ?party ?nick2 ?party2)
-             => ?result)
+           (with-open [db (jdbc-database/create-sqlite-db)]
+             (fact "produce contacts"
+               (test-produce-contacts db ?restart ?nick ?party ?nick2 ?party2)
+               => ?result)
+             (fact "count contacts"
+               (-> (db-query db ["SELECT * FROM tuple"])
+                   count
+                   (- 1))
+               => ?count))
 
            ?nick ?party ?nick2 ?party2 ?result ?count ?obs
-           "Ann" nil    "Ann"  "A"     ok      1      "Invited then added"
+           ;"Ann" nil    "Ann"  "A"     ok      1      "Invited then added"
            "Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
            "Ann" "A"    "Bob"  "B"     ok      2      "Diferent contacts"
            "Ann" "A"    "Ann"  "B"     nope    1      "Nickname already used"
