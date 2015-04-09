@@ -6,8 +6,7 @@
    [sneer.profile :refer [produce-profile]])
   (:import
     [sneer Sneer PrivateKey]
-    [sneer.tuples TupleSpace]
-    (java.util Random)))
+    [sneer.tuples TupleSpace]))
 
 (defn new-sneer [^TupleSpace tuple-space ^PrivateKey own-prik]
   (let [own-puk (.publicKey own-prik)

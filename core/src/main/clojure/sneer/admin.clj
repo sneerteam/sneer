@@ -1,21 +1,38 @@
 (ns sneer.admin
   (:require
-   [sneer.tuple.space :as space]
-   [sneer.impl :as impl]
-   [sneer.tuple.protocols :refer :all]
-   [sneer.tuple.persistent-tuple-base :as persistence]
-   [sneer.restartable :refer :all]
-   [sneer.tuple-base-provider :refer :all])
+    [sneer.commons :refer [dispose]]
+    [sneer.tuple.space :as space]
+    [sneer.impl :as impl]
+    [sneer.tuple.protocols :refer :all]
+    [sneer.tuple.persistent-tuple-base :as persistence]
+    [sneer.restartable :refer :all]
+    [sneer.tuple-base-provider :refer :all]
+    [sneer.async :refer [go-while-let]]
+    [rx.lang.clojure.core :as rx]
+    [clojure.core.async :refer [chan <!]])
   (:import
     [sneer PrivateKey]
     [sneer.admin SneerAdmin]
     [sneer.crypto.impl KeysImpl]))
+
+(defn handle-invites [sneer tuple-base puk]
+  (let [tuples-out (chan)
+        lease (chan)]
+    (query-tuples tuple-base {"type" "push" "audience" puk} tuples-out lease)
+    (go-while-let [tuple (<! tuples-out)]
+      (when-some [invite-code (get tuple "invite-code")]
+        (rx/subscribe (.. sneer contacts first)
+                      (fn [contacts]
+                        (some-> (filter #(= (.inviteCode %) invite-code) contacts)
+                                first
+                                (.setParty (.produceParty sneer (get tuple "author"))))))))))
 
 (defn new-sneer-admin
   [^PrivateKey own-prik tuple-base]
   (let [puk (.publicKey own-prik)
         tuple-space (space/reify-tuple-space puk tuple-base)
         sneer (impl/new-sneer tuple-space own-prik)]
+    (handle-invites sneer tuple-base puk)
     (reify
       SneerAdmin
       (sneer [this] sneer)
@@ -27,7 +44,11 @@
 
       Restartable
       (restart [this]
-        (new-sneer-admin own-prik (restarted tuple-base))))))
+        (new-sneer-admin own-prik (restarted tuple-base)))
+
+      AutoCloseable
+      (close [this]
+        (dispose tuple-base)))))
 
 (defn- produce-private-key [db]
   (if-let [existing (second (db-query db ["SELECT * FROM keys"]))]

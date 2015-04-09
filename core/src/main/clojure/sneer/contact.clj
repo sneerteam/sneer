@@ -57,6 +57,7 @@
           (throw (FriendlyException. "This contact already has a party.")))
         (when (get @puk->contact-atom (.publicKey party))
           (throw (FriendlyException. "Another contact already has this party.")))
+        (publish-contact tuple-space own-puk nickname party invite-code)
         (.onNext party-subject party))
 
       (inviteCode [_] invite-code)
@@ -136,17 +137,20 @@
   (check-new-nickname nick->contact puk->contact nickname party))
 
 (defn produce-contact [contacts-state nickname party invite-code-received]
+  (assert (or (and (nil? party) (nil? invite-code-received))
+              party))
   (let [nick->contact-atom (:nick->contact contacts-state)
         puk->contact-atom  (:puk->contact  contacts-state)
         space              (:tuple-space   contacts-state)
         own-puk            (:own-puk       contacts-state)
-        invite-code (when-not party (-> (UUID/randomUUID) .toString (.replaceAll "-" "")))]
+        invite-code (or invite-code-received
+                        (-> (UUID/randomUUID) .toString (.replaceAll "-" "")))]
 
     (check-new-contact @nick->contact-atom @puk->contact-atom nickname party)
 
     (publish-contact space own-puk nickname party invite-code)
 
-    (let [contact (reify-contact space nick->contact-atom puk->contact-atom own-puk nickname party invite-code-received)]
+    (let [contact (reify-contact space nick->contact-atom puk->contact-atom own-puk nickname party invite-code)]
       (swap! nick->contact-atom assoc nickname contact)
       (when party
         (swap! puk->contact-atom assoc (party-puk party) contact))

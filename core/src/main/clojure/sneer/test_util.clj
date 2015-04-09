@@ -1,7 +1,8 @@
 (ns sneer.test-util
   (:require
    [clojure.core.async :refer [alt!! timeout filter> >!! close! chan]]
-   [rx.lang.clojure.core :as rx]))
+   [rx.lang.clojure.core :as rx]
+   [sneer.rx :refer [observe-for-io]]))
 
 (defn <!!?
   ([ch]
@@ -41,3 +42,12 @@
 (defn observable->chan [observable]
   (doto (chan)
     (subscribe-chan observable)))
+
+(defn pst [fn]
+  (try (fn)
+       (catch Exception e (.printStackTrace e))))
+
+(defn ->chan [^rx.Observable o]
+  (->> o observe-for-io observable->chan))
+
+; (do (require 'midje.repl) (midje.repl/autotest))

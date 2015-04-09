@@ -3,12 +3,12 @@
             [clojure.core.async :as async :refer [thread]]
             [rx.lang.clojure.core :as rx]
             [sneer.admin :refer [new-sneer-admin-over-db]]
+            [sneer.commons :refer [dispose]]
             [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
-            [sneer.test-util :refer [<!!? observable->chan]]
+            [sneer.test-util :refer [<!!? observable->chan ->chan]]
             [sneer.tuple.jdbc-database :as jdbc-database]
-            [sneer.rx :refer [observe-for-io]]
             [sneer.keys :refer [->puk create-prik]]
             [sneer.impl :refer [new-sneer]]
             [sneer.restartable :refer [restart]])
@@ -17,25 +17,18 @@
            [sneer.commons.exceptions FriendlyException]
            [sneer.tuples TupleSpace]))
 
-; (do (require 'midje.repl) (midje.repl/autotest))
-
-(defn- pst [fn]
-  (try (fn)
-       (catch Exception e (.printStackTrace e))))
-
-(defn- ->chan [^Observable o]
-  (->> o observe-for-io observable->chan))
-
 (defn- test-produce-contact [sneer nick party]
   (let [->party #(.produceParty sneer (->puk (str % "Party")))]
     (.produceContact sneer nick (when party (->party party)) nil)))
 
 (defn- test-produce-contacts [db restart? nick party nick2 party2]
   (let [sneer-admin (atom (new-sneer-admin-over-db db))]
-    (test-produce-contact (.sneer @sneer-admin) nick party)
-    (when restart?
-      (swap! sneer-admin restart))
-    (test-produce-contact (.sneer @sneer-admin) nick2 party2))
+    (try
+      (test-produce-contact (.sneer @sneer-admin) nick party)
+      (when restart?
+        (swap! sneer-admin restart))
+      (test-produce-contact (.sneer @sneer-admin) nick2 party2)
+      (finally (dispose @sneer-admin))))
   true)
 
 (def ok   truthy)
@@ -49,12 +42,8 @@
                (test-produce-contacts db ?restart ?nick ?party ?nick2 ?party2)
                => ?result)
              (fact "count contacts"
-               (->> (new-sneer-admin-over-db db)
-                    .sneer
-                    .contacts
-                    .toBlocking
-                    .first
-                    .size)
+                   (with-open [sneer-admin (new-sneer-admin-over-db db)]
+                     (->> sneer-admin .sneer .contacts .toBlocking .first .size))
                => ?count))
 
            ?nick ?party ?nick2 ?party2 ?result ?count ?obs

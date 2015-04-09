@@ -15,15 +15,21 @@
 (def B (->puk "carla"))
 (def C (->puk "michael"))
 
+(defn get-transmitter-state []
+  (let [tuples-in (chan)
+        follower-connections (chan)
+        connect-to-follower (fn [follower-puk tuples-out]
+                              (go (>! follower-connections {follower-puk tuples-out})))
+        tuples-for! (fn [follower-puk]
+                      (get (<!!? follower-connections 500) follower-puk))]
+    {:tuples-in tuples-in
+     :connect-to-follower connect-to-follower
+     :tuples-for! tuples-for!}))
+
 (facts "About tuple transmitter"
   (with-open [db (jdbc-database/create-sqlite-db)
               tuple-base (tuple-base/create db)]
-    (let [tuples-in (chan)
-          follower-connections (chan)
-          connect-to-follower (fn [follower-puk tuples-out]
-                                (go (>! follower-connections {follower-puk tuples-out})))
-          tuples-for! (fn [follower-puk]
-                        (get (<!!? follower-connections 500) follower-puk))]
+    (let [{:keys [tuples-in connect-to-follower tuples-for!]} (get-transmitter-state)]
 
       (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
 
@@ -37,11 +43,11 @@
             (>!!? ack-chan tuple))))
 
       (fact "It sends subs to followees"
-        (let [sub {"type" "sub" "author" A "criteria" {"type" "tweet" "author" C}}]
-          (store-tuple tuple-base sub)
+        (let [sub-sent {"type" "sub" "author" A "criteria" {"type" "tweet" "author" C}}]
+          (store-tuple tuple-base sub-sent)
           (let [tuples-for-c (tuples-for! C)
-                [sub _] (<!!? tuples-for-c)]
-            sub => (contains (assoc sub "audience" C)))))
+                [sub-recv _] (<!!? tuples-for-c)]
+            sub-recv => (contains (assoc sub-sent "audience" C)))))
 
       (fact "It wont resend tuples upon restart"
         (close! tuples-in)
@@ -55,3 +61,17 @@
                     _ (assert tuples-for-b "tuples-for-b second time")
                     [tuple _] (<!!? tuples-for-b)]
                 tuple => (contains new-tweet)))))))))
+
+(facts "About pushes"
+  (with-open [db (jdbc-database/create-sqlite-db)
+              tuple-base (tuple-base/create db)]
+    (let [{:keys [tuples-in connect-to-follower tuples-for!]} (get-transmitter-state)]
+
+      (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
+
+      (fact "It sends pushes"
+        (let [push-sent {"type" "push" "author" A "value" 42 "audience" C}]
+          (store-tuple tuple-base push-sent)
+          (let [tuples-for-c (tuples-for! C)
+                [push-recv _] (<!!? tuples-for-c)]
+            push-recv => (contains push-sent)))))))

@@ -10,6 +10,9 @@
   (let [audience (get tuple "audience")]
     (or (nil? audience) (= puk audience))))
 
+(defn normalize-audience-for-sub [tuple]
+  (assoc tuple "audience" (get-in tuple ["criteria" "author"])))
+
 (defn start [own-puk tuple-base tuples-in connect-to-follower-fn]
   (let [peer-chans (atom {})
         chan-for-peer (fn [follower-puk]
@@ -50,21 +53,25 @@
           (go-while-let [last-tuple-sent (<! acks)]
             (set-local-attribute tuple-base "last-id-sent" (last-tuple-sent "id") sub-id)))))
 
-    (let [subs (chan)
-          subs-lease (chan)
-          subs-acks (chan)
+    (let [send (chan)
+          send-lease (chan)
+          send-acks (chan)
           sent? (chan)]
 
-      (query-tuples tuple-base {"type" "sub" "author" own-puk} subs subs-lease)
+      (query-tuples tuple-base
+                    {"type" "sub" "author" own-puk}
+                    (map> normalize-audience-for-sub send)
+                    send-lease)
+      (query-tuples tuple-base {"type" "push" "author" own-puk} send send-lease)
 
-      (go-while-let [ack (<! subs-acks)]
+      (go-while-let [ack (<! send-acks)]
         (set-local-attribute tuple-base "sent?" true (ack "id")))
 
-      (go-while-let [sub (<! subs)]
-        (if-some [followee (get-in sub ["criteria" "author"])]
+      (go-while-let [tuple (<! send)]
+        (if-some [followee (get tuple "audience")]
           (when-not (= own-puk followee)
-            (get-local-attribute tuple-base "sent?" false (sub "id") sent?)
+            (get-local-attribute tuple-base "sent?" false (tuple "id") sent?)
             (when-not (<! sent?)
               (let [followee-chan (produce-chan followee)]
-                (go-trace (>! followee-chan [(assoc sub "audience" followee) subs-acks])))))
-          (println "INVALID SUB! Author missing:" sub))))))
+                (go-trace (>! followee-chan [tuple send-acks])))))
+          (println "INVALID SUB! Audience missing:" tuple))))))
