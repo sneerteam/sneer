@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import com.ppeccin.sneer.location.R;
 
@@ -15,12 +16,8 @@ public class LocationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-        Intent intent = new Intent();
-        intent.putExtra("MESSAGE", "LOCATION: " + System.currentTimeMillis());
-        intent.setClassName("sneer.android.ipc", "sneer.android.ipc.SendMessage");
-        ComponentName compName = startService(intent);
-
-        System.out.println("ComponentName: " + compName);
+        String msg = "LOCATION: " + System.currentTimeMillis();
+        startService(getIntent().getExtras().<Intent>getParcelable("SEND_MESSAGE").setAction(msg));
     }
 
 }

@@ -16,7 +16,7 @@ public class SendMessage extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent == null) return;
 
-        final String message = intent.getExtras().getString("MESSAGE");   // TODO Create constant for extra ID. Protect from ClassCastException
+        final String message = intent.getAction();   // TODO Create constant for extra ID. Protect from ClassCastException
 
         // Create a handler to post messages to the main thread
         Handler mHandler = new Handler(getMainLooper());

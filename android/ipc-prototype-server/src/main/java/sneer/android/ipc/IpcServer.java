@@ -1,5 +1,6 @@
 package sneer.android.ipc;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -44,10 +45,14 @@ public class IpcServer extends ActionBarActivity {
 
     public void sendLocation(View view) {
 
-        Intent intent = new Intent();
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setClassName("com.ppeccin.sneer.location", "location.LocationActivity");
-        view.getContext().startActivity(intent);
+        Intent serviceIntent = new Intent();
+        serviceIntent.setClassName("sneer.android.ipc", "sneer.android.ipc.SendMessage");
+
+        Intent pluginIntent = new Intent();
+        pluginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        pluginIntent.setClassName("com.ppeccin.sneer.location", "location.LocationActivity");
+        pluginIntent.putExtra("SEND_MESSAGE", serviceIntent);
+        view.getContext().startActivity(pluginIntent);
 
     }
 }
