@@ -4,9 +4,9 @@
     android:installLocation="internalOnly" >
 
     <!--
-         Superceded by the gradle build:
-        android:versionCode="999"
-        android:versionName="99.99"
+        Superceded by the gradle build:
+            android:versionCode="999"
+            android:versionName="99.99"
     -->
 
     <uses-feature android:name="android.hardware.camera" />
