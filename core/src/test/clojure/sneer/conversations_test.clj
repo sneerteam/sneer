@@ -31,18 +31,21 @@
 (defn- test-produce-contacts [restart nick party nick2 party2]
   (with-open [db (jdbc-database/create-sqlite-db)]
     (let [own-prik (create-prik)
-          own-puk  (.publicKey own-prik)
-          tuple-base (tuple-base/create db)
-          tuple-space (space/reify-tuple-space own-puk tuple-base)
-          sneer (new-sneer tuple-space own-prik)]
-      (test-produce-contact sneer nick party)
-      (when restart (.close tuple-base))
-      (let [tuple-base (if restart (tuple-base/create db) tuple-base)
-            tuple-space (if restart (space/reify-tuple-space own-puk tuple-base) tuple-space)
-            sneer (if restart (new-sneer tuple-space own-prik) sneer)
-            contact (test-produce-contact sneer nick2 party2)]
-        (.close tuple-base)
-        contact))))
+          own-puk  (.publicKey own-prik)]
+      ; create first contact
+      (let [tuple-base (tuple-base/create db)
+            tuple-space (space/reify-tuple-space own-puk tuple-base)
+            sneer (new-sneer tuple-space own-prik)]
+        (test-produce-contact sneer nick party)
+        (when restart (.close tuple-base))
+        ; create second contact
+        (let [tuple-base (if restart (tuple-base/create db) tuple-base)
+              tuple-space (if restart (space/reify-tuple-space own-puk tuple-base) tuple-space)
+              sneer (if restart (new-sneer tuple-space own-prik) sneer)]
+          (test-produce-contact sneer nick2 party2)
+          (.close tuple-base)
+          ; return a truthy value
+          true)))))
 
 (def ok   truthy)
 (def nope (throws FriendlyException))
