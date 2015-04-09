@@ -8,7 +8,7 @@ import android.content.Intent;
 
 import java.util.Calendar;
 
-import sneer.android.ipc.TupleSpaceService;
+import sneer.android.ipcold.TupleSpaceService;
 import sneer.android.utils.LogUtils;
 
 public class SneerBoot extends BroadcastReceiver {

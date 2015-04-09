@@ -47,7 +47,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name="sneer.android.ipc.PluginMonitor"
+            android:name="sneer.android.ipcold.PluginMonitor"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
@@ -59,7 +59,7 @@
         </receiver>
 
         <service
-            android:name="sneer.android.ipc.TupleSpaceService"
+            android:name="sneer.android.ipcold.TupleSpaceService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="me.sneer.TUPLE_SPACE" />

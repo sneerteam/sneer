@@ -1,4 +1,4 @@
-package sneer.android.ipc;
+package sneer.android.ipcold;
 
 import android.content.Context;
 

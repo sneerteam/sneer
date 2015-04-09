@@ -16,7 +16,7 @@ import sneer.admin.SneerAdmin;
 import sneer.admin.SneerAdminFactory;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
-import sneer.android.ipc.PluginManager;
+import sneer.android.ipcold.PluginManager;
 import sneer.android.utils.AndroidUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
