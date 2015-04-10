@@ -88,7 +88,11 @@
                 (<!!? all-conversations) => ["carla" "neide"]
 
                 (.produceContact sneer "anna" nil nil)
-                (<!!? all-conversations) => ["anna" "carla" "neide"])
+                (<!!? all-conversations) => ["anna" "carla" "neide"]
+
+                (.withContact subject (.findByNick sneer "anna")) => some?)
+
+
 
           (fact "carla already has a different nickname"
                 (.problemWithNewNickname sneer "anna" carla) => some?)
