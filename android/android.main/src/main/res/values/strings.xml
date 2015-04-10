@@ -21,7 +21,7 @@
 
     <!-- ConversationActivity -->
     <string name="conversation_activity_action_button">Action</string>
-    <string name="conversation_activity_warning">User has not accepted the invite yet.</string>
+    <string name="conversation_activity_waiting">Waiting for user to accept your invite.</string>
     <!-- ConversationActivity -->
 
 

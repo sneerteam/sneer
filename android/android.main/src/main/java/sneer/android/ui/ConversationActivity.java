@@ -121,13 +121,13 @@ public class ConversationActivity extends SneerActivity {
 			handleClick(editText.getText().toString().trim());
 		}});
 
-		final TextView warning = (TextView)findViewById(R.id.warningMessage);
+		final TextView waiting = (TextView)findViewById(R.id.waitingMessage);
 
 		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) {
 			boolean enable = party != null;
 			editText.setEnabled(enable);
 			actionButton.setEnabled(enable);
-			warning.setVisibility(enable ? View.GONE : View.VISIBLE);
+			waiting.setVisibility(enable ? View.GONE : View.VISIBLE);
 		}});
 
 		menu = new PopupMenu(ConversationActivity.this, actionButton);
