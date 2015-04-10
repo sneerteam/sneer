@@ -24,8 +24,7 @@
       (when-some [invite-code (get tuple "invite-code")]
         (rx/subscribe (.. sneer contacts first)
                       (fn [contacts]
-                        (some-> (filter #(= (.inviteCode %) invite-code) contacts)
-                                first
+                        (some-> (first (filter #(= (.inviteCode %) invite-code) contacts))
                                 (.setParty (.produceParty sneer (get tuple "author"))))))))))
 
 (defn new-sneer-admin
@@ -36,19 +35,19 @@
     (handle-invites sneer tuple-base puk)
     (reify
       SneerAdmin
-      (sneer [this] sneer)
-      (privateKey [this] own-prik)
-      (keys [this] (KeysImpl.))
+      (sneer [_] sneer)
+      (privateKey [_] own-prik)
+      (keys [_] (KeysImpl.))
 
       TupleBaseProvider
-      (tuple-base-of [this] tuple-base)
+      (tuple-base-of [_] tuple-base)
 
       Restartable
-      (restart [this]
+      (restart [_]
         (new-sneer-admin own-prik (restarted tuple-base)))
 
       AutoCloseable
-      (close [this]
+      (close [_]
         (dispose tuple-base)))))
 
 (defn- produce-private-key [db]
@@ -62,13 +61,13 @@
   (if (instance? sneer.admin.Database db)
     (let [^sneer.admin.Database db db]
       (reify Database
-        (db-create-table [this table columns]
+        (db-create-table [_ table columns]
           (.createTable db (name table) columns))
-        (db-create-index [this table index-name column-names unique?]
+        (db-create-index [_ table index-name column-names unique?]
           (.createIndex db (name table) (name index-name) (mapv name column-names) unique?))
-        (db-insert [this table row]
+        (db-insert [_ table row]
           (.insert db (name table) row))
-        (db-query [this sql-and-params]
+        (db-query [_ sql-and-params]
           (.query db (first sql-and-params) (subvec sql-and-params 1)))))
     db))
 
