@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -43,17 +44,18 @@ public class SneerApp extends Application {
 
 	public void checkPlayServices(Activity activity) {
 		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-		if (resultCode != ConnectionResult.SUCCESS) {
-			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-				new AlertDialog.Builder(activity)
-						.setTitle("Missing Google Play services")
-						.setMessage("Some features such as using maps and receiving notifications when idle will not work without Google Play Services, which are missing from this phone.")
-						.setPositiveButton("OK", null)
-						.show();
-			} else {
-				Log.i(getClass().getName(), "This device is not supported.");
-				activity.finish();
-			}
+		if (resultCode == ConnectionResult.SUCCESS) return;
+		if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+			new AlertDialog.Builder(activity)
+					.setTitle("Missing Google Play Services")
+					.setMessage("Some features such as using maps and receiving notifications when idle will not work without Google Play Services, which are missing from this phone.")
+					.setPositiveButton("OK", null)
+					.show();
+		} else {
+			String msg = "This device is not supported.";
+			Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+			Log.i(getClass().getName(), msg);
+			activity.finish();
 		}
 	}
 
