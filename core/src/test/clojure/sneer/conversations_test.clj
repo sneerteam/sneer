@@ -88,8 +88,9 @@
                 (<!!? all-conversations) => ["carla" "neide"]
 
                 (.produceContact sneer "anna" nil nil)
-                (<!!? all-conversations) => ["anna" "carla" "neide"]
+                (<!!? all-conversations) => ["anna" "carla" "neide"])
 
+          (fact "carla already has a different nickname"
                 (.problemWithNewNickname sneer "anna" carla) => some?)
 
           (fact "conversations without a party cannot send messages"
