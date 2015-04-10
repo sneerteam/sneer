@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map]]
-   [sneer.party :refer [party-puk]]
+   [sneer.party :refer [party->puk]]
    [sneer.conversation :refer :all]
    [sneer.commons :refer [now produce!]]
    [sneer.contact :refer [get-contacts puk->contact]]

@@ -6,7 +6,7 @@
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :refer [->puk]]
             [sneer.test-util :refer [<!!? ->chan]]
-            [sneer.party :refer [party-puk]]
+            [sneer.party :refer [party->puk]]
             [rx.lang.clojure.core :as rx]))
 
 (def neide (->puk "neide"))
@@ -17,7 +17,7 @@
                      sneer-admin (new-sneer-admin-over-db db)]
            (let [contact (-> sneer-admin .sneer (.produceContact "neide" nil nil))
                  tuple-base (tuple-base-of sneer-admin)
-                 channel (->> contact .party .observable (rx/filter some?) (rx/map party-puk) ->chan)]
+                 channel (->> contact .party .observable (rx/filter some?) (rx/map party->puk) ->chan)]
              (store-tuple tuple-base {"type"        "push"
                                       "author"      neide
                                       "audience"    (.. sneer-admin privateKey publicKey)

@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [sneer.rx :refer [subject* shared-latest]]
    [sneer.commons :refer [produce!]]
-   [sneer.party :refer [party-puk]])
+   [sneer.party :refer [party->puk]])
   (:import
    [sneer Profile]
    [sneer.tuples Tuple TupleSpace]
@@ -18,7 +18,7 @@
                  filter
                  last
                  (type type)
-                 (author (party-puk party))
+                 (author (party->puk party))
                  tuples)))
 
           (payload-subject [tuple-type]
@@ -37,7 +37,7 @@
             (.. tuple-space
                 filter
                 last
-                (author (party-puk party))
+                (author (party->puk party))
                 (type type)
                 localTuples
                 toBlocking

@@ -19,7 +19,7 @@
       PartyImpl
         (name-subject [_] name))))
 
-(defn party-puk [^Party party]
+(defn party->puk [^Party party]
   (some-> party .publicKey .current))
 
 (defn produce-party! [parties puk]

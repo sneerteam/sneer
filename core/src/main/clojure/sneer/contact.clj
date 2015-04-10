@@ -2,7 +2,7 @@
   (:require
     [rx.lang.clojure.core :as rx]
     [sneer.rx :refer [atom->observable combine-latest]]
-    [sneer.party :refer [party-puk produce-party!]]
+    [sneer.party :refer [party->puk produce-party!]]
     [sneer.party-impl :refer [name-subject]])
   (:import
     [java.util UUID]
@@ -16,13 +16,13 @@
       publisher
       (audience own-puk)
       (type "contact")
-      (field "party" (when party (party-puk party)))
+      (field "party" (when party (party->puk party)))
       (field "invite-code" invite-code)
       (pub new-nick)))
 
 (defn problem-with-new-nickname-in [nick->contact puk->contact new-nick party]
   (let [old-by-nick (get nick->contact new-nick)
-        old-by-puk (get puk->contact (party-puk party))]
+        old-by-puk (get puk->contact (party->puk party))]
     (cond
       (.isEmpty ^String new-nick)
       "cannot be empty"
@@ -124,7 +124,7 @@
                                    (atom->observable nick->contact))}))
 
 (defn find-contact-in [puk->contact party]
-  (get puk->contact (party-puk party)))
+  (get puk->contact (party->puk party)))
 
 (defn find-contact [contacts-state party]
   (find-contact-in @(:puk->contact contacts-state) party))
@@ -156,7 +156,7 @@
     (let [contact (reify-contact space nick->contact-atom puk->contact-atom own-puk nickname party invite-code)]
       (swap! nick->contact-atom assoc nickname contact)
       (when party
-        (swap! puk->contact-atom assoc (party-puk party) contact))
+        (swap! puk->contact-atom assoc (party->puk party) contact))
 
       contact)))
 

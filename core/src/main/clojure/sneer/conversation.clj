@@ -3,7 +3,7 @@
    [rx.lang.clojure.core :as rx]
    [rx.lang.clojure.interop :as interop]
    [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map]]
-   [sneer.party :refer [party-puk]]
+   [sneer.party :refer [party->puk]]
    [sneer.commons :refer [now produce!]]
    [sneer.contact :refer [get-contacts puk->contact]]
    [sneer.tuple.space :refer [payload]])
@@ -102,7 +102,7 @@
 
 (defn reify-conversation
   [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
-  (let [^PublicKey party-puk (-> contact .party .current party-puk)
+  (let [^PublicKey party-puk (-> contact .party .current party->puk)
         {:keys [messages ack-pub unread-messages most-recent-message]}
         (some->> party-puk (get-conversation-state tuple-space own-puk))]
 
