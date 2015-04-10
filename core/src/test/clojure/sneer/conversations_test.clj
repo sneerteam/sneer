@@ -93,6 +93,10 @@
           (fact "carla already has a different nickname"
                 (.problemWithNewNickname sneer "anna" carla) => some?)
 
+          (fact "finding by nickname"
+                (.findByNick sneer "anna") => some?
+                (.findByNick sneer "wxyz") => nil)
+
           (fact "conversations without a party cannot send messages"
                 (let [contact (.produceContact sneer "bob" nil nil)
                       conversation (.withContact subject contact)

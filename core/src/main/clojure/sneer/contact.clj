@@ -129,6 +129,9 @@
 (defn find-contact [contacts-state party]
   (find-contact-in @(:puk->contact contacts-state) party))
 
+(defn find-by-nick [contacts-state nick]
+  (get @(:nick->contact contacts-state) nick))
+
 (defn check-new-contact [nick->contact puk->contact nickname party]
   ;(println "nicks" nick->contact)
   ;(println "puks" puk->contact)
