@@ -8,6 +8,15 @@
     android:textIsSelectable="true"
     tools:context=".ConversationActivity" >
 
+    <TextView
+        android:id="@+id/warningMessage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="normal|italic"
+        android:text="@string/conversation_activity_warning"
+        android:layout_alignParentTop="true"/>
+
     <ListView
         android:id="@+id/messageList"
         android:layout_width="fill_parent"

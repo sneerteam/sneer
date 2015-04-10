@@ -17,8 +17,10 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +119,15 @@ public class ConversationActivity extends SneerActivity {
 		actionButton.setImageResource(icAction);
 		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			handleClick(editText.getText().toString().trim());
+		}});
+
+		final TextView warning = (TextView)findViewById(R.id.warningMessage);
+
+		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) {
+			boolean enable = party != null;
+			editText.setEnabled(enable);
+			actionButton.setEnabled(enable);
+			warning.setVisibility(enable ? View.GONE : View.VISIBLE);
 		}});
 
 		menu = new PopupMenu(ConversationActivity.this, actionButton);
