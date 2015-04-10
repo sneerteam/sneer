@@ -18,6 +18,8 @@ public interface Sneer {
 	Observable<List<Contact>> contacts();
 	/** @return null if party is not a contact. */
 	Contact findContact(Party party);
+	/** @return null if not found. */
+	Contact findByNick(String nick);
 
 	// INVITES-TODO: When the user is trying to associate a Party with a Contact and types the nickname of an existing Contact without a party, change the UI to use the existing Contact, instead of displaying the error tooltip.
 	/** @return null if the new nickname is ok or a reason why the new nickname is not ok (empty or already used by another Contact). */
