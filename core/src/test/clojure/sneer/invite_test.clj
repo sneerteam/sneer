@@ -7,6 +7,7 @@
             [sneer.keys :refer [->puk]]
             [sneer.test-util :refer [<!!? ->chan]]
             [sneer.party :refer [party->puk]]
+            [sneer.restartable :refer [restart]]
             [rx.lang.clojure.core :as rx]))
 
 (def neide (->puk "neide"))
@@ -22,4 +23,6 @@
                                       "author"      neide
                                       "audience"    (.. sneer-admin privateKey publicKey)
                                       "invite-code" (.inviteCode contact)})
-             (<!!? channel) => neide))))
+             (<!!? channel) => neide)
+           (with-open [sneer-admin (restart sneer-admin)]
+             (-> sneer-admin .sneer .contacts .toBlocking .first first .party .current) => some?))))

@@ -22,13 +22,10 @@
     (.produceContact sneer nick (when party (->party party)) nil)))
 
 (defn- test-produce-contacts [db restart? nick party nick2 party2]
-  (let [sneer-admin (atom (new-sneer-admin-over-db db))]
-    (try
-      (test-produce-contact (.sneer @sneer-admin) nick party)
-      (when restart?
-        (swap! sneer-admin restart))
-      (test-produce-contact (.sneer @sneer-admin) nick2 party2)
-      (finally (dispose @sneer-admin))))
+  (with-open [sneer-admin (new-sneer-admin-over-db db)]
+    (test-produce-contact (.sneer sneer-admin) nick party)
+    (with-open [sneer-admin (if restart? (restart sneer-admin) sneer-admin)]
+      (test-produce-contact (.sneer sneer-admin) nick2 party2)))
   true)
 
 (def ok   truthy)
