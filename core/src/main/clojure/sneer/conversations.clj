@@ -28,7 +28,7 @@
      (let [text (message-label (first unread-messages))
            subText (unread-messages-label (count unread-messages))]
        (reify-notification [c] party-name text subText)))
-   (.. c party name first)))
+   (.. c contact party current name first)))
 
 (defn- notification-for-many [unread-conversations]
   (let [conversations (mapv first unread-conversations)

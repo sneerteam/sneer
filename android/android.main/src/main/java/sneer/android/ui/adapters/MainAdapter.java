@@ -175,7 +175,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 		public Subscription subscribe(Conversation conversation) {
 			return Subscriptions.from(
-					conversation.contact().party().current().name().subscribe(party),
+					conversation.contact().nickname().observable().subscribe(party),
 					conversation.mostRecentMessageContent().subscribe(summary),
 					pictureFor(conversation).map(TO_BITMAP).subscribe(picture),
 					conversation.unreadMessageCount().subscribe(unread),
