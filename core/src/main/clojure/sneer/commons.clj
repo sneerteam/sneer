@@ -1,5 +1,5 @@
 (ns sneer.commons
-  (:import (java.lang AutoCloseable)))
+  (:import [java.lang AutoCloseable]))
 
 (defprotocol Disposable
   (dispose [resource]))

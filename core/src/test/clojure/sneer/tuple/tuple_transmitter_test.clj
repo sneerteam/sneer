@@ -7,7 +7,7 @@
             [sneer.test-util :refer [>!!? <!!?]]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer [store-tuple restarted]])
-  (:import (java.lang AutoCloseable)))
+  (:import [java.lang AutoCloseable]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 

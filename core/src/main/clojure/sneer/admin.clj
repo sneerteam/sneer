@@ -11,10 +11,10 @@
     [rx.lang.clojure.core :as rx]
     [clojure.core.async :refer [chan <!]])
   (:import
+    [java.lang AutoCloseable]
     [sneer PrivateKey]
     [sneer.admin SneerAdmin]
-    [sneer.crypto.impl KeysImpl]
-    (java.lang AutoCloseable)))
+    [sneer.crypto.impl KeysImpl]))
 
 (defn handle-invites [sneer tuple-base puk]
   (let [tuples-out (chan)
