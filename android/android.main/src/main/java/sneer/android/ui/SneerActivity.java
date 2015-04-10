@@ -136,7 +136,8 @@ public class SneerActivity extends Activity {
 	}
 
 
-	protected void toast(Object text) { toast(text, LENGTH_SHORT); }
+	protected void toast    (Object text) { toast(text, LENGTH_SHORT); }
+	protected void toastLong(Object text) { toast(text, LENGTH_LONG ); }
 	protected void toast(FriendlyException e) { toast(e.getMessage(), LENGTH_LONG); }
 	protected void toast(final Object text, final int length) {
 		this.runOnUiThread(new Runnable() {  @Override public void run() {
