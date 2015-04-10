@@ -13,7 +13,8 @@
   (:import
     [sneer PrivateKey]
     [sneer.admin SneerAdmin]
-    [sneer.crypto.impl KeysImpl]))
+    [sneer.crypto.impl KeysImpl]
+    (java.lang AutoCloseable)))
 
 (defn handle-invites [sneer tuple-base puk]
   (let [tuples-out (chan)
