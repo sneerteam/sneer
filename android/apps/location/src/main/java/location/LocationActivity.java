@@ -16,8 +16,8 @@ public class LocationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-        String msg = "LOCATION: " + System.currentTimeMillis();
-        startService(getIntent().getExtras().<Intent>getParcelable("SEND_MESSAGE").setAction(msg));
+        String msg = "LOCATION : " + System.currentTimeMillis();
+        startService(getIntent().<Intent>getParcelableExtra("SEND_MESSAGE").setAction(msg));
     }
 
 }
