@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import java.util.Collection;
 
 import me.sneer.R;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Party;
@@ -24,7 +25,11 @@ import sneer.Profile;
 import sneer.android.Notifier;
 import sneer.android.SneerApp;
 import sneer.android.ui.adapters.MainAdapter;
+import sneer.android.utils.AndroidUtils;
 
+import static android.content.Intent.ACTION_SEND;
+import static android.content.Intent.EXTRA_SUBJECT;
+import static android.content.Intent.EXTRA_TEXT;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.utils.Puk.shareOwnPublicKey;
@@ -32,30 +37,33 @@ import static sneer.android.utils.Puk.shareOwnPublicKey;
 public class MainActivity extends SneerActivity {
 
 	private MainAdapter adapter;
-	private ListView conversationList;
 
 	private final Party self = sneer().self();
 	private final Profile ownProfile = sneer().profileFor(self);
-    private String subject;
-    private String text;
+
+    private String subjectToSend;
+    private String textToSend;
 
 
-    @Override
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (!sneerAndroid().checkOnCreate(this)) return;
 
-        if (!sneerAndroid().checkOnCreate(this)) return;
-        setContentView(R.layout.activity_main);
-        startProfileActivityIfFirstTime();
-        makeConversationList();
+		handleFirstTime();
 
-        Intent intent = getIntent();
-        if (intent.getAction() == Intent.ACTION_SEND && intent.getType() == "text/plain") {
-            subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-            text = intent.getStringExtra(Intent.EXTRA_TEXT);
-        }
+		setContentView(R.layout.activity_main);
+		makeConversationList();
 
-        ((SneerApp)getApplication()).checkPlayServices(this);
+		handleSend(getIntent());
+	}
+
+
+	private void handleSend(Intent intent) {
+		if (!intent.getAction().equals(ACTION_SEND )) return;
+		if (!intent.getType()  .equals("text/plain")) return;
+		subjectToSend = intent.getStringExtra(EXTRA_SUBJECT);
+		textToSend = intent.getStringExtra(EXTRA_TEXT);
 	}
 
 
@@ -82,7 +90,7 @@ public class MainActivity extends SneerActivity {
 					addContactTutorial.setVisibility(View.GONE);
 		}});
 
-		conversationList = (ListView) findViewById(R.id.conversationList);
+		ListView conversationList = (ListView) findViewById(R.id.conversationList);
 		conversationList.setAdapter(adapter);
 		conversationList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -138,15 +146,31 @@ public class MainActivity extends SneerActivity {
 	}
 
 
-	protected void onClicked(Conversation conversation) {
+	private void onClicked(Conversation conversation) {
+		sendMessageIfPresent(conversation);
 		Intent intent = new Intent();
 		intent.setClass(this, ConversationActivity.class);
-		intent.putExtra("partyPuk", conversation.contact().party().current().publicKey().current());
-        intent.putExtra("message_subject", subject);
-        intent.putExtra("message_text", text);
-        subject = null;
-        text = null;
+		intent.putExtra("nick", conversation.contact().nickname().current());
 		startActivity(intent);
+	}
+
+	private void sendMessageIfPresent(final Conversation conversation) {
+		if (subjectToSend == null && textToSend == null) return;
+		String separator = (subjectToSend != null && textToSend != null)
+				? "/n/n" : "";
+		final String message = ensure(subjectToSend) + separator + ensure(textToSend);
+		subjectToSend = null;
+		textToSend = null;
+		conversation.canSendMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() { @Override public void call(Boolean canSend) {
+			if (canSend)
+				conversation.sendMessage(message);
+			else
+				toastLong("This conversation cannot send messages yet");
+		}});
+	}
+
+	private String ensure(String s) {
+		return s == null ? "" : s;
 	}
 
 
@@ -161,17 +185,24 @@ public class MainActivity extends SneerActivity {
 	protected void onRestart() {
 		super.onRestart();
 		adapter.notifyDataSetChanged();
+		checkHasOwnName();
+	}
+
+
+	private void checkHasOwnName() {
 		if (isOwnNameLocallyAvailable()) return;
 		finish();
-		toast("First and last name must be filled in");
+		toast("Name must be filled in");
 	}
+
 
 	@Override protected void onPause()  { super.onPause();  Notifier.resume(); }
 	@Override protected void onResume() { super.onResume(); Notifier.pause(); }
 
-	private void startProfileActivityIfFirstTime() {
-		if (!isOwnNameLocallyAvailable())
-			navigateTo(ProfileActivity.class);
+	private void handleFirstTime() {
+		if (isOwnNameLocallyAvailable()) return;
+		((SneerApp)getApplication()).checkPlayServices(this);
+		navigateTo(ProfileActivity.class);
 	}
 
 

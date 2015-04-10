@@ -40,7 +40,6 @@ public class ContactActivity extends Activity {
 
 	public static final boolean USE_INVITES = false;
 
-	static final String PARTY_PUK = "partyPuk";
 	static final String CURRENT_NICKNAME = "currentNickname";
 
 	private ActionBar actionBar;
@@ -71,8 +70,8 @@ public class ContactActivity extends Activity {
 
 		intent = getIntent();
 
-		if (!validPuk()) {
-			toast("Invalid public key");
+		if (!extractPuk()) {
+			toast("Profile not found");
 			finish();
 			return;
 		}
@@ -137,7 +136,7 @@ public class ContactActivity extends Activity {
 	}
 
 
-	private boolean validPuk() {
+	private boolean extractPuk() {
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
 			String[] query = intent.getData().getQuery().split("&invite=");
 			try {
@@ -146,8 +145,11 @@ public class ContactActivity extends Activity {
 				return false;
 			}
 		} else {
-			Bundle extras = intent.getExtras();
-			partyPuk = (PublicKey) extras.getSerializable(PARTY_PUK);
+			Contact c = sneer().findByNick(intent.getStringExtra(CURRENT_NICKNAME));
+			if (c == null) return false;
+			Party p = c.party().current();
+			if (p == null) return false;
+			partyPuk = p.publicKey().current();
 		}
 		return true;
 	}

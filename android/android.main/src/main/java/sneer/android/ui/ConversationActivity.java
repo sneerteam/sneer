@@ -25,10 +25,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import me.sneer.R;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
+import sneer.Contact;
 import sneer.Conversation;
 import sneer.ConversationMenuItem;
 import sneer.Message;
@@ -36,20 +39,19 @@ import sneer.Party;
 import sneer.PublicKey;
 import sneer.android.ui.adapters.ConversationAdapter;
 
+import static rx.Observable.never;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 
 public class ConversationActivity extends SneerActivity {
 
-	public static final String PARTY_PUK = "partyPuk";
 	private static final String ACTIVITY_TITLE = "activityTitle";
 
 	private final List<Message> messages = new ArrayList<Message>();
 	private ConversationAdapter adapter;
 
-	private ActionBar actionBar;
-	private Party party;
 	private Conversation conversation;
+	private Contact contact;
 
 	private PopupMenu menu;
 	private ImageButton actionButton;
@@ -64,23 +66,23 @@ public class ConversationActivity extends SneerActivity {
 		super.onPostCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversation);
 		justOpened = true;
-		actionBar = getActionBar();
+		ActionBar actionBar = getActionBar();
         if (actionBar != null)
             actionBar.setHomeButtonEnabled(true);
 
-        party = sneer().produceParty((PublicKey)getIntent().getExtras().getSerializable(PARTY_PUK));
+		contact = sneer().findByNick(getIntent().getStringExtra("nick"));
 
-		plugActionBarTitle(actionBar, party.name());
-		plugActionBarIcon(actionBar, sneer().profileFor(party).selfie());
+		plugActionBarTitle(actionBar, contact.nickname().observable());
+		plugActionBarIcon(actionBar, selfieFor(contact));
 
-		conversation = sneer().conversations().withParty(party);
+		conversation = sneer().conversations().withContact(contact);
 
 		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),
 			R.layout.list_item_user_message,
 			R.layout.list_item_party_message,
 			messages,
-			party);
+			contact);
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
@@ -118,22 +120,18 @@ public class ConversationActivity extends SneerActivity {
 		}});
 
 		menu = new PopupMenu(ConversationActivity.this, actionButton);
-
-        sendMessageIfPresent();
 	}
 
-    private void sendMessageIfPresent() {
-        Bundle extras = getIntent().getExtras();
-        String subject = extras.getString("message_subject", "");
-        String text    = extras.getString("message_text", "");
-        String message = !subject.isEmpty() && !text.isEmpty()
-                ? subject + "\n\n" + text
-                : subject + text;
-        if (!message.isEmpty())
-            conversation.sendMessage(message);
-    }
+	private Observable<byte[]> selfieFor(Contact contact) {
+		return contact.party().observable().switchMap(new Func1<Party, Observable<? extends byte[]>>() { @Override public Observable<? extends byte[]> call(Party party) {
+			if (party == null)
+				return never();
+			else
+				return sneer().profileFor(party).selfie();
+		}});
+	}
 
-    private Message lastMessageReceived(List<Message> ms) {
+	private Message lastMessageReceived(List<Message> ms) {
 		for (int i = ms.size() - 1; i >= 0; --i) {
 			Message message = ms.get(i);
 			if (!message.isOwn())
@@ -171,8 +169,7 @@ public class ConversationActivity extends SneerActivity {
 	private void navigateToProfile() {
 		Intent intent = new Intent();
 		intent.setClass(this, ContactActivity.class);
-		intent.putExtra(PARTY_PUK, party.publicKey().current());
-		intent.putExtra(CURRENT_NICKNAME, actionBar.getTitle());
+		intent.putExtra(CURRENT_NICKNAME, contact.nickname().current());
 		intent.putExtra(ACTIVITY_TITLE, "Contact");
 		startActivity(intent);
 	}
@@ -237,7 +234,7 @@ public class ConversationActivity extends SneerActivity {
 										@Override
 										public boolean onMenuItemClick(MenuItem ignored) {
 											menu.getMenu().close();
-											item.call(party.publicKey().current());
+											item.call(contact.party().current().publicKey().current());
 											return true;
 										}
 									});

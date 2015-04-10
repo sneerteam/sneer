@@ -23,8 +23,8 @@ import java.util.Random;
 
 import me.sneer.R;
 import rx.functions.Action1;
+import sneer.Contact;
 import sneer.Message;
-import sneer.Party;
 import sneer.android.ui.drawable.TriangleLeftDrawable;
 import sneer.android.ui.drawable.TriangleRightDrawable;
 
@@ -37,19 +37,19 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
 	private final int layoutUserResourceId;
     private final int listContactResourceId;
 	private final LayoutInflater inflater;
-	private final Party party;
+	private final Contact contact;
 
     public ConversationAdapter(Context context,
     		LayoutInflater inflater,
     		int layoutUserResourceId,
     		int listContactResourceId,
     		List<Message> messages,
-    		Party party) {
+		    Contact contact) {
         super(context, layoutUserResourceId, messages);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
         this.listContactResourceId = listContactResourceId;
-		this.party = party;
+		this.contact = contact;
     }
 
 
@@ -83,9 +83,12 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
 
         messageView.setText(messageContent);
 
-        party.name().subscribe(new Action1<String>() { @Override public void call(String sender) {
-        	setColors(ret, sender, message.isOwn());
-        }});
+        contact.nickname().observable().subscribe(new Action1<String>() {
+	        @Override
+	        public void call(String sender) {
+		        setColors(ret, sender, message.isOwn());
+	        }
+        });
 
        	return ret;
     }
