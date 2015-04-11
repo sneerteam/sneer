@@ -2,7 +2,7 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [rx.lang.clojure.interop :as interop]
-   [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map]]
+   [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map switch-map-some map-some]]
    [sneer.party :refer [party->puk]]
    [sneer.commons :refer [now produce!]]
    [sneer.contact :refer [get-contacts puk->contact]]
@@ -97,7 +97,10 @@
 
       (canSendMessages [_] (rx/map some? (.. contact party observable)))
 
-      (messages [_] (or (get-messages) (rx/never)))
+      (messages [_]
+        (switch-map-some #(messages tuple-space own-puk %)
+                         (rx/return [])
+                         (.party contact)))
 
       (unreadMessages [_] (or (get-unread-messages) (rx/never)))
 
