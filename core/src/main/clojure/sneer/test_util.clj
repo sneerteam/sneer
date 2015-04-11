@@ -1,5 +1,6 @@
 (ns sneer.test-util
   (:require
+    [sneer.clojure.core :refer [nvl]]
     [clojure.core.async :refer [alt!! timeout filter> >!! close! chan]]
     [rx.lang.clojure.core :as rx]
     [sneer.rx :refer [observe-for-io]]))
@@ -33,7 +34,7 @@
 
 (defn subscribe-chan [c observable]
   (rx/subscribe observable
-                #(>!! c %)
+                #(>!! c (nvl % :nil))  ; Channels cannot take nil
                 #(do
                    (.printStackTrace %)
                    (close! c))
