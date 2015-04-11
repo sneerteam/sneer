@@ -119,7 +119,7 @@
             (rx/never)))
 
       (mostRecentMessageTimestamp [_]
-        (or (some->> (get-most-recent-message) (rx/map message-timestamp))
+        (or (some->> (get-most-recent-message) (map-some message-timestamp))
             (rx/never)))
 
       (menu [_]
