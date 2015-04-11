@@ -59,8 +59,7 @@
        (take-while #(> (original-id %) last-read-id))
        vec))
 
-(defn- latest-unread-messages
-  [^Observable observable-messages ^Observable acks]
+(defn- latest-unread-messages  [^Observable observable-messages ^Observable acks]
   (let [last-read-ids (rx/map payload acks)]
     (latest
      (Observable/combineLatest observable-messages
