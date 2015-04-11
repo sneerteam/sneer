@@ -40,6 +40,7 @@
 
       (fact "mostRecentMessageTimestamp includes message received"
         (store-tuple tuple-base message)
+        (<!!? most-recent-timestamps) => :nil
         (<!!? most-recent-timestamps) => timestamp)
 
       (fact "mostRecentMessageTimestamp includes message sent"

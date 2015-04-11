@@ -54,14 +54,6 @@
 (defn- reverse-party-messages [messages]
   (->> messages reverse (remove own?)))
 
-(defn- most-recent-message [^Observable observable-messages]
-  (switch-map
-   (fn [messages]
-     (if-some [message (last messages)]
-       (rx/return message)
-       (rx/empty)))
-   observable-messages))
-
 (defn- unread-messages [messages last-read-id]
   (->> (reverse-party-messages messages)
        (take-while #(> (original-id %) last-read-id))
@@ -98,7 +90,7 @@
         get-acks #(when-let [party-puk (get-party-puk)]
                    (.. tuple-space filter (type "message-read") (audience party-puk) (author own-puk) last tuples))
         get-unread-messages #(some-> (get-messages) (latest-unread-messages (get-acks)))
-        get-most-recent-message #(some-> (get-messages) most-recent-message)]
+        get-most-recent-message #(some-> (rx/map last (get-messages)))]
 
     (reify
       Conversation
