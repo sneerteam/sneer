@@ -73,5 +73,23 @@
   (let [^rx.functions.FuncN fn (func-n f)]
     (Observable/combineLatest os fn)))
 
+(defn map-some
+  ([f ^Observable o]
+    (map-some f nil o))
+  ([f default ^Observable o]
+   (rx/map #(if (some? %)
+             (f %)
+             default)
+           o)))
+
 (defn switch-map [f ^Observable o]
   (.switchMap o (interop/fn [x] (f x))))
+
+(defn switch-map-some
+  ([f ^Observable o]
+    (switch-map-some f nil o))
+  ([f default ^Observable o]
+    (switch-map #(if (some? %)
+                    (f %)
+                    (rx/return default))
+                o)))
