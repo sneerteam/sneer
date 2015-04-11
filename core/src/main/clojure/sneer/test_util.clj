@@ -1,8 +1,8 @@
 (ns sneer.test-util
   (:require
-   [clojure.core.async :refer [alt!! timeout filter> >!! close! chan]]
-   [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [observe-for-io]]))
+    [clojure.core.async :refer [alt!! timeout filter> >!! close! chan]]
+    [rx.lang.clojure.core :as rx]
+    [sneer.rx :refer [observe-for-io]]))
 
 (defn <!!?
   ([ch]
