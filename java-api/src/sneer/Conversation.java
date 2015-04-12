@@ -21,7 +21,6 @@ public interface Conversation {
 
 	Observable<List<Message>> unreadMessages();
 	Observable<Long> unreadMessageCount();
-
 	void setRead(Message last);
 
 	Observable<List<ConversationMenuItem>> menu();
