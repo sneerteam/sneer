@@ -54,18 +54,15 @@
 (defn- reverse-party-messages [messages]
   (->> messages reverse (remove own?)))
 
-(defn- unread-messages [messages last-read-id]
-  (->> (reverse-party-messages messages)
-       (take-while #(> (original-id %) last-read-id))
-       vec))
+(def unread (interop/fn [messages last-read-id]
+                        (->> (reverse-party-messages messages)
+                             (take-while #(> (original-id %) last-read-id))
+                             vec)))
 
-(defn- latest-unread-messages  [^Observable observable-messages ^Observable acks]
-  (let [last-read-ids (rx/map payload acks)]
+(defn- unread-messages  [^Observable messages ^Observable last-read]
+  (let [last-read-id (->> last-read (rx/map payload) (rx/cons 0))]
     (latest
-     (Observable/combineLatest observable-messages
-                               (rx/cons 0 last-read-ids)
-                               (interop/fn [messages last-read-id]
-                                 (unread-messages messages last-read-id))))))
+      (Observable/combineLatest messages last-read-id unread))))
 
 (defn- message-ids [m1 m2]
   (compare (message-id m1)
@@ -81,59 +78,38 @@
          (rx/map vec))))
 
 (defn reify-conversation
-  [^TupleSpace tuple-space ^Observable conversation-menu-items ^PublicKey own-puk ^Contact contact]
-  (let [get-party-puk #(-> contact .party .current party->puk)
-        get-messages #(some->> (get-party-puk) (messages tuple-space own-puk))
-        get-ack-pub #(when-let [party-puk (get-party-puk)]
-                      (.. tuple-space publisher (type "message-read") (audience party-puk)))
-        get-acks #(when-let [party-puk (get-party-puk)]
-                   (.. tuple-space filter (type "message-read") (audience party-puk) (author own-puk) last tuples))
-        get-unread-messages #(some-> (get-messages) (latest-unread-messages (get-acks)))
-        get-most-recent-message #(some-> (rx/map last (get-messages)))]
+  [^TupleSpace tuple-space ^Observable menu-items ^PublicKey own-puk ^Contact contact]
+  (let [party (.. contact party observable)
+        puk (switch-map-some #(.. % publicKey observable) party)
+
+        messages (switch-map-some #(messages tuple-space own-puk %) [] puk)
+
+        last-read-filter #(.. tuple-space filter (type "message-read") (audience %) (author own-puk) last tuples)
+        last-read (switch-map-some last-read-filter puk)
+
+        most-recent-message (rx/map last messages)
+
+        current-puk #(doto
+                      (some-> contact .party .current .publicKey .current)
+                      (assert "Contact does not have a known public key."))
+
+        sender #(.. tuple-space publisher (audience (current-puk)))
+        message-sender      #(.. (sender) (type "message"     ) (field "message-type" "chat"))
+        message-read-sender #(.. (sender) (type "message-read"))]
 
     (reify
       Conversation
       (contact [_] contact)
 
-      (canSendMessages [_] (rx/map some? (.. contact party observable)))
+      (canSendMessages [_] (rx/map some? party))
+      (sendMessage [_ label] (.. (message-sender) (field "label" label) pub))
 
-      (messages [_]
-        (switch-map-some #(messages tuple-space own-puk %)
-                         (rx/return [])
-                         (.party contact)))
+      (messages [_] messages)
+      (mostRecentMessageContent   [_] (map-some message-label     most-recent-message))
+      (mostRecentMessageTimestamp [_] (map-some message-timestamp most-recent-message))
 
-      (unreadMessages [_] (or (get-unread-messages) (rx/never)))
+      (unreadMessages [_] (unread-messages messages last-read))
+      (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
+      (setRead [_ message] (.pub (message-read-sender) (original-id message)))
 
-      (sendMessage [_ label]
-        (if-let [party-puk (get-party-puk)]
-          (..
-            tuple-space
-            publisher
-            (audience party-puk)
-            (type "message")
-            (field "message-type" "chat")
-            (field "label" label)
-            (pub))
-          (throw (Exception. "Contact party doesn't exist yet."))))
-
-      (mostRecentMessageContent [_]
-        (or (some->> (get-most-recent-message) (rx/map message-label))
-            (rx/never)))
-
-      (mostRecentMessageTimestamp [_]
-        (or (some->> (get-most-recent-message) (map-some message-timestamp))
-            (rx/never)))
-
-      (menu [_]
-        conversation-menu-items)
-
-      (unreadMessageCount [_]
-        (or (some->> (get-unread-messages) (rx/map (comp long count)))
-            (rx/return 0)))
-
-      (setRead [_ message]
-        (assert (-> message own? not))
-        (println "Publishing message read tuple.")          ;; Klaus: I suspect this might be happening too often, redundantly for already read messages.
-        (if-let [ack-pub (get-ack-pub)]
-          (.pub ack-pub (original-id message))
-          (throw (Exception. "Contact party doesn't exist yet.")))))))
+      (menu [_] menu-items))))
