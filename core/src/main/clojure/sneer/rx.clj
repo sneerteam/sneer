@@ -60,7 +60,7 @@
    (rx/subscribe-on (Schedulers/io) o)))
 
 (defn shared-latest [^Observable o]
-  "Returns a `rx.Observable' that publishes the latest value of the source sequence
+  "Returns a `rx.Observable' that emits the latest value of o
    while sharing a single subscription as long as there are subscribers."
   (.. o (replay 1) refCount))
 
