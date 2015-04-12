@@ -35,14 +35,30 @@
           ^Contact      carla-contact (produce-contact contacts-state "carla" carla-party nil)
           ^Conversation subject (reify-conversation tuple-space menu-items neide carla-contact)
           most-recent-timestamps (observable->chan (subscribe-on-io (.mostRecentMessageTimestamp subject)))
+          most-recent-labels     (observable->chan (subscribe-on-io (.mostRecentMessageContent   subject)))
+          unread-counts          (observable->chan (subscribe-on-io (.unreadMessageCount         subject)))
+          messages               (observable->chan (subscribe-on-io (.messages                   subject)))
           timestamp (long 42)
-          message {"type" "message" "author" carla "audience" neide "timestamp" timestamp}]
+          message {"type" "message" "author" carla "audience" neide "timestamp" timestamp "label" "Hi, Neide"}]
 
-      (fact "mostRecentMessageTimestamp includes message received"
+      (fact "mostRecentMessage includes message received"
         (store-tuple tuple-base message)
         (<!!? most-recent-timestamps) => :nil
-        (<!!? most-recent-timestamps) => timestamp)
+        (<!!? most-recent-timestamps) => timestamp
+
+        (<!!? most-recent-labels    ) => :nil
+        (<!!? most-recent-labels    ) => "Hi, Neide"
+
+        (<!!? unread-counts         ) => 0
+        (<!!? unread-counts         ) => 1
+
+        (<!!? messages              ) => []
+        (let [msg (last (<!!? messages))]
+          (.setRead subject msg))
+        (<!!? unread-counts         ) => 0)
 
       (fact "mostRecentMessageTimestamp includes message sent"
-        (.sendMessage subject "hi")
-        (<!!? most-recent-timestamps) => #(> % timestamp)))))
+        (.sendMessage subject "Hello, Carla")
+        (<!!? most-recent-timestamps) => #(> % timestamp)
+
+        (<!!? most-recent-labels    ) => "Hello, Carla"))))
