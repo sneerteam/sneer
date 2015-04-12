@@ -1,6 +1,6 @@
 (ns sneer.conversations-test
   (:require [midje.sweet :refer :all]
-            [clojure.core.async :as async :refer [thread]]
+            [clojure.core.async :refer [thread]]
             [rx.lang.clojure.core :as rx]
             [sneer.admin :refer [new-sneer-admin-over-db]]
             [sneer.commons :refer [dispose]]
@@ -12,8 +12,7 @@
             [sneer.keys :refer [->puk create-prik]]
             [sneer.impl :refer [new-sneer]]
             [sneer.restartable :refer [restart]])
-  (:import [rx Observable]
-           [sneer Sneer Party Conversations]
+  (:import [sneer Sneer Party Conversations]
            [sneer.commons.exceptions FriendlyException]
            [sneer.tuples TupleSpace]))
 

@@ -4,23 +4,26 @@
     [rx.lang.clojure.interop :as interop])
   (:import [rx.subjects BehaviorSubject]
            [rx.schedulers Schedulers]
-           [rx Observable]))
+           [rx Observable Observable$OnSubscribe Subscriber Observer]
+           [sneer.rx CompositeSubject]
+           (rx.functions FuncN)
+           (java.util List)))
 
 (defn on-subscribe [f]
   "Reifies a rx.Observable.OnSubscribe instance from a regular clojure function `f'."
-  (reify rx.Observable$OnSubscribe
-    (call [this subscriber] (f subscriber))))
+  (reify Observable$OnSubscribe
+    (call [_ subscriber] (f subscriber))))
 
 (defn on-subscribe-for [^Observable observable]
   "Returns a rx.Observable.OnSubscribe instance that subscribes subscribers to `observable'."
   (on-subscribe
-    (fn [^rx.Subscriber subscriber]
+    (fn [^Subscriber subscriber]
       (.add subscriber (.subscribe observable subscriber)))))
 
-(defn subject* [^Observable observable ^rx.Observer observer]
+(defn subject* [^Observable observable ^Observer observer]
   "Creates a rx.Subject from an `observable' part and an `observer' part."
   (let [subscriber (on-subscribe-for observable)]
-    (sneer.rx.CompositeSubject. subscriber observer)))
+    (CompositeSubject. subscriber observer)))
 
 (defn filter-by [criteria observable]
   "Filters an `observable' of maps by `criteria' represented as a map.
@@ -30,7 +33,7 @@
       (rx/filter #(= criteria (select-keys % ks)) observable)
       observable)))
 
-(defn seq->observable [^java.lang.Iterable iterable]
+(defn seq->observable [^Iterable iterable]
   (Observable/from iterable))
 
 (defn atom->observable [atom]
@@ -66,11 +69,11 @@
     .connect))
 
 (defn func-n [f]
-  (reify rx.functions.FuncN
+  (reify FuncN
     (call [_ args] (f args))))
 
-(defn combine-latest [f ^java.util.List os]
-  (let [^rx.functions.FuncN fn (func-n f)]
+(defn combine-latest [f ^List os]
+  (let [^FuncN fn (func-n f)]
     (Observable/combineLatest os fn)))
 
 (defn map-some
