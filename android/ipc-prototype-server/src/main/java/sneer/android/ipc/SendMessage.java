@@ -7,7 +7,10 @@ import android.widget.Toast;
 
 public class SendMessage extends IntentService {
 
-    public SendMessage() {
+	public static final String SEND_MESSAGE       = "SEND_MESSAGE";
+	public static final String CONVERSATION_TOKEN = "CONVERSATION_TOKEN";
+
+	public SendMessage() {
         super("SendMessage");
     }
 
@@ -16,11 +19,9 @@ public class SendMessage extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent == null) return;
 
-        final String message = intent.getAction();
+        final String message = intent.getStringExtra(CONVERSATION_TOKEN) + " " + intent.getAction();
 
-        // Create a handler to post messages to the main thread
-        Handler mHandler = new Handler(getMainLooper());
-        mHandler.post(new Runnable() { @Override public void run() {
+        new Handler(getMainLooper()).post(new Runnable() { @Override public void run() {
             Toast.makeText(getApplicationContext(), "" + message, Toast.LENGTH_SHORT).show();
         }});
 

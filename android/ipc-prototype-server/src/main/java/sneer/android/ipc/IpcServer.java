@@ -1,14 +1,13 @@
 package sneer.android.ipc;
 
-import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.ShareCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 
 public class IpcServer extends ActionBarActivity {
@@ -22,37 +21,39 @@ public class IpcServer extends ActionBarActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_ipc_server, menu);
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 
-		//noinspection SimplifiableIfStatement
-		if (id == R.id.action_settings) {
-			return true;
-		}
+		if (id == R.id.action_settings) return true;
 
 		return super.onOptionsItemSelected(item);
 	}
 
 
-    public void sendLocation(View view) {
-
-        Intent serviceIntent = new Intent();
-        serviceIntent.setClassName("sneer.android.ipc", "sneer.android.ipc.SendMessage");
-
-        Intent pluginIntent = new Intent();
-        pluginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        pluginIntent.setClassName("com.ppeccin.sneer.location", "location.LocationActivity");
-        pluginIntent.putExtra("SEND_MESSAGE", serviceIntent);
-        view.getContext().startActivity(pluginIntent);
-
+    public void launchInstalledPlugins(View view) {
+		for (Plugin p : InstalledPlugins.all(this))
+			launch(view.getContext(), p);
     }
+
+	private void launch(Context context, Plugin p) {
+		Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setClassName(p.packageName, p.activityName);
+        intent.putExtra(SendMessage.SEND_MESSAGE, sendMessageIntent("0123456789ABCDEF"));
+        context.startActivity(intent);
+	}
+
+
+	private Intent sendMessageIntent(String convoToken) {
+		return new Intent()
+				.setClassName("sneer.android.ipc", "sneer.android.ipc.SendMessage")
+				.putExtra(SendMessage.CONVERSATION_TOKEN, convoToken);
+
+	}
+
 }

@@ -17,12 +17,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send Location"
+        android:text="Launch Installed Plugins"
         android:id="@+id/bManda"
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="167dp"
         android:clickable="true"
-        android:onClick="sendLocation" />
+        android:onClick="launchInstalledPlugins" />
 
 </RelativeLayout>
