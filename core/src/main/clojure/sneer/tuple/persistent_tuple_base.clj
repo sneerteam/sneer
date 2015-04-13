@@ -58,35 +58,37 @@
 
 (def builtin-field? #{"type" "payload" "author" "audience" "timestamp"})
 
-(def puk-serializer
-  {:serialize   #(.toBytes ^PublicKey %)
-   :deserialize #(keys/create-puk %)})
+(defn puk-serializer [^PublicKey puk]
+  (.toBytes puk))
 
-(def core-serializer {:serialize serialization/serialize
-                      :deserialize serialization/deserialize})
+(defn puk-deserializer [bytes]
+  (keys/create-puk bytes))
 
-(def serializers {"author" puk-serializer
+(def core-serializer serialization/serialize)
+
+(def core-deserializer serialization/deserialize)
+
+(def serializers {"author"   puk-serializer
                   "audience" puk-serializer
-                  "payload" core-serializer
-                  "custom" core-serializer})
+                  "payload"  core-serializer
+                  "custom"   core-serializer})
 
-(defn apply-serializer [op row field serializer]
+(def deserializers {"author"   puk-deserializer
+                    "audience" puk-deserializer
+                    "payload"  core-deserializer
+                    "custom"   core-deserializer})
+
+(defn apply-serializer [row field serializer]
   (let [v (get row field)]
     (if (nil? v)
       row
-      (assoc row field ((op serializer) v)))))
-
-(def serialize-entry   (partial apply-serializer :serialize  ))
-(def deserialize-entry (partial apply-serializer :deserialize))
-
-(defn apply-serializers [f row]
-  (reduce-kv f row serializers))
+      (assoc row field (serializer v)))))
 
 (defn serialize-entries [row]
-  (apply-serializers serialize-entry row))
+  (reduce-kv apply-serializer row serializers))
 
 (defn deserialize-entries [row]
-  (apply-serializers deserialize-entry row))
+  (reduce-kv apply-serializer row deserializers))
 
 (defn ->custom-field-map [tuple]
   (reduce-kv
