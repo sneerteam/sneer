@@ -34,10 +34,12 @@ public class InstalledPlugins extends BroadcastReceiver {
 
 
 	private static void accumulateIfPlugin(List<Plugin> plugins, Context context, ApplicationInfo app) {
-		Plugin plugin = toPlugin(context, app);
-		if (plugin != null)
-			plugins.add(plugin);
-	}
+        Plugin plugin = toPlugin(context, app);
+        if (plugin != null) {
+            plugins.add(plugin);
+            Log.i(InstalledPlugins.class.getSimpleName(), "Sneer Plugin accumulated: " + plugin.packageName + ", Caption: " + plugin.caption);
+        }
+    }
 
 
 	private static Plugin toPlugin(Context context, ApplicationInfo app) {
@@ -55,14 +57,16 @@ public class InstalledPlugins extends BroadcastReceiver {
 			showToastError(context, packageName, activities.length);
 			return null;
 		}
-		return new Plugin(packageName, activities[0].name);
+
+        String activityClassName = activities[0].name;
+        CharSequence pluginCaption = activities[0].loadLabel(context.getPackageManager());
+
+        return new Plugin(pluginCaption, packageName, activityClassName);
 	}
 
 
 	private static boolean hasSneerMetaData(ApplicationInfo app) {
-		if (app.metaData == null) return false;
-		if (app.metaData.get("SneerApp") == null) return false;
-		return true;
+		return (app.metaData != null && app.metaData.get("SneerApp") != null);
 	}
 
 
@@ -88,17 +92,16 @@ public class InstalledPlugins extends BroadcastReceiver {
         }
 
         ApplicationInfo app = packageInfo.applicationInfo;
-	    toPlugin(context, app);
+        Plugin plugin = toPlugin(context, app);
 
-        //Update the stored list of plugins with: (packageName, activities[0].name);
-        //Log.i(getClass().getSimpleName(), "Sneer Plugin added: " + packageName);
+        Log.i(getClass().getSimpleName(), "Sneer Plugin added: " + plugin.packageName + ", Caption: " + plugin.caption);
+        //Update the stored list of plugins
+
     }
 
 
     private static void showToastError(Context context, String packageName, int numActivities) {
         Toast.makeText(context, packageName + " has " + numActivities + " activities. Should have 1 exported activity", Toast.LENGTH_LONG).show();
     }
-
-
 
 }

@@ -8,11 +8,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.PopupMenu;
 
 
 public class IpcServer extends ActionBarActivity {
 
-	@Override
+    private PopupMenu launchMenu;
+
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ipc_server);
@@ -25,7 +29,14 @@ public class IpcServer extends ActionBarActivity {
 		return true;
 	}
 
-	@Override
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        Button button = (Button) findViewById(R.id.bManda);
+        launchMenu = new PopupMenu(this, button);
+    }
+
+    @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 
@@ -36,8 +47,23 @@ public class IpcServer extends ActionBarActivity {
 
 
     public void launchInstalledPlugins(View view) {
-		for (Plugin p : InstalledPlugins.all(this))
-			launch(view.getContext(), p);
+        Menu menu = launchMenu.getMenu();
+
+        menu.close();
+        menu.clear();
+
+        for (final Plugin p : InstalledPlugins.all(this)) {
+            menu.add(p.caption).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                Plugin plugin = p;
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    launch(IpcServer.this, p);
+                    return true;
+                }
+            });
+        }
+
+        launchMenu.show();
     }
 
 	private void launch(Context context, Plugin p) {
