@@ -122,6 +122,8 @@ public class ConversationActivity extends SneerActivity {
 		}});
 
 		final TextView waiting = (TextView)findViewById(R.id.waitingMessage);
+		String waitingMessage = this.getResources().getString(R.string.conversation_activity_waiting);
+		waiting.setText(String.format(waitingMessage, contact.nickname().current()));
 
 		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) {
 			boolean enable = party != null;
