@@ -128,13 +128,11 @@ public class ConversationActivity extends SneerActivity {
 		final ListView messageList = (ListView)findViewById(R.id.messageList);
 		String waitingMessage = this.getResources().getString(R.string.conversation_activity_waiting);
 		waiting.setText(Html.fromHtml(String.format(waitingMessage, contact.nickname().current())));
-		waiting.setMovementMethod(new LinkMovementMethod() {
-			@Override
-			public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+		waiting.setMovementMethod(new LinkMovementMethod() { @Override public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+			if (event.getAction() == MotionEvent.ACTION_UP)
 				shareOwnPublicKey(ConversationActivity.this, sneer().self(), contact.inviteCode(), contact.nickname().current());
-				return true;
-			}
-		});
+			return true;
+		}});
 
 		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) {
 			boolean enable = party != null;
