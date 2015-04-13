@@ -55,14 +55,14 @@ public class SneerActivity extends Activity {
 
 	public static Subscription plug(final TextView textView, Observable<?> observable) {
 		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			textView.setText(obj.toString());
+			textView.setText(obj == null ? "" : obj.toString());
 		}});
 	}
 
 
 	public static Subscription plug(final EditText editText, Observable<?> observable) {
 		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			editText.setText(obj.toString());
+			editText.setText(obj == null ? "" : obj.toString());
 		}});
 	}
 
@@ -105,7 +105,7 @@ public class SneerActivity extends Activity {
 
 	public static Observable<String> prettyTime(Observable<Long> date) {
 		return Observable.combineLatest(EVERY_MINUTE, date, new Func2<Long, Long, String>() { @Override public String call(Long tickIgnored, Long date) {
-			return new PrettyTime().format(new Date(date));
+			return date == null ? "" : new PrettyTime().format(new Date(date));
 		}});
 	}
 
