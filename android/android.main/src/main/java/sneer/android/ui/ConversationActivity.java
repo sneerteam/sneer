@@ -6,10 +6,14 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
+import android.text.Spannable;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
@@ -17,7 +21,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -38,12 +41,12 @@ import sneer.Conversation;
 import sneer.ConversationMenuItem;
 import sneer.Message;
 import sneer.Party;
-import sneer.PublicKey;
 import sneer.android.ui.adapters.ConversationAdapter;
 
 import static rx.Observable.never;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
+import static sneer.android.utils.Puk.shareOwnPublicKey;
 
 public class ConversationActivity extends SneerActivity {
 
@@ -122,14 +125,23 @@ public class ConversationActivity extends SneerActivity {
 		}});
 
 		final TextView waiting = (TextView)findViewById(R.id.waitingMessage);
+		final ListView messageList = (ListView)findViewById(R.id.messageList);
 		String waitingMessage = this.getResources().getString(R.string.conversation_activity_waiting);
-		waiting.setText(String.format(waitingMessage, contact.nickname().current()));
+		waiting.setText(Html.fromHtml(String.format(waitingMessage, contact.nickname().current())));
+		waiting.setMovementMethod(new LinkMovementMethod() {
+			@Override
+			public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+				shareOwnPublicKey(ConversationActivity.this, sneer().self(), contact.inviteCode(), contact.nickname().current());
+				return true;
+			}
+		});
 
 		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) {
 			boolean enable = party != null;
 			editText.setEnabled(enable);
 			actionButton.setEnabled(enable);
 			waiting.setVisibility(enable ? View.GONE : View.VISIBLE);
+			messageList.setVisibility(enable ? View.VISIBLE : View.GONE);
 		}});
 
 		menu = new PopupMenu(ConversationActivity.this, actionButton);

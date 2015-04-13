@@ -1,20 +1,21 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
     android:id="@+id/conversation_detail"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#DDDDEE"
     android:padding="0dp"
     android:textIsSelectable="true"
-    tools:context=".ConversationActivity" >
+    tools:context=".ConversationActivity">
 
     <TextView
         android:id="@+id/waitingMessage"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:textSize="20sp"
-        android:textStyle="normal|italic"
-        android:layout_alignParentTop="true"/>
+        android:textStyle="normal|italic"/>
 
     <ListView
         android:id="@+id/messageList"
@@ -24,7 +25,7 @@
         android:divider="@null"
         android:padding="0dp"
         android:stackFromBottom="true"
-        android:transcriptMode="normal" />
+        android:transcriptMode="normal"/>
 
     <LinearLayout
         android:id="@+id/messageSender"
@@ -32,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#EEEEEE"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/editText"
@@ -42,7 +43,7 @@
             android:inputType="textMultiLine"
             android:lines="4"
             android:minLines="1"
-            android:scrollbars="vertical" >
+            android:scrollbars="vertical">
         </EditText>
 
         <ImageButton
@@ -52,7 +53,7 @@
             android:layout_gravity="bottom"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/conversation_activity_action_button"
-            android:src="@drawable/ic_action_send" >
+            android:src="@drawable/ic_action_send">
         </ImageButton>
     </LinearLayout>
 
