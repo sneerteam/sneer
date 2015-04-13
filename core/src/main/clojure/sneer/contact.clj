@@ -153,6 +153,14 @@
 
     (publish-contact space own-puk nickname party invite-code)
 
+    (when invite-code-received
+      (.. ^TupleSpace space
+          publisher
+          (audience (-> party .publicKey .current))
+          (type "push")
+          (field "invite-code" invite-code-received)
+          pub))
+
     (let [contact (reify-contact space nick->contact-atom puk->contact-atom own-puk nickname party invite-code)]
       (swap! nick->contact-atom assoc nickname contact)
       (when party

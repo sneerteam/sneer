@@ -25,4 +25,12 @@
                                       "invite-code" (.inviteCode contact)})
              (<!!? channel) => neide)
            (with-open [sneer-admin (restart sneer-admin)]
-             (-> sneer-admin .sneer .contacts .toBlocking .first first .party .current) => some?))))
+             (-> sneer-admin .sneer .contacts .toBlocking .first first .party .current) => some?)))
+
+       (fact "when adding a contact with an invite code, a push tuple is saved"
+         (with-open [db (jdbc-database/create-sqlite-db)
+                     sneer-admin (new-sneer-admin-over-db db)]
+           (let [party (-> sneer-admin .sneer (.produceParty neide))
+                 _ (-> sneer-admin .sneer (.produceContact "neide" party "test123"))
+                 filter (-> sneer-admin .sneer .tupleSpace .filter (.type "push") .tuples)]
+             (-> filter .toBlocking .first) => some?))))
