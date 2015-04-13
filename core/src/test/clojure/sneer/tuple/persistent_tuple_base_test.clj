@@ -37,7 +37,8 @@
         (store-tuple subject duplicate)
         (store-tuple subject duplicate)
         (store-tuple subject unique)
-        (->> (<!!? (query-all subject {"type" "whatever"})) select-ids) => [{"id" 2 "original_id" 42} {"id" 3 "original_id" 43}]))
+        (select-ids (<!!? (query-all subject {"type" "whatever"}))) => [{"id" 2 "original_id" 42}
+                                                                        {"id" 3 "original_id" 43}]))
 
     (fact "It accepts an optional uniqueness criteria"
       (let [t {"type" "unique" "author" neide}
