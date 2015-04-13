@@ -70,7 +70,7 @@
   (with-open [db (jdbc-database/create-sqlite-db)
               subject (create db)]
     (let [result (async/chan)
-          tuples [{"author" neide   "payload" "n"           "audience" carla}
+          tuples [{"author" neide   "payload" "n"           "audience" carla "id" 42}
                   {"author" carla   "payload" "c"           "audience" neide}
                   {"author" carla   "payload" "c"           "audience" neide}
                   {"author" michael "payload" "hello neide" "audience" neide "type" "chat"}
@@ -92,7 +92,8 @@
   {"author" carla "audience" neide}                  {"payload" "c"}
   {"author" neide "audience" carla "payload" "n"}    {"payload" "n"}
   {"author" michael "audience" neide}                {"payload" "hello neide"}
-  {"author" michael "audience" carla}                {"payload" "hello carla"})
+  {"author" michael "audience" carla}                {"payload" "hello carla"}
+  {"original_id" 42}                                 {"payload" "n" "original_id" 42})
 
 (facts "About :last-by-id query criterion"
   (with-open [db (jdbc-database/create-sqlite-db)
