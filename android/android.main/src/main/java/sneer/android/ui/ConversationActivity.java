@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
@@ -136,7 +137,7 @@ public class ConversationActivity extends SneerActivity {
 		final ListView messageList = (ListView)findViewById(R.id.messageList);
 		String waitingMessage = this.getResources().getString(R.string.conversation_activity_waiting);
 		waiting.setText(Html.fromHtml(String.format(waitingMessage, contact.nickname().current())));
-		waiting.setMovementMethod(new LinkMovementMethod() { @Override public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+		waiting.setMovementMethod(new LinkMovementMethod() { @Override public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
 			if (event.getAction() == MotionEvent.ACTION_UP)
 				shareOwnPublicKey(ConversationActivity.this, sneer().self(), contact.inviteCode(), contact.nickname().current());
 			return true;
@@ -161,16 +162,6 @@ public class ConversationActivity extends SneerActivity {
 				return sneer().profileFor(party).selfie();
 		}});
 	}
-
-	private Message lastMessageReceived(List<Message> ms) {
-		for (int i = ms.size() - 1; i >= 0; --i) {
-			Message message = ms.get(i);
-			if (!message.isOwn())
-				return message;
-		}
-		return null;
-	}
-
 
 	private void handleClick(String text) {
 		if (!text.isEmpty())
@@ -286,6 +277,16 @@ public class ConversationActivity extends SneerActivity {
 				conversation.setRead(last);
 			}
 		});
+	}
+
+
+	private Message lastMessageReceived(List<Message> ms) {
+		for (int i = ms.size() - 1; i >= 0; --i) {
+			Message message = ms.get(i);
+			if (!message.isOwn())
+				return message;
+		}
+		return null;
 	}
 
 }
