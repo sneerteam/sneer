@@ -14,7 +14,7 @@
 (def neide (->puk "neide"))
 
 (facts "About invites"
-       #_(fact "auto-add back when invite code received (without networking)"
+       (fact "auto-add back when invite code received (without networking)"
          (with-open [db (jdbc-database/create-sqlite-db)
                      sneer-admin (new-sneer-admin-over-db db)]
            (let [contact (-> sneer-admin .sneer (.produceContact "neide" nil nil))
