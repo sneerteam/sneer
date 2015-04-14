@@ -7,36 +7,101 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import sneer.Sneer;
-import sneer.android.ipcold.PluginHandler;
-import sneer.android.ipcold.PluginType;
-import sneer.android.utils.LogUtils;
-import sneer.commons.SystemReport;
-import sneer.commons.exceptions.FriendlyException;
-import sneer.rx.ObservedSubject;
+import static android.content.pm.PackageManager.GET_ACTIVITIES;
+import static android.content.pm.PackageManager.GET_META_DATA;
 
 public class InstalledPlugins extends BroadcastReceiver {
 
-	public static Observable<List<Object>> all() {  //Specific type not defined yet.
-		return null;
+	public static List<Plugin> all(Context context) {
+	    List<Plugin> ret = new ArrayList<>();
+
+	    for (ApplicationInfo app : installedApps(context))
+	        accumulateIfPlugin(ret, context, app);
+
+	    return ret;
 	}
+
+
+	private static List<ApplicationInfo> installedApps(Context context) {
+		return context.getPackageManager().getInstalledApplications(GET_META_DATA);
+	}
+
+
+	private static void accumulateIfPlugin(List<Plugin> plugins, Context context, ApplicationInfo app) {
+        Plugin plugin = toPlugin(context, app);
+        if (plugin != null) {
+            plugins.add(plugin);
+            Log.i(InstalledPlugins.class.getSimpleName(), "Sneer Plugin accumulated: " + plugin.packageName + ", Caption: " + plugin.caption);
+        }
+    }
+
+
+	private static Plugin toPlugin(Context context, ApplicationInfo app) {
+		if (!hasSneerMetaData(app)) return null;
+
+		String packageName = app.packageName;
+		ActivityInfo[] activities;
+		try {
+			activities = context.getPackageManager().getPackageInfo(packageName, GET_ACTIVITIES).activities;
+		} catch (PackageManager.NameNotFoundException e) {
+			Log.e(InstalledPlugins.class.getSimpleName(), "Error", e);
+			return null;
+		}
+		if (activities.length != 1) {
+			showToastError(context, packageName, activities.length);
+			return null;
+		}
+
+        String activityClassName = activities[0].name;
+        CharSequence pluginCaption = activities[0].loadLabel(context.getPackageManager());
+
+        return new Plugin(pluginCaption, packageName, activityClassName);
+	}
+
+
+	private static boolean hasSneerMetaData(ApplicationInfo app) {
+		return (app.metaData != null && app.metaData.get("SneerApp") != null);
+	}
+
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-//		String packageName = intent.getDataString().substring(intent.getDataString().indexOf(':')+1);
-//		if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction()))
-//			packageAdded(context, packageName);
+		String packageName = intent.getDataString().substring(intent.getDataString().indexOf(':')+1);
+		if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction()))
+			packageAdded(context, packageName);
 //		else
 //			packageRemoved(context, packageName);
 	}
+
+
+    private void packageAdded(Context context, String packageName) {
+        Log.i(getClass().getSimpleName(), "Package installed: " + packageName);
+
+        PackageInfo packageInfo;
+        try {
+            packageInfo = context.getPackageManager().getPackageInfo(packageName, GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.i(getClass().getSimpleName(), "PackageName not found: " + packageName);
+	        return;
+        }
+
+        ApplicationInfo app = packageInfo.applicationInfo;
+        Plugin plugin = toPlugin(context, app);
+
+        Log.i(getClass().getSimpleName(), "Sneer Plugin added: " + plugin.packageName + ", Caption: " + plugin.caption);
+        //Update the stored list of plugins
+
+    }
+
+
+    private static void showToastError(Context context, String packageName, int numActivities) {
+        Toast.makeText(context, packageName + " has " + numActivities + " activities. Should have 1 exported activity", Toast.LENGTH_LONG).show();
+    }
 
 }

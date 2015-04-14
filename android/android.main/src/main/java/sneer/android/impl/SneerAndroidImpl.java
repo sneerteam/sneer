@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 import sneer.Message;
 import sneer.Sneer;
@@ -16,6 +17,8 @@ import sneer.admin.SneerAdmin;
 import sneer.admin.SneerAdminFactory;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
+import sneer.android.ipc.InstalledPlugins;
+import sneer.android.ipc.Plugin;
 import sneer.android.ipcold.PluginManager;
 import sneer.android.utils.AndroidUtils;
 import sneer.commons.SystemReport;
@@ -23,24 +26,25 @@ import sneer.commons.exceptions.FriendlyException;
 
 public class SneerAndroidImpl implements SneerAndroid {
 
+	private final Context context;
 	private SneerAdmin sneerAdmin;
 	private static String error;
 	public static AlertDialog errorDialog;
-	private PluginManager pluginManager;
 
 	public SneerAndroidImpl(Context context) {
+		this.context = context;
+
 		try {
-			init(context);
+			init();
 		 } catch (FriendlyException e) {
 			error = e.getMessage();
 		}
 	}
 
 
-	private void init(Context context) throws FriendlyException {
+	private void init() throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
 		logPublicKey();
-		initPlugins(context);
 	}
 
 
@@ -51,12 +55,6 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	private String pukAddress() {
 		return sneerAdmin.privateKey().publicKey().toHex();
-	}
-
-
-	private void initPlugins(Context context) {
-		pluginManager = new PluginManager(context, sneer());
-		pluginManager.initPlugins();
 	}
 
 
@@ -114,6 +112,11 @@ public class SneerAndroidImpl implements SneerAndroid {
 		return false;
 	}
 
+	@Override
+	public List<Plugin> plugins() {
+		return InstalledPlugins.all(context);
+	}
+
 
 	@Override
 	public Sneer sneer() {
@@ -123,13 +126,12 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	@Override
 	public boolean isClickable(Message message) {
-		return pluginManager.isClickable(message);
+		return false; //TODO: Revise
 	}
-
 
 	@Override
 	public void doOnClick(Message message) {
-		pluginManager.doOnClick(message);
+		Log.i(getClass().getName(), "Message clicked: " + message);
 	}
 
 }
