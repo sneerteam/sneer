@@ -140,12 +140,11 @@ public class ConversationActivity extends SneerActivity {
 			return true;
 		}});
 
-		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) { //TODO: Use conversation.canSendMessages() instead of the party.
-			boolean enable = party != null;
-			messageInput.setEnabled(enable);
-			messageButton.setEnabled(enable);
-			waiting.setVisibility(enable ? View.GONE : View.VISIBLE);
-			messageList.setVisibility(enable ? View.VISIBLE : View.GONE);
+		conversation.canSendMessages().subscribe(new Action1<Boolean>() {@Override public void call(Boolean canSendMessages) {
+			messageInput .setEnabled(canSendMessages);
+			messageButton.setEnabled(canSendMessages);
+			waiting    .setVisibility(canSendMessages ? View.GONE    : View.VISIBLE);
+			messageList.setVisibility(canSendMessages ? View.VISIBLE : View.GONE);
 		}});
 
 		menu = new PopupMenu(ConversationActivity.this, messageButton);
