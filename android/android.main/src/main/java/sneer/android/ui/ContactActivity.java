@@ -232,7 +232,7 @@ public class ContactActivity extends Activity {
 		final String nickName = text(nicknameEdit);
 		try {
 			if (newContact) {
-				sneer().produceContact(nickName, party, null);
+				sneer().produceContact(nickName, party, inviteCode);
 				changed = true;
 			}
 
