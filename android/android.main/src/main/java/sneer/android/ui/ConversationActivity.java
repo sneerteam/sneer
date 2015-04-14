@@ -59,9 +59,9 @@ public class ConversationActivity extends SneerActivity {
 	private Contact contact;
 
 	private PopupMenu menu;
-	private ImageButton actionButton;
+	private ImageButton messageButton;
 	protected boolean justOpened;
-	private EditText editText;
+	private EditText messageInput;
 	private int icAction;
 	private CompositeSubscription subscriptions;
 
@@ -91,38 +91,46 @@ public class ConversationActivity extends SneerActivity {
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
-		editText = (EditText) findViewById(R.id.editText);
-		editText.addTextChangedListener(new TextWatcher() {
+		messageInput = (EditText) findViewById(R.id.editText);
+		messageInput.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (!editText.getText().toString().trim().isEmpty())
-					actionButton.setImageResource(R.drawable.ic_action_send);
+				if (!messageInput.getText().toString().trim().isEmpty())
+					messageButton.setImageResource(R.drawable.ic_action_send);
 				else
-					actionButton.setImageResource(icAction);
+					messageButton.setImageResource(icAction);
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
 
 			@Override
-			public void afterTextChanged(Editable s) {}
+			public void afterTextChanged(Editable s) {
+			}
 		});
 
-		editText.setOnKeyListener(new OnKeyListener() { @Override public boolean onKey(View v, int keyCode, KeyEvent event) {
-			if (!isHardwareKeyboardAvailable()) return false;
-			if (!(event.getAction() == KeyEvent.ACTION_DOWN)) return false;
-			if (!(keyCode == KeyEvent.KEYCODE_ENTER)) return false;
-			handleClick(editText.getText().toString().trim());
-			return true;
-		}});
+		messageInput.setOnKeyListener(new OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (!isHardwareKeyboardAvailable()) return false;
+				if (!(event.getAction() == KeyEvent.ACTION_DOWN)) return false;
+				if (!(keyCode == KeyEvent.KEYCODE_ENTER)) return false;
+				handleClick(messageInput.getText().toString().trim());
+				return true;
+			}
+		});
 
-		actionButton = (ImageButton)findViewById(R.id.actionButton);
+		messageButton = (ImageButton)findViewById(R.id.actionButton);
 		icAction = R.drawable.ic_action_send;
 
-		actionButton.setImageResource(icAction);
-		actionButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
-			handleClick(editText.getText().toString().trim());
-		}});
+		messageButton.setImageResource(icAction);
+		messageButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				handleClick(messageInput.getText().toString().trim());
+			}
+		});
 
 		final TextView waiting = (TextView)findViewById(R.id.waitingMessage);
 		final ListView messageList = (ListView)findViewById(R.id.messageList);
@@ -136,13 +144,13 @@ public class ConversationActivity extends SneerActivity {
 
 		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) {
 			boolean enable = party != null;
-			editText.setEnabled(enable);
-			actionButton.setEnabled(enable);
+			messageInput.setEnabled(enable);
+			messageButton.setEnabled(enable);
 			waiting.setVisibility(enable ? View.GONE : View.VISIBLE);
 			messageList.setVisibility(enable ? View.VISIBLE : View.GONE);
 		}});
 
-		menu = new PopupMenu(ConversationActivity.this, actionButton);
+		menu = new PopupMenu(ConversationActivity.this, messageButton);
 	}
 
 	private Observable<byte[]> selfieFor(Contact contact) {
@@ -169,7 +177,7 @@ public class ConversationActivity extends SneerActivity {
 			conversation.sendMessage(text);
 		else
 			openInteractionMenu();
-		editText.setText("");
+		messageInput.setText("");
 	}
 
 
@@ -202,7 +210,7 @@ public class ConversationActivity extends SneerActivity {
 		if (justOpened) {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+			imm.hideSoftInputFromWindow(messageInput.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 		}
 		justOpened = false;
 	}
@@ -245,10 +253,10 @@ public class ConversationActivity extends SneerActivity {
 						menu.getMenu().clear();
 						if (menuItems.size() > 0) {
 							icAction = R.drawable.ic_action_new;
-							actionButton.setImageResource(icAction);
+							messageButton.setImageResource(icAction);
 						} else {
 							icAction = R.drawable.ic_action_send;
-							actionButton.setImageResource(icAction);
+							messageButton.setImageResource(icAction);
 						}
 
 						for (final ConversationMenuItem item : menuItems) {
