@@ -13,7 +13,6 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,13 +32,11 @@ import java.util.concurrent.TimeUnit;
 import me.sneer.R;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import sneer.Contact;
 import sneer.Conversation;
-import sneer.ConversationMenuItem;
 import sneer.Message;
 import sneer.Party;
 import sneer.android.ui.adapters.ConversationAdapter;
@@ -143,7 +140,7 @@ public class ConversationActivity extends SneerActivity {
 			return true;
 		}});
 
-		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) {
+		contact.party().observable().subscribe(new Action1<Party>() {@Override public void call(Party party) { //TODO: Use conversation.canSendMessages() instead of the party.
 			boolean enable = party != null;
 			messageInput.setEnabled(enable);
 			messageButton.setEnabled(enable);
@@ -230,39 +227,9 @@ public class ConversationActivity extends SneerActivity {
 		sneer().conversations().notificationsStartIgnoring(conversation);
 
 		subscriptions = new CompositeSubscription(
-				subscribeToMessages(),
-				subscribeToMenu());
-	}
-
-	private Subscription subscribeToMenu() {
-		return conversation.menu().observeOn(AndroidSchedulers.mainThread()).subscribe(
-				new Action1<List<ConversationMenuItem>>() {
-					@SuppressWarnings("deprecation")
-					@Override
-					public void call(List<ConversationMenuItem> menuItems) {
-						menu.getMenu().close();
-						menu.getMenu().clear();
-						if (menuItems.size() > 0) {
-							icAction = R.drawable.ic_action_new;
-							messageButton.setImageResource(icAction);
-						} else {
-							icAction = R.drawable.ic_action_send;
-							messageButton.setImageResource(icAction);
-						}
-
-						for (final ConversationMenuItem item : menuItems) {
-							menu.getMenu().add(item.caption()).setOnMenuItemClickListener(
-									new OnMenuItemClickListener() {
-										@Override
-										public boolean onMenuItemClick(MenuItem ignored) {
-											menu.getMenu().close();
-											item.call(contact.party().current().publicKey().current());
-											return true;
-										}
-									});
-						}
-					}
-				});
+				subscribeToMessages()
+			//	subscribeToMenu()
+		);
 	}
 
 	private Subscription subscribeToMessages() {
