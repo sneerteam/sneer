@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
+import sneer.Conversation;
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
@@ -19,6 +20,7 @@ import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
 import sneer.android.ipc.InstalledPlugins;
 import sneer.android.ipc.Plugin;
+import sneer.android.ipc.PluginActivities;
 import sneer.android.ipcold.PluginManager;
 import sneer.android.utils.AndroidUtils;
 import sneer.commons.SystemReport;
@@ -115,6 +117,11 @@ public class SneerAndroidImpl implements SneerAndroid {
 	@Override
 	public List<Plugin> plugins() {
 		return InstalledPlugins.all(context);
+	}
+
+	@Override
+	public void startActivity(Plugin plugin, Conversation conversation) {
+		PluginActivities.start(context, plugin, conversation);
 	}
 
 

@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -60,8 +61,9 @@ public class InstalledPlugins extends BroadcastReceiver {
 
         String activityClassName = activities[0].name;
         CharSequence pluginCaption = activities[0].loadLabel(context.getPackageManager());
+        Drawable pluginIcon = activities[0].loadIcon(context.getPackageManager());
 
-        return new Plugin(pluginCaption, packageName, activityClassName);
+        return new Plugin(pluginCaption, pluginIcon, packageName, activityClassName);
 	}
 
 
