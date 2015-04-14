@@ -51,30 +51,6 @@ public class PluginManager {
 	}
 
 
-	public void initPlugins() {
-		PluginMonitor.initialDiscovery(context, sneer);
-		PluginMonitor.plugins()
-			.switchMap(fromSneerPluginInfoList)
-			.subscribe(new Action1<List<ConversationMenuItem>>() { @Override public void call(List<ConversationMenuItem> menuItems) {
-				sneer.conversations().setMenuItems(menuItems);
-			}});
-
-		PluginMonitor.plugins()
-			.switchMap(new Func1<List<PluginHandler>, Observable<Map<String, PluginHandler>>>() { @Override public Observable<Map<String, PluginHandler>> call(List<PluginHandler> handlers) {
-				return Observable.from(handlers)
-						.filter(new Func1<PluginHandler, Boolean>() { @Override public Boolean call(PluginHandler handler) {
-							return handler.canView();
-						}})
-						.toMap(new Func1<PluginHandler, String>() { @Override public String call(PluginHandler handler) {
-							return handler.tupleType();
-						}});
-			}})
-			.subscribe(new Action1<Map<String, PluginHandler>>() { @Override public void call(Map<String, PluginHandler> handlers) {
-				tupleViewers = handlers;
-			}});
-	}
-
-
 	public boolean isClickable(Message message) {
 		return tupleViewers.containsKey(message.tuple().get("message-type"));
 	}

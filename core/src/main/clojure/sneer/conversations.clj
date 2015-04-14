@@ -43,9 +43,8 @@
     (reify-notification [] nil nil nil)))
 
 (defn reify-conversations [own-puk tuple-space contacts-state]
-  (let [menu-items (BehaviorSubject/create [])
-        convos (atom {})
-        reify-conversation (partial reify-conversation tuple-space (.asObservable menu-items) own-puk)
+  (let [convos (atom {})
+        reify-conversation (partial reify-conversation tuple-space own-puk)
         null nil
         ignored-conversation (BehaviorSubject/create ^Object null)
         contacts (get-contacts contacts-state)
@@ -98,7 +97,4 @@
                   (notification-for-many unread-pairs))))))
 
       (notificationsStartIgnoring [_ conversation] (.onNext ignored-conversation conversation))
-      (notificationsStopIgnoring  [_]              (.onNext ignored-conversation nil))
-
-      (setMenuItems [_ menu-item-list]
-        (rx/on-next menu-items menu-item-list)))))
+      (notificationsStopIgnoring  [_]              (.onNext ignored-conversation nil)))))

@@ -18,8 +18,6 @@ public interface Conversations {
 	/** All Conversations of messageType have had, ordered by most recent first. */
 	Observable<List<Conversation>> ofType(String messageType);
 
-	void setMenuItems(List<ConversationMenuItem> menuItems);
-
 	Observable<Notification> notifications();
 	/** Ignores conversation when emitting notifications for unread messages. */
 	void notificationsStartIgnoring(Conversation conversation);

@@ -78,7 +78,7 @@
          (rx/map vec))))
 
 (defn reify-conversation
-  [^TupleSpace tuple-space ^Observable menu-items ^PublicKey own-puk ^Contact contact]
+  [^TupleSpace tuple-space ^PublicKey own-puk ^Contact contact]
   (let [party (.. contact party observable)
         puk (switch-map-some #(.. % publicKey observable) party)
 
@@ -110,6 +110,4 @@
 
       (unreadMessages [_] (unread-messages messages last-read))
       (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
-      (setRead [_ message] (.pub (message-read-sender) (original-id message)))
-
-      (menu [_] menu-items))))
+      (setRead [_ message] (.pub (message-read-sender) (original-id message))))))
