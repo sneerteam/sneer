@@ -38,7 +38,7 @@ import static sneer.android.ui.SneerActivity.plug;
 
 public class ContactActivity extends Activity {
 
-	public static final boolean USE_INVITES = false;
+	public static final boolean USE_INVITES = true;
 
 	static final String CURRENT_NICKNAME = "currentNickname";
 
