@@ -34,7 +34,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.subscriptions.CompositeSubscription;
 import sneer.Contact;
 import sneer.Conversation;
 import sneer.Message;
@@ -60,8 +59,7 @@ public class ConversationActivity extends SneerActivity {
 	private ImageButton messageButton;
 	protected boolean justOpened;
 	private EditText messageInput;
-	private int icAction;
-	private CompositeSubscription subscriptions;
+	private Subscription subscription;
 
 
 	@Override
@@ -90,45 +88,30 @@ public class ConversationActivity extends SneerActivity {
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 
 		messageInput = (EditText) findViewById(R.id.editText);
-		messageInput.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (!messageInput.getText().toString().trim().isEmpty())
-					messageButton.setImageResource(R.drawable.ic_action_send);
-				else
-					messageButton.setImageResource(icAction);
+		messageInput.addTextChangedListener(new TextWatcher() { @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+				messageButton.setImageResource( messageInput.getText().toString().trim().isEmpty()
+					? R.drawable.ic_action_new
+					: R.drawable.ic_action_send);
 			}
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
+			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			@Override public void afterTextChanged(Editable s) {}
 		});
 
-		messageInput.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if (!isHardwareKeyboardAvailable()) return false;
-				if (!(event.getAction() == KeyEvent.ACTION_DOWN)) return false;
-				if (!(keyCode == KeyEvent.KEYCODE_ENTER)) return false;
-				handleClick(messageInput.getText().toString().trim());
-				return true;
-			}
-		});
+		messageInput.setOnKeyListener(new OnKeyListener() { @Override public boolean onKey(View v, int keyCode, KeyEvent event) {
+			if (!isHardwareKeyboardAvailable()) return false;
+			if (!(event.getAction() == KeyEvent.ACTION_DOWN)) return false;
+			if (!(keyCode == KeyEvent.KEYCODE_ENTER)) return false;
+			handleClick(messageInput.getText().toString().trim());
+			return true;
+		}});
 
 		messageButton = (ImageButton)findViewById(R.id.actionButton);
-		icAction = R.drawable.ic_action_send;
 
-		messageButton.setImageResource(icAction);
-		messageButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				handleClick(messageInput.getText().toString().trim());
-			}
-		});
+		messageButton.setImageResource(R.drawable.ic_action_send);
+		messageButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+			handleClick(messageInput.getText().toString().trim());
+		}});
 
 		final TextView waiting = (TextView)findViewById(R.id.waitingMessage);
 		final ListView messageList = (ListView)findViewById(R.id.messageList);
@@ -143,7 +126,7 @@ public class ConversationActivity extends SneerActivity {
 		conversation.canSendMessages().subscribe(new Action1<Boolean>() {@Override public void call(Boolean canSendMessages) {
 			messageInput .setEnabled(canSendMessages);
 			messageButton.setEnabled(canSendMessages);
-			waiting    .setVisibility(canSendMessages ? View.GONE    : View.VISIBLE);
+			waiting    .setVisibility(canSendMessages ? View.GONE : View.VISIBLE);
 			messageList.setVisibility(canSendMessages ? View.VISIBLE : View.GONE);
 		}});
 
@@ -211,7 +194,7 @@ public class ConversationActivity extends SneerActivity {
 	protected void onPause() {
 		super.onPause();
 
-		subscriptions.unsubscribe();
+		subscription.unsubscribe();
 
 		sneer().conversations().notificationsStopIgnoring();
 	}
@@ -225,10 +208,7 @@ public class ConversationActivity extends SneerActivity {
 
 		sneer().conversations().notificationsStartIgnoring(conversation);
 
-		subscriptions = new CompositeSubscription(
-				subscribeToMessages()
-			//	subscribeToMenu()
-		);
+		subscription = subscribeToMessages();
 	}
 
 	private Subscription subscribeToMessages() {
