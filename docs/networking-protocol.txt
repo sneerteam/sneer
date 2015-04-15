@@ -13,39 +13,4 @@ Client Replies                                 Server Originates
 
 {:from own-puk :ack author-puk :id tuple-id}   {:send tuple}   (Tuple is being routed)
 
-{:from own-puk :ack puk}                       {:cts puk}   (The send queue to puk became empty)
-
-
-Server Implementation
-=====================
-
-; online-clients { puk { :pending-to-send  <tuple or cts-puk>
-;                        :online-countdown n                  } }
-
-Go loop [router, online-clients, send-round, offline-timout, resend-timout] :priority :false
-  Choose a channel operation:
-  (if some (next-packet-to-send send-round))
-    >! packets-out (next-packet-to-send)
-      decrement online-countdown
-      recur (pop send-round)
-    <! resend-timer (500ms)
-      recur send-round with (keys online-clients)
-
-  <! packets-in
-    when :from not online
-      update-in online-clients [:from :pending-to-send] (router peek))
-    update-in online-clients [:from :online-countdown] 20
-
-    match
-      ping  - >! packets-out {} (pong).
-      :send - enqueue. >! packets-out ack or nak.
-      :ack  - if (= tuple/cts (:from pending-out)) (assoc pending-out :from (router pop))
-
-  <! offline-timer (5s)
-    decrement online-countdown
-    purge offline entries (= :online-countdown zero) from online-clients.
- 
-
-enqueue! -> enqueue
-
-
+{:from own-puk :ack puk}                       {:cts puk}   (CTS (Clear To Send) - The send queue to puk became empty)
