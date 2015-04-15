@@ -54,7 +54,7 @@
 
         <!--
         <receiver
-            android:name="sneer.android.ipcold.PluginMonitor"
+            android:name="sneer.android.ipc.InstalledPlugins"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
