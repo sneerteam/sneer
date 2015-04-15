@@ -6,8 +6,8 @@ public class Plugin {
 
 	final String packageName;
 	final String activityName;
-    final CharSequence caption;
-    final Drawable icon;
+    public final CharSequence caption;
+    public final Drawable icon;
 
     public Plugin(CharSequence caption, Drawable icon, String packageName, String activityName) {
 		this.packageName = packageName;

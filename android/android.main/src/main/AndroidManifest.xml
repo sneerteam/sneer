@@ -74,6 +74,9 @@
         </service>
         -->
 
+        <service
+            android:name="sneer.android.ipc.SendMessage"
+            android:exported="true" />
 
         <activity
             android:name="sneer.android.ui.MainActivity"

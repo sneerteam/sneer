@@ -40,6 +40,7 @@ public class SendMessage extends IntentService {
 
 
 	private void tryToHandle(Intent intent) {
+		Log.d(getClass().getName(), "Intent received");
 		String pukHex  = intent.getStringExtra(TOKEN);
 		String message = intent.getAction();
 

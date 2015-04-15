@@ -1,6 +1,7 @@
 package sneer.android.ui;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -12,17 +13,20 @@ import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,6 +42,9 @@ import sneer.Contact;
 import sneer.Conversation;
 import sneer.Message;
 import sneer.Party;
+import sneer.android.ipc.InstalledPlugins;
+import sneer.android.ipc.Plugin;
+import sneer.android.ipc.PluginActivities;
 import sneer.android.ui.adapters.ConversationAdapter;
 
 import static rx.Observable.never;
@@ -55,7 +62,6 @@ public class ConversationActivity extends SneerActivity {
 	private Conversation conversation;
 	private Contact contact;
 
-	private PopupMenu menu;
 	private ImageButton messageButton;
 	protected boolean justOpened;
 	private EditText messageInput;
@@ -66,7 +72,6 @@ public class ConversationActivity extends SneerActivity {
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversation);
-		justOpened = true;
 		ActionBar actionBar = getActionBar();
         if (actionBar != null)
             actionBar.setHomeButtonEnabled(true);
@@ -108,7 +113,7 @@ public class ConversationActivity extends SneerActivity {
 
 		messageButton = (ImageButton)findViewById(R.id.actionButton);
 
-		messageButton.setImageResource(R.drawable.ic_action_send);
+		messageButton.setImageResource(R.drawable.ic_action_new);
 		messageButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
 			handleClick(messageInput.getText().toString().trim());
 		}});
@@ -129,8 +134,6 @@ public class ConversationActivity extends SneerActivity {
 			waiting    .setVisibility(canSendMessages ? View.GONE : View.VISIBLE);
 			messageList.setVisibility(canSendMessages ? View.VISIBLE : View.GONE);
 		}});
-
-		menu = new PopupMenu(ConversationActivity.this, messageButton);
 	}
 
 	private Observable<byte[]> selfieFor(Contact contact) {
@@ -152,7 +155,39 @@ public class ConversationActivity extends SneerActivity {
 
 
 	private void openInteractionMenu() {
-		menu.show();
+		final List<Plugin> plugins = InstalledPlugins.all(this);
+		final LayoutInflater inflater = getLayoutInflater();
+		ListView listView = (ListView) inflater.inflate(R.layout.plugins_list, null);
+
+		listView.setAdapter(new ArrayAdapter<Plugin>(ConversationActivity.this, R.layout.plugins_list_item, plugins) {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				TextView ret = (convertView != null)
+					? (TextView)convertView
+					: (TextView)inflater.inflate(R.layout.plugins_list_item, null);
+
+				Plugin plugin = plugins.get(position);
+				ret.setText(plugin.caption);
+
+				plugin.icon.setBounds(0, 0, 84, 84);    // TODO Not a good solution
+				ret.setCompoundDrawables(plugin.icon, null, null, null);
+
+				return ret;
+			}
+		});
+
+		final AlertDialog dialog = new AlertDialog.Builder(this)
+			.setTitle("Apps")
+			.create();
+
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			dialog.hide();
+			PluginActivities.start(ConversationActivity.this, plugins.get(position), conversation);
+		}});
+
+		dialog.setView(listView, 0, 0, 0, 0);
+		dialog.show();
+
 	}
 
 
