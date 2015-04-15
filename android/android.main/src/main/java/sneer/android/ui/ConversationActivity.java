@@ -63,7 +63,6 @@ public class ConversationActivity extends SneerActivity {
 	private Contact contact;
 
 	private ImageButton messageButton;
-	protected boolean justOpened;
 	private EditText messageInput;
 	private Subscription subscription;
 
@@ -212,12 +211,9 @@ public class ConversationActivity extends SneerActivity {
 
 
 	private void hideKeyboard() {
-		if (justOpened) {
-			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(messageInput.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-		}
-		justOpened = false;
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(messageInput.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 
 
@@ -228,9 +224,7 @@ public class ConversationActivity extends SneerActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-
 		subscription.unsubscribe();
-
 		sneer().conversations().notificationsStopIgnoring();
 	}
 
@@ -238,11 +232,8 @@ public class ConversationActivity extends SneerActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		hideKeyboard();
-
 		sneer().conversations().notificationsStartIgnoring(conversation);
-
 		subscription = subscribeToMessages();
 	}
 
