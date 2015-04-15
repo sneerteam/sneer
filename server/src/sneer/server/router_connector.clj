@@ -79,21 +79,25 @@
 
 (defn- handle-send [state from to tuple]
   (let [router (:router state)
-        packets-out (:packets-out state)]
-    (if (duplicated-tuple? @router from to tuple)
-      (do
-        (reply packets-out :ack from to tuple)
-        state)
-      (if (queue-full? @router from to)
+        packets-out (:packets-out state)
+        last-tuple (get-in state [:last-tuple from])
+        state (update-in state [:last-tuple from] tuple)]
+    (if (= tuple last-tuple)
+      state
+      (if (duplicated-tuple? @router from to tuple)
         (do
-          (reply packets-out :nak from to tuple)
-          state)
-        (do
-          (send-gcm-if-necessary! state @router to)
-          (p/handle! router [:enqueue from to tuple])
           (reply packets-out :ack from to tuple)
-          (-> state
-            (update-pending-to-send to)))))))
+          state)
+        (if (queue-full? @router from to)
+          (do
+            (reply packets-out :nak from to tuple)
+            state)
+          (do
+            (send-gcm-if-necessary! state @router to)
+            (p/handle! router [:enqueue from to tuple])
+            (reply packets-out :ack from to tuple)
+            (-> state
+                (update-pending-to-send to))))))))
 
 (defn- send-op [{:keys [packets-out online-clients send-round resend-timeout]}]
   (if-some [packet (next-packet-to-send online-clients send-round)]
