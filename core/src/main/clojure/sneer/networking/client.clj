@@ -67,13 +67,16 @@
         packets-out (map> #(do
                              (SystemReport/updateReport "network/last-packet-out" %)
                              (assoc % :from own-puk))
-                          packets-out)]
+                          packets-out)
+        last-tuple (atom {})]
     
     (go-while-let [packet (<! packets-in)]
       (SystemReport/updateReport "network/last-packet-in" packet)
       (match packet
         {:send tuple}
-        (do (>! tuples-received tuple)
+        (do (when-not (= @last-tuple tuple)
+              (reset! last-tuple tuple)
+              (>! tuples-received tuple))
             (>! packets-out (->ack tuple)))
 
         (:or {:for follower} {:cts follower})
