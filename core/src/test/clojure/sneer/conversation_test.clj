@@ -33,7 +33,7 @@
           ^Observable   menu-items (PublishSubject/create)
           ^Party        carla-party (reify-party carla)
           ^Contact      carla-contact (produce-contact contacts-state "carla" carla-party nil)
-          ^Conversation subject (reify-conversation tuple-space menu-items neide carla-contact)
+          ^Conversation subject (reify-conversation tuple-space neide carla-contact)
           most-recent-timestamps (observable->chan (subscribe-on-io (.mostRecentMessageTimestamp subject)))
           most-recent-labels     (observable->chan (subscribe-on-io (.mostRecentMessageContent   subject)))
           unread-counts          (observable->chan (subscribe-on-io (.unreadMessageCount         subject)))
