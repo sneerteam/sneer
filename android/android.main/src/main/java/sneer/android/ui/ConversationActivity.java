@@ -2,9 +2,13 @@ package sneer.android.ui;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -54,9 +58,10 @@ import static sneer.android.utils.Puk.shareOwnPublicKey;
 
 public class ConversationActivity extends SneerActivity {
 
-	private static final String ACTIVITY_TITLE = "activityTitle";
+    private static final String ACTIVITY_TITLE = "activityTitle";
+    private static final String SEARCH_SNEER_APPS_URL = "https://play.google.com/store/search?q=SneerApp";
 
-	private final List<Message> messages = new ArrayList<Message>();
+    private final List<Message> messages = new ArrayList<Message>();
 	private ConversationAdapter adapter;
 
 	private Conversation conversation;
@@ -168,7 +173,7 @@ public class ConversationActivity extends SneerActivity {
 				Plugin plugin = plugins.get(position);
 				ret.setText(plugin.caption);
 
-				plugin.icon.setBounds(0, 0, 84, 84);    // TODO Not a good solution
+				plugin.icon.setBounds(0, 0, 96, 96);    // TODO Not a good solution
 				ret.setCompoundDrawables(plugin.icon, null, null, null);
 
 				return ret;
@@ -180,13 +185,25 @@ public class ConversationActivity extends SneerActivity {
 			.create();
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			dialog.hide();
+			dialog.dismiss();
 			PluginActivities.start(ConversationActivity.this, plugins.get(position), conversation);
 		}});
 
+        dialog.setButton(Dialog.BUTTON_NEUTRAL, "Search for Apps", new Dialog.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which != Dialog.BUTTON_NEUTRAL) return;
+                try {
+                    Intent urlIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SEARCH_SNEER_APPS_URL));
+                    startActivity(urlIntent);
+                } catch (ActivityNotFoundException e) {
+                    // TODO Ignore by now
+                }
+            }
+        });
+
 		dialog.setView(listView, 0, 0, 0, 0);
 		dialog.show();
-
 	}
 
 
