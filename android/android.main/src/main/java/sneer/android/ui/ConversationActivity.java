@@ -1,14 +1,9 @@
 package sneer.android.ui;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -17,17 +12,13 @@ import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -46,9 +37,6 @@ import sneer.Contact;
 import sneer.Conversation;
 import sneer.Message;
 import sneer.Party;
-import sneer.android.ipc.InstalledPlugins;
-import sneer.android.ipc.Plugin;
-import sneer.android.ipc.PluginActivities;
 import sneer.android.ui.adapters.ConversationAdapter;
 
 import static rx.Observable.never;
@@ -56,12 +44,11 @@ import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 import static sneer.android.utils.Puk.shareOwnPublicKey;
 
-public class ConversationActivity extends SneerActivity {
+public class ConversationActivity extends SneerActivity implements StartPluginDialogFragment.SingleConversationProvider {
 
     private static final String ACTIVITY_TITLE = "activityTitle";
-    private static final String SEARCH_SNEER_APPS_URL = "https://play.google.com/store/search?q=SneerApp";
 
-    private final List<Message> messages = new ArrayList<Message>();
+    private final List<Message> messages = new ArrayList<>();
 	private ConversationAdapter adapter;
 
 	private Conversation conversation;
@@ -140,6 +127,11 @@ public class ConversationActivity extends SneerActivity {
 		}});
 	}
 
+    @Override
+    public Conversation getConversation() {
+        return conversation;
+    }
+
 	private Observable<byte[]> selfieFor(Contact contact) {
 		return contact.party().observable().switchMap(new Func1<Party, Observable<? extends byte[]>>() { @Override public Observable<? extends byte[]> call(Party party) {
 			if (party == null)
@@ -159,51 +151,8 @@ public class ConversationActivity extends SneerActivity {
 
 
 	private void openInteractionMenu() {
-		final List<Plugin> plugins = InstalledPlugins.all(this);
-		final LayoutInflater inflater = getLayoutInflater();
-		ListView listView = (ListView) inflater.inflate(R.layout.plugins_list, null);
-
-		listView.setAdapter(new ArrayAdapter<Plugin>(ConversationActivity.this, R.layout.plugins_list_item, plugins) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
-				TextView ret = (convertView != null)
-					? (TextView)convertView
-					: (TextView)inflater.inflate(R.layout.plugins_list_item, null);
-
-				Plugin plugin = plugins.get(position);
-				ret.setText(plugin.caption);
-
-				plugin.icon.setBounds(0, 0, 96, 96);    // TODO Not a good solution
-				ret.setCompoundDrawables(plugin.icon, null, null, null);
-
-				return ret;
-			}
-		});
-
-		final AlertDialog dialog = new AlertDialog.Builder(this)
-			.setTitle("Apps")
-			.create();
-
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			dialog.dismiss();
-			PluginActivities.start(ConversationActivity.this, plugins.get(position), conversation);
-		}});
-
-        dialog.setButton(Dialog.BUTTON_NEUTRAL, "Search for Apps", new Dialog.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (which != Dialog.BUTTON_NEUTRAL) return;
-                try {
-                    Intent urlIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SEARCH_SNEER_APPS_URL));
-                    startActivity(urlIntent);
-                } catch (ActivityNotFoundException e) {
-                    // TODO Ignore by now
-                }
-            }
-        });
-
-		dialog.setView(listView, 0, 0, 0, 0);
-		dialog.show();
+        StartPluginDialogFragment startPluginDialog = new StartPluginDialogFragment();
+        startPluginDialog.show(getFragmentManager(), "StartPluginDialogFrament");
 	}
 
 
