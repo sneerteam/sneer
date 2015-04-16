@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import me.sneer.R;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -119,10 +120,10 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
 			return true;
 		}});
 
-		conversation.canSendMessages().subscribe(new Action1<Boolean>() {@Override public void call(Boolean canSendMessages) {
+		conversation.canSendMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {@Override public void call(Boolean canSendMessages) {
 			messageInput .setEnabled(canSendMessages);
 			messageButton.setEnabled(canSendMessages);
-			waiting    .setVisibility(canSendMessages ? View.GONE : View.VISIBLE);
+			waiting.setVisibility(canSendMessages ? View.GONE : View.VISIBLE);
 			messageList.setVisibility(canSendMessages ? View.VISIBLE : View.GONE);
 		}});
 	}
