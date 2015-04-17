@@ -54,9 +54,14 @@
 (defn- reverse-party-messages [messages]
   (->> messages reverse (remove own?)))
 
+(def ten-minutes (* 1000 60 10))
+(defn- age [message] (- (System/currentTimeMillis) (.timestampCreated message)))
+(defn- recent? [message] (< (age message) ten-minutes))
+
 (def unread (interop/fn [messages last-read-id]
                         (->> (reverse-party-messages messages)
-                             (take-while #(> (original-id %) last-read-id))
+                             (take-while #(and (> (original-id %) last-read-id)
+                                               (recent? %)))  ;TODO Remove this "recent" hack and fix redundant notification generation.
                              vec)))
 
 (defn- unread-messages [^Observable messages ^Observable last-read]
