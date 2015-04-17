@@ -4,7 +4,7 @@
     [sneer.tuple.space :as space]
     [sneer.impl :as impl]
     [sneer.tuple.protocols :refer :all]
-    [sneer.tuple.persistent-tuple-base :as persistence]
+    [sneer.tuple.persistent-tuple-base :as tuple-base]
     [sneer.restartable :refer :all]
     [sneer.tuple-base-provider :refer :all]
     [sneer.async :refer [go-while-let]]
@@ -73,6 +73,6 @@
 
 (defn new-sneer-admin-over-db [db]
   (let [db (ensure-protocol db)
-        tuple-base (persistence/create db)
+        tuple-base (tuple-base/create db)
         own-prik (produce-private-key db)]
     (new-sneer-admin own-prik tuple-base)))
