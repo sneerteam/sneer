@@ -23,7 +23,7 @@ public class SendMessage extends IntentService {
 
 	static Intent intentFor(Conversation convo) {
 		return new Intent()
-			.setClassName("me.sneer", SendMessage.class.getName())
+			.setClassName("sneer.main", SendMessage.class.getName())
 			.putExtra(TOKEN, convo.contact().party().current().publicKey().current().toHex());
 	}
 

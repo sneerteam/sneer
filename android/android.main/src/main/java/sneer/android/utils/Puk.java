@@ -14,7 +14,7 @@ public class Puk {
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Sneer Invite");
 		sharingIntent.putExtra(Intent.EXTRA_TEXT,
-				"\n\nIf you don't have the Sneer app, install it using the Play Store: https://play.google.com/store/apps/details?id=me.sneer\n\n" +
+				"\n\nIf you don't have the Sneer app, install it using the Play Store: https://play.google.com/store/apps/details?id=sneer.main\n\n" +
 				"Then, tap to add me as a Sneer contact: " +
 				buildSneerUri(self.publicKey().current().toHex(), inviteCode));
 

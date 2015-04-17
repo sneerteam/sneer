@@ -11,7 +11,7 @@ import android.widget.Toast;
 import sneer.android.utils.AndroidUtils;
 import sneer.Contact;
 
-import me.sneer.R;
+import sneer.main.R;
 import sneer.Party;
 import sneer.commons.exceptions.FriendlyException;
 

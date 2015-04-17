@@ -13,7 +13,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.util.Date;
 
-import me.sneer.R;
+import sneer.main.R;
 import sneer.commons.Clock;
 import sneer.commons.Threads;
 

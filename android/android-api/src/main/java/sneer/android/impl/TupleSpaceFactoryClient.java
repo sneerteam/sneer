@@ -16,7 +16,7 @@ package sneer.android.impl;//package sneer;
 //
 //public class TupleSpaceFactoryClient extends LocalTuplesFactory {
 //
-//	public static final String TUPLE_SPACE_SERVICE = "me.sneer.TUPLE_SPACE";
+//	public static final String TUPLE_SPACE_SERVICE = "sneer.main.TUPLE_SPACE";
 //
 //	public enum TupleSpaceOp {
 //		PUBLISH,

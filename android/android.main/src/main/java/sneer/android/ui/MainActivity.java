@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 
 import java.util.Collection;
 
-import me.sneer.R;
+import sneer.main.R;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Conversation;

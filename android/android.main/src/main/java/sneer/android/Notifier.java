@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 
 import java.util.List;
 
-import me.sneer.R;
+import sneer.main.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;

@@ -13,7 +13,7 @@ public class SneerInstallation {
     public static void showInstallSneerDialogIfNecessary(final Activity activity) {
         PackageManager pm = activity.getPackageManager();
         try {
-           pm.getPackageInfo("me.sneer", PackageManager.GET_ACTIVITIES);
+           pm.getPackageInfo("sneer.main", PackageManager.GET_ACTIVITIES);
         } catch (PackageManager.NameNotFoundException e) {
             showInstallSneerDialog(activity);
         }
@@ -25,7 +25,7 @@ public class SneerInstallation {
 		.setTitle("You Need the Sneer App")
 		.setMessage("Do you want to install it now?")
 		.setPositiveButton("Yes", new OnClickListener() {@Override public void onClick(DialogInterface arg0, int option) {
-		    Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=me.sneer"));
+		    Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=sneer.main"));
 		    goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		    activity.startActivity(goToMarket);
 		    activity.finish();

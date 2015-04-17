@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import me.sneer.R;
+import sneer.main.R;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.commons.SystemReport;

@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import me.sneer.R;
+import sneer.main.R;
 import rx.functions.Action1;
 import sneer.Profile;
 import sneer.commons.exceptions.FriendlyException;

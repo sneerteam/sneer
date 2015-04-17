@@ -22,7 +22,7 @@ android {
   defaultConfig {
     minSdkVersion external.android.minSdkVersion
     targetSdkVersion external.android.sdkVersion
-    applicationId "me.sneer"
+    applicationId "sneer.main"
     versionCode 9
     versionName "0.3.0"
   }

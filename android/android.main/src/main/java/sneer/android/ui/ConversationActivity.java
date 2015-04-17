@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import me.sneer.R;
+import sneer.main.R;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.Observable;
 import rx.Subscription;

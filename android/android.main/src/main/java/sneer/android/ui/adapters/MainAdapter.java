@@ -17,7 +17,7 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.sneer.R;
+import sneer.main.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;

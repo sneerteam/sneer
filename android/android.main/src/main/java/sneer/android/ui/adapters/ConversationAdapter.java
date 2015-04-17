@@ -21,7 +21,7 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Random;
 
-import me.sneer.R;
+import sneer.main.R;
 import rx.functions.Action1;
 import sneer.Contact;
 import sneer.Message;

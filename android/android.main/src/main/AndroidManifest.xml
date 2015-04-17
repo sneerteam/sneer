@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="me.sneer"
+    package="sneer.main"
     android:installLocation="internalOnly" >
 
     <!--
@@ -21,10 +21,10 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <permission
-        android:name="me.sneer.C2D_MESSAGE"
+        android:name="sneer.main.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="me.sneer.C2D_MESSAGE" />
+    <uses-permission android:name="sneer.main.C2D_MESSAGE" />
 
     <application
         android:name="sneer.android.SneerApp"
@@ -46,7 +46,7 @@
         <receiver android:name="sneer.android.GcmBroadcastReceiver" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="me.sneer" />
+                <category android:name="sneer.main" />
             </intent-filter>
         </receiver>
 
@@ -69,7 +69,7 @@
             android:name="sneer.android.ipcold.TupleSpaceService"
             android:exported="true" >
             <intent-filter>
-                <action android:name="me.sneer.TUPLE_SPACE" />
+                <action android:name="sneer.main.TUPLE_SPACE" />
             </intent-filter>
         </service>
         -->

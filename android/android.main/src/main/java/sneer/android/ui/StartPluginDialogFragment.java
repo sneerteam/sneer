@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import me.sneer.R;
+import sneer.main.R;
 import sneer.Conversation;
 import sneer.android.ipc.InstalledPlugins;
 import sneer.android.ipc.Plugin;
