@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.ppeccin.sneer.location.R;
+import sneer.location.R;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
@@ -55,10 +55,9 @@ public class LocationActivity extends Activity implements LocationListener {
 
 
     public void onSendClicked(View view) {
-        Intent sendMessageIntent = getIntent().<Intent>getParcelableExtra("SEND_MESSAGE");
-        if (sendMessageIntent != null) {
+	    if (getIntent().<Intent>getParcelableExtra("SEND_MESSAGE") != null) {
             String url = "Location:\nhttps://google.com/maps/place/" + latestLocation.getLatitude() + "," + latestLocation.getLongitude();
-            startService(sendMessageIntent.setAction(url));
+            startService(getIntent().<Intent>getParcelableExtra("SEND_MESSAGE").setAction(url));
         }
         finish();
     }
