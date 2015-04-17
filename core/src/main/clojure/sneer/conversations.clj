@@ -9,6 +9,7 @@
    [sneer.tuple.space :refer [payload]])
   (:import
     [sneer Conversations Conversation Conversations$Notification]
+    [sneer.rx ObservedSubject]
     [rx.subjects BehaviorSubject]))
 
 
@@ -42,6 +43,11 @@
   (rx/return
     (reify-notification [] nil nil nil)))
 
+(defn- most-recent-message-timestamp [^Conversation conv]
+  (let [^ObservedSubject subject (ObservedSubject/create 0)]
+    (.subscribe ^rx.Observable (.mostRecentMessageTimestamp conv) subject)
+    (-> subject .observed .current (or 0))))
+
 (defn reify-conversations [own-puk tuple-space contacts-state]
   (let [convos (atom {})
         reify-conversation (partial reify-conversation tuple-space own-puk)
@@ -55,6 +61,7 @@
       (all [_]
         (->> contacts
              (rx/map (partial mapv produce-convo))
+             (rx/map (partial sort-by most-recent-message-timestamp #(compare %2 %1)))
              shared-latest))
 
       (ofType [_ _type]
