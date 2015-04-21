@@ -23,11 +23,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import sneer.android.utils.AndroidUtils;
 import sneer.main.R;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.Observable;
@@ -68,7 +70,13 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
         if (actionBar != null)
             actionBar.setHomeButtonEnabled(true);
 
-		contact = sneer().findByNick(getIntent().getStringExtra("nick"));
+		String nick = getIntent().getStringExtra("nick");
+		contact = sneer().findByNick(nick);
+		if (contact == null) {
+			AndroidUtils.toast(this, "Contact not found: " + nick, Toast.LENGTH_LONG);
+			finish();
+			return;
+		}
 
 		plugActionBarTitle(actionBar, contact.nickname().observable());
 		plugActionBarIcon(actionBar, selfieFor(contact));

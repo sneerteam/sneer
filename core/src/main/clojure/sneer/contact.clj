@@ -70,10 +70,13 @@
       (nickname [_]
         (.observed nick-subject))
 
-      (setNickname [_ new-nick]
+      (setNickname [this new-nick]
         (when party
           (check-new-nickname @nick->contact-atom @puk->contact-atom new-nick party))
         (publish-contact tuple-space own-puk new-nick party invite-code)
+        (swap! nick->contact-atom #(-> %
+                                       (dissoc (.. this nickname current))
+                                       (assoc new-nick this)))
         (rx/on-next nick-subject new-nick))
 
       (toString [this]
@@ -114,19 +117,19 @@
   (let [nick->contact (atom {})
         puk->contact (atom {})
         contacts (restore-contacts tuple-space nick->contact puk->contact own-puk puk->party)]
+    (doseq [^Contact c contacts]
+      (when-let [party (.. c party current)]
+        (when-let [old-contact (get @puk->contact (.. party publicKey current))]
+          (swap! nick->contact dissoc (.. old-contact nickname current)))
+        (swap! puk->contact assoc (.. party publicKey current) c))
+      (swap! nick->contact assoc (.. c nickname current) c))
 
-     (reset! nick->contact (apply hash-map (mapcat (fn [c] [(.. c nickname current) c])
-                                                contacts)))
-     (reset! puk->contact  (apply hash-map (->> contacts
-                                                (filter #(.. % party current))
-                                                (mapcat (fn [c] [(.. c party current publicKey current) c])))))
-
-     {:own-puk             own-puk
-      :tuple-space         tuple-space
-      :nick->contact       nick->contact
-      :puk->contact        puk->contact
-      :observable-contacts (rx/map ->contact-list
-                                   (atom->observable nick->contact))}))
+    {:own-puk             own-puk
+     :tuple-space         tuple-space
+     :nick->contact       nick->contact
+     :puk->contact        puk->contact
+     :observable-contacts (rx/map ->contact-list
+                                  (atom->observable nick->contact))}))
 
 (defn find-contact-in [puk->contact party]
   (get puk->contact (party->puk party)))
