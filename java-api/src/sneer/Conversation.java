@@ -15,9 +15,9 @@ public interface Conversation {
 	Observable<Boolean> canSendMessages();
 	void sendMessage(String label);
 
-//	Session startSession();
+	Session startSession();
 
-//	Observable<List<Conversation.Event>> entries(); //Entry: Message or Session
+//	Observable<List<ConversationItem>> entries(); //Entry: Message or Session
 	Observable<List<Message>> messages();
 	Observable<String> mostRecentMessageContent();
 	Observable<Long> mostRecentMessageTimestamp();
@@ -28,20 +28,4 @@ public interface Conversation {
 
 	Observable<List<ConversationMenuItem>> menu();
 
-/*
-	interface Event {
-		String type();
-		String label();
-		byte[] jpegImage();
-		long timestamp();
-	}
-*/
-
 }
-
-/*
-Session extends Conversation.Event {
-	List <Message> messages();
-	send(Object payload);
-}
-*/

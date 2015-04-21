@@ -2,10 +2,9 @@ package sneer;
 
 import sneer.tuples.Tuple;
 
-public interface Message {
+public interface Message /* extends ConversationItem */ {
 
 	boolean isOwn();
-//	PublicKey author();
 
 	String messageType();
 	/** Text, if present, or messageType, if present, or empty string. Never null. */
