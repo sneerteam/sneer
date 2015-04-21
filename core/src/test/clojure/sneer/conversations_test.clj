@@ -102,7 +102,7 @@
                 (-> (.findByNick sneer "anna") .party .current) => anna)
 
           (fact "no problem setting the same nickname for the same party"
-                (.problemWithNewNickname sneer "anna" anna) => nil)
+                (.problemWithNewNickname sneer "anna2" anna) => nil)
 
           (fact "finding by nickname"
                 (.findByNick sneer "anna") => some?

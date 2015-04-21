@@ -27,7 +27,9 @@
       (.isEmpty ^String new-nick)
       "cannot be empty"
 
-      (and old-by-puk (not= new-nick (-> old-by-puk .nickname .current)))
+      (and old-by-puk
+           old-by-nick
+           (not= old-by-puk old-by-nick))
       "party already is a contact"
 
       (and old-by-nick (= party (-> old-by-nick .party .current)))
