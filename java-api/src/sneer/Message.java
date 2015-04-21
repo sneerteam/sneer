@@ -5,17 +5,15 @@ import sneer.tuples.Tuple;
 public interface Message {
 
 	boolean isOwn();
+//	PublicKey author();
 
 	String messageType();
-	/** Can be null. */
-	String text();
-	/** Can be null. */
+	/** Text, if present, or messageType, if present, or empty string. Never null. */
+	String label();
 	byte[] jpegImage();
 	/** Any parcelable object such as arrays, collections, number types, etc. Can be null. */
 	Object payload();
 
-	/** Text, if present, or messageType, if present, or empty string. Never null. */
-	String label();
 
 	/** When this message was created. */
 	long timestampCreated();
