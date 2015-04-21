@@ -27,8 +27,11 @@
       (.isEmpty ^String new-nick)
       "cannot be empty"
 
-      old-by-puk
+      (and old-by-puk (not= new-nick (-> old-by-puk .nickname .current)))
       "party already is a contact"
+
+      (and old-by-nick (= party (-> old-by-nick .party .current)))
+      nil
 
       (some-> old-by-nick .party .current)
       "already used")))
@@ -133,19 +136,29 @@
   (get @(:nick->contact contacts-state) nick))
 
 (defn check-new-contact [nick->contact puk->contact nickname party]
-  ;(println "nicks" nick->contact)
-  ;(println "puks" puk->contact)
   (when (some->> party (find-contact-in puk->contact))
     (throw (FriendlyException. "Duplicate contact")))
   (check-new-nickname nick->contact puk->contact nickname party))
 
-(defn produce-contact [contacts-state nickname party invite-code-received]
-  (assert (or (and (nil? party) (nil? invite-code-received))
-              party))
+(defn check-existing-contact [contacts-state party contact]
+  (cond
+    (= party (-> contact .party .current))
+    contact
+
+    (find-contact contacts-state party)
+    (throw (FriendlyException. "Party already is a contact"))
+
+    (nil? (-> contact .party .current))
+    contact
+
+    :else
+    (throw (FriendlyException. "Nickname already used"))))
+
+(defn create-contact [contacts-state nickname party invite-code-received]
   (let [nick->contact-atom (:nick->contact contacts-state)
-        puk->contact-atom  (:puk->contact  contacts-state)
-        space              (:tuple-space   contacts-state)
-        own-puk            (:own-puk       contacts-state)
+        puk->contact-atom (:puk->contact contacts-state)
+        space (:tuple-space contacts-state)
+        own-puk (:own-puk contacts-state)
         invite-code (or invite-code-received
                         (-> (UUID/randomUUID) .toString (.replaceAll "-" "")))]
 
@@ -163,10 +176,20 @@
 
     (let [contact (reify-contact space nick->contact-atom puk->contact-atom own-puk nickname party invite-code)]
       (swap! nick->contact-atom assoc nickname contact)
-      (when party
-        (swap! puk->contact-atom assoc (party->puk party) contact))
-
       contact)))
+
+(defn produce-contact [contacts-state nickname party invite-code-received]
+  (assert (or (and (nil? party) (nil? invite-code-received))
+              party))
+  (let [contact (or (some->> nickname
+                             (find-by-nick contacts-state)
+                             (check-existing-contact contacts-state party))
+                    (create-contact contacts-state nickname party invite-code-received))]
+    (when party
+      (swap! (:puk->contact contacts-state) assoc (party->puk party) contact)
+      (when (not= party (-> contact .party .current))
+        (.setParty contact party)))
+    contact))
 
 (defn get-contacts [contacts-state]
   (:observable-contacts contacts-state))

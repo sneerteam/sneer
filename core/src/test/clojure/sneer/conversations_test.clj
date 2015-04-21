@@ -44,8 +44,8 @@
 
            ?nick ?party ?nick2 ?party2 ?result ?count ?obs
            "Ann" nil    "Ann"  "A"     ok      1      "Invited then added"
-           "Ann" "A"    "Ann"  "A"     nope    1      "Duplicate contact"
-           "Ann" "A"    "Bob"  "B"     ok      2      "Diferent contacts"
+           "Ann" "A"    "Ann"  "A"     ok      1      "Same nickname for same party"
+           "Ann" "A"    "Bob"  "B"     ok      2      "Different contacts"
            "Ann" "A"    "Ann"  "B"     nope    1      "Nickname already used"
            "Ann" "A"    "Ann"  nil     nope    1      "Nickname already used 2"
            "Ann" "A"    "Bob"  "A"     nope    1      "Ann already has a nick")
@@ -70,6 +70,7 @@
               produce-party  #(.produceParty sneer (->puk %))
               ^Party         neide       (produce-party "neide")
               ^Party         carla       (produce-party "carla")
+              ^Party         anna        (produce-party "anna")
 
               all-conversations (->chan (->> (.all subject)
                                              (rx/map (partial mapv #(some-> % .contact .nickname .current)))))]
@@ -90,8 +91,18 @@
 
 
 
-          (fact "carla already has a different nickname"
+          (fact "the nickname 'anna' is already used"
                 (.problemWithNewNickname sneer "anna" carla) => some?)
+
+          (fact "existing contact cannot be added to new invite"
+                (.produceContact sneer "anna" carla nil) => nope)
+
+          (fact "new party can be added to new invite"
+                (.produceContact sneer "anna" anna nil) => ok
+                (-> (.findByNick sneer "anna") .party .current) => anna)
+
+          (fact "no problem setting the same nickname for the same party"
+                (.problemWithNewNickname sneer "anna" anna) => nil)
 
           (fact "finding by nickname"
                 (.findByNick sneer "anna") => some?
