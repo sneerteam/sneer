@@ -95,7 +95,7 @@
               (partial combine-latest
                        (partial filterv (comp not empty? second))))
 
-             ;; [(Conversation, [Message])]
+             ;; [(Conversation, [unread Message])]
              (switch-map
               (fn [unread-pairs]
                 (case (count unread-pairs)
