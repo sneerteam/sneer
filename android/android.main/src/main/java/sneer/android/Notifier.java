@@ -79,7 +79,7 @@ public class Notifier {
 			return;
 		}
 		Intent intent = conversations.size() == 1
-				? conversationActivityIntent(conversations.get(0), notification)
+				? conversationActivityIntent(conversations.get(0))
 				: mainActivityIntent();
 		notify(notification, intent);
 	}
@@ -90,15 +90,11 @@ public class Notifier {
 		return intent;
 	}
 
-	private static Intent conversationActivityIntent(Conversation conversation, Conversations.Notification notification) {
+	private static Intent conversationActivityIntent(Conversation conversation) {
 		Intent intent = new Intent();
 		intent.setClass(context, ConversationActivity.class);
-		intent.putExtra("nick", notification.title());
+		intent.putExtra("nick", conversation.contact().nickname().current());
 		return intent;
-	}
-
-	private static PublicKey partyPuk(Conversation conversation) {
-		return conversation.contact().party().current().publicKey().current();
 	}
 
 	private static void notify(Conversations.Notification notification, Intent intent) {

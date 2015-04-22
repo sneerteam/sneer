@@ -23,13 +23,13 @@
 (defn- unread-messages-label [count]
   (str count " unread message" (when-not (= 1 count) "s")))
 
-(defn- notification-for-single [[^Conversation c unread-messages]]
+(defn- notification-for-single [[^Conversation convo unread-messages]]
   (rx/map
-   (fn [party-name]
+   (fn [nick]
      (let [text (message-label (first unread-messages))
            subText (unread-messages-label (count unread-messages))]
-       (reify-notification [c] party-name text subText)))
-   (.. c contact party current name first)))
+       (reify-notification [convo] nick text subText)))
+   (.. convo contact nickname observable)))
 
 (defn- notification-for-many [unread-conversations]
   (let [conversations (mapv first unread-conversations)
