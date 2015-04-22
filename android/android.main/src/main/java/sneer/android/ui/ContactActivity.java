@@ -204,6 +204,8 @@ public class ContactActivity extends Activity {
 	private void hidePreferredNicknameWhenNeeded() {
 		if (newContact) return;
 		Observable.combineLatest(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>() { @Override public Boolean call(String preferredNickname, String ownName) {
+			if (TextUtils.isEmpty(preferredNickname))
+				return true;
 			return preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current());
 		}}).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() { @Override public void call(Boolean canHide) {
 			if (canHide)
