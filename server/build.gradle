@@ -49,4 +49,5 @@ run {
   if (!serverOptions.empty) {
     args Eval.me(serverOptions)
   }
+  workingDir buildDir
 }

@@ -102,8 +102,10 @@
 (defn- query-by-builtin-fields [criteria after-id last-by-id]
   (let [columns (-> criteria (select-keys builtin-field?) serialize-entries)
         clauses (cond-> (map #(str % " = ?") (keys columns))
-                        (some? after-id) (conj (str "ID > " after-id)))
-        ^String filter (apply str (interpose " AND " clauses))
+                  (some? after-id)
+                  (conj (str "ID > " after-id)))
+        ^String
+        filter (apply str (interpose " AND " clauses))
         values (vals columns)
         select (str "SELECT * FROM tuple"
                     (when-not (.isEmpty filter) " WHERE ") filter
@@ -126,7 +128,8 @@
         criteria (dissoc criteria ::after-id)
         last-by-id (::last-by-id criteria)
         criteria (dissoc criteria ::last-by-id)
-        rs (db-query db (query-by-builtin-fields criteria after-id last-by-id))
+        query (query-by-builtin-fields criteria after-id last-by-id)
+        rs (db-query db query)
         field-names (mapv name (first rs))
         custom (-> criteria ->custom-field-map)]
     (->>

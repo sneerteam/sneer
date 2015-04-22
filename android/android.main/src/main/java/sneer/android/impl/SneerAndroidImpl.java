@@ -12,7 +12,16 @@ import java.io.StringWriter;
 import java.util.List;
 
 import sneer.Conversation;
+
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.Contact;
+
 import sneer.Message;
+import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.admin.SneerAdminFactory;
@@ -25,6 +34,7 @@ import sneer.android.ipcold.PluginManager;
 import sneer.android.utils.AndroidUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
+import sneer.crypto.impl.KeysImpl;
 
 public class SneerAndroidImpl implements SneerAndroid {
 
@@ -47,6 +57,55 @@ public class SneerAndroidImpl implements SneerAndroid {
 	private void init() throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
 		logPublicKey();
+		initPlugins(context);
+
+		Observable.timer(60, TimeUnit.SECONDS).subscribe(
+				new Action1<Long>() {
+					@Override
+					public void call(Long aLong) {
+						createBogusContacts();
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						throwable.printStackTrace();
+					}
+				});
+	}
+
+
+	private void createBogusContacts() {
+		final Sneer sneer = sneerAdmin.sneer();
+		if (sneer.contacts().toBlocking().first().size() > 0)
+			return;
+		final KeysImpl keys = new KeysImpl();
+		every(1, TimeUnit.SECONDS)
+			.take(42)
+			.subscribe(
+					new Action1<Long>() {
+						@Override
+						public void call(Long aLong) {
+							String contactName = "Contact " + aLong;
+							try {
+								PublicKey contactPuk = keys.createPublicKey(contactName.getBytes());
+								final Contact c = sneer.produceContact(contactName, sneer.produceParty(contactPuk), null);
+								every(5, TimeUnit.SECONDS).take(5).subscribe(
+										new Action1<Long>() {
+											@Override
+											public void call(Long aLong) {
+												sneer.conversations().withContact(c).sendMessage("Message ");
+											}
+										});
+
+							} catch (FriendlyException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+	}
+
+	private Observable<Long> every(int t, TimeUnit unit) {
+		return Observable.timer(t, t, unit, AndroidSchedulers.mainThread());
 	}
 
 
@@ -61,7 +120,8 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 
 	private SneerAdmin newSneerAdmin(Context context) throws FriendlyException {
-		File dbFile = secureFile(context, "tupleSpace.sqlite");
+		String dbFileName = "tupleSpace.sqlite";
+		File dbFile = secureFile(context, dbFileName);
 		try {
 			return newSneerAdmin(SneerSqliteDatabase.openDatabase(dbFile));
 		} catch (IOException e) {
