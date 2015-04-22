@@ -23,8 +23,8 @@ android {
     minSdkVersion external.android.minSdkVersion
     targetSdkVersion external.android.sdkVersion
     applicationId "sneer.main"
-    versionCode 11
-    versionName "0.3.2"
+    versionCode 12
+    versionName "0.3.3"
   }
 
   buildTypes {
