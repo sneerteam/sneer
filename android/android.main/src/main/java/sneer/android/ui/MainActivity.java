@@ -61,6 +61,7 @@ public class MainActivity extends SneerActivity {
 
 	private void handleSend(Intent intent) {
 		if (intent == null) return;
+		if (intent.getAction() == null) return;
 		if (!intent.getAction().equals(ACTION_SEND )) return;
 		if (!intent.getType()  .equals("text/plain")) return;
 		subjectToSend = intent.getStringExtra(EXTRA_SUBJECT);
