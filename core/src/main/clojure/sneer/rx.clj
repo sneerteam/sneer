@@ -96,3 +96,6 @@
                     (f %)
                     (rx/return default))
                 o)))
+
+(defn behavior-subject [& [initial-value]]
+  (BehaviorSubject/create initial-value))

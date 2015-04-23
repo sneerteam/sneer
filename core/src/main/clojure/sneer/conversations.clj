@@ -1,7 +1,7 @@
 (ns sneer.conversations
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map]]
+   [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]
    [sneer.party :refer [party->puk]]
    [sneer.conversation :refer :all]
    [sneer.commons :refer [now produce!]]
@@ -51,8 +51,7 @@
 (defn reify-conversations [own-puk tuple-space contacts-state]
   (let [convos (atom {})
         reify-conversation (partial reify-conversation tuple-space own-puk)
-        null nil
-        ignored-conversation (BehaviorSubject/create ^Object null)
+        ignored-conversation (behavior-subject)
         contacts (get-contacts contacts-state)
         produce-convo (fn [contact] (produce! reify-conversation convos contact))]
 
@@ -78,12 +77,12 @@
         (produce-convo contact))
 
       (notifications [this]
-        (->> (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all))
-                               [(.all this) ignored-conversation])
+        (->> [(.all this) ignored-conversation]
+
+             ;; ([Conversation], Conversation)
+             (combine-latest (fn [[all ignored]] (remove #(identical? % ignored) all)))
 
              ;; [Conversation]
-
-
              (rx/map (fn [conversations]
                        (->> conversations
                             (mapv (fn [^Conversation c]
