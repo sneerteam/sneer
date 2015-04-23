@@ -39,9 +39,6 @@
 (defn- message-id [^Message msg]
   (-> msg .tuple (get "id")))
 
-(defn original-id [^Message message]
-  (get (.tuple message) "original_id"))
-
 (defn own? [^Message message]
   (.isOwn message))
 
@@ -60,7 +57,7 @@
 
 (def unread (interop/fn [messages last-read-id]
                         (->> (reverse-party-messages messages)
-                             (take-while #(and (> (original-id %) last-read-id)
+                             (take-while #(and (> (message-id %) last-read-id)
                                                (recent? %)))  ;TODO Remove this "recent" hack and fix redundant notification generation.
                              vec)))
 
@@ -115,4 +112,4 @@
 
       (unreadMessages [_] (unread-messages messages last-read))
       (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
-      (setRead [_ message] (.pub (message-read-sender) (original-id message))))))
+      (setRead [_ message] (.pub (message-read-sender) (message-id message))))))
