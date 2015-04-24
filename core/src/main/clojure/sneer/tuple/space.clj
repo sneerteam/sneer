@@ -1,13 +1,15 @@
 (ns sneer.tuple.space
   (:require
    [rx.lang.clojure.core :as rx]
+   [sneer.async :refer [go-trace]]
    [sneer.serialization :refer [roundtrip]]
    [sneer.commons :refer [now reify+ while-let]]
-   [clojure.core.async :refer [thread chan <!! close!]]
+   [clojure.core.async :refer [thread chan <! <!! close!]]
    [sneer.tuple.persistent-tuple-base :refer [last-by-id]]
    [sneer.tuple.protocols :refer [store-tuple query-tuples]]
    [sneer.tuple.macros :refer :all])
   (:import
+   [rx.subjects AsyncSubject]
    [sneer PrivateKey PublicKey]
    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]))
 
@@ -43,10 +45,14 @@
       (pub [this payload]
         (.. this (payload payload) pub))
       (pub [this]
-        (let [tuple (timestamped proto-tuple)]
-          (store-tuple tuples-out tuple)
-          (rx/return
-            (reify-tuple tuple)))))))
+        (let [tuple (timestamped proto-tuple)
+              result (AsyncSubject/create)
+              result-chan (store-tuple tuples-out tuple)]
+          (go-trace
+            (when-some [tuple (<! result-chan)]
+              (rx/on-next result tuple))
+            (rx/on-completed result))
+          result)))))
 
 (defn- set-thread-name! [name]
   (.setName (Thread/currentThread) name))

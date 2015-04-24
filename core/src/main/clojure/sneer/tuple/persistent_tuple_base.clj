@@ -181,10 +181,9 @@
   (idempotently #(create-prik-table db))
   (idempotently #(create-tuple-indices db)))
 
-(defn- store! [db new-tuples request next-tuple-id tuple]
-  (let [uniqueness (:uniqueness request)]
-    (and (or (nil? uniqueness) (result-empty? db uniqueness))
-         (try-insert-tuple db tuple next-tuple-id))))
+(defn- store! [db uniqueness tuple-id tuple]
+  (and (or (nil? uniqueness) (result-empty? db uniqueness))
+       (try-insert-tuple db tuple tuple-id)))
 
 (defn- set-attr! [db attribute value tuple-id]
   (try
@@ -206,10 +205,15 @@
 
 (defn- handle-request! [db new-tuples request next-tuple-id]
   (match request
-    {:store tuple}
-    (when (store! db new-tuples request next-tuple-id tuple)
-      (>!! new-tuples tuple)
-      true)
+    {:store tuple :tuple-out tuple-out}
+    (try
+      (when (store! db (:uniqueness request) next-tuple-id tuple)
+        (let [tuple (assoc tuple "id" next-tuple-id)]
+          (go-trace (>! new-tuples tuple))
+          (>!! tuple-out tuple))
+        true)
+      (finally
+        (close! tuple-out)))
 
     {:query criteria :tuples-out tuples-out}
     (do (go-trace (>! tuples-out (query-tuples-from-db db criteria)))
@@ -236,15 +240,21 @@
   (let [new-tuples (dropping-chan)
         new-tuples-mult (mult new-tuples)
         requests (chan 1024)
-        running (server-loop db requests new-tuples)]
+        running (server-loop db requests new-tuples)
+
+        post-store-tuple-request
+        (fn [tuple uniqueness-criteria]
+          (let [tuple-out (chan 1)]
+            (>!! requests {:store tuple :tuple-out tuple-out :uniqueness uniqueness-criteria})
+            tuple-out))]
 
     (reify TupleBase
 
       (store-tuple [_ tuple]
-        (>!! requests {:store tuple}))
+        (post-store-tuple-request tuple nil))
 
       (store-tuple [_ tuple uniqueness-criteria]
-        (>!! requests {:store tuple :uniqueness uniqueness-criteria}))
+        (post-store-tuple-request tuple uniqueness-criteria))
 
       (query-tuples [_ criteria tuples-out]
         (let [query-result (chan)]

@@ -4,10 +4,11 @@
   "A backing store for tuples (represented as maps)."
 
   (store-tuple
-    ^Void [this tuple]
-    ^Void [this tuple uniqueness-criteria]
+    [this tuple]
+    [this tuple uniqueness-criteria]
     "Stores the tuple represented as map. When uniqueness-criteria is provided,
-     the tuple is stored only if a query by uniqueness-criteria returns an empty set.")
+     the tuple is stored only if a query by uniqueness-criteria returns an empty set.
+     Returns a channel that will emit the stored tuple if accepted and close.")
 
   (query-tuples
     [this criteria tuples-out]

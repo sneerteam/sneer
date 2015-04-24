@@ -1,10 +1,11 @@
 (ns sneer.tuple.space-test
+  (:import [sneer.tuples TupleSpace TuplePublisher])
   (:require [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as base]
             [sneer.tuple.protocols :refer [store-tuple query-tuples]]
             [sneer.test-util :refer [<!!? subscribe-chan observable->chan]]
             [midje.sweet :refer :all]
-            [clojure.core.async :as async]
+            [clojure.core.async :as async :refer [>!]]
             [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.keys :refer [->puk]]
             [rx.lang.clojure.core :as rx]))
@@ -42,6 +43,22 @@
             subscriber (subscribe-chan tuples observable-tuples)]
         (.unsubscribe subscriber)
         (<!!? (async/filter< nil? tuples)) => nil))))
+
+(facts "About TuplePublisher#pub"
+  (with-open [db (jdbc-database/create-sqlite-db)
+              tuple-base (base/create db)]
+    (let [^TupleSpace     tuple-space (space/reify-tuple-space neide tuple-base)
+          ^TuplePublisher subject (.publisher tuple-space)]
+
+      (fact "Emits tuple with id after publishing"
+        (let [tuple-out (async/chan)]
+
+          (rx/subscribe
+            (.. subject (type "has-id") (pub "42"))
+            (fn [tuple] (async/go (>! tuple-out tuple))))
+
+          (<!!? tuple-out) => (contains {"id" 1 "type" "has-id" "payload" "42"}))))))
+
 
 (facts "About TupleFilter#tuples"
   (with-open [db (jdbc-database/create-sqlite-db)

@@ -28,7 +28,9 @@
 
     (fact "It remembers original-id"
       (let [t (assoc t1 "id" 42)]
-        (store-tuple subject t)
+        (let [stored-tuple-chan (store-tuple subject t)]
+          (fact "It returns channel that emits stored tuple"
+            (<!!? stored-tuple-chan) => (contains {"id" 1})))
         (->> (<!!? (query-all subject {"type" "tweet"})) select-ids) => [{"id" 1 "original_id" 42}]))
 
     (fact "It discards author/id duplicates"
