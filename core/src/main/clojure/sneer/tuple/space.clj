@@ -20,7 +20,8 @@
     (tuple-getter author)
     (tuple-getter payload)
     (tuple-getter timestamp)
-    (toString [this] (str tuple))))
+    (toString [this] (str tuple))
+    (entrySet [this] (.entrySet tuple))))
 
 (defn payload [^Tuple tuple]
   (.payload tuple))
