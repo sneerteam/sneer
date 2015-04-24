@@ -57,7 +57,6 @@ public class SneerAndroidImpl implements SneerAndroid {
 	private void init() throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
 		logPublicKey();
-		initPlugins(context);
 
 		Observable.timer(60, TimeUnit.SECONDS).subscribe(
 				new Action1<Long>() {
