@@ -81,10 +81,10 @@
          shared-latest)))
 
 (defn reify-session [space contact-puk id]
-  (let [publisher (.. space publisher (audience contact-puk) (field "ref" id))]
+  (let [publisher (.. space publisher (audience contact-puk) (type "message") (field "ref" id))]
     (reify Session
       (messages [_]
-        (.. space filter (field "ref" id) tuples))
+        (.. space filter (type "message") (field "ref" id) tuples))
       (send [_ payload]
         (.pub publisher payload)))))
 
