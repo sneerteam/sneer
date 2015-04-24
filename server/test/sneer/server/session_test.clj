@@ -39,12 +39,12 @@
       (fact "Communication is working"
             (.sendMessage n->m "Hello")
             (let [messages (->chan (.messages m->n))]
-              (<!!? messages 1000)                               ; Skip history replay :(
-              (.size (<!!? messages 1000)) => 1))
+              (<!!? messages 500)                               ; Skip history replay :(
+              (.size (<!!? messages 500)) => 1))
 
       (fact "Neide sees her own messages in the session"
             (let [session (<!!? (->chan (.startSession n->m)))
                   messages (->chan (.messages session))]
-              #_(.send session "some payload")
+              (.send session "some payload")
               ;  (.payload (<!!? messages)) => "some payload"
               )))))

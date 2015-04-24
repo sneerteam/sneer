@@ -85,7 +85,7 @@
     (reify Session
       (messages [_]
         (.. space filter (field "ref" id) tuples))
-      #_(send [payload]
+      (send [_ payload]
         (.pub publisher payload)))))
 
 (defn- start-session [space contact-puk #_session-type]

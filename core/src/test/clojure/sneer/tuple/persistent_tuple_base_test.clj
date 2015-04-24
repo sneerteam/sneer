@@ -75,7 +75,7 @@
                   {"author" carla   "payload" "c"           "audience" neide}
                   {"author" carla   "payload" "c"           "audience" neide}
                   {"author" michael "payload" "hello neide" "audience" neide "type" "chat"}
-                  {"author" michael "payload" "hello carla" "audience" carla "type" "chat"}]]
+                  {"author" michael "payload" "hello carla" "audience" carla "type" "chat" "custom-field" "urgent"}]]
       (doseq [tuple tuples]
         (store-tuple subject (assoc tuple "type" "test")))
       (query-tuples subject ?criteria result)
@@ -94,7 +94,8 @@
   {"author" neide "audience" carla "payload" "n"}    {"payload" "n"}
   {"author" michael "audience" neide}                {"payload" "hello neide"}
   {"author" michael "audience" carla}                {"payload" "hello carla"}
-  {"original_id" 42}                                 {"payload" "n" "original_id" 42})
+  {"original_id" 42}                                 {"payload" "n" "original_id" 42}
+  {"custom-field" "urgent"}                          {"payload" "hello carla"})
 
 (facts "About :last-by-id query criterion"
   (with-open [db (jdbc-database/create-sqlite-db)
