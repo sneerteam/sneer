@@ -10,6 +10,9 @@
             [sneer.server.simulated-network :as sim-network])
   (:import [sneer Sneer Conversation Party Contact]))
 
+(defn- ->chan [obs]
+  (observable->chan (subscribe-on-io obs)))
+
 (facts "About Sessions"
   (with-open [neide-db (create-sqlite-db)
               maico-db (create-sqlite-db)
@@ -30,10 +33,19 @@
       (network/connect sim neide-puk neide-tuple-base)
       (network/connect sim maico-puk maico-tuple-base)
 
-      (.sendMessage n->m "Hello")
+      (fact "Communication is working"
+            (.sendMessage n->m "Hello")
 
-      (.. m->n messages toBlocking first)
-      (.. m->n messages (skip 1) toBlocking first size) => 1
+            (let [messages (->chan (.messages m->n))]
+              (<!!? messages)                               ; Skip history replay :(
+              (.size (<!!? messages)) => 1))
+
+      #_(fact "Neide sees her own messages in the session"
+            (let [session (.startSession n->m)
+                  ]
+              (.send session "some payload")
+              (.. session messages toBlocking first payload) => "some payload"
+              ))
 
       #_(fact "..."
         (<!!? notifications) => notification-empty?))))
