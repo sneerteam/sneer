@@ -183,9 +183,8 @@
 
 (defn- store! [db new-tuples request next-tuple-id tuple]
   (let [uniqueness (:uniqueness request)]
-    (when (and (or (nil? uniqueness) (result-empty? db uniqueness))
-               (try-insert-tuple db tuple next-tuple-id))
-      {:channel new-tuples :response tuple :bump-id true})))
+    (and (or (nil? uniqueness) (result-empty? db uniqueness))
+         (try-insert-tuple db tuple next-tuple-id))))
 
 (defn- set-attr! [db attribute value tuple-id]
   (try
@@ -193,8 +192,7 @@
                               "value"     (serialization/serialize value)
                               "tuple_id"  tuple-id})
     (catch Exception e
-      (.printStackTrace e)))
-  {})
+      (.printStackTrace e))))
 
 (defn- get-attr! [db attribute default-value tuple-id]
   (println ">>>>> CHANGE TO USE UPDATE <<<<<")
@@ -206,22 +204,31 @@
       (serialization/deserialize value)
       default-value)))
 
-(defn- response-for! [db new-tuples request next-tuple-id]
+(defn- handle-request! [db new-tuples request next-tuple-id]
   (match request
     {:store tuple}
-      (store! db new-tuples request next-tuple-id tuple)
+    (when (store! db new-tuples request next-tuple-id tuple)
+      (>!! new-tuples tuple)
+      true)
 
     {:query criteria :tuples-out tuples-out}
-      {:channel tuples-out :response (query-tuples-from-db db criteria)}
+    (do (go-trace (>! tuples-out (query-tuples-from-db db criteria)))
+        nil)
 
     {:set-attribute attribute :value value :tuple-id tuple-id}
-      (set-attr! db attribute value tuple-id)
+    (do (set-attr! db attribute value tuple-id)
+        nil)
 
     {:get-attribute attribute :default-value default-value :tuple-id tuple-id :response-ch response-ch}
-      (assoc {:channel response-ch} :response (get-attr! db attribute default-value tuple-id))))
+    (do (go-trace (>! response-ch (get-attr! db attribute default-value tuple-id)))
+        nil)))
 
-(defn- go-put-in-separate-fn-to-avoid-class-name-too-long [channel response]
-  (go (>! channel response)))
+(defn- server-loop [db requests new-tuples]
+  (go-trace
+   (loop [next-tuple-id (-> db max-tuple-id inc)]
+     (when-some [request (<! requests)]
+       (let [bump-id (handle-request! db new-tuples request next-tuple-id)]
+         (recur (cond-> next-tuple-id bump-id inc)))))))
 
 (defn create [db]
   (setup db)
@@ -229,14 +236,7 @@
   (let [new-tuples (dropping-chan)
         new-tuples-mult (mult new-tuples)
         requests (chan 1024)
-        running (go-trace
-                  (loop [next-tuple-id (-> db max-tuple-id inc)]
-                    (when-some [request (<! requests)]
-                      (let [{:keys [channel response bump-id]} (response-for! db new-tuples request next-tuple-id)]
-                        (when (some? response)
-                          (assert (some? channel))
-                          (go-put-in-separate-fn-to-avoid-class-name-too-long channel response))
-                        (recur (cond-> next-tuple-id bump-id inc))))))]
+        running (server-loop db requests new-tuples)]
 
     (reify TupleBase
 
@@ -257,13 +257,12 @@
 
       (query-tuples [_ criteria tuples-out lease]
         (let [new-tuples (dropping-tap new-tuples-mult)
-              query-result (chan)
               criteria (atom criteria)]
           (go (<! lease)
               (close! new-tuples))
           (go-loop []
-            (when (>! requests {:query @criteria :tuples-out query-result})
-              (let [tuples (<! query-result)]
+            (do
+              (let [tuples (query-tuples-from-db db @criteria)]
                 (when-not (empty? tuples)
                   (doseq [tuple tuples]
                     (>! tuples-out tuple))
