@@ -8,7 +8,7 @@
    [sneer.contact :refer [get-contacts puk->contact]]
    [sneer.tuple.space :refer [payload]])
   (:import
-    [sneer PublicKey Contact Conversation Message]
+    [sneer PublicKey Contact Conversation Message Session]
     [sneer.tuples Tuple TupleSpace]
     [java.text SimpleDateFormat]
     [rx Observable]))
@@ -80,6 +80,19 @@
          (rx/map vec)
          shared-latest)))
 
+(defn reify-session [space contact-puk id]
+  (let [publisher (.. space publisher (audience contact-puk) (field "ref" id))]
+    (reify Session
+      (messages [_]
+        (.. space filter (field "ref" id) tuples))
+      #_(send [payload]
+        (.pub publisher payload)))))
+
+(defn- start-session [space contact-puk #_session-type]
+  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") pub)]
+    (rx/map #(reify-session space contact-puk (.get % "id"))
+            tuple-obs)))
+
 (defn reify-conversation
   [^TupleSpace space ^PublicKey own-puk ^Contact contact]
   (let [party (.. contact party observable)
@@ -113,4 +126,6 @@
 
       (unreadMessages [_] (unread-messages messages last-read))
       (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
-      (setRead [_ message] (.pub (message-read-sender) (message-id message))))))
+      (setRead [_ message] (.pub (message-read-sender) (message-id message)))
+
+      (startSession [_] (start-session space (current-puk))))))

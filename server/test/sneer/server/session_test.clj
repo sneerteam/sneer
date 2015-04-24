@@ -42,12 +42,11 @@
               (<!!? messages 1000)                               ; Skip history replay :(
               (.size (<!!? messages 1000)) => 1))
 
-      #_(fact "Neide sees her own messages in the session"
-            (let [session (.startSession n->m)
-
-                  ]
-              (.send session "some payload")
-              (.. session messages toBlocking first payload) => "some payload"
+      (fact "Neide sees her own messages in the session"
+            (let [session (<!!? (->chan (.startSession n->m)))
+                  messages (->chan (.messages session))]
+              #_(.send session "some payload")
+              (.payload (<!!? messages)) => "some payload"
               ))
 
       #_(fact "..."

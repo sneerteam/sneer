@@ -15,7 +15,7 @@ public interface Conversation {
 	Observable<Boolean> canSendMessages();
 	void sendMessage(String label);
 
-	Session startSession();
+	Observable<Session> startSession();
 
 //	Observable<List<ConversationItem>> entries(); //Entry: Message or Session
 	Observable<List<Message>> messages();
