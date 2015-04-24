@@ -43,4 +43,13 @@
                   _ (<!!? sessions 500)                         ; Skip history replay :(
                   session (first (<!!? sessions 500))
                   messages (->chan (.messages session))]
-              (.payload (<!!? messages)) => "some payload")))))
+              (.payload (<!!? messages)) => "some payload"
+              (.send session "some reply")))
+
+      (fact "Neide sees reply from Maico"
+            (let [sessions (->chan (.sessions n->m))
+                  _ (<!!? sessions 500)                         ; Skip history replay :(
+                  session (first (<!!? sessions 500))
+                  messages (->chan (.messages session))]
+              (.payload (<!!? messages)) => "some payload"
+              (.payload (<!!? messages)) => "some reply")))))

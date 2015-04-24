@@ -99,13 +99,13 @@
         tuples-in  (.. filter (author party-puk) (audience own-puk  ) tuples)]
     (->> (rx/merge tuples-in tuples-out)
          (rx/map #(reify-session tuple-space own-puk (get % "own-id")))
-         (rx/reductions conj (sorted-set-by message-ids))
+         (rx/reductions conj (sorted-set-by session-ids))
          (rx/map vec)
          shared-latest)))
 
 (defn- start-session [space contact-puk #_session-type]
   ; TODO: change own-id to id
-  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") (field "own-id" (.toString (java.util.UUID/randomUUID))) pub)]
+  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") (field "own-id" (System/nanoTime)) pub)]
     (rx/map #(reify-session space contact-puk (.get % "own-id"))
             tuple-obs)))
 
