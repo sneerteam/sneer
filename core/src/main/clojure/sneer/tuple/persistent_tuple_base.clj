@@ -228,7 +228,7 @@
 
   (let [new-tuples (dropping-chan)
         new-tuples-mult (mult new-tuples)
-        requests (chan)
+        requests (chan 1024)
         running (go-trace
                   (loop [next-tuple-id (-> db max-tuple-id inc)]
                     (when-some [request (<! requests)]
