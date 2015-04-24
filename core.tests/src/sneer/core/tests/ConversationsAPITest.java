@@ -122,7 +122,7 @@ public class ConversationsAPITest extends TestCase {
 		assertNull(contact);
 
 		sneerA.produceContact("Party Boy", partyB, null);
-		assertSame(partyB, sneerA.findContact(partyB).party());
+		assertSame(partyB, sneerA.findContact(partyB).party().current());
 	}
 
 
