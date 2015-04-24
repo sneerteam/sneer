@@ -81,22 +81,22 @@
          shared-latest)))
 
 (defn reify-conversation
-  [^TupleSpace tuple-space ^PublicKey own-puk ^Contact contact]
+  [^TupleSpace space ^PublicKey own-puk ^Contact contact]
   (let [party (.. contact party observable)
         puk (switch-map-some #(.. % publicKey observable) party)
 
-        messages (switch-map-some #(messages tuple-space own-puk %) [] puk)
+        messages (switch-map-some #(messages space own-puk %) [] puk)
 
-        last-read-filter #(.. tuple-space filter (type "message-read") (audience %) (author own-puk) last tuples)
+        last-read-filter #(.. space filter (type "message-read") (audience %) (author own-puk) last tuples)
         last-read (switch-map-some last-read-filter puk)
 
         most-recent-message (rx/map last messages)
 
-        current-puk #(doto
+        current-puk #(doto                                  ;TODO: rename to current-contact-puk
                       (some-> contact .party .current .publicKey .current)
                       (assert "Contact does not have a known public key."))
 
-        sender #(.. tuple-space publisher (audience (current-puk)))
+        sender #(.. space publisher (audience (current-puk)))
         message-sender      #(.. (sender) (type "message"     ) (field "message-type" "chat"))
         message-read-sender #(.. (sender) (type "message-read"))]
 
