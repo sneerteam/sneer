@@ -89,8 +89,9 @@
         (.pub publisher payload)))))
 
 (defn- start-session [space contact-puk #_session-type]
-  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") pub)]
-    (rx/map #(reify-session space contact-puk (.get % "id"))
+  ; TODO: change own-id to id
+  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") (field "own-id" (.toString (java.util.UUID/randomUUID))) pub)]
+    (rx/map #(reify-session space contact-puk (.get % "own-id"))
             tuple-obs)))
 
 (defn reify-conversation

@@ -32,9 +32,18 @@
               (<!!? messages 500)                               ; Skip history replay :(
               (.size (<!!? messages 500)) => 1))
 
+      (fact "Custom field can be used in filter"
+            (let [space (.tupleSpace neide-sneer)
+                  _ (.. space publisher (type "ourtype") (field "banana" 42) pub)
+                  _ (.. space publisher (type "ourtype") (field "banana" 43) pub)
+                  filter (->chan (.. space filter (field "banana" 43) tuples))
+                  tuple (<!!? filter)]
+              (get tuple "type") => "ourtype"
+              (get tuple "banana") => 43))
+
       (fact "Neide sees her own messages in the session"
             (let [session (<!!? (->chan (.startSession n->m)))
                   messages (->chan (.messages session))]
               (.send session "some payload")
-              ;(.payload (<!!? messages)) => "some payload"
+              (.payload (<!!? messages)) => "some payload"
               )))))
