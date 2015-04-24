@@ -11,6 +11,7 @@
   :main ^:skip-aot sneer.server.main
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[midje "1.6.3"]]
+             :dev {:dependencies [[midje "1.6.3"]
+                                  [org.xerial/sqlite-jdbc "3.8.6"]]
                    :plugins [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
                              [lein-midje "3.1.3"]]}})
