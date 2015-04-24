@@ -40,6 +40,7 @@ dependencies {
   compile external['clojure.core.match']
   compile project(':core')
   testCompile 'midje:midje:1.6.3'
+  testRuntime 'org.xerial:sqlite-jdbc:3.8.6'
 }
 
 apply plugin: 'application'
