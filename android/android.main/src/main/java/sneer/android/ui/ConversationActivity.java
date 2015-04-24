@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import sneer.ConversationItem;
 import sneer.android.utils.AndroidUtils;
 import sneer.main.R;
 import rx.android.schedulers.AndroidSchedulers;
@@ -51,7 +52,7 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
 
     private static final String ACTIVITY_TITLE = "activityTitle";
 
-    private final List<Message> messages = new ArrayList<>();
+    private final List<ConversationItem> messages = new ArrayList<>();
 	private ConversationAdapter adapter;
 
 	private Conversation conversation;
@@ -213,13 +214,13 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
 	}
 
 	private Subscription subscribeToMessages() {
-		return deferUI(conversation.messages().debounce(200, TimeUnit.MILLISECONDS)).subscribe(new Action1<List<Message>>() {
+		return deferUI(conversation.items().debounce(200, TimeUnit.MILLISECONDS)).subscribe(new Action1<List<ConversationItem>>() {
 			@Override
-			public void call(List<Message> msgs) {
+			public void call(List<ConversationItem> msgs) {
 			messages.clear();
 			messages.addAll(msgs);
 			adapter.notifyDataSetChanged();
-			Message last = lastMessageReceived(msgs);
+			ConversationItem last = lastMessageReceived(msgs);
 			if (last != null)
 				conversation.setRead(last);
 			}
@@ -227,9 +228,9 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
 	}
 
 
-	private Message lastMessageReceived(List<Message> ms) {
+	private ConversationItem lastMessageReceived(List<ConversationItem> ms) {
 		for (int i = ms.size() - 1; i >= 0; --i) {
-			Message message = ms.get(i);
+			ConversationItem message = ms.get(i);
 			if (!message.isOwn())
 				return message;
 		}

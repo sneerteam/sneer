@@ -20,6 +20,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Contact;
 
+import sneer.ConversationItem;
 import sneer.Message;
 import sneer.PublicKey;
 import sneer.Sneer;
@@ -191,12 +192,12 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 
 	@Override
-	public boolean isClickable(Message message) {
+	public boolean isClickable(ConversationItem message) {
 		return false; //TODO: Revise
 	}
 
 	@Override
-	public void doOnClick(Message message) {
+	public void doOnClick(ConversationItem message) {
 		Log.i(getClass().getName(), "Message clicked: " + message);
 	}
 

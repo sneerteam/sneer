@@ -138,7 +138,7 @@
       (sendMessage [_ label] (.. (message-sender) (field "label" label) pub))
 
       (sessions [_] sessions)
-      (messages [_] messages)
+      (items [_] messages)
       (mostRecentMessageContent   [_] (map-some message-label     most-recent-message))
       (mostRecentMessageTimestamp [_] (map-some message-timestamp most-recent-message))
 

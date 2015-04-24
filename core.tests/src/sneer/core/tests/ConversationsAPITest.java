@@ -392,10 +392,10 @@ public class ConversationsAPITest extends TestCase {
 		cAB.sendMessage("Hello1 - read");
 		expecting(eventually(cBA.unreadMessageCount(), 1L));
 
-		cBA.messages().subscribe(new Action1<List<Message>>() { @Override public void call(List<Message> messages) {
+		cBA.items().subscribe(new Action1<List<ConversationItem>>() { @Override public void call(List<ConversationItem> messages) {
 			if (messages.isEmpty())
 				return;
-			Message last = messages.get(messages.size() - 1);
+			Message last = (Message) messages.get(messages.size() - 1);
 			if (last.label().contains("read"))
 				cBA.setRead(last);
 		}});
@@ -416,7 +416,7 @@ public class ConversationsAPITest extends TestCase {
 
 
 	private void messagesEventually(Conversation conversation, String... msgsExpected) {
-		expecting(eventually(conversation.messages().map(toMessageContentList()), asList(msgsExpected)));
+		expecting(eventually(conversation.items().map(toMessageContentList()), asList(msgsExpected)));
 	}
 
 
@@ -450,11 +450,11 @@ public class ConversationsAPITest extends TestCase {
 		publisher.field("label", "mylabel3").pub();
 
 		Observable<String> contents = conversationWith(sneerA.produceParty(userB), sneerA)
-			.messages()
-			.flatMapIterable(new Func1<List<Message>, Iterable<? extends Message>>() { @Override public Iterable<? extends Message> call(List<Message> messages) {
+			.items()
+			.flatMapIterable(new Func1<List<ConversationItem>, Iterable<? extends ConversationItem>>() { @Override public Iterable<? extends ConversationItem> call(List<ConversationItem> messages) {
 				return messages;
 			}})
-			.map(new Func1<Message, String>() { @Override public String call(Message message) {
+			.map(new Func1<ConversationItem, String>() { @Override public String call(ConversationItem message) {
 				return message.label().toString();
 			}});
 
@@ -462,10 +462,10 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
-	private Func1<? super List<Message>, ? extends List<Object>> toMessageContentList() {
-		return new Func1<List<Message>, List<Object>>() {  @Override public List<Object> call(List<Message> messages) {
+	private Func1<? super List<ConversationItem>, ? extends List<Object>> toMessageContentList() {
+		return new Func1<List<ConversationItem>, List<Object>>() {  @Override public List<Object> call(List<ConversationItem> messages) {
 			ArrayList<Object> r = new ArrayList<Object>(messages.size());
-			for (Message m : messages) r.add(m.label());
+			for (ConversationItem m : messages) r.add(m.label());
 			return r;
 		}};
 	}

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Random;
 
+import sneer.ConversationItem;
 import sneer.main.R;
 import rx.functions.Action1;
 import sneer.Contact;
@@ -32,7 +33,7 @@ import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findImageView;
 import static sneer.android.ui.SneerActivity.findTextView;
 
-public class ConversationAdapter extends ArrayAdapter<Message> implements OnClickListener{
+public class ConversationAdapter extends ArrayAdapter<ConversationItem> implements OnClickListener{
 
 	private final int layoutUserResourceId;
     private final int listContactResourceId;
@@ -43,7 +44,7 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
     		LayoutInflater inflater,
     		int layoutUserResourceId,
     		int listContactResourceId,
-    		List<Message> messages,
+    		List<ConversationItem> messages,
 		    Contact contact) {
         super(context, layoutUserResourceId, messages);
 		this.inflater = inflater;
@@ -55,7 +56,7 @@ public class ConversationAdapter extends ArrayAdapter<Message> implements OnClic
 
 	@SuppressLint("ViewHolder") @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-		final Message message = this.getItem(position);
+		final ConversationItem message = this.getItem(position);
         final View ret = inflater.inflate(
         	message.isOwn() ? layoutUserResourceId : listContactResourceId,
         	parent,

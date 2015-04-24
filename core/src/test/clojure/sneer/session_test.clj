@@ -26,12 +26,6 @@
           n->m (.. neide-sneer conversations (withContact maico))
           m->n (.. maico-sneer conversations (withContact neide))]
 
-      (fact "Communication is working"
-            (.sendMessage n->m "Hello")
-            (let [messages (->chan (.messages m->n))]
-              (<!!? messages 500)                               ; Skip history replay :(
-              (.size (<!!? messages 500)) => 1))
-
       (fact "Neide sees her own messages in the session"
             (let [session (<!!? (->chan (.startSession n->m)))
                   messages (->chan (.messages session))]

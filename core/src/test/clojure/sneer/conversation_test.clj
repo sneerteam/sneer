@@ -37,7 +37,7 @@
           most-recent-timestamps (observable->chan (subscribe-on-io (.mostRecentMessageTimestamp subject)))
           most-recent-labels     (observable->chan (subscribe-on-io (.mostRecentMessageContent   subject)))
           unread-counts          (observable->chan (subscribe-on-io (.unreadMessageCount         subject)))
-          messages               (observable->chan (subscribe-on-io (.messages                   subject)))
+          messages               (observable->chan (subscribe-on-io (.items                      subject)))
           timestamp (System/currentTimeMillis)
           message {"type" "message" "author" carla "audience" neide "timestamp" timestamp "label" "Hi, Neide"}]
 

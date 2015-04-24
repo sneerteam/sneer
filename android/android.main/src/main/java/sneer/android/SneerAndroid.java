@@ -5,6 +5,7 @@ import android.app.Activity;
 import java.util.List;
 
 import sneer.Conversation;
+import sneer.ConversationItem;
 import sneer.Message;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
@@ -20,7 +21,7 @@ public interface SneerAndroid {
 	List<Plugin> plugins();
 	void startActivity(Plugin plugin, Conversation conversation);
 
-	boolean isClickable(Message message);
-	void doOnClick(Message message);
+	boolean isClickable(ConversationItem message);
+	void doOnClick(ConversationItem message);
 
 }

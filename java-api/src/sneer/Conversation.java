@@ -18,13 +18,13 @@ public interface Conversation {
 	Observable<Session> startSession();
 
 	Observable<List<Session>> sessions(); //Item: Message or Session
-	Observable<List<Message>> messages();
+	Observable<List<ConversationItem>> items();
 	Observable<String> mostRecentMessageContent();
 	Observable<Long> mostRecentMessageTimestamp();
 
-	Observable<List<Message>> unreadMessages();
+	Observable<List<ConversationItem>> unreadMessages();
 	Observable<Long> unreadMessageCount();
-	void setRead(Message last);
+	void setRead(ConversationItem last);
 
 	Observable<List<ConversationMenuItem>> menu();
 
