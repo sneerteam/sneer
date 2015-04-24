@@ -77,7 +77,8 @@
     (->> (rx/merge tuples-in tuples-out)
          (rx/map #(reify-message own-puk %))
          (rx/reductions conj (sorted-set-by message-ids))
-         (rx/map vec))))
+         (rx/map vec)
+         shared-latest)))
 
 (defn reify-conversation
   [^TupleSpace tuple-space ^PublicKey own-puk ^Contact contact]
