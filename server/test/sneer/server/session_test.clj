@@ -13,6 +13,11 @@
 (defn- ->chan [obs]
   (observable->chan (subscribe-on-io obs)))
 
+(defn connect [network admin]
+  (network/connect network
+                   (.. admin privateKey publicKey)
+                   (tuple-base-of admin)))
+
 (facts "About Sessions"
   (with-open [neide-db (create-sqlite-db)
               maico-db (create-sqlite-db)
@@ -22,26 +27,24 @@
           maico-puk (.. maico-admin privateKey publicKey)
           neide-sneer (.sneer neide-admin)
           maico-sneer (.sneer maico-admin)
-          neide-tuple-base (tuple-base-of neide-admin)
-          maico-tuple-base (tuple-base-of maico-admin)
           neide (.produceContact maico-sneer "neide" (.produceParty maico-sneer neide-puk) nil)
           maico (.produceContact neide-sneer "maico" (.produceParty neide-sneer maico-puk) nil)
           n->m (.. neide-sneer conversations (withContact maico))
           m->n (.. maico-sneer conversations (withContact neide))
-
           sim (sim-network/start)]
-      (network/connect sim neide-puk neide-tuple-base)
-      (network/connect sim maico-puk maico-tuple-base)
+
+      (connect sim neide-admin)
+      (connect sim maico-admin)
 
       (fact "Communication is working"
             (.sendMessage n->m "Hello")
-
             (let [messages (->chan (.messages m->n))]
-              (<!!? messages)                               ; Skip history replay :(
-              (.size (<!!? messages)) => 1))
+              (<!!? messages 1000)                               ; Skip history replay :(
+              (.size (<!!? messages 1000)) => 1))
 
       #_(fact "Neide sees her own messages in the session"
             (let [session (.startSession n->m)
+
                   ]
               (.send session "some payload")
               (.. session messages toBlocking first payload) => "some payload"
