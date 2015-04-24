@@ -31,6 +31,7 @@ import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.SneerActivity.TO_BITMAP;
 import static sneer.android.ui.SneerActivity.deferUI;
 import static sneer.android.ui.SneerActivity.findView;
+import static sneer.android.ui.SneerActivity.onMainThread;
 import static sneer.android.ui.SneerActivity.plug;
 import static sneer.android.ui.SneerActivity.prettyTime;
 
@@ -148,7 +149,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 		private Subscription bindUnread(ObservedSubject<Long> subject) {
 			setMessageUnread(subject.current());
-			return deferUI(subject.observable()).subscribe(new Action1<Long>() {@Override public void call(Long unread) {
+			return onMainThread(subject.observable()).subscribe(new Action1<Long>() { @Override public void call(Long unread) {
 				setMessageUnread(unread);
 			}});
 		}

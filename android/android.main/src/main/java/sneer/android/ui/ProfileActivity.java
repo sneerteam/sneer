@@ -89,28 +89,28 @@ public class ProfileActivity extends SneerActivity {
 
 
 	private void loadProfile() {
-		deferUI(profile.ownName()).subscribe(new Action1<String>() { @Override public void call(String ownName) {
+		onMainThread(profile.ownName()).subscribe(new Action1<String>() { @Override public void call(String ownName) {
 			ProfileActivity.ownName = ownName;
 			firstNameEdit.setText(ownName);
 			lastNameEdit.setVisibility(View.GONE);
 		}});
 
-		deferUI(profile.preferredNickname()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
+		onMainThread(profile.preferredNickname()).subscribe(new Action1<String>() { @Override public void call(String preferredNickname) {
 			ProfileActivity.preferredNickname = preferredNickname;
 			preferredNickNameEdit.setText(preferredNickname);
 		}});
 
-		deferUI(profile.country()).subscribe(new Action1<String>() { @Override public void call(String country) {
+		onMainThread(profile.country()).subscribe(new Action1<String>() { @Override public void call(String country) {
 			ProfileActivity.country = country;
 			countryEdit.setText(country);
 		}});
 
-		deferUI(profile.city()).subscribe(new Action1<String>() { @Override public void call(String city) {
+		onMainThread(profile.city()).subscribe(new Action1<String>() { @Override public void call(String city) {
 			ProfileActivity.city = city;
 			cityEdit.setText(city);
 		}});
 
-		deferUI(profile.selfie().map(TO_BITMAP)).subscribe(new Action1<Bitmap>() { @Override public void call(Bitmap selfie) {
+		onMainThread(profile.selfie().map(TO_BITMAP)).subscribe(new Action1<Bitmap>() { @Override public void call(Bitmap selfie) {
 			ProfileActivity.selfie = selfie;
 			selfieImage.setImageBitmap(selfie);
 		}});

@@ -54,14 +54,14 @@ public class SneerActivity extends Activity {
 
 
 	public static Subscription plug(final TextView textView, Observable<?> observable) {
-		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
+		return onMainThread(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			textView.setText(obj == null ? "" : obj.toString());
 		}});
 	}
 
 
 	public static Subscription plug(final EditText editText, Observable<?> observable) {
-		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
+		return onMainThread(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
 			editText.setText(obj == null ? "" : obj.toString());
 		}});
 	}
@@ -154,8 +154,12 @@ public class SneerActivity extends Activity {
 
 
 	public static <T> Observable<T> deferUI(Observable<T> observable) {
+		return onMainThread(
+				observable.subscribeOn(Schedulers.io()));
+	}
+
+	public static <T> Observable<T> onMainThread(Observable<T> observable) {
 		return observable
-				.subscribeOn(Schedulers.computation())
 				.observeOn(AndroidSchedulers.mainThread());
 	}
 
