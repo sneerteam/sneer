@@ -70,6 +70,10 @@
   (compare (message-id m1)
            (message-id m2)))
 
+(defn- session-ids [s1 s2]
+  (compare (.id s1)
+           (.id s2)))
+
 (defn- messages [tuple-space own-puk party-puk]
   (let [filter (.. tuple-space filter (type "message"))
         tuples-out (.. filter (author own-puk  ) (audience party-puk) tuples)
@@ -83,10 +87,21 @@
 (defn reify-session [space contact-puk id]
   (let [publisher (.. space publisher (audience contact-puk) (type "message") (field "ref" id))]
     (reify Session
+      (id [_] id)
       (messages [_]
         (.. space filter (type "message") (field "ref" id) tuples))
       (send [_ payload]
         (.pub publisher payload)))))
+
+(defn- sessions [tuple-space own-puk party-puk]
+  (let [filter (.. tuple-space filter (type "session"))
+        tuples-out (.. filter (author own-puk  ) (audience party-puk) tuples)
+        tuples-in  (.. filter (author party-puk) (audience own-puk  ) tuples)]
+    (->> (rx/merge tuples-in tuples-out)
+         (rx/map #(reify-session tuple-space own-puk (get % "own-id")))
+         (rx/reductions conj (sorted-set-by message-ids))
+         (rx/map vec)
+         shared-latest)))
 
 (defn- start-session [space contact-puk #_session-type]
   ; TODO: change own-id to id
@@ -99,6 +114,7 @@
   (let [party (.. contact party observable)
         puk (switch-map-some #(.. % publicKey observable) party)
 
+        sessions (switch-map-some #(sessions space own-puk %) [] puk)
         messages (switch-map-some #(messages space own-puk %) [] puk)
 
         last-read-filter #(.. space filter (type "message-read") (audience %) (author own-puk) last tuples)
@@ -121,6 +137,7 @@
       (canSendMessages [_] (rx/map some? party))
       (sendMessage [_ label] (.. (message-sender) (field "label" label) pub))
 
+      (sessions [_] sessions)
       (messages [_] messages)
       (mostRecentMessageContent   [_] (map-some message-label     most-recent-message))
       (mostRecentMessageTimestamp [_] (map-some message-timestamp most-recent-message))

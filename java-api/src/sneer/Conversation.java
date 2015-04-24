@@ -17,7 +17,7 @@ public interface Conversation {
 
 	Observable<Session> startSession();
 
-//	Observable<List<ConversationItem>> entries(); //Entry: Message or Session
+	Observable<List<Session>> sessions(); //Item: Message or Session
 	Observable<List<Message>> messages();
 	Observable<String> mostRecentMessageContent();
 	Observable<Long> mostRecentMessageTimestamp();
