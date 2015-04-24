@@ -46,5 +46,5 @@
             (let [session (<!!? (->chan (.startSession n->m)))
                   messages (->chan (.messages session))]
               #_(.send session "some payload")
-              (.payload (<!!? messages)) => "some payload"
+              ;  (.payload (<!!? messages)) => "some payload"
               )))))
