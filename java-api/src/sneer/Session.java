@@ -1,10 +1,10 @@
 package sneer;
 
 
-import java.util.List;
+import rx.Observable;
 
 public interface Session extends ConversationItem {
-	List<Message> messages();
+	Observable<Message> messages();
 	void send(Object payload);
 }
 
