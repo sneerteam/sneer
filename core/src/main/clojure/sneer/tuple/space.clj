@@ -50,7 +50,7 @@
               result-chan (store-tuple tuples-out tuple)]
           (go-trace
             (when-some [tuple (<! result-chan)]
-              (rx/on-next result tuple))
+              (rx/on-next result (reify-tuple tuple)))
             (rx/on-completed result))
           result)))))
 
