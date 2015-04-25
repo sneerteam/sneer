@@ -82,6 +82,7 @@
          (rx/map #(reify-message own-puk %))
          (rx/reductions conj (sorted-set-by message-ids))
          (rx/map vec)
+         (rx/cons [])
          shared-latest)))
 
 (defn reify-session [space contact-puk id]
@@ -101,6 +102,7 @@
          (rx/map #(reify-session tuple-space own-puk (get % "own-id")))
          (rx/reductions conj (sorted-set-by session-ids))
          (rx/map vec)
+         (rx/cons [])
          shared-latest)))
 
 (defn- start-session [space contact-puk #_session-type]

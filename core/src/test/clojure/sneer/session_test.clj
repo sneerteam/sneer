@@ -34,16 +34,22 @@
 
       (fact "Maico sees this session"
             (let [sessions (->chan (.sessions m->n))
-                  _ (<!!? sessions 500)                         ; Skip history replay :(
-                  session (first (<!!? sessions 500))
+                  replay1 (<!!? sessions)                 ; Skip history replay :(
+                  replay2 (<!!? sessions)                 ; Skip history replay :(
+                  session (first (<!!? sessions))
                   messages (->chan (.messages session))]
+              replay1 => []
+              replay2 => []
               (.payload (<!!? messages)) => "some payload"
               (.send session "some reply")))
 
       (fact "Neide sees reply from Maico"
             (let [sessions (->chan (.sessions n->m))
-                  _ (<!!? sessions 500)                         ; Skip history replay :(
-                  session (first (<!!? sessions 500))
+                  replay1 (<!!? sessions)                 ; Skip history replay :(
+                  replay2 (<!!? sessions)                 ; Skip history replay :(
+                  session (first (<!!? sessions))
                   messages (->chan (.messages session))]
+              replay1 => []
+              replay2 => []
               (.payload (<!!? messages)) => "some payload"
               (.payload (<!!? messages)) => "some reply")))))

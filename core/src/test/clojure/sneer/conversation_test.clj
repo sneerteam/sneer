@@ -30,7 +30,6 @@
           own-puk (.publicKey own-prik)
           puk->party (create-puk->party)
           contacts-state (create-contacts-state tuple-space own-puk puk->party)
-          ^Observable   menu-items (PublishSubject/create)
           ^Party        carla-party (reify-party carla)
           ^Contact      carla-contact (produce-contact contacts-state "carla" carla-party nil)
           ^Conversation subject (reify-conversation tuple-space neide carla-contact)
@@ -42,16 +41,21 @@
           message {"type" "message" "author" carla "audience" neide "timestamp" timestamp "label" "Hi, Neide"}]
 
       (fact "mostRecentMessage includes message received"
+        (<!!? unread-counts         ) => 0
+
         (store-tuple tuple-base message)
+        (<!!? most-recent-timestamps) => :nil
         (<!!? most-recent-timestamps) => :nil
         (<!!? most-recent-timestamps) => timestamp
 
+        (<!!? most-recent-labels    ) => :nil
         (<!!? most-recent-labels    ) => :nil
         (<!!? most-recent-labels    ) => "Hi, Neide"
 
         (<!!? unread-counts         ) => 0
         (<!!? unread-counts         ) => 1
 
+        (<!!? messages              ) => []
         (<!!? messages              ) => []
         (let [msg (last (<!!? messages))]
           (.setRead subject msg))
