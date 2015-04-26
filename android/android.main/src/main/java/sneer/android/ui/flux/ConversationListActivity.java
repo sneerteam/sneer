@@ -8,6 +8,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static sneer.android.ui.SneerActivity.onMainThread;
 
@@ -54,7 +55,7 @@ public class ConversationListActivity extends Activity {
 	}
 
 	private Observable<List<ConversationListModel.Item>> model() {
-		return onMainThread(ConversationListModel.items());
+		return onMainThread(ConversationListModel.items().sample(1, TimeUnit.SECONDS));
 	}
 
 	private void toast(String text) {
