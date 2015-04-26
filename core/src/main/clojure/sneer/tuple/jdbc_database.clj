@@ -2,9 +2,10 @@
   (:require [clojure.java.jdbc :as sql]
             [clojure.string :as string]
             [sneer.tuple.protocols :as tuple-base])
-  (:import [java.sql DriverManager]
+  (:import [java.sql DriverManager SQLException]
            [sneer.admin UniqueConstraintViolated]
-           [java.util.concurrent.locks Lock ReentrantReadWriteLock]))
+           [java.util.concurrent.locks Lock ReentrantReadWriteLock]
+           [java.io Closeable]))
 
 (defn- get-connection [databaseFile]
   (DriverManager/getConnection
@@ -46,7 +47,7 @@
         (try
           (with-write-lock rw-lock
             (sql/insert! db table row))
-          (catch java.sql.SQLException e
+          (catch SQLException e
             ;; [SQLITE_CONSTRAINT] Abort due to constraint violation (UNIQUE constraint failed: tuple.author, tuple.original_id
             (if (.. e getMessage (contains "UNIQUE constraint"))
               (throw (UniqueConstraintViolated. (.getMessage e)))
@@ -57,7 +58,7 @@
         (with-read-lock rw-lock
           (sql/query db sql-and-params :result-set-fn doall :as-arrays? true)))
 
-      java.io.Closeable
+      Closeable
       (close [_]
         (with-write-lock rw-lock
           (reset! open false)

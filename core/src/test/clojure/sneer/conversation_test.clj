@@ -44,19 +44,19 @@
         (<!!? unread-counts         ) => 0
 
         (store-tuple tuple-base message)
-        (<!!? most-recent-timestamps) => :nil
-        (<!!? most-recent-timestamps) => :nil
+        (<!!? most-recent-timestamps) => :nil               ; Skipping history replay. :(
+        (<!!? most-recent-timestamps) => :nil               ; Skipping history replay. :(
         (<!!? most-recent-timestamps) => timestamp
 
-        (<!!? most-recent-labels    ) => :nil
-        (<!!? most-recent-labels    ) => :nil
+        (<!!? most-recent-labels    ) => :nil               ; Skipping history replay. :(
+        (<!!? most-recent-labels    ) => :nil               ; Skipping history replay. :(
         (<!!? most-recent-labels    ) => "Hi, Neide"
 
-        (<!!? unread-counts         ) => 0
+        (<!!? unread-counts         ) => 0                  ; Skipping history replay. :(
         (<!!? unread-counts         ) => 1
 
-        (<!!? messages              ) => []
-        (<!!? messages              ) => []
+        (<!!? messages              ) => []                 ; Skipping history replay. :(
+        (<!!? messages              ) => []                 ; Skipping history replay. :(
         (let [msg (last (<!!? messages))]
           (.setRead subject msg))
         (<!!? unread-counts         ) => 0)
