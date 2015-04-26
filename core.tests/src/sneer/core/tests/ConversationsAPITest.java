@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.observables.BlockingObservable;
 import rx.observables.ConnectableObservable;
 import sneer.*;
 import sneer.admin.SneerAdmin;
@@ -16,6 +17,7 @@ import sneer.tuples.TuplePublisher;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import static sneer.core.tests.ClojureUtils.var;
@@ -390,12 +392,18 @@ public class ConversationsAPITest extends TestCase {
 		expecting(eventually(cBA.unreadMessageCount(), 0L));
 
 		cAB.sendMessage("Hello1 - read");
+		Iterator<List<ConversationItem>> items = cBA.items().toBlocking().getIterator();
+		System.out.println("- - - - Message: " + items.next());
+		System.out.println("- - - - Message: " + items.next());
+		System.out.println("- - - - Message: " + items.next());
+
 		expecting(eventually(cBA.unreadMessageCount(), 1L));
 
 		cBA.items().subscribe(new Action1<List<ConversationItem>>() { @Override public void call(List<ConversationItem> messages) {
 			if (messages.isEmpty())
 				return;
 			Message last = (Message) messages.get(messages.size() - 1);
+			System.out.println("- - - - LAST: " + last);
 			if (last.label().contains("read"))
 				cBA.setRead(last);
 		}});
