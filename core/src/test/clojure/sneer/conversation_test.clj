@@ -46,36 +46,36 @@
       (let [n->m (:neide->maico scenario)
             m->n (:maico->neide scenario)
 
-            most-recent-timestamps (->chan (.mostRecentMessageTimestamp m->n))
-            most-recent-labels     (->chan (.mostRecentMessageContent   m->n))
-            unread-counts          (->chan (.unreadMessageCount         m->n))
             messages               (->chan (.items                      m->n))
+            most-recent-labels     (->chan (.mostRecentMessageContent   m->n))
+            most-recent-timestamps (->chan (.mostRecentMessageTimestamp m->n))
+            unread-counts          (->chan (.unreadMessageCount         m->n))
 
             t0 (System/currentTimeMillis)]
 
-        (fact "mostRecentMessage includes message received"
-          (<!!? unread-counts) => 0
+        (fact "initial values are empty"
+          (<!!? messages) => []
+          (<!!? most-recent-labels) => :nil
+          (<!!? most-recent-timestamps) => :nil
+          (<!!? unread-counts) => 0)
 
+        (fact "new message received increments values"
           (.sendMessage n->m "Hi, Maico")
-          (<!!? most-recent-timestamps) => :nil             ; Skipping history replay. :(
+          (<!!? unread-counts) => 0                         ; Skipping history replay. :(
+          (<!!? unread-counts) => 1
+
           (<!!? most-recent-timestamps) => :nil             ; Skipping history replay. :(
           (<!!? most-recent-timestamps) => #(>= % t0)
 
           (<!!? most-recent-labels) => :nil                 ; Skipping history replay. :(
-          (<!!? most-recent-labels) => :nil                 ; Skipping history replay. :(
           (<!!? most-recent-labels) => "Hi, Maico"
 
-          (<!!? unread-counts) => 0                         ; Skipping history replay. :(
-          (<!!? unread-counts) => 1
-
-          (<!!? messages) => []                             ; Skipping history replay. :(
           (<!!? messages) => []                             ; Skipping history replay. :(
           (let [msg (last (<!!? messages))]
             (.setRead m->n msg))
           (<!!? unread-counts) => 0)
 
-        (fact "mostRecentMessageTimestamp includes message sent"
+        (fact "mostRecentLabel includes message sent"
           (.sendMessage m->n "Hello, Neide")
           (<!!? most-recent-timestamps) => #(>= % t0)
-
           (<!!? most-recent-labels) => "Hello, Neide")))))
