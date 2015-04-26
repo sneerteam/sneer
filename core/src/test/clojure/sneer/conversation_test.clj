@@ -70,12 +70,21 @@
           (<!!? most-recent-labels) => :nil                 ; Skipping history replay. :(
           (<!!? most-recent-labels) => "Hi, Maico"
 
+          (.sendMessage n->m "Hi, Maico2")
+          (<!!? most-recent-labels) => "Hi, Maico2"
+          (<!!? unread-counts) => 2
+
+          (.sendMessage n->m "Hi, Maico3")
+          (<!!? most-recent-labels) => "Hi, Maico3"
+          (<!!? unread-counts) => 3
+
           (<!!? messages) => []                             ; Skipping history replay. :(
-          (let [msg (last (<!!? messages))]
+          (let [msg (first (<!!? messages))]
             (.setRead m->n msg))
-          (<!!? unread-counts) => 0)
+          (<!!? unread-counts) => 2)
 
         (fact "mostRecentLabel includes message sent"
           (.sendMessage m->n "Hello, Neide")
+          (<!!? unread-counts) => 2                         ; Sending messages re-emits the unread-count. :(
           (<!!? most-recent-timestamps) => #(>= % t0)
           (<!!? most-recent-labels) => "Hello, Neide")))))
