@@ -19,7 +19,7 @@ public class ConversationListModel {
 
 	public static Observable<List<Item>> items() {
 
-		Observable<List<ConversationStore.Summary>> summaries = true ? fakeSummaries() : summaries();
+		Observable<List<ConversationStore.Summary>> summaries = false ? fakeSummaries() : summaries();
 		Observable<Long> reformattingTick = Observable.timer(0, 1, TimeUnit.MINUTES);
 
 		return Observable.combineLatest(summaries, reformattingTick, ConversationListModel.<List<ConversationStore.Summary>>firstArg()).map(

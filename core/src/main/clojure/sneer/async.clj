@@ -1,5 +1,6 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go remove< >! <! tap]]
+  (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! tap]]
+            [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
             [sneer.commons :refer :all]))
 
@@ -58,3 +59,20 @@
 
 (defn dropping-tap [mult]
   (tap mult (dropping-chan)))
+
+(defn link-chan-to-subscriber
+  "Closes the channel when the subscriber is unsubscribed."
+  [chan ^rx.Subscriber subscriber]
+  (.add subscriber (rx/subscription #(async/close! chan))))
+
+(defn thread-chan-to-subscriber
+  "Copies values from channel to rx subscriber in a separate thread."
+  [chan ^rx.Subscriber subscriber ^String thread-name]
+  (async/thread
+    (try
+      (.setName (Thread/currentThread) thread-name)
+      (while-let [value (<!! chan)]
+        (rx/on-next subscriber value))
+      (rx/on-completed subscriber)
+      (catch Exception e
+        (rx/on-error subscriber e)))))
