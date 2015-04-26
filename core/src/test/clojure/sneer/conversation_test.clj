@@ -43,33 +43,27 @@
   (let [scenario (neide-maicon-conversation-scenario!)]
     (with-open [_db (:db scenario)
                 _tb (:tb scenario)]
-      (let [^TupleSpace tuple-space (space/reify-tuple-space neide _tb)
-            own-prik (create-prik)
-            own-puk (.publicKey own-prik)
-            puk->party (create-puk->party)
-            contacts-state (create-contacts-state tuple-space own-puk puk->party)
-            ^Party carla-party (reify-party carla)
-            ^Contact carla-contact (produce-contact contacts-state "carla" carla-party nil)
-            ^Conversation subject (reify-conversation tuple-space neide carla-contact)
-            most-recent-timestamps (->chan (.mostRecentMessageTimestamp subject))
-            most-recent-labels     (->chan (.mostRecentMessageContent subject))
-            unread-counts          (->chan (.unreadMessageCount subject))
-            messages               (->chan (.items subject))
-            t0 (System/currentTimeMillis)
-            message {"type" "message" "author" carla "audience" neide "timestamp" t0 "label" "Hi, Neide"}
-            ]
+      (let [n->m (:neide->maico scenario)
+            m->n (:maico->neide scenario)
+
+            most-recent-timestamps (->chan (.mostRecentMessageTimestamp m->n))
+            most-recent-labels     (->chan (.mostRecentMessageContent   m->n))
+            unread-counts          (->chan (.unreadMessageCount         m->n))
+            messages               (->chan (.items                      m->n))
+
+            t0 (System/currentTimeMillis)]
 
         (fact "mostRecentMessage includes message received"
           (<!!? unread-counts) => 0
 
-          (store-tuple _tb message)
+          (.sendMessage n->m "Hi, Maico")
           (<!!? most-recent-timestamps) => :nil             ; Skipping history replay. :(
           (<!!? most-recent-timestamps) => :nil             ; Skipping history replay. :(
-          (<!!? most-recent-timestamps) => t0
+          (<!!? most-recent-timestamps) => #(>= % t0)
 
           (<!!? most-recent-labels) => :nil                 ; Skipping history replay. :(
           (<!!? most-recent-labels) => :nil                 ; Skipping history replay. :(
-          (<!!? most-recent-labels) => "Hi, Neide"
+          (<!!? most-recent-labels) => "Hi, Maico"
 
           (<!!? unread-counts) => 0                         ; Skipping history replay. :(
           (<!!? unread-counts) => 1
@@ -77,11 +71,11 @@
           (<!!? messages) => []                             ; Skipping history replay. :(
           (<!!? messages) => []                             ; Skipping history replay. :(
           (let [msg (last (<!!? messages))]
-            (.setRead subject msg))
+            (.setRead m->n msg))
           (<!!? unread-counts) => 0)
 
         (fact "mostRecentMessageTimestamp includes message sent"
-          (.sendMessage subject "Hello, Carla")
+          (.sendMessage m->n "Hello, Neide")
           (<!!? most-recent-timestamps) => #(>= % t0)
 
-          (<!!? most-recent-labels) => "Hello, Carla")))))
+          (<!!? most-recent-labels) => "Hello, Neide")))))
