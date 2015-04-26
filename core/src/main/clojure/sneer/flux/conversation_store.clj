@@ -24,7 +24,7 @@
         contact-puk (if (= author own-puk) (message "audience") author)]
     (update state contact-puk
             assoc :summary   (or (message "label") "")
-            :timestamp (message "timestamp"))))
+                  :timestamp (message "timestamp"))))
 
 (defn flip [f]
   (fn [x y] (f y x)))
