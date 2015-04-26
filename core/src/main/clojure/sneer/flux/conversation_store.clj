@@ -82,7 +82,6 @@
        (loop [state state]
          (>! summaries-out (summarize state))
          (when-some [tuple (<! tuples)]
-           (println "SUMMARIZE" tuple "ON" state)
            (case (tuple "type")
              "contact"
              (if-some [puk (contact-puk tuple)]
