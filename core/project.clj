@@ -28,6 +28,7 @@
                     sneer.rx-macros
                     sneer.rx
                     sneer.tuple-base-provider
+                    sneer.flux.conversation-store
                     sneer.tuple.persistent-tuple-base
                     sneer.tuple.space
                     sneer.tuple.queue
