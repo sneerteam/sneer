@@ -2,12 +2,9 @@
   (:require [midje.sweet :refer :all]
             [sneer.tuple-base-provider :refer :all]
             [sneer.rx :refer [subscribe-on-io]]
-            [sneer.test-util :refer [<!!? observable->chan]]
+            [sneer.test-util :refer [<!!? ->chan]]
             [sneer.keys :refer [->puk]]
             [sneer.conversation-test :refer [neide-maicon-conversation-scenario!]]))
-
-(defn- ->chan [obs]
-  (observable->chan (subscribe-on-io obs)))
 
 (facts "About Sessions"
   (let [scenario (neide-maicon-conversation-scenario!)]
