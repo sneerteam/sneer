@@ -8,7 +8,7 @@ import sneer.admin.SneerAdmin;
 /**
  * Intermediates the creation of clojure instances.
  */
-public class ConversationStore {
+public class ConversationStore {  //TODO Flux: Eliminate via factory macro.
 
 	public static Interface createInstance(SneerAdmin admin) {
 		try {
@@ -20,11 +20,11 @@ public class ConversationStore {
 		}
 	}
 
-	public interface Interface {
+	public interface Interface { //TODO Flux: Rename from ConversationStore.Interface to ConversationSource.
 		Observable<List<Summary>> summaries();
 	}
 
-	public static class Summary {
+	public static class Summary { //TODO Flux: Rename from ConversationStore.Summary to ConversationSource.Summary.
 		public final String party;
 		public final String textPreview;
 		public final long timestamp;
