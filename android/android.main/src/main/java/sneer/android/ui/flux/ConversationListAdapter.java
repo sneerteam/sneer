@@ -74,7 +74,7 @@ class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
 
 		public void bind(ConversationListModel.Item conversation) {
 			conversationParty.setText(conversation.party);
-			conversationSummary.setText(conversation.summary);
+			conversationSummary.setText(conversation.textPreview);
 			conversationDate.setText(conversation.date);
 			if (conversation.unread.isEmpty()) {
 				conversationUnread.setVisibility(View.GONE);

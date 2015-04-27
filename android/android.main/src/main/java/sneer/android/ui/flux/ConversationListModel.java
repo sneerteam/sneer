@@ -57,13 +57,13 @@ public class ConversationListModel {
 
 	static class Item {
 		public final String party;
-		public final String summary;
+		public final String textPreview;
 		public final String date;
 		public final String unread;
 
-		Item(String party, String summary, String date, String unread) {
+		Item(String party, String textPreview, String date, String unread) {
 			this.party = party;
-			this.summary = summary;
+			this.textPreview = textPreview;
 			this.date = date;
 			this.unread = unread;
 		}
@@ -76,7 +76,7 @@ public class ConversationListModel {
 			items.add(
 				new Item(
 					summary.party,
-					summary.summary,
+					summary.textPreview,
 					pt.format(new Date(summary.timestamp)),
 					summary.unread > 0 ? Long.toString(summary.unread) : ""));
 		return items;
