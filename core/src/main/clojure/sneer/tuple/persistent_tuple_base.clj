@@ -141,23 +141,24 @@
 (defn- insert-tuple [db tuple id]
   (let [custom (->custom-field-map tuple)
         row (select-keys tuple builtin-field?)
+        original-id (or (get tuple "id") id)
         row (assoc row
                    "id" id
-                   "original_id" (or (get tuple "id") id)
+                   "original_id" original-id
                    "custom" custom)]
-    (db-insert db :tuple (serialize-entries row))))
+    (db-insert db :tuple (serialize-entries row))
+    (assoc tuple "id" id "original_id" original-id)))
 
 (defn- try-insert-tuple [db tuple id]
   (try
     (insert-tuple db tuple id)
-    true
     (catch UniqueConstraintViolated _
       (println "try-insert: unique constraint violated")
-      false)
+      nil)
     (catch Exception e
       (println e)
       (SystemReport/updateReport "database/error" e)
-      false)))
+      nil)))
 
 (defn- result-empty? [db criteria]
   (let [rs (query-tuples-from-db db criteria)]
@@ -207,10 +208,9 @@
   (match request
     {:store tuple :tuple-out tuple-out}
     (try
-      (when (store! db (:uniqueness request) next-tuple-id tuple)
-        (let [tuple (assoc tuple "id" next-tuple-id)]
-          (go-trace (>! new-tuples tuple))
-          (>!! tuple-out tuple))
+      (when-let [tuple (store! db (:uniqueness request) next-tuple-id tuple)]
+        (go-trace (>! new-tuples tuple))
+        (>!! tuple-out tuple)
         true)
       (finally
         (close! tuple-out)))
