@@ -25,7 +25,6 @@ import sneer.Profile;
 import sneer.android.Notifier;
 import sneer.android.SneerApp;
 import sneer.android.ui.adapters.MainAdapter;
-import sneer.android.utils.AndroidUtils;
 
 import static android.content.Intent.ACTION_SEND;
 import static android.content.Intent.EXTRA_SUBJECT;
