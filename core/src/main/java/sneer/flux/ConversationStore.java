@@ -26,13 +26,13 @@ public class ConversationStore {
 
 	public static class Summary {
 		public final String party;
-		public final String summary;
+		public final String textPreview;
 		public final long timestamp;
 		public final long unread;
 
-		public Summary(String party, String summary, long timestamp, long unread) {
+		public Summary(String party, String textPreview, long timestamp, long unread) {
 			this.party = party;
-			this.summary = summary;
+			this.textPreview = textPreview;
 			this.timestamp = timestamp;
 			this.unread = unread;
 		}
