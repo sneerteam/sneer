@@ -14,21 +14,7 @@
 (def neide (->puk "neide"))
 
 (facts "About invites"
-       (fact "auto-add back when invite code received (without networking)"
-         (with-open [db (jdbc-database/create-sqlite-db)
-                     sneer-admin (new-sneer-admin-over-db db)]
-           (let [contact (-> sneer-admin .sneer (.produceContact "neide" nil nil))
-                 tuple-base (tuple-base-of sneer-admin)
-                 channel (->> contact .party .observable (rx/filter some?) (rx/map party->puk) ->chan)]
-             (store-tuple tuple-base {"type"        "push"
-                                      "author"      neide
-                                      "audience"    (.. sneer-admin privateKey publicKey)
-                                      "invite-code" (.inviteCode contact)})
-             (<!!? channel) => neide)
-           (with-open [sneer-admin (restart sneer-admin)]
-             (-> sneer-admin .sneer .contacts .toBlocking .first first .party .current) => some?)))
-
-       (fact "auto-add back when invite code received (with networking)"
+       (fact "auto-add back when invite code received"
              (with-open [db-1 (jdbc-database/create-sqlite-db)
                          sneer-admin-1 (start db-1)
                          db-2 (jdbc-database/create-sqlite-db)
