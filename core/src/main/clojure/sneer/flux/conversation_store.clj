@@ -22,9 +22,10 @@
 (defn update-message [own-puk message state]
   (let [author (message "author")
         contact-puk (if (= author own-puk) (message "audience") author)]
-    (update state contact-puk
-            assoc :summary   (or (message "label") "")
-                  :timestamp (message "timestamp"))))
+    (-> state (update contact-puk assoc
+                      :summary (or (message "label") "")
+                :timestamp (message "timestamp"))
+              (update-in [contact-puk :unread] inc))))
 
 (defn flip [f]
   (fn [x y] (f y x)))

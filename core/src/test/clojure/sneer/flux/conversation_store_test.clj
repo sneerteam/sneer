@@ -46,9 +46,9 @@
 
         (fact "message from contact causes summary update"
           (store-message {"author" maico "label" "let's go" "timestamp" 70})
-          (<!!? summaries-out) => #(->> % (mapv (juxt :name :summary)) (= [["maico" "let's go"]
-                                                                           ["jonas" ""]
-                                                                           ["alice" ""]]))
+          (<!!? summaries-out) =>  [{:name "maico" :unread 1 :timestamp 70 :summary "let's go"}
+                                    {:name "jonas" :unread 0 :timestamp 63 :summary ""}
+                                    {:name "alice" :unread 0 :timestamp 51 :summary ""}]
 
           (store-message {"author" alice "label" "ho" "timestamp" 80})
           (<!!? summaries-out) => #(->> % (mapv (juxt :name :summary)) (= [["alice" "ho"]
