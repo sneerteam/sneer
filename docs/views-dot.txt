@@ -1,0 +1,10 @@
+// nano networking-dot.txt && dot -Tpng -onetworking.png networking-dot.txt && xdg-open networking.png
+ 
+digraph {
+
+	splines=line;
+
+        "Activity/Adapter/Fragments" -> {"View Widgets" ViewModel};
+	ViewModel -> {Dispatcher Store};
+	Store -> Dispatcher;
+}
