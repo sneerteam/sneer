@@ -25,6 +25,7 @@ import sneer.Profile;
 import sneer.android.Notifier;
 import sneer.android.SneerApp;
 import sneer.android.ui.adapters.MainAdapter;
+import sneer.rx.ObservedSubject;
 
 import static android.content.Intent.ACTION_SEND;
 import static android.content.Intent.EXTRA_SUBJECT;
@@ -55,7 +56,41 @@ public class MainActivity extends SneerActivity {
 		makeConversationList();
 
 		handleSend(getIntent());
+
+//		final ActionBar actionBar = getActionBar();
+//		onMainThread(subject.observable()).subscribe(new Action1<String>() { @Override public void call(String value) {
+//			actionBar.setTitle(value);
+//			synchronized (monitor) {
+//				monitor.notify();
+//			}
+//		}});
 	}
+
+
+
+
+	private boolean benchmarkRunning = true;
+	private Object monitor = new Object();
+	private int counter = 0;
+	ObservedSubject<String> subject = ObservedSubject.create("");
+	private void startBenchmarkThread() {
+		benchmarkRunning = true;
+
+		new Thread() { @Override public void run() {
+			while (benchmarkRunning) {
+				synchronized (monitor) {
+					subject.onNext(counter++ + " Thread:" + Thread.currentThread().hashCode());
+					try { monitor.wait(); } catch (InterruptedException e) { throw new IllegalStateException(e); }
+				}
+			}
+		}}.start();
+	}
+
+
+
+
+
+
 
 
 	private void handleSend(Intent intent) {
@@ -117,6 +152,7 @@ public class MainActivity extends SneerActivity {
 			navigateTo(ProfileActivity.class);
 			break;
 		case R.id.action_add_contact:
+//			startBenchmarkThread();  // To use the benchmark uncomment this line and comment the ones below in this case.
 			if (ContactActivity.USE_INVITES)
 				navigateTo(AddContactActivity.class);
 			else
@@ -197,7 +233,7 @@ public class MainActivity extends SneerActivity {
 	}
 
 
-	@Override protected void onPause()  { super.onPause();  Notifier.resume(); }
+	@Override protected void onPause()  { super.onPause();  Notifier.resume(); benchmarkRunning = false; }
 	@Override protected void onResume() { super.onResume(); Notifier.pause(); }
 
 	private void handleFirstTime() {
