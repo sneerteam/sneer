@@ -1,17 +1,19 @@
 (ns sneer.conversation-test
-  (:require [midje.sweet :refer :all]
+  (:require [clojure.core.async :refer [chan <! >! pipe]]
+            [midje.sweet :refer :all]
             [sneer.tuple.jdbc-database :refer [create-sqlite-db]]
             [sneer.admin :refer [new-sneer-admin]]
             [sneer.contact :refer [produce-contact create-contacts-state]]
             [sneer.tuple.space :as space]
             [sneer.tuple.persistent-tuple-base :as base]
+            [sneer.tuple.tuple-transmitter :as transmitter]
             [sneer.test-util :refer [<!!? ->chan]]
             [sneer.tuple.protocols :refer :all]
             [sneer.rx :refer [subscribe-on-io]]
             [sneer.keys :refer [->puk create-prik]]
             [sneer.party :refer [reify-party create-puk->party]]
             [sneer.conversation :refer [reify-conversation]]
-            [sneer.tuple.persistent-tuple-base :as tuple-base])
+            [sneer.async :refer [go-while-let]])
   (:import [sneer Conversation Party Contact]
            [sneer.tuples TupleSpace]
            [sneer.crypto.impl KeysImpl]))
@@ -19,18 +21,36 @@
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
 (defn neide-maicon-conversation-scenario! []
-  (let [db (create-sqlite-db)
-        tb (tuple-base/create db)
-        neide-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) tb)
-        maico-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) tb)
+  (let [neide-db (create-sqlite-db)
+        maico-db (create-sqlite-db)
+        neide-tb (base/create neide-db)
+        maico-tb (base/create maico-db)
+        neide-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) neide-tb)
+        maico-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) maico-tb)
         neide-puk (.. neide-admin privateKey publicKey)
         maico-puk (.. maico-admin privateKey publicKey)
         neide-sneer (.sneer neide-admin)
         maico-sneer (.sneer maico-admin)
+        neide-received (chan)
+        maico-received (chan)
+        _ (transmitter/start neide-puk neide-tb neide-received
+                             (fn [follower-puk tuples-out & _]
+                               (assert (= follower-puk maico-puk))
+                               (go-while-let [[tuple ack-ch] (<! tuples-out)]
+                                 (>! maico-received tuple)
+                                 (>! ack-ch tuple))))
+        _ (transmitter/start maico-puk maico-tb maico-received
+                             (fn [follower-puk tuples-out & _]
+                               (assert (= follower-puk neide-puk))
+                               (go-while-let [[tuple ack-ch] (<! tuples-out)]
+                                 (>! neide-received tuple)
+                                 (>! ack-ch tuple))))
         neide (.produceContact maico-sneer "neide" (.produceParty maico-sneer neide-puk) nil)
         maico (.produceContact neide-sneer "maico" (.produceParty neide-sneer maico-puk) nil)]
-    {:db db
-     :tb tb
+    {:neide-db neide-db
+     :maico-db maico-db
+     :neide-tb neide-tb
+     :maico-tb maico-tb
      :neide->maico (.. neide-sneer conversations (withContact maico))
      :maico->neide (.. maico-sneer conversations (withContact neide))}))
 
@@ -41,8 +61,10 @@
 
 (facts "About reify-conversation"
   (let [scenario (neide-maicon-conversation-scenario!)]
-    (with-open [_db (:db scenario)
-                _tb (:tb scenario)]
+    (with-open [_neide-db (:neide-db scenario)
+                _maico-db (:maico-db scenario)
+                _neide-tb (:neide-tb scenario)
+                _maico-tb (:maico-tb scenario)]
       (let [n->m (:neide->maico scenario)
             m->n (:maico->neide scenario)
 
