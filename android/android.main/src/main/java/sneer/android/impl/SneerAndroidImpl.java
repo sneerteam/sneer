@@ -63,7 +63,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 				new Action1<Long>() {
 					@Override
 					public void call(Long aLong) {
-						createBogusContacts();
+						//createBogusContacts();
 					}
 				}, new Action1<Throwable>() {
 					@Override
