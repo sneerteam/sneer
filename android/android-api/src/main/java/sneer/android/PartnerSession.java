@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+
+import java.util.List;
+
 import sneer.android.impl.SharedResultReceiver;
 import sneer.android.impl.Utils;
 import sneer.android.impl.Value;
@@ -12,21 +15,14 @@ import static sneer.android.impl.IPCProtocol.*;
 
 public class PartnerSession {
 
+	public static PartnerSession join(Context context, Intent intent, Listener listener) {
+		return null;
+	}
+
     public interface Listener {
-
-        /** @param name The current name of the peer with you in this session. */
-        void onPartnerName(String name);
-
-        void onMessageToPartner(Object message);
-        void onMessageFromPartner(Object message);
-
-        /**
-         * Called after each message, if it is the most recent message in the session. This method will
-         * not be called, therefore, when previous messages in the session are being replayed.
-         */
-        void refresh();
+		void onHistoryReplay(List<Message> history);
+		void onNewMessage(Message message);
     }
-
 
     private final Listener listener;
     private final ClassLoader classLoader;
@@ -55,8 +51,10 @@ public class PartnerSession {
 
     private void handlePartnerName(Bundle received) {
         String partnerName = received.getString(PARTNER_NAME);
+		/*
         if (partnerName != null)
             listener.onPartnerName(partnerName);
+        */
     }
 
     private void handlePayload(Bundle received) {
@@ -65,18 +63,22 @@ public class PartnerSession {
 
         Object message = ((Value)messageEnvelope).get();
         boolean mine = received.getBoolean(OWN);
+		/*
         if (mine)
            listener.onMessageToPartner(message);
         else
            listener.onMessageFromPartner(message);
+        */
     }
 
     private void handleRefresh(Bundle received) {
         if (received.getBoolean(REPLAY_FINISHED))
             isReplaying = false;
 
+		/*
         if (!isReplaying)
             listener.refresh();
+        */
     }
 
     private ResultReceiver resultReceiver(Intent intent) {

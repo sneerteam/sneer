@@ -2,8 +2,10 @@ package sneer.android.ipc;
 
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
 import sneer.Conversation;
+import sneer.android.utils.AndroidUtils;
 
 public class PluginActivities {
 
@@ -14,6 +16,10 @@ public class PluginActivities {
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setClassName(plugin.packageName, plugin.activityName);
 		intent.putExtra(SEND_MESSAGE, SendMessage.intentFor(convo));
-		context.startActivity(intent);
+		try {
+			context.startActivity(intent);
+		} catch(Exception e) {
+			AndroidUtils.toast(context, e.getMessage(), Toast.LENGTH_LONG);
+		}
 	}
 }
