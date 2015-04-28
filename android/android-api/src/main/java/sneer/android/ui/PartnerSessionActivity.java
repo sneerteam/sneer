@@ -2,6 +2,10 @@ package sneer.android.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import java.util.List;
+
+import sneer.android.Message;
 import sneer.android.PartnerSession;
 
 public abstract class PartnerSessionActivity extends Activity {
@@ -12,29 +16,39 @@ public abstract class PartnerSessionActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         toPartner = new PartnerSession(this.getApplicationContext(), getIntent(), new PartnerSession.Listener() {
-            @Override
+//            @Override
             public void onPartnerName(final String name) {
                 runOnUiThread(new Runnable() { @Override public void run() {
                     PartnerSessionActivity.this.onPartnerName(name);
                 }});
             }
 
-            @Override
+//            @Override
             public void onMessageToPartner(Object message) {
                 PartnerSessionActivity.this.onMessageToPartner(message);
             }
 
-            @Override
+//            @Override
             public void onMessageFromPartner(Object message) {
                 PartnerSessionActivity.this.onMessageFromPartner(message);
             }
 
-            @Override
+//            @Override
             public void refresh() {
                 runOnUiThread(new Runnable() { @Override public void run() {
                     PartnerSessionActivity.this.refresh();
                 }});
             }
+
+	        @Override
+	        public void onHistoryReplay(List<Message> history) {
+
+	        }
+
+	        @Override
+	        public void onNewMessage(Message message) {
+
+	        }
         });
 	}
 
