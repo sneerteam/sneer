@@ -14,6 +14,7 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import sneer.android.SneerAndroidSingleton;
 import sneer.flux.ConversationStore;
+import sneer.flux.Dispatcher;
 
 public class ConversationListModel {
 
@@ -30,7 +31,11 @@ public class ConversationListModel {
 	}
 
 	private static Observable<List<ConversationStore.Summary>> summaries() {
-		return ConversationStore.createInstance(SneerAndroidSingleton.admin()).summaries();
+		return store().summaries();
+	}
+
+	private static ConversationStore store() {
+		return Dispatcher.createInstance(ConversationStore.class, SneerAndroidSingleton.admin());
 	}
 
 	private static Observable<List<ConversationStore.Summary>> fakeSummaries() {

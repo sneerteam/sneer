@@ -3,26 +3,10 @@ package sneer.flux;
 import java.util.List;
 
 import rx.Observable;
-import sneer.admin.SneerAdmin;
 
-/**
- * Intermediates the creation of clojure instances.
- */
-public class ConversationStore {  //TODO Flux: Eliminate via factory macro.
+public interface ConversationStore { //TODO Flux: Rename from ConversationStore to ConversationSource.
 
-	public static Interface createInstance(SneerAdmin admin) {
-		try {
-			return ((Interface) Class.forName("sneer.flux.ConversationStoreServiceProvider")
-									 .getConstructor(SneerAdmin.class)
-									 .newInstance(admin));
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
-	public interface Interface { //TODO Flux: Rename from ConversationStore.Interface to ConversationSource.
-		Observable<List<Summary>> summaries();
-	}
+	Observable<List<Summary>> summaries();
 
 	public static class Summary { //TODO Flux: Rename from ConversationStore.Summary to ConversationSource.Summary.
 		public final String party;

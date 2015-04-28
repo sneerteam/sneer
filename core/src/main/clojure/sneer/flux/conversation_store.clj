@@ -1,6 +1,7 @@
 (ns sneer.flux.conversation-store
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :refer [go chan close! <! >! sliding-buffer]]
+            [sneer.flux.macros :refer :all]
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.persistent-tuple-base :as ptb]
             [sneer.tuple.protocols :refer :all]
@@ -104,29 +105,17 @@
 (defn to-foreign-summary [{:keys [name summary timestamp unread]}]
   (sneer.flux.ConversationStore$Summary. name summary timestamp unread))
 
-(gen-class
-  :name sneer.flux.ConversationStoreServiceProvider
-  :implements [sneer.flux.ConversationStore$Interface]
-  :init create
-  :state state
-  :prefix -interface-
-  :constructors {[sneer.admin.SneerAdmin] []})
+(defcomponent sneer.flux.ConversationStore [^SneerAdmin admin]
 
-(defn -interface-create [admin]
-  (let [super-args []
-        state {:admin admin}]
-    [super-args state]))
-
-(defn -interface-summaries [this]
-  (rx/observable*
-   (fn [^rx.Subscriber subscriber]
-     (let [{:keys [^SneerAdmin admin]} (.state this)
-           own-puk (.. admin privateKey publicKey)
-           tuple-base (tuple-base-of admin)
-           to-foreign (map (fn [summaries] (mapv to-foreign-summary summaries)))
-           summaries-out (chan (sliding-buffer 1) to-foreign)
-           lease (chan)]
-       (link-chan-to-subscriber lease subscriber)
-       (link-chan-to-subscriber summaries-out subscriber)
-       (start-summarization-machine own-puk tuple-base summaries-out lease)
-       (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
+  (defn summaries [this]
+    (rx/observable*
+     (fn [^rx.Subscriber subscriber]
+       (let [own-puk (.. admin privateKey publicKey)
+             tuple-base (tuple-base-of admin)
+             to-foreign (map (fn [summaries] (mapv to-foreign-summary summaries)))
+             summaries-out (chan (sliding-buffer 1) to-foreign)
+             lease (chan)]
+         (link-chan-to-subscriber lease subscriber)
+         (link-chan-to-subscriber summaries-out subscriber)
+         (start-summarization-machine own-puk tuple-base summaries-out lease)
+         (thread-chan-to-subscriber summaries-out subscriber "conversation summaries"))))))
