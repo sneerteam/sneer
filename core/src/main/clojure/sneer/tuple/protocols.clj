@@ -14,9 +14,9 @@
     [this criteria tuples-out]
     [this criteria tuples-out lease]
     "Filters tuples by the criteria represented as a map of
-     field/value. When a lease channel is passed the result
-     channel will keep receiving new tuples until the lease
-     emits a value.")
+     field/value. When a lease channel is passed, tuples-out
+     will keep receiving new stored tuples until the lease emits a
+     value.")
 
   (set-local-attribute
     ^Void [this attribute value tuple-id])
