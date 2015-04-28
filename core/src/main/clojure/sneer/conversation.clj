@@ -85,12 +85,16 @@
          (rx/cons [])
          shared-latest)))
 
-(defn reify-session [space contact-puk id]
-  (let [publisher (.. space publisher (audience contact-puk) (type "message") (field "ref" id))]
+(defn reify-session [space own-puk contact-puk tuple]
+  (let [id (get tuple "original_id")
+        author (get tuple "author")
+        publisher (.. space publisher (audience contact-puk) (type "message") (field "ref" id) (field "session_author" author))
+        filter (.. space filter (type "message") (field "ref" id) (field "session_author" author))]
     (reify Session
       (id [_] id)
       (messages [_]
-        (.. space filter (type "message") (field "ref" id) tuples))
+        (rx/merge (.. filter (audience contact-puk) (author own-puk)     tuples)
+                  (.. filter (audience own-puk)     (author contact-puk) tuples)))
       (send [_ payload]
         (.pub publisher payload)))))
 
@@ -99,16 +103,15 @@
         tuples-out (.. filter (author own-puk  ) (audience party-puk) tuples)
         tuples-in  (.. filter (author party-puk) (audience own-puk  ) tuples)]
     (->> (rx/merge tuples-in tuples-out)
-         (rx/map #(reify-session tuple-space own-puk (get % "own-id")))
+         (rx/map #(reify-session tuple-space own-puk party-puk %))
          (rx/reductions conj (sorted-set-by session-ids))
          (rx/map vec)
          (rx/cons [])
          shared-latest)))
 
-(defn- start-session [space contact-puk #_session-type]
-  ; TODO: change own-id to id
-  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") (field "own-id" (System/nanoTime)) pub)]
-    (rx/map #(reify-session space contact-puk (.get % "own-id"))
+(defn- start-session [space own-puk contact-puk #_session-type]
+  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") pub)]
+    (rx/map #(reify-session space own-puk contact-puk %)
             tuple-obs)))
 
 (defn reify-conversation
@@ -124,11 +127,11 @@
 
         most-recent-message (rx/map last messages)
 
-        current-puk #(doto                                  ;TODO: rename to current-contact-puk
+        contact-puk #(doto
                       (some-> contact .party .current .publicKey .current)
                       (assert "Contact does not have a known public key."))
 
-        sender #(.. space publisher (audience (current-puk)))
+        sender #(.. space publisher (audience (contact-puk)))
         message-sender      #(.. (sender) (type "message"     ) (field "message-type" "chat"))
         message-read-sender #(.. (sender) (type "message-read"))]
 
@@ -148,4 +151,4 @@
       (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
       (setRead [_ message] (.pub (message-read-sender) (message-id message)))
 
-      (startSession [_] (start-session space (current-puk))))))
+      (startSession [_] (start-session space own-puk (contact-puk))))))

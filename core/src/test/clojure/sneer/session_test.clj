@@ -35,7 +35,7 @@
                 messages (->chan (.messages session))]
             replay1 => []
             replay2 => []
-            (.payload (<!!? messages)) => "some payload"
+            (<!!? messages) => #(-> % .payload (= "some payload"))
             (<!!? unread-m) => 0                        ; Skip history replay :(
             (<!!? unread-m) => 1
             (.send session "some reply")))
@@ -48,10 +48,8 @@
                 messages (->chan (.messages session))]
             replay1 => []
             replay2 => []
-            (.payload (<!!? messages)) => "some payload"
-            ; TODO: uncomment this test
-            ;(.payload (<!!? messages)) => "some reply"
-            )
+            (<!!? messages) => #(-> % .payload (= "some payload"))
+            (<!!? messages) => #(-> % .payload (= "some reply")))
           (<!!? unread-n) => 0                          ; Skip history replay :(
           ; (<!!? unread-n) => 1
           )))))
