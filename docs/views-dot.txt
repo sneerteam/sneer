@@ -1,10 +1,12 @@
-// nano networking-dot.txt && dot -Tpng -onetworking.png networking-dot.txt && xdg-open networking.png
+// nano views-dot.txt && dot -Tpng -oviews.png views-dot.txt && xdg-open views.png
  
 digraph {
 
 	splines=line;
 
-        "Activity/Adapter/Fragments" -> {"View Widgets" ViewModel};
-	ViewModel -> {Dispatcher Store};
-	Store -> Dispatcher;
+        "FooActivity/Adapter/Fragments" -> {"Bar(Interface)" "TupleBase(Dispatcher)" "BarImpl(clj)" "BarSim" "Android Widgets"} [arrowhead=vee];
+	"BarSim" -> "Bar(Interface)" [style=dashed, arrowhead=onormal];
+	"BarImpl(clj)" -> {"Bar(Interface)"} [style=dashed, arrowhead=onormal];
+	"BarImpl(clj)" -> "TupleBase(Dispatcher)" [arrowhead=vee];
+
 }
