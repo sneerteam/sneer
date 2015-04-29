@@ -89,6 +89,11 @@ afterEvaluate {
                 name 'Diego Mendes'
                 email 'dhmendes@gmail.com'
               }
+              developer {
+                id 'oakes'
+                name 'Zach Oakes'
+                email 'zsoakes@gmail.com'
+              }
             }
           }
         }
