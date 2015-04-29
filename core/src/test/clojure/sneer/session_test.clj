@@ -22,7 +22,7 @@
           (<!!? unread-m) => 0)
 
         (fact "Neide sees her own messages in the session"
-          (let [session (<!!? (->chan (.startSession n->m)))
+          (let [session (<!!? (->chan (.startSession n->m "some type")))
                 messages (->chan (.messages session))]
             (.send session "some payload")
             (.payload (<!!? messages)) => "some payload"))
@@ -35,6 +35,7 @@
                 messages (->chan (.messages session))]
             replay1 => []
             replay2 => []
+            (.type session) => "some type"
             (<!!? messages) => #(-> % .payload (= "some payload"))
             (<!!? unread-m) => 0                        ; Skip history replay :(
             (<!!? unread-m) => 1

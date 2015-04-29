@@ -86,12 +86,13 @@
          shared-latest)))
 
 (defn reify-session [space own-puk contact-puk tuple]
-  (let [id (get tuple "original_id")
+  (let [original-id (get tuple "original_id")
         author (get tuple "author")
-        publisher (.. space publisher (audience contact-puk) (type "message") (field "ref" id) (field "session_author" author))
-        filter (.. space filter (type "message") (field "ref" id) (field "session_author" author))]
+        publisher (.. space publisher (type "message") (field "ref" original-id) (field "session_author" author) (audience contact-puk))
+        filter    (.. space filter    (type "message") (field "ref" original-id) (field "session_author" author))]
     (reify Session
-      (id [_] id)
+      (id [_] (get tuple "id"))
+      (type [_] (get tuple "session-type"))
       (messages [_]
         (rx/merge (.. filter (audience contact-puk) (author own-puk)     tuples)
                   (.. filter (audience own-puk)     (author contact-puk) tuples)))
@@ -109,8 +110,8 @@
          (rx/cons [])
          shared-latest)))
 
-(defn- start-session [space own-puk contact-puk #_session-type]
-  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" #_session-type "TODO") pub)]
+(defn- start-session [space own-puk contact-puk session-type]
+  (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" session-type) pub)]
     (rx/map #(reify-session space own-puk contact-puk %)
             tuple-obs)))
 
@@ -151,4 +152,4 @@
       (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
       (setRead [_ message] (.pub (message-read-sender) (message-id message)))
 
-      (startSession [_] (start-session space own-puk (contact-puk))))))
+      (startSession [_ type] (start-session space own-puk (contact-puk) type)))))

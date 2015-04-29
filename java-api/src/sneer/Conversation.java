@@ -15,10 +15,10 @@ public interface Conversation {
 	Observable<Boolean> canSendMessages();
 	void sendMessage(String label);
 
-	Observable<Session> startSession();
+	Observable<Session> startSession(String type);
 
-	Observable<List<Session>> sessions(); //Item: Message or Session
-	Observable<List<ConversationItem>> items();
+	Observable<List<Session>> sessions(); //TODO: remove this
+	Observable<List<ConversationItem>> items(); //Item: Message or Session
 	Observable<String> mostRecentMessageContent();
 	Observable<Long> mostRecentMessageTimestamp();
 

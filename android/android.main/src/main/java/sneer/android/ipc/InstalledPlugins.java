@@ -59,11 +59,12 @@ public class InstalledPlugins extends BroadcastReceiver {
 			return null;
 		}
 
-        String activityClassName = activities[0].name;
+        String activityClassName   = activities[0].name;
         CharSequence pluginCaption = activities[0].loadLabel(context.getPackageManager());
-        Drawable pluginIcon = activities[0].loadIcon(context.getPackageManager());
+        Drawable pluginIcon        = activities[0].loadIcon(context.getPackageManager());
+		String partnerSessionType  = activities[0].metaData.getString("sneer:session-type");
 
-        return new Plugin(pluginCaption, pluginIcon, packageName, activityClassName);
+        return new Plugin(pluginCaption, pluginIcon, packageName, activityClassName, partnerSessionType);
 	}
 
 

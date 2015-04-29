@@ -13,6 +13,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import sneer.android.gcm.GcmRegistrationAlarmReceiver;
 import sneer.android.impl.SneerAndroidImpl;
+import sneer.android.ipc.PartnerSessions;
 
 public class SneerApp extends Application {
 
@@ -37,6 +38,7 @@ public class SneerApp extends Application {
 
 		Context app = getApplicationContext();
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
+		PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
 		Notifier.start(app);
 		GcmRegistrationAlarmReceiver.schedule(app);
 	}

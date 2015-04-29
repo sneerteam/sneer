@@ -23,6 +23,8 @@ public interface Conversations {
 	void notificationsStartIgnoring(Conversation conversation);
 	void notificationsStopIgnoring();
 
+	Session findSessionById(long id);
+
 	interface Notification {
 		/** Zero or more conversations related to this notification */
 		List<Conversation> conversations();

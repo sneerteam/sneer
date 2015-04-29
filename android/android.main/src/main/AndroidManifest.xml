@@ -77,6 +77,9 @@
         <service
             android:name="sneer.android.ipc.SendMessage"
             android:exported="true" />
+        <service
+            android:name="sneer.android.ipc.PartnerSessions"
+            android:exported="true" />
 
         <activity
             android:name="sneer.android.ui.MainActivity"
