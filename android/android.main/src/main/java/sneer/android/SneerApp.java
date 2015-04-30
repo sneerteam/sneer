@@ -36,7 +36,7 @@ public class SneerApp extends Application {
 //			? new SneerAndroidImpl(getApplicationContext())
 //			: new SneerAndroidSimulator(getApplicationContext()));
 
-		UncaughtExceptionReporter.start(getApplicationContext(), "sneer@wiki.com.br", "Sneer");
+		UncaughtExceptionReporter.start(getApplicationContext(), "klauswuestefeld@gmail.com", "Sneer");
 
 		Context app = getApplicationContext();
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
