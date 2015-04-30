@@ -75,7 +75,8 @@
         (try
           (rx/on-next subscriber value)
           (catch Exception e
-            (println "Subscriber.onNext Exception: " e " subscriber: " subscriber " value: " value "thread: " thread-name))))
+            (throw (RuntimeException. (str "onNext Exception subscriber: " subscriber " value: " value "thread: " thread-name)
+                                      e)))))
       (rx/on-completed subscriber)
       (catch Exception e
         (rx/on-error subscriber e)))))
