@@ -1,7 +1,7 @@
 (ns sneer.tuple.space
   (:require
    [rx.lang.clojure.core :as rx]
-   [sneer.async :refer [go-trace]]
+   [sneer.async :refer [go-trace thread-chan-to-subscriber]]
    [sneer.serialization :refer [roundtrip]]
    [sneer.commons :refer [now reify+ while-let]]
    [clojure.core.async :refer [thread chan <! <!! close!]]
@@ -67,11 +67,7 @@
            (.add subscriber (rx/subscription #(do (close! lease) (close! result)))))
          (query-tuples tuple-base criteria result))
        ;; TODO: reassess use of thread here
-       (thread
-         (set-thread-name! (str "tuple-query: " criteria))
-         (while-let [tuple (<!! result)]
-           (rx/on-next subscriber tuple))
-         (rx/on-completed subscriber))))))
+       (thread-chan-to-subscriber result subscriber (str "tuple-query: " criteria))))))
 
 (defn new-tuple-filter
   ([tuple-base own-puk] (new-tuple-filter tuple-base own-puk {}))
