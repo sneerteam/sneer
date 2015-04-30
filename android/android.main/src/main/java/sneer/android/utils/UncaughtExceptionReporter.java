@@ -16,12 +16,12 @@ public class UncaughtExceptionReporter implements Thread.UncaughtExceptionHandle
 	private static final String FILE_NAME = "stack.trace";
 	private static Context context;
 
-	public static void start(Context context, String mailAddress) {
+	public static void start(Context context, String mailAddress, String appName) {
 		Exceptions.check(UncaughtExceptionReporter.context == null);
 		UncaughtExceptionReporter.context = context;
 
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionReporter());
-		emailPreviousException(mailAddress);
+		emailPreviousException(mailAddress, appName);
 	}
 
 
@@ -69,12 +69,12 @@ public class UncaughtExceptionReporter implements Thread.UncaughtExceptionHandle
 	}
 
 
-	private static void emailPreviousException(final String mailAddress) {
+	private static void emailPreviousException(String mailAddress, String appName) {
 		final String trace = readPreviousTrace();
 		if (trace == null) return;
 
 		Intent sendIntent = new Intent(Intent.ACTION_SEND);
-		String subject = "Report to Improve " + appName();
+		String subject = "Report to Improve " + appName;
 		String body =
 				"Mail this to " + mailAddress +
 						"\n\n" +
@@ -86,13 +86,9 @@ public class UncaughtExceptionReporter implements Thread.UncaughtExceptionHandle
 		sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
 		sendIntent.setType("message/rfc822");
 
-		Intent chooser = Intent.createChooser(sendIntent, "Title:");
+		Intent chooser = Intent.createChooser(sendIntent, "Send Crash Report?");
 		chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(chooser);
-	}
-
-	private static String appName() {
-		return context.getApplicationContext().getApplicationInfo().name;
 	}
 
 
