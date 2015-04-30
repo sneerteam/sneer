@@ -1,6 +1,7 @@
 package sneer.android.ipc;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -8,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -62,16 +64,16 @@ public class InstalledPlugins extends BroadcastReceiver {
         String activityClassName   = activities[0].name;
         CharSequence pluginCaption = activities[0].loadLabel(context.getPackageManager());
         Drawable pluginIcon        = activities[0].loadIcon(context.getPackageManager());
-		String partnerSessionType  = sessionType(activities[0]);
+
+		Bundle metaData;
+		try {
+			metaData = context.getPackageManager().getActivityInfo(new ComponentName(activities[0].packageName, activities[0].name), GET_META_DATA).metaData;
+		} catch (Exception e) {
+			metaData = null;
+		}
+		String partnerSessionType = metaData == null ? null : metaData.getString("sneer:session-type");
 
         return new Plugin(pluginCaption, pluginIcon, packageName, activityClassName, partnerSessionType);
-	}
-
-
-	private static String sessionType(ActivityInfo activity) {
-		return activity.metaData == null
-			? null
-			: activity.metaData.getString("sneer:session-type");
 	}
 
 
