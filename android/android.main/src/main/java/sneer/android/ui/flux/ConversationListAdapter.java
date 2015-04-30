@@ -15,6 +15,8 @@ import java.util.List;
 
 import sneer.main.R;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static sneer.android.ui.SneerActivity.findView;
 
 class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
@@ -35,16 +37,10 @@ class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView == null
-			? createView(parent)
+			? inflateConversationView(parent)
 			: convertView;
 
-		bindConversation(position, view);
-		return view;
-	}
-
-	private View createView(ViewGroup parent) {
-		View view = inflateConversationView(parent);
-		tagNewWidgetOnto(view);
+		setConversation(position, view);
 		return view;
 	}
 
@@ -53,40 +49,21 @@ class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
 		return inflater.inflate(R.layout.list_item_main, parent, false);
 	}
 
-	private void tagNewWidgetOnto(View view) {
-		ConversationWidget widget = new ConversationWidget();
-		widget.conversationParty = findView(view, R.id.conversationParty);
-		widget.conversationSummary = findView(view, R.id.conversationSummary);
-		widget.conversationDate = findView(view, R.id.conversationDate);
-		widget.conversationPicture = findView(view, R.id.conversationPicture);
-		widget.conversationSummary.getPaint().setShader(textShader);
-		widget.conversationUnread = findView(view, R.id.conversationUnread);
-		view.setTag(widget);
-	}
-
-	private void bindConversation(int position, View view) {
+	private void setConversation(int position, View view) {
 		ConversationListModel.Item conversation = getItem(position);
-		((ConversationWidget)view.getTag()).bind(conversation);
-	}
 
-	private class ConversationWidget {
-		TextView conversationParty;
-		TextView conversationSummary;
-		TextView conversationDate;
-		TextView conversationUnread;
-		ImageView conversationPicture;
+		ImageView pic     = findView(view, R.id.conversationPicture);
+		TextView  party   = findView(view, R.id.conversationParty);
+		TextView  date    = findView(view, R.id.conversationDate);
+		TextView  unread  = findView(view, R.id.conversationUnread);
+		TextView  summary = findView(view, R.id.conversationSummary);
+		summary.getPaint().setShader(textShader);
 
-		public void bind(ConversationListModel.Item conversation) {
-			conversationParty.setText(conversation.party);
-			conversationSummary.setText(conversation.textPreview);
-			conversationDate.setText(conversation.date);
-			if (conversation.unread.isEmpty()) {
-				conversationUnread.setVisibility(View.GONE);
-			} else {
-				conversationUnread.setVisibility(View.VISIBLE);
-				conversationUnread.setText(conversation.unread);
-			}
-		}
+		party  .setText(conversation.party);
+		summary.setText(conversation.textPreview);
+		date   .setText(conversation.date);
+		unread .setText(conversation.unread);
+		unread.setVisibility(conversation.unread.isEmpty() ? GONE : VISIBLE);
 	}
 
 	private final Shader textShader = new LinearGradient(200, 0, 650, 0,
