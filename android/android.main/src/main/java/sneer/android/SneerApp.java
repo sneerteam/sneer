@@ -14,6 +14,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import sneer.android.gcm.GcmRegistrationAlarmReceiver;
 import sneer.android.impl.SneerAndroidImpl;
 import sneer.android.ipc.PartnerSessions;
+import sneer.android.utils.UncaughtExceptionReporter;
 
 public class SneerApp extends Application {
 
@@ -35,6 +36,7 @@ public class SneerApp extends Application {
 //			? new SneerAndroidImpl(getApplicationContext())
 //			: new SneerAndroidSimulator(getApplicationContext()));
 
+		UncaughtExceptionReporter.start(getApplicationContext(), "sneer@wiki.com.br");
 
 		Context app = getApplicationContext();
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
