@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import sneer.android.ui.flux.ConversationListModel;
 import sneer.main.R;
 
 import static android.view.View.GONE;
@@ -23,12 +24,12 @@ class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
 
 	private final Activity activity;
 
-	public ConversationListAdapter(Activity activity) {
+	ConversationListAdapter(Activity activity) {
 		super(activity, R.layout.list_item_main);
 		this.activity = activity;
 	}
 
-	public void update(List<ConversationListModel.Item> summaries) {
+	void update(List<ConversationListModel.Item> summaries) {
 		clear();
 		addAll(summaries);
 		notifyDataSetChanged();
