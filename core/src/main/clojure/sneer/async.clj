@@ -72,7 +72,10 @@
     (try
       (.setName (Thread/currentThread) thread-name)
       (while-let [value (<!! chan)]
-        (rx/on-next subscriber value))
+        (try
+          (rx/on-next subscriber value)
+          (catch Exception e
+            (println "Subscriber.onNext Exception: " e " subscriber: " subscriber " value: " value "thread: " thread-name))))
       (rx/on-completed subscriber)
       (catch Exception e
         (rx/on-error subscriber e)))))
