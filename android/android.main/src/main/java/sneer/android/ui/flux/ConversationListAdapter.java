@@ -34,18 +34,18 @@ class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		View view = convertView == null
+			? createView(parent)
+			: convertView;
 
-		ConversationListModel.Item conversation = getItem(position);
-		if (convertView == null) {
-			View view = inflateConversationView(parent);
-			final ConversationWidget widget = conversationWidgetFor(view);
-			widget.bind(conversation);
-			return view;
-		} else {
-			ConversationWidget existing = (ConversationWidget) convertView.getTag();
-			existing.bind(conversation);
-			return convertView;
-		}
+		bindConversation(position, view);
+		return view;
+	}
+
+	private View createView(ViewGroup parent) {
+		View view = inflateConversationView(parent);
+		tagNewWidgetOnto(view);
+		return view;
 	}
 
 	private View inflateConversationView(ViewGroup parent) {
@@ -53,8 +53,8 @@ class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
 		return inflater.inflate(R.layout.list_item_main, parent, false);
 	}
 
-	private ConversationWidget conversationWidgetFor(View view) {
-		final ConversationWidget widget = new ConversationWidget();
+	private void tagNewWidgetOnto(View view) {
+		ConversationWidget widget = new ConversationWidget();
 		widget.conversationParty = findView(view, R.id.conversationParty);
 		widget.conversationSummary = findView(view, R.id.conversationSummary);
 		widget.conversationDate = findView(view, R.id.conversationDate);
@@ -62,7 +62,11 @@ class ConversationListAdapter extends ArrayAdapter<ConversationListModel.Item> {
 		widget.conversationSummary.getPaint().setShader(textShader);
 		widget.conversationUnread = findView(view, R.id.conversationUnread);
 		view.setTag(widget);
-		return widget;
+	}
+
+	private void bindConversation(int position, View view) {
+		ConversationListModel.Item conversation = getItem(position);
+		((ConversationWidget)view.getTag()).bind(conversation);
 	}
 
 	private class ConversationWidget {
