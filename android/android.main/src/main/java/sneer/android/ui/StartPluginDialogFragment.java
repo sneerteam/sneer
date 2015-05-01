@@ -19,9 +19,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import sneer.android.ipc.Plugins;
 import sneer.main.R;
 import sneer.Conversation;
-import sneer.android.ipc.InstalledPlugins;
+import sneer.android.ipc.Plugins;
 import sneer.android.ipc.Plugin;
 import sneer.android.ipc.PluginActivities;
 
@@ -44,7 +45,7 @@ public class StartPluginDialogFragment extends DialogFragment {
                 .setTitle("Apps")
                 .create();
 
-        final List<Plugin> plugins = InstalledPlugins.all(activity);
+        final List<Plugin> plugins = Plugins.all(activity);
         final LayoutInflater inflater = activity.getLayoutInflater();
         ListView listView = (ListView) inflater.inflate(R.layout.plugins_list, null);
 

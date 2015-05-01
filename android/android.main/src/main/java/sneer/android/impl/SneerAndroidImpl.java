@@ -28,9 +28,10 @@ import sneer.admin.SneerAdmin;
 import sneer.admin.SneerAdminFactory;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
-import sneer.android.ipc.InstalledPlugins;
+import sneer.android.ipc.Plugins;
 import sneer.android.ipc.Plugin;
 import sneer.android.ipc.PluginActivities;
+import sneer.android.ipc.Plugins;
 import sneer.android.ipcold.PluginManager;
 import sneer.android.utils.AndroidUtils;
 import sneer.commons.SystemReport;
@@ -176,7 +177,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	@Override
 	public List<Plugin> plugins() {
-		return InstalledPlugins.all(context);
+		return Plugins.all(context);
 	}
 
 	@Override
