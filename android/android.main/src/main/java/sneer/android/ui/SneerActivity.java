@@ -162,6 +162,8 @@ public class SneerActivity extends Activity {
 		return observable.observeOn(AndroidSchedulers.mainThread());
 	}
 
+	public static <T> Observable<T> ui(Observable<T> observable) {
+		return onMainThread(observable.debounce(300, TimeUnit.MILLISECONDS));
 	}
 
 	public static Bitmap toBitmap(byte[] bytes) {
