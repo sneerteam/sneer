@@ -19,8 +19,7 @@ public class Components {
 	}
 
 	private static <T> T instantiate(Class<T> component) {
-		Class<T>           clazz = tryToLoad(component, "$Impl");
-		if (clazz == null) clazz = tryToLoad(component, "Impl");
+		Class<T>           clazz = tryToLoad(component, "Impl");
 		if (clazz == null) clazz = tryToLoad(component, "$Sim");
 		if (clazz == null) clazz = tryToLoad(component, "Sim");
 
