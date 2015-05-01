@@ -96,8 +96,13 @@
         </activity>
 
         <activity
-            android:name="sneer.android.ui.flux.ConversationListActivity"
-            android:label="@string/app_name" >
+            android:name="sneer.android.ui.flux.ConversationListActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="sneer.android.flux2.ConversationListActivity">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

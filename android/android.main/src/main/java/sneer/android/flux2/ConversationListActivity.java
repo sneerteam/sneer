@@ -1,6 +1,5 @@
 package sneer.android.flux2;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -8,14 +7,19 @@ import android.widget.ListView;
 
 import java.util.List;
 
-import sneer.commons.Consumer;
+import rx.Subscription;
+import rx.functions.Action1;
+import sneer.android.ui.SneerActivity;
 import sneer.main.R;
 
-public class ConversationListActivity extends Activity {
+import static sneer.android.flux2.Components.component;
 
-	private final Dispatcher dispatcher = Dispatcher.Factory.produceFor(getApplicationContext());
-	private final Conversations convos = dispatcher.produce(Conversations.class);
-	private final Lease lease = new Lease();
+public class ConversationListActivity extends SneerActivity {
+
+	private final ActionBus bus = component(ActionBus.class);
+	private final Conversations convos = component(Conversations.class);
+	private Subscription subscription;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +29,9 @@ public class ConversationListActivity extends Activity {
 	}
 
 	@Override
-	protected void onDestroy() {
-		lease.dispose();
-		super.onDestroy();
+	protected void onStop() {
+		if (subscription != null) subscription.unsubscribe();
+		super.onStop();
 	}
 
 	private void setUpConversationList() {
@@ -37,14 +41,11 @@ public class ConversationListActivity extends Activity {
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
 			long id = adapter.getItem(position).id;
-			dispatcher.dispatch(new Conversations.Click(id));
+			bus.action(new Conversations.Click(id));
 		}});
 
-		convos.summaries().addConsumer(lease, new Consumer<List<Conversations.Summary>>() { @Override public void consume(final List<Conversations.Summary> summaries) {
-			//TODO Sample 1 second.
-			list.post(new Runnable() { @Override public void run() {
-				adapter.update(summaries);
-			}});
+		subscription = ui(convos.summaries()).subscribe(new Action1<List<Conversations.Summary>>() { @Override public void call(List<Conversations.Summary> summaries) {
+			adapter.update(summaries);
 		}});
 	}
 
