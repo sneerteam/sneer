@@ -1,4 +1,4 @@
-package sneer.android;
+package sneer.android.ui;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,9 +20,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Conversations;
-import sneer.PublicKey;
-import sneer.android.ui.ConversationActivity;
-import sneer.android.ui.MainActivity;
 import sneer.commons.Clock;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.Exceptions;

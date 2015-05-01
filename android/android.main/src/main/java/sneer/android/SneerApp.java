@@ -14,6 +14,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import sneer.android.gcm.GcmRegistrationAlarmReceiver;
 import sneer.android.impl.SneerAndroidImpl;
 import sneer.android.ipc.PartnerSessions;
+import sneer.android.ui.Notifier;
 import sneer.android.utils.UncaughtExceptionReporter;
 
 public class SneerApp extends Application {
