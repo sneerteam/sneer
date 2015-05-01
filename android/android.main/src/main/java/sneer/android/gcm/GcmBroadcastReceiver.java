@@ -1,4 +1,4 @@
-package sneer.android;
+package sneer.android.gcm;
 
 import android.app.Activity;
 import android.app.NotificationManager;
