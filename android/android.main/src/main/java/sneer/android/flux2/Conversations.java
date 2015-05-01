@@ -1,5 +1,6 @@
 package sneer.android.flux2;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,9 +41,10 @@ public interface Conversations {
 		@Override
 		public Observable<List<Summary>> summaries() {
 			BehaviorSubject<List<Summary>> subject = BehaviorSubject.create();
-			subject.onNext(Arrays.asList(
-					new Summary("Wesley", "Hello", "Moments Ago", "3", 1042)
-			));
+			ArrayList<Summary> data = new ArrayList<>(10000);
+			for (int i = 0; i < 10000; i++)
+				data.add(new Summary("Wesley " + i, "Hello " + i, i + " Days Ago", ""+i, 1042+i));
+			subject.onNext(data);
 			return subject;
 		}
 	}
