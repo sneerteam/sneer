@@ -52,28 +52,6 @@
 
         <receiver android:name="sneer.android.gcm.GcmRegistrationAlarmReceiver" />
 
-        <!--
-        <receiver
-            android:name="sneer.android.ipc.InstalledPlugins"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <data android:scheme="package" />
-
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <action android:name="android.intent.action.PACKAGE_REMOVED" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="sneer.android.ipcold.TupleSpaceService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="sneer.main.TUPLE_SPACE" />
-            </intent-filter>
-        </service>
-        -->
-
         <service
             android:name="sneer.android.ipc.SendMessage"
             android:exported="true" />
