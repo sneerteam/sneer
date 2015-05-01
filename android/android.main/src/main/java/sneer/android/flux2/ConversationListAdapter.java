@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -52,7 +51,7 @@ class ConversationListAdapter extends ArrayAdapter<Conversations.Summary> {
 	private void updateConversation(int position, View view) {
 		Conversations.Summary summary = getItem(position);
 
-		ImageView pic     = findView(view, R.id.conversationPicture);
+//		ImageView pic     = findView(view, R.id.conversationPicture);
 		TextView  party   = findView(view, R.id.conversationParty);
 		TextView  date    = findView(view, R.id.conversationDate);
 		TextView  unread  = findView(view, R.id.conversationUnread);
