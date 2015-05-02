@@ -14,14 +14,14 @@
                     `(let [[~@parameters] (.parameters ~this)]
                        ~body))))))
 
-(defmacro defcomponent
+(defmacro defimpl
 
-  "(defcomponent sneer.flux.ConversationStore [admin]
+  "(defimpl sneer.ConversationList [admin]
      (defn summaries [this] (rx/never))"
 
-  [interface parameters & methods]
+  [component-interface parameters & methods]
 
-  (let [name (str (name interface) "ServiceProvider")
+  (let [name (str (name component-interface) "Impl")
         methods (->> methods (map (comp list* prefix-method-name #(inject-parameters parameters %) vec)))
         parameter-types (map (constantly `Object) parameters)
         init (prefix-symbol 'init)]
@@ -29,7 +29,7 @@
     `(do
        (gen-class
         :name ~name
-        :implements [~interface]
+        :implements [~component-interface]
         :prefix "-interface-"
         :state "parameters"
         :init "init"
