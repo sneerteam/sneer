@@ -5,7 +5,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-
 import java.util.List;
 
 import rx.Subscription;
@@ -14,13 +13,13 @@ import sneer.commons.ActionBus;
 import sneer.conversations.ConversationList;
 import sneer.main.R;
 
-import static sneer.commons.Container.singleton;
+import static sneer.android.SneerAndroidContainer.component;
 
 
 public class ConversationListActivity extends SneerActivity {
 
-	private final ActionBus bus = singleton(ActionBus.class);
-	private final ConversationList convos = singleton(ConversationList.class);
+	private final ActionBus bus = component(ActionBus.class);
+	private final ConversationList convos = component(ConversationList.class);
 	private Subscription subscription;
 
 

@@ -6,44 +6,37 @@ import java.util.Map;
 
 public class Container {
 
-	private static Container singletons = new Container();
+	private final ComponentLoader loader;
+	private final Map<Class<?>, Object> instancesByInterface = new HashMap<Class<?>, Object>();
 
-	synchronized
-	static public <T> T singleton(Class<T> intrface) {
-		return singletons.component(intrface);
+	public Container(ComponentLoader loader) {
+		this.loader = loader;
 	}
 
-	private Map<Class<?>, Object> instancesByInterface = new HashMap<Class<?>, Object>();
-
 	synchronized
-	public <T> T component(Class<T> intrface) { //Method named to use with static import, for example: Foo foo = component(Foo.class)
-		T cached = (T)instancesByInterface.get(intrface);
+	public <T> T produce(Class<T> componentInterface) {
+		T cached = (T)instancesByInterface.get(componentInterface);
 		if (cached != null) return cached;
 
-		T created = instantiate(intrface);
-		instancesByInterface.put(intrface, created);
-		return created;
+		T loaded = loader.load(componentInterface);
+		instancesByInterface.put(componentInterface, loaded);
+		return loaded;
 	}
 
-	private static <T> T instantiate(Class<T> component) {
-		Class<T>           clazz = tryToLoad(component, "Impl");
-		if (clazz == null) clazz = tryToLoad(component, "$Sim");
-		if (clazz == null) clazz = tryToLoad(component, "Sim");
 
-		try {
-			return clazz.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to load component " + component + " class: " + clazz, e);
-		}
-
+	interface ComponentLoader {
+		<T> T load(Class<T> componentInterface);
 	}
 
-	private static <T> Class<T> tryToLoad(Class<T> component, String suffix) {
-		try {
-			return (Class<T>) Class.forName(component.getName() + suffix);
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
+
+	public static ComponentLoader withPadding(final String prefix, final String suffix) {
+		return new ComponentLoader() { @Override public <T> T load(Class<T> intrface) {
+			try {
+				return (T)Class.forName(prefix + intrface.getName() + suffix).newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}};
 	}
 
 }

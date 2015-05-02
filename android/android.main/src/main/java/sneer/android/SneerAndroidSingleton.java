@@ -4,7 +4,7 @@ import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.commons.exceptions.Exceptions;
 
-public class SneerAndroidSingleton {
+public class SneerAndroidSingleton { //TODO: This will be replaced by the SneerAndroidContainer.
 
 	private static SneerAndroid INSTANCE;
 
