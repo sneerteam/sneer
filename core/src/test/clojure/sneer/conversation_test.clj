@@ -4,8 +4,7 @@
             [sneer.tuple.jdbc-database :refer [create-sqlite-db]]
             [sneer.admin :refer [new-sneer-admin]]
             [sneer.contact :refer [produce-contact create-contacts-state]]
-            [sneer.tuple.space :as space]
-            [sneer.tuple.persistent-tuple-base :as base]
+            [sneer.tuple.persistent-tuple-base :as tb]
             [sneer.tuple.tuple-transmitter :as transmitter]
             [sneer.test-util :refer [<!!? ->chan]]
             [sneer.tuple.protocols :refer :all]
@@ -14,17 +13,15 @@
             [sneer.party :refer [reify-party create-puk->party]]
             [sneer.conversation :refer [reify-conversation]]
             [sneer.async :refer [go-while-let]])
-  (:import [sneer Conversation Party Contact]
-           [sneer.tuples TupleSpace]
-           [sneer.crypto.impl KeysImpl]))
+  (:import [sneer.crypto.impl KeysImpl]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
 (defn neide-maicon-conversation-scenario! []
   (let [neide-db (create-sqlite-db)
         maico-db (create-sqlite-db)
-        neide-tb (base/create neide-db)
-        maico-tb (base/create maico-db)
+        neide-tb (tb/create neide-db)
+        maico-tb (tb/create maico-db)
         neide-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) neide-tb)
         maico-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) maico-tb)
         neide-puk (.. neide-admin privateKey publicKey)
