@@ -1,23 +1,19 @@
-package sneer.android.flux2;
+package sneer.android.ui;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.util.List;
 
 import rx.Subscription;
-import rx.functions.Action1;
-import sneer.android.ui.SneerActivity;
 import sneer.main.R;
 
-import static sneer.android.flux2.Components.component;
 
 public class ConversationListActivity extends SneerActivity {
 
-	private final ActionBus bus = component(ActionBus.class);
-	private final Conversations convos = component(Conversations.class);
+	private final ActionBus bus = singleton(ActionBus.class);
+	private final ConversationList convos = singleton(ConversationList.class);
 	private Subscription subscription;
 
 
@@ -41,10 +37,10 @@ public class ConversationListActivity extends SneerActivity {
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
 			long id = adapter.getItem(position).id;
-			bus.action(new Conversations.Click(id));
+			bus.action(new ConversationList.Click(id));
 		}});
 
-		subscription = ui(convos.summaries()).subscribe(new Action1<List<Conversations.Summary>>() { @Override public void call(List<Conversations.Summary> summaries) {
+		subscription = ui(convos.summaries()).subscribe(new Action1<List<ConversationList.Summary>>() { @Override public void call(List<ConversationList.Summary> summaries) {
 			adapter.update(summaries);
 		}});
 	}

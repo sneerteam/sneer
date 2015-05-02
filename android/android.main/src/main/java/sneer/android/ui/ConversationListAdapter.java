@@ -1,4 +1,4 @@
-package sneer.android.flux2;
+package sneer.android.ui;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -7,10 +7,7 @@ import android.graphics.Shader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
-import java.util.List;
 
 import sneer.main.R;
 
@@ -18,16 +15,14 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static sneer.android.ui.SneerActivity.findView;
 
-class ConversationListAdapter extends ArrayAdapter<Conversations.Summary> {
+class ConversationListAdapter extends ArrayAdapter<ConversationList.Summary> {
+
+	ConversationL
 
 	private final Activity activity;
 
-	ConversationListAdapter(Activity activity) {
-		super(activity, R.layout.list_item_main);
-		this.activity = activity;
-	}
 
-	void update(List<Conversations.Summary> summaries) {
+	void update(List<ConversationList.Summary> summaries) {
 		clear();
 		addAll(summaries);
 		notifyDataSetChanged();
@@ -49,7 +44,7 @@ class ConversationListAdapter extends ArrayAdapter<Conversations.Summary> {
 	}
 
 	private void updateConversation(int position, View view) {
-		Conversations.Summary summary = getItem(position);
+		ConversationList.Summary summary = getItem(position);
 
 //		ImageView pic     = findView(view, R.id.conversationPicture);
 		TextView  party   = findView(view, R.id.conversationParty);

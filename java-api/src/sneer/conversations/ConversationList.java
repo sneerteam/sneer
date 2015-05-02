@@ -1,13 +1,14 @@
-package sneer.android.flux2;
+package sneer.conversations;
 
+import java.lang.Override;
+import java.lang.String;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
-public interface Conversations {
+public interface ConversationList {
 
 	Observable<List<Summary>> summaries();
 
@@ -27,21 +28,21 @@ public interface Conversations {
 		}
 	}
 
-	class Click {
+	class Open {
 		public final long id;
 
-		public Click(long id) {
+		public Open(long id) {
 			this.id = id;
 		}
 	}
 
 
-	class Sim implements Conversations {
+	class Sim implements ConversationList {
 
 		@Override
 		public Observable<List<Summary>> summaries() {
 			BehaviorSubject<List<Summary>> subject = BehaviorSubject.create();
-			ArrayList<Summary> data = new ArrayList<>(10000);
+			ArrayList<Summary> data = new ArrayList(10000);
 			for (int i = 0; i < 10000; i++)
 				data.add(new Summary("Wesley " + i, "Hello " + i, i + " Days Ago", ""+i, 1042+i));
 			subject.onNext(data);

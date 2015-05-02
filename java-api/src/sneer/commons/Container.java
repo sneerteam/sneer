@@ -1,16 +1,23 @@
-package sneer.android.flux2;
+package sneer.commons;
 
-import java.util.HashMap;
+import java.lang.Class;import java.lang.ClassNotFoundException;import java.lang.Exception;import java.lang.Object;import java.lang.RuntimeException;import java.lang.String;import java.util.HashMap;
 import java.util.Map;
 
 
-public class Components {
+public class Container {
 
-	private static Map<Class<?>, Object> instancesByInterface = new HashMap<>();
+	private static Container singletons = new Container();
 
 	synchronized
-	public static <T> T component(Class<T> intrface) { //Method named to use with static import, for example: Foo foo = component(Foo.class)
-		T cached = (T) instancesByInterface.get(intrface);
+	static public <T> T singleton(Class<T> intrface) {
+		return singletons.component(intrface);
+	}
+
+	private Map<Class<?>, Object> instancesByInterface = new HashMap<Class<?>, Object>();
+
+	synchronized
+	public <T> T component(Class<T> intrface) { //Method named to use with static import, for example: Foo foo = component(Foo.class)
+		T cached = (T)instancesByInterface.get(intrface);
 		if (cached != null) return cached;
 
 		T created = instantiate(intrface);

@@ -1,6 +1,4 @@
-package sneer.android.flux2;
-
-import android.util.Log;
+package sneer.commons;
 
 public interface ActionBus {
 
@@ -11,7 +9,7 @@ public interface ActionBus {
 
 		@Override
 		public void action(Object action) {
-			Log.d("ActionBus", action.toString());
+			System.out.println("Action: " + action);
 		}
 	}
 
