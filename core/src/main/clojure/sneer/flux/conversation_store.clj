@@ -5,8 +5,7 @@
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.persistent-tuple-base :as ptb]
             [sneer.tuple.protocols :refer :all]
-            [sneer.async :refer [go-trace link-chan-to-subscriber thread-chan-to-subscriber]])
-  (:import [sneer.admin SneerAdmin]))
+            [sneer.async :refer [go-trace link-chan-to-subscriber thread-chan-to-subscriber]]))
 
 (defn create-summarization-state []
   {})
@@ -103,14 +102,17 @@
 ; Java interface
 
 (defn to-foreign-summary [{:keys [name summary timestamp unread]}]
-  (sneer.flux.ConversationStore$Summary. name summary timestamp unread))
+  (println "TODO: SUMMARY ID")
+  (sneer.conversations.ConversationList$Summary. name summary (str timestamp) (str unread) -4242))
 
-(defcomponent sneer.flux.ConversationStore [^SneerAdmin admin]
+
+(defimpl sneer.conversations.ConversationList []
 
   (defn summaries [this]
     (rx/observable*
      (fn [^rx.Subscriber subscriber]
-       (let [own-puk (.. admin privateKey publicKey)
+       (let [admin (throw (RuntimeException. "TODO: Retreive admin from container as a component."))
+             own-puk (.. admin privateKey publicKey)
              tuple-base (tuple-base-of admin)
              to-foreign (map (fn [summaries] (mapv to-foreign-summary summaries)))
              summaries-out (chan (sliding-buffer 1) to-foreign)
