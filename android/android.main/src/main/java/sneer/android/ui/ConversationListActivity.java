@@ -6,8 +6,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 
+import java.util.List;
+
 import rx.Subscription;
+import rx.functions.Action1;
+import sneer.commons.ActionBus;
+import sneer.conversations.ConversationList;
 import sneer.main.R;
+
+import static sneer.commons.Container.singleton;
 
 
 public class ConversationListActivity extends SneerActivity {
@@ -37,7 +44,7 @@ public class ConversationListActivity extends SneerActivity {
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
 			long id = adapter.getItem(position).id;
-			bus.action(new ConversationList.Click(id));
+			bus.action(new ConversationList.Open(id));
 		}});
 
 		subscription = ui(convos.summaries()).subscribe(new Action1<List<ConversationList.Summary>>() { @Override public void call(List<ConversationList.Summary> summaries) {

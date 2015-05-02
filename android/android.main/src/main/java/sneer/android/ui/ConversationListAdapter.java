@@ -1,14 +1,20 @@
 package sneer.android.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.List;
+
+import rx.subscriptions.CompositeSubscription;
+import sneer.conversations.ConversationList;
 import sneer.main.R;
 
 import static android.view.View.GONE;
@@ -17,10 +23,12 @@ import static sneer.android.ui.SneerActivity.findView;
 
 class ConversationListAdapter extends ArrayAdapter<ConversationList.Summary> {
 
-	ConversationL
+	private final LayoutInflater inflater;
 
-	private final Activity activity;
-
+	public ConversationListAdapter(Activity activity) {
+        super(activity, R.layout.list_item_main);
+		inflater = activity.getLayoutInflater();
+    }
 
 	void update(List<ConversationList.Summary> summaries) {
 		clear();
@@ -39,7 +47,6 @@ class ConversationListAdapter extends ArrayAdapter<ConversationList.Summary> {
 	}
 
 	private View inflateConversationView(ViewGroup parent) {
-		LayoutInflater inflater = activity.getLayoutInflater();
 		return inflater.inflate(R.layout.list_item_main, parent, false);
 	}
 
