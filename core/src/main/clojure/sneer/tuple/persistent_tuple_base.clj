@@ -272,12 +272,13 @@
               (close! new-tuples))
           (go-loop []
             (do
+              ;; TODO: Optimization, especially when no records are found: Query using next-tuple-id (see server-loop) minus one as the max id. Use that as the ::after-id value in the next loop iteration.
               (let [tuples (query-tuples-from-db db @criteria)]
                 (when-not (empty? tuples)
                   (doseq [tuple tuples]
                     (>! tuples-out tuple))
                   (swap! criteria assoc ::after-id (-> tuples last (get "id")))))
-              ;;TODO: (>! tuples-out :wait-marker)
+              ;;TODO: (>! tuples-out :wait-marker)      Klaus: Sounds interesting. What is the :wait-marker?
               (when (<! new-tuples)
                 (recur))))))
 
