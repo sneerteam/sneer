@@ -26,11 +26,6 @@ public class SneerApp extends Application {
 		super.onCreate();
 		if (DEVELOPER_MODE) setStrictMode();
 
-		//Do not delete this. We must revive the simulator for rapid UI development.
-//		SneerAndroidSingleton.setInstance(isCoreAvailable()
-//			? new SneerAndroidImpl(getApplicationContext())
-//			: new SneerAndroidSimulator(getApplicationContext()));
-
 		UncaughtExceptionReporter.start(getApplicationContext(), "klauswuestefeld@gmail.com", "Sneer");
 
 		Context app = getApplicationContext();
