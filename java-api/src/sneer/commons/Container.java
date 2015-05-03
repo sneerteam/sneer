@@ -13,7 +13,7 @@ public class Container {
 
 	static private final WeakHashMap<Object, Container> containersByComponent = new WeakHashMap<Object, Container>();
 
-	/** Useful for components to load others using: Container.of(this).produce(OtherComponent.class) */
+	/** Used by components to load others: Container.of(this).produce(OtherComponent.class) */
 	synchronized
 	static public Container of(Object component) {
 		Container ret = containersByComponent.get(component);
@@ -53,7 +53,10 @@ public class Container {
 
 	private void keep(Class<?> componentInterface, Object component) {
 		componentsByInterface.put(componentInterface, component);
-		containersByComponent.put(component, this);
+		if (containersByComponent.containsKey(component))
+			containersByComponent.remove(component); //Component is in more than one container. See Container.of(component) method.
+		else
+			containersByComponent.put(component, this);
 	}
 
 
