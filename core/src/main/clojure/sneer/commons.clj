@@ -1,5 +1,6 @@
 (ns sneer.commons
-  (:import [java.lang AutoCloseable]))
+  (:import [java.lang AutoCloseable]
+           [sneer.commons ActionBus]))
 
 (defprotocol Disposable
   (dispose [resource]))
@@ -52,3 +53,7 @@
   (let [next (try (fn initial) (catch Throwable t (.printStackTrace t)))]
     (when (not= next :break)
       (recur fn (merge initial next)))))
+
+(defn reify-ActionBus []
+  (reify ActionBus
+    (action [_ action] (println "Action: " action))))
