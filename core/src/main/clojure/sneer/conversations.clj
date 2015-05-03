@@ -45,7 +45,7 @@
 
 (defn- most-recent-message-timestamp [^Conversation conv]
   (let [^ObservedSubject subject (ObservedSubject/create 0)]
-    (.subscribe ^rx.Observable (.mostRecentMessageTimestamp conv) subject)
+    (.subscribe ^Observable (.mostRecentMessageTimestamp conv) subject)
     (-> subject .observed .current (or 0))))
 
 (defn reify-conversations [own-puk tuple-space contacts-state]
