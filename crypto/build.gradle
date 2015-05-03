@@ -9,7 +9,7 @@ targetCompatibility = 1.6
 dependencies {
   compile project(':sneer-java-api')
   testCompile 'junit:junit:4.11'
-  runtime('org.bouncycastle:bcprov-jdk16:1.46')
+  runtime('org.bouncycastle:bcprov-jdk16:1.46') //This is why the crypto project is separate.
 }
 
 uploadArchives {
