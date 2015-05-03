@@ -26,9 +26,9 @@ public class SneerApp extends Application {
 		super.onCreate();
 		if (DEVELOPER_MODE) setStrictMode();
 
-		UncaughtExceptionReporter.start(getApplicationContext(), "klauswuestefeld@gmail.com", "Sneer");
-
 		Context app = getApplicationContext();
+		UncaughtExceptionReporter.start(app, "klauswuestefeld@gmail.com", "Sneer");
+
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
 		PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
 		Notifier.start(app);
