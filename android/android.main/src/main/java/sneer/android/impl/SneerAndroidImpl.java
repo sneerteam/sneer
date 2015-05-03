@@ -10,29 +10,23 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
-
-import sneer.Conversation;
-
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Contact;
-
+import sneer.Conversation;
 import sneer.ConversationItem;
-import sneer.Message;
 import sneer.PublicKey;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.admin.SneerAdminFactory;
 import sneer.android.SneerAndroid;
 import sneer.android.database.SneerSqliteDatabase;
-import sneer.android.ipc.Plugins;
 import sneer.android.ipc.Plugin;
 import sneer.android.ipc.PluginActivities;
 import sneer.android.ipc.Plugins;
-import sneer.android.ipcold.PluginManager;
 import sneer.android.utils.AndroidUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
