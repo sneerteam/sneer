@@ -11,11 +11,16 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import sneer.Sneer;
+import sneer.admin.Database;
+import sneer.admin.SneerAdmin;
 import sneer.android.gcm.GcmRegistrationAlarmReceiver;
 import sneer.android.impl.SneerAndroidImpl;
 import sneer.android.ipc.PartnerSessions;
 import sneer.android.ui.Notifier;
 import sneer.android.utils.UncaughtExceptionReporter;
+
+import static sneer.android.SneerAndroidContainer.container;
 
 public class SneerApp extends Application {
 
@@ -29,10 +34,18 @@ public class SneerApp extends Application {
 		Context app = getApplicationContext();
 		UncaughtExceptionReporter.start(app, "klauswuestefeld@gmail.com", "Sneer");
 
+		// TODO: Migrate to container.
+		// Old pre-container way:
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
 		PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
 		Notifier.start(app);
 		GcmRegistrationAlarmReceiver.schedule(app);
+
+		// New container way:
+		SneerAdmin admin = SneerAndroidSingleton.admin();
+		container().inject(SneerAdmin.class, admin);
+		container().inject(Sneer.class,      admin.sneer());
+	}
 
 	private void setStrictMode() {
 		StrictMode.setThreadPolicy(
