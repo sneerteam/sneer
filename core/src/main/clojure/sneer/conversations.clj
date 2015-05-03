@@ -6,7 +6,6 @@
     [sneer.commons :refer [now produce!]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
-    [sneer.flux.macros :refer :all]
     [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]
     [sneer.party :refer [party->puk]]
     [sneer.tuple.persistent-tuple-base :as ptb]
