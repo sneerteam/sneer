@@ -5,7 +5,11 @@
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.persistent-tuple-base :as ptb]
             [sneer.tuple.protocols :refer :all]
-            [sneer.async :refer [go-trace link-chan-to-subscriber thread-chan-to-subscriber]]))
+            [sneer.async :refer [go-trace link-chan-to-subscriber thread-chan-to-subscriber]])
+  (:import (sneer.commons Container)
+           (sneer.admin SneerAdmin)
+           (rx Subscriber)
+           (sneer.conversations ConversationList$Summary)))
 
 (defn create-summarization-state []
   {})
@@ -103,21 +107,18 @@
 
 (defn to-foreign-summary [{:keys [name summary timestamp unread]}]
   (println "TODO: SUMMARY ID")
-  (sneer.conversations.ConversationList$Summary. name summary (str timestamp) (str unread) -4242))
+  (ConversationList$Summary. name summary (str timestamp) (str unread) -4242))
 
-
-(defimpl sneer.conversations.ConversationList []
-
-  (defn summaries [this]
-    (rx/observable*
-     (fn [^rx.Subscriber subscriber]
-       (let [admin (throw (RuntimeException. "TODO: Retreive admin from container as a component."))
-             own-puk (.. admin privateKey publicKey)
-             tuple-base (tuple-base-of admin)
-             to-foreign (map (fn [summaries] (mapv to-foreign-summary summaries)))
-             summaries-out (chan (sliding-buffer 1) to-foreign)
-             lease (chan)]
-         (link-chan-to-subscriber lease subscriber)
-         (link-chan-to-subscriber summaries-out subscriber)
-         (start-summarization-machine own-puk tuple-base summaries-out lease)
-         (thread-chan-to-subscriber summaries-out subscriber "conversation summaries"))))))
+(defn do-summaries [this]
+  (rx/observable*
+       (fn [^Subscriber subscriber]
+         (let [admin (.produce (Container/of this) SneerAdmin)
+               own-puk (.. admin privateKey publicKey)
+               tuple-base (tuple-base-of admin)
+               to-foreign (map (fn [summaries] (mapv to-foreign-summary summaries)))
+               summaries-out (chan (sliding-buffer 1) to-foreign)
+               lease (chan)]
+           (link-chan-to-subscriber lease subscriber)
+           (link-chan-to-subscriber summaries-out subscriber)
+           (start-summarization-machine own-puk tuple-base summaries-out lease)
+           (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
