@@ -1,5 +1,4 @@
-
-(ns sneer.flux.conversation-store-test
+(ns sneer.conversation-summarization-test
   (:require [midje.sweet :refer :all]
             [clojure.core.async :refer [chan close!]]
             [sneer.test-util :refer [<!!?]]
@@ -7,7 +6,7 @@
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :as keys]
-            [sneer.flux.conversation-store :as store]))
+            [sneer.conversations :as convos]))
 
 (facts "about the summarization machine"
 
@@ -32,7 +31,7 @@
 
                          (doseq [ps pending-stores] (<!!? ps)) ; wait for all stores to happen
 
-          machine (store/start-summarization-machine own-puk tuple-base summaries-out lease)]
+          subject (convos/start-summarization-machine own-puk tuple-base summaries-out lease)]
 
       (try
 
@@ -65,4 +64,4 @@
           (close! lease)))
 
       (fact "machine terminates when lease channel is closed"
-        (<!!? machine) => nil))))
+        (<!!? subject) => nil))))
