@@ -24,13 +24,7 @@ public class SneerApp extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		if (DEVELOPER_MODE) {
-			StrictMode.setThreadPolicy(
-					new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-			StrictMode.setVmPolicy(
-					new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
-		}
+		if (DEVELOPER_MODE) setStrictMode();
 
 		//Do not delete this. We must revive the simulator for rapid UI development.
 //		SneerAndroidSingleton.setInstance(isCoreAvailable()
@@ -44,6 +38,12 @@ public class SneerApp extends Application {
 		PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
 		Notifier.start(app);
 		GcmRegistrationAlarmReceiver.schedule(app);
+
+	private void setStrictMode() {
+		StrictMode.setThreadPolicy(
+				new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+		StrictMode.setVmPolicy(
+				new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
 	}
 
 
