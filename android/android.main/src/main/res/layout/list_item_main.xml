@@ -41,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/conversationParty"
         android:layout_toRightOf="@+id/conversationPicture"
+        android:ellipsize="end"
         android:lines="1"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
