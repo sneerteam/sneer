@@ -2,10 +2,6 @@ package sneer.android.ui.adapters;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
-import android.graphics.Shader.TileMode;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +13,6 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-import sneer.main.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -25,6 +20,7 @@ import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.SerialSubscription;
 import rx.subscriptions.Subscriptions;
 import sneer.Conversation;
+import sneer.main.R;
 import sneer.rx.ObservedSubject;
 
 import static sneer.android.SneerAndroidSingleton.sneer;
@@ -39,9 +35,6 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 	private final Activity activity;
 	private final CompositeSubscription subscriptions;
-	private final Shader textShader = new LinearGradient(200, 0, 650, 0,
-			new int[] {Color.DKGRAY, Color.LTGRAY},
-			new float[] {0, 1}, TileMode.CLAMP);
 
 	public MainAdapter(Activity activity) {
         super(activity, R.layout.list_item_main);
@@ -79,7 +72,6 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		widget.conversationSummary = findView(view, R.id.conversationSummary);
 		widget.conversationDate = findView(view, R.id.conversationDate);
 		widget.conversationPicture = findView(view, R.id.conversationPicture);
-		widget.conversationSummary.getPaint().setShader(textShader);
 		widget.conversationUnread = findView(view, R.id.conversationUnread);
 		view.setTag(widget);
 		return widget;
