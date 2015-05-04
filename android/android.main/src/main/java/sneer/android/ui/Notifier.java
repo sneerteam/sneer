@@ -28,6 +28,7 @@ import static sneer.android.SneerAndroidSingleton.sneer;
 
 public class Notifier {
 
+	private static final String TAG = "UNREAD CONVERSATIONS";
 	private static final int NOTIFICATION_ID = 1;
 
 	private static Context context;
@@ -107,7 +108,7 @@ public class Notifier {
 
     private static void cancelNotification() {
         handler.post(new Runnable() { public void run() {
-            notificationManager.cancel(NOTIFICATION_ID);
+            notificationManager.cancel(TAG, NOTIFICATION_ID);
         }});
     }
 
@@ -151,7 +152,7 @@ public class Notifier {
 				.setAutoCancel(true)
 				.setContentIntent(pendingIntent)
 				.setOngoing(false);
-		notificationManager.notify("unread conversations", NOTIFICATION_ID, builder.build());
+		notificationManager.notify(TAG, NOTIFICATION_ID, builder.build());
 	}
 
 }
