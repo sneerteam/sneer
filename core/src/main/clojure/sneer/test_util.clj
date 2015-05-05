@@ -1,8 +1,9 @@
 (ns sneer.test-util
   (:require
     [sneer.clojure.core :refer [nvl]]
-    [clojure.core.async :refer [alt!! timeout filter> >!! close! chan]]
+    [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]]
     [rx.lang.clojure.core :as rx]
+    [sneer.async :refer [go-loop-trace]]
     [sneer.rx :refer [observe-for-io subscribe-on-io]]))
 
 (defn >!!?
@@ -21,6 +22,17 @@
       (timeout timeout-millis) :timeout
       ch ([v] v))))
 
+(defn <wait-for! [ch expected]
+  (<!!
+    (go-loop-trace [previous nil]
+      (let [current (<!!? ch)]
+;        (println "Intermediate: " current)
+        (if (= current :timeout)
+          (do
+            (println "TIMEOUT waiting for:" expected "\n    but got:" previous)
+            :timeout)
+          (when-not (= current expected)
+            (recur current)))))))
 
 (defn compromised
   ([ch] (compromised ch 0.7))
