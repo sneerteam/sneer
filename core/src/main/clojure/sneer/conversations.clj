@@ -30,15 +30,17 @@
   (let [contact-id (contact-puk contact)
         contact-name (contact "payload")
         timestamp (contact "timestamp")]
-    (assoc state contact-id {:name contact-name :summary "" :timestamp timestamp :unread 0})))
+;    (println "Update contact:" contact)
+    (assoc state contact-id {:name contact-name :preview "" :timestamp timestamp :unread ""})))
 
 (defn update-message [own-puk message state]
   (let [author (message "author")
         contact-puk (if (= author own-puk) (message "audience") author)]
+;    (println "Update message:" message)
     (-> state (update contact-puk assoc
-                      :summary (or (message "label") "")
+                :preview   (or (message "label") "")
                 :timestamp (message "timestamp"))
-              (update-in [contact-puk :unread] inc))))
+              (assoc-in [contact-puk :unread] "*"))))
 
 (defn flip [f]
   (fn [x y] (f y x)))
@@ -46,7 +48,8 @@
 (defn summarize [state]
   (->> state
        vals
-       (sort-by :timestamp (flip compare))))
+       (sort-by :timestamp (flip compare))
+       vec))
 
 (defn summarization-state-from-contacts [contacts]
   (reduce
