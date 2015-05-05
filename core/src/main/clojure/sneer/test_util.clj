@@ -5,6 +5,14 @@
     [rx.lang.clojure.core :as rx]
     [sneer.rx :refer [observe-for-io subscribe-on-io]]))
 
+(defn >!!?
+  ([ch v]
+    (>!!? ch v 200))
+  ([ch v timeout-millis]
+    (alt!!
+      (timeout timeout-millis) false
+      [[ch v]] true)))
+
 (defn <!!?
   ([ch]
     (<!!? ch 200))
@@ -13,13 +21,6 @@
       (timeout timeout-millis) :timeout
       ch ([v] v))))
 
-(defn >!!?
-  ([ch v]
-    (>!!? ch v 200))
-  ([ch v timeout-millis]
-    (alt!!
-      (timeout timeout-millis) false
-      [[ch v]] true)))
 
 (defn compromised
   ([ch] (compromised ch 0.7))
