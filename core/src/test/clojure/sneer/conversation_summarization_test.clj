@@ -27,14 +27,12 @@
           _ (loop [timestamp 0
                    pending events]
               (let [e (first pending)]
-                (when-let [party (:contact-new e)]
-                  (println "Contact" (:nick e))
+                (when-let [party (:contact e)]
                   (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
                 (when-let [text (:recv e)]
                   (<!!? (store-message {"author" (:auth e) "label" text "timestamp" timestamp}))))
-              (when-let [val (next pending)]
-                (println "Val:" val)
-                (recur (inc timestamp) (next pending))))
+              (when-let [pending' (next pending)]
+                (recur (inc timestamp) pending')))
 
 ;          _ (println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
@@ -76,11 +74,18 @@
     []
 
     "Contact new"
-    [{:contact-new ann :nick "Ann"}]
+    [{:contact ann :nick "Ann"}]
     [{:name "Ann" :timestamp 0 :preview "" :unread ""}]
 
     "Message received from Ann is unread"
-    [{:contact-new ann :nick "Anna"}
+    [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}]
 
-    [{:name "Anna" :timestamp 1 :preview "Hello" :unread "*"}]))
+    [{:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}]
+
+    "Nick change should not affect other summary fields."
+    [{:contact ann :nick "Ann"}
+     {:recv "Hello" :auth ann}
+     {:contact ann :nick "Annabelle"}]
+
+    [{:name "Annabelle" :timestamp 1 :preview "Hello" :unread "*"}]))
