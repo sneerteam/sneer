@@ -69,14 +69,11 @@
   "Copies values from channel to rx subscriber in a separate thread."
   [chan ^rx.Subscriber subscriber ^String thread-name]
   (async/thread
-    (try
-      (.setName (Thread/currentThread) thread-name)
-      (while-let [value (<!! chan)]
-        (try
-          (rx/on-next subscriber value)
-          (catch Exception e
-            (throw (RuntimeException. (str "onNext Exception subscriber: " subscriber " value: " value "thread: " thread-name)
-                                      e)))))
-      (rx/on-completed subscriber)
-      (catch Exception e
-        (rx/on-error subscriber e)))))
+    (.setName (Thread/currentThread) thread-name)
+    (while-let [value (<!! chan)]
+      (try
+        (rx/on-next subscriber value)
+        (catch Exception e
+          (throw (RuntimeException. (str "onNext Exception. subscriber: " subscriber " value: " value "thread: " thread-name)
+                                    e)))))
+    (rx/on-completed subscriber)))
