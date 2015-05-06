@@ -8,7 +8,6 @@ import android.content.Intent;
 
 import java.util.Calendar;
 
-import sneer.android.ipcold.TupleSpaceService;
 import sneer.android.utils.LogUtils;
 
 public class SneerBoot extends BroadcastReceiver {
@@ -16,7 +15,6 @@ public class SneerBoot extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 		LogUtils.debug(SneerBoot.class, "Starting Sneer background service");
-        TupleSpaceService.startTupleSpaceService(context);
 
         // This is an attempt to make the CPU and network wake up periodically to fetch new tuples.
         // It can be used if Google Cloud Messaging (GCM) doesn't work.
