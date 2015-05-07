@@ -26,6 +26,7 @@
         own? (= own-puk (.author tuple))]
 
     (reify Message
+      (id [_] (get tuple "id"))
       (isOwn [_] own?)
       (label [_] label)
       (jpegImage [_] jpeg-image)
@@ -90,9 +91,18 @@
   (let [original-id (get tuple "original_id")
         author (get tuple "author")
         publisher (.. space publisher (type "session-message") (field "session-id" original-id) (field "session-author" author) (audience contact-puk))
-        filter    (.. space filter    (type "session-message") (field "session-id" original-id) (field "session-author" author))]
+        filter    (.. space filter    (type "session-message") (field "session-id" original-id) (field "session-author" author))
+        created (.timestamp tuple)]
+    
     (reify Session
       (id [_] (get tuple "id"))
+      (isOwn [_] (= own-puk author))
+      (label [this] (.type this))
+      (jpegImage [_] ^bytes (.get tuple "jpeg-image"))
+      (timestampCreated [_] created)
+      (timestampReceived [_] 0)
+      (timeCreated [_] (format-date created))
+      (tuple [_] tuple)
       (type [_] (get tuple "session-type"))
       (messages [_]
 
@@ -161,7 +171,7 @@
       (sendMessage [_ label] (.. (message-sender) (field "label" label) pub))
 
       (sessions [_] sessions)
-      (items [_] messages)
+      (items [_] (combine-latest #(->> (first %) (concat (second %)) (sort-by (fn [item] (.id item))) vec) [messages sessions]))
       (mostRecentMessageContent   [_] (map-some message-label     most-recent-message))
       (mostRecentMessageTimestamp [_] (map-some message-timestamp most-recent-message))
 
