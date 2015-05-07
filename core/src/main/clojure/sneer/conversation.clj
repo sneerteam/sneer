@@ -89,15 +89,19 @@
 (defn reify-session [space own-puk contact-puk tuple]
   (let [original-id (get tuple "original_id")
         author (get tuple "author")
-        publisher (.. space publisher (type "message") (field "ref" original-id) (field "session_author" author) (audience contact-puk))
-        filter    (.. space filter    (type "message") (field "ref" original-id) (field "session_author" author))]
+        publisher (.. space publisher (type "session-message") (field "session-id" original-id) (field "session-author" author) (audience contact-puk))
+        filter    (.. space filter    (type "session-message") (field "session-id" original-id) (field "session-author" author))]
     (reify Session
       (id [_] (get tuple "id"))
       (type [_] (get tuple "session-type"))
       (messages [_]
+
+        ;; This is how it was done before (by merging the two filters below) but ordering by id was not garanteed:
+       ;(-> filter (.audience contact-puk) (.author own-puk) .tuples)
+        (-> filter (.audience own-puk) (.author contact-puk) .tuples (rx/subscribe identity)) ;; Force a valid sub to be sent
+
         (->>
-          (rx/merge (.. filter (audience contact-puk) (author own-puk) tuples)
-                    (.. filter (audience own-puk) (author contact-puk) tuples))
+          (.tuples filter) ;; This is how we do it now so tuples come ordered by id
           (rx/map #(reify-message own-puk %))))
       (send [_ payload]
         (.pub publisher payload)))))

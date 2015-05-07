@@ -37,8 +37,8 @@
             replay2 => []
             (.type session) => "some type"
             (<!!? messages) => #(-> % .payload (= "some payload"))
-            (<!!? unread-m) => 0                        ; Skip history replay :(
-            (<!!? unread-m) => 1
+            ;;(<!!? unread-m) => 0                        ; Skip history replay :(
+            ;;(<!!? unread-m) => 1
             (.send session "some reply")))
 
         (fact "Neide sees reply from Maico"
@@ -49,8 +49,8 @@
                 messages (->chan (.messages session))]
             replay1 => []
             replay2 => []
-            (<!!? messages) => #(-> % .payload (= "some payload"))
-            (<!!? messages) => #(-> % .payload (= "some reply")))
-          (<!!? unread-n) => 0                          ; Skip history replay :(
+            (.payload (<!!? messages)) => "some payload"
+            (.payload (<!!? messages)) => "some reply")
+          ;;(<!!? unread-n) => 0                          ; Skip history replay :(
           ; (<!!? unread-n) => 1
           )))))

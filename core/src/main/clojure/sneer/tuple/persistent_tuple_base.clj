@@ -278,7 +278,7 @@
                   (doseq [tuple tuples]
                     (>! tuples-out tuple))
                   (swap! criteria assoc ::after-id (-> tuples last (get "id")))))
-              ;;TODO: (>! tuples-out :wait-marker)      Klaus: Sounds interesting. What is the :wait-marker?
+              ;;TODO: (>! tuples-out :wait-marker)
               (when (<! new-tuples)
                 (recur))))))
 
