@@ -99,6 +99,16 @@
       (send [_ payload]
         (.pub publisher payload)))))
 
+(defn other-party [tuple own-puk]
+  (if (= (.author tuple) own-puk)
+    (.audience tuple)
+    (.author tuple)))
+
+(defn reify-session-by-id [space own-puk id]
+  (let [filter (.. space filter (field "id" id))
+        tuple  (.. filter localTuples toBlocking first)]
+    (reify-session space own-puk (other-party tuple own-puk) tuple)))
+
 (defn- sessions [tuple-space own-puk party-puk]
   (let [filter (.. tuple-space filter (type "session"))
         tuples-out (.. filter (author own-puk  ) (audience party-puk) tuples)

@@ -112,7 +112,14 @@
                 (let [contact (.produceContact sneer "bob" nil nil)
                       conversation (.withContact subject contact)
                       channel (->chan (.canSendMessages conversation))]
-                  (<!!? channel) => false)))
+                  (<!!? channel) => false))
+
+          (fact "sessions can be found by id"
+            (let [contact (.produceContact sneer "anna" anna nil)
+                  conversation (.withContact subject contact)
+                  started (<!!? (->chan (.startSession conversation "some-type")))
+                  found (.findSessionById subject (.id started))]
+              (.id found) => (.id started))))
 
         (let [^Sneer         sneer-2   (new-sneer tuple-space own-prik)
               ^Conversations subject-2 (.conversations sneer-2)

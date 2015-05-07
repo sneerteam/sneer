@@ -179,9 +179,9 @@
     (.subscribe ^Observable (.mostRecentMessageTimestamp conv) subject)
     (-> subject .observed .current (or 0))))
 
-(defn reify-conversations [own-puk tuple-space contacts-state]
+(defn reify-conversations [own-puk space contacts-state]
   (let [convos (atom {})
-        reify-conversation (partial reify-conversation tuple-space own-puk)
+        reify-conversation (partial reify-conversation space own-puk)
         ignored-conversation (behavior-subject)
         contacts (get-contacts contacts-state)
         produce-convo (fn [contact] (produce! reify-conversation convos contact))]
@@ -234,4 +234,7 @@
                   (notification-for-many unread-pairs))))))
 
       (notificationsStartIgnoring [_ conversation] (.onNext ignored-conversation conversation))
-      (notificationsStopIgnoring  [_]              (.onNext ignored-conversation nil)))))
+      (notificationsStopIgnoring  [_]              (.onNext ignored-conversation nil))
+
+      (findSessionById [_ id]
+        (reify-session-by-id space own-puk id)))))
