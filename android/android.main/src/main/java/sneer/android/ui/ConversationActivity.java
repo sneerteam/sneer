@@ -29,19 +29,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import sneer.ConversationItem;
-import sneer.android.utils.AndroidUtils;
-import sneer.main.R;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import sneer.Contact;
 import sneer.Conversation;
-import sneer.Message;
+import sneer.ConversationItem;
 import sneer.Party;
 import sneer.android.ui.adapters.ConversationAdapter;
+import sneer.android.utils.AndroidUtils;
+import sneer.main.R;
 
 import static rx.Observable.never;
 import static sneer.android.SneerAndroidSingleton.sneer;
@@ -89,7 +88,8 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
 			R.layout.list_item_user_message,
 			R.layout.list_item_party_message,
 			messages,
-			contact);
+			contact,
+			conversation);
 
 		((ListView)findViewById(R.id.messageList)).setAdapter(adapter);
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import sneer.Contact;
 import sneer.Conversation;
 import sneer.ConversationItem;
 import sneer.PublicKey;
+import sneer.Session;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.admin.SneerAdminFactory;
@@ -187,13 +189,16 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 
 	@Override
-	public boolean isClickable(ConversationItem message) {
-		return false; //TODO: Revise
+	public boolean isClickable(ConversationItem item) {
+		return item instanceof Session;
 	}
 
 	@Override
-	public void doOnClick(ConversationItem message) {
-		Log.i(getClass().getName(), "Message clicked: " + message);
+	public void doOnClick(ConversationItem item, Conversation convo) {
+		if (item instanceof Session)
+			PluginActivities.open(context, (Session)item, convo);
+		else
+			Toast.makeText(context, "Message clicked: " + item, Toast.LENGTH_LONG).show();
 	}
 
 }

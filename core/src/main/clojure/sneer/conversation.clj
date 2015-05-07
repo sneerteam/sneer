@@ -33,6 +33,7 @@
       (timestampReceived [_] 0)
       (timeCreated [_] (format-date created))
       (tuple [_] tuple)
+      (payload [_] (.payload tuple))
       Object
       (toString [_] label))))
 
@@ -94,8 +95,10 @@
       (id [_] (get tuple "id"))
       (type [_] (get tuple "session-type"))
       (messages [_]
-        (rx/merge (.. filter (audience contact-puk) (author own-puk)     tuples)
-                  (.. filter (audience own-puk)     (author contact-puk) tuples)))
+        (->>
+          (rx/merge (.. filter (audience contact-puk) (author own-puk) tuples)
+                    (.. filter (audience own-puk) (author contact-puk) tuples))
+          (rx/map #(reify-message own-puk %))))
       (send [_ payload]
         (.pub publisher payload)))))
 

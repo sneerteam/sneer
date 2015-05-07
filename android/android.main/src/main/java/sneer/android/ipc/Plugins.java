@@ -27,6 +27,14 @@ public class Plugins {
 	}
 
 
+	static Plugin forSessionType(Context context, String type) {
+		for (Plugin p : all(context))
+			if (p.partnerSessionType.equals(type))
+				return p;
+		return null;
+	}
+
+
 	private static List<ApplicationInfo> installedApps(Context context) {
 		return context.getPackageManager().getInstalledApplications(GET_META_DATA);
 	}

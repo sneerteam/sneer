@@ -8,7 +8,12 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import rx.functions.Action1;
 import sneer.Conversations;
 import sneer.Session;
 import sneer.android.impl.Envelope;
@@ -30,17 +35,31 @@ public class PartnerSessions extends Service {
 
 		public SessionHandler(Session session) {
 			this.session = session;
+			session.messages().subscribe(new Action1<sneer.Message>() { @Override public void call(sneer.Message message) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("wasSentByMe", message.isOwn());
+				map.put("payload", message.payload());
+				sendToApp(map);
+			}});
 		}
 
 		@Override
 		public void handleMessage(Message msg) {
-//			session.send(msg.obj);
-			if (toApp == null) {
-				Bundle data = msg.getData();
-				data.setClassLoader(getClassLoader());
-				toApp = ((Messenger) ((Envelope) data.getParcelable(ENVELOPE)).content);
-			}
-			sendToApp("Hello!!!");
+			Object payload = getPayload(msg);
+			if (isFirstMessage())
+				toApp = (Messenger)payload;
+			else
+				session.send(payload);
+		}
+
+		private Object getPayload(Message msg) {
+			Bundle data = msg.getData();
+			data.setClassLoader(getClassLoader());
+			return ((Envelope)data.getParcelable(ENVELOPE)).content;
+		}
+
+		private boolean isFirstMessage() {
+			return toApp == null;
 		}
 
 		private void sendToApp(Object data) {
@@ -66,16 +85,14 @@ public class PartnerSessions extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-//		long token = intent.getExtras().getLong(TOKEN);
-//		Session session = conversations.findSessionById(token);
-//		if (session != null)
-//		return new Messenger(new SessionHandler(session)).getBinder();
-//		else {
-//			Toast.makeText(this, "Conversation session not found. Token: " + token, Toast.LENGTH_LONG).show();
-//			return null;
-//		}
-		return new Messenger(new SessionHandler(null)).getBinder();
-
+		long token = intent.getExtras().getLong(TOKEN);
+		Session session = conversations.findSessionById(token);
+		if (session != null)
+			return new Messenger(new SessionHandler(session)).getBinder();
+		else {
+			Toast.makeText(this, "Conversation session not found. Token: " + token, Toast.LENGTH_LONG).show();
+			return null;
+		}
 	}
 
 	public static Intent intentFor(Session session) {

@@ -17,17 +17,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 import java.util.Random;
 
-import sneer.ConversationItem;
-import sneer.main.R;
 import rx.functions.Action1;
 import sneer.Contact;
-import sneer.Message;
+import sneer.Conversation;
+import sneer.ConversationItem;
 import sneer.android.ui.drawable.TriangleLeftDrawable;
 import sneer.android.ui.drawable.TriangleRightDrawable;
+import sneer.main.R;
 
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findImageView;
@@ -39,19 +40,22 @@ public class ConversationAdapter extends ArrayAdapter<ConversationItem> implemen
     private final int listContactResourceId;
 	private final LayoutInflater inflater;
 	private final Contact contact;
+	private final Conversation convo;
 
-    public ConversationAdapter(Context context,
+	public ConversationAdapter(Context context,
     		LayoutInflater inflater,
     		int layoutUserResourceId,
     		int listContactResourceId,
     		List<ConversationItem> messages,
-		    Contact contact) {
+		    Contact contact,
+			Conversation convo) {
         super(context, layoutUserResourceId, messages);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
         this.listContactResourceId = listContactResourceId;
 		this.contact = contact;
-    }
+		this.convo = convo;
+	}
 
 
 	@SuppressLint("ViewHolder") @Override
@@ -141,7 +145,7 @@ public class ConversationAdapter extends ArrayAdapter<ConversationItem> implemen
 
 	@Override
 	public void onClick(View v) {
-		sneerAndroid().doOnClick((Message) v.getTag());
+		sneerAndroid().doOnClick((ConversationItem) v.getTag(), convo);
 	}
 
 }
