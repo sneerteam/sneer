@@ -20,7 +20,10 @@ public class PluginActivities {
 
 	public static void open(Context context, Session session, Conversation convo) {
 		Plugin plugin = Plugins.forSessionType(context, session.type());
-		start(context, plugin, convo, session);
+		if (plugin == null)
+			Toast.makeText(context, "Please install an app for " + session.type(), Toast.LENGTH_LONG).show();
+		else
+			start(context, plugin, convo, session);
 	}
 
 	private static void start(final Context context, Plugin plugin, Conversation convo, Session session) {

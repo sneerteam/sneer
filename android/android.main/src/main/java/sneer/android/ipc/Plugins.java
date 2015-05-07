@@ -29,7 +29,7 @@ public class Plugins {
 
 	static Plugin forSessionType(Context context, String type) {
 		for (Plugin p : all(context))
-			if (p.partnerSessionType.equals(type))
+			if (type.equals(p.partnerSessionType))
 				return p;
 		return null;
 	}
