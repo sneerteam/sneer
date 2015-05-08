@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,29 +40,37 @@ public class Plugins {
 
 
 	private static void accumulateIfPlugin(List<Plugin> plugins, Context context, ApplicationInfo app) {
-        Plugin plugin = toPlugin(context, app);
-        if (plugin != null) {
-            plugins.add(plugin);
-            Log.i(Plugins.class.getSimpleName(), "Sneer Plugin accumulated: " + plugin.packageName + ", Caption: " + plugin.caption);
+		List<Plugin> pluginList = toPlugin(context, app);
+        if (pluginList != null) {
+			for (Plugin p : pluginList) {
+				plugins.add(p);
+				Log.i(Plugins.class.getSimpleName(), "Sneer Plugin accumulated: " + p.packageName + ", Caption: " + p.caption);
+			}
         }
     }
 
 
-	private static Plugin toPlugin(Context context, ApplicationInfo app) {
+	private static List<Plugin> toPlugin(Context context, ApplicationInfo app) {
 		if (!hasSneerMetaData(app)) return null;
 
 		String packageName = app.packageName;
 		ActivityInfo[] activities = getActivityInfos(context, packageName);
+
 		if (activities == null) return null;
 
-		String activityClassName = activities[0].name;
-        CharSequence caption     = activities[0].loadLabel(context.getPackageManager());
-        Drawable icon            = activities[0].loadIcon(context.getPackageManager());
-		String sessionType       = sessionType(activities[0]);
+		List<Plugin> ret = new ArrayList<>();
+		for (ActivityInfo ai : activities) {
+			if (ai.exported) {
+				CharSequence caption = ai.loadLabel(context.getPackageManager());
+				Drawable icon = ai.loadIcon(context.getPackageManager());
+				String activityClassName = ai.name;
+				String sessionType = sessionType(ai);
 
-		Log.d("Plugins", "" + sessionType);
-
-        return new Plugin(caption, icon, packageName, activityClassName, sessionType);
+				Log.d("Plugins", "" + sessionType);
+				ret.add(new Plugin(caption, icon, packageName, activityClassName, sessionType));
+			}
+		}
+        return ret;
 	}
 
 
@@ -81,10 +88,6 @@ public class Plugins {
 			Log.e(Plugins.class.getSimpleName(), "Error", e);
 			return null;
 		}
-		if (ret.length != 1) {
-			toastTooManyActivities(context, packageName, ret.length);
-			return null;
-		}
 		return ret;
 	}
 
@@ -92,10 +95,5 @@ public class Plugins {
 	private static boolean hasSneerMetaData(ApplicationInfo app) {
 		return (app.metaData != null && app.metaData.get("SneerApp") != null);
 	}
-
-
-    private static void toastTooManyActivities(Context context, String packageName, int numActivities) {
-        Toast.makeText(context, packageName + " has " + numActivities + " activities. Should have 1 exported activity", Toast.LENGTH_LONG).show();
-    }
 
 }
