@@ -1,21 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="sneer.location">
+<manifest
+    package="sneer.location"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@android:style/Theme.DeviceDefault.Dialog">
+        android:label="@string/app_name">
 
-        <meta-data android:name="SneerApp" android:value=""/>
+        <meta-data
+            android:name="SneerApp"
+            android:value=""/>
+
+        <activity
+            android:name="location.MainActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog">
+        </activity>
 
         <activity
             android:name="location.LocationActivity"
             android:excludeFromRecents="true"
-            android:exported="true">
+            android:theme="@android:style/Theme.DeviceDefault.Dialog">
         </activity>
+
+        <activity
+            android:name="location.FollowMeActivity"
+            android:excludeFromRecents="true">
+        </activity>
+
+        <service
+            android:name="location.LocationService"
+            android:enabled="true">
+        </service>
+
+        <receiver
+            android:name="location.LocationServiceKiller"
+            android:enabled="true">
+        </receiver>
 
     </application>
 

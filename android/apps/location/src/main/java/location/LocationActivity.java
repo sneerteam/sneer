@@ -28,7 +28,7 @@ public class LocationActivity extends Activity implements LocationListener {
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_location);
         textAccuracy = (TextView) findViewById(R.id.textAccuracy);
         sendButton = (Button) findViewById(R.id.buttonSend);
         sendButton.setEnabled(false);
@@ -74,6 +74,7 @@ public class LocationActivity extends Activity implements LocationListener {
         updateTextAccuracy();
     }
 
+
     private void updateTextAccuracy() {
         Log.d(">>>> LocationChanged: ", latestLocation.toString());
 
@@ -86,17 +87,11 @@ public class LocationActivity extends Activity implements LocationListener {
         });
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-    }
-    @Override
-    public void onProviderEnabled(String provider) {
+    @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
+    @Override public void onProviderEnabled(String provider) { }
+    @Override public void onProviderDisabled(String provider) { }
 
-    }
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
 }
 
 
