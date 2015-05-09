@@ -54,8 +54,6 @@
 
 (def neide (->puk "neide"))
 
-(def carla (->puk "carla"))
-
 (facts "About reify-conversation"
   (let [scenario (neide-maicon-conversation-scenario!)]
     (with-open [_neide-db (:neide-db scenario)

@@ -137,12 +137,12 @@
   (let [party (.. contact party observable)
         contact-puks (switch-map-some #(.. % publicKey observable) party)
 
-        contact->lists (fn [fn] (switch-map-some fn [] contact-puks))
         messages (fn [contact-puk] (items space own-puk contact-puk "message"))
         sessions (fn [contact-puk] (items space own-puk contact-puk "session"))
-        message-lists (contact->lists #(lists-sorted-by-id (messages %)))
-        session-lists (contact->lists #(lists-sorted-by-id (sessions %)))
-        items-lists   (contact->lists #(lists-sorted-by-id (rx/merge (messages %) (sessions %))))
+        contact->lists (fn [fn] (switch-map-some #(lists-sorted-by-id (fn %)) [] contact-puks))
+        message-lists (contact->lists messages)
+        session-lists (contact->lists sessions)
+        items-lists   (contact->lists #(rx/merge (messages %) (sessions %)))
 
         last-read-filter #(.. space filter (type "message-read") (audience %) (author own-puk) last tuples)
         last-read (switch-map-some last-read-filter contact-puks)
