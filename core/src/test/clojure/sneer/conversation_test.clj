@@ -65,7 +65,7 @@
       (let [n->m (:neide->maico scenario)
             m->n (:maico->neide scenario)
 
-            messages               (->chan (.items                      m->n))
+            items                  (->chan (.items                      m->n))
             most-recent-labels     (->chan (.mostRecentMessageContent   m->n))
             most-recent-timestamps (->chan (.mostRecentMessageTimestamp m->n))
             unread-counts          (->chan (.unreadMessageCount         m->n))
@@ -73,7 +73,7 @@
             t0 (System/currentTimeMillis)]
 
         (fact "initial values are empty"
-          (<!!? messages) => []
+          (<!!? items) => []
           (<!!? most-recent-labels) => :nil
           (<!!? most-recent-timestamps) => :nil
           (<!!? unread-counts) => 0)
@@ -97,8 +97,8 @@
           (<!!? most-recent-labels) => "Hi, Maico3"
           (<!!? unread-counts) => 3
 
-          (<!!? messages) => []                             ; Skipping history replay. :(
-          (let [msg (first (<!!? messages))]
+          (<!!? items) => []                             ; Skipping history replay. :(
+          (let [msg (first (<!!? items))]
             (.setRead m->n msg))
           (<!!? unread-counts) => 2)
 

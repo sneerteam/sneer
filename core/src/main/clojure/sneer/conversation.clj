@@ -137,10 +137,12 @@
   (let [party (.. contact party observable)
         contact-puks (switch-map-some #(.. % publicKey observable) party)
 
-        message-lists (fn [contact-puk] (lists-sorted-by-id (items space own-puk contact-puk "message")))
-        session-lists (fn [contact-puk] (lists-sorted-by-id (items space own-puk contact-puk "session")))
-        message-lists (switch-map-some #(message-lists %) [] contact-puks)
-        session-lists (switch-map-some #(session-lists %) [] contact-puks)
+        contact->lists (fn [fn] (switch-map-some fn [] contact-puks))
+        messages (fn [contact-puk] (items space own-puk contact-puk "message"))
+        sessions (fn [contact-puk] (items space own-puk contact-puk "session"))
+        message-lists (contact->lists #(lists-sorted-by-id (messages %)))
+        session-lists (contact->lists #(lists-sorted-by-id (sessions %)))
+        items-lists   (contact->lists #(lists-sorted-by-id (rx/merge (messages %) (sessions %))))
 
         last-read-filter #(.. space filter (type "message-read") (audience %) (author own-puk) last tuples)
         last-read (switch-map-some last-read-filter contact-puks)
@@ -152,7 +154,7 @@
                       (assert "Contact does not have a known public key."))
 
         sender #(.. space publisher (audience (contact-puk)))
-        message-sender      #(.. (sender) (type "message"     ) (field "message-type" "chat"))
+        message-sender #(.. (sender) (type "message") (field "message-type" "chat"))
         message-read-sender #(.. (sender) (type "message-read"))]
 
     (reify
@@ -163,8 +165,8 @@
       (sendMessage [_ label] (.. (message-sender) (field "label" label) pub))
 
       (sessions [_] session-lists)
-      (items [_] (combine-latest #(->> (first %) (concat (second %)) (sort-by (fn [item] (.id item))) vec) [message-lists session-lists]))
-      (mostRecentMessageContent   [_] (map-some message-label     most-recent-message))
+      (items [_] items-lists)
+      (mostRecentMessageContent [_] (map-some message-label most-recent-message))
       (mostRecentMessageTimestamp [_] (map-some message-timestamp most-recent-message))
 
       (unreadMessages [_] (unread-messages message-lists last-read))
