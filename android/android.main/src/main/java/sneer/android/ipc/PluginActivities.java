@@ -7,12 +7,14 @@ import android.widget.Toast;
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Session;
+import sneer.android.impl.IPCProtocol;
 import sneer.android.utils.AndroidUtils;
+
+import static sneer.android.impl.IPCProtocol.JOIN_SESSION;
 
 public class PluginActivities {
 
 	private static final String SEND_MESSAGE = "SEND_MESSAGE";
-	private static final String JOIN_SESSION = "JOIN_SESSION";
 
 	public static void start(final Context context, Plugin plugin, Conversation convo) {
 		start(context, plugin, convo, null);
