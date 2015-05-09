@@ -120,19 +120,18 @@
     (->> (rx/merge tuples-in tuples-out)
          (rx/map #(reify-item space own-puk party-puk %)))))
 
-(defn- message-lists [tuple-space own-puk party-puk]
-  (->> (items tuple-space own-puk party-puk "message")
+(defn- lists-sorted-by-id [items]
+  (->> items
        (rx/reductions conj (sorted-set-by item-ids))
        (rx/map vec)
        (rx/cons [])
        shared-latest))
 
+(defn- message-lists [tuple-space own-puk party-puk]
+  (lists-sorted-by-id (items tuple-space own-puk party-puk "message")))
+
 (defn- session-lists [tuple-space own-puk party-puk]
-  (->> (items tuple-space own-puk party-puk "session")
-       (rx/reductions conj (sorted-set-by item-ids))
-       (rx/map vec)
-       (rx/cons [])
-       shared-latest))
+  (lists-sorted-by-id (items tuple-space own-puk party-puk "session")))
 
 (defn- start-session [space own-puk contact-puk session-type]
   (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" session-type) pub)]
