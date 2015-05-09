@@ -127,12 +127,6 @@
        (rx/cons [])
        shared-latest))
 
-(defn- message-lists [tuple-space own-puk party-puk]
-  (lists-sorted-by-id (items tuple-space own-puk party-puk "message")))
-
-(defn- session-lists [tuple-space own-puk party-puk]
-  (lists-sorted-by-id (items tuple-space own-puk party-puk "session")))
-
 (defn- start-session [space own-puk contact-puk session-type]
   (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" session-type) pub)]
     (rx/map #(reify-session space own-puk contact-puk %)
@@ -143,8 +137,10 @@
   (let [party (.. contact party observable)
         contact-puks (switch-map-some #(.. % publicKey observable) party)
 
-        session-lists (switch-map-some #(session-lists space own-puk %) [] contact-puks)
-        message-lists (switch-map-some #(message-lists space own-puk %) [] contact-puks)
+        message-lists (fn [contact-puk] (lists-sorted-by-id (items space own-puk contact-puk "message")))
+        session-lists (fn [contact-puk] (lists-sorted-by-id (items space own-puk contact-puk "session")))
+        message-lists (switch-map-some #(message-lists %) [] contact-puks)
+        session-lists (switch-map-some #(session-lists %) [] contact-puks)
 
         last-read-filter #(.. space filter (type "message-read") (audience %) (author own-puk) last tuples)
         last-read (switch-map-some last-read-filter contact-puks)
