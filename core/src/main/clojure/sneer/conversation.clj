@@ -8,7 +8,7 @@
    [sneer.contact :refer [get-contacts puk->contact]]
    [sneer.tuple.space :refer [payload]])
   (:import
-    [sneer PublicKey Contact Conversation Message Session]
+    [sneer PublicKey Contact Conversation Message Session ConversationItem]
     [sneer.tuples Tuple TupleSpace]
     [java.text SimpleDateFormat]
     [rx Observable]))
@@ -38,9 +38,6 @@
       Object
       (toString [_] label))))
 
-(defn- message-id [^Message msg]
-  (-> msg .tuple (get "id")))
-
 (defn own? [^Message message]
   (.isOwn message))
 
@@ -59,7 +56,7 @@
 
 (def unread (interop/fn [messages last-read-id]
                         (->> (reverse-party-messages messages)
-                             (take-while #(and (> (message-id %) last-read-id)
+                             (take-while #(and (> (.id %) last-read-id)
                                                (recent? %)))  ;TODO Remove this "recent" hack and fix redundant notification generation.
                              vec)))
 
@@ -68,24 +65,9 @@
     (latest
       (Observable/combineLatest messages last-read-id unread))))
 
-(defn- message-ids [m1 m2]
-  (compare (message-id m1)
-           (message-id m2)))
-
-(defn- session-ids [s1 s2]
-  (compare (.id s1)
-           (.id s2)))
-
-(defn- messages [tuple-space own-puk party-puk]
-  (let [filter (.. tuple-space filter (type "message"))
-        tuples-out (.. filter (author own-puk  ) (audience party-puk) tuples)
-        tuples-in  (.. filter (author party-puk) (audience own-puk  ) tuples)]
-    (->> (rx/merge tuples-in tuples-out)
-         (rx/map #(reify-message own-puk %))
-         (rx/reductions conj (sorted-set-by message-ids))
-         (rx/map vec)
-         (rx/cons [])
-         shared-latest)))
+(defn- item-ids [item1 item2]
+  (compare (.id item1)
+           (.id item2)))
 
 (defn reify-session [space own-puk contact-puk tuple]
   (let [original-id (get tuple "original_id")
@@ -126,16 +108,31 @@
         tuple  (.. filter localTuples toBlocking first)]
     (reify-session space own-puk (other-party tuple own-puk) tuple)))
 
-(defn- sessions [tuple-space own-puk party-puk]
-  (let [filter (.. tuple-space filter (type "session"))
+(defn reify-item [space own-puk party-puk tuple]
+  (case (.type tuple)
+    "message" (reify-message own-puk tuple)
+    "session" (reify-session space own-puk party-puk tuple)))
+
+(defn- items [space own-puk party-puk type]
+  (let [filter (.. space filter (type type))
         tuples-out (.. filter (author own-puk  ) (audience party-puk) tuples)
         tuples-in  (.. filter (author party-puk) (audience own-puk  ) tuples)]
     (->> (rx/merge tuples-in tuples-out)
-         (rx/map #(reify-session tuple-space own-puk party-puk %))
-         (rx/reductions conj (sorted-set-by session-ids))
-         (rx/map vec)
-         (rx/cons [])
-         shared-latest)))
+         (rx/map #(reify-item space own-puk party-puk %)))))
+
+(defn- messages [tuple-space own-puk party-puk]
+  (->> (items tuple-space own-puk party-puk "message")
+       (rx/reductions conj (sorted-set-by item-ids))
+       (rx/map vec)
+       (rx/cons [])
+       shared-latest))
+
+(defn- sessions [tuple-space own-puk party-puk]
+  (->> (items tuple-space own-puk party-puk "session")
+       (rx/reductions conj (sorted-set-by item-ids))
+       (rx/map vec)
+       (rx/cons [])
+       shared-latest))
 
 (defn- start-session [space own-puk contact-puk session-type]
   (let [tuple-obs (.. space publisher (audience contact-puk) (type "session") (field "session-type" session-type) pub)]
@@ -177,6 +174,6 @@
 
       (unreadMessages [_] (unread-messages messages last-read))
       (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
-      (setRead [_ message] (.pub (message-read-sender) (message-id message)))
+      (setRead [_ message] (.pub (message-read-sender) (.id message)))
 
       (startSession [_ type] (start-session space own-puk (contact-puk) type)))))
