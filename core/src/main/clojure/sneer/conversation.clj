@@ -120,14 +120,14 @@
     (->> (rx/merge tuples-in tuples-out)
          (rx/map #(reify-item space own-puk party-puk %)))))
 
-(defn- messages [tuple-space own-puk party-puk]
+(defn- message-lists [tuple-space own-puk party-puk]
   (->> (items tuple-space own-puk party-puk "message")
        (rx/reductions conj (sorted-set-by item-ids))
        (rx/map vec)
        (rx/cons [])
        shared-latest))
 
-(defn- sessions [tuple-space own-puk party-puk]
+(defn- session-lists [tuple-space own-puk party-puk]
   (->> (items tuple-space own-puk party-puk "session")
        (rx/reductions conj (sorted-set-by item-ids))
        (rx/map vec)
@@ -142,15 +142,15 @@
 (defn reify-conversation
   [^TupleSpace space ^PublicKey own-puk ^Contact contact]
   (let [party (.. contact party observable)
-        puk (switch-map-some #(.. % publicKey observable) party)
+        contact-puks (switch-map-some #(.. % publicKey observable) party)
 
-        sessions (switch-map-some #(sessions space own-puk %) [] puk)
-        messages (switch-map-some #(messages space own-puk %) [] puk)
+        session-lists (switch-map-some #(session-lists space own-puk %) [] contact-puks)
+        message-lists (switch-map-some #(message-lists space own-puk %) [] contact-puks)
 
         last-read-filter #(.. space filter (type "message-read") (audience %) (author own-puk) last tuples)
-        last-read (switch-map-some last-read-filter puk)
+        last-read (switch-map-some last-read-filter contact-puks)
 
-        most-recent-message (rx/map last messages)
+        most-recent-message (rx/map last message-lists)
 
         contact-puk #(doto
                       (some-> contact .party .current .publicKey .current)
@@ -167,12 +167,12 @@
       (canSendMessages [_] (rx/map some? party))
       (sendMessage [_ label] (.. (message-sender) (field "label" label) pub))
 
-      (sessions [_] sessions)
-      (items [_] (combine-latest #(->> (first %) (concat (second %)) (sort-by (fn [item] (.id item))) vec) [messages sessions]))
+      (sessions [_] session-lists)
+      (items [_] (combine-latest #(->> (first %) (concat (second %)) (sort-by (fn [item] (.id item))) vec) [message-lists session-lists]))
       (mostRecentMessageContent   [_] (map-some message-label     most-recent-message))
       (mostRecentMessageTimestamp [_] (map-some message-timestamp most-recent-message))
 
-      (unreadMessages [_] (unread-messages messages last-read))
+      (unreadMessages [_] (unread-messages message-lists last-read))
       (unreadMessageCount [this] (rx/map (comp long count) (.unreadMessages this)))
       (setRead [_ message] (.pub (message-read-sender) (.id message)))
 
