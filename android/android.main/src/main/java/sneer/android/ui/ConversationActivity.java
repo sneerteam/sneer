@@ -214,7 +214,7 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
 	}
 
 	private Subscription subscribeToMessages() {
-		return deferUI(conversation.items().debounce(200, TimeUnit.MILLISECONDS)).subscribe(new Action1<List<ConversationItem>>() {
+		return ui(conversation.items()).subscribe(new Action1<List<ConversationItem>>() {
 			@Override
 			public void call(List<ConversationItem> msgs) {
 			messages.clear();
