@@ -213,6 +213,7 @@ public class ConversationActivity extends SneerActivity implements StartPluginDi
 		subscription = subscribeToMessages();
 	}
 
+
 	private Subscription subscribeToMessages() {
 		return ui(conversation.items()).subscribe(new Action1<List<ConversationItem>>() {
 			@Override

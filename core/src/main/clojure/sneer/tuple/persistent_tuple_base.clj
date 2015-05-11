@@ -13,7 +13,6 @@
             [sneer.keys :as keys]))
 
 (def after-id ::after-id)
-
 (def last-by-id ::last-by-id)
 
 (defn query-all [tuple-base criteria]
