@@ -160,7 +160,7 @@
     :else
     (throw (FriendlyException. "Nickname already used"))))
 
-(defn create-contact [contacts-state nickname party invite-code-received]
+(defn- create-contact [contacts-state nickname party invite-code-received]
   (let [nick->contact-atom (:nick->contact contacts-state)
         puk->contact-atom (:puk->contact contacts-state)
         space (:tuple-space contacts-state)
