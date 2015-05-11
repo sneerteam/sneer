@@ -20,10 +20,10 @@
                (let [puk-c (-> sneer-admin-c .sneer .self .publicKey .current)
                      sneer-n (.sneer sneer-admin-n)
                      sneer-c (.sneer sneer-admin-c)
-                     c->n (-> sneer-c (.produceContact "neide" nil                           nil))
-                        _ (-> sneer-n (.produceContact "carla" (.produceParty sneer-n puk-c) (.inviteCode c->n)))
+                     c->n (.produceContact sneer-c "neide" nil nil)
+                        _ (.produceContact sneer-n "carla" (.produceParty sneer-n puk-c) (.inviteCode c->n))
                      c->n-parties (->> c->n .party .observable (rx/filter some?))
-                     c->n-puks (->> c->n-parties (rx/map party->puk) ->chan)]
-                 ; user 1 set the party for the contact
-                 (<!!? c->n-puks) => some?
+                     c->n-puks (->> c->n-parties (rx/map party->puk))]
+                 (<!!? (->chan c->n-parties) 1000) => #(not (= % :timeout))
+                 (<!!? (->chan c->n-puks   ) 1000) => #(not (= % :timeout))
                  (-> c->n .party .current) => some?))))
