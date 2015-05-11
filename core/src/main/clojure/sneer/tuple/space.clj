@@ -85,8 +85,7 @@
           (^TupleFilter audience [this ^PublicKey puk]
             (with "audience" puk))
           (field [this field value] (with field value))
-          (last [_]
-            (with last-by-id true))
+          (last [_] (with last-by-id true))
           (localTuples [this]
             (rx/map reify-tuple (rx-query-tuples tuple-base criteria false)))
           (tuples [this]
