@@ -3,7 +3,8 @@
            [sneer.admin UniqueConstraintViolated]
            [java.lang AutoCloseable]
            (sneer PublicKey))
-  (:require [sneer.async :refer [dropping-chan go-trace dropping-tap]]
+  (:require [sneer.commons :refer [now]]
+            [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! <!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
             [sneer.rx-macros :refer :all]
@@ -301,3 +302,13 @@
         (close! requests)
         (close! new-tuples)
         (<!! running)))))
+
+
+
+(defn timestamped [proto-tuple]
+  (let [max-size 1000]
+    (serialization/roundtrip (assoc proto-tuple "timestamp" (now)) max-size)))
+
+(defn store-sub [tuple-base own-puk criteria]
+  (let [sub {"type" "sub" "author" own-puk "criteria" criteria}]
+    (store-tuple tuple-base (timestamped sub) sub)))

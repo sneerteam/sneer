@@ -2,12 +2,12 @@
   (:require
    [rx.lang.clojure.core :as rx]
    [sneer.async :refer [go-trace thread-chan-to-subscriber]]
-   [sneer.serialization :refer [roundtrip]]
    [sneer.commons :refer [now reify+ while-let]]
    [clojure.core.async :refer [thread chan <! <!! close!]]
-   [sneer.tuple.persistent-tuple-base :refer [last-by-id]]
+   [sneer.tuple.persistent-tuple-base :refer [last-by-id store-sub timestamped]]
    [sneer.tuple.protocols :refer [store-tuple query-tuples]]
-   [sneer.tuple.macros :refer :all])
+   [sneer.tuple.macros :refer :all]
+   [sneer.tuple-base-provider :refer [TupleBaseProvider]])
   (:import
     [rx.subjects AsyncSubject]
     [sneer PrivateKey PublicKey]
@@ -28,10 +28,6 @@
 
 (defn payload [^Tuple tuple]
   (.payload tuple))
-
-(def max-size 1000)
-(defn- timestamped [proto-tuple]
-  (roundtrip (assoc proto-tuple "timestamp" (now)) max-size))
 
 (defn new-tuple-publisher [tuples-out proto-tuple]
   (letfn
@@ -91,8 +87,7 @@
           (tuples [this]
             (rx/observable*
               (fn [^Subscriber subscriber]
-                (let [sub {"type" "sub" "author" own-puk "criteria" criteria}]
-                  (store-tuple tuple-base (timestamped sub) sub))
+                (store-sub tuple-base own-puk criteria)
                 (let [^Observable tuples (rx/map reify-tuple (rx-query-tuples tuple-base criteria true))]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
@@ -101,8 +96,12 @@
   (get criteria "author"))
 
 (defn reify-tuple-space [own-puk tuple-base]
-  (reify TupleSpace
+  (reify
+    TupleSpace
     (publisher [_]
       (new-tuple-publisher tuple-base {"author" own-puk}))
     (filter [_]
-      (new-tuple-filter tuple-base own-puk))))
+      (new-tuple-filter tuple-base own-puk))
+
+    TupleBaseProvider
+    (tuple-base-of [_] tuple-base)))
