@@ -17,14 +17,13 @@ import rx.functions.Action1;
 import sneer.Conversations;
 import sneer.Session;
 import sneer.android.impl.Envelope;
-import sneer.android.impl.IPCProtocol;
 import sneer.commons.exceptions.Exceptions;
 
 import static android.os.Message.obtain;
 import static sneer.android.impl.Envelope.envelope;
 import static sneer.android.impl.IPCProtocol.ENVELOPE;
+import static sneer.android.impl.IPCProtocol.IS_OWN;
 import static sneer.android.impl.IPCProtocol.PAYLOAD;
-import static sneer.android.impl.IPCProtocol.WAS_SENT_BY_ME;
 
 public class PartnerSessions extends Service {
 
@@ -40,7 +39,7 @@ public class PartnerSessions extends Service {
 			this.session = session;
 			session.messages().subscribe(new Action1<sneer.Message>() { @Override public void call(sneer.Message message) {
 				Map<String, Object> map = new HashMap<>();
-				map.put(WAS_SENT_BY_ME, message.isOwn());
+				map.put(IS_OWN, message.isOwn());
 				map.put(PAYLOAD, message.payload());
 				sendToApp(map);
 			}});
@@ -101,7 +100,8 @@ public class PartnerSessions extends Service {
 	public static Intent intentFor(Session session) {
 		return new Intent()
 				.setClassName("sneer.main", PartnerSessions.class.getName())
-				.putExtra(TOKEN, session.id());
+				.putExtra(TOKEN, session.id())
+				.putExtra(IS_OWN, session.isOwn());
 	}
 
 	public static void init(Conversations conversations) {
