@@ -1,6 +1,7 @@
 package sneer.android.ui;
 
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -16,7 +17,7 @@ import sneer.main.R;
 import static sneer.android.SneerAndroidContainer.component;
 
 
-public class ConversationListActivity extends SneerActivity {
+public class ConversationListActivity extends SneerActionBarActivity {
 
 	private final ActionBus bus = component(ActionBus.class);
 	private final ConversationList convos = component(ConversationList.class);
@@ -26,8 +27,12 @@ public class ConversationListActivity extends SneerActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		setUpConversationList();
+		setContentView(R.layout.activity_conversation_list);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);     // Attaching the layout to the toolbar object
+        setSupportActionBar(toolbar);                               // Setting toolbar as the ActionBar with setSupportActionBar() call
+
+        setUpConversationList();
 	}
 
 	@Override

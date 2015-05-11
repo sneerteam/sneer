@@ -74,7 +74,8 @@
         </activity>
 
         <activity
-            android:name="sneer.android.ui.ConversationListActivity">
+            android:name="sneer.android.ui.ConversationListActivity"
+            android:theme="@style/AppThemeMaterial">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
