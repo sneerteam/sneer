@@ -135,6 +135,7 @@
   (get puk->contact (party->puk party)))
 
 (defn find-contact [contacts-state party]
+  (println "FELIPETESTE: contact/find-contact.@(:puk->contact contacts-state)->" @(:puk->contact contacts-state))
   (find-contact-in @(:puk->contact contacts-state) party))
 
 (defn find-by-nick [contacts-state nick]

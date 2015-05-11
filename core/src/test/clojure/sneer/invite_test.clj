@@ -11,23 +11,19 @@
             [sneer.restartable :refer [restart]]
             [rx.lang.clojure.core :as rx]))
 
-(def neide (->puk "neide"))
-
 (facts "About invites"
        (fact "auto-add back when invite code received"
-             (with-open [db-1 (jdbc-database/create-sqlite-db)
-                         sneer-admin-1 (start db-1)
-                         db-2 (jdbc-database/create-sqlite-db)
-                         sneer-admin-2 (start db-2)]
-               (let [contact-1 (-> sneer-admin-1 .sneer (.produceContact "neide" nil nil))
-                     _ (-> sneer-admin-2 .sneer (.produceContact "carla" (-> sneer-admin-1 .sneer .self) (.inviteCode contact-1)))
-                     filter-1 (-> sneer-admin-1 .sneer .tupleSpace .filter (.type "push") .tuples)
-                     filter-2 (-> sneer-admin-2 .sneer .tupleSpace .filter (.type "push") .tuples)
-                     channel (->> contact-1 .party .observable (rx/filter some?) (rx/map party->puk) ->chan)]
-                 ; user 2 successfully saved a push tuple
-                 (-> filter-2 .toBlocking .first) => some?
-                 ; user 1 successfully received a push tuple
-                 (-> filter-1 .toBlocking .first) => some?
+             (with-open [db-c (jdbc-database/create-sqlite-db)
+                         sneer-admin-c (start db-c)
+                         db-n (jdbc-database/create-sqlite-db)
+                         sneer-admin-n (start db-n)]
+               (let [puk-c (-> sneer-admin-c .sneer .self .publicKey .current)
+                     sneer-n (.sneer sneer-admin-n)
+                     sneer-c (.sneer sneer-admin-c)
+                     c->n (-> sneer-c (.produceContact "neide" nil                           nil))
+                        _ (-> sneer-n (.produceContact "carla" (.produceParty sneer-n puk-c) (.inviteCode c->n)))
+                     c->n-parties (->> c->n .party .observable (rx/filter some?))
+                     c->n-puks (->> c->n-parties (rx/map party->puk) ->chan)]
                  ; user 1 set the party for the contact
-                 (<!!? channel)
-                 (-> contact-1 .party .current) => some?))))
+                 (<!!? c->n-puks) => some?
+                 (-> c->n .party .current) => some?))))
