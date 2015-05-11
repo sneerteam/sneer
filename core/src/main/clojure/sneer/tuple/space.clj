@@ -9,9 +9,10 @@
    [sneer.tuple.protocols :refer [store-tuple query-tuples]]
    [sneer.tuple.macros :refer :all])
   (:import
-   [rx.subjects AsyncSubject]
-   [sneer PrivateKey PublicKey]
-   [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]))
+    [rx.subjects AsyncSubject]
+    [sneer PrivateKey PublicKey]
+    [sneer.tuples Tuple TupleSpace TuplePublisher TupleFilter]
+    [rx Subscriber Observable]))
 
 (defn reify-tuple [tuple]
   (assert (some? (get tuple "timestamp")))
@@ -59,7 +60,7 @@
 
 (defn rx-query-tuples [tuple-base criteria keep-alive]
   (rx/observable*
-   (fn [^rx.Subscriber subscriber]
+   (fn [^Subscriber subscriber]
      (let [result (chan)]
        (if keep-alive
          (let [lease (chan)]
@@ -90,10 +91,10 @@
             (rx/map reify-tuple (rx-query-tuples tuple-base criteria false)))
           (tuples [this]
             (rx/observable*
-              (fn [^rx.Subscriber subscriber]
+              (fn [^Subscriber subscriber]
                 (let [sub {"type" "sub" "author" own-puk "criteria" criteria}]
                   (store-tuple tuple-base (timestamped sub) sub))
-                (let [^rx.Observable tuples (rx/map reify-tuple (rx-query-tuples tuple-base criteria true))]
+                (let [^Observable tuples (rx/map reify-tuple (rx-query-tuples tuple-base criteria true))]
                   (. subscriber add
                     (. tuples subscribe subscriber))))))))))
 
@@ -102,7 +103,7 @@
 
 (defn reify-tuple-space [own-puk tuple-base]
   (reify TupleSpace
-    (publisher [this]
+    (publisher [_]
       (new-tuple-publisher tuple-base {"author" own-puk}))
-    (filter [this]
+    (filter [_]
       (new-tuple-filter tuple-base own-puk))))
