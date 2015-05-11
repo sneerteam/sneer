@@ -24,6 +24,5 @@
                         _ (.produceContact sneer-n "carla" (.produceParty sneer-n puk-c) (.inviteCode c->n))
                      c->n-parties (->> c->n .party .observable (rx/filter some?))
                      c->n-puks (->> c->n-parties (rx/map party->puk))]
-                 (<!!? (->chan c->n-parties) 1000) => #(not (= % :timeout))
-                 (<!!? (->chan c->n-puks   ) 1000) => #(not (= % :timeout))
-                 (-> c->n .party .current) => some?))))
+                 (<!!? (->chan c->n-parties) 2000) => #(not (= % :timeout))
+                 (<!!? (->chan c->n-puks   ) 2000) => #(not (= % :timeout))))))
