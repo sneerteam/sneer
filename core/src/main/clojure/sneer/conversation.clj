@@ -88,12 +88,14 @@
       (type [_] (get tuple "session-type"))
       (messages [_]
 
-        ;; This is how it was done before (by merging the two filters below) but ordering by id was not garanteed:
-       ;(-> filter (.audience contact-puk) (.author own-puk) .tuples)
-        (-> filter (.audience own-puk) (.author contact-puk) .tuples (rx/subscribe identity)) ;; Force a valid sub to be sent
+        ; This is how it was done before (by merging the two filters below) but ordering by id was not garanteed:
+        ;(-> filter (.audience contact-puk) (.author own-puk) .tuples)
+        ;(-> filter (.audience own-puk) (.author contact-puk) .tuples)
 
+        ; This is how we do it now so tuples come ordered by id:
+        (-> filter (.audience own-puk) (.author contact-puk) .tuples (rx/subscribe identity)) ;; Force a valid sub to be sent
         (->>
-          (.tuples filter) ;; This is how we do it now so tuples come ordered by id
+          (.tuples filter) ; Simply get all messages in this session. This might be slow because there is no index on the session-id (it is a custom field).
           (rx/map #(reify-message own-puk %))))
       (send [_ payload]
         (.pub publisher payload)))))
