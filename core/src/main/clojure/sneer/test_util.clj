@@ -53,12 +53,19 @@
                    (close! c))
                 #(close! c)))
 
-(defn observable->chan [observable]
-  (doto (chan)
-    (subscribe-chan observable)))
+(defn observable->chan
+  ([obs]
+   (doto (chan)
+     (subscribe-chan obs)))
+  ([obs xform]
+   (doto (chan 1 xform)
+     (subscribe-chan obs))))
 
-(defn ->chan [obs]
-  (observable->chan (subscribe-on-io obs)))
+(defn ->chan2
+  ([obs]
+   (observable->chan (subscribe-on-io obs)))
+  ([obs xform]
+   (observable->chan (subscribe-on-io obs) xform)))
 
 (defn pst [fn]
   (try (fn)

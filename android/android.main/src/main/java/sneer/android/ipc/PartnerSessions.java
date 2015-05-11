@@ -17,6 +17,7 @@ import rx.functions.Action1;
 import sneer.Conversations;
 import sneer.Session;
 import sneer.android.impl.Envelope;
+import sneer.android.impl.IPCProtocol;
 import sneer.commons.exceptions.Exceptions;
 
 import static android.os.Message.obtain;
@@ -37,12 +38,19 @@ public class PartnerSessions extends Service {
 
 		public SessionHandler(Session session) {
 			this.session = session;
-			session.messages().subscribe(new Action1<sneer.Message>() { @Override public void call(sneer.Message message) {
-				Map<String, Object> map = new HashMap<>();
-				map.put(IS_OWN, message.isOwn());
-				map.put(PAYLOAD, message.payload());
-				sendToApp(map);
-			}});
+			session.messages().subscribe(new Action1<Session.MessageOrUpToDate>() {
+				@Override
+				public void call(Session.MessageOrUpToDate messageOrUpToDate) {
+					if (messageOrUpToDate.isUpToDate())
+						sendToApp(IPCProtocol.UP_TO_DATE);
+					else {
+						Map<String, Object> map = new HashMap<>();
+						map.put(IS_OWN, messageOrUpToDate.message().isOwn());
+						map.put(PAYLOAD, messageOrUpToDate.message().payload());
+						sendToApp(map);
+					}
+				}
+			});
 		}
 
 		@Override

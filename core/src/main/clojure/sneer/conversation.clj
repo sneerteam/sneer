@@ -1,14 +1,19 @@
 (ns sneer.conversation
   (:require
-   [rx.lang.clojure.core :as rx]
-   [rx.lang.clojure.interop :as interop]
-   [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map switch-map-some map-some]]
-   [sneer.party :refer [party->puk]]
-   [sneer.commons :refer [now produce!]]
-   [sneer.contact :refer [get-contacts puk->contact]]
-   [sneer.tuple.space :refer [payload]])
+    [clojure.core.async :refer [chan <! >!]]
+    [rx.lang.clojure.core :as rx]
+    [rx.lang.clojure.interop :as interop]
+    [sneer.async :refer [thread-chan-to-subscriber link-chan-to-subscriber go-trace]]
+    [sneer.commons :refer [now produce! while-let]]
+    [sneer.tuple-base-provider :refer :all]
+    [sneer.tuple.protocols :refer :all]
+    [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map switch-map-some map-some]]
+    [sneer.party :refer [party->puk]]
+    [sneer.contact :refer [get-contacts puk->contact]]
+    [sneer.tuple.space :refer [payload reify-tuple]]
+    [sneer.tuple.persistent-tuple-base :as tb])
   (:import
-    [sneer PublicKey Contact Conversation Message Session ConversationItem]
+    [sneer PublicKey Contact Conversation Message Session Session$MessageOrUpToDate]
     [sneer.tuples Tuple TupleSpace]
     [java.text SimpleDateFormat]
     [rx Observable]))
@@ -73,7 +78,6 @@
   (let [original-id (get tuple "original_id")
         author (get tuple "author")
         publisher (.. space publisher (type "session-message") (field "session-id" original-id) (field "session-author" author) (audience contact-puk))
-        filter    (.. space filter    (type "session-message") (field "session-id" original-id) (field "session-author" author))
         created (.timestamp tuple)]
     
     (reify Session
@@ -87,16 +91,29 @@
       (tuple [_] tuple)
       (type [_] (get tuple "session-type"))
       (messages [_]
-
-        ; This is how it was done before (by merging the two filters below) but ordering by id was not garanteed:
-        ;(-> filter (.audience contact-puk) (.author own-puk) .tuples)
-        ;(-> filter (.audience own-puk) (.author contact-puk) .tuples)
-
-        ; This is how we do it now so tuples come ordered by id:
-        (-> filter (.audience own-puk) (.author contact-puk) .tuples (rx/subscribe identity)) ;; Force a valid sub to be sent
-        (->>
-          (.tuples filter) ; Simply get all messages in this session. This might be slow because there is no index on the session-id (it is a custom field).
-          (rx/map #(reify-message own-puk %))))
+        (rx/observable*
+          (fn [^rx.Subscriber s]
+            (let [tb (tuple-base-of space)
+                  criteria {"type" "session-message"
+                            "session-id" original-id
+                            "session-author" author}
+                  reify-message-or-up-to-date #(if (= ::up-to-date %)
+                                                Session/UP_TO_DATE
+                                                (Session$MessageOrUpToDate. (reify-message own-puk (reify-tuple %))))
+                  messages (chan 1 (map reify-message-or-up-to-date))
+                  lease (chan)]
+              (tb/store-sub tb own-puk (assoc criteria "author" contact-puk))
+              (thread-chan-to-subscriber messages s "Session messages")
+              (link-chan-to-subscriber lease s)
+              (go-trace
+                (let [tuples (chan)
+                      last-id (atom -1)]
+                  (query-tuples tb criteria tuples)
+                  (while-let [t (<! tuples)]
+                             (>! messages t)
+                             (reset! last-id (get "id" t)))
+                  (>! messages ::up-to-date)
+                  (query-tuples tb (assoc criteria tb/after-id @last-id) messages lease)))))))
       (send [_ payload]
         (.pub publisher payload)))))
 
