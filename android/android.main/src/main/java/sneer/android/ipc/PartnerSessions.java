@@ -108,8 +108,7 @@ public class PartnerSessions extends Service {
 	public static Intent intentFor(Session session) {
 		return new Intent()
 				.setClassName("sneer.main", PartnerSessions.class.getName())
-				.putExtra(TOKEN, session.id())
-				.putExtra(IS_OWN, session.isOwn());
+				.putExtra(TOKEN, session.id());
 	}
 
 	public static void init(Conversations conversations) {

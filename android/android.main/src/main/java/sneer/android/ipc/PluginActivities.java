@@ -10,6 +10,7 @@ import sneer.Session;
 import sneer.android.impl.IPCProtocol;
 import sneer.android.utils.AndroidUtils;
 
+import static sneer.android.impl.IPCProtocol.IS_OWN;
 import static sneer.android.impl.IPCProtocol.JOIN_SESSION;
 
 public class PluginActivities {
@@ -43,9 +44,10 @@ public class PluginActivities {
 	}
 
 	private static void startActivity(Context context, Intent intent, Session session) {
-		if (session != null)
+		if (session != null) {
 			intent.putExtra(JOIN_SESSION, PartnerSessions.intentFor(session));
-
+			intent.putExtra(IS_OWN, session.isOwn());
+		}
 		startActivity(context, intent);
 	}
 

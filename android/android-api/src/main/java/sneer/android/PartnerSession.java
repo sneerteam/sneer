@@ -83,11 +83,9 @@ public class PartnerSession implements Closeable {
     private PartnerSession(Activity activity, Listener listener) {
 		this.activity = activity;
         this.listener = listener;
-		boolean success = activity.bindService(
-			activity.getIntent().<Intent>getParcelableExtra(IPCProtocol.JOIN_SESSION),
-			connection,
-			BIND_AUTO_CREATE | BIND_IMPORTANT
-		);
+	    Intent callback = activity.getIntent().<Intent>getParcelableExtra(IPCProtocol.JOIN_SESSION);
+	    if (callback == null) toast("Make sure metadata is correctly set in your AndroidManifest.xml file");
+	    boolean success = activity.bindService(callback, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
 	    if (!success) finish("Unable to connect to Sneer");
     }
 
