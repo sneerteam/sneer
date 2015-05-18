@@ -23,18 +23,15 @@
 
           proto-message {"type" "message" "audience" own-puk "message-type" "chat"}
           store-message (fn [tuple] (store-tuple tuple-base (merge proto-message tuple)))
-
           _ (loop [timestamp 0
-                   pending events]
-              (let [e (first pending)]
+                   pending-events events]
+              (let [e (first pending-events)]
                 (when-let [party (:contact e)]
                   (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
                 (when-let [text (:recv e)]
                   (<!!? (store-message {"author" (:auth e) "label" text "timestamp" timestamp}))))
-              (when-let [pending' (next pending)]
-                (recur (inc timestamp) pending')))
-
-;          _ (println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+              (when-let [pending-events' (next pending-events)]
+                (recur (inc timestamp) pending-events')))
 
           subject (convos/start-summarization-machine own-puk tuple-base summaries-out lease)]
 
