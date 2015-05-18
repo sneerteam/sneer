@@ -113,9 +113,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
+                    android:scheme="http"
                     android:host="sneer.me"
-                    android:pathPrefix="/public-key"
-                    android:scheme="http" />
+                    android:pathPrefix="/public-key"/>
             </intent-filter>
         </activity>
         <activity
