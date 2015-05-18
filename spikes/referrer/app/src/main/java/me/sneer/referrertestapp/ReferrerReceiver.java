@@ -19,6 +19,6 @@ public class ReferrerReceiver extends BroadcastReceiver {
         Log.w("TEST", "Referrer is: " + referrerString);
 	    Toast.makeText(context, "REFERRER: " + referrerString, Toast.LENGTH_LONG).show();
 
-	    context.startActivity(new Intent(context, MainActivity.class));
+//	    context.startActivity(new Intent(context, MainActivity.class));
     }
 }
