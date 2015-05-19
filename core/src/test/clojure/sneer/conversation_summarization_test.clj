@@ -1,6 +1,7 @@
 (ns sneer.conversation-summarization-test
   (:require [midje.sweet :refer :all]
             [clojure.core.async :refer [chan close!]]
+            [sneer.async :refer [sliding-chan]]
             [sneer.test-util :refer [<!!? <wait-for!]]
             [sneer.tuple.jdbc-database :as database]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
@@ -15,7 +16,7 @@
               tuple-base (tuple-base/create db)]
 
     (let [own-puk (keys/->puk "neide puk")
-          summaries-out (chan)
+          summaries-out (sliding-chan 1)
           lease (chan)
 
           proto-contact {"type" "contact" "audience" own-puk "author" own-puk}
@@ -25,29 +26,27 @@
           store-message (fn [tuple] (store-tuple tuple-base (merge proto-message tuple)))
 
           subject (atom nil)
-          summarize2 (fn [] (swap! subject (fn [old]
-                                             (assert (nil? old))
-                                             (convos/start-summarization-machine own-puk tuple-base summaries-out lease))))
+          start-subject (fn [] (swap! subject (fn [old]
+                                                (assert (nil? old))
+                                                (convos/start-summarization-machine own-puk tuple-base summaries-out lease))))]
+      (loop [timestamp 0
+             pending events]
+        (when-let [e (first pending)]
+          (if (= e :summarize)
+            (do
+              (start-subject)
+              (recur timestamp (next pending)))
+            (do
+              (when-let [party (:contact e)]
+                (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
+              (when-let [text (:recv e)]
+                (<!!? (store-message {"author" (:auth e) "label" text "timestamp" timestamp})))
+              (recur (inc timestamp) (next pending))))))
 
-          _ (loop [timestamp 0
-                   pending-events events]
-              (let [e (first pending-events)]
-                (if (= e :summarize)
-                  (summarize2)
-                  (do
-                    (when-let [party (:contact e)]
-                      (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
-                    (when-let [text (:recv e)]
-                      (<!!? (store-message {"author" (:auth e) "label" text "timestamp" timestamp}))))))
-              (when-let [pending-events' (next pending-events)]
-                (recur (inc timestamp) pending-events')))]
-
-      (when-not @subject (summarize2))
+      (when-not @subject (start-subject))
 
       (try
-        (if (= :timeout (<wait-for! summaries-out summaries))
-          :timeout
-          :ok)
+        (or (<wait-for! summaries-out summaries) :ok)
 
         (finally
           (close! lease)
@@ -60,12 +59,6 @@
 
     (fact "Events produce expected summaries"
       (summarize ?events ?summaries) => :ok)
-
-    ; Contact new
-    ; Contact change nick
-    ; Message received
-    ; Message sent
-    ; Messages Read
 
     ?obs
     ?events
@@ -89,19 +82,22 @@
 
     [{:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}]
 
-    "Nick change should not affect other summary fields."
+    "Nick change should not affect unread field."
     [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}
      :summarize
      {:contact ann :nick "Annabelle"}]
 
-    [{:name "Annabelle" :timestamp 1 :preview "Hello" :unread "*"}]
+    [{:name "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}]
 
-    "Message received with question mark produces question mark in unread status."
+    "Any unread message with question mark produces question mark in unread status."
     [{:contact ann :nick "Ann"}
-     {:recv "Where is the party??? :)" :auth ann}]
+     {:recv "Where is the party??? :)" :auth ann}
+     {:recv "Answer me!!" :auth ann}]
 
-    [{:name "Ann" :timestamp 1 :preview "Where is the party??? :)" :unread "?"}]
+    [{:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}]))
 
-    ; TODO: Test Summary date with pretty time. Ex: "3 minutes ago"
-    ))
+    ; TODO: Message sent
+    ; TODO: Messages Read
+    ; TODO: Date with pretty time. Ex: "3 minutes ago"
+    ; TODO: Process deltas, not entire history.
