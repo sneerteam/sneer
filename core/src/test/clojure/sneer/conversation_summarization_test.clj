@@ -101,8 +101,7 @@
     [{:contact ann :nick "Ann"}
      {:recv "Where is the party??? :)" :auth ann}]
 
-; TODO:   [{:name "Ann" :timestamp 1 :preview "Where is the party??? :)" :unread "?"}]
-    [{:name "Ann" :timestamp 1 :preview "Where is the party??? :)" :unread "*"}]
+    [{:name "Ann" :timestamp 1 :preview "Where is the party??? :)" :unread "?"}]
 
     ; TODO: Test Summary date with pretty time. Ex: "3 minutes ago"
     ))

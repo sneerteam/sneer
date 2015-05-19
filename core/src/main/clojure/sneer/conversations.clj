@@ -33,14 +33,18 @@
 ;    (println "Update contact:" contact)
     (assoc state contact-id {:name contact-name :preview "" :timestamp timestamp :unread ""})))
 
+(defn unread-status [label]
+  (if (.contains label "?") "?" "*"))
+
 (defn update-message [own-puk message state]
   (let [author (message "author")
+        label (message "label")
         contact-puk (if (= author own-puk) (message "audience") author)]
 ;    (println "Update message:" message)
     (-> state (update contact-puk assoc
-                :preview   (or (message "label") "")
+                :preview   (or label "")
                 :timestamp (message "timestamp"))
-              (assoc-in [contact-puk :unread] "*"))))
+              (assoc-in [contact-puk :unread] (unread-status label)))))
 
 (defn flip [f]
   (fn [x y] (f y x)))
