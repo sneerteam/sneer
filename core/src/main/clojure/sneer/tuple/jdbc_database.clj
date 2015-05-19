@@ -54,9 +54,11 @@
               (throw e)))))
 
       (db-query [_ sql-and-params]
-        (assert @open)  ;For debugging in 2015/FEB.
-        (with-read-lock rw-lock
-          (sql/query db sql-and-params :result-set-fn doall :as-arrays? true)))
+        (try
+          (with-read-lock rw-lock
+                          (sql/query db sql-and-params :result-set-fn doall :as-arrays? true))
+          (catch Exception e
+            (if @open (throw e) []))))
 
       Closeable
       (close [_]
