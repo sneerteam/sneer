@@ -61,10 +61,8 @@
   (let [tuples (chan)]
 
     ; link machine lifetime to lease
-    (go (println "SUMMARIZATION STARTED")
-        (<! lease)
-        (close! tuples)
-        (println "SUMMARIZATION STOPPED"))
+    (go (<! lease)
+        (close! tuples))
 
     (go-trace
 
