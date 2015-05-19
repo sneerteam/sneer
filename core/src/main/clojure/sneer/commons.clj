@@ -57,3 +57,6 @@
 (defn reify-ActionBus []
   (reify ActionBus
     (action [_ action] (println "Action: " action))))
+
+(defn flip [f]
+  (fn [x y] (f y x)))
