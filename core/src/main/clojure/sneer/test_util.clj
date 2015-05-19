@@ -29,7 +29,7 @@
 ;        (println "Intermediate: " current)
         (if (= current :timeout)
           (do
-            (println "TIMEOUT waiting for:" expected "\n    but got:" previous)
+            (println "TIMEOUT waiting for:" expected "\n            but got:" previous)
             :timeout)
           (when-not (= current expected)
             (recur current)))))))
