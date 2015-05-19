@@ -24,14 +24,14 @@
 (defn- contact-puk [tuple]
   (tuple "party"))
 
-(defn- update-contact [contact state]
+(defn- handle-contact [contact state]
   (let [contact-id (contact-puk contact)
         contact-name (contact "payload")
         timestamp (contact "timestamp")]
     (if contact-id
       (-> state
           (assoc-in  [contact-id :name] contact-name)
-          (update-in [contact-id :timestamp] #(Math/max (or % 0) timestamp))
+          (update-in [contact-id :timestamp] #(Math/max (or % 0) timestamp)) ; Message might have arrived before contact.
           (update-in [contact-id :preview] nvl "")
           (update-in [contact-id :unread ] nvl ""))
       state)))
@@ -42,7 +42,7 @@
     (.contains label "?") "?"
     :else                 "*"))
 
-(defn- update-message [own-puk message state]
+(defn- handle-message [own-puk message state]
   (let [author (message "author")
         label (message "label")
         contact-puk (if (= author own-puk) (message "audience") author)]
@@ -76,8 +76,8 @@
         (when-some [tuple (<! tuples)]
           (recur
             (case (tuple "type")
-              "contact" (update-contact tuple state)
-              "message" (update-message own-puk tuple state))))))))
+              "contact" (handle-contact tuple state)
+              "message" (handle-message own-puk tuple state))))))))
 
 
 ; Java interface
