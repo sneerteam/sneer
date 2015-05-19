@@ -23,17 +23,24 @@
 
           proto-message {"type" "message" "audience" own-puk "message-type" "chat"}
           store-message (fn [tuple] (store-tuple tuple-base (merge proto-message tuple)))
+
+          subject (atom nil)
+          summarize (fn [] (swap! subject (convos/start-summarization-machine own-puk tuple-base summaries-out lease)))
+
           _ (loop [timestamp 0
                    pending-events events]
               (let [e (first pending-events)]
-                (when-let [party (:contact e)]
-                  (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
-                (when-let [text (:recv e)]
-                  (<!!? (store-message {"author" (:auth e) "label" text "timestamp" timestamp}))))
+                (if (= e :summarize)
+                  (summarize)
+                  (do
+                    (when-let [party (:contact e)]
+                      (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
+                    (when-let [text (:recv e)]
+                      (<!!? (store-message {"author" (:auth e) "label" text "timestamp" timestamp}))))))
               (when-let [pending-events' (next pending-events)]
-                (recur (inc timestamp) pending-events')))
+                (recur (inc timestamp) pending-events')))]
 
-          subject (convos/start-summarization-machine own-puk tuple-base summaries-out lease)]
+      (when-not @subject (summarize))
 
       (try
 
@@ -42,7 +49,7 @@
         (finally
           (close! lease)
           (fact "machine terminates when lease channel is closed"
-            (<!!? subject) => nil))))))
+            (<!!? @subject) => nil))))))
 
 
 (let [unknown (keys/->puk "unknown puk")
@@ -83,6 +90,7 @@
     "Nick change should not affect other summary fields."
     [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}
+     :summarize
      {:contact ann :nick "Annabelle"}]
 
     [{:name "Annabelle" :timestamp 1 :preview "Hello" :unread "*"}]))
