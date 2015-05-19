@@ -76,7 +76,7 @@
     (socket-operation socket)
     (catch Exception e
       (when (is-open socket)
-        (.printStackTrace e)
+        (println (.getMessage e))
         (close-socket port socket)))))
 
 (defn start-udp-server
