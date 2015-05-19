@@ -25,13 +25,15 @@
           store-message (fn [tuple] (store-tuple tuple-base (merge proto-message tuple)))
 
           subject (atom nil)
-          summarize (fn [] (swap! subject (convos/start-summarization-machine own-puk tuple-base summaries-out lease)))
+          summarize2 (fn [] (swap! subject (fn [old]
+                                             (assert (nil? old))
+                                             (convos/start-summarization-machine own-puk tuple-base summaries-out lease))))
 
           _ (loop [timestamp 0
                    pending-events events]
               (let [e (first pending-events)]
                 (if (= e :summarize)
-                  (summarize)
+                  (summarize2)
                   (do
                     (when-let [party (:contact e)]
                       (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
@@ -40,24 +42,24 @@
               (when-let [pending-events' (next pending-events)]
                 (recur (inc timestamp) pending-events')))]
 
-      (when-not @subject (summarize))
+      (when-not @subject (summarize2))
 
       (try
-
-        (<wait-for! summaries-out summaries)
+        (if (= :timeout (<wait-for! summaries-out summaries))
+          :timeout
+          :ok)
 
         (finally
           (close! lease)
           (fact "machine terminates when lease channel is closed"
             (<!!? @subject) => nil))))))
 
-
 (let [unknown (keys/->puk "unknown puk")
       ann (keys/->puk "ann puk")]
   (tabular "Conversation summarization"
 
     (fact "Events produce expected summaries"
-      (summarize ?events ?summaries) => #(not (= % :timeout)))
+      (summarize ?events ?summaries) => :ok)
 
     ; Contact new
     ; Contact change nick
@@ -93,4 +95,14 @@
      :summarize
      {:contact ann :nick "Annabelle"}]
 
-    [{:name "Annabelle" :timestamp 1 :preview "Hello" :unread "*"}]))
+    [{:name "Annabelle" :timestamp 1 :preview "Hello" :unread "*"}]
+
+    "Message received with question mark produces question mark in unread status."
+    [{:contact ann :nick "Ann"}
+     {:recv "Where is the party??? :)" :auth ann}]
+
+; TODO:   [{:name "Ann" :timestamp 1 :preview "Where is the party??? :)" :unread "?"}]
+    [{:name "Ann" :timestamp 1 :preview "Where is the party??? :)" :unread "*"}]
+
+    ; TODO: Test Summary date with pretty time. Ex: "3 minutes ago"
+    ))
