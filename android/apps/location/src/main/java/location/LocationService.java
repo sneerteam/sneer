@@ -35,7 +35,7 @@ public class LocationService extends Service implements LocationListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setSmallIcon(R.drawable.ic_launcher)
+        builder.setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("Location")
                 .setContentText("Sending your GPS location...")
                 .setOnlyAlertOnce(true);
