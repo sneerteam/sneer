@@ -1,20 +1,32 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_height="match_parent"
     tools:context=".MainActivity">
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar_conversation_list">
-    </include>
+        layout="@layout/toolbar_conversation_list"
+    />
 
     <ListView
         android:id="@+id/conversationList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_below="@id/toolbar"
+        android:layout_alignParentBottom="true"
     />
 
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/addButton"
+        android:src="@drawable/ic_add_contact_menu"
+        android:background="@drawable/fab_shape"
+        android:layout_margin="16dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+    />
+
+</RelativeLayout>

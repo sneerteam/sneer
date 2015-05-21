@@ -49,6 +49,8 @@ public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
+        if (SneerAndroidSingleton.admin() == null)      // Running without core
+            return;
         log("GCM wake up");
         new AsyncTask<Void, Void, Void>() {
             @Override
