@@ -64,7 +64,7 @@ if (file("$skummetArtifactsDir/me.sneer/core").exists()) {
   }
   repositories.remove(
     repositories.getByName('MavenLocal'))
-} else {
+} else if (file("../../core/build").exists()) {
   dependencies {
     compile 'me.sneer:core:+'
   }

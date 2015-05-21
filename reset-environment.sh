@@ -1,14 +1,9 @@
 #!/bin/bash -v
 
-git pull --rebase || exit -1
+./reset-environment-for-sims.sh
 
-#Delete all untracked files and directories (-d), even ignored ones (-x).
-git clean -d -x --force --quiet
+cd core       && ../gradlew       check install && cd .. || exit -1
+cd server     && ../gradlew clean check install && cd .. || exit -1
+cd core.tests && ../gradlew clean check install && cd .. || exit -1
 
-rm -rf ~/.m2/repository/me/sneer/
-
-./gradlew clean check install || exit -1
-
-cd android && ./gradlew clean && cd .. || exit -1
-
-#Reset environment sucessful
+#Reset environment successful

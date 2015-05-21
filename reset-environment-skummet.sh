@@ -4,4 +4,4 @@
 
 ./gradlew :core:publish || exit -1
 
-#Reset environment sucessful
+#Reset environment SKUMMET successful
