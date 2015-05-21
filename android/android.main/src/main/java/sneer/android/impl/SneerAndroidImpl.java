@@ -54,7 +54,6 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	private void init() throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
-		logPublicKey();
 
 		Observable.timer(60, TimeUnit.SECONDS).subscribe(
 				new Action1<Long>() {
@@ -103,16 +102,6 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	private Observable<Long> every(int t, TimeUnit unit) {
 		return Observable.timer(t, t, unit, AndroidSchedulers.mainThread());
-	}
-
-
-	private void logPublicKey() {
-		System.out.println("YOUR PUBLIC KEY IS: " + pukAddress());
-	}
-
-
-	private String pukAddress() {
-		return sneerAdmin.privateKey().publicKey().toHex();
 	}
 
 
