@@ -37,7 +37,7 @@ public class MainActivity extends SneerActivity {
 
 	private MainAdapter adapter;
 
-	private final Party self = sneer().self();
+	private final Party self = initSelf();
 	private final Profile ownProfile = sneer().profileFor(self);
 
     private String subjectToSend;
@@ -241,6 +241,13 @@ public class MainActivity extends SneerActivity {
 		navigateTo(ProfileActivity.class);
 	}
 
+	private Party initSelf() {
+		try {
+			return sneer().self();
+		} catch (NullPointerException npe) {
+			throw new RuntimeException("MainActivity needs the Core. To work without the Core, launch a different Activity.");
+		}
+	}
 
 	private boolean isOwnNameLocallyAvailable() {
 		return ownProfile.isOwnNameLocallyAvailable();

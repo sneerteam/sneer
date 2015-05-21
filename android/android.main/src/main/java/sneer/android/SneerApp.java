@@ -37,14 +37,18 @@ public class SneerApp extends Application {
 		// TODO: Migrate to container.
 		// Old pre-container way:
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
-		PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
-		Notifier.start(app);
-		GcmRegistrationAlarmReceiver.schedule(app);
+		if (SneerAndroidSingleton.admin() == null)
+			System.out.println("CORE NOT FOUND.");
+		else {
+			PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
+			Notifier.start(app);
+			GcmRegistrationAlarmReceiver.schedule(app);
 
-		// New container way:
-		SneerAdmin admin = SneerAndroidSingleton.admin();
-		container().inject(SneerAdmin.class, admin);
-		container().inject(Sneer.class,      admin.sneer());
+			// New container way:
+			SneerAdmin admin = SneerAndroidSingleton.admin();
+			container().inject(SneerAdmin.class, admin);
+			container().inject(Sneer.class, admin.sneer());
+		}
 	}
 
 	private void setStrictMode() {

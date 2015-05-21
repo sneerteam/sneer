@@ -54,6 +54,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 	private void init() throws FriendlyException {
 		sneerAdmin = newSneerAdmin(context);
+		if (sneerAdmin == null) return;
 
 		Observable.timer(60, TimeUnit.SECONDS).subscribe(
 				new Action1<Long>() {
