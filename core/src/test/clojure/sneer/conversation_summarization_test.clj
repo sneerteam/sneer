@@ -31,7 +31,7 @@
           subject (atom nil)
           start-subject (fn [] (swap! subject (fn [old]
                                                 (assert (nil? old))
-                                                (convos/start-summarization-machine own-puk tuple-base summaries-out lease))))]
+                                                (convos/start-summarization-machine! own-puk tuple-base summaries-out lease))))]
       (loop [timestamp 0
              pending events]
         (when-let [e (first pending)]

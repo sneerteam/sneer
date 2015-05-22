@@ -24,7 +24,7 @@
 (defn- contact-puk [tuple]
   (tuple "party"))
 
-(defn- handle-contact [contact state]
+(defn- handle-contact! [contact state]
   (let [contact-id (contact-puk contact)
         contact-name (contact "payload")
         timestamp (contact "timestamp")]
@@ -44,7 +44,7 @@
       (.contains label "?") "?"
       :else "*")))
 
-(defn- handle-message [own-puk message state]
+(defn- handle-message! [own-puk message state]
   (let [author (message "author")
         label (message "label")
         contact-puk (if (= author own-puk) (message "audience") author)]
@@ -60,13 +60,12 @@
        (sort-by :timestamp (flip compare))
        vec))
 
-(defn start-summarization-machine [own-puk tuple-base summaries-out lease]
+(defn start-summarization-machine! [own-puk tuple-base summaries-out lease]
   (let [tuples (chan)
         query-tuples (fn [criteria]
                        (query-tuples tuple-base criteria tuples lease))
         state (atom {})]
-    (query-tuples {"type" "contact" "author" own-puk "audience" own-puk})
-    (query-tuples {"type" "message"})
+    (query-tuples {})
 
     (go
       ; link machine lifetime to lease
@@ -79,8 +78,8 @@
         (when-some [tuple (<! tuples)]
           (swap! state
                  #(case (tuple "type")
-                   "contact" (handle-contact tuple %)
-                   "message" (handle-message own-puk tuple %)))
+                   "contact" (handle-contact! tuple %)
+                   "message" (handle-message! own-puk tuple %)))
           (recur))))))
 
 
@@ -101,7 +100,7 @@
             lease (chan)]
         (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
-        (start-summarization-machine own-puk tuple-base summaries-out lease)
+        (start-summarization-machine! own-puk tuple-base summaries-out lease)
         (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []
