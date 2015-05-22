@@ -46,11 +46,6 @@ dependencies {
   compile 'com.android.support:appcompat-v7:21.0.+'
   // compile 'com.android.support:cardview-v7:21.0.+'
   // compile 'com.android.support:recyclerview-v7:21.0.+'
-
-
-    compile 'me.sneer:crypto:+'
-    compile 'me.sneer:sneer-java-api:+'
-
 }
 
 def skummetArtifactsDir = '../../skummet-artifacts'
@@ -67,5 +62,10 @@ if (file("$skummetArtifactsDir/me.sneer/core").exists()) {
 } else if (file("../../core/build").exists()) {
   dependencies {
     compile 'me.sneer:core:+'
+  }
+} else {
+    dependencies {
+      compile 'me.sneer:crypto:+'
+      compile 'me.sneer:sneer-java-api:+'
   }
 }
