@@ -63,7 +63,8 @@
 (defn start-summarization-machine [own-puk tuple-base summaries-out lease]
   (let [tuples (chan)
         query-tuples (fn [criteria]
-                       (query-tuples tuple-base criteria tuples lease))]
+                       (query-tuples tuple-base criteria tuples lease))
+        state (atom {})]
     (query-tuples {"type" "contact" "author" own-puk "audience" own-puk})
     (query-tuples {"type" "message"})
 
@@ -73,13 +74,14 @@
       (close! tuples))
 
     (go-trace
-      (loop [state {}]
-        (>! summaries-out (summarize state))
+      (loop []
+        (>! summaries-out (summarize @state))
         (when-some [tuple (<! tuples)]
-          (recur
-            (case (tuple "type")
-              "contact" (handle-contact tuple state)
-              "message" (handle-message own-puk tuple state))))))))
+          (swap! state
+                 #(case (tuple "type")
+                   "contact" (handle-contact tuple %)
+                   "message" (handle-message own-puk tuple %)))
+          (recur))))))
 
 
 ; Java interface
