@@ -24,11 +24,11 @@
 (defn- contact-puk [tuple]
   (tuple "party"))
 
-(defn- handle-contact! [contact state]
+(defn- handle-contact! [own-puk contact state]
   (let [contact-id (contact-puk contact)
         contact-name (contact "payload")
         timestamp (contact "timestamp")]
-    (if contact-id
+    (if (and contact-id (= (contact "author") own-puk))
       (-> state
           (assoc-in  [contact-id :name] contact-name)
           (update-in [contact-id :timestamp] #(Math/max (or % 0) timestamp)) ; Message might have arrived before contact.
@@ -78,7 +78,7 @@
         (when-some [tuple (<! tuples)]
           (swap! state
                  #(case (tuple "type")
-                   "contact" (handle-contact! tuple %)
+                   "contact" (handle-contact! own-puk tuple %)
                    "message" (handle-message! own-puk tuple %)))
           (recur))))))
 
