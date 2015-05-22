@@ -36,11 +36,13 @@
           (update-in [contact-id :unread ] nvl ""))
       state)))
 
-(defn- unread-status [label old-status]
-  (cond
-    (= old-status "?")    "?"
-    (.contains label "?") "?"
-    :else                 "*"))
+(defn- unread-status [own-puk author label old-status]
+  (if (= author own-puk)
+    old-status
+    (cond
+      (= old-status "?") "?"
+      (.contains label "?") "?"
+      :else "*")))
 
 (defn- handle-message [own-puk message state]
   (let [author (message "author")
@@ -49,7 +51,7 @@
     (-> state (update contact-puk assoc
                 :preview   (or label "")
                 :timestamp (message "timestamp"))
-              (update-in [contact-puk :unread] #(unread-status label %)))))
+              (update-in [contact-puk :unread] #(unread-status own-puk author label %)))))
 
 (defn- summarize [state]
   (->> state

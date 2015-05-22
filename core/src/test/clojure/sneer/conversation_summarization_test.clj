@@ -22,7 +22,7 @@
           proto-contact {"type" "contact" "audience" own-puk "author" own-puk}
           store-contact (fn [contact] (store-tuple tuple-base (merge proto-contact contact)))
 
-          proto-message {"type" "message" "audience" own-puk "message-type" "chat"}
+          proto-message {"type" "message" "message-type" "chat"}
           store-message (fn [tuple] (store-tuple tuple-base (merge proto-message tuple)))
 
           subject (atom nil)
@@ -40,7 +40,9 @@
               (when-let [party (:contact e)]
                 (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
               (when-let [text (:recv e)]
-                (<!!? (store-message {"author" (:auth e) "label" text "timestamp" timestamp})))
+                (<!!? (store-message {"author" (:auth e) "audience" own-puk "label" text "timestamp" timestamp})))
+              (when-let [text (:send e)]
+                (<!!? (store-message {"author" own-puk "audience" (:audience e) "label" text "timestamp" timestamp})))
               (recur (inc timestamp) (next pending))))))
 
       (when-not @subject (start-subject))
@@ -95,9 +97,17 @@
      {:recv "Where is the party??? :)" :auth ann}
      {:recv "Answer me!!" :auth ann}]
 
-    [{:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}]))
+    [{:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}]
 
-    ; TODO: Message sent
+    "Sent messages appear in the preview."
+    [{:contact ann :nick "Ann"}
+     {:send "Hi Ann!" :audience ann}]
+
+    [{:name "Ann" :timestamp 1 :preview "Hi Ann!" :unread ""}]
+
+
+    ))
+
     ; TODO: Messages Read
     ; TODO: Date with pretty time. Ex: "3 minutes ago"
     ; TODO: Process deltas, not entire history.
