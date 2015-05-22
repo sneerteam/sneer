@@ -23,8 +23,10 @@
           (.put map1 "key3" {:a :b})
           (.get map1 "key3") => {:a :b})))
 
+
     (with-open [store (MVStore/open filename)]
       (let [map1 (.openMap store "map-name")]
+
         (fact "Map is persistent"
           (.get map1 "key") => "value"
           (.get map1 (.getBytes "key2")) => "value2"
