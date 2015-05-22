@@ -76,8 +76,8 @@
           tuples [{"author" neide   "payload" "n"           "audience" carla "id" 42}
                   {"author" carla   "payload" "c"           "audience" neide}
                   {"author" carla   "payload" "c"           "audience" neide}
-                  {"author" michael "payload" "hello neide" "audience" neide "type" "chat"}
-                  {"author" michael "payload" "hello carla" "audience" carla "type" "chat" "custom-field" "urgent"}]]
+                  {"author" michael "payload" "hello neide" "audience" neide}
+                  {"author" michael "payload" "hello carla" "audience" carla "custom-field" "urgent"}]]
       (doseq [tuple tuples]
         (store-tuple subject (assoc tuple "type" "test")))
       (query-tuples subject ?criteria result)

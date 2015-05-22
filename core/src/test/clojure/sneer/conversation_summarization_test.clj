@@ -111,7 +111,6 @@
 
     [{:name "Ann" :timestamp 1 :preview "Hi Ann!" :unread ""}]
 
-
     #_(
     "Last message marked as read clears unread status."
     [{:contact ann :nick "Ann"}
@@ -131,6 +130,6 @@
 
     ))
 
-    ; TODO: Messages Read
-    ; TODO: Date with pretty time. Ex: "3 minutes ago"
-    ; TODO: Process deltas, not entire history.
+; TODO: Date with pretty time. Ex: "3 minutes ago"
+; TODO: Use bytes in mvstore for puks instead of hex strings.
+; TODO: Process deltas, not entire history.
