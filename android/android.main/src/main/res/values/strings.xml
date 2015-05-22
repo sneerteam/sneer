@@ -26,6 +26,7 @@
 
 
     <!-- ContactActivity -->
+    <string name="add_contact_view_nickname">Choose a nickname</string>
     <string name="contact_view_nickname">Nickname</string>
     <string name="contact_view_public_key">Public key</string>
     <string name="contact_view_share_public_key">Share Public key</string>

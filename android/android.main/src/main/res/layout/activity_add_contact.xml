@@ -21,7 +21,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_marginTop="15dp"
-            android:hint="@string/contact_view_nickname"
+            android:hint="@string/add_contact_view_nickname"
             android:inputType="textPersonName"
             android:textAppearance="@android:style/TextAppearance.Large">
         </EditText>
