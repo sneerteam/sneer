@@ -29,9 +29,9 @@
         contact-name (contact "payload")
         timestamp (contact "timestamp")]
     (if (and contact-id (= (contact "author") own-puk))
-      (-> state
-          (assoc-in  [contact-id :name] contact-name)
-          (assoc-in  [contact-id :timestamp] timestamp))
+      (update state contact-id assoc
+        :name contact-name
+        :timestamp timestamp)
       state)))
 
 (defn- unread-status [own-puk author label old-status]
