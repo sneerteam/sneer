@@ -173,7 +173,7 @@
                       (assert "Contact does not have a known public key."))
 
         sender #(.. space publisher (audience (contact-puk)))
-        message-sender #(.. (sender) (type "message") (field "message-type" "chat"))
+        message-sender      #(.. (sender) (type "message") (field "message-type" "chat"))
         message-read-sender #(.. (sender) (type "message-read"))]
 
     (reify
