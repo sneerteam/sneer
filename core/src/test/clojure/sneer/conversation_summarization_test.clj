@@ -25,6 +25,9 @@
           proto-message {"type" "message" "message-type" "chat"}
           store-message (fn [tuple] (store-tuple tuple-base (merge proto-message tuple)))
 
+          label->id (atom {})
+          store-read (fn [contact-puk msg-id] (store-tuple tuple-base {"author" own-puk "type" "message-read" "audience" contact-puk "payload" msg-id}))
+
           subject (atom nil)
           start-subject (fn [] (swap! subject (fn [old]
                                                 (assert (nil? old))
@@ -39,10 +42,13 @@
             (do
               (when-let [party (:contact e)]
                 (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
-              (when-let [text (:recv e)]
-                (<!!? (store-message {"author" (:auth e) "audience" own-puk "label" text "timestamp" timestamp})))
-              (when-let [text (:send e)]
-                (<!!? (store-message {"author" own-puk "audience" (:audience e) "label" text "timestamp" timestamp})))
+              (when-let [label (:recv e)]
+                (let [received-msg (<!!? (store-message {"author" (:auth e) "audience" own-puk "label" label "timestamp" timestamp}))]
+                  (swap! label->id assoc label (received-msg "id"))))
+              (when-let [label (:send e)]
+                (<!!? (store-message {"author" own-puk "audience" (:audience e) "label" label "timestamp" timestamp})))
+              (when-let [label (:read e)]
+                (store-read (:auth e) (@label->id label)))
               (recur (inc timestamp) (next pending))))))
 
       (when-not @subject (start-subject))
@@ -105,6 +111,23 @@
 
     [{:name "Ann" :timestamp 1 :preview "Hi Ann!" :unread ""}]
 
+
+    #_(
+    "Last message marked as read clears unread status."
+    [{:contact ann :nick "Ann"}
+     {:recv "Hello1" :auth ann}
+     {:recv "Hello2" :auth ann}
+     {:read "Hello2" :auth ann}]
+
+    [{:name "Ann" :timestamp 2 :preview "Hello2" :unread ""}]
+
+      "Old message marked as read does not clear unread status."
+      [{:contact ann :nick "Ann"}
+       {:recv "Hello1" :auth ann}
+       {:recv "Hello2" :auth ann}
+       {:read "Hello1" :auth ann}]
+
+      [{:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}])
 
     ))
 
