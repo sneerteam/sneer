@@ -31,14 +31,12 @@
     (if (and contact-id (= (contact "author") own-puk))
       (-> state
           (assoc-in  [contact-id :name] contact-name)
-          (update-in [contact-id :timestamp] #(Math/max (or % 0) timestamp)) ; Message might have arrived before contact.
-          (update-in [contact-id :preview] nvl "")
-          (update-in [contact-id :unread ] nvl ""))
+          (assoc-in  [contact-id :timestamp] timestamp))
       state)))
 
 (defn- unread-status [own-puk author label old-status]
   (if (= author own-puk)
-    old-status
+    (nvl old-status "")
     (cond
       (= old-status "?") "?"
       (.contains label "?") "?"

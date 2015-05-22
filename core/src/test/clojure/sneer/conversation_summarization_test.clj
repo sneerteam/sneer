@@ -80,9 +80,9 @@
     [{:recv "Hello" :auth unknown}]
     []
 
-    "Contact new"
+    "New contact"
     [{:contact ann :nick "Ann"}]
-    [{:name "Ann" :timestamp 0 :preview "" :unread ""}]
+    [{:name "Ann" :timestamp 0}]
 
     "Message received from Ann is unread"
     [{:contact ann :nick "Ann"}
