@@ -9,5 +9,13 @@ import android.test.ApplicationTestCase;
 public class ApplicationTest extends ApplicationTestCase<Application> {
 	public ApplicationTest() {
 		super(Application.class);
+
+		stimulateApiToRemoveUnusedWarnings();
+	}
+
+	private void stimulateApiToRemoveUnusedWarnings() {
+		PartnerSession session = PartnerSession.join(null, null);
+		session.wasStartedByMe();
+		session.send(null);
 	}
 }
