@@ -12,10 +12,9 @@ import sneer.android.utils.AndroidUtils;
 
 import static sneer.android.impl.IPCProtocol.IS_OWN;
 import static sneer.android.impl.IPCProtocol.JOIN_SESSION;
+import static sneer.android.impl.IPCProtocol.SEND_MESSAGE;
 
 public class PluginActivities {
-
-	private static final String SEND_MESSAGE = "SEND_MESSAGE";
 
 	public static void start(final Context context, Plugin plugin, Conversation convo) {
 		start(context, plugin, convo, null);
