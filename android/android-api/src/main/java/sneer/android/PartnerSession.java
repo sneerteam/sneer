@@ -16,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 
 import sneer.android.impl.Envelope;
 import sneer.android.impl.IPCProtocol;
+import sneer.android.ui.SneerInstallation;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 import static android.content.Context.BIND_IMPORTANT;
@@ -84,9 +85,14 @@ public class PartnerSession implements Closeable {
     private PartnerSession(Activity activity, Listener listener) {
 		this.activity = activity;
         this.listener = listener;
-	    Intent callback = activity.getIntent().<Intent>getParcelableExtra(IPCProtocol.JOIN_SESSION);
-	    if (callback == null) toast("Make sure metadata is correctly set in your AndroidManifest.xml file");
-	    boolean success = activity.bindService(callback, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
+
+	    Intent sneer = activity.getIntent().getParcelableExtra(IPCProtocol.JOIN_SESSION);
+	    if (sneer == null) {
+		    if (SneerInstallation.checkConversationContext(activity))
+			    finish(activity.getLocalClassName() + ": Make sure Sneer session metadata is correctly set in your AndroidManifest.xml file");
+		    return;
+	    }
+	    boolean success = activity.bindService(sneer, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
 	    if (!success) finish("Unable to connect to Sneer");
     }
 
