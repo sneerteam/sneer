@@ -64,3 +64,5 @@
 (defn update-java-map [jmap key fn]
   (let [old-value (.get jmap key)]
     (.put jmap key (fn old-value))))
+
+(def descending (flip compare))
