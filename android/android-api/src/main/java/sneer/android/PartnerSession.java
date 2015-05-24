@@ -57,6 +57,7 @@ public class PartnerSession implements Closeable {
     private final Listener listener;
 	private final CountDownLatch connectionPending = new CountDownLatch(1);
 	private final ServiceConnection connection = createConnection();
+	private boolean isUpToDate = false;
 	private Messenger toSneer;
 
 
@@ -65,7 +66,7 @@ public class PartnerSession implements Closeable {
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				toSneer = new Messenger(service);
-				Messenger callback = new Messenger(new FromSneerHandler());
+				Messenger callback = new Messenger(new FromSneerHandler(PartnerSession.this));
 				sendToSneer(callback);
 				connectionPending.countDown();
 			}
@@ -93,6 +94,21 @@ public class PartnerSession implements Closeable {
 	private void finish(String endingToast) {
 		toast(endingToast);
 		activity.finish();
+	}
+
+
+	public void handleMessageFromSneer(android.os.Message msg) {
+		Bundle data = msg.getData();
+		data.setClassLoader(getClass().getClassLoader());
+		Object content = ((Envelope)data.getParcelable(ENVELOPE)).content;
+		if (content.equals(IPCProtocol.UP_TO_DATE))
+			isUpToDate = true;
+		else
+			listener.onMessage(getMessage(content));
+
+		if (isUpToDate)	activity.runOnUiThread(new Runnable() { @Override public void run() {
+			listener.onUpToDate();
+		}});
 	}
 
 
@@ -124,29 +140,8 @@ public class PartnerSession implements Closeable {
 	}
 
 
-	private class FromSneerHandler extends Handler {
-		private boolean isUpToDate = false;
-
-		@Override
-		public void handleMessage(android.os.Message msg) {
-			Bundle data = msg.getData();
-			data.setClassLoader(getClass().getClassLoader());
-			Object content = ((Envelope)data.getParcelable(ENVELOPE)).content;
-			if (content.equals(IPCProtocol.UP_TO_DATE))
-				isUpToDate = true;
-			else
-				listener.onMessage(getMessage(content));
-
-			if (isUpToDate)	activity.runOnUiThread(new Runnable() { @Override
-				                                                       public void run() {
-				listener.onUpToDate();
-			}});
-
-		}
-	}
-
-
 	private Message getMessage(Object content) {
+		@SuppressWarnings("unchecked")
 		final Map<String, Object> map = (Map<String, Object>)content;
 		return new Message() {
 			@Override
@@ -174,9 +169,21 @@ public class PartnerSession implements Closeable {
 
 
 	private static void await (CountDownLatch latch) {
-		try {
-			latch.await();
-		} catch (InterruptedException e) { throw new RuntimeException(e); }
+		try { latch.await(); } catch (InterruptedException e) { throw new RuntimeException(e); }
 	}
 
+}
+
+/** Separate class because ADT will issue HandlerLeak warnings if a Handler is an inner class. Suppressing it doesn't work. */
+class FromSneerHandler extends Handler {
+	private final PartnerSession session;
+
+	FromSneerHandler(PartnerSession session) {
+		this.session = session;
+	}
+
+	@Override
+	public void handleMessage(android.os.Message msg) {
+		session.handleMessageFromSneer(msg);
+	}
 }
