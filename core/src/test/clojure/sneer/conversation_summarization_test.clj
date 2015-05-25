@@ -145,7 +145,7 @@
        {:step-millis 10}]
       {:name "Ann" :date "moments ago"}
 
-      "Pretty time: minutes ago"
+      "Pretty time: 5 minutes ago"
       [{:contact ann :nick "Ann"}
        {:step-millis (inc (* 1000 60 5))}]
       {:name "Ann" :date "5 minutes ago"}))
