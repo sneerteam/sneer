@@ -66,7 +66,7 @@
   (tabular "Conversation summarization"
 
     (fact "Events produce expected summaries"
-      (summarize ?events ?summaries) => :ok)
+      (summarize ?events ?expected-summary) => :ok)
 
     ?obs
     ?events
