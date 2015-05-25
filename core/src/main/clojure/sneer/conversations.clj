@@ -122,10 +122,11 @@
             tuple-base (tuple-base-of admin)
             to-foreign (map (fn [summaries] (mapv to-foreign-summary summaries)))
             summaries-out (chan (sliding-buffer 1) to-foreign)
+            pretty-date-period (chan)
             lease (chan)]
         (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
-        (start-summarization-machine! own-puk tuple-base summaries-out lease)
+        (start-summarization-machine! own-puk tuple-base summaries-out pretty-date-period lease)
         (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []
