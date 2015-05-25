@@ -27,7 +27,7 @@ import static sneer.android.impl.IPCProtocol.IS_OWN;
 
 public class PartnerSession implements Closeable {
 
-	private boolean success;
+	private boolean isBound;
 
 	public static PartnerSession join(Activity activity, Listener listener) {
 		return new PartnerSession(activity, listener);
@@ -52,7 +52,7 @@ public class PartnerSession implements Closeable {
 
 	@Override
 	public void close() {
-		if (success) activity.unbindService(connection);
+		if (isBound) activity.unbindService(connection);
 	}
 
 
@@ -94,8 +94,8 @@ public class PartnerSession implements Closeable {
 			    finish(activity.getLocalClassName() + ": Make sure Sneer session metadata is correctly set in your AndroidManifest.xml file");
 		    return;
 	    }
-		success = activity.bindService(sneer, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
-		if (!success) finish("Unable to connect to Sneer");
+		isBound = activity.bindService(sneer, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
+		if (!isBound) finish("Unable to connect to Sneer");
     }
 
 
