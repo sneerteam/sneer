@@ -1,6 +1,6 @@
 (ns sneer.conversation-summarization-test
   (:require [midje.sweet :refer :all]
-            [clojure.core.async :refer [chan close!]]
+            [clojure.core.async :refer [chan close!] :as async]
             [sneer.async :refer [sliding-chan]]
             [sneer.test-util :refer [<!!? <wait-for!]]
             [sneer.tuple.jdbc-database :as database]
@@ -16,8 +16,6 @@
               tuple-base (tuple-base/create db)]
 
     (let [own-puk (keys/->puk "neide puk")
-          summaries-out (sliding-chan 1)
-          lease (chan)
 
           proto-contact {"type" "contact" "audience" own-puk "author" own-puk}
           store-contact (fn [contact] (store-tuple tuple-base (merge proto-contact contact)))
@@ -29,6 +27,8 @@
           store-read (fn [contact-puk msg-id] (store-tuple tuple-base {"author" own-puk "type" "message-read" "audience" contact-puk "payload" msg-id}))
 
           subject (atom nil)
+          summaries-out (chan (async/sliding-buffer 1) (map #(select-keys (first %) [:name :timestamp :preview :unread])))
+          lease (chan)
           start-subject (fn [] (swap! subject (fn [old]
                                                 (assert (nil? old))
                                                 (convos/start-summarization-machine! own-puk tuple-base summaries-out lease))))]
@@ -70,25 +70,25 @@
 
     ?obs
     ?events
-    ?summaries
+    ?expected-summary
 
     "Summaries start empty."
     []
-    []
+    {}
 
     "Message received without contact is ignored"
     [{:recv "Hello" :auth unknown}]
-    []
+    {}
 
     "New contact"
     [{:contact ann :nick "Ann"}]
-    [{:name "Ann" :timestamp 0}]
+    {:name "Ann" :timestamp 0}
 
     "Message received from Ann is unread"
     [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}]
 
-    [{:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}]
+    {:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}
 
     "Nick change should not affect unread field."
     [{:contact ann :nick "Ann"}
@@ -96,29 +96,28 @@
      :summarize
      {:contact ann :nick "Annabelle"}]
 
-    [{:name "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}]
+    {:name "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}
 
     "Any unread message with question mark produces question mark in unread status."
     [{:contact ann :nick "Ann"}
      {:recv "Where is the party??? :)" :auth ann}
      {:recv "Answer me!!" :auth ann}]
 
-    [{:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}]
+    {:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}
 
     "Sent messages appear in the preview."
     [{:contact ann :nick "Ann"}
      {:send "Hi Ann!" :audience ann}]
 
-    [{:name "Ann" :timestamp 1 :preview "Hi Ann!" :unread ""}]
+    {:name "Ann" :timestamp 1 :preview "Hi Ann!"}
 
-    #_(
     "Last message marked as read clears unread status."
     [{:contact ann :nick "Ann"}
      {:recv "Hello1" :auth ann}
      {:recv "Hello2" :auth ann}
      {:read "Hello2" :auth ann}]
 
-    [{:name "Ann" :timestamp 2 :preview "Hello2" :unread ""}]
+    {:name "Ann" :timestamp 2 :preview "Hello2" :unread ""}
 
       "Old message marked as read does not clear unread status."
       [{:contact ann :nick "Ann"}
@@ -126,10 +125,8 @@
        {:recv "Hello2" :auth ann}
        {:read "Hello1" :auth ann}]
 
-      [{:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}])
+      {:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}))
 
-    ))
-
-; TODO: Date with pretty time. Ex: "3 minutes ago"
-; TODO: Use bytes in mvstore for puks instead of hex strings.
 ; TODO: Process deltas, not entire history.
+; TODO: Identify read messages by author and original id, so senders can ask for them and display "message was read" signs.
+; TODO: Date with pretty time. Ex: "3 minutes ago"

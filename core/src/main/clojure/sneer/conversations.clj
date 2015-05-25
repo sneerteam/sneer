@@ -3,7 +3,7 @@
     [clojure.core.async :refer [go chan close! <! >! sliding-buffer]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-trace link-chan-to-subscriber thread-chan-to-subscriber]]
-    [sneer.commons :refer [now produce! flip update-java-map]]
+    [sneer.commons :refer [now produce! descending update-java-map]]
     [sneer.clojure.core :refer [nvl]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
@@ -24,41 +24,56 @@
 (defn- contact-puk [tuple]
   (tuple "party"))
 
-(defn- handle-contact! [own-puk contact state]
-  (let [contact-puk (contact-puk contact)
-        contact-name (contact "payload")
-        timestamp (contact "timestamp")]
-    (when (and contact-puk (= (contact "author") own-puk))
+(defn- handle-contact! [own-puk tuple state]
+  (when (= (tuple "author") own-puk)
+    (when-let [contact-puk (contact-puk tuple)]
       (update-java-map state contact-puk #(assoc %
-                                           :name contact-name
-                                           :timestamp timestamp)))))
+                                           :name      (tuple "payload")
+                                           :timestamp (tuple "timestamp"))))))
 
-(defn- unread-status [own-puk author label old-status]
-  (if (= author own-puk)
-    (nvl old-status "")
-    (cond
-      (= old-status "?") "?"
-      (.contains label "?") "?"
-      :else "*")))
+(defn- unread-status [label old-status]
+  (cond
+    (= old-status "?") "?"
+    (.contains label "?") "?"
+    :else "*"))
 
-(defn- update-summary [own-puk author label timestamp old-summary]
+(defn update-with-received [id label old-summary]
   (-> old-summary
+    (assoc :last-received id)
+    (update :unread #(unread-status label %))))
+
+(defn- update-summary [own? message old-summary]
+  (let [label     (message "label")
+        timestamp (message "timestamp")]
+    (->
+      (if own?
+        old-summary
+        (update-with-received (message "id") label old-summary))
       (assoc
         :preview (or label "")
-        :timestamp timestamp)
-      (update :unread #(unread-status own-puk author label %))))
+        :timestamp timestamp))))
 
 (defn- handle-message! [own-puk message state]
-  (let [author    (message "author")
-        label     (message "label")
-        timestamp (message "timestamp")
-        contact-puk (if (= author own-puk) (message "audience") author)]
-    (update-java-map state contact-puk #(update-summary own-puk author label timestamp %))))
+  (let [author (message "author")
+        own? (= author own-puk)
+        contact-puk (if own? (message "audience") author)]
+    (update-java-map state contact-puk #(update-summary own? message %))))
+
+(defn update-with-read [old-summary tuple]
+  (let [msg-id (tuple "payload")]
+    (cond-> old-summary
+      (= msg-id (old-summary :last-received)) (assoc :unread ""))))
+
+(defn- handle-msg-read! [own-puk tuple state]
+  (when (= (tuple "author") own-puk)
+    (let [contact-puk (tuple "audience")]
+      (update-java-map state contact-puk #(update-with-read % tuple)))))
 
 (defn- summarize [state]
   (->> state
        .values
-       (sort-by :timestamp (flip compare))
+       (filter :name)
+       (sort-by :timestamp descending)
        vec))
 
 (defn start-summarization-machine! [own-puk tuple-base summaries-out lease]
@@ -77,8 +92,9 @@
         (>! summaries-out (summarize state))
         (when-some [tuple (<! tuples)]
           (case (tuple "type")
-            "contact" (handle-contact! own-puk tuple state)
-            "message" (handle-message! own-puk tuple state))
+            "contact"      (handle-contact!  own-puk tuple state)
+            "message"      (handle-message!  own-puk tuple state)
+            "message-read" (handle-msg-read! own-puk tuple state))
           (recur))))))
 
 
