@@ -1,6 +1,6 @@
 (ns sneer.conversations
   (:require
-    [clojure.core.async :refer [go chan close! <! >! sliding-buffer alt!]]
+    [clojure.core.async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
     [sneer.commons :refer [now produce! descending update-java-map]]
@@ -114,6 +114,12 @@
   (println "TODO: CONVERSATION ID")
   (ConversationList$Summary. name summary (str timestamp) (str unread) -4242))
 
+(defn ping-every-minute [ch]
+  (go-loop-trace []
+    (<! (timeout (* 1000 60)))
+    (>! ch :ping)
+    (recur)))
+
 (defn do-summaries [this]
   (rx/observable*
     (fn [^Subscriber subscriber]
@@ -126,6 +132,7 @@
             lease (chan)]
         (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
+        (ping-every-minute pretty-date-period)
         (start-summarization-machine! own-puk tuple-base summaries-out pretty-date-period lease)
         (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
 
