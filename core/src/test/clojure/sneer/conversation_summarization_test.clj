@@ -2,15 +2,17 @@
   (:require [midje.sweet :refer :all]
             [clojure.core.async :refer [chan close!] :as async]
             [sneer.async :refer [sliding-chan]]
+            [sneer.commons :refer [submap?]]
             [sneer.test-util :refer [<!!? <wait-for!]]
             [sneer.tuple.jdbc-database :as database]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :as keys]
-            [sneer.conversations :as convos]))
+            [sneer.conversations :as convos])
+  (:import [sneer.commons Clock]))
 
 
-(defn summarize [events summaries]
+(defn summarize [events expected-summary]
 
   (with-open [db (database/create-sqlite-db)
               tuple-base (tuple-base/create db)]
@@ -27,11 +29,13 @@
           store-read (fn [contact-puk msg] (store-tuple tuple-base {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "original_id")}))
 
           subject (atom nil)
-          summaries-out (chan (async/sliding-buffer 1) (map #(select-keys (first %) [:name :timestamp :preview :unread])))
+          summaries-out (chan (async/sliding-buffer 1) (map #(select-keys (first %) [:name :timestamp :date :preview :unread])))
           lease (chan)
+          pretty-date-period (chan)
           start-subject (fn [] (swap! subject (fn [old]
                                                 (assert (nil? old))
-                                                (convos/start-summarization-machine! own-puk tuple-base summaries-out lease))))]
+                                                (convos/start-summarization-machine! own-puk tuple-base summaries-out pretty-date-period lease))))]
+      (Clock/startMocking)
       (loop [timestamp 0
              pending events]
         (when-let [e (first pending)]
@@ -49,14 +53,18 @@
                 (<!!? (store-message {"author" own-puk "audience" (:audience e) "label" label "timestamp" timestamp})))
               (when-let [label (:read e)]
                 (store-read (:auth e) (@label->msg label)))
+              (when-let [millis (:step-millis e)]
+                (Clock/advance millis))
               (recur (inc timestamp) (next pending))))))
 
       (when-not @subject (start-subject))
 
       (try
-        (or (<wait-for! summaries-out summaries) :ok)
+        (or (<wait-for! summaries-out #(submap? expected-summary %))
+            :ok)
 
         (finally
+          (Clock/stopMocking)
           (close! lease)
           (fact "machine terminates when lease channel is closed"
             (<!!? @subject) => nil))))))
@@ -66,7 +74,8 @@
   (tabular "Conversation summarization"
 
     (fact "Events produce expected summaries"
-      (summarize ?events ?expected-summary) => :ok)
+      (let [expected-summary ?expected-summary]
+        (summarize ?events expected-summary)) => :ok)
 
     ?obs
     ?events
@@ -125,7 +134,20 @@
        {:recv "Hello2" :auth ann}
        {:read "Hello1" :auth ann}]
 
-      {:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}))
+      {:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}
+
+      "Pretty time: now"
+      [{:contact ann :nick "Ann"}]
+      {:name "Ann" :date "moments from now"}
+
+      "Pretty time: moments ago"
+      [{:contact ann :nick "Ann"}
+       {:step-millis 10}]
+      {:name "Ann" :date "moments ago"}
+
+      "Pretty time: minutes ago"
+      [{:contact ann :nick "Ann"}
+       {:step-millis (inc (* 1000 60 5))}]
+      {:name "Ann" :date "5 minutes ago"}))
 
 ; TODO: Process deltas, not entire history.
-; TODO: Date with pretty time. Ex: "3 minutes ago"

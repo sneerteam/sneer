@@ -1,6 +1,6 @@
 (ns sneer.conversations
   (:require
-    [clojure.core.async :refer [go chan close! <! >! sliding-buffer]]
+    [clojure.core.async :refer [go chan close! <! >! sliding-buffer alt!]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
     [sneer.commons :refer [now produce! descending update-java-map]]
@@ -16,10 +16,11 @@
     [rx Subscriber Observable]
     [sneer Conversations Conversation Conversations$Notification]
     [sneer.admin SneerAdmin]
-    [sneer.commons Container]
+    [sneer.commons Container Clock]
     [sneer.conversations ConversationList ConversationList$Summary ConversationList]
     [sneer.rx ObservedSubject]
-    (java.util HashMap)))
+    [org.ocpsoft.prettytime PrettyTime]
+    [java.util HashMap Date]))
 
 (defn- contact-puk [tuple]
   (tuple "party"))
@@ -70,13 +71,18 @@
       (update-java-map state contact-puk #(update-with-read % tuple)))))
 
 (defn- summarize [state]
-  (->> state
-       .values
-       (filter :name)
-       (sort-by :timestamp descending)
-       vec))
+  (let [pretty-time (PrettyTime. (Date. (Clock/now)))
+        with-pretty-date (fn [summary]
+                           (assoc summary :date
+                                          (.format pretty-time (Date. ^long (summary :timestamp)))))]
+    (->> state
+         .values
+         (filter :name)
+         (sort-by :timestamp descending)
+         (map with-pretty-date)
+         vec)))
 
-(defn start-summarization-machine! [own-puk tuple-base summaries-out lease]
+(defn start-summarization-machine! [own-puk tuple-base summaries-out pretty-date-period lease]
   (let [tuples (chan)
         query-tuples (fn [criteria] (query-tuples tuple-base criteria tuples lease))
         state (HashMap.)]
@@ -89,12 +95,17 @@
 
     (go-loop-trace []
       (>! summaries-out (summarize state))
-      (when-some [tuple (<! tuples)]
-        (case (tuple "type")
-          "contact" (handle-contact! own-puk tuple state)
-          "message" (handle-message! own-puk tuple state)
-          "message-read" (handle-msg-read! own-puk tuple state))
-        (recur)))))
+
+      (alt! :priority true
+        tuples
+        ([tuple] (when tuple
+                   (case (tuple "type")
+                     "contact"      (handle-contact!  own-puk tuple state)
+                     "message"      (handle-message!  own-puk tuple state)
+                     "message-read" (handle-msg-read! own-puk tuple state))
+                   (recur)))
+        pretty-date-period
+        ([_] (recur))))))
 
 
 ; Java interface

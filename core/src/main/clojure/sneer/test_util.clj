@@ -22,16 +22,16 @@
       (timeout timeout-millis) :timeout
       ch ([v] v))))
 
-(defn <wait-for! [ch expected]
+(defn <wait-for! [ch predicate]
   (<!!
     (go-loop-trace [previous nil]
       (let [current (<!!? ch)]
 ;        (println "Intermediate: " current)
         (if (= current :timeout)
           (do
-            (println "TIMEOUT waiting for:" expected "\n            but got:" previous)
+            (println "TIMEOUT. Last value:" previous)
             :timeout)
-          (when-not (= current expected)
+          (when-not (predicate current)
             (recur current)))))))
 
 (defn compromised
