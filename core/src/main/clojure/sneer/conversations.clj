@@ -2,7 +2,7 @@
   (:require
     [clojure.core.async :refer [go chan close! <! >! sliding-buffer]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [go-trace link-chan-to-subscriber thread-chan-to-subscriber]]
+    [sneer.async :refer [go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
     [sneer.commons :refer [now produce! descending update-java-map]]
     [sneer.clojure.core :refer [nvl]]
     [sneer.contact :refer [get-contacts puk->contact]]
@@ -87,15 +87,14 @@
       (<! lease)
       (close! tuples))
 
-    (go-trace
-      (loop []
-        (>! summaries-out (summarize state))
-        (when-some [tuple (<! tuples)]
-          (case (tuple "type")
-            "contact"      (handle-contact!  own-puk tuple state)
-            "message"      (handle-message!  own-puk tuple state)
-            "message-read" (handle-msg-read! own-puk tuple state))
-          (recur))))))
+    (go-loop-trace []
+      (>! summaries-out (summarize state))
+      (when-some [tuple (<! tuples)]
+        (case (tuple "type")
+          "contact" (handle-contact! own-puk tuple state)
+          "message" (handle-message! own-puk tuple state)
+          "message-read" (handle-msg-read! own-puk tuple state))
+        (recur)))))
 
 
 ; Java interface
