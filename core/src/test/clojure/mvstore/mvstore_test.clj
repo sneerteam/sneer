@@ -5,7 +5,7 @@
     (java.io File)))
 
 (facts "MVStore Works"
-  (let [filename (str "//sneer/lixo" (System/currentTimeMillis))]
+  (let [filename (.getAbsolutePath (File/createTempFile "tmp" ".tmp" ))]
     (with-open [store (MVStore/open filename)]
       (let [map1 (.openMap store "map-name")]
 
