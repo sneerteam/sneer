@@ -28,7 +28,8 @@
        ~@forms
        (catch java.lang.Throwable ~'e
          (println "GO ERROR" ~'e)
-         (print-throwable ~'e)))))
+         #_(print-throwable ~'e)
+         (.printStackTrace ~'e)))))
 
 (defmacro go-loop-trace
   "Same as go-loop but prints unhandled exception stack trace"

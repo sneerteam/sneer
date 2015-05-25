@@ -66,3 +66,12 @@
     (.put jmap key (fn old-value))))
 
 (def descending (flip compare))
+
+(defn submap? [sub super]
+  (reduce-kv
+    (fn [_ k v]
+      (if (= v (get super k))
+        true
+        (reduced false)))
+    true
+    sub))

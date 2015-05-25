@@ -3,7 +3,7 @@
            [sneer.admin UniqueConstraintViolated]
            [java.lang AutoCloseable]
            (sneer PublicKey))
-  (:require [sneer.commons :refer [now]]
+  (:require [sneer.commons :refer [now submap?]]
             [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! <!! mult tap chan close! go]]
             [sneer.rx :refer [filter-by seq->observable]]
@@ -112,16 +112,6 @@
                     " ORDER BY id"
                     (when last-by-id " DESC LIMIT 1"))]
     (apply vector select values)))
-
-
-(defn submap? [sub super]
-  (reduce-kv
-    (fn [_ k v]
-      (if (= v (get super k))
-        true
-        (reduced false)))
-    true
-    sub))
 
 (defn query-tuples-from-db [db criteria]
   (let [after-id (::after-id criteria)
