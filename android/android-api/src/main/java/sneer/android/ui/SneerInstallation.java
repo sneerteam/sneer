@@ -30,7 +30,7 @@ public class SneerInstallation {
 
 	private static Intent market() {
 		Intent ret = new Intent(Intent.ACTION_VIEW);
-		ret.setData(Uri.parse("market://details?id=sneer.main"));
+		ret.setData(Uri.parse("https://play.google.com/store/apps/details?id=sneer.main"));
 		return ret;
 	}
 
