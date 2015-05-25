@@ -23,8 +23,8 @@
           proto-message {"type" "message" "message-type" "chat"}
           store-message (fn [tuple] (store-tuple tuple-base (merge proto-message tuple)))
 
-          label->id (atom {})
-          store-read (fn [contact-puk msg-id] (store-tuple tuple-base {"author" own-puk "type" "message-read" "audience" contact-puk "payload" msg-id}))
+          label->msg (atom {})
+          store-read (fn [contact-puk msg] (store-tuple tuple-base {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "original_id")}))
 
           subject (atom nil)
           summaries-out (chan (async/sliding-buffer 1) (map #(select-keys (first %) [:name :timestamp :preview :unread])))
@@ -44,11 +44,11 @@
                 (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
               (when-let [label (:recv e)]
                 (let [received-msg (<!!? (store-message {"author" (:auth e) "audience" own-puk "label" label "timestamp" timestamp}))]
-                  (swap! label->id assoc label (received-msg "id"))))
+                  (swap! label->msg assoc label received-msg)))
               (when-let [label (:send e)]
                 (<!!? (store-message {"author" own-puk "audience" (:audience e) "label" label "timestamp" timestamp})))
               (when-let [label (:read e)]
-                (store-read (:auth e) (@label->id label)))
+                (store-read (:auth e) (@label->msg label)))
               (recur (inc timestamp) (next pending))))))
 
       (when-not @subject (start-subject))
@@ -128,5 +128,4 @@
       {:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}))
 
 ; TODO: Process deltas, not entire history.
-; TODO: Identify read messages by author and original id, so senders can ask for them and display "message was read" signs.
 ; TODO: Date with pretty time. Ex: "3 minutes ago"

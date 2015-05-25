@@ -48,7 +48,7 @@
     (->
       (if own?
         old-summary
-        (update-with-received (message "id") label old-summary))
+        (update-with-received (message "original_id") label old-summary))
       (assoc
         :preview (or label "")
         :timestamp timestamp))))
