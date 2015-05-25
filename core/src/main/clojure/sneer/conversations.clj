@@ -11,7 +11,8 @@
     [sneer.party :refer [party->puk]]
     [sneer.tuple.protocols :refer :all]
     [sneer.tuple.space :refer [payload]]
-    [sneer.tuple-base-provider :refer :all])
+    [sneer.tuple-base-provider :refer :all]
+    [sneer.tuple.persistent-tuple-base :as tb])
   (:import
     [rx Subscriber Observable]
     [sneer Conversations Conversation Conversations$Notification]
@@ -28,9 +29,11 @@
 (defn- handle-contact! [own-puk tuple state]
   (when (= (tuple "author") own-puk)
     (when-let [contact-puk (contact-puk tuple)]
-      (update-java-map state contact-puk #(assoc %
-                                           :name      (tuple "payload")
-                                           :timestamp (tuple "timestamp"))))))
+      (update-java-map state
+                       (.toHex contact-puk)
+                       #(assoc %
+                         :name      (tuple "payload")
+                         :timestamp (tuple "timestamp"))))))
 
 (defn- unread-status [label old-status]
   (cond
@@ -58,7 +61,9 @@
   (let [author (message "author")
         own? (= author own-puk)
         contact-puk (if own? (message "audience") author)]
-    (update-java-map state contact-puk #(update-summary own? message %))))
+    (update-java-map state
+                     (.toHex contact-puk)
+                     #(update-summary own? message %))))
 
 (defn update-with-read [old-summary tuple]
   (let [msg-id (tuple "payload")]
@@ -68,7 +73,9 @@
 (defn- handle-msg-read! [own-puk tuple state]
   (when (= (tuple "author") own-puk)
     (let [contact-puk (tuple "audience")]
-      (update-java-map state contact-puk #(update-with-read % tuple)))))
+      (update-java-map state
+                       (.toHex contact-puk)
+                       #(update-with-read % tuple)))))
 
 (defn- summarize [state]
   (let [pretty-time (PrettyTime. (Date. (Clock/now)))
@@ -84,9 +91,9 @@
 
 (defn start-summarization-machine! [own-puk tuple-base summaries-out pretty-date-period lease]
   (let [tuples (chan)
-        query-tuples (fn [criteria] (query-tuples tuple-base criteria tuples lease))
-        state (HashMap.)]
-    (query-tuples {})
+        state (HashMap.)
+        all-tuples-criteria {}]      ;{tb/after-id id}
+    (query-tuples tuple-base all-tuples-criteria tuples lease)
 
     (go
       ; link machine lifetime to lease
@@ -100,8 +107,8 @@
         tuples
         ([tuple] (when tuple
                    (case (tuple "type")
-                     "contact"      (handle-contact!  own-puk tuple state)
-                     "message"      (handle-message!  own-puk tuple state)
+                     "contact" (handle-contact! own-puk tuple state)
+                     "message" (handle-message! own-puk tuple state)
                      "message-read" (handle-msg-read! own-puk tuple state))
                    (recur)))
         pretty-date-period

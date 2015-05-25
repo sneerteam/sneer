@@ -20,7 +20,11 @@
 
         (fact "Serializable objects can be stored"
           (.put map1 "key3" {:a :b})
-          (.get map1 "key3") => {:a :b})))
+          (.get map1 "key3") => {:a :b})
+
+        (fact "Serializable objects can be used as keys"
+          (.put map1 {:c :d} "value4")
+          (.get map1 {:c :d}) => "value4")))
 
 
     (with-open [store (MVStore/open filename)]
@@ -29,6 +33,7 @@
         (fact "Map is persistent"
           (.get map1 "key") => "value"
           (.get map1 (.getBytes "key2")) => "value2"
-          (.get map1 "key3") => {:a :b})))
+          (.get map1 "key3") => {:a :b}
+          (.get map1 {:c :d}) => "value4")))
 
     (-> filename File. .delete) => true))
