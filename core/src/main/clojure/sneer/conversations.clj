@@ -101,7 +101,7 @@
 ; Java interface
 
 (defn to-foreign-summary [{:keys [name summary timestamp unread]}]
-  (println "TODO: SUMMARY ID")
+  (println "TODO: CONVERSATION ID")
   (ConversationList$Summary. name summary (str timestamp) (str unread) -4242))
 
 (defn do-summaries [this]
