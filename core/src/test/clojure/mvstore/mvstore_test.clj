@@ -2,7 +2,6 @@
   (:require [midje.sweet :refer :all])
   (:import
     [org.h2.mvstore MVStore]
-    (java.net DatagramPacket)
     (java.io File)))
 
 (facts "MVStore Works"
