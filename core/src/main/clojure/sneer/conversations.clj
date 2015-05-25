@@ -9,7 +9,6 @@
     [sneer.conversation :refer :all]
     [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]
     [sneer.party :refer [party->puk]]
-    [sneer.tuple.persistent-tuple-base :as tb]
     [sneer.tuple.protocols :refer :all]
     [sneer.tuple.space :refer [payload]]
     [sneer.tuple-base-provider :refer :all])
@@ -64,8 +63,7 @@
 
 (defn start-summarization-machine! [own-puk tuple-base summaries-out lease]
   (let [tuples (chan)
-        query-tuples (fn [criteria]
-                       (query-tuples tuple-base criteria tuples lease))
+        query-tuples (fn [criteria] (query-tuples tuple-base criteria tuples lease))
         state (HashMap.)]
     (query-tuples {})
 
