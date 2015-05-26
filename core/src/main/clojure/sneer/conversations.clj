@@ -89,9 +89,8 @@
          (map with-pretty-date)
          vec)))
 
-(defn start-summarization-machine! [own-puk tuple-base summaries-out pretty-date-period lease]
+(defn start-summarization-machine! [state own-puk tuple-base summaries-out pretty-date-period lease]
   (let [tuples (chan)
-        state (HashMap.)
         all-tuples-criteria {}]      ;{tb/after-id id}
     (query-tuples tuple-base all-tuples-criteria tuples lease)
 
@@ -140,7 +139,7 @@
         (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
         (ping-every-minute pretty-date-period)
-        (start-summarization-machine! own-puk tuple-base summaries-out pretty-date-period lease)
+        (start-summarization-machine! nil own-puk tuple-base summaries-out pretty-date-period lease)
         (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []

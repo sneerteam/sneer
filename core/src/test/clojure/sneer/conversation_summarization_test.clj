@@ -9,7 +9,9 @@
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :as keys]
             [sneer.conversations :as convos])
-  (:import [sneer.commons Clock]))
+  (:import [sneer.commons Clock]
+           [org.h2.mvstore MVStore]
+           (java.io File)))
 
 
 (defn summarize [events expected-summary]
@@ -28,38 +30,44 @@
           label->msg (atom {})
           store-read (fn [contact-puk msg] (store-tuple tuple-base {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "original_id")}))
 
+          store-filename (.getAbsolutePath (File/createTempFile "tmp" ".tmp"))
+          store (atom nil)
           subject (atom nil)
           summaries-out (chan (async/sliding-buffer 1) (map #(select-keys (first %) [:name :timestamp :date :preview :unread])))
           lease (chan)
           pretty-date-period (chan)
-          start-subject (fn [] (swap! subject (fn [old]
-                                                (assert (nil? old))
-                                                (convos/start-summarization-machine! own-puk tuple-base summaries-out pretty-date-period lease))))]
-      (Clock/startMocking)
-      (loop [timestamp 0
-             pending events]
-        (when-let [e (first pending)]
-          (if (= e :summarize)
-            (do
-              (start-subject)
-              (recur timestamp (next pending)))
-            (do
-              (when-let [party (:contact e)]
-                (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
-              (when-let [label (:recv e)]
-                (let [received-msg (<!!? (store-message {"author" (:auth e) "audience" own-puk "label" label "timestamp" timestamp}))]
-                  (swap! label->msg assoc label received-msg)))
-              (when-let [label (:send e)]
-                (<!!? (store-message {"author" own-puk "audience" (:audience e) "label" label "timestamp" timestamp})))
-              (when-let [label (:read e)]
-                (store-read (:auth e) (@label->msg label)))
-              (when-let [millis (:step-millis e)]
-                (Clock/advance millis))
-              (recur (inc timestamp) (next pending))))))
-
-      (when-not @subject (start-subject))
+          restart-subject #(do
+                            (swap! store (fn [old-store]
+                                           (when old-store (.close old-store))
+                                           (MVStore/open store-filename)))
+                            (reset! subject
+                                       (convos/start-summarization-machine! (.openMap @store "test-state") own-puk tuple-base summaries-out pretty-date-period lease)))]
 
       (try
+        (Clock/startMocking)
+        (loop [timestamp 0
+               pending events]
+          (when-let [e (first pending)]
+            (if (= e :restart)
+              (do
+                (restart-subject)
+                (recur timestamp (next pending)))
+              (do
+                (when-let [party (:contact e)]
+                  (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
+                (when-let [label (:recv e)]
+                  (let [received-msg (<!!? (store-message {"author" (:auth e) "audience" own-puk "label" label "timestamp" timestamp}))]
+                    (swap! label->msg assoc label received-msg)))
+                (when-let [label (:send e)]
+                  (<!!? (store-message {"author" own-puk "audience" (:audience e) "label" label "timestamp" timestamp})))
+                (when-let [label (:read e)]
+                  (store-read (:auth e) (@label->msg label)))
+                (when-let [millis (:step-millis e)]
+                  (Clock/advance millis))
+                (recur (inc timestamp) (next pending))))))
+
+        (when-not @subject (restart-subject))
+
         (or (<wait-for! summaries-out #(submap? expected-summary %))
             :ok)
 
@@ -102,7 +110,7 @@
     "Nick change should not affect unread field."
     [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}
-     :summarize
+     :restart
      {:contact ann :nick "Annabelle"}]
 
     {:name "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}
