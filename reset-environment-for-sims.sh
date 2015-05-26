@@ -15,6 +15,3 @@ cd core           && ../gradlew clean               && cd .. || exit -1
 cd android        &&  ./gradlew clean               && cd .. || exit -1
 
 #Reset environment for Sims successful.
-
-
-#UNCOMMENT ABOVE
