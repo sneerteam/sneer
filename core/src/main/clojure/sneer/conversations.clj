@@ -109,9 +109,10 @@
         tuples
         ([tuple] (when tuple
                    (case (tuple "type")
-                     "contact" (handle-contact! own-puk tuple state)
-                     "message" (handle-message! own-puk tuple state)
-                     "message-read" (handle-msg-read! own-puk tuple state))
+                     "contact"      (handle-contact!  own-puk tuple state)
+                     "message"      (handle-message!  own-puk tuple state)
+                     "message-read" (handle-msg-read! own-puk tuple state)
+                     :else-ignore)
                    (.put state last-id-key (tuple "id"))
                    (recur)))
         pretty-date-period
