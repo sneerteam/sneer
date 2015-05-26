@@ -77,12 +77,15 @@
 
         (finally
           (Clock/stopMocking)
-          (close! @lease)
+          (fact "File can be deleted when mvstore is closed"
+            (.close @store)
+            (.delete (File. store-filename)) => true)
           (fact "machine terminates when lease channel is closed"
+            (close! @lease)
             (<!!? @subject) => nil))))))
 
 (let [unknown (keys/->puk "unknown puk")
-      ann (keys/->puk "ann puk")]
+      ann     (keys/->puk "ann puk")]
   (tabular "Conversation summarization"
 
     (fact "Events produce expected summaries"
@@ -97,7 +100,7 @@
     []
     {}
 
-    "Message received without contact is ignored"
+    "Message received without known contact is ignored"
     [{:recv "Hello" :auth unknown}]
     {}
 
