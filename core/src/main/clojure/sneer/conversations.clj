@@ -121,9 +121,9 @@
 
 ; Java interface
 
-(defn to-foreign-summary [{:keys [name summary timestamp unread]}]
+(defn to-foreign-summary [{:keys [name summary date unread]}]
   (println "TODO: CONVERSATION ID")
-  (ConversationList$Summary. name summary (str timestamp) (str unread) -4242))
+  (ConversationList$Summary. name summary date (str unread) -4242))
 
 (defn ping-every-minute [ch]
   (go-loop-trace []
