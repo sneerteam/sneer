@@ -23,6 +23,8 @@
     [org.ocpsoft.prettytime PrettyTime]
     [java.util HashMap Date]))
 
+(def last-id-key "last-id")
+
 (defn- contact-puk [tuple]
   (tuple "party"))
 
@@ -90,8 +92,9 @@
          vec)))
 
 (defn start-summarization-machine! [state own-puk tuple-base summaries-out pretty-date-period lease]
-  (let [tuples (chan)
-        all-tuples-criteria {}]      ;{tb/after-id id}
+  (let [last-id (.get state last-id-key)
+        tuples (chan)
+        all-tuples-criteria {tb/after-id last-id}]
     (query-tuples tuple-base all-tuples-criteria tuples lease)
 
     (go
@@ -109,6 +112,7 @@
                      "contact" (handle-contact! own-puk tuple state)
                      "message" (handle-message! own-puk tuple state)
                      "message-read" (handle-msg-read! own-puk tuple state))
+                   (.put state last-id-key (tuple "id"))
                    (recur)))
         pretty-date-period
         ([_] (recur))))))
@@ -139,7 +143,7 @@
         (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
         (ping-every-minute pretty-date-period)
-        (start-summarization-machine! nil own-puk tuple-base summaries-out pretty-date-period lease)
+        (start-summarization-machine! (HashMap.) own-puk tuple-base summaries-out pretty-date-period lease)
         (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []

@@ -33,15 +33,19 @@
           store-filename (.getAbsolutePath (File/createTempFile "tmp" ".tmp"))
           store (atom nil)
           subject (atom nil)
+          lease (atom nil)
           summaries-out (chan (async/sliding-buffer 1) (map #(select-keys (first %) [:name :timestamp :date :preview :unread])))
-          lease (chan)
           pretty-date-period (chan)
-          restart-subject #(do
+          restart-subject (fn []
+                            (swap! lease #(do
+                                           (when % (do (close! %)
+                                                       (<!!? @subject)))
+                                           (chan)))
                             (swap! store (fn [old-store]
                                            (when old-store (.close old-store))
                                            (MVStore/open store-filename)))
                             (reset! subject
-                                       (convos/start-summarization-machine! (.openMap @store "test-state") own-puk tuple-base summaries-out pretty-date-period lease)))]
+                                       (convos/start-summarization-machine! (.openMap @store "test-state") own-puk tuple-base summaries-out pretty-date-period @lease)))]
 
       (try
         (Clock/startMocking)
@@ -73,7 +77,7 @@
 
         (finally
           (Clock/stopMocking)
-          (close! lease)
+          (close! @lease)
           (fact "machine terminates when lease channel is closed"
             (<!!? @subject) => nil))))))
 
@@ -108,7 +112,8 @@
     {:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}
 
     "Nick change should not affect unread field."
-    [{:contact ann :nick "Ann"}
+    [:restart
+     {:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}
      :restart
      {:contact ann :nick "Annabelle"}]
@@ -157,5 +162,3 @@
       [{:contact ann :nick "Ann"}
        {:step-millis (inc (* 1000 60 5))}]
       {:name "Ann" :date "5 minutes ago"}))
-
-; TODO: Process deltas, not entire history.
