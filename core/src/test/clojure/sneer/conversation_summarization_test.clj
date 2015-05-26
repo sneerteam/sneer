@@ -11,7 +11,7 @@
             [sneer.conversations :as convos])
   (:import [sneer.commons Clock]
            [org.h2.mvstore MVStore]
-           (java.io File)))
+           [java.io File]))
 
 
 (defn summarize [events expected-summary]
