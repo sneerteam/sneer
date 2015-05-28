@@ -87,7 +87,8 @@ public class SneerActivity extends Activity {
 	}
 	public static Subscription plugActionBarTitle(final ActionBar actionBar, Observable<?> observable) {
 		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			actionBar.setTitle(obj.toString());
+			actionBar.setTitle(
+                    obj != null ? obj.toString() : "");
 		}});
 	}
 
