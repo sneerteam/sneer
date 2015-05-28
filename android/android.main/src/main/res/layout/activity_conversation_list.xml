@@ -19,14 +19,15 @@
 
     <ImageButton
         android:id="@+id/addButton"
-        android:src="@drawable/ic_add_contact_menu"
+        android:src="@drawable/ic_add_white_24dp"
         android:background="@drawable/fab_shape"
-        android:layout_margin="16dp"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_margin="20dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:onClick="onAddContactClicked"
     />
 
 </RelativeLayout>

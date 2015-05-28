@@ -56,4 +56,7 @@ public class ConversationListActivity extends SneerActionBarActivity {
 		}});
 	}
 
+    public void onAddContactClicked(View view) {
+        navigateTo(AddContactActivity.class);
+    }
 }
