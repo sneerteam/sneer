@@ -5,4 +5,4 @@ I want to contribute!
 ---------------------
 That's great!
 
-First take a look at our wiki to set up your [development environment](https://github.com/sneerteam/sneer/wiki/Android-Development-Environment) and then go to our [Trello board](https://trello.com/b/lEdEIxxA/sneer) to look for something you can do. We recommend the green labeled cards to get you started.
+First take a look at the wiki to set up your [development environment](https://github.com/sneerteam/sneer/wiki/Android-Development-Environment) then go to Sneer's [Trello board](https://trello.com/b/lEdEIxxA/sneer) and look for something you can do. There's lots of cards there so we recommend starting with the green labeled ones.
