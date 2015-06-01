@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/sneerteam/sneer.svg?branch=master)](https://travis-ci.org/sneerteam/sneer)
----
-
 Sneer - A Platform for Sovereign Computing Apps
 -----------------------------------------------
 Sneer is an open source platform for sharing media, data, applications or anything you want with anyone you care. There are no servers in the way, no eavesdropping middlemen, no companies to own your data, no strings attached. It's your stuff, your computer, your privacy, your friends... your decision. It's cool, easy and free.
