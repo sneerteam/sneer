@@ -8,4 +8,4 @@ That's great!
 
 First take a look at the wiki to set up your [development environment](https://github.com/sneerteam/sneer/wiki/Android-Development-Environment) then go to Sneer's [Trello board](https://trello.com/b/lEdEIxxA/sneer) and look for something you can do. There's lots of cards there so we recommend starting with the green labeled ones.
 
-```Note that Sneer is under heavy development and the way things are done today is likely to change in the near future.```
+Let us know if you hit any roadblocks. Sneer is under heavy development and the way things are done often change.
