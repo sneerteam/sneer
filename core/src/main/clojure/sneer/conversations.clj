@@ -1,14 +1,16 @@
 (ns sneer.conversations
   (:require
-    [clojure.core.async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
+    [clojure.core.async :as async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
+    [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
+    [sneer.async :refer [sliding-chan go-while-let go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
     [sneer.commons :refer [now produce! descending]]
     [sneer.clojure.core :refer [nvl]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
     [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]
     [sneer.party :refer [party->puk]]
+    [sneer.serialization :refer [serialize deserialize]]
     [sneer.tuple.protocols :refer :all]
     [sneer.tuple.space :refer [payload]]
     [sneer.tuple-base-provider :refer :all]
@@ -17,10 +19,11 @@
     [rx Subscriber Observable]
     [sneer Conversations Conversation Conversations$Notification]
     [sneer.admin SneerAdmin]
-    [sneer.commons Container Clock]
+    [sneer.commons Container Clock PersistenceFolder]
     [sneer.conversations ConversationList ConversationList$Summary ConversationList]
     [sneer.rx ObservedSubject]
     [org.ocpsoft.prettytime PrettyTime]
+    [java.io File]
     [java.util HashMap Date]))
 
 (defn- contact-puk [tuple]
@@ -82,11 +85,10 @@
                            (assoc summary :date
                                           (.format pretty-time (Date. ^long (summary :timestamp)))))]
     (->> state
-         .values
+         vals
          (filter :name)
          (sort-by :timestamp descending)
-         (map with-pretty-date)
-         vec)))
+         (mapv with-pretty-date))))
 
 (defn link-lease-to-chan
   "Closes `linked' when `lease' emits a value."
@@ -143,20 +145,42 @@
              (>! out latest))
            (recur latest (timeout period))))))
 
-(defn do-summaries [this]
+(defn- read-snapshot [file]
+  (try
+    (deserialize (slurp file))
+    (catch Exception e
+      (print-stack-trace e)
+      {})))
+
+(defn- write-snapshot [file snapshot]
+  (spit file (serialize snapshot)))
+
+(defn- save-snapshots-to [file ch]
+  (go-while-let [snapshot (<! ch)]
+    (write-snapshot file snapshot)))
+
+(defn- do-summaries [this]
   (rx/observable*
     (fn [^Subscriber subscriber]
-      (let [admin (.produce (Container/of this) SneerAdmin)
+      (let [container (Container/of this)
+            folder (.. container (produce PersistenceFolder) get)
+            file (File. folder "conversation-summaries.tmp")
+            admin (.produce container SneerAdmin)
             own-puk (.. admin privateKey publicKey)
             tuple-base (tuple-base-of admin)
-            summaries-out (chan (sliding-buffer 1))
-            pretty-summaries-out (chan (sliding-buffer 1) to-foreign)
+            summaries-out (sliding-chan)
+            summaries-out-mult (async/mult summaries-out)
+            tap-summaries #(let [ch (sliding-chan)]
+                             (async/tap summaries-out-mult ch)
+                             ch)
+            pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))
             lease (chan)]
         (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
         (link-lease-to-chan lease pretty-summaries-out)
-        (start-summarization-machine! {} own-puk tuple-base summaries-out lease)
-        (republish-latest-every summaries-out pretty-summaries-out)
+        (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
+        (republish-latest-every (* 60 1000) (tap-summaries) pretty-summaries-out)
+        (save-snapshots-to file (tap-summaries))
         (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []

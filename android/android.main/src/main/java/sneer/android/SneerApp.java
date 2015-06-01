@@ -11,14 +11,16 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import java.io.File;
+
 import sneer.Sneer;
-import sneer.admin.Database;
 import sneer.admin.SneerAdmin;
 import sneer.android.gcm.GcmRegistrationAlarmReceiver;
 import sneer.android.impl.SneerAndroidImpl;
 import sneer.android.ipc.PartnerSessions;
 import sneer.android.ui.Notifier;
 import sneer.android.utils.UncaughtExceptionReporter;
+import sneer.commons.PersistenceFolder;
 
 import static sneer.android.SneerAndroidContainer.container;
 
@@ -48,6 +50,11 @@ public class SneerApp extends Application {
 			SneerAdmin admin = SneerAndroidSingleton.admin();
 			container().inject(SneerAdmin.class, admin);
 			container().inject(Sneer.class, admin.sneer());
+			container().inject(PersistenceFolder.class, new PersistenceFolder() {
+				public File get() {
+					return getFilesDir();
+				}
+			});
 		}
 	}
 
