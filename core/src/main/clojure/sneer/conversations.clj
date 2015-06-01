@@ -3,7 +3,7 @@
     [clojure.core.async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
-    [sneer.commons :refer [now produce! descending update-java-map]]
+    [sneer.commons :refer [now produce! descending]]
     [sneer.clojure.core :refer [nvl]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
@@ -23,19 +23,16 @@
     [org.ocpsoft.prettytime PrettyTime]
     [java.util HashMap Date]))
 
-(def last-id-key "last-id")
-
 (defn- contact-puk [tuple]
   (tuple "party"))
 
 (defn- handle-contact! [own-puk tuple state]
   (when (= (tuple "author") own-puk)
     (when-let [contact-puk (contact-puk tuple)]
-      (update-java-map state
-                       (.toHex contact-puk)
-                       #(assoc %
-                         :name      (tuple "payload")
-                         :timestamp (tuple "timestamp"))))))
+      (update-in state
+                 [contact-puk]
+                 assoc :name      (tuple "payload")
+                       :timestamp (tuple "timestamp")))))
 
 (defn- unread-status [label old-status]
   (cond
@@ -63,9 +60,9 @@
   (let [author (message "author")
         own? (= author own-puk)
         contact-puk (if own? (message "audience") author)]
-    (update-java-map state
-                     (.toHex contact-puk)
-                     #(update-summary own? message %))))
+    (update-in state
+               [contact-puk]
+               #(update-summary own? message %))))
 
 (defn update-with-read [old-summary tuple]
   (let [msg-id (tuple "payload")]
@@ -75,11 +72,11 @@
 (defn- handle-msg-read! [own-puk tuple state]
   (when (= (tuple "author") own-puk)
     (let [contact-puk (tuple "audience")]
-      (update-java-map state
-                       (.toHex contact-puk)
-                       #(update-with-read % tuple)))))
+      (update-in state
+                 [contact-puk]
+                 update-with-read tuple))))
 
-(defn- summarize [state]
+(defn summarize [state]
   (let [pretty-time (PrettyTime. (Date. (Clock/now)))
         with-pretty-date (fn [summary]
                            (assoc summary :date
@@ -91,32 +88,34 @@
          (map with-pretty-date)
          vec)))
 
-(defn start-summarization-machine! [state own-puk tuple-base summaries-out pretty-date-period lease]
-  (let [last-id (.get state last-id-key)
+(defn link-lease-to-chan
+  "Closes `linked' when `lease' emits a value."
+  [lease linked]
+  (go
+    (<! lease)
+    (close! linked)))
+
+(defn start-summarization-machine! [state own-puk tuple-base summaries-out lease]
+  (let [last-id (:last-id state)
         tuples (chan)
         all-tuples-criteria {tb/after-id last-id}]
     (query-tuples tuple-base all-tuples-criteria tuples lease)
 
-    (go
-      ; link machine lifetime to lease
-      (<! lease)
-      (close! tuples))
+    ; link machine lifetime to lease
+    (link-lease-to-chan lease tuples)
 
-    (go-loop-trace []
-      (>! summaries-out (summarize state))
+    (go-loop-trace [state state]
+      (>! summaries-out state)
 
-      (alt! :priority true
-        tuples
-        ([tuple] (when tuple
-                   (case (tuple "type")
-                     "contact"      (handle-contact!  own-puk tuple state)
-                     "message"      (handle-message!  own-puk tuple state)
-                     "message-read" (handle-msg-read! own-puk tuple state)
-                     :else-ignore)
-                   (.put state last-id-key (tuple "id"))
-                   (recur)))
-        pretty-date-period
-        ([_] (recur))))))
+      (when-let [tuple (<! tuples)]
+        (recur
+         (->
+          (case (tuple "type")
+            "contact"      (handle-contact!  own-puk tuple state)
+            "message"      (handle-message!  own-puk tuple state)
+            "message-read" (handle-msg-read! own-puk tuple state)
+            state)
+          (assoc :last-id (tuple "id"))))))))
 
 
 ; Java interface
@@ -125,11 +124,24 @@
   (println "TODO: CONVERSATION ID")
   (ConversationList$Summary. name summary date (str unread) -4242))
 
-(defn ping-every-minute [ch]
-  (go-loop-trace []
-    (<! (timeout (* 1000 60)))
-    (>! ch :ping)
-    (recur)))
+(defn- to-foreign [summaries]
+  (->> summaries summarize (mapv to-foreign-summary)))
+
+(defn republish-latest-every [period in out]
+  (go-loop-trace [latest nil
+                  period-timeout (timeout period)]
+    (alt! :priority true
+          in
+          ([latest]
+           (when latest
+             (>! out latest)
+             (recur latest period-timeout)))
+
+          period-timeout
+          ([_]
+           (when latest
+             (>! out latest))
+           (recur latest (timeout period))))))
 
 (defn do-summaries [this]
   (rx/observable*
@@ -137,15 +149,15 @@
       (let [admin (.produce (Container/of this) SneerAdmin)
             own-puk (.. admin privateKey publicKey)
             tuple-base (tuple-base-of admin)
-            to-foreign (map (fn [summaries] (mapv to-foreign-summary summaries)))
-            summaries-out (chan (sliding-buffer 1) to-foreign)
-            pretty-date-period (chan)
+            summaries-out (chan (sliding-buffer 1))
+            pretty-summaries-out (chan (sliding-buffer 1) to-foreign)
             lease (chan)]
         (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
-        (ping-every-minute pretty-date-period)
-        (start-summarization-machine! (HashMap.) own-puk tuple-base summaries-out pretty-date-period lease)
-        (thread-chan-to-subscriber summaries-out subscriber "conversation summaries")))))
+        (link-lease-to-chan lease pretty-summaries-out)
+        (start-summarization-machine! {} own-puk tuple-base summaries-out lease)
+        (republish-latest-every summaries-out pretty-summaries-out)
+        (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []
   (reify ConversationList
