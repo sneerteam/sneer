@@ -187,10 +187,10 @@
         (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []
-  (reify ConversationList
-    (summaries [this] (do-summaries this))))
-
-
+  (let [shared-summaries (atom nil)]
+    (reify ConversationList
+      (summaries [this]
+        (swap! shared-summaries #(if % % (shared-latest (do-summaries this))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OLD:
