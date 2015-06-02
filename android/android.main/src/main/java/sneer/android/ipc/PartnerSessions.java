@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import rx.functions.Action1;
 import sneer.Conversations;
@@ -35,15 +36,18 @@ public class PartnerSessions extends Service {
 	class SessionHandler extends Handler {
 		private final Session session;
 		private Messenger toApp;
+		private final CountDownLatch connectionPending = new CountDownLatch(1);
 
-		public SessionHandler(Session session) {
+
+		public SessionHandler(final Session session) {
 			this.session = session;
 			session.messages().subscribe(new Action1<Session.MessageOrUpToDate>() {
 				@Override
 				public void call(Session.MessageOrUpToDate messageOrUpToDate) {
-					if (messageOrUpToDate.isUpToDate())
+					if (messageOrUpToDate.isUpToDate()) {
+						await(connectionPending);
 						sendToApp(IPCProtocol.UP_TO_DATE);
-					else {
+					} else {
 						Map<String, Object> map = new HashMap<>();
 						map.put(IS_OWN, messageOrUpToDate.message().isOwn());
 						map.put(PAYLOAD, messageOrUpToDate.message().payload());
@@ -57,9 +61,12 @@ public class PartnerSessions extends Service {
 		public void handleMessage(Message msg) {
 			Object payload = getPayload(msg);
 			if (isFirstMessage())
-				toApp = (Messenger)payload;
+				toApp = (Messenger) payload;
 			else
 				session.send(payload);
+
+			if (toApp != null)
+				connectionPending.countDown();
 		}
 
 		private Object getPayload(Message msg) {
@@ -73,10 +80,12 @@ public class PartnerSessions extends Service {
 		}
 
 		private void sendToApp(Object data) {
-			android.os.Message msg = obtain();
+			Message msg = obtain();
+
 			Bundle bundle = new Bundle();
 			bundle.putParcelable(ENVELOPE, envelope(data));
 			msg.setData(bundle);
+
 			try {
 				doSendToApp(msg);
 			} catch (Exception e) {
@@ -86,6 +95,14 @@ public class PartnerSessions extends Service {
 
 		private void doSendToApp(android.os.Message msg) throws Exception {
 			toApp.send(msg);
+		}
+
+		private void await(CountDownLatch latch) {
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
