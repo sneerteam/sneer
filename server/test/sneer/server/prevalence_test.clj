@@ -10,7 +10,7 @@
     (java.io.File/createTempFile "test-" ".tmp")
     (.delete)))
 
-(fact "Prevalence"
+#_(fact "Prevalence"
   (let [handler +
         initial-state 0
         file (tmp-file)
