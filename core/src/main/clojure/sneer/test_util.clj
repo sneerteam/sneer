@@ -52,11 +52,6 @@
                                    false)
             :else (recur current)))))))
 
-(defn emits [expected]
-  (fn [obs]
-    (let [ch (->chan obs)]
-      (<wait-for! ch expected))))
-
 (defn compromised
   ([ch] (compromised ch 0.7))
   ([ch failure-rate]
@@ -96,5 +91,11 @@
 
 (defn ->chan [^rx.Observable o]
   (->> o observe-for-io observable->chan))
+
+(defn emits [expected]
+  (fn [obs]
+    (let [ch (->chan obs)]
+      (<wait-for! ch expected))))
+
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
