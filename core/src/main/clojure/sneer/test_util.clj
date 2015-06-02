@@ -33,6 +33,8 @@
       (timeout timeout-millis) :timeout
       ch ([v] v))))
 
+(defn ->predicate [expected]
+  (if (fn? expected) expected #(= % expected)))
 (defn <wait-for! [ch predicate]
   (<!!
     (go-loop-trace [previous nil]
