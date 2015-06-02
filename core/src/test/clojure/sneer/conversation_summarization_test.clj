@@ -80,8 +80,9 @@
 
         (when-not @subject (restart-subject))
 
-        (or (<wait-for! summaries-out #(submap? expected-summary %))
-            :ok)
+        (if (<wait-for! summaries-out #(submap? expected-summary %))
+            :ok
+            :error)
 
         (finally
           (fact "machine terminates when lease channel is closed"

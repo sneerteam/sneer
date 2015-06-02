@@ -35,17 +35,23 @@
 
 (defn ->predicate [expected]
   (if (fn? expected) expected #(= % expected)))
-(defn <wait-for! [ch predicate]
-  (<!!
-    (go-loop-trace [previous nil]
-      (let [current (<!!? ch)]
-;        (println "Intermediate: " current)
-        (if (= current :timeout)
-          (do
-            (println "TIMEOUT. Last value:" previous)
-            :timeout)
-          (when-not (predicate current)
-            (recur current)))))))
+
+(defn <wait-for! [ch expected]
+  (let [expected (nvl expected :nil)
+        pred (->predicate expected)]
+    (<!!
+      (go-loop-trace [last-value nil]
+        (let [current (<!!? ch)]
+          (cond
+            (pred current) true
+            (nil? current) (do
+                             (println "COMPLETED/CLOSED. Last value: " last-value)
+                             false)
+            (= current :timeout) (do
+                                   (println "TIMEOUT. Last value:" last-value)
+                                   false)
+            :else (recur current)))))))
+
 
 (defn compromised
   ([ch] (compromised ch 0.7))
