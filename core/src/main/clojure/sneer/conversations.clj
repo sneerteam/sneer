@@ -1,13 +1,13 @@
 (ns sneer.conversations
   (:require
     [clojure.core.async :as async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
-    [clojure.java.io :as io]
     [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [sliding-chan go-while-let go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
     [sneer.commons :refer [now produce! descending]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
+    [sneer.io :as io]
     [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]
     [sneer.party :refer [party->puk]]
     [sneer.serialization :refer [serialize deserialize]]
@@ -145,24 +145,15 @@
              (>! out latest))
            (recur latest (timeout period))))))
 
-(defn read-bytes [^File file]
-  (let [buffer (byte-array (.length file))]
-    (.read (io/input-stream file) buffer)
-    buffer))
-
 (defn read-snapshot [file]
   (try
-    (deserialize (read-bytes file))
+    (deserialize (io/read-bytes file))
     (catch Exception e
       (println (.getMessage e))
       {})))
 
-(defn write-bytes [file buffer]
-  (with-open [out (io/output-stream file)]
-    (.write out buffer)))
-
 (defn write-snapshot [file snapshot]
-  (write-bytes file (serialize snapshot)))
+  (io/write-bytes file (serialize snapshot)))
 
 (defn- save-snapshots-to [file ch]
   (go-while-let [snapshot (<! ch)]
