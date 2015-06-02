@@ -20,12 +20,11 @@
 
     <ImageButton
         android:id="@+id/addButton"
-        android:src="@drawable/ic_add_white_24dp"
+        android:src="@drawable/ic_person_add_white_24dp"
         android:background="@drawable/fab_shape"
         android:layout_margin="16dp"
         android:layout_width="62dp"
         android:layout_height="62dp"
-        android:scaleType="fitXY"
         android:padding="16dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
