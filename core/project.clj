@@ -22,6 +22,7 @@
               :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
               :aot [sneer.commons
                     sneer.async
+                    sneer.io
                     sneer.restartable
                     sneer.party-impl
                     sneer.tuple.protocols
