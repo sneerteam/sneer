@@ -159,6 +159,11 @@
   (go-while-let [snapshot (<! ch)]
     (write-snapshot file snapshot)))
 
+(defn- sliding-tap [mult]
+  (let [ch (sliding-chan)]
+    (async/tap mult ch)
+    ch))
+
 (defn- do-summaries [this]
   (rx/observable*
     (fn [^Subscriber subscriber]
@@ -170,9 +175,7 @@
             tuple-base (tuple-base-of admin)
             summaries-out (sliding-chan)
             summaries-out-mult (async/mult summaries-out)
-            tap-summaries #(let [ch (sliding-chan)]
-                             (async/tap summaries-out-mult ch)
-                             ch)
+            tap-summaries #(sliding-tap summaries-out-mult)
             pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))
             lease (chan)]
         (link-chan-to-subscriber lease subscriber)
