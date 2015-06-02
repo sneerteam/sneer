@@ -29,7 +29,7 @@
 (defn- contact-puk [tuple]
   (tuple "party"))
 
-(defn- handle-contact! [own-puk tuple state]
+(defn- handle-contact [own-puk tuple state]
   (when (= (tuple "author") own-puk)
     (when-let [contact-puk (contact-puk tuple)]
       (update-in state
@@ -59,7 +59,7 @@
         :preview (or label "")
         :timestamp timestamp))))
 
-(defn- handle-message! [own-puk message state]
+(defn- handle-message [own-puk message state]
   (let [author (message "author")
         own? (= author own-puk)
         contact-puk (if own? (message "audience") author)]
@@ -72,7 +72,7 @@
     (cond-> old-summary
       (= msg-id (:last-received old-summary)) (assoc :unread ""))))
 
-(defn- handle-msg-read! [own-puk tuple state]
+(defn- handle-read-receipt [own-puk tuple state]
   (when (= (tuple "author") own-puk)
     (let [contact-puk (tuple "audience")]
       (update-in state
@@ -113,9 +113,9 @@
         (recur
          (->
           (case (tuple "type")
-            "contact"      (handle-contact!  own-puk tuple state)
-            "message"      (handle-message!  own-puk tuple state)
-            "message-read" (handle-msg-read! own-puk tuple state)
+            "contact"      (handle-contact  own-puk tuple state)
+            "message"      (handle-message  own-puk tuple state)
+            "message-read" (handle-read-receipt own-puk tuple state)
             state)
           (assoc :last-id (tuple "id"))))))))
 
