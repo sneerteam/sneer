@@ -42,6 +42,7 @@
                     sneer.serialization
                     sneer.networking.udp
                     sneer.networking.client
+                    sneer.impl.CoreLoader
                     sneer.main]
               :uberjar-exclusions [#"META-INF/DUMMY.SF"
                                    #"^org/(apache|bouncycastle|json|msgpack)"
