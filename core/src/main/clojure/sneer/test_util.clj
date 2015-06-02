@@ -52,6 +52,10 @@
                                    false)
             :else (recur current)))))))
 
+(defn emits [expected]
+  (fn [obs]
+    (let [ch (->chan obs)]
+      (<wait-for! ch expected))))
 
 (defn compromised
   ([ch] (compromised ch 0.7))
