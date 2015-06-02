@@ -1,6 +1,7 @@
 (ns sneer.conversations
   (:require
     [clojure.core.async :as async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
+    [clojure.java.io :as io]
     [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [sliding-chan go-while-let go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
@@ -70,7 +71,7 @@
 (defn update-with-read [old-summary tuple]
   (let [msg-id (tuple "payload")]
     (cond-> old-summary
-      (= msg-id (old-summary :last-received)) (assoc :unread ""))))
+      (= msg-id (:last-received old-summary)) (assoc :unread ""))))
 
 (defn- handle-msg-read! [own-puk tuple state]
   (when (= (tuple "author") own-puk)
@@ -145,15 +146,24 @@
              (>! out latest))
            (recur latest (timeout period))))))
 
-(defn- read-snapshot [file]
+(defn read-bytes [^File file]
+  (let [buffer (byte-array (.length file))]
+    (.read (io/input-stream file) buffer)
+    buffer))
+
+(defn read-snapshot [file]
   (try
-    (deserialize (slurp file))
+    (deserialize (read-bytes file))
     (catch Exception e
-      (print-stack-trace e)
+      (println (.getMessage e))
       {})))
 
-(defn- write-snapshot [file snapshot]
-  (spit file (serialize snapshot)))
+(defn write-bytes [file buffer]
+  (with-open [out (io/output-stream file)]
+    (.write out buffer)))
+
+(defn write-snapshot [file snapshot]
+  (write-bytes file (serialize snapshot)))
 
 (defn- save-snapshots-to [file ch]
   (go-while-let [snapshot (<! ch)]

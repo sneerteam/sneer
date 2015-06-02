@@ -3,13 +3,30 @@
             [clojure.core.async :refer [chan close!] :as async]
             [sneer.async :refer [sliding-chan]]
             [sneer.commons :refer [submap?]]
-            [sneer.test-util :refer [<!!? <wait-for!]]
+            [sneer.test-util :refer [<!!? <wait-for! tmp-file]]
             [sneer.tuple.jdbc-database :as database]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :as keys]
             [sneer.conversations :as convos])
   (:import  [java.io File]))
+
+
+(fact "Reading snapshot from file that doesnt exist returns empty map"
+  (convos/read-snapshot (tmp-file)) => {})
+
+(defn roundtrip [state]
+  (let [file (tmp-file)]
+      (convos/write-snapshot file state)
+      (convos/read-snapshot file)))
+
+(tabular
+  (fact "Snapshot read/write roundtrip works"
+    (roundtrip ?state) => ?state)
+
+  ?state
+  {}
+  {:a :b})
 
 
 (defn summarize [events expected-summary]

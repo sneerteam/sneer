@@ -4,7 +4,13 @@
     [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-loop-trace]]
-    [sneer.rx :refer [observe-for-io subscribe-on-io]]))
+    [sneer.rx :refer [observe-for-io subscribe-on-io]])
+  (:import [java.io File]))
+
+(defn tmp-file []
+  (doto
+    (File/createTempFile "test-" ".tmp")
+    (.delete)))
 
 (defn >!!?
   ([ch v]
