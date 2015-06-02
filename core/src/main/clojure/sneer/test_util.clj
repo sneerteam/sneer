@@ -12,6 +12,11 @@
     (File/createTempFile "test-" ".tmp")
     (.delete)))
 
+(defn tmp-folder []
+  (doto
+    (File/createTempFile "test-" ".tmp")
+    (.mkdir)))
+
 (defn >!!?
   ([ch v]
     (>!!? ch v 200))
