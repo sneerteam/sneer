@@ -61,7 +61,7 @@
 (defn flip [f]
   (fn [x y] (f y x)))
 
-(defn update-java-map [jmap key fn]
+(defn update-java-map [^java.util.Map jmap key fn]
   (let [old-value (.get jmap key)]
     (.put jmap key (fn old-value))))
 
