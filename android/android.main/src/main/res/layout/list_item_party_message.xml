@@ -43,7 +43,6 @@
             android:layout_alignLeft="@+id/messageContent"
             android:layout_alignParentBottom="true"
             android:layout_below="@+id/messageContent"
-            android:textColor="#777"
             android:textSize="12sp"/>
     </RelativeLayout>
 

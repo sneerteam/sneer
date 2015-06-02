@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/speechBubbleArrowRight"
-        android:background="@drawable/user_speech_bubble"
+        android:background="@drawable/user_speech_bubble_old"
         android:padding="10dp">
 
         <ImageView
@@ -35,7 +35,6 @@
             android:minWidth="40dp"
             android:paddingLeft="5dp"
             android:textIsSelectable="true"
-            android:textColor="#fff"
             android:textSize="15sp"/>
 
         <TextView
@@ -46,7 +45,7 @@
             android:layout_alignRight="@+id/messageContent"
             android:layout_below="@+id/messageContent"
             android:paddingLeft="5dp"
-            android:textColor="#fff"
+            android:textColor="#777"
             android:textSize="12sp"/>
     </RelativeLayout>
 

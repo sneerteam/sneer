@@ -90,7 +90,7 @@ public class Notifier {
 
 	private static Intent conversationActivityIntent(Conversation conversation) {
 		Intent intent = new Intent();
-		intent.setClass(context, ConversationActivity.class);
+		intent.setClass(context, ConversationActivityOld.class);
 		intent.putExtra("nick", conversation.contact().nickname().current());
 		return intent;
 	}

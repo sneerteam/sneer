@@ -4,29 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#DDDDEE"
     android:padding="0dp"
     android:textIsSelectable="true"
-    android:background="#FFF"
     tools:context=".ConversationActivity">
-
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar_conversation"
-    />
 
     <TextView
         android:id="@+id/waitingMessage"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/toolbar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:textSize="20sp"
         android:textStyle="normal|italic"/>
 
     <ListView
         android:id="@+id/messageList"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/waitingMessage"
+        android:layout_height="fill_parent"
         android:layout_above="@+id/messageSender"
         android:divider="@null"
         android:padding="0dp"
@@ -38,6 +32,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="#EEEEEE"
         android:orientation="horizontal">
 
         <EditText

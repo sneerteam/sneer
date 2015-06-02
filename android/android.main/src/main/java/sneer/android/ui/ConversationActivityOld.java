@@ -1,12 +1,11 @@
 package sneer.android.ui;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
@@ -26,7 +25,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +46,7 @@ import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 import static sneer.android.utils.Puk.shareOwnPublicKey;
 
-public class ConversationActivity extends SneerActionBarActivity implements StartPluginDialogFragment.SingleConversationProvider {
+public class ConversationActivityOld extends SneerActivity implements StartPluginDialogFragment.SingleConversationProvider {
 
     private static final String ACTIVITY_TITLE = "activityTitle";
 
@@ -66,10 +64,10 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		setContentView(R.layout.activity_conversation);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);     // Attaching the layout to the toolbar object
-        setSupportActionBar(toolbar);                               // Setting toolbar as the ActionBar with setSupportActionBar() call
+		setContentView(R.layout.activity_conversation_old);
+		ActionBar actionBar = getActionBar();
+        if (actionBar != null)
+            actionBar.setHomeButtonEnabled(true);
 
 		String nick = getIntent().getStringExtra("nick");
 		contact = sneer().findByNick(nick);
@@ -79,36 +77,15 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
 			return;
 		}
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
-
-        // TODO Register a Click Listener on the Toolbar Title via reflection. Find a better solution
-        try {
-            Field titleField = Toolbar.class.getDeclaredField("mTitleTextView");
-            titleField.setAccessible(true);
-            TextView barTitleView = (TextView) titleField.get(toolbar);
-            barTitleView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onToolbarTitleClick();
-                }
-            });
-        } catch (NoSuchFieldException e) {
-            // Ignore
-        } catch (IllegalAccessException e) {
-            // Ignore
-        }
-
-        plugActionBarTitle(actionBar, contact.nickname().observable());
-        plugActionBarIcon(actionBar, selfieFor(contact));
+		plugActionBarTitle(actionBar, contact.nickname().observable());
+		plugActionBarIcon(actionBar, selfieFor(contact));
 
 		conversation = sneer().conversations().withContact(contact);
 
 		adapter = new ConversationAdapter(this,
 			this.getLayoutInflater(),
-			R.layout.list_item_user_message,
-			R.layout.list_item_party_message,
+			R.layout.list_item_user_message_old,
+			R.layout.list_item_party_message_old,
 			messages,
 			contact,
 			conversation);
@@ -147,7 +124,7 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
 		waiting.setText(Html.fromHtml(String.format(waitingMessage, contact.nickname().current())));
 		waiting.setMovementMethod(new LinkMovementMethod() { @Override public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
 			if (event.getAction() == MotionEvent.ACTION_UP)
-				shareOwnPublicKey(ConversationActivity.this, sneer().self(), contact.inviteCode(), contact.nickname().current());
+				shareOwnPublicKey(ConversationActivityOld.this, sneer().self(), contact.inviteCode(), contact.nickname().current());
 			return true;
 		}});
 
@@ -189,20 +166,17 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
 
 
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.title:
-                navigateToProfile();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			navigateToProfile();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    public void onToolbarTitleClick() {
-        navigateToProfile();
-    }
 
-    private void navigateToProfile() {
+	private void navigateToProfile() {
 		Intent intent = new Intent();
 		intent.setClass(this, ContactActivity.class);
 		intent.putExtra(CURRENT_NICKNAME, contact.nickname().current());

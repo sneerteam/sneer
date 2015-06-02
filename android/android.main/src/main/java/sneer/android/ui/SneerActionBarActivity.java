@@ -1,7 +1,5 @@
 package sneer.android.ui;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -14,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.ContextMenu;
 import android.view.View;
@@ -88,7 +87,8 @@ public class SneerActionBarActivity extends ActionBarActivity {
 	}
 	public static Subscription plugActionBarTitle(final ActionBar actionBar, Observable<?> observable) {
 		return deferUI(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			actionBar.setTitle(obj.toString());
+			actionBar.setTitle(
+                    obj.toString());
 		}});
 	}
 

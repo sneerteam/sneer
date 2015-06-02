@@ -185,7 +185,7 @@ public class MainActivity extends SneerActivity {
 	private void onClicked(Conversation conversation) {
 		sendMessageIfPresent(conversation);
 		Intent intent = new Intent();
-		intent.setClass(this, ConversationActivity.class);
+		intent.setClass(this, ConversationActivityOld.class);
 		intent.putExtra("nick", conversation.contact().nickname().current());
 		startActivity(intent);
 	}

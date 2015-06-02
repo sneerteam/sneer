@@ -80,10 +80,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="sneer.android.ui.ConversationActivity"
+            android:label="@string/title_conversation"
+            android:theme="@style/AppThemeMaterial"
+            android:parentActivityName="sneer.android.ui.MainActivity" />
+
+        <activity
+            android:name="sneer.android.ui.ConversationActivityOld"
             android:label="@string/title_conversation" />
+
         <activity
             android:name="sneer.android.ui.ProfileActivity"
             android:label="@string/title_activity_profile" >
