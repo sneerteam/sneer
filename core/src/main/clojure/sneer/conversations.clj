@@ -24,7 +24,7 @@
     [sneer.rx ObservedSubject]
     [org.ocpsoft.prettytime PrettyTime]
     [java.io File]
-    [java.util HashMap Date]))
+    [java.util Date]))
 
 (defn- contact-puk [tuple]
   (tuple "party"))
