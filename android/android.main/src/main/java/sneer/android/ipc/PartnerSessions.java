@@ -41,32 +41,26 @@ public class PartnerSessions extends Service {
 
 		public SessionHandler(final Session session) {
 			this.session = session;
-			session.messages().subscribe(new Action1<Session.MessageOrUpToDate>() {
-				@Override
-				public void call(Session.MessageOrUpToDate messageOrUpToDate) {
-					if (messageOrUpToDate.isUpToDate()) {
-						await(connectionPending);
-						sendToApp(IPCProtocol.UP_TO_DATE);
-					} else {
-						Map<String, Object> map = new HashMap<>();
-						map.put(IS_OWN, messageOrUpToDate.message().isOwn());
-						map.put(PAYLOAD, messageOrUpToDate.message().payload());
-						sendToApp(map);
-					}
+			session.messages().subscribe(new Action1<Session.MessageOrUpToDate>() { @Override public void call(Session.MessageOrUpToDate messageOrUpToDate) {
+				if (messageOrUpToDate.isUpToDate())
+					sendToApp(IPCProtocol.UP_TO_DATE);
+				else {
+					Map<String, Object> map = new HashMap<>();
+					map.put(IS_OWN, messageOrUpToDate.message().isOwn());
+					map.put(PAYLOAD, messageOrUpToDate.message().payload());
+					sendToApp(map);
 				}
-			});
+			}});
 		}
 
 		@Override
 		public void handleMessage(Message msg) {
 			Object payload = getPayload(msg);
-			if (isFirstMessage())
+			if (isFirstMessage()) {
 				toApp = (Messenger) payload;
-			else
-				session.send(payload);
-
-			if (toApp != null)
 				connectionPending.countDown();
+			} else
+				session.send(payload);
 		}
 
 		private Object getPayload(Message msg) {
@@ -86,24 +80,15 @@ public class PartnerSessions extends Service {
 			bundle.putParcelable(ENVELOPE, envelope(data));
 			msg.setData(bundle);
 
+			await(connectionPending);
+
 			try {
-				doSendToApp(msg);
+				toApp.send(msg);
 			} catch (Exception e) {
 				handleException(e);
 			}
 		}
 
-		private void doSendToApp(android.os.Message msg) throws Exception {
-			toApp.send(msg);
-		}
-
-		private void await(CountDownLatch latch) {
-			try {
-				latch.await();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
 	}
 
 	private void handleException(Exception e) {
@@ -132,4 +117,13 @@ public class PartnerSessions extends Service {
 		Exceptions.check(PartnerSessions.conversations == null);
 		PartnerSessions.conversations = conversations;
 	}
+
+	private static void await(CountDownLatch latch) {
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }
