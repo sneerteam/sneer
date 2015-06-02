@@ -36,9 +36,16 @@
 (defn ->predicate [expected]
   (if (fn? expected) expected #(= % expected)))
 
+(defn ->robust [f]
+  (fn [arg]
+      (try
+        (f arg)
+        (catch Exception e
+          false))))
+
 (defn <wait-for! [ch expected]
   (let [expected (nvl expected :nil)
-        pred (->predicate expected)]
+        pred (->robust (->predicate expected))]
     (<!!
       (go-loop-trace [last-value nil]
         (let [current (<!!? ch)]
