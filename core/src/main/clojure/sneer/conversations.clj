@@ -6,7 +6,6 @@
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [sliding-chan go-while-let go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
     [sneer.commons :refer [now produce! descending]]
-    [sneer.clojure.core :refer [nvl]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
     [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]

@@ -75,3 +75,6 @@
         (reduced false)))
     true
     sub))
+
+(defn nvl [v default]
+  (if (some? v) v default))

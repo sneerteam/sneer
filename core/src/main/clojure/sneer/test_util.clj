@@ -1,6 +1,6 @@
 (ns sneer.test-util
   (:require
-    [sneer.clojure.core :refer [nvl]]
+    [sneer.commons :refer [nvl]]
     [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-loop-trace]]
