@@ -1,8 +1,6 @@
 package sneer.android.ui;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,13 +14,13 @@ import android.widget.RelativeLayout;
 
 import java.util.Collection;
 
-import sneer.main.R;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Party;
 import sneer.Profile;
 import sneer.android.SneerApp;
+import sneer.main.R;
 import sneer.rx.ObservedSubject;
 
 import static android.content.Intent.ACTION_SEND;
@@ -32,7 +30,6 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
-import static sneer.android.utils.Puk.shareOwnPublicKey;
 
 public class MainActivity extends SneerActivity {
 
@@ -70,7 +67,7 @@ public class MainActivity extends SneerActivity {
 
 
 	private boolean benchmarkRunning = true;
-	private Object monitor = new Object();
+	private final Object monitor = new Object();
 	private int counter = 0;
 	ObservedSubject<String> subject = ObservedSubject.create("");
 	private void startBenchmarkThread() {
