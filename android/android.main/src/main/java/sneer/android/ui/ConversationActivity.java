@@ -39,11 +39,12 @@ import sneer.Contact;
 import sneer.Conversation;
 import sneer.ConversationItem;
 import sneer.Party;
+import sneer.Sneer;
 import sneer.android.utils.AndroidUtils;
 import sneer.main.R;
 
 import static rx.Observable.never;
-import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 import static sneer.android.utils.Puk.shareOwnPublicKey;
 
@@ -259,5 +260,10 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
 		}
 		return null;
 	}
+
+	private static Sneer sneer() {
+		return component(Sneer.class);
+	}
+
 
 }

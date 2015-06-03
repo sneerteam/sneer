@@ -19,6 +19,7 @@ import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Party;
 import sneer.Profile;
+import sneer.Sneer;
 import sneer.android.SneerApp;
 import sneer.main.R;
 import sneer.rx.ObservedSubject;
@@ -28,7 +29,7 @@ import static android.content.Intent.EXTRA_SUBJECT;
 import static android.content.Intent.EXTRA_TEXT;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 
 public class MainActivity extends SneerActivity {
@@ -231,6 +232,11 @@ public class MainActivity extends SneerActivity {
 
 	private boolean isOwnNameLocallyAvailable() {
 		return ownProfile.isOwnNameLocallyAvailable();
+	}
+
+
+	private static Sneer sneer() {
+		return component(Sneer.class);
 	}
 
 }
