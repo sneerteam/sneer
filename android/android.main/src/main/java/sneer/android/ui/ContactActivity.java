@@ -11,26 +11,15 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import sneer.main.R;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import sneer.Contact;
 import sneer.Party;
-import sneer.Profile;
 import sneer.PublicKey;
 import sneer.commons.exceptions.FriendlyException;
+import sneer.main.R;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static sneer.android.SneerAndroidSingleton.admin;
 import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.SneerAndroidSingleton.sneerAndroid;
@@ -43,22 +32,13 @@ public class ContactActivity extends Activity {
 	private ActionBar actionBar;
 
 	private boolean newContact = false;
-	private Profile profile;
-	private ImageView selfieImage;
+	private Contact contact;
 
 	private EditText nicknameEdit;
-	private TextView fullNameView;
-	private TextView preferredNicknameView;
-	private TextView countryView;
-	private TextView cityView;
 	private Party party = null;
 	private PublicKey partyPuk;
 	private String inviteCode;
 	private Intent intent;
-	private Contact contact;
-	private boolean isOwn;
-	private Subscription ownNameSubscription;
-	private Subscription preferredNicknameSubscription;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +49,7 @@ public class ContactActivity extends Activity {
 		intent = getIntent();
 
 		if (!extractPuk()) {
-			toast("Profile not found");
+			toast("Contact not found");
 			finish();
 			return;
 		}
@@ -80,9 +60,8 @@ public class ContactActivity extends Activity {
 			return;
 		}
 
-		if (partyPuk.toHex().equals(sneer().self().publicKey().current().toHex())) {
-			isOwn = true;
-			startActivity(new Intent().setClass(this, ProfileActivity.class));
+		if (partyPuk.equals(sneer().self().publicKey().current())) {
+			toast("That is your own public key");
 			finish();
 			return;
 		}
@@ -93,15 +72,9 @@ public class ContactActivity extends Activity {
 		if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
-		fullNameView = (TextView) findViewById(R.id.fullName);
-		preferredNicknameView = (TextView) findViewById(R.id.preferredNickName);
-		selfieImage = (ImageView) findViewById(R.id.selfie);
-		countryView = (TextView) findViewById(R.id.country);
-		cityView = (TextView) findViewById(R.id.city);
 
 		loadContact();
-		plugProfile();
-		hidePreferredNicknameWhenNeeded();
+		plug(nicknameEdit, contact.nickname().observable());
 		validationOnTextChanged(nicknameEdit);
 	}
 
@@ -171,7 +144,6 @@ public class ContactActivity extends Activity {
 
 	private void loadContact() {
 		party = sneer().produceParty(partyPuk);
-		profile = sneer().profileFor(party);
 		contact = sneer().findContact(party);
 		newContact = contact == null;
 
@@ -180,44 +152,10 @@ public class ContactActivity extends Activity {
 	}
 
 
-	private void plugProfile() {
-		if (newContact) {
-			ownNameSubscription = plug(nicknameEdit, profile.preferredNickname().mergeWith(profile.ownName().delay(100, MILLISECONDS)).first());
-			if (nicknameEdit.getText().toString().isEmpty())
-				preferredNicknameSubscription = plug(nicknameEdit, profile.preferredNickname());
-		} else {
-			plug(nicknameEdit, contact.nickname().observable());
-		}
-
-		plug(fullNameView, profile.ownName());
-		plug(preferredNicknameView, profile.preferredNickname().map(new Func1<Object, String>() { @Override public String call(Object obj) {
-			return "(" + obj.toString() + ")";
-		}}));
-		plug(countryView, profile.country());
-		plug(cityView, profile.city());
-		plug(selfieImage, profile.selfie());
-	}
-
-
-	private void hidePreferredNicknameWhenNeeded() {
-		if (newContact) return;
-		Observable.combineLatest(profile.preferredNickname(), profile.ownName(), new Func2<String, String, Boolean>() { @Override public Boolean call(String preferredNickname, String ownName) {
-			if (TextUtils.isEmpty(preferredNickname))
-				return true;
-			return preferredNickname.equalsIgnoreCase(ownName) || preferredNickname.equalsIgnoreCase(contact.nickname().current());
-		}}).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() { @Override public void call(Boolean canHide) {
-			if (canHide)
-				preferredNicknameView.setVisibility(View.GONE);
-		}});
-	}
-
-
 	private void validationOnTextChanged(final EditText editText) {
 		editText.addTextChangedListener(new TextWatcher() {
 
 			@Override public void afterTextChanged(Editable s) {
-				if (ownNameSubscription != null) ownNameSubscription.unsubscribe();
-				if (preferredNicknameSubscription != null) preferredNicknameSubscription.unsubscribe();
 				nicknameEdit.setError(sneer().problemWithNewNickname(editText.getText().toString(), party));
 			}
 
@@ -253,7 +191,6 @@ public class ContactActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (isOwn) return;
 		saveContact();
 	}
 

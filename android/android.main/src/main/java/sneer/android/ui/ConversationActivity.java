@@ -30,20 +30,16 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import sneer.Contact;
 import sneer.Conversation;
 import sneer.ConversationItem;
-import sneer.Party;
 import sneer.Sneer;
 import sneer.android.utils.AndroidUtils;
 import sneer.main.R;
 
-import static rx.Observable.never;
 import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 import static sneer.android.utils.Puk.shareOwnPublicKey;
@@ -99,7 +95,6 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
         }
 
 		plugActionBarTitle(actionBar, contact.nickname().observable());
-        plugActionBarIcon(actionBar, selfieFor(contact));
 
 		conversation = sneer().conversations().withContact(contact);
 
@@ -162,15 +157,6 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
         return conversation;
     }
 
-	private Observable<byte[]> selfieFor(Contact contact) {
-		return contact.party().observable().switchMap(new Func1<Party, Observable<? extends byte[]>>() { @Override public Observable<? extends byte[]> call(Party party) {
-			if (party == null)
-				return never();
-			else
-				return sneer().profileFor(party).selfie();
-		}});
-	}
-
 	private void handleClick(String text) {
 		if (!text.isEmpty())
 			conversation.sendMessage(text);
@@ -190,17 +176,17 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.title:
-                navigateToProfile();
+                navigateToContact();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void onToolbarTitleClick() {
-        navigateToProfile();
+        navigateToContact();
     }
 
-    private void navigateToProfile() {
+    private void navigateToContact() {
 		Intent intent = new Intent();
 		intent.setClass(this, ContactActivity.class);
 		intent.putExtra(CURRENT_NICKNAME, contact.nickname().current());

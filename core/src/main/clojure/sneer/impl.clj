@@ -2,8 +2,7 @@
   (:require
    [sneer.conversations :refer [reify-conversations]]
    [sneer.contact :refer [create-contacts-state produce-contact get-contacts find-contact find-by-nick problem-with-new-nickname]]
-   [sneer.party :refer [party->puk reify-party produce-party! create-puk->party]]
-   [sneer.profile :refer [produce-profile]])
+   [sneer.party :refer [party->puk reify-party produce-party! create-puk->party]])
   (:import
     [sneer Sneer PrivateKey]
     [sneer.tuples TupleSpace]))
@@ -11,7 +10,6 @@
 (defn new-sneer [^TupleSpace tuple-space ^PrivateKey own-prik]
   (let [own-puk (.publicKey own-prik)
         puk->party (create-puk->party)
-        profiles (atom {})
         contacts-state (create-contacts-state tuple-space own-puk puk->party)
         contacts (get-contacts contacts-state)
         conversations (reify-conversations own-puk tuple-space contacts-state)
@@ -19,9 +17,6 @@
 
     (reify Sneer
       (self [_] self)
-
-      (profileFor [_ party]
-        (produce-profile tuple-space profiles party))
 
       (contacts [_]
         contacts)

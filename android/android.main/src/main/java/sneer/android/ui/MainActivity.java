@@ -1,6 +1,7 @@
 package sneer.android.ui;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,15 +13,18 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Party;
-import sneer.Profile;
 import sneer.Sneer;
-import sneer.android.SneerApp;
 import sneer.main.R;
 import sneer.rx.ObservedSubject;
 
@@ -37,7 +41,6 @@ public class MainActivity extends SneerActivity {
 	private MainAdapter adapter;
 
 	private final Party self = initSelf();
-	private final Profile ownProfile = sneer().profileFor(self);
 
     private String subjectToSend;
     private String textToSend;
@@ -48,7 +51,7 @@ public class MainActivity extends SneerActivity {
 		super.onCreate(savedInstanceState);
 		if (!sneerAndroid().checkOnCreate(this)) return;
 
-		handleFirstTime();
+		checkPlayServices();
 
 		setContentView(R.layout.activity_main);
 		makeConversationList();
@@ -103,11 +106,8 @@ public class MainActivity extends SneerActivity {
 
 	private void makeConversationList() {
 		final ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setHomeButtonEnabled(true);
-            plugActionBarTitle(actionBar, ownProfile.ownName());
-            plugActionBarIcon(actionBar, ownProfile.selfie());
-        }
+        if (actionBar != null)
+	        actionBar.setHomeButtonEnabled(true);
 
 		final RelativeLayout addContactTutorial = (RelativeLayout) findViewById(R.id.add_contact_tutorial);
 
@@ -142,9 +142,6 @@ public class MainActivity extends SneerActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			navigateTo(ProfileActivity.class);
-			break;
 		case R.id.action_add_contact:
 //			startBenchmarkThread();  // To use the benchmark uncomment this line and comment the ones below in this case.
 			navigateTo(AddContactActivity.class);
@@ -202,25 +199,12 @@ public class MainActivity extends SneerActivity {
 	protected void onRestart() {
 		super.onRestart();
 		adapter.notifyDataSetChanged();
-		checkHasOwnName();
-	}
-
-
-	private void checkHasOwnName() {
-		if (isOwnNameLocallyAvailable()) return;
-		finish();
-		toast("Name must be filled in");
 	}
 
 
 	@Override protected void onPause()  { super.onPause();  Notifier.resume(); benchmarkRunning = false; }
 	@Override protected void onResume() { super.onResume(); Notifier.pause(); }
 
-	private void handleFirstTime() {
-		if (isOwnNameLocallyAvailable()) return;
-		((SneerApp)getApplication()).checkPlayServices(this);
-		navigateTo(ProfileActivity.class);
-	}
 
 	private Party initSelf() {
 		try {
@@ -230,13 +214,29 @@ public class MainActivity extends SneerActivity {
 		}
 	}
 
-	private boolean isOwnNameLocallyAvailable() {
-		return ownProfile.isOwnNameLocallyAvailable();
-	}
-
 
 	private static Sneer sneer() {
 		return component(Sneer.class);
+	}
+
+	private void checkPlayServices() {
+		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+		if (resultCode == ConnectionResult.SUCCESS) return;
+
+		if (firstTime("GOOGLE_PLAY_MISSING"))
+			new AlertDialog.Builder(this)
+				.setTitle("Missing Google Play Services")
+				.setMessage("Some features such as using maps and receiving notifications when idle will not work without Google Play Services, which are missing from this phone.")
+				.setPositiveButton("OK", null)
+				.show();
+	}
+
+	private boolean firstTime(String filename) {
+		try {
+			return new File(getFilesDir(), filename).createNewFile();
+		} catch (IOException e) {
+			return true;
+		}
 	}
 
 }

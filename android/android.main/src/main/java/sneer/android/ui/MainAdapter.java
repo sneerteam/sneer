@@ -13,7 +13,6 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
@@ -23,8 +22,6 @@ import sneer.Conversation;
 import sneer.main.R;
 import sneer.rx.ObservedSubject;
 
-import static sneer.android.SneerAndroidSingleton.sneer;
-import static sneer.android.ui.SneerActivity.TO_BITMAP;
 import static sneer.android.ui.SneerActivity.deferUI;
 import static sneer.android.ui.SneerActivity.findView;
 import static sneer.android.ui.SneerActivity.onMainThread;
@@ -92,8 +89,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		return oc;
 	}
 
-	private final Map<Conversation, ObservedConversation> observedConversations
-			= new HashMap<Conversation, ObservedConversation>();
+	private final Map<Conversation, ObservedConversation> observedConversations	= new HashMap<>();
 
 	class ConversationWidget {
 		Conversation conversation;
@@ -155,9 +151,6 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 		}
 	}
 
-	private Observable<byte[]> pictureFor(Conversation conversation) {
-		return sneer().profileFor(conversation.contact().party().current()).selfie();
-	}
 
 	class ObservedConversation {
 		public final ObservedSubject<String> party = ObservedSubject.create("");
@@ -170,7 +163,6 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 			return Subscriptions.from(
 					conversation.contact().nickname().observable().subscribe(party),
 					conversation.mostRecentMessageContent().subscribe(summary),
-					pictureFor(conversation).map(TO_BITMAP).subscribe(picture),
 					conversation.unreadMessageCount().subscribe(unread),
 					prettyTime(conversation.mostRecentMessageTimestamp()).subscribe(timestamp)
 			);

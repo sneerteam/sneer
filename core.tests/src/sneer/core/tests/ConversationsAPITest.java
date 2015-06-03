@@ -95,11 +95,6 @@ public class ConversationsAPITest extends TestCase {
 	}
 
 
-	public void testSameProfile() {
-		assertEquals(sneerA.profileFor(sneerA.self()), sneerA.profileFor(sneerA.self()));
-	}
-
-
 	public void testPukOfParty() {
 
 		Party someone = sneerA.produceParty(userB);
@@ -240,54 +235,6 @@ public class ConversationsAPITest extends TestCase {
 		}});
 	}
 
-	public void testPreferredNickname() {
-
-		Profile profileBFromB = sneerB.profileFor(sneerB.self());
-		Profile profileBFromA = sneerA.profileFor(sneerA.produceParty(userB));
-
-		profileBFromB.setPreferredNickname("Party Boy");
-
-		expecting(
-			values(profileBFromA.preferredNickname(), "Party Boy"));
-
-		profileBFromB.setPreferredNickname("Party Man");
-
-		expecting(
-			eventually(profileBFromA.preferredNickname(), "Party Man"));
-
-	}
-
-	public void testPreferredNicknameForSelf() {
-
-		Profile profileB = sneerB.profileFor(sneerB.self());
-		profileB.setPreferredNickname("Party Boy");
-		expecting(
-			values(profileB.preferredNickname(), "Party Boy"));
-
-		SneerAdmin adminB2 = restart(adminB);
-		Sneer sneerB2 = adminB2.sneer();
-		Profile profileB2 = sneerB2.profileFor(sneerB2.self());
-		expecting(
-			values(profileB2.preferredNickname(), "Party Boy"));
-
-		profileB2.setPreferredNickname("Party Man");
-		expecting(
-			eventually(profileB2.preferredNickname(), "Party Man"));
-
-	}
-
-
-	public void testIsOwnNameLocallyAvailable() {
-
-		Profile profile = sneerA.profileFor(sneerA.self());
-
-		assertEquals(false, profile.isOwnNameLocallyAvailable());
-
-		profile.setOwnName("neide");
-
-		assertEquals(true, profile.isOwnNameLocallyAvailable());
-	}
-
 
 	public void ignoreTestTuplesFromContactsAreVisible() throws FriendlyException {
 
@@ -425,24 +372,6 @@ public class ConversationsAPITest extends TestCase {
 
 	private void messagesEventually(Conversation conversation, String... msgsExpected) {
 		expecting(eventually(conversation.items().map(toMessageContentList()), asList(msgsExpected)));
-	}
-
-
-	public void testPartyName() throws FriendlyException {
-
-		// 1 - type=contact party=puk
-		// 2 - ? profile/preferred-nickname author=puk
-		// 3 - ? profile/preferred-name author=puk
-		// 3 - puk
-
-		// TODO
-
-		Party partyBOfA = sneerA.produceParty(userB);
-		sneerA.produceContact("little b", partyBOfA, null);
-
-		expecting(
-			values(partyBOfA.name(), "little b"));
-
 	}
 
 

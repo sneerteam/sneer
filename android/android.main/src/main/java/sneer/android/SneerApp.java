@@ -65,22 +65,4 @@ public class SneerApp extends Application {
 				new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
 	}
 
-
-	public void checkPlayServices(Activity activity) {
-		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-		if (resultCode == ConnectionResult.SUCCESS) return;
-		if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-			new AlertDialog.Builder(activity)
-					.setTitle("Missing Google Play Services")
-					.setMessage("Some features such as using maps and receiving notifications when idle will not work without Google Play Services, which are missing from this phone.")
-					.setPositiveButton("OK", null)
-					.show();
-		} else {
-			String msg = "This device is not supported.";
-			Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
-			Log.i(getClass().getName(), msg);
-			activity.finish();
-		}
-	}
-
 }

@@ -14,7 +14,6 @@
     <string name="comments">Comments</string>
     <string name="button_send">Send</string>
     <string name="title_conversation">Conversation</string>
-    <string name="title_activity_profile">Public Profile</string>
     <string name="action_new_conversation">New Message</string>
 
     <string name="empty_contact_list">Tap the \"Add contact\" icon to invite a friend to a conversation using Sneer.</string>
@@ -30,7 +29,6 @@
     <string name="contact_view_nickname">Nickname</string>
     <string name="contact_view_public_key">Public key</string>
     <string name="contact_view_share_public_key">Share Public key</string>
-    <string name="profile_view_section_profile">PROFILE</string>
     <!-- ContactActivity -->
 
 
@@ -42,19 +40,6 @@
     <string name="action_add_contact">Add Sovereign Contact</string>
     <string name="add_contact_send_invite">Next ></string>
     <!-- ContactActivity -->
-
-    <!-- ProfileActivity -->
-    <string name="profile_view_content_description">Your Picture</string>
-    <string name="profile_view_first_name">First name</string>
-    <string name="profile_view_last_name">Last name</string>
-    <string name="profile_view_full_name">Full name</string>
-    <string name="profile_view_preferred_nickname">Preferred nickname (optional)</string>
-    <string name="profile_view_country">Country (optional)</string>
-    <string name="profile_view_city">City (optional)</string>
-    <string name="profile_error_size_name">Name too short</string>
-    <string name="action_save_profile">Save</string>
-    <string name="profile_view_location">LOCATION</string>
-    <!-- ProfileActivity -->
 
     <string name="search_hint">Search conversation</string>
     <string name="action_search">Search Conversation</string>
