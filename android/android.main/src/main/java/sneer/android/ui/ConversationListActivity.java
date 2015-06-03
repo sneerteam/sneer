@@ -11,7 +11,6 @@ import java.util.List;
 
 import rx.Subscription;
 import rx.functions.Action1;
-import sneer.commons.ActionBus;
 import sneer.conversations.ConversationList;
 import sneer.main.R;
 
@@ -20,7 +19,6 @@ import static sneer.android.SneerAndroidContainer.component;
 
 public class ConversationListActivity extends SneerActionBarActivity {
 
-	private final ActionBus bus = component(ActionBus.class);
 	private final ConversationList convos = component(ConversationList.class);
 	private Subscription subscription;
 

@@ -28,8 +28,8 @@
         (produce-contact contacts-state nickname party invite-code-received))
 
       (findContact [_ party]
-        (println "FELIPETESTE: impl/new-sneer.findContact.contacts-state->" contacts-state)
-        (println "FELIPETESTE: impl/new-sneer.findContact.party->" party)
+        ;(println "FELIPETESTE: impl/new-sneer.findContact.contacts-state->" contacts-state)
+        ;(println "FELIPETESTE: impl/new-sneer.findContact.party->" party)
         (find-contact contacts-state party))
       (findByNick [_ nick]
         (find-by-nick contacts-state nick))
