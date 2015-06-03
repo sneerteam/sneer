@@ -29,7 +29,7 @@
   {:a :b})
 
 
-(defn summarize [events expected-summary]
+(defn summarize [events expected-summaries]
 
   (with-open [db (database/create-sqlite-db)
               tuple-base (tuple-base/create db)]
@@ -49,7 +49,7 @@
           store-filename (.getAbsolutePath (File/createTempFile "tmp" ".tmp"))
           subject (atom nil)
           lease (atom nil)
-          summaries-out (chan (async/sliding-buffer 1) (map #(select-keys (first (convos/summarize %)) [:name :timestamp :preview :unread])))
+          summaries-out (chan (async/sliding-buffer 1) (map #(mapv (fn [summary] (select-keys summary [:name :timestamp :preview :unread])) (convos/summarize %))))
           restart-subject (fn []
                             (swap! lease #(do
                                             (when % (do (close! %)
@@ -67,8 +67,8 @@
                 (restart-subject)
                 (recur timestamp (next pending)))
               (do
-                (when-let [party (:contact e)]
-                  (<!!? (store-contact {"party" party "payload" (:nick e) "timestamp" timestamp})))
+                (when (contains? e :contact)
+                  (<!!? (store-contact {"party" (:contact e) "payload" (:nick e) "timestamp" timestamp})))
                 (when-let [label (:recv e)]
                   (let [received-msg (<!!? (store-message {"author" (:auth e) "audience" own-puk "label" label "timestamp" timestamp}))]
                     (swap! label->msg assoc label received-msg)))
@@ -80,7 +80,7 @@
 
         (when-not @subject (restart-subject))
 
-        (if (<wait-for! summaries-out #(submap? expected-summary %))
+        (if (<wait-for! summaries-out expected-summaries)
             :ok
             :error)
 
@@ -90,34 +90,42 @@
             (<!!? @subject) => nil))))))
 
 (let [unknown (keys/->puk "unknown puk")
-      ann     (keys/->puk "ann puk")]
+      ann     (keys/->puk "ann puk")
+      jon     (keys/->puk "jon puk")]
   (tabular "Conversation summarization"
 
     (fact "Events produce expected summaries"
-      (let [expected-summary ?expected-summary]
-        (summarize ?events expected-summary)) => :ok)
+      (summarize ?events ?expected-summaries) => :ok)
 
     ?obs
     ?events
-    ?expected-summary
+    ?expected-summaries
 
     "Summaries start empty."
     []
-    {}
+    []
 
     "Message received without known contact is ignored"
     [{:recv "Hello" :auth unknown}]
-    {}
+    []
 
     "New contact"
     [{:contact ann :nick "Ann"}]
-    {:name "Ann" :timestamp 0}
+    [{:name "Ann" :timestamp 0}]
+
+    "New contacts and invites"
+    [{:contact ann :nick "Ann"}
+     {:contact nil :nick "Bob"}
+     {:contact jon :nick "Jon"}]
+    [{:name "Jon" :timestamp 2}
+     ;{:name "Bob" :timestamp 1}
+     {:name "Ann" :timestamp 0}]
 
     "Message received from Ann is unread"
     [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}]
 
-    {:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}
+    [{:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}]
 
     "Nick change should not affect unread field."
     [:restart
@@ -126,20 +134,20 @@
      :restart
      {:contact ann :nick "Annabelle"}]
 
-    {:name "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}
+    [{:name "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}]
 
     "Any unread message with question mark produces question mark in unread status."
     [{:contact ann :nick "Ann"}
      {:recv "Where is the party??? :)" :auth ann}
      {:recv "Answer me!!" :auth ann}]
 
-    {:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}
+    [{:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}]
 
     "Sent messages appear in the preview."
     [{:contact ann :nick "Ann"}
      {:send "Hi Ann!" :audience ann}]
 
-    {:name "Ann" :timestamp 1 :preview "Hi Ann!"}
+    [{:name "Ann" :timestamp 1 :preview "Hi Ann!"}]
 
     "Last message marked as read clears unread status."
     [{:contact ann :nick "Ann"}
@@ -147,12 +155,12 @@
      {:recv "Hello2" :auth ann}
      {:read "Hello2" :auth ann}]
 
-    {:name "Ann" :timestamp 2 :preview "Hello2" :unread ""}
+    [{:name "Ann" :timestamp 2 :preview "Hello2" :unread ""}]
 
-      "Old message marked as read does not clear unread status."
-      [{:contact ann :nick "Ann"}
-       {:recv "Hello1" :auth ann}
-       {:recv "Hello2" :auth ann}
-       {:read "Hello1" :auth ann}]
+    "Old message marked as read does not clear unread status."
+    [{:contact ann :nick "Ann"}
+     {:recv "Hello1" :auth ann}
+     {:recv "Hello2" :auth ann}
+     {:read "Hello1" :auth ann}]
 
-      {:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}))
+    [{:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}]))

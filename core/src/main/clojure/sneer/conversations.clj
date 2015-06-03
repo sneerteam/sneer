@@ -30,10 +30,10 @@
   (tuple "party"))
 
 (defn- handle-contact [own-puk tuple state]
-  (when (= (tuple "author") own-puk)
-    (when-let [contact-puk (contact-puk tuple)]
-      (update-in state
-                 [contact-puk]
+  (let [contact-puk (contact-puk tuple)]
+    (cond-> state
+      (and (some? contact-puk) (= (tuple "author") own-puk))
+      (update-in [contact-puk]
                  assoc :name      (tuple "payload")
                        :timestamp (tuple "timestamp")))))
 
@@ -73,10 +73,10 @@
       (= msg-id (:last-received summary)) (assoc :unread ""))))
 
 (defn- handle-read-receipt [own-puk tuple state]
-  (when (= (tuple "author") own-puk)
-    (let [contact-puk (tuple "audience")]
-      (update-in state
-                 [contact-puk]
+  (let [contact-puk (tuple "audience")]
+    (cond-> state
+      (= (tuple "author") own-puk)
+      (update-in [contact-puk]
                  update-with-read tuple))))
 
 (defn summarize [state]
