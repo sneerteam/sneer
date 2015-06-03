@@ -39,7 +39,6 @@
                     sneer.impl
                     sneer.keys
                     sneer.party
-                    sneer.profile
                     sneer.serialization
                     sneer.networking.udp
                     sneer.networking.client
