@@ -39,7 +39,6 @@ import sneer.Contact;
 import sneer.Conversation;
 import sneer.ConversationItem;
 import sneer.Party;
-import sneer.android.ui.adapters.ConversationAdapter;
 import sneer.android.utils.AndroidUtils;
 import sneer.main.R;
 

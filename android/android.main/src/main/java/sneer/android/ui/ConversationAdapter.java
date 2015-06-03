@@ -1,4 +1,4 @@
-package sneer.android.ui.adapters;
+package sneer.android.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
