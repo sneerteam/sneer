@@ -94,13 +94,11 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
                     onToolbarTitleClick();
                 }
             });
-        } catch (NoSuchFieldException e) {
-            // Ignore
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             // Ignore
         }
 
-        plugActionBarTitle(actionBar, contact.nickname().observable());
+		plugActionBarTitle(actionBar, contact.nickname().observable());
         plugActionBarIcon(actionBar, selfieFor(contact));
 
 		conversation = sneer().conversations().withContact(contact);
