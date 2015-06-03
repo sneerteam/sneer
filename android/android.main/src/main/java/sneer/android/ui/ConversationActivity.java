@@ -156,7 +156,7 @@ public class ConversationActivity extends SneerActionBarActivity implements Star
 		}});
 	}
 
-    @Override
+	@Override
     public Conversation getConversation() {
         return conversation;
     }
