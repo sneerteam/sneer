@@ -23,7 +23,6 @@ import sneer.Conversation;
 import sneer.Party;
 import sneer.Profile;
 import sneer.android.SneerApp;
-import sneer.android.ui.adapters.MainAdapter;
 import sneer.rx.ObservedSubject;
 
 import static android.content.Intent.ACTION_SEND;
