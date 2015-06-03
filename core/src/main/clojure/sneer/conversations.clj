@@ -67,10 +67,10 @@
                [contact-puk]
                #(update-summary own? message %))))
 
-(defn update-with-read [old-summary tuple]
+(defn update-with-read [summary tuple]
   (let [msg-id (tuple "payload")]
-    (cond-> old-summary
-      (= msg-id (:last-received old-summary)) (assoc :unread ""))))
+    (cond-> summary
+      (= msg-id (:last-received summary)) (assoc :unread ""))))
 
 (defn- handle-read-receipt [own-puk tuple state]
   (when (= (tuple "author") own-puk)
@@ -235,7 +235,7 @@
         reify-conversation (partial reify-conversation space own-puk)
         ignored-conversation (behavior-subject)
         contacts (get-contacts contacts-state)
-        produce-convo (fn [contact] (do (println "FELIPETESTE: conversations/reify-conversations.produce-convo.contact->" contact) (produce! reify-conversation convos contact)))]
+        produce-convo (fn [contact] (do #_(println "FELIPETESTE: conversations/reify-conversations.produce-convo.contact->" contact) (produce! reify-conversation convos contact)))]
 
     (reify Conversations
 
@@ -256,7 +256,7 @@
                  (.withContact this)))
 
       (withContact [_ contact]
-        (println "FELIPETESTE: conversations/reify-conversations.withContact.contact->" contact)
+        ;(println "FELIPETESTE: conversations/reify-conversations.withContact.contact->" contact)
         (produce-convo contact))
 
       (notifications [this]
