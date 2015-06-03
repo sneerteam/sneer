@@ -5,8 +5,6 @@ import android.content.Intent;
 
 import sneer.Party;
 
-import static sneer.android.ui.ContactActivity.USE_INVITES;
-
 public class Puk {
 
 	public static void shareOwnPublicKey(Activity activity, Party self, String inviteCode, String receiver) {
@@ -18,7 +16,7 @@ public class Puk {
 				"Then, tap to add me as a Sneer contact: " +
 				buildSneerUri(self.publicKey().current().toHex(), inviteCode));
 
-		String title = (USE_INVITES ? "Send invite to " : "Share your Public-key") + receiver;
+		String title = ("Send invite to ") + receiver;
 		Intent chooser = Intent.createChooser(sharingIntent, title);
 
 		if (sharingIntent.resolveActivity(activity.getPackageManager()) != null)
@@ -27,10 +25,7 @@ public class Puk {
 
 
 	public static String buildSneerUri(String puk, String inviteCode) {
-		String ret = "http://sneer.me/public-key?" + puk;
-		if (USE_INVITES && inviteCode != null)
-			ret += "&invite=" + inviteCode;
-		return ret;
+		return "http://sneer.me/public-key?" + puk + "&invite=" + inviteCode;
 	}
 
 }

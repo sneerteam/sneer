@@ -38,8 +38,6 @@ import static sneer.android.ui.SneerActivity.plug;
 
 public class ContactActivity extends Activity {
 
-	public static final boolean USE_INVITES = true;
-
 	static final String CURRENT_NICKNAME = "currentNickname";
 
 	private ActionBar actionBar;
@@ -76,7 +74,7 @@ public class ContactActivity extends Activity {
 			return;
 		}
 
-		if (!validInviteCode() && USE_INVITES) {
+		if (!validInviteCode()) {
 			toast("Invalid invite code");
 			finish();
 			return;
