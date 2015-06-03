@@ -74,7 +74,9 @@ public class ContactActivity extends Activity {
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 
 		loadContact();
-		plug(nicknameEdit, contact.nickname().observable());
+		if (!newContact)
+			plug(nicknameEdit, contact.nickname().observable());
+		
 		validationOnTextChanged(nicknameEdit);
 	}
 
