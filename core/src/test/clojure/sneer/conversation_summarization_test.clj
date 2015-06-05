@@ -12,21 +12,6 @@
   (:import  [java.io File]))
 
 
-(fact "Reading snapshot from file that doesnt exist returns empty map"
-  (convos/read-snapshot (tmp-file)) => {})
-
-(defn roundtrip [state]
-  (let [file (tmp-file)]
-      (convos/write-snapshot file state)
-      (convos/read-snapshot file)))
-
-(tabular
-  (fact "Snapshot read/write roundtrip works"
-    (roundtrip ?state) => ?state)
-
-  ?state
-  {}
-  {:a :b})
 
 
 (defn summarize [events expected-summaries]

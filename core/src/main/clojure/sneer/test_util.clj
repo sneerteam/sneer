@@ -13,9 +13,7 @@
     (.delete)))
 
 (defn tmp-folder []
-  (doto
-    (File/createTempFile "test-" ".tmp")
-    (.mkdir)))
+  (doto (tmp-file) (.mkdir)))
 
 (defn >!!?
   ([ch v]
@@ -46,18 +44,17 @@
 (defn <wait-for! [ch expected]
   (let [expected (nvl expected :nil)
         pred (->robust (->predicate expected))]
-    (<!!
-      (go-loop-trace [last-value nil]
-        (let [current (<!!? ch)]
-          (cond
-            (pred current) true
-            (nil? current) (do
-                             (println "COMPLETED/CLOSED. Last value: " last-value)
-                             false)
-            (= current :timeout) (do
-                                   (println "TIMEOUT. Last value:" last-value)
-                                   false)
-            :else (recur current)))))))
+    (loop-trace [last-value nil]
+      (let [current (<!!? ch)]
+        (cond
+          (pred current) true
+          (nil? current) (do
+                           (println "COMPLETED/CLOSED. Last value: " last-value)
+                           false)
+          (= current :timeout) (do
+                                 (println "TIMEOUT. Last value:" last-value)
+                                 false)
+          :else (recur current))))))
 
 (defn compromised
   ([ch] (compromised ch 0.7))

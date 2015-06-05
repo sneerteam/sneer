@@ -17,7 +17,7 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-(defn neide-maicon-conversation-scenario! []
+(defn neide-maico-conversation-scenario! []
   (let [neide-db (create-sqlite-db)
         maico-db (create-sqlite-db)
         neide-tb (tb/create neide-db)
@@ -30,6 +30,7 @@
         maico-sneer (.sneer maico-admin)
         neide-received (chan)
         maico-received (chan)
+
         _ (transmitter/start neide-puk neide-tb neide-received
                              (fn [follower-puk tuples-out & _]
                                (assert (= follower-puk maico-puk))
@@ -55,7 +56,7 @@
 (def neide (->puk "neide"))
 
 (facts "About reify-conversation"
-  (let [scenario (neide-maicon-conversation-scenario!)]
+  (let [scenario (neide-maico-conversation-scenario!)]
     (with-open [_neide-db (:neide-db scenario)
                 _maico-db (:maico-db scenario)
                 _neide-tb (:neide-tb scenario)

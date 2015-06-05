@@ -26,7 +26,7 @@
   `(go
      (try
        ~@forms
-       (catch java.lang.Throwable ~'e
+       (catch Throwable ~'e
          (println "GO ERROR" ~'e)
          #_(print-throwable ~'e)
          (.printStackTrace ~'e)))))
