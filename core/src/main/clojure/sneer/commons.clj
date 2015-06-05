@@ -13,6 +13,17 @@
   (dispose [closeable]
     (.close closeable)))
 
+(defmacro loop-trace
+  "Same as loop but prints unhandled exception stack trace"
+  [binding & forms]
+  `(try
+    (loop ~binding
+      ~@forms)
+    (catch Throwable ~'e
+      (println "LOOP ERROR" ~'e)
+      #_(print-throwable ~'e)
+      (.printStackTrace ~'e))))
+
 (defmacro while-let
   "Makes it easy to continue processing an expression as long as it is true"
   [binding & forms]
