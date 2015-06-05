@@ -3,7 +3,7 @@
             [clojure.core.async :refer [chan close!] :as async]
             [sneer.async :refer [sliding-chan]]
             [sneer.commons :refer [submap?]]
-            [sneer.test-util :refer [<!!? <wait-for! tmp-file]]
+            [sneer.test-util :refer [<!!? <emits tmp-file]]
             [sneer.tuple.jdbc-database :as database]
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
@@ -12,9 +12,7 @@
   (:import  [java.io File]))
 
 
-
-
-(defn summarize [events expected-summaries]
+(defn- summarize! [events expected-summaries]
 
   (with-open [db (database/create-sqlite-db)
               tuple-base (tuple-base/create db)]
@@ -65,9 +63,8 @@
 
         (when-not @subject (restart-subject))
 
-        (if (<wait-for! summaries-out expected-summaries)
-            :ok
-            :error)
+        (fact "Events produce expected summaries"
+          summaries-out => (<emits expected-summaries))
 
         (finally
           (fact "machine terminates when lease channel is closed"
@@ -80,7 +77,7 @@
   (tabular "Conversation summarization"
 
     (fact "Events produce expected summaries"
-      (summarize ?events ?expected-summaries) => :ok)
+      (summarize! ?events ?expected-summaries))             ; Tabular symbols like ?this need the fact macro to work. That is why this fact has no "=>" operator.
 
     ?obs
     ?events

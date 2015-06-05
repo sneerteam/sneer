@@ -6,7 +6,7 @@
             [sneer.contact :refer [produce-contact create-contacts-state]]
             [sneer.tuple.persistent-tuple-base :as tb]
             [sneer.tuple.tuple-transmitter :as transmitter]
-            [sneer.test-util :refer [<!!? ->chan]]
+            [sneer.test-util :refer [<!!? ->chan <wait-for! <emits]]
             [sneer.tuple.protocols :refer :all]
             [sneer.rx :refer [subscribe-on-io]]
             [sneer.keys :refer [->puk create-prik]]
@@ -79,14 +79,11 @@
 
         (fact "new message received increments values"
           (.sendMessage n->m "Hi, Maico")
-          (<!!? unread-counts) => 0                         ; Skipping history replay. :(
-          (<!!? unread-counts) => 1
+          unread-counts => (<emits 1)
 
-          (<!!? most-recent-timestamps) => :nil             ; Skipping history replay. :(
-          (<!!? most-recent-timestamps) => #(>= % t0)
+          most-recent-timestamps => (<emits #(>= % t0))
 
-          (<!!? most-recent-labels) => :nil                 ; Skipping history replay. :(
-          (<!!? most-recent-labels) => "Hi, Maico"
+          most-recent-labels => (<emits "Hi, Maico")
 
           (.sendMessage n->m "Hi, Maico2")
           (<!!? most-recent-labels) => "Hi, Maico2"

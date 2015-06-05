@@ -1,6 +1,6 @@
 (ns sneer.test-util
   (:require
-    [sneer.commons :refer [nvl]]
+    [sneer.commons :refer [nvl loop-trace]]
     [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-loop-trace]]
@@ -95,6 +95,10 @@
 
 (defn ->chan [^rx.Observable o]
   (->> o observe-for-io observable->chan))
+
+(defn <emits [expected]
+  (fn [ch]
+    (<wait-for! ch expected)))
 
 (defn emits [expected]
   (fn [obs]
