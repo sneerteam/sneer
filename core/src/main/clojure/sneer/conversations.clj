@@ -159,9 +159,17 @@
   (io/write-bytes file (serialize snapshot))
   (println "Snapshot written:" (count snapshot) "conversations, last-id:" (:last-id snapshot)))
 
-(defn- save-snapshots-to [file ch]
-  (go-while-let [snapshot (<! ch)]
-    (write-snapshot file snapshot)))
+(defn- start-saving-snapshots-to! [file ch]
+  (let [never (chan)]
+    (go-loop-trace [snapshot nil
+                    debounce never]
+      (alt! :priority true
+        ch       ([snapshot]
+                   (when snapshot
+                     (recur snapshot (timeout 5000))))
+        debounce ([_]
+                   (write-snapshot file snapshot)
+                   (recur nil never))))))
 
 (defn- sliding-tap [mult]
   (let [ch (sliding-chan)]
@@ -187,7 +195,7 @@
         (link-lease-to-chan lease pretty-summaries-out)
         (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
         (republish-latest-every (* 60 1000) (tap-summaries) pretty-summaries-out)
-        (save-snapshots-to file (tap-summaries))
+        (start-saving-snapshots-to! file (tap-summaries))
         (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList []
