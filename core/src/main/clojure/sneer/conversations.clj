@@ -155,8 +155,9 @@
           default))
       default)))
 
-(defn write-snapshot [file snapshot]
-  (io/write-bytes file (serialize snapshot)))
+(defn- write-snapshot [file snapshot]
+  (io/write-bytes file (serialize snapshot))
+  (println "Snapshot written:" (count snapshot) "conversations, last-id:" (:last-id snapshot)))
 
 (defn- save-snapshots-to [file ch]
   (go-while-let [snapshot (<! ch)]
