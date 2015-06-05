@@ -146,11 +146,14 @@
            (recur latest (timeout period))))))
 
 (defn read-snapshot [file]
-  (try
-    (deserialize (io/read-bytes file))
-    (catch Exception e
-      (println (.getMessage e))
-      {})))
+  (let [default {}]
+    (if (.exists file)
+      (try
+        (deserialize (io/read-bytes file))
+        (catch Exception e
+          (println "Exception reading snapshot:" (.getMessage e))
+          default))
+      default)))
 
 (defn write-snapshot [file snapshot]
   (io/write-bytes file (serialize snapshot)))
