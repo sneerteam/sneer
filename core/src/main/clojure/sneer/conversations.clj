@@ -160,7 +160,8 @@
 (defn- write-snapshot [file snapshot]
   (when file
     (io/write-bytes file (serialize snapshot))
-    (println "Snapshot written:" (count snapshot) "conversations, last-id:" (:last-id snapshot))))
+    (println "Snapshot written:" (-> snapshot count dec)    ; dec: Don't count the :last-id key.
+             "conversations, last-id:" (:last-id snapshot))))
 
 (defn- start-saving-snapshots-to! [file ch]
   (let [never (chan)]
