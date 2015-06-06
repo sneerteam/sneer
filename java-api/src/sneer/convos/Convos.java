@@ -21,10 +21,10 @@ public interface Convos {
 	Observable<List<Summary>> summaries();
 
 	/** @return null if the new nickname is ok or a reason why the new nickname is not ok (empty or already used by another Contact). */
-	String problemWithNewNickname(String newNick);
+	String problemWithNewNickname(String newContactNick);
 
 	/** @return The new convo id.
-	 * @throws sneer.commons.exceptions.FriendlyException (see problemWithNewNickname(newNick)). */
+	 * @throws sneer.commons.exceptions.FriendlyException (see problemWithNewNickname(newContactNick)). */
 	long startConvo(String newContactNick) throws FriendlyException;
 
 }

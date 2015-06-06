@@ -177,11 +177,10 @@
     (async/tap mult ch)
     ch))
 
-(defn- do-summaries [this]
+(defn- do-summaries [container]
   (rx/observable*
     (fn [^Subscriber subscriber]
-      (let [container (Container/of this)
-            lease (.getLeaseChannel (.produce container LeaseHolder))
+      (let [lease (.getLeaseChannel (.produce container LeaseHolder))
             file (some-> (.produce container PersistenceFolder)
                          (.get)
                          (File. "conversation-summaries.tmp"))
@@ -199,8 +198,8 @@
         (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
         (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
 
-(defn reify-Convos [_container]
+(defn reify-Convos [container]
   (let [shared-summaries (atom nil)]
     (reify Convos
-      (summaries [this]
-        (swap! shared-summaries #(if % % (shared-latest (do-summaries this))))))))
+      (summaries [_]
+        (swap! shared-summaries #(if % % (shared-latest (do-summaries container)))))
