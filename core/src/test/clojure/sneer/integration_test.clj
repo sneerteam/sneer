@@ -28,5 +28,11 @@
   (with-open [neide (sneer-container!)]
     (. (neide ConversationList) summaries) => (emits #(.isEmpty %)))
   ;(. (neide Contacts) problemWithNewNickname) => nil
+
+  ; Invites must appear in summarization.
+  ; Subs for conversations.
+  ; Reads not being emitted by old logic or not being porcessed by new summarization.
+
+
   )
 
