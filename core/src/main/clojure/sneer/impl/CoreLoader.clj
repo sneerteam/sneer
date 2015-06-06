@@ -16,4 +16,4 @@
     (sneer.commons/reify-ActionBus container)
 
     sneer.convos.Convos
-    (sneer.conversations/reify-ConversationList container)))
+    (sneer.convos/reify-Convos container)))
