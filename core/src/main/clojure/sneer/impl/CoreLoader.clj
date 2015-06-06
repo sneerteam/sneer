@@ -6,11 +6,6 @@
 ;  (println component-interface "::" LeaseHolder)
   (condp = component-interface
 
-    ; Irregular:
-    sneer.tuple.protocols.Database
-    (sneer.tuple.jdbc-database/reify-Database container)
-
-    ; Regular:
     sneer.admin.SneerAdmin
     (sneer.admin/reify-SneerAdmin container)
 

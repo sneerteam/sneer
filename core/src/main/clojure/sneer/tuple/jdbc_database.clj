@@ -69,6 +69,3 @@
 
 (defn create-sqlite-db [& [databaseFile]]
   (reify-with(get-connection databaseFile)))
-
-(defn reify-Database [container]
-  (create-sqlite-db (some-> (.produce container PersistenceFolder) (.get) (.File "db"))))
