@@ -78,3 +78,11 @@
           (throw (RuntimeException. (str "onNext Exception. subscriber: " subscriber " value: " value "thread: " thread-name)
                                     e)))))
     (rx/on-completed subscriber)))
+
+(defprotocol LeaseHolder
+  (getLeaseChannel [this]))
+
+(defn reify-LeaseHolder [_container]
+  (let [lease (chan)]
+    (reify LeaseHolder
+      (getLeaseChannel [_] lease))))

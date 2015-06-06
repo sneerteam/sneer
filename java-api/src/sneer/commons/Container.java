@@ -35,7 +35,7 @@ public class Container {
 			T cached = (T) componentsByInterface.get(componentInterface);
 			if (cached != null) return cached;
 
-			T loaded = loader.load(componentInterface);
+			T loaded = loader.load(componentInterface, this);
 			keep(componentInterface, loaded);
 			return loaded;
 		}
@@ -61,7 +61,7 @@ public class Container {
 
 
 	public interface ComponentLoader {
-		<T> T load(Class<T> componentInterface);
+		<T> T load(Class<T> componentInterface, Container container);
 	}
 
 }

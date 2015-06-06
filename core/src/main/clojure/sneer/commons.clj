@@ -65,7 +65,7 @@
     (when (not= next :break)
       (recur fn (merge initial next)))))
 
-(defn reify-ActionBus []
+(defn reify-ActionBus [_container]
   (reify ActionBus
     (action [_ action] (println "Action: " action))))
 

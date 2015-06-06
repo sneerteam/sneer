@@ -16,15 +16,16 @@
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.persistent-tuple-base :as tb])
   (:import
+    [java.io File]
+    [java.util Date]
+    [org.ocpsoft.prettytime PrettyTime]
     [rx Subscriber Observable]
     [sneer Conversations Conversation Conversations$Notification]
     [sneer.admin SneerAdmin]
+    [sneer.async LeaseHolder]
     [sneer.commons Container Clock PersistenceFolder]
     [sneer.conversations ConversationList ConversationList$Summary ConversationList]
-    [sneer.rx ObservedSubject]
-    [org.ocpsoft.prettytime PrettyTime]
-    [java.io File]
-    [java.util Date]))
+    [sneer.rx ObservedSubject]))
 
 (defn- contact-puk [tuple]
   (tuple "party"))
@@ -98,7 +99,6 @@
     (close! linked)))
 
 (defn start-summarization-machine! [state own-puk tuple-base summaries-out lease]
-  (println "-----start-summarization-machine!")
   (let [last-id (:last-id state)
         tuples (chan)
         all-tuples-criteria {tb/after-id last-id}]
@@ -108,13 +108,10 @@
     (link-lease-to-chan lease tuples)
 
     (go-loop-trace [state state]
-      (println "-----BEFORE OUT")
       (>! summaries-out state)
-      (println "-----AFTER OUT")
 
       (if-let [tuple (<! tuples)]
         (do
-          (println "-----TUPLE")
           (recur
             (->
               (case (tuple "type")
@@ -122,8 +119,7 @@
                 "message" (handle-message own-puk tuple state)
                 "message-read" (handle-read-receipt own-puk tuple state)
                 state)
-              (assoc :last-id (tuple "id")))))
-        (println "----- summarization done!")))))
+              (assoc :last-id (tuple "id")))))))))
 
 
 ; Java interface
@@ -133,7 +129,6 @@
   (ConversationList$Summary. name summary date (str unread) -4242))
 
 (defn- to-foreign [summaries]
-  (println "-----to-foreign")
   (->> summaries summarize (mapv to-foreign-summary)))
 
 (defn republish-latest-every [period in out]
@@ -154,7 +149,7 @@
 
 (defn read-snapshot [file]
   (let [default {}]
-    (if (.exists file)
+    (if (and file (.exists file))
       (try
         (deserialize (io/read-bytes file))
         (catch Exception e
@@ -163,8 +158,9 @@
       default)))
 
 (defn- write-snapshot [file snapshot]
-  (io/write-bytes file (serialize snapshot))
-  (println "Snapshot written:" (count snapshot) "conversations, last-id:" (:last-id snapshot)))
+  (when file
+    (io/write-bytes file (serialize snapshot))
+    (println "Snapshot written:" (count snapshot) "conversations, last-id:" (:last-id snapshot))))
 
 (defn- start-saving-snapshots-to! [file ch]
   (let [never (chan)]
@@ -183,12 +179,14 @@
     (async/tap mult ch)
     ch))
 
-(defn- do-summaries [this lease]
+(defn- do-summaries [this]
   (rx/observable*
     (fn [^Subscriber subscriber]
       (let [container (Container/of this)
-            folder (.. container (produce PersistenceFolder) get)
-            file (File. folder "conversation-summaries.tmp")
+            lease (.getLeaseChannel (.produce container LeaseHolder))
+            file (some-> (.produce container PersistenceFolder)
+                         (.get)
+                         (File. "conversation-summaries.tmp"))
             admin (.produce container SneerAdmin)
             own-puk (.. admin privateKey publicKey)
             tuple-base (tuple-base-of admin)
@@ -196,7 +194,6 @@
             summaries-out-mult (async/mult summaries-out)
             tap-summaries #(sliding-tap summaries-out-mult)
             pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
-        (link-chan-to-subscriber lease subscriber)
         (link-chan-to-subscriber summaries-out subscriber)
         (link-lease-to-chan lease pretty-summaries-out)
         (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
@@ -204,12 +201,11 @@
         (start-saving-snapshots-to! file (tap-summaries))
         (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
 
-(defn reify-ConversationList []
-  (let [shared-summaries (atom nil)
-        lease (chan)]
+(defn reify-ConversationList [_container]
+  (let [shared-summaries (atom nil)]
     (reify ConversationList
       (summaries [this]
-        (swap! shared-summaries #(if % % (shared-latest (do-summaries this lease))))))))
+        (swap! shared-summaries #(if % % (shared-latest (do-summaries this))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OLD:

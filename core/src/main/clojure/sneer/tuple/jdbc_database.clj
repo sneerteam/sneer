@@ -5,7 +5,8 @@
   (:import [java.sql DriverManager SQLException]
            [sneer.admin UniqueConstraintViolated]
            [java.util.concurrent.locks Lock ReentrantReadWriteLock]
-           [java.io Closeable]))
+           [java.io Closeable]
+           [sneer.commons PersistenceFolder]))
 
 (defn- get-connection [databaseFile]
   (DriverManager/getConnection
@@ -28,7 +29,7 @@
   `(with-lock (.writeLock ~rw-lock) ~@body))
 
 
-(defn reify-database [connection]
+(defn- reify-with [connection]
   (let [db {:connection connection}
         rw-lock (ReentrantReadWriteLock.)
         open (atom true)]
@@ -67,5 +68,7 @@
           (.close connection))))))
 
 (defn create-sqlite-db [& [databaseFile]]
-  (reify-database(get-connection databaseFile)))
+  (reify-with(get-connection databaseFile)))
 
+(defn reify-Database [container]
+  (create-sqlite-db (some-> (.produce container PersistenceFolder) (.get) (.File "db"))))

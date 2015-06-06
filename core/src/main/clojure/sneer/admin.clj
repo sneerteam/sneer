@@ -76,3 +76,6 @@
         tuple-base (tuple-base/create db)
         own-prik (produce-private-key db)]
     (new-sneer-admin own-prik tuple-base)))
+
+(defn reify-SneerAdmin [container]
+  (new-sneer-admin-over-db (.produce container sneer.tuple.protocols.Database)))
