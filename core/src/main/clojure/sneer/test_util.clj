@@ -44,15 +44,15 @@
 (defn <wait-for! [ch expected]
   (let [expected (nvl expected :nil)
         pred (->robust (->predicate expected))]
-    (loop-trace [last-value nil]
+    (loop-trace [last-value "<none>"]
       (let [current (<!!? ch)]
         (cond
           (pred current) true
           (nil? current) (do
-                           (println "COMPLETED/CLOSED. Last value: " last-value)
+                           (println "COMPLETED/CLOSED. Last value emitted: " last-value)
                            false)
           (= current :timeout) (do
-                                 (println "TIMEOUT. Last value:" last-value)
+                                 (println "TIMEOUT. Last value emitted:" last-value)
                                  false)
           :else (recur current))))))
 
