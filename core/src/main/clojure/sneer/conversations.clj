@@ -24,7 +24,7 @@
     [sneer.admin SneerAdmin]
     [sneer.async LeaseHolder]
     [sneer.commons Container Clock PersistenceFolder]
-    [sneer.conversations ConversationList ConversationList$Summary ConversationList]
+    [sneer.convos Convos Convos$Summary]
     [sneer.rx ObservedSubject]))
 
 (defn- contact-puk [tuple]
@@ -126,7 +126,7 @@
 
 (defn to-foreign-summary [{:keys [name summary date unread]}]
   (println "TODO: CONVERSATION ID")
-  (ConversationList$Summary. name summary date (str unread) -4242))
+  (Convos$Summary. name summary date (str unread) -4242))
 
 (defn- to-foreign [summaries]
   (->> summaries summarize (mapv to-foreign-summary)))
@@ -204,7 +204,7 @@
 
 (defn reify-ConversationList [_container]
   (let [shared-summaries (atom nil)]
-    (reify ConversationList
+    (reify Convos
       (summaries [this]
         (swap! shared-summaries #(if % % (shared-latest (do-summaries this))))))))
 

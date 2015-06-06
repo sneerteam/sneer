@@ -11,15 +11,16 @@ import java.util.List;
 
 import rx.Subscription;
 import rx.functions.Action1;
-import sneer.conversations.ConversationList;
+import sneer.convos.Convos;
 import sneer.main.R;
 
 import static sneer.android.SneerAndroidContainer.component;
+import static sneer.convos.Convos.Summary;
 
 
 public class ConversationListActivity extends SneerActionBarActivity {
 
-	private final ConversationList convos = component(ConversationList.class);
+	private final Convos convos = component(Convos.class);
 	private Subscription subscription;
 
 
@@ -46,11 +47,11 @@ public class ConversationListActivity extends SneerActionBarActivity {
 		final ListView list = (ListView)findViewById(R.id.conversationList);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
-    		String nick = adapter.getItem(position).party;
+    		String nick = adapter.getItem(position).nickname;
             openConversation(nick);
 		}});
 
-		subscription = ui(convos.summaries()).subscribe(new Action1<List<ConversationList.Summary>>() { @Override public void call(List<ConversationList.Summary> summaries) {
+		subscription = ui(convos.summaries()).subscribe(new Action1<List<Summary>>() { @Override public void call(List<Summary> summaries) {
 			adapter.update(summaries);
 		}});
 	}

@@ -1,7 +1,6 @@
 package sneer.android.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
@@ -13,15 +12,14 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import rx.subscriptions.CompositeSubscription;
-import sneer.conversations.ConversationList;
 import sneer.main.R;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static sneer.android.ui.SneerActivity.findView;
+import static sneer.convos.Convos.Summary;
 
-class ConversationListAdapter extends ArrayAdapter<ConversationList.Summary> {
+class ConversationListAdapter extends ArrayAdapter<Summary> {
 
 	private final LayoutInflater inflater;
 
@@ -30,7 +28,7 @@ class ConversationListAdapter extends ArrayAdapter<ConversationList.Summary> {
 		inflater = activity.getLayoutInflater();
     }
 
-	void update(List<ConversationList.Summary> summaries) {
+	void update(List<Summary> summaries) {
 		clear();
 		addAll(summaries);
 		notifyDataSetChanged();
@@ -51,7 +49,7 @@ class ConversationListAdapter extends ArrayAdapter<ConversationList.Summary> {
 	}
 
 	private void updateConversation(int position, View view) {
-		ConversationList.Summary summary = getItem(position);
+		Summary summary = getItem(position);
 
 //		ImageView pic     = findView(view, R.id.conversationPicture);
 		TextView  party   = findView(view, R.id.conversationParty);
@@ -60,7 +58,7 @@ class ConversationListAdapter extends ArrayAdapter<ConversationList.Summary> {
 		TextView  preview = findView(view, R.id.conversationSummary);
 		preview.getPaint().setShader(textShader);
 
-		party  .setText(summary.party);
+		party  .setText(summary.nickname);
 		preview.setText(summary.textPreview);
 		date   .setText(summary.date);
 		unread .setText(summary.unread);
