@@ -196,9 +196,9 @@
             pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
         (link-chan-to-subscriber summaries-out subscriber)
         (link-lease-to-chan lease pretty-summaries-out)
-        (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
         (republish-latest-every (* 60 1000) (tap-summaries) pretty-summaries-out)
         (start-saving-snapshots-to! file (tap-summaries))
+        (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
         (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
 
 (defn reify-ConversationList [_container]
