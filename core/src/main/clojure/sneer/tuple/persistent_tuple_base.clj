@@ -5,7 +5,7 @@
            (sneer PublicKey))
   (:require [sneer.commons :refer [now submap?]]
             [sneer.async :refer [dropping-chan go-trace dropping-tap]]
-            [clojure.core.async :as async :refer [go-loop <! >! >!! <!! mult tap chan close! go]]
+            [clojure.core.async :as async :refer [go-loop <! >! >!! <!! mult tap chan close! go thread]]
             [sneer.rx :refer [filter-by seq->observable]]
             [sneer.rx-macros :refer :all]
             [clojure.core.match :refer [match]]
@@ -218,9 +218,9 @@
         nil)))
 
 (defn- server-loop [db requests new-tuples]
-  (go-trace
+  (thread
    (loop [next-tuple-id (-> db max-tuple-id inc)]
-     (when-some [request (<! requests)]
+     (when-some [request (<!! requests)]
        (let [bump-id (handle-request! db new-tuples request next-tuple-id)]
          (recur (cond-> next-tuple-id bump-id inc)))))))
 
