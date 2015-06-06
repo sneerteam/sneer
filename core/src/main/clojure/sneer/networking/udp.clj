@@ -1,6 +1,5 @@
 (ns sneer.networking.udp
   (:require [sneer.serialization :refer [serialize deserialize]]
-            [sneer.async :refer [go-trace]]
             [clojure.core.async :as async :refer [>! <! >!! <!!]]
             [sneer.commons :refer :all])
   (:import [java.net DatagramPacket DatagramSocket]
@@ -48,7 +47,7 @@
     (when port (println "Closing port" port))
     (try
       (.close socket)
-      (catch Exception e :ignored))))
+      (catch Exception _ :ignored))))
 
 (defn on-open-error [exception]
   (println "Error opening socket:")
