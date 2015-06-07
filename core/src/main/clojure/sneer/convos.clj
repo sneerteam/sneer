@@ -202,6 +202,9 @@
   (let [shared-summaries (atom nil)]
     (reify Convos
       (summaries [_]
-        (swap! shared-summaries #(if % % (shared-latest (do-summaries container)))))
-      (problemWithNewNickname [_ newContactNick])
-      (startConvo [_ newContactNick] -345354))))
+        (swap! shared-summaries #(if % % (shared-latest (-summaries container)))))
+
+      (problemWithNewNickname [_ newContactNick]
+        )
+
+      (startConvo [_ newContactNick] -1234))))
