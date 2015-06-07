@@ -101,6 +101,12 @@
      {:nick "Bob" :timestamp 1}
      {:nick "Ann" :timestamp 0}]
 
+    "Duplicate nick is ignored"
+    [{:contact ann :nick "Ann"}
+     {:contact jon :nick "Ann"}
+     {:recv "Hello" :auth jon}]
+    [{:nick "Ann" :timestamp 0}]
+
     "Message received from Ann is unread"
     [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}]

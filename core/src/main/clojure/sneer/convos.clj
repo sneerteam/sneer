@@ -30,16 +30,19 @@
 (defn- handle-contact [own-puk tuple state]
   (if-not (= (tuple "author") own-puk)
     state
-    (let [puk (contact-puk tuple)
-          new-nick (tuple "payload")
-          old-nick (get-in state [:puk->nick puk])
-          summary  (get-in state [:nick->summary old-nick])
-          summary  (assoc summary :nick new-nick
-                                 :timestamp (tuple "timestamp"))]
-      (-> state
-        (update-in [:nick->summary] dissoc old-nick)
-        (assoc-in [:nick->summary new-nick] summary)
-        (assoc-in [:puk->nick puk] new-nick)))))
+    (let [new-nick (tuple "payload")
+          nick-already-used? (get-in state [:nick->summary new-nick])]
+      (if nick-already-used?
+        state
+        (let [puk (contact-puk tuple)
+              old-nick (get-in state [:puk->nick puk])
+              summary  (get-in state [:nick->summary old-nick])
+              summary  (assoc summary :nick new-nick
+                                     :timestamp (tuple "timestamp"))]
+          (-> state
+            (update-in [:nick->summary] dissoc old-nick)
+            (assoc-in [:nick->summary new-nick] summary)
+            (assoc-in [:puk->nick puk] new-nick)))))))
 
 (defn- unread-status [label old-status]
   (cond
