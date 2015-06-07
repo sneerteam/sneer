@@ -35,7 +35,7 @@ public class SneerInstallation {
 	}
 
 
-	private static boolean wasCalledFromConversation(Activity activity) {
+	public static boolean wasCalledFromConversation(Activity activity) {
 		return activity.getIntent().getParcelableExtra(SEND_MESSAGE) != null;
 	}
 
