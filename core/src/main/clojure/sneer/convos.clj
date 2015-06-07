@@ -28,12 +28,18 @@
   (tuple "party"))
 
 (defn- handle-contact [own-puk tuple state]
-  (let [contact-puk (contact-puk tuple)]
-    (cond-> state
-      (and (some? contact-puk) (= (tuple "author") own-puk))
-      (update-in [contact-puk]
-                 assoc :name      (tuple "payload")
-                       :timestamp (tuple "timestamp")))))
+  (if-not (= (tuple "author") own-puk)
+    state
+    (let [puk (contact-puk tuple)
+          new-nick (tuple "payload")
+          old-nick (get-in state [:puk->nick puk])
+          summary  (get-in state [:nick->summary old-nick])
+          summary  (assoc summary :nick new-nick
+                                 :timestamp (tuple "timestamp"))]
+      (-> state
+        (update-in [:nick->summary] dissoc old-nick)
+        (assoc-in [:nick->summary new-nick] summary)
+        (assoc-in [:puk->nick puk] new-nick)))))
 
 (defn- unread-status [label old-status]
   (cond
@@ -61,9 +67,9 @@
   (let [author (message "author")
         own? (= author own-puk)
         contact-puk (if own? (message "audience") author)]
-    (update-in state
-               [contact-puk]
-               #(update-summary own? message %))))
+    (if-let [nick (get-in state [:puk->nick contact-puk])]
+      (update-in state [:nick->summary nick] #(update-summary own? message %))
+      state)))
 
 (defn- update-with-read [summary tuple]
   (let [msg-id (tuple "payload")]
@@ -71,10 +77,11 @@
       (= msg-id (:last-received summary)) (assoc :unread ""))))
 
 (defn- handle-read-receipt [own-puk tuple state]
-  (let [contact-puk (tuple "audience")]
+  (let [contact-puk (tuple "audience")
+        nick (get-in state [:puk->nick contact-puk])]
     (cond-> state
       (= (tuple "author") own-puk)
-      (update-in [contact-puk]
+      (update-in [:nick->summary nick]
                  update-with-read tuple))))
 
 (defn summarize [state]
@@ -85,7 +92,6 @@
     (->> state
          :nick->summary
          vals
-         (filter :name)
          (sort-by :timestamp descending)
          (mapv with-pretty-date))))
 
@@ -96,34 +102,39 @@
     (<! lease)
     (close! victim)))
 
+; state: {:last-id 42
+;         :puk->nick {puk "Neide"}
+;         :nick->summary {"Neide" {:nick "Neide"
+;                                  :timestamp 1234567890
+;                                  :unread "*"
+;                                  :preview "Hi, Maico"}}
+
 (defn start-summarization-machine! [previous-state own-puk tuple-base summaries-out lease]
-  (let [nick->summary (previous-state :nick->summary)
-        last-id       (previous-state :last-id)
+  (let [last-id (previous-state :last-id)
         tuples (chan)
         all-tuples-criteria {tb/after-id last-id}]
 
     (query-tuples tuple-base all-tuples-criteria tuples lease)
     (close-with! lease tuples)
 
-    (go-loop-trace [nick->summary (previous-state :nick->summary)
-                    last-id       (previous-state :last-id)]
-      (>! summaries-out {:nick->summary nick->summary
-                         :last-id       last-id})
+    (go-loop-trace [state previous-state]
+      (>! summaries-out state)
       (when-let [tuple (<! tuples)]
         (recur
-          (case (tuple "type")
-            "contact"      (handle-contact      own-puk tuple nick->summary)
-            "message"      (handle-message      own-puk tuple nick->summary)
-            "message-read" (handle-read-receipt own-puk tuple nick->summary)
-            nick->summary)
-          (tuple "id"))))))
+          (->
+            (case (tuple "type")
+              "contact"      (handle-contact      own-puk tuple state)
+              "message"      (handle-message      own-puk tuple state)
+              "message-read" (handle-read-receipt own-puk tuple state)
+              state)
+            (assoc :last-id (tuple "id"))))))))
 
 
 ; Java interface
 
-(defn- to-foreign-summary [{:keys [name summary date unread]}]
+(defn- to-foreign-summary [{:keys [nick summary date unread]}]
   (println "TODO: CONVERSATION ID")
-  (Convos$Summary. name summary date (str unread) -4242))
+  (Convos$Summary. nick summary date (str unread) -4242))
 
 (defn- to-foreign [summaries]
   (->> summaries summarize (mapv to-foreign-summary)))
