@@ -8,8 +8,7 @@
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :as keys]
-            [sneer.convos :as convos])
-  (:import  [java.io File]))
+            [sneer.convos :as convos]))
 
 
 (defn- summarize! [events expected-summaries]
@@ -31,7 +30,7 @@
 
           subject (atom nil)
           lease (atom nil)
-          summaries-out (chan (async/sliding-buffer 1) (map #(mapv (fn [summary] (select-keys summary [:name :timestamp :preview :unread])) (convos/summarize %))))
+          summaries-out (chan (async/sliding-buffer 1) (map #(mapv (fn [summary] (select-keys summary [:nick :timestamp :preview :unread])) (convos/summarize %))))
           restart-subject (fn []
                             (swap! lease #(do
                                             (when % (do (close! %)
@@ -92,21 +91,21 @@
 
     "New contact"
     [{:contact ann :nick "Ann"}]
-    [{:name "Ann" :timestamp 0}]
+    [{:nick "Ann" :timestamp 0}]
 
     "New contacts and invites"
     [{:contact ann :nick "Ann"}
      {:contact nil :nick "Bob"}
      {:contact jon :nick "Jon"}]
-    [{:name "Jon" :timestamp 2}
-     ;{:name "Bob" :timestamp 1}
-     {:name "Ann" :timestamp 0}]
+    [{:nick "Jon" :timestamp 2}
+     {:nick "Bob" :timestamp 1}
+     {:nick "Ann" :timestamp 0}]
 
     "Message received from Ann is unread"
     [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}]
 
-    [{:name "Ann" :timestamp 1 :preview "Hello" :unread "*"}]
+    [{:nick "Ann" :timestamp 1 :preview "Hello" :unread "*"}]
 
     "Nick change should not affect unread field."
     [:restart
@@ -115,20 +114,20 @@
      :restart
      {:contact ann :nick "Annabelle"}]
 
-    [{:name "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}]
+    [{:nick "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}]
 
     "Any unread message with question mark produces question mark in unread status."
     [{:contact ann :nick "Ann"}
      {:recv "Where is the party??? :)" :auth ann}
      {:recv "Answer me!!" :auth ann}]
 
-    [{:name "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}]
+    [{:nick "Ann" :timestamp 2 :preview "Answer me!!" :unread "?"}]
 
     "Sent messages appear in the preview."
     [{:contact ann :nick "Ann"}
      {:send "Hi Ann!" :audience ann}]
 
-    [{:name "Ann" :timestamp 1 :preview "Hi Ann!"}]
+    [{:nick "Ann" :timestamp 1 :preview "Hi Ann!"}]
 
     "Last message marked as read clears unread status."
     [{:contact ann :nick "Ann"}
@@ -136,7 +135,7 @@
      {:recv "Hello2" :auth ann}
      {:read "Hello2" :auth ann}]
 
-    [{:name "Ann" :timestamp 2 :preview "Hello2" :unread ""}]
+    [{:nick "Ann" :timestamp 2 :preview "Hello2" :unread ""}]
 
     "Old message marked as read does not clear unread status."
     [{:contact ann :nick "Ann"}
@@ -144,4 +143,4 @@
      {:recv "Hello2" :auth ann}
      {:read "Hello1" :auth ann}]
 
-    [{:name "Ann" :timestamp 2 :preview "Hello2" :unread "*"}]))
+    [{:nick "Ann" :timestamp 2 :preview "Hello2" :unread "*"}]))
