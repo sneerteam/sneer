@@ -83,6 +83,7 @@
                            (assoc summary :date
                                           (.format pretty-time (Date. ^long (summary :timestamp)))))]
     (->> state
+         :nick->summary
          vals
          (filter :name)
          (sort-by :timestamp descending)
@@ -95,28 +96,27 @@
     (<! lease)
     (close! victim)))
 
-(defn start-summarization-machine! [state own-puk tuple-base summaries-out lease]
-  (let [last-id (:last-id state)
+(defn start-summarization-machine! [previous-state own-puk tuple-base summaries-out lease]
+  (let [nick->summary (previous-state :nick->summary)
+        last-id       (previous-state :last-id)
         tuples (chan)
         all-tuples-criteria {tb/after-id last-id}]
+
     (query-tuples tuple-base all-tuples-criteria tuples lease)
+    (close-with! lease tuples)
 
-    ; link machine lifetime to lease
-    (link-lease-to-chan lease tuples)
-
-    (go-loop-trace [state state]
-      (>! summaries-out state)
-
-      (if-let [tuple (<! tuples)]
-        (do
-          (recur
-            (->
-              (case (tuple "type")
-                "contact" (handle-contact own-puk tuple state)
-                "message" (handle-message own-puk tuple state)
-                "message-read" (handle-read-receipt own-puk tuple state)
-                state)
-              (assoc :last-id (tuple "id")))))))))
+    (go-loop-trace [nick->summary (previous-state :nick->summary)
+                    last-id       (previous-state :last-id)]
+      (>! summaries-out {:nick->summary nick->summary
+                         :last-id       last-id})
+      (when-let [tuple (<! tuples)]
+        (recur
+          (case (tuple "type")
+            "contact"      (handle-contact      own-puk tuple nick->summary)
+            "message"      (handle-message      own-puk tuple nick->summary)
+            "message-read" (handle-read-receipt own-puk tuple nick->summary)
+            nick->summary)
+          (tuple "id"))))))
 
 
 ; Java interface
