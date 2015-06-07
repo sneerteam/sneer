@@ -88,12 +88,12 @@
          (sort-by :timestamp descending)
          (mapv with-pretty-date))))
 
-(defn link-lease-to-chan
-  "Closes `linked' when `lease' emits a value."
-  [lease linked]
+(defn- close-with!
+  "Closes `victim' channel when `lease' emits a value."
+  [lease victim]
   (go
     (<! lease)
-    (close! linked)))
+    (close! victim)))
 
 (defn start-summarization-machine! [state own-puk tuple-base summaries-out lease]
   (let [last-id (:last-id state)
@@ -192,7 +192,7 @@
             tap-summaries #(sliding-tap summaries-out-mult)
             pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
         (link-chan-to-subscriber summaries-out subscriber)
-        (link-lease-to-chan lease pretty-summaries-out)
+        (close-with! lease pretty-summaries-out)
         (republish-latest-every (* 60 1000) (tap-summaries) pretty-summaries-out)
         (start-saving-snapshots-to! file (tap-summaries))
         (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
