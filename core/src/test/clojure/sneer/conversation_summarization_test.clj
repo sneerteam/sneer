@@ -8,7 +8,7 @@
             [sneer.tuple.persistent-tuple-base :as tuple-base]
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :as keys]
-            [sneer.conversations :as convos])
+            [sneer.convos :as convos])
   (:import  [java.io File]))
 
 
@@ -29,7 +29,6 @@
           store-read (fn [contact-puk msg] (store-tuple tuple-base
                                                         {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "original_id")}))
 
-          store-filename (.getAbsolutePath (File/createTempFile "tmp" ".tmp"))
           subject (atom nil)
           lease (atom nil)
           summaries-out (chan (async/sliding-buffer 1) (map #(mapv (fn [summary] (select-keys summary [:name :timestamp :preview :unread])) (convos/summarize %))))

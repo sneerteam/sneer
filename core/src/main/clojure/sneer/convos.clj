@@ -8,7 +8,7 @@
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
     [sneer.io :as io]
-    [sneer.rx :refer [shared-latest behavior-subject]]
+    [sneer.rx :refer [shared-latest]]
     [sneer.party :refer [party->puk]]
     [sneer.serialization :refer [serialize deserialize]]
     [sneer.tuple.protocols :refer :all]
@@ -21,7 +21,7 @@
     [rx Subscriber]
     [sneer.admin SneerAdmin]
     [sneer.async LeaseHolder]
-    [sneer.commons Container Clock PersistenceFolder]
+    [sneer.commons Clock PersistenceFolder]
     [sneer.convos Convos Convos$Summary]))
 
 (defn- contact-puk [tuple]
@@ -41,7 +41,7 @@
     (.contains label "?") "?"
     :else "*"))
 
-(defn update-with-received [id label old-summary]
+(defn- update-with-received [id label old-summary]
   (-> old-summary
     (assoc :last-received id)
     (update :unread #(unread-status label %))))
@@ -65,7 +65,7 @@
                [contact-puk]
                #(update-summary own? message %))))
 
-(defn update-with-read [summary tuple]
+(defn- update-with-read [summary tuple]
   (let [msg-id (tuple "payload")]
     (cond-> summary
       (= msg-id (:last-received summary)) (assoc :unread ""))))
@@ -121,14 +121,14 @@
 
 ; Java interface
 
-(defn to-foreign-summary [{:keys [name summary date unread]}]
+(defn- to-foreign-summary [{:keys [name summary date unread]}]
   (println "TODO: CONVERSATION ID")
   (Convos$Summary. name summary date (str unread) -4242))
 
 (defn- to-foreign [summaries]
   (->> summaries summarize (mapv to-foreign-summary)))
 
-(defn republish-latest-every [period in out]
+(defn- republish-latest-every [period in out]
   (go-loop-trace [latest nil
                   period-timeout (timeout period)]
     (alt! :priority true
@@ -144,7 +144,7 @@
              (>! out latest))
            (recur latest (timeout period))))))
 
-(defn read-snapshot [file]
+(defn- read-snapshot [file]
   (let [default {}]
     (if (and file (.exists file))
       (try
@@ -177,7 +177,7 @@
     (async/tap mult ch)
     ch))
 
-(defn- do-summaries [container]
+(defn- -summaries [container]
   (rx/observable*
     (fn [^Subscriber subscriber]
       (let [lease (.getLeaseChannel (.produce container LeaseHolder))
