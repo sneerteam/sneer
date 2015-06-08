@@ -112,7 +112,7 @@
 ;                                  :unread "*"
 ;                                  :preview "Hi, Maico"}}
 
-(defn start-summarization-machine! [previous-state own-puk tuple-base summaries-out lease]
+(defn start-summarization-machine! [previous-state own-puk tuple-base state-out lease]
   (let [last-id (previous-state :last-id)
         tuples (chan)
         all-tuples-criteria {tb/after-id last-id}]
@@ -121,7 +121,7 @@
     (close-with! lease tuples)
 
     (go-loop-trace [state previous-state]
-      (>! summaries-out state)
+      (>! state-out state)
       (when-let [tuple (<! tuples)]
         (recur
           (->
@@ -191,32 +191,32 @@
     (async/tap mult ch)
     ch))
 
-(defn- -summaries [container]
-  (rx/observable*
-    (fn [^Subscriber subscriber]
-      (let [lease (.getLeaseChannel (.produce container LeaseHolder))
-            file (some-> (.produce container PersistenceFolder)
-                         (.get)
-                         (File. "conversation-summaries.tmp"))
-            admin (.produce container SneerAdmin)
-            own-puk (.. admin privateKey publicKey)
-            tuple-base (tuple-base-of admin)
-            summaries-out (sliding-chan)
-            summaries-out-mult (async/mult summaries-out)
-            tap-summaries #(sliding-tap summaries-out-mult)
-            pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
-        (link-chan-to-subscriber summaries-out subscriber)
-        (close-with! lease pretty-summaries-out)
-        (republish-latest-every (* 60 1000) (tap-summaries) pretty-summaries-out)
-        (start-saving-snapshots-to! file (tap-summaries))
-        (start-summarization-machine! (read-snapshot file) own-puk tuple-base summaries-out lease)
-        (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries")))))
+(defn- summaries-for [container]
+  (shared-latest
+    (rx/observable*
+      (fn [^Subscriber subscriber]
+        (let [lease (.getLeaseChannel (.produce container LeaseHolder))
+              file (some-> (.produce container PersistenceFolder)
+                           (.get)
+                           (File. "conversation-summaries.tmp"))
+              admin (.produce container SneerAdmin)
+              own-puk (.. admin privateKey publicKey)
+              tuple-base (tuple-base-of admin)
+              state-out (sliding-chan)
+              state-out-mult (async/mult state-out)
+              tap-summaries #(sliding-tap state-out-mult)
+              pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
+          (link-chan-to-subscriber state-out subscriber)
+          (close-with! lease pretty-summaries-out)
+          (republish-latest-every (* 60 1000) (tap-summaries) pretty-summaries-out)
+          (start-saving-snapshots-to! file (tap-summaries))
+          (start-summarization-machine! (read-snapshot file) own-puk tuple-base state-out lease)
+          (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries"))))))
 
 (defn reify-Convos [container]
-  (let [shared-summaries (atom nil)]
+  (let [summaries (summaries-for container)]
     (reify Convos
-      (summaries [_]
-        (swap! shared-summaries #(if % % (shared-latest (-summaries container)))))
+      (summaries [_] summaries)
 
       (problemWithNewNickname [_ newContactNick]
         )
