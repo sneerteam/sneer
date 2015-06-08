@@ -191,6 +191,8 @@
     (async/tap mult ch)
     ch))
 
+
+
 (defn- summaries-for [container]
   (shared-latest
     (rx/observable*
@@ -204,12 +206,12 @@
               tuple-base (tuple-base-of admin)
               state-out (sliding-chan)
               state-out-mult (async/mult state-out)
-              tap-summaries #(sliding-tap state-out-mult)
+              tap-state #(sliding-tap state-out-mult)
               pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
           (link-chan-to-subscriber state-out subscriber)
           (close-with! lease pretty-summaries-out)
-          (republish-latest-every (* 60 1000) (tap-summaries) pretty-summaries-out)
-          (start-saving-snapshots-to! file (tap-summaries))
+          (republish-latest-every (* 60 1000) (tap-state) pretty-summaries-out)
+          (start-saving-snapshots-to! file (tap-state))
           (start-summarization-machine! (read-snapshot file) own-puk tuple-base state-out lease)
           (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries"))))))
 
