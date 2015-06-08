@@ -6,11 +6,11 @@
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
 
-(defn dropping-chan [& [n]]
-  (chan (async/dropping-buffer (or n 1))))
+(defn dropping-chan [& [n xform]]
+  (chan (async/dropping-buffer (or n 1)) xform))
 
-(defn sliding-chan [& [n]]
-  (chan (async/sliding-buffer (or n 1))))
+(defn sliding-chan [& [n xform]]
+  (chan (async/sliding-buffer (or n 1)) xform))
 
 (defn connection [in out]
   [in out])

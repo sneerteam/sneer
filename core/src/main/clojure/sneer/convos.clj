@@ -204,7 +204,7 @@
               admin (.produce container SneerAdmin)
               own-puk (.. admin privateKey publicKey)
               tuple-base (tuple-base-of admin)
-              state-out (sliding-chan)
+              state-out (sliding-chan 1 (dedupe))
               state-out-mult (async/mult state-out)
               tap-state #(sliding-tap state-out-mult)
               pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
