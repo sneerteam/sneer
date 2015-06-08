@@ -18,7 +18,7 @@ import static sneer.android.SneerAndroidContainer.component;
 import static sneer.convos.Convos.Summary;
 
 
-public class ConversationListActivity extends SneerActionBarActivity {
+public class ConvosActivity extends SneerActionBarActivity {
 
 	private final Convos convos = component(Convos.class);
 	private Subscription subscription;
