@@ -7,7 +7,7 @@
     [sneer.commons :refer [now produce! while-let]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer :all]
-    [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map switch-map-some map-some]]
+    [sneer.rx :refer [subscribe-on-io latest shared-latest combine-latest switch-map switch-map-some map-some]]
     [sneer.party :refer [party->puk]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.tuple.space :refer [payload reify-tuple]]

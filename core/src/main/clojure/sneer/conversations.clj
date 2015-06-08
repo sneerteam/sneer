@@ -7,7 +7,7 @@
     [sneer.commons :refer [now produce! descending]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
-    [sneer.rx :refer [atom->observable subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]
+    [sneer.rx :refer [subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]
     [sneer.party :refer [party->puk]]
     [sneer.serialization :refer [serialize deserialize]]
     [sneer.tuple.protocols :refer :all]
