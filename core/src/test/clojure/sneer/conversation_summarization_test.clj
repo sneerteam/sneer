@@ -30,7 +30,7 @@
 
           subject (atom nil)
           lease (atom nil)
-          summaries-out (chan (async/sliding-buffer 1) (map #(mapv (fn [summary] (select-keys summary [:nick :timestamp :preview :unread])) (convos/summarize %))))
+          summaries-out (chan (async/sliding-buffer 1) (map #(mapv (fn [summary] (select-keys summary [:nick :timestamp :preview :unread])) (convos/summarize (% :nick->summary)))))
           restart-subject (fn []
                             (swap! lease #(do
                                             (when % (do (close! %)

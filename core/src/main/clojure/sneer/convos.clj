@@ -93,7 +93,6 @@
                            (assoc summary :date
                                           (.format pretty-time (Date. ^long (summary :timestamp)))))]
     (->> state
-         :nick->summary
          vals
          (sort-by :timestamp descending)
          (mapv with-pretty-date))))
@@ -204,10 +203,10 @@
               admin (.produce container SneerAdmin)
               own-puk (.. admin privateKey publicKey)
               tuple-base (tuple-base-of admin)
-              state-out (sliding-chan 1 (dedupe))
+              state-out (sliding-chan)
               state-out-mult (async/mult state-out)
               tap-state #(sliding-tap state-out-mult)
-              pretty-summaries-out (chan (sliding-buffer 1) (map to-foreign))]
+              pretty-summaries-out (chan (sliding-buffer 1) (comp (map :nick->summary) (dedupe) (map to-foreign)))]
           (link-chan-to-subscriber state-out subscriber)
           (close-with! lease pretty-summaries-out)
           (republish-latest-every (* 60 1000) (tap-state) pretty-summaries-out)
