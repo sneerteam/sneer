@@ -7,6 +7,7 @@
     [sneer.commons :refer [now produce! descending]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
+    [sneer.flux :refer :all]                                ; Required to cause compilation of LeaseHolder
     [sneer.io :as io]
     [sneer.rx :refer [shared-latest]]
     [sneer.party :refer [party->puk]]
@@ -20,7 +21,7 @@
     [org.ocpsoft.prettytime PrettyTime]
     [rx Subscriber]
     [sneer.admin SneerAdmin]
-    [sneer.async LeaseHolder]
+    [sneer.flux LeaseHolder]
     [sneer.commons Clock PersistenceFolder]
     [sneer.convos Convos Convos$Summary]))
 

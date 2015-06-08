@@ -65,10 +65,6 @@
     (when (not= next :break)
       (recur fn (merge initial next)))))
 
-(defn reify-ActionBus [_container]
-  (reify ActionBus
-    (action [_ action] (println "Action: " action))))
-
 (defn flip [f]
   (fn [x y] (f y x)))
 
@@ -89,3 +85,4 @@
 
 (defn nvl [v default]
   (if (some? v) v default))
+

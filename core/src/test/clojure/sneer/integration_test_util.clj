@@ -7,7 +7,7 @@
            [sneer.commons Container PersistenceFolder]
            [sneer.impl CoreLoader]
            [java.io Closeable]
-           [sneer.async LeaseHolder]
+           [sneer.flux LeaseHolder]
            [sneer.tuple.protocols Database]))
 
 (defn sneer! []
