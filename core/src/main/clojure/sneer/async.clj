@@ -45,19 +45,6 @@
      (while-let ~binding
                 ~@forms)))
 
-(defn non-repeating<
-  ([ch]
-    (non-repeating< = ch))
-  ([equality-fn ch]
-    (let [ret (chan)]
-      (go-trace
-        (loop [previous nil]
-          (when-some [v (<! ch)]
-                     (when-not (equality-fn v previous)
-                       (>! ret v))
-                     (recur v))))
-      ret)))
-
 (defn dropping-tap [mult]
   (tap mult (dropping-chan)))
 
