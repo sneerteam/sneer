@@ -48,12 +48,12 @@
 (defn dropping-tap [mult]
   (tap mult (dropping-chan)))
 
-(defn link-chan-to-subscriber
+(defn close-on-unsubscribe!
   "Closes the channel when the subscriber is unsubscribed."
   [chan ^rx.Subscriber subscriber]
   (.add subscriber (rx/subscription #(async/close! chan))))
 
-(defn thread-chan-to-subscriber
+(defn pipe-to-subscriber!
   "Copies values from channel to rx subscriber in a separate thread."
   [chan ^rx.Subscriber subscriber ^String thread-name]
   (async/thread

@@ -3,11 +3,11 @@
     [clojure.core.async :as async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [sliding-chan go-while-let go-loop-trace link-chan-to-subscriber thread-chan-to-subscriber]]
+    [sneer.async :refer [sliding-chan go-while-let go-loop-trace close-on-unsubscribe! pipe-to-subscriber!]]
     [sneer.commons :refer [now produce! descending]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
-    [sneer.flux :refer :all]                                ; Required to cause compilation of LeaseHolder
+    [sneer.flux :as flux]                                ; Required to cause compilation of LeaseHolder
     [sneer.io :as io]
     [sneer.rx :refer [shared-latest]]
     [sneer.party :refer [party->puk]]
@@ -142,7 +142,7 @@
 (defn- to-foreign [summaries]
   (->> summaries summarize (mapv to-foreign-summary)))
 
-(defn- republish-latest-every [period in out]
+(defn- republish-latest-every! [period in out]
   (go-loop-trace [latest nil
                   period-timeout (timeout period)]
     (alt! :priority true
@@ -208,12 +208,12 @@
               state-out-mult (async/mult state-out)
               tap-state #(sliding-tap state-out-mult)
               pretty-summaries-out (chan (sliding-buffer 1) (comp (map :nick->summary) (dedupe) (map to-foreign)))]
-          (link-chan-to-subscriber state-out subscriber)
+          (close-on-unsubscribe! state-out subscriber)
           (close-with! lease pretty-summaries-out)
-          (republish-latest-every (* 60 1000) (tap-state) pretty-summaries-out)
+          (republish-latest-every! (* 60 1000) (tap-state) pretty-summaries-out)
           (start-saving-snapshots-to! file (tap-state))
           (start-summarization-machine! (read-snapshot file) own-puk tuple-base state-out lease)
-          (thread-chan-to-subscriber pretty-summaries-out subscriber "conversation summaries"))))))
+          (pipe-to-subscriber! pretty-summaries-out subscriber "conversation summaries"))))))
 
 (defn reify-Convos [container]
   (let [summaries (summaries-for container)]

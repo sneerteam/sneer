@@ -3,7 +3,7 @@
     [clojure.core.async :refer [chan <! >!]]
     [rx.lang.clojure.core :as rx]
     [rx.lang.clojure.interop :as interop]
-    [sneer.async :refer [thread-chan-to-subscriber link-chan-to-subscriber go-trace]]
+    [sneer.async :refer [pipe-to-subscriber! close-on-unsubscribe! go-trace]]
     [sneer.commons :refer [now produce! while-let]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer :all]
@@ -103,8 +103,8 @@
                   messages (chan 1 (map reify-message-or-up-to-date))
                   lease (chan)]
               (tb/store-sub tb own-puk (assoc criteria "author" contact-puk))
-              (thread-chan-to-subscriber messages s "Session messages")
-              (link-chan-to-subscriber lease s)
+              (pipe-to-subscriber! messages s "Session messages")
+              (close-on-unsubscribe! lease s)
               (go-trace
                 (let [tuples (chan)
                       last-id (atom -1)]
