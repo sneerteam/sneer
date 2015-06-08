@@ -65,7 +65,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 	private ConversationWidget conversationWidgetFor(View view) {
 		final ConversationWidget widget = new ConversationWidget();
-		widget.conversationParty = findView(view, R.id.conversationParty);
+		widget.conversationParty = findView(view, R.id.conversationNickname);
 		widget.conversationSummary = findView(view, R.id.conversationSummary);
 		widget.conversationDate = findView(view, R.id.conversationDate);
 		widget.conversationPicture = findView(view, R.id.conversationPicture);
