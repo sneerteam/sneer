@@ -15,7 +15,7 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/conversationParty"
+        android:id="@+id/conversationNickname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/conversationPicture"
@@ -39,7 +39,7 @@
         android:id="@+id/conversationSummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/conversationParty"
+        android:layout_below="@+id/conversationNickname"
         android:layout_toRightOf="@+id/conversationPicture"
         android:ellipsize="end"
         android:lines="1"

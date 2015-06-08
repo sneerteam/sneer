@@ -52,13 +52,13 @@ class ConversationListAdapter extends ArrayAdapter<Summary> {
 		Summary summary = getItem(position);
 
 //		ImageView pic     = findView(view, R.id.conversationPicture);
-		TextView  party   = findView(view, R.id.conversationParty);
+		TextView  nickname   = findView(view, R.id.conversationNickname);
 		TextView  date    = findView(view, R.id.conversationDate);
 		TextView  unread  = findView(view, R.id.conversationUnread);
 		TextView  preview = findView(view, R.id.conversationSummary);
 		preview.getPaint().setShader(textShader);
 
-		party  .setText(summary.nickname);
+		nickname.setText(summary.nickname);
 		preview.setText(summary.textPreview);
 		date   .setText(summary.date);
 		unread .setText(summary.unread);
