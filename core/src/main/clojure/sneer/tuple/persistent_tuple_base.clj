@@ -262,14 +262,13 @@
               (close! new-tuples))
           (go-loop []
             (do
-              ;; TODO: Optimization, especially when no records are found: Query using next-tuple-id (see server-loop) minus one as the max id. Use that as the ::after-id value in the next loop iteration.
               (let [tuples (query-tuples-from-db db @criteria)]
                 (when-not (empty? tuples)
                   (doseq [tuple tuples]
                     (>! tuples-out tuple))
                   (swap! criteria assoc ::after-id (-> tuples last (get "id")))))
               ;TODO: (>! tuples-out :up-to-date)
-              (when (<! new-tuples)
+              (when (<! new-tuples) ;TODO: Optimization: Simply check the new tuple against the criteria instead of rerunning the DB query. In that case, new-tuples can no longer be a sliding/dropping channel.
                 (recur))))))
 
       (set-local-attribute [_ attribute value tuple-id]
