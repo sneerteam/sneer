@@ -268,7 +268,7 @@
                   (doseq [tuple tuples]
                     (>! tuples-out tuple))
                   (swap! criteria assoc ::after-id (-> tuples last (get "id")))))
-              ;;TODO: (>! tuples-out :wait-marker)
+              ;TODO: (>! tuples-out :up-to-date)
               (when (<! new-tuples)
                 (recur))))))
 

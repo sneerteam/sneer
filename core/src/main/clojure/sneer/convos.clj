@@ -105,10 +105,10 @@
     (<! lease)
     (close! victim)))
 
-; state: {:last-id 42
+; state: {:last-id long
 ;         :puk->nick {puk "Neide"}
 ;         :nick->summary {"Neide" {:nick "Neide"
-;                                  :timestamp 1234567890
+;                                  :timestamp long
 ;                                  :unread "*"
 ;                                  :preview "Hi, Maico"}}
 
