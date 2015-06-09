@@ -3,7 +3,6 @@ package sneer.convos;
 import java.util.List;
 
 import rx.Observable;
-import sneer.Session;
 
 public interface Convo {
 
@@ -14,7 +13,7 @@ public interface Convo {
 
     Chat chat();
 
-    Observable<List<Session>> sessions();
+    Observable<List<SessionSummary>> sessionSummaries();
     long startSession(String type);
 
 }
