@@ -1,4 +1,4 @@
-package sims.sneer.conversations;
+package sims.sneer.convos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 import sneer.commons.exceptions.FriendlyException;
+import sneer.convos.Convo;
 import sneer.convos.Convos;
 
 
@@ -36,7 +37,12 @@ public class ConvosSim implements Convos {
 		return 4242;
 	}
 
-	private static final String[] UNREAD_OPTIONS = {"?", "*", ""};
+    @Override
+    public Convo get(long id) {
+        return new ConvoSim();
+    }
+
+    private static final String[] UNREAD_OPTIONS = {"?", "*", ""};
 	private static String unread(int i) {
 		return UNREAD_OPTIONS[i % 3];
 	}

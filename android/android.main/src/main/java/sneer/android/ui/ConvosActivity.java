@@ -47,8 +47,8 @@ public class ConvosActivity extends SneerActionBarActivity {
 		final ListView list = (ListView)findViewById(R.id.conversationList);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
-    		String nickname = adapter.getItem(position).nickname;
-            openConversation(nickname);
+    		long convoId = adapter.getItem(position).convoId;
+            openConversation(convoId);
 		}});
 
 		subscription = ui(convos.summaries()).subscribe(new Action1<List<Summary>>() { @Override public void call(List<Summary> summaries) {
@@ -60,11 +60,10 @@ public class ConvosActivity extends SneerActionBarActivity {
         navigateTo(AddContactActivity.class);
     }
 
-    private void openConversation(String nick) {
-        // sendMessageIfPresent(conversation);
+    private void openConversation(long id) {
         Intent intent = new Intent();
         intent.setClass(this, ConversationActivity.class);
-        intent.putExtra("nick", nick);
+        intent.putExtra("id", id);
         startActivity(intent);
     }
 

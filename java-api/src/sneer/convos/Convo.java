@@ -14,6 +14,5 @@ public interface Convo {
     Chat chat();
 
     Observable<List<SessionSummary>> sessionSummaries();
-    long startSession(String type);
 
 }
