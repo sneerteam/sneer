@@ -47,13 +47,6 @@ public class SendMessage extends IntentService {
 		PublicKey puk = sneerAndroid().admin().keys().createPublicKey(pukHex);
 		Party party = sneer().produceParty(puk);
 		Contact contact = sneer().findContact(party);
-
-		Log.d("FELIPETESTE", "SendMessage.tryToHandle().pukHex->" + pukHex);
-		Log.d("FELIPETESTE", "SendMessage.tryToHandle().message->" + message);
-		Log.d("FELIPETESTE", "SendMessage.tryToHandle().puk->" + puk);
-		Log.d("FELIPETESTE", "SendMessage.tryToHandle().party->" + party);
-		Log.d("FELIPETESTE", "SendMessage.tryToHandle().contact->" + contact);
-
 		sneer().conversations().withContact(contact).sendMessage(message);
 	}
 
