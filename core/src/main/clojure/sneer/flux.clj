@@ -4,8 +4,8 @@
   (:import
     [sneer.commons ActionBus]))
 
-(defprotocol LeaseHolder
-  (getLeaseChannel [this]))
+(definterface LeaseHolder
+  (getLeaseChannel []))
 
 (defn reify-LeaseHolder [_container]
   (let [lease (chan)]
