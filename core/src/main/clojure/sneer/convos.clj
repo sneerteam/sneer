@@ -71,10 +71,5 @@
             attempt-id
             (throw (FriendlyException. (if actual-id (str newContactNick " was already a contact") "Unknown error"))))))
 
-      #_(loop-trace []
-        (let [current (<!! state)
-              last-id (or (current :last-id) 0)]
-          (if (< last-id attempt-id) (recur) current)))
-
       (getById [_ id]
         (reify-Convo id)))))

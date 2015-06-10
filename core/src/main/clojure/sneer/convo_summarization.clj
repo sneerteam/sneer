@@ -182,4 +182,11 @@
   (reify ConvoSummarization
     (slidingSummaries [_] (niy)) ;(map :nick->summary) (dedupe) (map vals) (sort-by :timestamp descending)
     (getIdByNick [_ nick] (niy))
-    (processUpToId [_ id] (niy))))
+    (processUpToId [_ id]
+      (niy)
+      ; Something like:
+      #_(loop-trace []
+        (let [current (<!! state)
+              last-id (or (current :last-id) 0)]
+          (if (< last-id id) (recur) current)))
+      )))
