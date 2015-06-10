@@ -1,5 +1,5 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! tap]]
+  (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! alt! timeout tap close!]]
             [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
             [sneer.commons :refer :all]))
@@ -75,3 +75,18 @@
           (throw (RuntimeException. (str "onNext Exception. subscriber: " subscriber " value: " value "thread: " thread-name)
                                     e)))))
     (rx/on-completed subscriber)))
+
+(defn republish-latest-every! [period in out] ; This republish fn would be cool as a transducer. :)
+  (go-loop-trace [latest nil
+                  period-timeout (chan)]
+    (alt! :priority true
+          in
+          ([latest]
+            (when latest
+              (when (>! out latest)
+                (recur latest (timeout period)))))
+
+          period-timeout
+          ([_]
+            (>! out latest)
+            (recur latest (timeout period))))))

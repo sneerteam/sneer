@@ -15,4 +15,7 @@
     (sneer.flux/reify-ActionBus container)
 
     sneer.convos.Convos
-    (sneer.convos/reify-Convos container)))
+    (sneer.convos/reify-Convos container)
+
+    sneer.convo_summarization.ConvoSummarization
+    (sneer.convo-summarization/reify-ConvoSummarization container)))

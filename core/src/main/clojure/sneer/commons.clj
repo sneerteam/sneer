@@ -86,3 +86,6 @@
 (defn nvl [v default]
   (if (some? v) v default))
 
+(defn niy []
+  (throw (RuntimeException. "Not Implemented Yet")))
+

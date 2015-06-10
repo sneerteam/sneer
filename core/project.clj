@@ -37,6 +37,8 @@
                     sneer.admin
                     sneer.contact
                     sneer.conversation
+                    sneer.convo
+                    sneer.convo-summarization
                     sneer.convos
                     sneer.impl
                     sneer.keys
