@@ -168,7 +168,7 @@
     machine))
 
 (defn- nick->id [state nick]
-  (some-> state :nick->summary (get nick) :id))
+  (get-in state [:nick->summary nick :id]))
 
 (defn sliding-summaries! [own-puk tuples-in]
   (niy))
