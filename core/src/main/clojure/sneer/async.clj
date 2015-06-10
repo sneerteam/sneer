@@ -6,11 +6,21 @@
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
 
+(defn close-with!
+  "Closes victim channel when ch emits a value."
+  [ch victim]
+  (go
+    (<! ch)
+    (close! victim)))
+
 (defn dropping-chan [& [n xform]]
   (chan (async/dropping-buffer (or n 1)) xform))
 
 (defn sliding-chan [& [n xform]]
   (chan (async/sliding-buffer (or n 1)) xform))
+
+(defn sliding-tap [mult]
+  (let [ch (sliding-chan)] (async/tap mult ch) ch))
 
 (defn connection [in out]
   [in out])
@@ -50,8 +60,8 @@
 
 (defn close-on-unsubscribe!
   "Closes the channel when the subscriber is unsubscribed."
-  [chan ^rx.Subscriber subscriber]
-  (.add subscriber (rx/subscription #(async/close! chan))))
+  [^rx.Subscriber subscriber & chans]
+  (.add subscriber (rx/subscription #(doseq [c chans] (async/close! c)))))
 
 (defn pipe-to-subscriber!
   "Copies values from channel to rx subscriber in a separate thread."

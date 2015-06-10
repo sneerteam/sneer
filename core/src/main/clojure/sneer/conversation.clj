@@ -104,7 +104,7 @@
                   lease (chan)]
               (tb/store-sub tb own-puk (assoc criteria "author" contact-puk))
               (pipe-to-subscriber! messages s "Session messages")
-              (close-on-unsubscribe! lease s)
+              (close-on-unsubscribe! s lease)
               (go-trace
                 (let [tuples (chan)
                       last-id (atom -1)]
