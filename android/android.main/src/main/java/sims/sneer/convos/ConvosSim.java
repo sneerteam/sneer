@@ -38,7 +38,7 @@ public class ConvosSim implements Convos {
 	}
 
     @Override
-    public Convo get(long id) {
+    public Convo getById(long id) {
         return new ConvoSim();
     }
 
