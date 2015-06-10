@@ -1,6 +1,5 @@
 package sneer.commons;
 
-import java.lang.Class;
 import java.lang.Object;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,44 +23,41 @@ public class Container {
 
 
 	private final ComponentLoader loader;
-	private final Map<Class<?>, Object> componentsByInterface = new HashMap<Class<?>, Object>();
+	private final Map<Object, Object> componentsByHandle = new HashMap<Object, Object>();
 
 	public Container(ComponentLoader loader) {
 		this.loader = loader;
 	}
 
-	public <T> T produce(Class<T> componentInterface) {
+	/** @param handle Typically an interface but can be anything the component loader understands. */
+	public <T> T produce(Object handle) {
 		synchronized (Container.class) {
-			T cached = (T) componentsByInterface.get(componentInterface);
+			T cached = (T) componentsByHandle.get(handle);
 			if (cached != null) return cached;
 
-			T loaded = loader.load(componentInterface, this);
-			keep(componentInterface, loaded);
+			T loaded = loader.load(handle, this);
+			keep(handle, loaded);
 			return loaded;
 		}
 	}
 
 
-	public void inject(Class<?> componentInterface, Object component) {
+	public void inject(Object handle, Object component) {
 		synchronized (Container.class) {
-			check(componentInterface.isAssignableFrom(component.getClass()));
-			check(!componentsByInterface.containsKey(componentInterface));
+			check(!componentsByHandle.containsKey(handle));
 
-			keep(componentInterface, component);
+			keep(handle, component);
 		}
 	}
 
-	private void keep(Class<?> componentInterface, Object component) {
-		componentsByInterface.put(componentInterface, component);
-		if (containersByComponent.containsKey(component))
-			containersByComponent.remove(component); //Component is in more than one container. See Container.of(component) method.
-		else
-			containersByComponent.put(component, this);
+	private void keep(Object handle, Object component) {
+		check(!containersByComponent.containsKey(component));
+		containersByComponent.put(component, this);
+		componentsByHandle.put(handle, component);
 	}
 
-
 	public interface ComponentLoader {
-		<T> T load(Class<T> componentInterface, Container container);
+		<T> T load(Object handle, Container container);
 	}
 
 }

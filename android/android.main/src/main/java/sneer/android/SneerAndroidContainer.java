@@ -28,9 +28,9 @@ public class SneerAndroidContainer {
 		catch (Exception e)              { throw new RuntimeException(e); }
 	}
 
-	private static ComponentLoader simsLoader() { return new ComponentLoader() { @Override public <T> T load(Class<T> intrface, Container ignored) {
+	private static ComponentLoader simsLoader() { return new ComponentLoader() { @Override public <T> T load(Object handle, Container ignored) {
 		try {
-			return (T) Class.forName("sims." + intrface.getName() + "Sim").newInstance();   //Example: sims.sneer.ConversationListSim
+			return (T) Class.forName("sims." + ((Class<T>)handle).getName() + "Sim").newInstance();   //Example: sims.sneer.ConversationListSim
 		} catch (Exception e) { throw new RuntimeException(e); }
 	}};}
 
