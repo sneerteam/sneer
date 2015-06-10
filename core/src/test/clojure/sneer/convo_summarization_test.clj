@@ -11,11 +11,20 @@
 (defn relevant-keys [summary]
   (select-keys summary [:nick :timestamp :preview :unread]))
 
+(defn feed-tuple! [tuples-in tuple]
+  (let [timestamp (tuple "timestamp")
+        tuple (assoc tuple
+                     "id" timestamp
+                     "original_id" timestamp)]
+    (assert
+     (>!!? tuples-in tuple))
+    tuple))
+
 (defn- summarize! [events expected-summaries]
   (let [own-puk (keys/->puk "neide puk")
 
         tuples-in (chan)
-        feed-tuple! #(>!!? tuples-in %)
+        feed-tuple! #(feed-tuple! tuples-in %)
 
         proto-contact {"type" "contact" "audience" own-puk "author" own-puk}
         feed-contact! #(feed-tuple! (merge proto-contact %))
@@ -32,12 +41,12 @@
            pending events]
       (when-let [e (first pending)]
         (when (contains? e :contact)
-          (<!!? (feed-contact! {"party" (:contact e) "payload" (:nick e) "timestamp" timestamp})))
+          (feed-contact! {"party" (:contact e) "payload" (:nick e) "timestamp" timestamp}))
         (when-let [label (:recv e)]
-          (let [received-msg (<!!? (feed-message! {"author" (:auth e) "audience" own-puk "label" label "timestamp" timestamp}))]
+          (let [received-msg (feed-message! {"author" (:auth e) "audience" own-puk "label" label "timestamp" timestamp})]
             (swap! label->msg assoc label received-msg)))
         (when-let [label (:send e)]
-          (<!!? (feed-message! {"author" own-puk "audience" (:audience e) "label" label "timestamp" timestamp})))
+          (feed-message! {"author" own-puk "audience" (:audience e) "label" label "timestamp" timestamp}))
         (when-let [label (:read e)]
           (feed-read! (:auth e) (@label->msg label)))
         (recur (inc timestamp) (next pending))))
@@ -49,7 +58,7 @@
       (close! tuples-in)
       (<!!? summaries-out) => nil)))
 
-#_(let [unknown (keys/->puk "unknown puk")
+(let [unknown (keys/->puk "unknown puk")
       ann     (keys/->puk "ann puk")
       jon     (keys/->puk "jon puk")]
   (tabular "Conversation summarization"
@@ -94,10 +103,8 @@
     [{:nick "Ann" :timestamp 1 :preview "Hello" :unread "*"}]
 
     "Nick change should not affect unread field."
-    [:restart
-     {:contact ann :nick "Ann"}
+    [{:contact ann :nick "Ann"}
      {:recv "Hello" :auth ann}
-     :restart
      {:contact ann :nick "Annabelle"}]
 
     [{:nick "Annabelle" :timestamp 2 :preview "Hello" :unread "*"}]

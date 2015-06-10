@@ -2,7 +2,7 @@
   (:require
     [clojure.core.async :as async :refer [go chan close! <! >! <!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
-    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-loop-trace close-on-unsubscribe! pipe-to-subscriber!]]
+    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace close-on-unsubscribe! pipe-to-subscriber!]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
@@ -84,6 +84,19 @@
       (update-in [:nick->summary nick]
                  update-with-read tuple))))
 
+(defn- summarization-loop [previous-state own-puk tuples state-out]
+  (go-loop-trace [state previous-state]
+    (>! state-out state)
+    (when-let [tuple (<! tuples)]
+      (recur
+       (->
+        (case (tuple "type")
+          "contact" (handle-contact own-puk tuple state)
+          "message" (handle-message own-puk tuple state)
+          "message-read" (handle-read-receipt own-puk tuple state)
+          state)
+        (assoc :last-id (tuple "id")))))))
+
 ; state: {:last-id long
 ;         :puk->nick {puk "Neide"}
 ;         :nick->summary {"Neide" {:nick "Neide"
@@ -107,17 +120,7 @@
      (query-tuples tuple-base all-tuples-criteria tuples lease)
      (close-with! lease tuples)
 
-     (go-loop-trace [state previous-state]
-       (>! state-out state)
-       (when-let [tuple (<! tuples)]
-         (recur
-           (->
-             (case (tuple "type")
-               "contact" (handle-contact own-puk tuple state)
-               "message" (handle-message own-puk tuple state)
-               "message-read" (handle-read-receipt own-puk tuple state)
-               state)
-             (assoc :last-id (tuple "id")))))))))
+     (summarization-loop previous-state own-puk tuples state-out))))
 
 (defn- read-snapshot [file]
   (let [default {}]
@@ -170,8 +173,17 @@
 (defn- nick->id [state nick]
   (get-in state [:nick->summary nick :id]))
 
+(def ^:private xsummarize (comp (map :nick->summary)
+                                (dedupe)
+                                (map vals)
+                                (map #(sort-by :timestamp descending %))))
+
 (defn sliding-summaries! [own-puk tuples-in]
-  (niy))
+  (let [summaries-out (sliding-chan 1 xsummarize)
+        loop (summarization-loop {} own-puk tuples-in summaries-out)]
+    (go-trace (<! loop)
+              (close! summaries-out))
+    summaries-out))
 
 (definterface ConvoSummarization
   (slidingSummaries [])
@@ -180,7 +192,7 @@
 
 (defn reify-ConvoSummarization [container]
   (reify ConvoSummarization
-    (slidingSummaries [_] (niy)) ;(map :nick->summary) (dedupe) (map vals) (sort-by :timestamp descending)
+    (slidingSummaries [_] (niy))
     (getIdByNick [_ nick] (niy))
     (processUpToId [_ id]
       (niy)
