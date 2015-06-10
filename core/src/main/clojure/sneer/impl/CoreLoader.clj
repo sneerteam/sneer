@@ -1,6 +1,10 @@
 (ns sneer.impl.CoreLoader
   (:gen-class
-    :implements [sneer.commons.Container$ComponentLoader]))
+   :implements [sneer.commons.Container$ComponentLoader])
+  (:require sneer.admin
+            sneer.flux
+            sneer.convos
+            sneer.convo-summarization))
 
 (defn -load [this component-interface container]
   (condp = component-interface

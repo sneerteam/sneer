@@ -59,7 +59,8 @@
 
 
              :dev
-             {:dependencies [[org.clojure/clojure "1.7.0-RC1"]
+             {:aot [sneer.impl.CoreLoader]
+              :dependencies [[org.clojure/clojure "1.7.0-RC1"]
                              [midje "1.6.3"]
                              [org.xerial/sqlite-jdbc "3.8.6"]]
               :plugins [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
