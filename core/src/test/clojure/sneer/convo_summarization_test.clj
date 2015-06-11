@@ -15,7 +15,7 @@
   (let [own-puk (keys/->puk "neide puk")
 
         tuples-in (chan)
-        feed-tuple! #(assert (>!!? tuples-in %))
+        feed-tuple! #(>!!? tuples-in %)
 
         proto-contact {"type" "contact" "audience" own-puk "author" own-puk}
         feed-contact! #(feed-tuple! (merge proto-contact %))

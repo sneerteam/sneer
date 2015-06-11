@@ -1,5 +1,5 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! alt! timeout tap close!]]
+  (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! alt! timeout mult tap close!]]
             [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
             [sneer.commons :refer :all]))
@@ -90,3 +90,35 @@
           ([_]
             (>! out latest)
             (recur latest (timeout period))))))
+
+(defn state-machine* [initial-state function events-in]
+  "Returns a channel that accepts other channels as taps for this state machine
+   in a way similar to clojure.core.async/tap.
+   Reduces initial-state applying (function state event) to each event from the
+   events-in channel and puts each resulting state onto the tap channels."
+  (let [taps-in (chan)
+        states-out (chan)
+        mult (mult states-out)]
+
+    (go-trace
+      (loop [state initial-state]
+        (alt! :priority true
+
+          taps-in
+          ([tap]
+            (when (some? tap)
+              (>! tap state)
+              (async/tap mult tap)
+              (recur state)))
+
+          events-in
+          ([event]
+            (when (some? event)
+              (let [state' (function state event)]
+                (>! states-out state')
+                (recur state'))))))
+
+      (close! taps-in)
+      (close! states-out))
+
+    taps-in))

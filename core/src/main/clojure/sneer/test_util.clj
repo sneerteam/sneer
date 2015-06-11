@@ -20,8 +20,8 @@
     (>!!? ch v 200))
   ([ch v timeout-millis]
     (alt!!
-      (timeout timeout-millis) false
-      [[ch v]] true)))
+      (timeout timeout-millis) (throw (RuntimeException. (str "TIMEOUT putting: " v)))
+      [[ch v]] :>!!?-return)))
 
 (defn <!!?
   ([ch]
