@@ -170,6 +170,7 @@
                  :state-mult (mult state-out)}]
 
     (start-saving-snapshots-to! file (tap-state machine))
+
     (go-while-let [current (<! (tap-state machine))]
       (reset! state current))
 
