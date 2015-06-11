@@ -1,7 +1,7 @@
 (ns sneer.async-test
   (:require [clojure.core.async :refer [chan close!]]
             [midje.sweet :refer :all]
-            [sneer.async :refer [state-machine* sliding-chan go-trace]]
+            [sneer.async :refer [state-machine sliding-chan go-trace]]
             [sneer.test-util :refer [<!!? >!!?]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
@@ -10,7 +10,7 @@
   (let [events (chan)
         function +
         initial-state 42
-        machine (state-machine* initial-state function events)
+        machine (state-machine initial-state function events)
         tap1 (sliding-chan)
         tap2 (sliding-chan)
         tap3 (sliding-chan)]

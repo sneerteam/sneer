@@ -91,7 +91,7 @@
             (>! out latest)
             (recur latest (timeout period))))))
 
-(defn state-machine* [initial-state function events-in]
+(defn state-machine [initial-state function events-in]
   "Returns a channel that accepts other channels as taps for this state machine
    in a way similar to clojure.core.async/tap.
    Reduces initial-state applying (function state event) to each event from the
