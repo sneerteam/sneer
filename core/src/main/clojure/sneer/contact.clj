@@ -6,10 +6,11 @@
     [sneer.party-impl :refer [name-subject]])
   (:import
     [java.util UUID]
-    [sneer Contact PublicKey Party]
+    [sneer Contact]
     [sneer.rx ObservedSubject]
     [sneer.commons.exceptions FriendlyException]
-    [sneer.tuples Tuple TupleSpace]))
+    [sneer.tuples Tuple TupleSpace]
+    [rx Observable]))
 
 (defn publish-contact [tuple-space own-puk new-nick party invite-code]
   (.. ^TupleSpace tuple-space
@@ -53,7 +54,7 @@
   (let [nick-subject (ObservedSubject/create nickname)
         party-subject (ObservedSubject/create party)]
     (when party
-      (.subscribe ^rx.Observable (.observable nick-subject) ^ObservedSubject (name-subject party)))
+      (.subscribe ^Observable (.observable nick-subject) ^ObservedSubject (name-subject party)))
     (reify Contact
       (party [_] (.observed party-subject))
 

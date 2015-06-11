@@ -11,18 +11,17 @@
             [sneer.restartable :refer [restart]]
             [rx.lang.clojure.core :as rx]))
 
-(facts "About invites"
-       (fact "auto-add back when invite code received"
-             (with-open [db-c (jdbc-database/create-sqlite-db)
-                         sneer-admin-c (start db-c)
-                         db-n (jdbc-database/create-sqlite-db)
-                         sneer-admin-n (start db-n)]
-               (let [puk-c (-> sneer-admin-c .sneer .self .publicKey .current)
-                     sneer-n (.sneer sneer-admin-n)
-                     sneer-c (.sneer sneer-admin-c)
-                     c->n (.produceContact sneer-c "neide" nil nil)
-                        _ (.produceContact sneer-n "carla" (.produceParty sneer-n puk-c) (.inviteCode c->n))
-                     c->n-parties (->> c->n .party .observable (rx/filter some?))
-                     c->n-puks (->> c->n-parties (rx/map party->puk))]
-                 (<!!? (->chan c->n-parties) 2000) => #(not (= % :timeout))
-                 (<!!? (->chan c->n-puks   ) 2000) => #(not (= % :timeout))))))
+(fact "Auto-add back when invite code received"
+  (with-open [db-c (jdbc-database/create-sqlite-db)
+              sneer-admin-c (start db-c)
+              db-n (jdbc-database/create-sqlite-db)
+              sneer-admin-n (start db-n)]
+    (let [puk-c (-> sneer-admin-c .sneer .self .publicKey .current)
+          sneer-n (.sneer sneer-admin-n)
+          sneer-c (.sneer sneer-admin-c)
+          c->n (.produceContact sneer-c "neide" nil nil)
+          _ (.produceContact sneer-n "carla" (.produceParty sneer-n puk-c) (.inviteCode c->n))
+          c->n-parties (->> c->n .party .observable (rx/filter some?))
+          c->n-puks (->> c->n-parties (rx/map party->puk))]
+      (<!!? (->chan c->n-parties) 2000) => #(not (= % :timeout))
+      (<!!? (->chan c->n-puks) 2000) => #(not (= % :timeout)))))
