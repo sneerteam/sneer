@@ -15,6 +15,7 @@
     [sneer.tuple-base-provider :refer :all])
   (:import
     [rx Observable]
+    [rx.subjects BehaviorSubject]
     [sneer Conversations Conversation Conversations$Notification]
     [sneer.rx ObservedSubject]))
 
@@ -108,8 +109,8 @@
                   1 (notification-for-single (first unread-pairs))
                   (notification-for-many unread-pairs))))))
 
-      (notificationsStartIgnoring [_ conversation] (.onNext ignored-conversation conversation))
-      (notificationsStopIgnoring  [_]              (.onNext ignored-conversation nil))
+      (notificationsStartIgnoring [_ conversation] (.onNext ^BehaviorSubject ignored-conversation conversation))
+      (notificationsStopIgnoring  [_]              (.onNext ^BehaviorSubject ignored-conversation nil))
 
       (findSessionById [_ id]
         (reify-session-by-id space own-puk id)))))
