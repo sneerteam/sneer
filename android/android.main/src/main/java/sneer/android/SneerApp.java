@@ -1,15 +1,8 @@
 package sneer.android;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import android.support.multidex.MultiDexApplication;
 
 import java.io.File;
 
@@ -24,7 +17,7 @@ import sneer.commons.PersistenceFolder;
 
 import static sneer.android.SneerAndroidContainer.container;
 
-public class SneerApp extends Application {
+public class SneerApp extends MultiDexApplication {
 
 	private static final boolean DEVELOPER_MODE = false;
 
