@@ -183,7 +183,8 @@
 (def ^:private xsummarize (comp (map :nick->summary)
                                 (dedupe)
                                 (map vals)
-                                (map #(sort-by :timestamp descending %))))
+                                (map #(sort-by :timestamp descending %))
+                                (map vec)))
 
 (defn sliding-summaries! [own-puk tuples-in]
   (let [summaries-out (sliding-chan 1 xsummarize)
