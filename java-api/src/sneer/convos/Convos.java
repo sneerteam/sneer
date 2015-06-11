@@ -24,9 +24,9 @@ public interface Convos {
 	String problemWithNewNickname(String newContactNick);
 
 	/** @return The new convo id.
-	 * @throws sneer.commons.exceptions.FriendlyException (see problemWithNewNickname(newContactNick)). */
-	long startConvo(String newContactNick) throws FriendlyException;
+	 * @throws (via rx) sneer.commons.exceptions.FriendlyException (see problemWithNewNickname(newContactNick)). */
+	Observable<Long> startConvo(String newContactNick);
 
-    Convo getById(long id);
+	Convo getById(long id);
 
 }

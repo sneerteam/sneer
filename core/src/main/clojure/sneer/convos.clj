@@ -3,7 +3,9 @@
     [clojure.core.async :refer [go chan close! <! >! <!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-loop-trace close-on-unsubscribe! pipe-to-subscriber! republish-latest-every!]]
+    [sneer.async :refer [close-with! sliding-chan sliding-tap
+                         go-trace go-while-let go-loop-trace
+                         close-on-unsubscribe! pipe-to-subscriber! republish-latest-every!]]
     [sneer.commons :refer [now produce! descending loop-trace]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.convo :refer [reify-Convo]]
@@ -12,7 +14,8 @@
     [sneer.party :refer [party->puk]]
     [sneer.serialization :refer [serialize deserialize]]
     [sneer.tuple.protocols :refer :all]
-    [sneer.tuple-base-provider :refer :all])
+    [sneer.tuple-base-provider :refer :all]
+    [sneer.interfaces])
   (:import
     [java.util Date]
     [org.ocpsoft.prettytime PrettyTime]
@@ -21,7 +24,7 @@
     [sneer.commons Clock]
     [sneer.convos Convos Convos$Summary]
     [sneer.commons.exceptions FriendlyException]
-    [sneer.convo_summarization ConvoSummarization]))
+    [sneer.interfaces ConvoSummarization]))
 
 (defn- to-foreign-summary [pretty-time {:keys [nick summary timestamp unread id]}]
   (let [date (.format pretty-time (Date. ^long timestamp))]
@@ -51,25 +54,38 @@
                                   "audience"  own-puk
                                   "author"    own-puk}))))
 
+
+(defn- start-convo! [container newContactNick]
+  (let [result (rx.subjects.AsyncSubject/create)
+        summarization ^ConvoSummarization (.produce container ConvoSummarization)]
+
+    (go-trace
+     (let [tuple (store-contact! container newContactNick)
+           attempt-id (tuple "id")
+           _ (<! (.processUpToId summarization attempt-id))
+           actual-id (.getIdByNick summarization newContactNick)]
+       (if (= actual-id attempt-id)
+         (rx/on-next result attempt-id)
+         (rx/on-error result (FriendlyException. (if actual-id (str newContactNick " was already a contact") "Unknown error"))))))
+
+    result))
+
 (defn reify-Convos [container]
-  (let [summarization (.produce container ConvoSummarization)
+  (let [summarization ^ConvoSummarization (.produce container ConvoSummarization)
         summaries-obs (summaries-obs* summarization)]
     (reify Convos
       (summaries [_] summaries-obs)
 
-      (problemWithNewNickname [_ newContactNick]
-        (cond
-          (.isEmpty newContactNick) "cannot be empty"
-          (.getIdByNick summarization newContactNick) "already used"))
+      (problemWithNewNickname
+       [_ newContactNick]
+       (cond
+         (.isEmpty newContactNick) "cannot be empty"
+         (.getIdByNick summarization newContactNick) "already used"))
 
-      (startConvo [_ newContactNick]
-        (let [tuple (store-contact! container newContactNick)
-              attempt-id (tuple "id")
-              _ (.processUpToId summarization attempt-id)
-              actual-id (.getIdByNick summarization newContactNick)]
-          (if (= actual-id attempt-id)
-            attempt-id
-            (throw (FriendlyException. (if actual-id (str newContactNick " was already a contact") "Unknown error"))))))
+      (startConvo
+       [_ newContactNick]
+       (start-convo! container newContactNick))
 
-      (getById [_ id]
-        (reify-Convo id)))))
+      (getById
+       [_ id]
+       (reify-Convo id)))))

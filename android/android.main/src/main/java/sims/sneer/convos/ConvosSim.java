@@ -31,10 +31,11 @@ public class ConvosSim implements Convos {
 	}
 
 	@Override
-	public long startConvo(String newContactNick) throws FriendlyException {
+	public Observable<Long> startConvo(String newContactNick) {
 		if (newContactNick.equals("Wesley"))
-			throw new FriendlyException("Wesley is already a contact");
-		return 4242;
+			return Observable.error(
+					new FriendlyException("Wesley is already a contact"));
+		return Observable.just(4242L);
 	}
 
     @Override

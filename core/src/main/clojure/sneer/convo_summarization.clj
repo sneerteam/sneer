@@ -1,6 +1,6 @@
 (ns sneer.convo-summarization
   (:require
-    [clojure.core.async :as async :refer [go chan close! <! >! <!! sliding-buffer alt! timeout mult]]
+    [clojure.core.async :as async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace close-on-unsubscribe! pipe-to-subscriber!]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
@@ -13,12 +13,14 @@
     [sneer.serialization :refer [serialize deserialize]]
     [sneer.tuple.protocols :refer :all]
     [sneer.tuple-base-provider :refer :all]
-    [sneer.tuple.persistent-tuple-base :as tb])
+    [sneer.tuple.persistent-tuple-base :as tb]
+    [sneer.interfaces])
   (:import
     [java.io File]
     [sneer.admin SneerAdmin]
     [sneer.flux LeaseHolder]
-    [sneer.commons PersistenceFolder]))
+    [sneer.commons PersistenceFolder]
+    [sneer.interfaces ConvoSummarization]))
 
 (defn- contact-puk [tuple]
   (tuple "party"))
@@ -150,8 +152,13 @@
                    (write-snapshot file snapshot)
                    (recur nil never))))))
 
-(defn- tap-state [machine]
-  (sliding-tap (machine :state-mult)))
+(defn- tap-state
+  ([machine ch]
+   (>!! ch @(machine :state)) ; TODO: make it deterministic by sending messages to the machine
+   (async/tap (machine :state-mult) ch)
+   ch)
+  ([machine]
+   (sliding-tap (machine :state-mult))))
 
 (defn- start-machine! [container]
   (let [file (some-> (.produce container PersistenceFolder)
@@ -185,20 +192,29 @@
               (close! summaries-out))
     summaries-out))
 
-(definterface ConvoSummarization
-  (slidingSummaries [])
-  (getIdByNick [nick])
-  (processUpToId [id]))
-
 (defn reify-ConvoSummarization [container]
-  (reify ConvoSummarization
-    (slidingSummaries [_] (niy))
-    (getIdByNick [_ nick] (niy))
-    (processUpToId [_ id]
-      (niy)
-      ; Something like:
-      #_(loop-trace []
-        (let [current (<!! state)
-              last-id (or (current :last-id) 0)]
-          (if (< last-id id) (recur) current)))
-      )))
+  (let [machine (start-machine! container)
+        state (:state machine)]
+    (reify ConvoSummarization
+
+      (slidingSummaries
+       [_]
+       (let [summaries-out (sliding-chan 1 xsummarize)]
+         (tap-state machine summaries-out)
+         summaries-out))
+
+      (getIdByNick
+       [_ nick]
+       (nick->id @state nick))
+
+      (processUpToId
+       [_ id]
+       (let [state (tap-state machine)]
+         (go-trace
+           (loop []
+             (let [current (<! state)
+                   last-id (or (current :last-id) 0)] ; TODO: move :last-id initialization to start-machine!
+               (when (< last-id id)
+                 (recur))))
+           (close! state)
+           nil))))))

@@ -2,6 +2,7 @@
   (:gen-class
    :implements [sneer.commons.Container$ComponentLoader])
   (:require sneer.admin
+            sneer.interfaces
             sneer.flux
             sneer.convos
             sneer.convo-summarization))
@@ -21,5 +22,5 @@
     sneer.convos.Convos
     (sneer.convos/reify-Convos container)
 
-    sneer.convo_summarization.ConvoSummarization
+    sneer.interfaces.ConvoSummarization
     (sneer.convo-summarization/reify-ConvoSummarization container)))

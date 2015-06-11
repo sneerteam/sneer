@@ -72,6 +72,7 @@
                 #(>!! c (nvl % :nil))  ; Channels cannot take nil
                 #(do
                    (.printStackTrace %)
+                   (>!! c {::error %})
                    (close! c))
                 #(close! c)))
 
@@ -104,6 +105,9 @@
   (fn [obs]
     (let [ch (->chan obs)]
       (<wait-for! ch expected))))
+
+(defn emits-error [exception-type]
+  (emits #(instance? exception-type (::error %))))
 
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
