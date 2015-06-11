@@ -65,7 +65,9 @@
            _ (<! (.processUpToId summarization attempt-id))
            actual-id (.getIdByNick summarization newContactNick)]
        (if (= actual-id attempt-id)
-         (rx/on-next result attempt-id)
+         (do
+           (rx/on-next result attempt-id)
+           (rx/on-completed result))
          (rx/on-error result (FriendlyException. (if actual-id (str newContactNick " was already a contact") "Unknown error"))))))
 
     result))
