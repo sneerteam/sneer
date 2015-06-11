@@ -1,6 +1,6 @@
 (ns sneer.convo-summarization-test
   (:require [midje.sweet :refer :all]
-            [clojure.core.async :refer [chan close!] :as async]
+            [clojure.core.async :refer [chan close!]]
             [sneer.async :refer [sliding-chan]]
             [sneer.commons :refer [submap?]]
             [sneer.test-util :refer [<!!? >!!? <emits tmp-file]]

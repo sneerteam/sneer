@@ -6,7 +6,7 @@
     [sneer.async :refer [close-with! sliding-chan sliding-tap
                          go-trace go-while-let go-loop-trace
                          close-on-unsubscribe! pipe-to-subscriber! republish-latest-every!]]
-    [sneer.commons :refer [now produce! descending loop-trace]]
+    [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.convo :refer [reify-Convo]]
     [sneer.convo-summarization :refer :all] ; Force compilation of interface
@@ -76,16 +76,14 @@
     (reify Convos
       (summaries [_] summaries-obs)
 
-      (problemWithNewNickname
-       [_ newContactNick]
-       (cond
-         (.isEmpty newContactNick) "cannot be empty"
-         (.getIdByNick summarization newContactNick) "already used"))
+      (problemWithNewNickname [_ newContactNick]
+        (cond
+          (.isEmpty newContactNick) "cannot be empty"
+          (.getIdByNick summarization newContactNick) "already used"))
 
-      (startConvo
-       [_ newContactNick]
-       (start-convo! container newContactNick))
+      (startConvo [_ newContactNick]
+        (start-convo! container newContactNick))
 
-      (getById
-       [_ id]
-       (reify-Convo id)))))
+      (getById [_ id]
+        (niy)
+        (reify-Convo nil nil)))))
