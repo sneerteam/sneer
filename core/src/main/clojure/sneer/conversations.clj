@@ -59,7 +59,7 @@
         reify-conversation (partial reify-conversation space own-puk)
         ignored-conversation (behavior-subject)
         contacts (get-contacts contacts-state)
-        produce-convo (fn [contact] (do #_(println "FELIPETESTE: conversations/reify-conversations.produce-convo.contact->" contact) (produce! reify-conversation convos contact)))]
+        produce-convo (fn [contact] (produce! reify-conversation convos contact))]
 
     (reify Conversations
 
@@ -80,7 +80,6 @@
                  (.withContact this)))
 
       (withContact [_ contact]
-        ;(println "FELIPETESTE: conversations/reify-conversations.withContact.contact->" contact)
         (produce-convo contact))
 
       (notifications [this]
