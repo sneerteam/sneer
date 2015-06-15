@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 import java.util.Random;
@@ -81,6 +80,9 @@ public class ConversationAdapter extends ArrayAdapter<ConversationItem> implemen
         ret.setTag(message);
         if (sneerAndroid().isClickable(message)) {
         	messageView.setAutoLinkMask(0);
+			messageView.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+				ret.callOnClick();
+			}});
 	        ret.setClickable(true);
 	        ret.setOnClickListener(this);
 	        clickableMessageStyle(messageView, messageContent);
