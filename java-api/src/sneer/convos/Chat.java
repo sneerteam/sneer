@@ -5,7 +5,7 @@ import rx.Observable;
 
 public interface Chat {
 
-    Observable<List<Message>> messages();
+    List<Message> messages();
 
     void sendMessage(String text);
 
@@ -15,14 +15,16 @@ public interface Chat {
         public final long id;
         public final String text;
         public final boolean isOwn;
-        public final long timestampCreated;
+        public final String date;
 
-        public Message(long id, String text, boolean isOwn, long timestampCreated) {
+        public Message(long id, String text, boolean isOwn, String date) {
             this.id = id;
             this.text = text;
             this.isOwn = isOwn;
-            this.timestampCreated = timestampCreated;
+            this.date = date;
         }
     }
 
 }
+
+

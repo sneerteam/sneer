@@ -4,15 +4,22 @@ import java.util.List;
 
 import rx.Observable;
 
-public interface Convo {
+public class Convo {
 
-    Observable<String> nick();
+    public final String nick;
 
     /** @return null if invite already accepted */
-    Observable<String> inviteCodePending();
+    public final String inviteCodePending;
 
-    Chat chat();
+    public final Chat chat;
 
-    Observable<List<SessionSummary>> sessionSummaries();
+    public final List<SessionSummary> sessionSummaries;
 
+
+    public Convo(String nick, String inviteCodePending, Chat chat, List<SessionSummary> sessionSummaries) {
+        this.nick = nick;
+        this.inviteCodePending = inviteCodePending;
+        this.chat = chat;
+        this.sessionSummaries = sessionSummaries;
+    }
 }

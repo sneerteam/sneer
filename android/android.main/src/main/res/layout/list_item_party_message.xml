@@ -19,14 +19,6 @@
         android:background="@drawable/contact_speech_bubble"
         android:padding="10dp">
 
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/messageContent"
-            android:visibility="gone">
-        </ImageView>
-
         <TextView
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
@@ -44,6 +36,7 @@
             android:layout_alignParentBottom="true"
             android:layout_below="@+id/messageContent"
             android:textSize="12sp"/>
+
     </RelativeLayout>
 
 </RelativeLayout>

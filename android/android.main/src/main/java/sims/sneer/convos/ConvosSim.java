@@ -8,6 +8,7 @@ import rx.subjects.BehaviorSubject;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
+import sneer.convos.SessionSummary;
 
 
 @SuppressWarnings("unused")
@@ -39,8 +40,8 @@ public class ConvosSim implements Convos {
 	}
 
     @Override
-    public Convo getById(long id) {
-        return new ConvoSim();
+    public Observable<Convo> getById(long id) {
+        return Observable.just(new Convo("Nicholas", null, new ChatSim(), new ArrayList<SessionSummary>()));
     }
 
     private static final String[] UNREAD_OPTIONS = {"?", "*", ""};

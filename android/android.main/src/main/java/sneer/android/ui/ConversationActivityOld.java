@@ -46,7 +46,7 @@ public class ConversationActivityOld extends SneerActivity implements StartPlugi
     private static final String ACTIVITY_TITLE = "activityTitle";
 
     private final List<ConversationItem> messages = new ArrayList<>();
-	private ConversationAdapter adapter;
+	private ConversationAdapterOld adapter;
 
 	private Conversation conversation;
 	private Contact contact;
@@ -76,7 +76,7 @@ public class ConversationActivityOld extends SneerActivity implements StartPlugi
 
 		conversation = sneer().conversations().withContact(contact);
 
-		adapter = new ConversationAdapter(this,
+		adapter = new ConversationAdapterOld(this,
 			this.getLayoutInflater(),
 			R.layout.list_item_user_message_old,
 			R.layout.list_item_party_message_old,

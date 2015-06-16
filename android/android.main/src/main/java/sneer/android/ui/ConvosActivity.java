@@ -62,7 +62,7 @@ public class ConvosActivity extends SneerActionBarActivity {
 
     private void openConversation(long id) {
         Intent intent = new Intent();
-        intent.setClass(this, ConversationActivity.class);
+        intent.setClass(this, ConvoActivity.class);
         intent.putExtra("id", id);
         startActivity(intent);
     }

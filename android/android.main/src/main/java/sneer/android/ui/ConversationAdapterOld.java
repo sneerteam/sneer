@@ -33,7 +33,7 @@ import static sneer.android.SneerAndroidSingleton.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findImageView;
 import static sneer.android.ui.SneerActivity.findTextView;
 
-public class ConversationAdapter extends ArrayAdapter<ConversationItem> implements OnClickListener{
+public class ConversationAdapterOld extends ArrayAdapter<ConversationItem> implements OnClickListener{
 
 	private final int layoutUserResourceId;
     private final int listContactResourceId;
@@ -41,13 +41,13 @@ public class ConversationAdapter extends ArrayAdapter<ConversationItem> implemen
 	private final Contact contact;
 	private final Conversation convo;
 
-	public ConversationAdapter(Context context,
-    		LayoutInflater inflater,
-    		int layoutUserResourceId,
-    		int listContactResourceId,
-    		List<ConversationItem> messages,
-		    Contact contact,
-			Conversation convo) {
+	public ConversationAdapterOld(Context context,
+                                  LayoutInflater inflater,
+                                  int layoutUserResourceId,
+                                  int listContactResourceId,
+                                  List<ConversationItem> messages,
+                                  Contact contact,
+                                  Conversation convo) {
         super(context, layoutUserResourceId, messages);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;

@@ -81,7 +81,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="sneer.android.ui.ConversationActivity"
+            android:name="sneer.android.ui.ConvoActivity"
             android:label="@string/title_conversation"
             android:theme="@style/AppThemeMaterial"
             android:parentActivityName="sneer.android.ui.MainActivity" />

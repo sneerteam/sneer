@@ -10,29 +10,26 @@ import sneer.rx.ObservedSubject;
 
 public class ChatSim implements Chat {
 
-    private final ObservedSubject<List<Message>> messages;
+    private final List<Message> messages;
 
     {
-        messages = ObservedSubject.create((List<Message>)Collections.EMPTY_LIST);
-        ArrayList<Message> data = new ArrayList<>(3);
-        data.add(new Message(1, "Yo bro, whatsapp?", false, System.currentTimeMillis() - 60 * 60 * 1000));
-        data.add(new Message(2, "My bad, just saw your message", true, System.currentTimeMillis() - 30 * 60 * 1000));
-        data.add(new Message(3, "Hi. Sorry, too late...", false, System.currentTimeMillis() - 1 * 60 * 1000));
-        messages.onNext(data);
+        messages = new ArrayList<>(3);
+        messages.add(new Message(1, "Yo bro, whatsapp?", false, "Mar 23"));
+        messages.add(new Message(2, "My bad, just saw your message", true, "30 mins ago"));
+        messages.add(new Message(3, "Hi. Sorry, too late...", false, "15 mins ago"));
     }
 
     @Override
-    public Observable<List<Message>> messages() {
-        return messages.observable();
+    public List<Message> messages() {
+        return messages;
     }
 
     @Override
     public void sendMessage(String text) {
-        List<Message> mess = messages.current();
+        List<Message> mess = messages;
         int size = mess.size();
-        Message newMessage = new Message(size + 1, text, size % 2 == 0, System.currentTimeMillis());
+        Message newMessage = new Message(size + 1, text, size % 2 == 0, size + " mins ago");
         mess.add(newMessage);
-        messages.onNext(mess);
     }
 
     @Override
