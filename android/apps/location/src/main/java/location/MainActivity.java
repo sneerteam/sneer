@@ -28,26 +28,16 @@ public class MainActivity extends Activity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose your action");
-        builder.setItems(colors, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                navigateTo(which == 0 ? LocationActivity.class : FollowMeActivity.class);
-                progressDialog("Doing stuff");
-            }
-        });
-        builder.show();
-    }
-
-    public void navigateTo(Class<?> class1) {
-        startActivity(new Intent().setClass(this, class1));
-    }
-
-    private void progressDialog(String message) {
-        ProgressDialog ret = ProgressDialog.show(this, null, message);
-        ret.setIndeterminate(true);
-        ret.setCancelable(true); ret.setOnCancelListener(new DialogInterface.OnCancelListener() { @Override public void onCancel(DialogInterface dialog) {
-            finish();
-        }});
+		builder.setItems(colors, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Intent intent = new Intent();
+				intent.putExtra("SEND_MESSAGE", getIntent().<Intent>getParcelableExtra("SEND_MESSAGE"));
+				intent.setClass(MainActivity.this, which == 0 ? LocationActivity.class : FollowMeActivity.class);
+				startActivity(intent);
+			}
+		});
+		builder.show();
     }
 
     @Override

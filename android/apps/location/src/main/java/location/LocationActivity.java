@@ -23,9 +23,10 @@ public class LocationActivity extends Activity implements LocationListener {
     private Location latestLocation;
     private TextView textAccuracy;
     private Button sendButton;
+	private Intent intent;
 
 
-    @Override
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location);
@@ -55,11 +56,12 @@ public class LocationActivity extends Activity implements LocationListener {
 
 
     public void onSendClicked(View view) {
-	    if (getIntent().<Intent>getParcelableExtra("SEND_MESSAGE") != null) {
+        Intent msg = getIntent().getParcelableExtra("SEND_MESSAGE");
+        if (msg != null) {
             String url = "Location:\nhttps://google.com/maps/place/" + latestLocation.getLatitude() + "," + latestLocation.getLongitude();
-            startService(getIntent().<Intent>getParcelableExtra("SEND_MESSAGE").setAction(url));
+            startService(msg.setAction(url));
         }
-        finish();
+		finish();
     }
 
 
