@@ -23,8 +23,8 @@ android {
     minSdkVersion external.android.minSdkVersion
     targetSdkVersion external.android.sdkVersion
     applicationId "sneer.main"
-    versionCode 21
-    versionName "0.3.12"
+    versionCode 22
+    versionName "0.3.22"
     multiDexEnabled true
   }
 
