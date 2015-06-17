@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import sneer.android.impl.IPCProtocol;
+
 
 public class MainActivity extends Activity {
 
@@ -22,6 +24,7 @@ public class MainActivity extends Activity {
 			public void onClick(DialogInterface dialog, int which) {
 				Intent intent = new Intent();
 				intent.putExtra("SEND_MESSAGE", getIntent().<Intent>getParcelableExtra("SEND_MESSAGE"));
+				intent.putExtra("JOIN_SESSION", getIntent().<Intent>getParcelableExtra(IPCProtocol.JOIN_SESSION));
 				intent.setClass(MainActivity.this, which == 0 ? LocationActivity.class : FollowMeActivity.class);
 				startActivity(intent);
 			}

@@ -20,6 +20,9 @@
             android:excludeFromRecents="true"
             android:exported="true"
             android:theme="@android:style/Theme.DeviceDefault.Dialog">
+            <meta-data
+                android:name="sneer:session-type"
+                android:value="location"/>
         </activity>
 
         <activity
