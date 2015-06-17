@@ -15,7 +15,7 @@
 
 (defn reify-Convo [contact-puk nick-ch]
   (let [nick-obs (nick-obs* nick-ch)]
-    (reify Convo
+    #_(reify Convo
       (nick [_] nick-obs)
 
       ;/** @return null if invite already accepted
