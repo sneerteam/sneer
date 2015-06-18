@@ -46,7 +46,6 @@ public class MapDownloader extends AsyncTask<String, Void, Bitmap> {
         bmImage.setImageBitmap(newbitMap);
 		activity.setProgressBarIndeterminateVisibility(false);
 		activity.setProgressBarVisibility(false);
-		session.send(url);
 	}
 
 }
