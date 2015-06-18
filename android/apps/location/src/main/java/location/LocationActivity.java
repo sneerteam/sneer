@@ -23,8 +23,6 @@ public class LocationActivity extends Activity implements LocationListener {
     private Location latestLocation;
     private TextView textAccuracy;
     private Button sendButton;
-	private Intent intent;
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +32,6 @@ public class LocationActivity extends Activity implements LocationListener {
         sendButton = (Button) findViewById(R.id.buttonSend);
         sendButton.setEnabled(false);
     }
-
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -46,14 +43,12 @@ public class LocationActivity extends Activity implements LocationListener {
             locationManager.requestLocationUpdates(GPS_PROVIDER, 1000, 0, this);
     }
 
-
     @Override
     protected void onPause() {
         locationManager.removeUpdates(this);
         finish();
         super.onPause();
     }
-
 
     public void onSendClicked(View view) {
         Intent msg = getIntent().getParcelableExtra("SEND_MESSAGE");
@@ -64,18 +59,15 @@ public class LocationActivity extends Activity implements LocationListener {
 		finish();
     }
 
-
     public void onCancelClicked(View view) {
         finish();
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
         latestLocation = location;
         updateTextAccuracy();
     }
-
 
     private void updateTextAccuracy() {
         Log.d(">>>> LocationChanged: ", latestLocation.toString());
@@ -88,7 +80,6 @@ public class LocationActivity extends Activity implements LocationListener {
             }
         });
     }
-
 
     @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
     @Override public void onProviderEnabled(String provider) { }
