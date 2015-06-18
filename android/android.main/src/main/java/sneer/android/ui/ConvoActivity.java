@@ -93,9 +93,9 @@ public class ConvoActivity extends SneerActionBarActivity {
 
 
     private void refresh() {
-        actionBar.setTitle(currentConvo.nick);
+        actionBar.setTitle(currentConvo.nickname);
         refreshInvitePendingMessage();
-        chatAdapter.update(currentConvo.nick, currentConvo.chat.messages());
+        chatAdapter.update(currentConvo.nickname, currentConvo.chat.messages());
 
         Chat.Message last = lastMessageReceived(currentConvo.chat.messages());
         if (last != null) {
@@ -113,7 +113,7 @@ public class ConvoActivity extends SneerActionBarActivity {
         final ListView messageList = (ListView) findViewById(R.id.messageList);
         if (pending) {
             String waitingMessage = ConvoActivity.this.getResources().getString(R.string.conversation_activity_waiting);
-            waiting.setText(Html.fromHtml(String.format(waitingMessage, currentConvo.nick)));
+            waiting.setText(Html.fromHtml(String.format(waitingMessage, currentConvo.nickname)));
             waiting.setMovementMethod(new LinkMovementMethod() {
                 @Override
                 public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
@@ -206,7 +206,7 @@ public class ConvoActivity extends SneerActionBarActivity {
     private void navigateToContact() {
 		Intent intent = new Intent();
 		intent.setClass(this, ContactActivity.class);
-		intent.putExtra(CURRENT_NICKNAME, currentConvo.nick);
+		intent.putExtra(CURRENT_NICKNAME, currentConvo.nickname);
 		intent.putExtra(ACTIVITY_TITLE, "Contact");
 		startActivity(intent);
 	}
