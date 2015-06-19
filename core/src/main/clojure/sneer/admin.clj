@@ -16,10 +16,10 @@
     [sneer.admin SneerAdmin]
     [sneer.crypto.impl KeysImpl]))
 
-(defn handle-invites [sneer tuple-base puk]
+(defn- start-handling-invites [sneer tuple-base own-puk]
   (let [tuples-out (chan)
         lease (chan)]
-    (query-tuples tuple-base {"type" "push" "audience" puk} tuples-out lease)
+    (query-tuples tuple-base {"type" "push" "audience" own-puk} tuples-out lease)
     (go-while-let [tuple (<! tuples-out)]
       (when-some [invite-code (get tuple "invite-code")]
         (rx/subscribe (.. sneer contacts first)
@@ -32,7 +32,7 @@
   (let [puk (.publicKey own-prik)
         tuple-space (space/reify-tuple-space puk tuple-base)
         sneer (impl/new-sneer tuple-space own-prik)]
-    (handle-invites sneer tuple-base puk)
+    (start-handling-invites sneer tuple-base puk)
     (reify
       SneerAdmin
       (sneer [_] sneer)
