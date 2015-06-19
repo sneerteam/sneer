@@ -7,7 +7,6 @@ import android.widget.Toast;
 import rx.functions.Action1;
 import sneer.Conversation;
 import sneer.Session;
-import sneer.android.impl.IPCProtocol;
 import sneer.android.utils.AndroidUtils;
 
 import static sneer.android.impl.IPCProtocol.IS_OWN;
