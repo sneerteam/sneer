@@ -4,9 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public class LocationServiceKiller extends BroadcastReceiver {
+public class FollowMeServiceKiller extends BroadcastReceiver {
 
-    public static LocationService victim;
+    public static FollowMeService victim;
 
     @Override
     public void onReceive(Context context, Intent intent) {

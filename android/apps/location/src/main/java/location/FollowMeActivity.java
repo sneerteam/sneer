@@ -23,7 +23,6 @@ import static android.location.LocationManager.GPS_PROVIDER;
 public class FollowMeActivity extends Activity implements LocationListener {
 
     private PartnerSession session;
-    private Intent service;
 
 	private LocationManager locationManager;
 	private double myLatitude;
@@ -42,8 +41,8 @@ public class FollowMeActivity extends Activity implements LocationListener {
 
 		startSession();
 
-//		service = new Intent(this, LocationService.class);
-//        startService(service);
+		Intent service = new Intent(this, FollowMeService.class);
+        startService(service);
     }
 
 
@@ -70,21 +69,18 @@ public class FollowMeActivity extends Activity implements LocationListener {
 				locationManager.requestLocationUpdates(GPS_PROVIDER, 30000, 0, this);
 		}
 
-		map.post(new Runnable() {
-			@Override
-			public void run() {
-				int width = map.getMeasuredWidth();
-				int height = map.getMeasuredHeight();
+		map.post(new Runnable() { @Override public void run() {
+			int width = map.getMeasuredWidth();
+			int height = map.getMeasuredHeight();
 
-				setProgressBarIndeterminate(true);
-				setProgressBarIndeterminateVisibility(true);
-				setProgressBarVisibility(true);
+			setProgressBarIndeterminate(true);
+			setProgressBarIndeterminateVisibility(true);
+			setProgressBarVisibility(true);
 
-				new MapDownloader(map, width, height, FollowMeActivity.this, session).execute(
-					getMapURL(width, height)
-				);
-			}
-		});
+			new MapDownloader(map, width, height, FollowMeActivity.this, session).execute(
+				getMapURL(width, height)
+			);
+		}});
 	}
 
 	private void handle(Message message) {

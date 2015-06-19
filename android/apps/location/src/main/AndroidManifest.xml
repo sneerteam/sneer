@@ -15,7 +15,7 @@
             android:value=""/>
 
         <activity
-            android:name="location.LocationActivity"
+            android:name="location.SendLocationActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:label="Send Location"
@@ -33,12 +33,12 @@
         </activity>
 
         <service
-            android:name="location.LocationService"
+            android:name="location.FollowMeService"
             android:enabled="true">
         </service>
 
         <receiver
-            android:name="location.LocationServiceKiller"
+            android:name="location.FollowMeServiceKiller"
             android:enabled="true">
         </receiver>
 

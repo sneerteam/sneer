@@ -19,7 +19,7 @@ import sneer.location.R;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
-public class LocationService extends Service implements LocationListener {
+public class FollowMeService extends Service implements LocationListener {
 
     public final static int SERVICE_ID = 1234;
 
@@ -54,9 +54,9 @@ public class LocationService extends Service implements LocationListener {
     }
 
     private void startKillAlarm() {
-        LocationServiceKiller.victim = this;
+        FollowMeServiceKiller.victim = this;
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, LocationServiceKiller.class);
+        Intent intent = new Intent(this, FollowMeServiceKiller.class);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,

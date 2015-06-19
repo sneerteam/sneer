@@ -17,7 +17,7 @@ import sneer.location.R;
 import static android.location.LocationManager.GPS_PROVIDER;
 
 
-public class LocationActivity extends Activity implements LocationListener {
+public class SendLocationActivity extends Activity implements LocationListener {
 
     private LocationManager locationManager;
     private Location latestLocation;
