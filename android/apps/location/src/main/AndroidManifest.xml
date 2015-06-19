@@ -22,7 +22,7 @@
             android:theme="@android:style/Theme.DeviceDefault.Dialog">
             <meta-data
                 android:name="sneer:session-type"
-                android:value="location"/>
+                android:value="follow me"/>
         </activity>
 
         <activity
