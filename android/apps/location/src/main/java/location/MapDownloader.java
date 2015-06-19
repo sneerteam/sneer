@@ -30,7 +30,6 @@ public class MapDownloader extends AsyncTask<String, Void, Bitmap> {
 	protected Bitmap doInBackground(String... urls) {
 		url = urls[0];
 
-		Log.d("FELIPETESTE", "urls->" + urls);
 		Bitmap mIcon = null;
 		try {
 			InputStream in = new java.net.URL(url).openStream();

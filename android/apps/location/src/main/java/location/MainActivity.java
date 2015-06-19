@@ -15,20 +15,23 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        final CharSequence colors[] = new CharSequence[] {"Send current location", "Follow me for one hour"};
+		final CharSequence options[] = new CharSequence[] {"Send current location", "Follow me for one hour"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose your action");
-		builder.setItems(colors, new DialogInterface.OnClickListener() {
+		builder.setItems(options, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				Intent intent = new Intent();
-				intent.putExtra("SEND_MESSAGE", getIntent().<Intent>getParcelableExtra("SEND_MESSAGE"));
+				intent.putExtra("SEND_MESSAGE", getIntent().<Intent>getParcelableExtra(IPCProtocol.SEND_MESSAGE));
 				intent.putExtra("JOIN_SESSION", getIntent().<Intent>getParcelableExtra(IPCProtocol.JOIN_SESSION));
 				intent.setClass(MainActivity.this, which == 0 ? LocationActivity.class : FollowMeActivity.class);
 				startActivity(intent);
 			}
 		});
+		builder.setOnCancelListener(new DialogInterface.OnCancelListener() { @Override public void onCancel(DialogInterface dialog) {
+			finish();
+		}});
 		builder.show();
     }
 
