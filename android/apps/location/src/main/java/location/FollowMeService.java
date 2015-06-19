@@ -12,8 +12,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.Toast;
+
+import java.util.HashMap;
 
 import sneer.location.R;
 
@@ -23,7 +24,7 @@ public class FollowMeService extends Service implements LocationListener {
 
     public final static int SERVICE_ID = 1234;
 
-    private static final int TEN_SECONDS = 10000;
+    private static final int TEN_SECONDS = 30000;
 
     private volatile LocationManager locationManager;
 
@@ -71,7 +72,10 @@ public class FollowMeService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("onLocationChanged", location.toString());
+		HashMap<String, Double> m = new HashMap<>();
+		m.put("latitude", location.getLatitude());
+		m.put("longitude", location.getLongitude());
+		FollowMeActivity.session.send(m);
     }
 
     @Override public void onProviderDisabled(String arg0) { }

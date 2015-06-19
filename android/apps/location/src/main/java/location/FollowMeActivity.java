@@ -22,7 +22,8 @@ import static android.location.LocationManager.GPS_PROVIDER;
 
 public class FollowMeActivity extends Activity implements LocationListener {
 
-    private PartnerSession session;
+    public static PartnerSession session;
+    private Intent service;
 
 	private LocationManager locationManager;
 	private double myLatitude;
@@ -40,9 +41,6 @@ public class FollowMeActivity extends Activity implements LocationListener {
 		map = (ImageView) findViewById(R.id.map_view);
 
 		startSession();
-
-		Intent service = new Intent(this, FollowMeService.class);
-        startService(service);
     }
 
 
@@ -116,6 +114,13 @@ public class FollowMeActivity extends Activity implements LocationListener {
 
         return url;
     }
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		service = new Intent(this, FollowMeService.class);
+        startService(service);
+	}
 
 	@Override
 	protected void onDestroy() {
