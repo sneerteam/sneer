@@ -1,18 +1,16 @@
 (ns sneer.conversation-test
-  (:require [clojure.core.async :refer [chan <! >! pipe]]
-            [midje.sweet :refer :all]
+  (:require [midje.sweet :refer :all]
             [sneer.tuple.jdbc-database :refer [create-sqlite-db]]
             [sneer.admin :refer [new-sneer-admin]]
             [sneer.contact :refer [produce-contact create-contacts-state]]
             [sneer.tuple.persistent-tuple-base :as tb]
-            [sneer.tuple.tuple-transmitter :as transmitter]
             [sneer.test-util :refer [<!!? ->chan <wait-for! <emits]]
             [sneer.tuple.protocols :refer :all]
             [sneer.rx :refer [subscribe-on-io]]
             [sneer.keys :refer [->puk create-prik]]
             [sneer.party :refer [reify-party create-puk->party]]
             [sneer.conversation :refer [reify-conversation]]
-            [sneer.async :refer [go-while-let]])
+            [sneer.integration-test-util :refer [own-puk connect!]])
   (:import [sneer.crypto.impl KeysImpl]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
@@ -24,25 +22,11 @@
         maico-tb (tb/create maico-db)
         neide-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) neide-tb)
         maico-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) maico-tb)
-        neide-puk (.. neide-admin privateKey publicKey)
-        maico-puk (.. maico-admin privateKey publicKey)
+        neide-puk (own-puk neide-admin)
+        maico-puk (own-puk maico-admin)
         neide-sneer (.sneer neide-admin)
         maico-sneer (.sneer maico-admin)
-        neide-received (chan)
-        maico-received (chan)
-
-        _ (transmitter/start neide-puk neide-tb neide-received
-                             (fn [follower-puk tuples-out & _]
-                               (assert (= follower-puk maico-puk))
-                               (go-while-let [[tuple ack-ch] (<! tuples-out)]
-                                 (>! maico-received tuple)
-                                 (>! ack-ch tuple))))
-        _ (transmitter/start maico-puk maico-tb maico-received
-                             (fn [follower-puk tuples-out & _]
-                               (assert (= follower-puk neide-puk))
-                               (go-while-let [[tuple ack-ch] (<! tuples-out)]
-                                 (>! neide-received tuple)
-                                 (>! ack-ch tuple))))
+        _ (connect! neide-admin maico-admin)
         neide (.produceContact maico-sneer "neide" (.produceParty maico-sneer neide-puk) nil)
         maico (.produceContact neide-sneer "maico" (.produceParty neide-sneer maico-puk) nil)]
     {:neide-db neide-db
