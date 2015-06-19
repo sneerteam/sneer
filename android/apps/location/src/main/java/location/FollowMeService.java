@@ -23,10 +23,11 @@ import static android.location.LocationManager.GPS_PROVIDER;
 public class FollowMeService extends Service implements LocationListener {
 
     public final static int SERVICE_ID = 1234;
-
     private static final int TEN_SECONDS = 30000;
 
     private volatile LocationManager locationManager;
+
+	public static boolean isRunning;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -51,6 +52,7 @@ public class FollowMeService extends Service implements LocationListener {
         locationManager.requestLocationUpdates(GPS_PROVIDER, TEN_SECONDS, 0, this);
         startForeground(SERVICE_ID, builder.build());
         startKillAlarm();
+		isRunning = true;
         return Service.START_STICKY;
     }
 

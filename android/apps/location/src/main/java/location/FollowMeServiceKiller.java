@@ -12,6 +12,7 @@ public class FollowMeServiceKiller extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         victim.stopForeground(true);
         victim.stopSelf();
+    	FollowMeService.isRunning = false;
     }
 
 }

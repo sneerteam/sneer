@@ -41,6 +41,8 @@ public class FollowMeActivity extends Activity implements LocationListener {
 		map = (ImageView) findViewById(R.id.map_view);
 
 		startSession();
+
+		service = new Intent(this, FollowMeService.class);
     }
 
 
@@ -118,8 +120,8 @@ public class FollowMeActivity extends Activity implements LocationListener {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		service = new Intent(this, FollowMeService.class);
-        startService(service);
+        if (!FollowMeService.isRunning)
+			startService(service);
 	}
 
 	@Override
