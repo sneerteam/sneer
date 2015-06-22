@@ -1,7 +1,7 @@
 (ns sneer.async-test
   (:require [clojure.core.async :refer [chan close!]]
             [midje.sweet :refer :all]
-            [sneer.async :refer [state-machine sliding-chan go-trace]]
+            [sneer.async :refer [state-machine sliding-chan go-trace peek-state]]
             [sneer.test-util :refer [<!!? >!!? closes]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
@@ -24,6 +24,8 @@
     (>!!? events 4000)
     (<!!? tap1) => 4242
     (<!!? tap2) => 4242
+
+    (<!!? (peek-state machine)) => 4242
 
     (close! tap1)
     (>!!? machine tap3)
