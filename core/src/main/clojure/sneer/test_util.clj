@@ -101,16 +101,15 @@
   (fn [ch]
     (<wait-for! ch expected)))
 
-(defn closes []
-  (fn [ch]
-    (loop-trace [last-value "<none>"]
-      (if-some [current (<!!? ch)]
-        (if (= current :timeout)
-          (do
-            (println "TIMEOUT. Last value emitted:" last-value)
-            false)
-          (recur current))
-        true))))
+(defn closes [ch]
+  (loop-trace [last-value "<none>"]
+    (if-some [current (<!!? ch)]
+      (if (= current :timeout)
+        (do
+          (println "TIMEOUT. Last value emitted:" last-value)
+          false)
+        (recur current))
+      true)))
 
 (defn emits [expected]
   (fn [obs]

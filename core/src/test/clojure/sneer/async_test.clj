@@ -2,7 +2,7 @@
   (:require [clojure.core.async :refer [chan close!]]
             [midje.sweet :refer :all]
             [sneer.async :refer [state-machine sliding-chan go-trace]]
-            [sneer.test-util :refer [<!!? >!!?]]))
+            [sneer.test-util :refer [<!!? >!!? closes]]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
@@ -29,4 +29,8 @@
     (>!!? machine tap3)
     (>!!? events 20000)
     (<!!? tap2) => 24242
-    (<!!? tap3) => 24242))
+    (<!!? tap3) => 24242
+
+    (close! events)
+    tap2 => closes
+    tap3 => closes))
