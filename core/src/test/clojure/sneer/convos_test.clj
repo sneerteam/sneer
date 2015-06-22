@@ -22,4 +22,4 @@
       (. convos startConvo "Maico") => (emits-error FriendlyException))))
 
   ; Subs for conversations.
-  ; Reads not being emitted by old logic or not being porcessed by new summarization.
+  ; Reads not being emitted by old logic or not being processed by new summarization.
