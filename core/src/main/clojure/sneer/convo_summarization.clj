@@ -153,7 +153,8 @@
                      (File. "conversation-summaries.tmp"))
         previous-state (read-snapshot file)
         machine (start-summarization-machine! container previous-state)]
-    (start-saving-snapshots-to! file (tap-state machine))))
+    (start-saving-snapshots-to! file (tap-state machine))
+    machine))
 
 (defn- nick->id [state nick]
   (get-in state [:nick->summary nick :id]))
