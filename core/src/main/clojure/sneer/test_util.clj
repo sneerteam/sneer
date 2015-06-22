@@ -71,7 +71,7 @@
   (rx/subscribe observable
                 #(>!! c (nvl % :nil))  ; Channels cannot take nil
                 #(do
-                   (.printStackTrace %)
+                   #_(.printStackTrace %)
                    (>!! c {::error %})
                    (close! c))
                 #(close! c)))
