@@ -1,6 +1,6 @@
 (ns sneer.convo-summarization
   (:require
-    [clojure.core.async :as async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
+    [clojure.core.async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace close-on-unsubscribe! pipe-to-subscriber! state-machine tap-state peek-state]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
@@ -95,9 +95,8 @@
      state)
    (assoc :last-id (tuple "id"))))
 
-(defn- summarization-loop! [previous-state own-puk tuples state-out]
-  (let [machine (state-machine previous-state (partial handle-tuple own-puk) tuples)]
-    (tap-state machine state-out)))
+(defn- summarization-loop! [previous-state own-puk tuples]
+  (state-machine previous-state (partial handle-tuple own-puk) tuples))
 
 ; state: {:last-id long
 ;         :puk->nick {puk "Neide"}
@@ -106,23 +105,19 @@
 ;                                  :unread "*"
 ;                                  :preview "Hi, Maico"
 ;                                  :id long}}
-(defn start-summarization-machine!
-  ([container previous-state state-out]
-    (let [lease (.getLeaseChannel (.produce container LeaseHolder))
-          admin (.produce container SneerAdmin)
-          own-puk (.. admin privateKey publicKey)
-          tuple-base (tuple-base-of admin)]
-      (start-summarization-machine! previous-state own-puk tuple-base state-out lease)))
+(defn- start-summarization-machine! [container previous-state]
+  (let [lease (.getLeaseChannel (.produce container LeaseHolder))
+        admin (.produce container SneerAdmin)
+        own-puk (.. admin privateKey publicKey)
+        tuple-base (tuple-base-of admin)
+        last-id (previous-state :last-id)
+        tuples (chan)
+        all-tuples-criteria {tb/after-id last-id}]
 
-  ([previous-state own-puk tuple-base state-out lease]      ; Called by the summarization test.
-   (let [last-id (previous-state :last-id)
-         tuples (chan)
-         all-tuples-criteria {tb/after-id last-id}]
+    (query-tuples tuple-base all-tuples-criteria tuples lease)
+    (close-with! lease tuples)
 
-     (query-tuples tuple-base all-tuples-criteria tuples lease)
-     (close-with! lease tuples)
-
-     (summarization-loop! previous-state own-puk tuples state-out))))
+    (summarization-loop! previous-state own-puk tuples)))
 
 (defn- read-snapshot [file]
   (let [default {}]
@@ -152,31 +147,13 @@
                    (write-snapshot file snapshot)
                    (recur nil never))))))
 
-(defn- tap-state-old
-  ([machine ch]
-   (>!! ch @(machine :state)) ; TODO: make it deterministic by sending messages to the machine
-   (async/tap (machine :state-mult) ch)
-   ch)
-  ([machine]
-   (sliding-tap (machine :state-mult))))
-
 (defn- start-machine! [container]
   (let [file (some-> (.produce container PersistenceFolder)
                      (.get)
                      (File. "conversation-summaries.tmp"))
-        state (atom (read-snapshot file))
-        state-out (sliding-chan)
-        machine {:state      state
-                 :state-mult (mult state-out)}]
-
-    (start-saving-snapshots-to! file (tap-state-old machine))
-
-    (go-while-let [current (<! (tap-state-old machine))]
-      (reset! state current))
-
-    (start-summarization-machine! container @state state-out)
-
-    machine))
+        previous-state (read-snapshot file)
+        machine (start-summarization-machine! container previous-state)]
+    (start-saving-snapshots-to! file (tap-state machine))))
 
 (defn- nick->id [state nick]
   (get-in state [:nick->summary nick :id]))
@@ -187,29 +164,26 @@
                                 (map #(sort-by :timestamp descending %))
                                 (map vec)))
 
-(defn sliding-summaries! [own-puk tuples-in]
-  (let [summaries-out (sliding-chan 1 xsummarize)]
-    (summarization-loop! {} own-puk tuples-in summaries-out)
-    summaries-out))
+(defn sliding-summaries!
+  ([own-puk tuples-in]
+   (sliding-summaries! (summarization-loop! {} own-puk tuples-in)))
+  ([machine]
+   (tap-state machine (sliding-chan 1 xsummarize))))
 
 (defn reify-ConvoSummarization [container]
   (let [machine (start-machine! container)
-        state (:state machine)]
+        sliding-summaries (sliding-summaries! machine)]
     (reify ConvoSummarization
 
-      (slidingSummaries
-       [_]
-       (let [summaries-out (sliding-chan 1 xsummarize)]
-         (tap-state-old machine summaries-out)
-         summaries-out))
+      (slidingSummaries [_] sliding-summaries)
 
       (getIdByNick
        [_ nick]
-       (nick->id @state nick))
+       (nick->id (<!! (peek-state machine)) nick))
 
       (processUpToId
        [_ id]
-       (let [state (tap-state-old machine)]
+       (let [state (tap-state machine)]
          (go-trace
            (loop []
              (let [current (<! state)
