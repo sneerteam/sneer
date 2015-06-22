@@ -122,3 +122,20 @@
       (close! states-out))
 
     taps-in))
+
+(defn tap-state
+  ([machine]
+   (let [result (sliding-chan)]
+     (tap-state machine result)
+     result))
+  ([machine tap-ch]
+   (go
+     (>! machine tap-ch))
+    tap-ch))
+
+(defn peek-state [machine]
+  (go
+    (let [tap (tap-state machine)
+          result (<! tap)]
+      (close! tap)
+      result)))
