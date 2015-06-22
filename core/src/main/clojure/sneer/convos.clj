@@ -24,7 +24,8 @@
     [sneer.commons Clock]
     [sneer.convos Convos Convos$Summary]
     [sneer.commons.exceptions FriendlyException]
-    [sneer.interfaces ConvoSummarization]))
+    [sneer.interfaces ConvoSummarization]
+    [rx.subjects AsyncSubject]))
 
 (defn- to-foreign-summary [pretty-time {:keys [nick summary timestamp unread id]}]
   (let [date (.format pretty-time (Date. ^long timestamp))]
@@ -56,7 +57,7 @@
 
 
 (defn- start-convo! [container newContactNick]
-  (let [result (rx.subjects.AsyncSubject/create)
+  (let [result (AsyncSubject/create)
         summarization ^ConvoSummarization (.produce container ConvoSummarization)]
 
     (go-trace
