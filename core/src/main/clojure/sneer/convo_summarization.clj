@@ -2,11 +2,11 @@
   (:require
     [clojure.core.async :as async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
-    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace close-on-unsubscribe! pipe-to-subscriber!]]
+    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace close-on-unsubscribe! pipe-to-subscriber! state-machine tap-state peek-state]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
-    [sneer.flux :as flux]                                ; Required to cause compilation of LeaseHolder
+    [sneer.flux :refer :all]                                ; Required to cause compilation of LeaseHolder
     [sneer.io :as io]
     [sneer.rx :refer [shared-latest]]
     [sneer.party :refer [party->puk]]
@@ -25,7 +25,7 @@
 (defn- contact-puk [tuple]
   (tuple "party"))
 
-(defn- handle-contact [own-puk tuple state]
+(defn- handle-contact [own-puk state tuple]
   (if-not (= (tuple "author") own-puk)
     state
     (let [new-nick (tuple "payload")
@@ -65,7 +65,7 @@
         :preview (or label "")
         :timestamp timestamp))))
 
-(defn- handle-message [own-puk message state]
+(defn- handle-message [own-puk state message]
   (let [author (message "author")
         own? (= author own-puk)
         contact-puk (if own? (message "audience") author)]
@@ -78,7 +78,7 @@
     (cond-> summary
       (= msg-id (:last-received summary)) (assoc :unread ""))))
 
-(defn- handle-read-receipt [own-puk tuple state]
+(defn- handle-read-receipt [own-puk state tuple]
   (let [contact-puk (tuple "audience")
         nick (get-in state [:puk->nick contact-puk])]
     (cond-> state
@@ -86,18 +86,18 @@
       (update-in [:nick->summary nick]
                  update-with-read tuple))))
 
-(defn- summarization-loop [previous-state own-puk tuples state-out]
-  (go-loop-trace [state previous-state]
-    (>! state-out state)
-    (when-let [tuple (<! tuples)]
-      (recur
-       (->
-        (case (tuple "type")
-          "contact" (handle-contact own-puk tuple state)
-          "message" (handle-message own-puk tuple state)
-          "message-read" (handle-read-receipt own-puk tuple state)
-          state)
-        (assoc :last-id (tuple "id")))))))
+(defn handle-tuple [own-puk state tuple]
+  (->
+   (case (tuple "type")
+     "contact"      (handle-contact      own-puk state tuple)
+     "message"      (handle-message      own-puk state tuple)
+     "message-read" (handle-read-receipt own-puk state tuple)
+     state)
+   (assoc :last-id (tuple "id"))))
+
+(defn- summarization-loop! [previous-state own-puk tuples state-out]
+  (let [machine (state-machine previous-state (partial handle-tuple own-puk) tuples)]
+    (tap-state machine state-out)))
 
 ; state: {:last-id long
 ;         :puk->nick {puk "Neide"}
@@ -122,7 +122,7 @@
      (query-tuples tuple-base all-tuples-criteria tuples lease)
      (close-with! lease tuples)
 
-     (summarization-loop previous-state own-puk tuples state-out))))
+     (summarization-loop! previous-state own-puk tuples state-out))))
 
 (defn- read-snapshot [file]
   (let [default {}]
@@ -152,7 +152,7 @@
                    (write-snapshot file snapshot)
                    (recur nil never))))))
 
-(defn- tap-state
+(defn- tap-state-old
   ([machine ch]
    (>!! ch @(machine :state)) ; TODO: make it deterministic by sending messages to the machine
    (async/tap (machine :state-mult) ch)
@@ -169,9 +169,9 @@
         machine {:state      state
                  :state-mult (mult state-out)}]
 
-    (start-saving-snapshots-to! file (tap-state machine))
+    (start-saving-snapshots-to! file (tap-state-old machine))
 
-    (go-while-let [current (<! (tap-state machine))]
+    (go-while-let [current (<! (tap-state-old machine))]
       (reset! state current))
 
     (start-summarization-machine! container @state state-out)
@@ -188,10 +188,8 @@
                                 (map vec)))
 
 (defn sliding-summaries! [own-puk tuples-in]
-  (let [summaries-out (sliding-chan 1 xsummarize)
-        loop (summarization-loop {} own-puk tuples-in summaries-out)]
-    (go-trace (<! loop)
-              (close! summaries-out))
+  (let [summaries-out (sliding-chan 1 xsummarize)]
+    (summarization-loop! {} own-puk tuples-in summaries-out)
     summaries-out))
 
 (defn reify-ConvoSummarization [container]
@@ -202,7 +200,7 @@
       (slidingSummaries
        [_]
        (let [summaries-out (sliding-chan 1 xsummarize)]
-         (tap-state machine summaries-out)
+         (tap-state-old machine summaries-out)
          summaries-out))
 
       (getIdByNick
@@ -211,7 +209,7 @@
 
       (processUpToId
        [_ id]
-       (let [state (tap-state machine)]
+       (let [state (tap-state-old machine)]
          (go-trace
            (loop []
              (let [current (<! state)
