@@ -2,7 +2,7 @@
   (:require [midje.sweet :refer :all]
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer!]]
-            [sneer.test-util :refer [emits emits-error ->chan <!!?]])
+            [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
   (:import [sneer.convos Convos]
            [sneer.commons.exceptions FriendlyException]))
 
@@ -14,9 +14,9 @@
       (. convos summaries) => (emits #(.isEmpty %))
       (. convos problemWithNewNickname "") => "cannot be empty"
       (. convos problemWithNewNickname "Maico") => nil
-      (let [convo-id (<!!? (->chan (. convos startConvo "Maico")))]
+      (let [convo-id (<next (. convos startConvo "Maico"))]
         convo-id => #(instance? Long %)
-        (.getById convos convo-id) => (emits #(-> % .nickname (= "Maico"))))
+        (-> convos (.getById convo-id) <next .nickname) => "Maico")
       (. convos summaries) => (emits #(-> % first .nickname (= "Maico")))
       (. convos problemWithNewNickname "Maico") => "already used"
       (. convos startConvo "Maico") => (emits-error FriendlyException))))

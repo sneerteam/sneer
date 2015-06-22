@@ -119,5 +119,7 @@
 (defn emits-error [exception-type]
   (emits #(instance? exception-type (::error %))))
 
+(defn <next [obs]
+  (<!!? (->chan obs)))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
