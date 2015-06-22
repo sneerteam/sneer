@@ -55,7 +55,6 @@
                                   "audience"  own-puk
                                   "author"    own-puk}))))
 
-
 (defn- start-convo! [container newContactNick]
   (let [result (AsyncSubject/create)
         summarization ^ConvoSummarization (.produce container ConvoSummarization)]

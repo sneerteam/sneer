@@ -96,7 +96,8 @@
    (assoc :last-id (tuple "id"))))
 
 (defn- summarization-loop! [previous-state own-puk tuples]
-  (state-machine previous-state (partial handle-tuple own-puk) tuples))
+  (let [previous-state (or previous-state {:last-id 0})]
+    (state-machine previous-state (partial handle-tuple own-puk) tuples)))
 
 ; state: {:last-id long
 ;         :puk->nick {puk "Neide"}
@@ -110,9 +111,10 @@
         admin (.produce container SneerAdmin)
         own-puk (.. admin privateKey publicKey)
         tuple-base (tuple-base-of admin)
-        last-id (previous-state :last-id)
         tuples (chan)
-        all-tuples-criteria {tb/after-id last-id}]
+        all-tuples-criteria (if (some? previous-state)
+                              {tb/after-id (previous-state :last-id)}
+                              {})]
 
     (query-tuples tuple-base all-tuples-criteria tuples lease)
     (close-with! lease tuples)
@@ -120,14 +122,12 @@
     (summarization-loop! previous-state own-puk tuples)))
 
 (defn- read-snapshot [file]
-  (let [default {}]
-    (if (and file (.exists file))
-      (try
-        (deserialize (io/read-bytes file))
-        (catch Exception e
-          (println "Exception reading snapshot:" (.getMessage e))
-          default))
-      default)))
+  (when (and file (.exists file))
+    (try
+      (deserialize (io/read-bytes file))
+      (catch Exception e
+        (println "Exception reading snapshot:" (.getMessage e))
+        nil))))
 
 (defn- write-snapshot [file snapshot]
   (when file
@@ -167,7 +167,7 @@
 
 (defn sliding-summaries!
   ([own-puk tuples-in]
-   (sliding-summaries! (summarization-loop! {} own-puk tuples-in)))
+   (sliding-summaries! (summarization-loop! nil own-puk tuples-in)))
   ([machine]
    (tap-state machine (sliding-chan 1 xsummarize))))
 
@@ -188,7 +188,7 @@
          (go-trace
            (loop []
              (let [current (<! state)
-                   last-id (or (current :last-id) 0)] ; TODO: move :last-id initialization to start-machine!
+                   last-id (current :last-id)]
                (when (< last-id id)
                  (recur))))
            (close! state)
