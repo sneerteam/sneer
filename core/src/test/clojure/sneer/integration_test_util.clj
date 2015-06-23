@@ -14,11 +14,11 @@
            [sneer.tuple.protocols Database]
            (sneer.admin SneerAdmin)))
 
-(defn puk [container]
-  (admin->puk (container SneerAdmin)))
-
 (defn admin->puk [admin]
   (.. admin privateKey publicKey))
+
+(defn puk [container]
+  (admin->puk (container SneerAdmin)))
 
 (defn- start [puk tb in out other-puk]
   (transmitter/start puk tb in
