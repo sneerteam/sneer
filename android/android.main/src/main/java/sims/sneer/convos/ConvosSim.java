@@ -39,6 +39,11 @@ public class ConvosSim implements Convos {
 		return Observable.just(4242L);
 	}
 
+	@Override
+	public Observable<Long> startConvo(String newContactNick, String contactPuk, String inviteCodeReceived) {
+		return Observable.just(4343L);
+	}
+
     @Override
     public Observable<Convo> getById(long id) {
         return Observable.just(new Convo("Nicholas", null, new ChatSim(), new ArrayList<SessionSummary>()));
