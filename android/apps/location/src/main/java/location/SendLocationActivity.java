@@ -1,26 +1,27 @@
 package location;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import sneer.location.R;
+import java.util.List;
 
-import static android.location.LocationManager.GPS_PROVIDER;
+import sneer.location.R;
 
 
 public class SendLocationActivity extends Activity implements LocationListener {
 
-    private LocationManager locationManager;
-    private Location latestLocation;
+	private static final String TAG = "LOCATIONTEST";
+
+	private LocationManager locationManager;
+
+	private Location latestLocation;
     private TextView textAccuracy;
     private Button sendButton;
 
@@ -28,29 +29,45 @@ public class SendLocationActivity extends Activity implements LocationListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location);
-        textAccuracy = (TextView) findViewById(R.id.textAccuracy);
+
+		textAccuracy = (TextView) findViewById(R.id.textAccuracy);
         sendButton = (Button) findViewById(R.id.buttonSend);
         sendButton.setEnabled(false);
-    }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(GPS_PROVIDER))
-            textAccuracy.setText("GPS is off.");
-        else
-            locationManager.requestLocationUpdates(GPS_PROVIDER, 1000, 0, this);
-    }
+		locationManager = LocationManager.getInstance(getApplicationContext());
+		List<String> providers = locationManager.getAllProviders();
+		boolean hasFused = false;
+		for (String provider : providers) {
+			if (LocationManager.FUSED_PROVIDER.equals(provider)) {
+				hasFused = true;
+				break;
+			}
+		}
 
-    @Override
-    protected void onPause() {
-        locationManager.removeUpdates(this);
-        finish();
-        super.onPause();
-    }
+		if (hasFused) {
+			try {
+				locationManager.requestLocationUpdates(LocationManager.FUSED_PROVIDER, 1000, 0, this);
+			} catch (IllegalArgumentException e) {
+				Log.d(TAG, "failed to request a location with fused provider" + e);
+			}
+		}
 
-    public void onSendClicked(View view) {
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+		try {
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
+		} catch (IllegalArgumentException e) {
+			Log.d(TAG, "failed to request a location with network provider" + e);
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		locationManager.removeUpdates(this);
+		finish();
+		super.onPause();
+	}
+
+	public void onSendClicked(View view) {
         Intent msg = getIntent().getParcelableExtra("SEND_MESSAGE");
         if (msg != null) {
             String url = "Location:\nhttps://google.com/maps/place/" + latestLocation.getLatitude() + "," + latestLocation.getLongitude();
@@ -63,29 +80,26 @@ public class SendLocationActivity extends Activity implements LocationListener {
         finish();
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        latestLocation = location;
-        updateTextAccuracy();
-    }
 
-    private void updateTextAccuracy() {
-        Log.d(">>>> LocationChanged: ", latestLocation.toString());
+	@Override
+	public void onLocationChanged(Location location) {
+		latestLocation = location;
 
-        textAccuracy.post(new Runnable() {
-            @Override
-            public void run() {
-                sendButton.setEnabled(true);
-                textAccuracy.setText("Accuracy " + (int) latestLocation.getAccuracy() + " meters");
-            }
-        });
-    }
+		updateTextAccuracy();
+	}
 
-    @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
-    @Override public void onProviderEnabled(String provider) { }
-    @Override public void onProviderDisabled(String provider) { }
+	private void updateTextAccuracy() {
+		textAccuracy.post(new Runnable() {
+			@Override
+			public void run() {
+				sendButton.setEnabled(true);
+				textAccuracy.setText("Accuracy " + (int) latestLocation.getAccuracy() + " meters");
+			}
+		});
+	}
+
+	@Override public void onStatusChanged(String provider, int status, Bundle extras) { }
+	@Override public void onProviderEnabled(String provider) { }
+	@Override public void onProviderDisabled(String provider) { }
 
 }
-
-
-
