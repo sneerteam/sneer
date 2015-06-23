@@ -11,32 +11,36 @@
            [sneer.impl CoreLoader]
            [java.io Closeable]
            [sneer.flux LeaseHolder]
-           [sneer.tuple.protocols Database]))
+           [sneer.tuple.protocols Database]
+           (sneer.admin SneerAdmin)))
 
-(defn own-puk [admin]
+(defn puk [container]
+  (admin->puk (container SneerAdmin)))
+
+(defn admin->puk [admin]
   (.. admin privateKey publicKey))
 
-(defn connect! [admin1 admin2]
-  (let [admin1-received (chan)
-        admin2-received (chan)
-        admin1-puk (own-puk admin1)
-        admin2-puk (own-puk admin2)
-        admin1-tb (tuple-base-of admin1)
-        admin2-tb (tuple-base-of admin2)]
+(defn- start [puk tb in out other-puk]
+  (transmitter/start puk tb in
+                     (fn [follower-puk tuples-out & _]
+                       (assert (= follower-puk other-puk))
+                       (go-while-let [[tuple ack-ch] (<! tuples-out)]
+                                     (>! out tuple)
+                                     (>! ack-ch tuple)))))
 
-    (transmitter/start admin1-puk admin1-tb admin1-received
-                       (fn [follower-puk tuples-out & _]
-                         (assert (= follower-puk admin2-puk))
-                         (go-while-let [[tuple ack-ch] (<! tuples-out)]
-                           (>! admin2-received tuple)
-                           (>! ack-ch tuple))))
+(defn connect-admins! [admin-a admin-b]
+  (let [->a (chan)
+        ->b (chan)
+        puk-a (admin->puk admin-a)
+        puk-b (admin->puk admin-b)
+        tb-a (tuple-base-of admin-a)
+        tb-b (tuple-base-of admin-b)]
 
-    (transmitter/start admin2-puk admin2-tb admin2-received
-                       (fn [follower-puk tuples-out & _]
-                         (assert (= follower-puk admin1-puk))
-                         (go-while-let [[tuple ack-ch] (<! tuples-out)]
-                           (>! admin1-received tuple)
-                           (>! ack-ch tuple))))))
+    (start puk-a tb-a ->a ->b puk-b)
+    (start puk-b tb-b ->b ->a puk-a)))
+
+(defn connect! [container-a container-b]
+  (connect-admins! (container-a SneerAdmin) (container-b SneerAdmin)))
 
 (defn sneer! []
   (let [delegate (Container. (CoreLoader.))

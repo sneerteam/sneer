@@ -10,7 +10,7 @@
             [sneer.keys :refer [->puk create-prik]]
             [sneer.party :refer [reify-party create-puk->party]]
             [sneer.conversation :refer [reify-conversation]]
-            [sneer.integration-test-util :refer [own-puk connect!]])
+            [sneer.integration-test-util :refer [admin->puk connect-admins!]])
   (:import [sneer.crypto.impl KeysImpl]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
@@ -22,11 +22,11 @@
         maico-tb (tb/create maico-db)
         neide-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) neide-tb)
         maico-admin (new-sneer-admin (.createPrivateKey (KeysImpl.)) maico-tb)
-        neide-puk (own-puk neide-admin)
-        maico-puk (own-puk maico-admin)
+        neide-puk (admin->puk neide-admin)
+        maico-puk (admin->puk maico-admin)
         neide-sneer (.sneer neide-admin)
         maico-sneer (.sneer maico-admin)
-        _ (connect! neide-admin maico-admin)
+        _ (connect-admins! neide-admin maico-admin)
         neide (.produceContact maico-sneer "neide" (.produceParty maico-sneer neide-puk) nil)
         maico (.produceContact neide-sneer "maico" (.produceParty neide-sneer maico-puk) nil)]
     {:neide-db neide-db
