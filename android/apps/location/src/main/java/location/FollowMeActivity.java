@@ -1,15 +1,12 @@
 package location;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Window;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -17,7 +14,7 @@ import sneer.android.Message;
 import sneer.android.PartnerSession;
 import sneer.location.R;
 
-import static android.location.LocationManager.GPS_PROVIDER;
+import static location.LocationUtils.initProviders;
 
 
 public class FollowMeActivity extends Activity implements LocationListener {
@@ -62,11 +59,8 @@ public class FollowMeActivity extends Activity implements LocationListener {
 
 	private void refresh() {
 		if (locationManager == null) {
-			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-			if (!locationManager.isProviderEnabled(GPS_PROVIDER))
-				Toast.makeText(this, "GPS is off", Toast.LENGTH_SHORT).show();
-			else
-				locationManager.requestLocationUpdates(GPS_PROVIDER, 30000, 0, this);
+			locationManager = LocationManager.getInstance(getApplicationContext());
+			initProviders(locationManager, 30000, this);
 		}
 
 		map.post(new Runnable() { @Override public void run() {

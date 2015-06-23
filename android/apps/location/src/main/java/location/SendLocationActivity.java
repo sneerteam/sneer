@@ -17,8 +17,6 @@ import sneer.location.R;
 
 public class SendLocationActivity extends Activity implements LocationListener {
 
-	private static final String TAG = "LOCATIONTEST";
-
 	private LocationManager locationManager;
 
 	private Location latestLocation;
@@ -35,30 +33,10 @@ public class SendLocationActivity extends Activity implements LocationListener {
         sendButton.setEnabled(false);
 
 		locationManager = LocationManager.getInstance(getApplicationContext());
-		List<String> providers = locationManager.getAllProviders();
-		boolean hasFused = false;
-		for (String provider : providers) {
-			if (LocationManager.FUSED_PROVIDER.equals(provider)) {
-				hasFused = true;
-				break;
-			}
-		}
-
-		if (hasFused) {
-			try {
-				locationManager.requestLocationUpdates(LocationManager.FUSED_PROVIDER, 1000, 0, this);
-			} catch (IllegalArgumentException e) {
-				Log.d(TAG, "failed to request a location with fused provider" + e);
-			}
-		}
-
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-		try {
-			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
-		} catch (IllegalArgumentException e) {
-			Log.d(TAG, "failed to request a location with network provider" + e);
-		}
+		LocationUtils.initProviders(locationManager, 1000, this);
 	}
+
+
 
 	@Override
 	protected void onPause() {

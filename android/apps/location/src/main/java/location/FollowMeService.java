@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -18,12 +17,12 @@ import java.util.HashMap;
 
 import sneer.location.R;
 
-import static android.location.LocationManager.GPS_PROVIDER;
+import static location.LocationUtils.initProviders;
 
 public class FollowMeService extends Service implements LocationListener {
 
     public final static int SERVICE_ID = 1234;
-    private static final int TEN_SECONDS = 30000;
+    private static final int THIRD_SECONDS = 30000;
 
     private volatile LocationManager locationManager;
 
@@ -43,13 +42,13 @@ public class FollowMeService extends Service implements LocationListener {
                 .setOnlyAlertOnce(true);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Toast.makeText(this, "No GPS available", Toast.LENGTH_LONG).show();
             stopSelf();
             return Service.START_NOT_STICKY;
         }
 
-        locationManager.requestLocationUpdates(GPS_PROVIDER, TEN_SECONDS, 0, this);
+        initProviders(locationManager, THIRD_SECONDS, this);
         startForeground(SERVICE_ID, builder.build());
         startKillAlarm();
 		isRunning = true;
@@ -61,9 +60,7 @@ public class FollowMeService extends Service implements LocationListener {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, FollowMeServiceKiller.class);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + 60 * 1000 * 60, alarmIntent);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60 * 1000 * 60, alarmIntent);
     }
 
     @Override
