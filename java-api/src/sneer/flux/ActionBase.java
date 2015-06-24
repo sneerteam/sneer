@@ -1,6 +1,6 @@
 package sneer.flux;
 
-class ActionBase {
+public class ActionBase {
 
 	public final String type;
 	public final Object[] keyValuePairs;

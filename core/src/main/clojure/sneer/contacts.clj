@@ -1,9 +1,9 @@
 (ns sneer.contacts
   (:require
-    [clojure.core.async :refer [chan <!]]
+    [clojure.core.async :refer [chan <! >!]]
     [sneer.async :refer [go-while-let]]
     [sneer.commons :refer [now]]
-    [sneer.flux :refer [tap-actions of-type]]
+    [sneer.flux :refer [tap-actions response]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer [store-tuple]])
   (:import
@@ -26,11 +26,20 @@
                              "author"    own-puk})))
 
 (defn start! [container]
-  (let [actions (chan 1 (filter (of-type "set-nickname")))]
+  (let [actions (chan 1)]
     (tap-actions (.produce container Dispatcher) actions)
+
     (go-while-let [a (<! actions)]
 
-      (let [{:strs [convo-id new-nick]} (-> a .keyValuePairs seq)]
-        (println "CONVO-ID" convo-id "NEW-NICK" new-nick))
+      (case (a :type)
 
-      )))
+        "set-nickname"
+        (let [{:strs [convo-id new-nick]} a]
+          (println "set-nickname" convo-id new-nick))
+
+        "accept-invite"
+        (let [{:strs [new-contact-nick contact-puk invite-code-received]} a]
+          (println "accept-invite" new-contact-nick contact-puk invite-code-received)
+          (>! (response a) 42))
+
+        nil))))
