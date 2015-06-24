@@ -46,7 +46,7 @@ public class ConvosSim implements Convos {
 
     @Override
     public Observable<Convo> getById(long id) {
-        return Observable.just(new Convo("Nicholas", null, new ChatSim(), new ArrayList<SessionSummary>()));
+        return Observable.just(new Convo(id, "Nicholas", null, new ChatSim(), new ArrayList<SessionSummary>()));
     }
 
     private static final String[] UNREAD_OPTIONS = {"?", "*", ""};
