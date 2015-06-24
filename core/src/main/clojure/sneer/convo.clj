@@ -3,6 +3,7 @@
             [clojure.core.async :as async :refer [<! >! chan]]
             [sneer.async :refer [pipe-to-subscriber! close-on-unsubscribe! state-machine go-trace go-loop-trace sliding-chan]]
             [sneer.chat :refer [reify-Chat]]
+            [sneer.contacts]
             [sneer.rx :refer [shared-latest]]
             [sneer.tuple.protocols :refer :all]
             [sneer.tuple-base-provider :refer :all]
@@ -59,14 +60,15 @@
 (defn- start!
   "`id' is the id of the first contact tuple for this party"
   [container id convo-ch lease]
-  (go-trace
-    ; don't emit historical snapshots upon startup
-    (let [state (<! (catch-up container id))]
-      (>! convo-ch state)
-      (let [events (query-remaining-tuples container (:last-id state) lease)
-            taps (state-machine state handle-tuple events)]
-        (>! taps convo-ch)
-        (<! lease)))))
+  (let [contacts (.produce container sneer.contacts/handle)]
+    (go-trace
+      ; don't emit historical snapshots upon startup
+      (let [state (<! (catch-up container id))]
+        (>! convo-ch state)
+        (let [events (query-remaining-tuples container (:last-id state) lease)
+              taps (state-machine state handle-tuple events)]
+          (>! taps convo-ch)
+          (<! lease))))))
 
 ; public Convo(String nick, String inviteCodePending, Chat chat, List<SessionSummary> sessionSummaries)
 ; public SessionSummary(long id, String type, String title, String date, String unread)

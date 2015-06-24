@@ -23,14 +23,16 @@
         (. convos summaries) => (emits #(-> % first .nickname (= "Maico")))
 
         (.nickname convo) => "Maico"
-        (.dispatch (neide Dispatcher) (.setNickname convo "Maico Costa"))
-;        convo-obs => (emits #(-> % .nickname (= "Maico Costa")))
 
         (with-open [maico (sneer!)]
           (connect! neide maico)
-          #_(-> (maico Convos) (.startconvo "Neide" (-> neide puk .toHex) (.inviteCodePending convo)))
+          #_(.dispatch (maico Dispatcher)
+                     (Convos$Actions/acceptInvite "Neide" (-> neide puk .toHex) (.inviteCodePending convo))))
 
-          )))))
+        (.dispatch (neide Dispatcher) (.setNickname convo "Maico Costa"))
+        ;convo-obs => (emits #(-> % .nickname (= "Maico Costa")))
+
+        ))))
 
   ; set-nickname action with duplicate nick emits error warning via "toaster"
   ; Subs for conversations.

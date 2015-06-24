@@ -14,7 +14,7 @@
     :lease
     (clojure.core.async/chan)
 
-    :contacts
+    sneer.contacts/handle
     (sneer.contacts/start! container)
 
     sneer.admin.SneerAdmin
