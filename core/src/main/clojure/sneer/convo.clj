@@ -18,13 +18,6 @@
   ; contact, push (invite accept), message
   (query-tuples (tuple-base container) {after-id starting-id} tuples))
 
-; public Convo(String nick, String inviteCodePending, Chat chat, List<SessionSummary> sessionSummaries)
-; public SessionSummary(long id, String type, String title, String date, String unread)
-; interface Chat { List<Message> messages(); }
-; public Message(long id, String text, boolean isOwn, String date)
-(defn- to-foreign [state]
-  (Convo. (state :nick) "" nil nil))
-
 (defn- update-nick [state tuple]
   (some->> (tuple "payload")
            (assoc state :nick)))
@@ -74,6 +67,13 @@
             taps (state-machine state handle-tuple events)]
         (>! taps convo-ch)
         (<! lease)))))
+
+; public Convo(String nick, String inviteCodePending, Chat chat, List<SessionSummary> sessionSummaries)
+; public SessionSummary(long id, String type, String title, String date, String unread)
+; interface Chat { List<Message> messages(); }
+; public Message(long id, String text, boolean isOwn, String date)
+(defn- to-foreign [state]
+  (Convo. (state :id) (state :nick) "" nil nil))
 
 (defn convo-by-id [container id]
   (rx/observable*

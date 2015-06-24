@@ -1,17 +1,26 @@
 (ns sneer.flux
   (:require
-    [clojure.core.async :refer [chan]])
+    [clojure.core.async :refer [chan mult tap go >!]]
+    [sneer.async :refer [close-with!]])
   (:import
-    [sneer.commons ActionBus]))
+    [sneer.flux Dispatcher Action]))
 
-(definterface LeaseHolder
-  (getLeaseChannel []))
+(defprotocol ActionSource
+  (tap-actions [_ ch]))
 
-(defn reify-LeaseHolder [_container]
-  (let [lease (chan)]
-    (reify LeaseHolder
-      (getLeaseChannel [_] lease))))
+(defn reify-Dispatcher [container]
+  (let [actions (chan)
+        mult (mult actions)
+        lease (.produce container :lease)]
 
-(defn reify-ActionBus [_]
-  (reify ActionBus
-    (action [_ action] (println "Action: " action))))
+    (close-with! lease actions)
+
+    (reify
+      Dispatcher
+      (dispatch [_ action] (go (>! actions action)))
+
+      ActionSource
+      (tap-actions [_ ch] (tap mult ch)))))
+
+(defn of-type [type]
+  (fn [^Action action] (-> action .type (= type))))

@@ -6,7 +6,6 @@
     [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
-    [sneer.flux :refer :all]                                ; Required to cause compilation of LeaseHolder
     [sneer.io :as io]
     [sneer.rx :refer [shared-latest]]
     [sneer.party :refer [party->puk]]
@@ -18,7 +17,6 @@
   (:import
     [java.io File]
     [sneer.admin SneerAdmin]
-    [sneer.flux LeaseHolder]
     [sneer.commons PersistenceFolder]
     [sneer.interfaces ConvoSummarization]))
 
@@ -107,7 +105,7 @@
 ;                                  :preview "Hi, Maico"
 ;                                  :id long}}
 (defn- start-summarization-machine! [container previous-state]
-  (let [lease (.getLeaseChannel (.produce container LeaseHolder))
+  (let [lease (.produce container :lease)
         admin (.produce container SneerAdmin)
         own-puk (.. admin privateKey publicKey)
         tuple-base (tuple-base-of admin)

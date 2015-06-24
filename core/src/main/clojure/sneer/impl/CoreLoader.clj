@@ -2,22 +2,26 @@
   (:gen-class
    :implements [sneer.commons.Container$ComponentLoader])
   (:require sneer.admin
+            sneer.contacts
             sneer.interfaces
             sneer.flux
             sneer.convos
             sneer.convo-summarization))
 
-(defn -load [this component-interface container]
-  (condp = component-interface
+(defn -load [_this component-handle container]
+  (condp = component-handle
+
+    :lease
+    (clojure.core.async/chan)
+
+    :contacts
+    (sneer.contacts/start! container)
 
     sneer.admin.SneerAdmin
     (sneer.admin/reify-SneerAdmin container)
 
-    sneer.flux.LeaseHolder
-    (sneer.flux/reify-LeaseHolder container)
-
-    sneer.commons.ActionBus
-    (sneer.flux/reify-ActionBus container)
+    sneer.flux.Dispatcher
+    (sneer.flux/reify-Dispatcher container)
 
     sneer.convos.Convos
     (sneer.convos/reify-Convos container)

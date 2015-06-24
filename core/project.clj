@@ -36,6 +36,7 @@
                     sneer.tuple.tuple-transmitter
                     sneer.admin
                     sneer.contact
+                    sneer.contacts
                     sneer.conversation
                     sneer.convo
                     sneer.convo-summarization

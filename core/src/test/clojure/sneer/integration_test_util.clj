@@ -10,7 +10,6 @@
            [sneer.commons Container PersistenceFolder]
            [sneer.impl CoreLoader]
            [java.io Closeable]
-           [sneer.flux LeaseHolder]
            [sneer.tuple.protocols Database]
            (sneer.admin SneerAdmin)))
 
@@ -53,4 +52,4 @@
       (invoke [_ component] (.produce delegate component))
 
       Closeable
-      (close [_] (close! (.getLeaseChannel (.produce delegate LeaseHolder)))))))
+      (close [_] (close! (.produce delegate :lease))))))
