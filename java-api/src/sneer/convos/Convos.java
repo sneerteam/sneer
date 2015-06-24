@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import rx.Observable;
-import sneer.commons.exceptions.FriendlyException;
+import sneer.flux.Request;
 
 public interface Convos {
 
@@ -29,5 +29,12 @@ public interface Convos {
 	Observable<Long> startConvo(String newContactNick, String contactPuk, String inviteCodeReceived);
 
 	Observable<Convo> getById(long id);
+
+	class Actions {
+		/** @return A request for the convo id of a new convo. */
+		public static Request<Long> acceptInvite(String newContactNick, String contactPuk, String inviteCodeReceived) {
+			return Request.request("accept-invite", "new-contact-nick", newContactNick, "contact-puk", contactPuk, "invite-code-received", inviteCodeReceived);
+		}
+	}
 
 }

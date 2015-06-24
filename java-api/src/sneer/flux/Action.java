@@ -1,13 +1,9 @@
 package sneer.flux;
 
-public class Action {
+public class Action extends ActionBase {
 
-	public final String type;
-	public final Object[] keyValuePairs;
-
-	private Action(String type, Object[] keyValuePairs) {
-		this.type = type;
-		this.keyValuePairs = keyValuePairs;
+	Action(String type, Object[] keyValuePairs) {
+		super(keyValuePairs, type);
 	}
 
 	public static Action action(String type, Object... keyValuePairs) {
