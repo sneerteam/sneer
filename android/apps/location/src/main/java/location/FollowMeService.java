@@ -41,7 +41,7 @@ public class FollowMeService extends Service implements LocationListener {
                 .setContentText("Sending your GPS location...")
                 .setOnlyAlertOnce(true);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationManager = LocationManager.getInstance(getApplicationContext());
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Toast.makeText(this, "No GPS available", Toast.LENGTH_LONG).show();
             stopSelf();
