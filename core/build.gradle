@@ -48,8 +48,8 @@ sourceSets {
 compileClojure.mustRunAfter compileJava
 
 dependencies {
-  compile 'org.clojure:clojure:1.7.0-alpha5'
-  compile 'org.clojure:core.async:0.1.346.0-17112a-alpha'
+  compile external['clojure.core']
+  compile external['clojure.core.async']
   compile external['clojure.core.match']
   compile('com.cognitect:transit-clj:0.8.269') {
     exclude group: 'org.msgpack', module: 'msgpack'
@@ -117,4 +117,3 @@ uploadArchives {
     mavenLocal()
   }
 }
-
