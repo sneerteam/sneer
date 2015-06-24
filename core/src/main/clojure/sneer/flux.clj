@@ -14,6 +14,8 @@
 (defn- ->map [^ActionBase a]
   (assoc (apply hash-map (.keyValuePairs a))
          :type (.type a)))
+
+(defn reify-Dispatcher [^Container container]
   (let [actions (chan)
         mult (mult actions)
         lease (.produce container :lease)]
