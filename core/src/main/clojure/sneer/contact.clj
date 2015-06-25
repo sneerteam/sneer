@@ -63,7 +63,7 @@
           (throw (FriendlyException. "This contact already has a party.")))
         (when (get @puk->contact-atom (.publicKey party))
           (throw (FriendlyException. "Another contact already has this party.")))
-        (publish-contact tuple-space own-puk nickname party invite-code)
+        (publish-contact tuple-space own-puk nickname party nil)
         (swap! puk->contact-atom #(-> %
                                       (dissoc (.. this nickname current))
                                       (assoc (.. party publicKey current) this)))
