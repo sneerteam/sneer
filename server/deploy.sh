@@ -2,8 +2,6 @@
 export LEIN_ROOT=yes
 
 # Build new server version
-rm -rf /root/.m2/repository/me/sneer/
-git clean -d -x --force --quiet
 lein do clean, midje, uberjar || exit -1
 
 mkdir -p /root/sneer-live      || exit -1
