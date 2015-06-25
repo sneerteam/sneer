@@ -4,26 +4,31 @@
     [sneer.async :refer [go-while-let]]
     [sneer.commons :refer [now]]
     [sneer.flux :refer [tap-actions response]]
+    [sneer.keys :refer [from-hex]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer [store-tuple]])
   (:import
-   [sneer.flux Dispatcher]
-   [sneer.admin SneerAdmin]))
+    [sneer.flux Dispatcher]
+    [sneer.admin SneerAdmin]))
 
 (def handle ::contacts)
 
 (defn- puk [^SneerAdmin admin]
   (.. admin privateKey publicKey))
 
-(defn- store-contact! [container newContactNick]
+(defn- -store-tuple! [container tuple]
   (let [admin (.produce container SneerAdmin)
         own-puk (puk admin)
-        tuple-base (tuple-base-of admin)]
-    (store-tuple tuple-base {"type"      "contact"
-                             "payload"   newContactNick
-                             "timestamp" (now)
-                             "audience"  own-puk
-                             "author"    own-puk})))
+        tuple-base (tuple-base-of admin)
+        defaults {"timestamp" (now)
+                  "audience"  own-puk
+                  "author"    own-puk}]
+      (store-tuple tuple-base (merge defaults tuple))))
+
+(defn- store-contact! [container new-contact-nick contact-puk]
+  (-store-tuple! container {"type"    "contact"
+                            "payload" new-contact-nick
+                            "party"   contact-puk}))
 
 (defn start! [container]
   (let [actions (chan 1)]
@@ -38,8 +43,13 @@
           (println "set-nickname" convo-id new-nick))
 
         "accept-invite"
-        (let [{:strs [new-contact-nick contact-puk invite-code-received]} a]
-          (println "accept-invite" new-contact-nick contact-puk invite-code-received)
-          (>! (response a) 42))
+        (let [{:strs [new-contact-nick contact-puk invite-code-received]} a
+              contact-puk (from-hex contact-puk)
+              contact-tuple (<! (store-contact! container new-contact-nick contact-puk))]
+          (-store-tuple! container {"type"     "push"
+                                    "audience" contact-puk
+                                    "invite-code" invite-code-received})
 
-        nil))))
+          (>! (response a) (contact-tuple "id")))
+
+        (println "UNKNOWN ACTION: " a)))))

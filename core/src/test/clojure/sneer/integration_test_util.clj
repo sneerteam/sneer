@@ -7,7 +7,7 @@
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.tuple-transmitter :as transmitter])
   (:import [clojure.lang IFn]
-           [sneer.commons Container PersistenceFolder]
+           [sneer.commons Container PersistenceFolder Startup]
            [sneer.impl CoreLoader]
            [java.io Closeable]
            [sneer.tuple.protocols Database]
@@ -46,6 +46,7 @@
         transient nil]
     (.inject delegate PersistenceFolder (reify PersistenceFolder (get [_] transient)))
     (.inject delegate Database (create-sqlite-db))
+    (.produce delegate Startup)
 
     (reify
       IFn

@@ -17,7 +17,7 @@
     [sneer.tuple-base-provider :refer :all]
     [sneer.interfaces])
   (:import
-    [java.util Date]
+    [java.util Date UUID]
     [org.ocpsoft.prettytime PrettyTime]
     [rx Subscriber]
     [sneer.admin SneerAdmin]
@@ -45,30 +45,34 @@
           (pipe-to-subscriber!   out subscriber "conversation summaries")
           (republish-latest-every! (* 60 1000) in out))))))
 
-(defn store-contact! [container newContactNick]
+(defn store-contact! [container newContactNick invite-code]
   (let [admin (.produce container SneerAdmin)
         own-puk (.. admin privateKey publicKey)
         tuple-base (tuple-base-of admin)]
-    (<!! (store-tuple tuple-base {"type"      "contact"
-                                  "payload"   newContactNick
-                                  "timestamp" (now)
-                                  "audience"  own-puk
-                                  "author"    own-puk}))))
+    (store-tuple tuple-base {"type"        "contact"
+                             "payload"     newContactNick
+                             "timestamp"   (now)
+                             "audience"    own-puk
+                             "author"      own-puk
+                             "invite-code" invite-code})))
+
+(defn- invite-code []
+  (-> (UUID/randomUUID) .toString (.replaceAll "-" "")))
 
 (defn- start-convo! [container newContactNick]
   (let [result (AsyncSubject/create)
         summarization ^ConvoSummarization (.produce container ConvoSummarization)]
 
     (go-trace
-     (let [tuple (store-contact! container newContactNick)
-           attempt-id (tuple "id")
-           _ (<! (.processUpToId summarization attempt-id))
-           actual-id (.getIdByNick summarization newContactNick)]
-       (if (= actual-id attempt-id)
-         (do
-           (rx/on-next result attempt-id)
-           (rx/on-completed result))
-         (rx/on-error result (FriendlyException. (if actual-id (str newContactNick " was already a contact") "Unknown error"))))))
+      (let [tuple (<! (store-contact! container newContactNick (invite-code)))
+            attempt-id (tuple "id")
+            _ (<! (.processUpToId summarization attempt-id))
+            actual-id (.getIdByNick summarization newContactNick)]
+        (if (= actual-id attempt-id)
+          (do
+            (rx/on-next result attempt-id)
+            (rx/on-completed result))
+          (rx/on-error result (FriendlyException. (if actual-id (str newContactNick " was already a contact") "Unknown error"))))))
 
     result))
 

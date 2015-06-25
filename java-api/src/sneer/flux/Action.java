@@ -3,7 +3,7 @@ package sneer.flux;
 public class Action extends ActionBase {
 
 	Action(String type, Object[] keyValuePairs) {
-		super(keyValuePairs, type);
+		super(type, keyValuePairs);
 	}
 
 	public static Action action(String type, Object... keyValuePairs) {

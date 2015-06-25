@@ -1,6 +1,7 @@
 package sneer.android;
 
 import sneer.commons.Container;
+import sneer.commons.Startup;
 
 import static sneer.commons.Container.ComponentLoader;
 
@@ -17,9 +18,16 @@ public class SneerAndroidContainer {
 	}
 
 	private static Container initContainer() {
-		ComponentLoader     loader = coreLoader();
-		if (loader == null) loader = simsLoader();
-		return new Container(loader);
+		Container ret = new Container(loader());
+		ret.produce(Startup.class);
+		return ret;
+	}
+
+	private static ComponentLoader loader() {
+		ComponentLoader coreLoader = coreLoader();
+		return coreLoader != null
+			? coreLoader
+			: simsLoader();
 	}
 
 	private static ComponentLoader coreLoader() {
@@ -28,6 +36,7 @@ public class SneerAndroidContainer {
 		catch (Exception e)              { throw new RuntimeException(e); }
 	}
 
+	@SuppressWarnings("unchecked")
 	private static ComponentLoader simsLoader() { return new ComponentLoader() { @Override public <T> T load(Object handle, Container ignored) {
 		try {
 			return (T) Class.forName("sims." + ((Class<T>)handle).getName() + "Sim").newInstance();   //Example: sims.sneer.ConversationListSim

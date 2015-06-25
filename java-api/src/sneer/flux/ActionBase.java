@@ -5,7 +5,7 @@ public class ActionBase {
 	public final String type;
 	public final Object[] keyValuePairs;
 
-	ActionBase(Object[] keyValuePairs, String type) {
+	ActionBase(String type, Object[] keyValuePairs) {
 		this.keyValuePairs = keyValuePairs;
 		this.type = type;
 	}

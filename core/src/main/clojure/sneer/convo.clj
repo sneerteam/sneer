@@ -28,11 +28,19 @@
     (update-nick state tuple)
     state))
 
+(defn handle-invite-acceptance [state tuple]
+  (let [puk (tuple "party")]
+    (-> state
+        (assoc :puk puk)
+        (dissoc :invite-code))))
+
 (defn- update-contact-without-puk [state tuple]
   (if (= (state :id) (tuple "id"))
-    (update-nick state tuple)
+    (-> state
+      (update-nick tuple)
+      (assoc :invite-code (tuple "invite-code")))
     (if (= (state :nick) (tuple "payload"))
-      (assoc state :puk (tuple "party"))
+      (handle-invite-acceptance state tuple)
       state)))
 
 (defn- handle-contact [state tuple]
@@ -70,12 +78,12 @@
           (>! taps convo-ch)
           (<! lease))))))
 
-; public Convo(String nick, String inviteCodePending, Chat chat, List<SessionSummary> sessionSummaries)
+; public Convo(long id, String nick, String inviteCodePending, Chat chat, List<SessionSummary> sessionSummaries)
 ; public SessionSummary(long id, String type, String title, String date, String unread)
 ; interface Chat { List<Message> messages(); }
 ; public Message(long id, String text, boolean isOwn, String date)
-(defn- to-foreign [state]
-  (Convo. (state :id) (state :nick) "" nil nil))
+(defn- to-foreign [{:keys [id nick invite-code]}]
+  (Convo. id nick invite-code nil nil))
 
 (defn convo-by-id [container id]
   (rx/observable*

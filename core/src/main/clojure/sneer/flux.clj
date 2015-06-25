@@ -16,7 +16,7 @@
          :type (.type a)))
 
 (defn reify-Dispatcher [^Container container]
-  (let [actions (chan)
+  (let [actions (chan) #_(chan 1 (map #(do (println "ACTION:" %) %)))
         mult (mult actions)
         lease (.produce container :lease)]
 

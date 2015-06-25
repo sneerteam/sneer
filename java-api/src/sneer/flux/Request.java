@@ -1,6 +1,6 @@
 package sneer.flux;
 
-public class Request<T> extends Action {
+public class Request<T> extends ActionBase {
 
 	Request(String type, Object[] keyValuePairs) {
 		super(type, keyValuePairs);

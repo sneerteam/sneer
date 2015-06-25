@@ -3,7 +3,7 @@
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! connect! puk]]
             [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
-  (:import [sneer.convos Convos]
+  (:import [sneer.convos Convos Convos$Actions]
            [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))
 
@@ -23,13 +23,17 @@
         (. convos summaries) => (emits #(-> % first .nickname (= "Maico")))
 
         (.nickname convo) => "Maico"
+        (.inviteCodePending convo) => some?
 
         (with-open [maico (sneer!)]
           (connect! neide maico)
-          #_(.dispatch (maico Dispatcher)
-                     (Convos$Actions/acceptInvite "Neide" (-> neide puk .toHex) (.inviteCodePending convo))))
+          (.request (maico Dispatcher)
+                     (Convos$Actions/acceptInvite "Neide" (-> neide puk .toHex) (.inviteCodePending convo)))
+          convo-obs => (emits #(-> % .inviteCodePending nil?)))
 
-        (.dispatch (neide Dispatcher) (.setNickname convo "Maico Costa"))
+
+
+        ;(.dispatch (neide Dispatcher) (.setNickname convo "Maico Costa"))
         ;convo-obs => (emits #(-> % .nickname (= "Maico Costa")))
 
         ))))
