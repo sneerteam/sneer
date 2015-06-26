@@ -10,10 +10,8 @@
             [sneer.tuple.persistent-tuple-base :refer [after-id]])
   (:import
     [sneer.convos Convo]
-    [rx Subscriber]))
-
-(defn- tuple-base [container]
-  (tuple-base-of (.produce container sneer.admin.SneerAdmin)))
+    [rx Subscriber]
+    [sneer.admin SneerAdmin]))
 
 (defn- update-nick [state tuple]
   (some->> (tuple "payload")
@@ -50,6 +48,9 @@
      "contact" (handle-contact state tuple)
      state)
    (assoc :last-id (tuple "id"))))
+
+(defn- tuple-base [container]
+  (tuple-base-of (.produce container SneerAdmin)))
 
 (defn- query-convo-tuples [container starting-id tuples]
   ; contact, push (invite accept), message

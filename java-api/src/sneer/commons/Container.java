@@ -10,15 +10,16 @@ import static sneer.commons.exceptions.Exceptions.check;
 
 public class Container {
 
-	static private final WeakHashMap<Object, Container> containersByComponent = new WeakHashMap<Object, Container>();
+	static private final WeakHashMap<Object, Object> containersByComponent = new WeakHashMap<Object, Object>();
+	private static final Object MULTIPLE = "COMPONENT IN MULTIPLE CONTAINERS";
 
 	/** Used by components to load others: Container.of(this).produce(OtherComponent.class) */
 	synchronized
 	static public Container of(Object component) {
-		Container ret = containersByComponent.get(component);
-		if (ret == null) throw new IllegalArgumentException("Unable to find single container of " + component + " (it is contained by none or more than one container)." );
-
-		return ret;
+		Object ret = containersByComponent.get(component);
+		if (ret == null)     throw new IllegalArgumentException("Unable to find container for component: " + component);
+		if (ret == MULTIPLE) throw new IllegalArgumentException("Component '" + component + "' is in more than one container.");
+		return (Container)ret;
 	}
 
 
@@ -51,8 +52,11 @@ public class Container {
 	}
 
 	private void keep(Object handle, Object component) {
-		check(!containersByComponent.containsKey(component));
-		containersByComponent.put(component, this);
+		if (containersByComponent.containsKey(component))
+			containersByComponent.put(component, MULTIPLE);
+		else
+			containersByComponent.put(component, this);
+
 		componentsByHandle.put(handle, component);
 	}
 
