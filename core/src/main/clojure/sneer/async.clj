@@ -2,7 +2,8 @@
   (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! alt! timeout mult tap close!]]
             [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
-            [sneer.commons :refer :all]))
+            [sneer.commons :refer :all])
+  (:import [rx Subscriber]))
 
 (def IMMEDIATELY (doto (async/chan) async/close!))
 
@@ -60,12 +61,12 @@
 
 (defn close-on-unsubscribe!
   "Closes the channel when the subscriber is unsubscribed."
-  [^rx.Subscriber subscriber & chans]
+  [^Subscriber subscriber & chans]
   (.add subscriber (rx/subscription #(doseq [c chans] (async/close! c)))))
 
 (defn pipe-to-subscriber!
   "Copies values from channel to rx subscriber in a separate thread."
-  [chan ^rx.Subscriber subscriber ^String thread-name]
+  [chan ^Subscriber subscriber ^String thread-name]
   (async/thread
     (.setName (Thread/currentThread) thread-name)
     (while-let [value (<!! chan)]
