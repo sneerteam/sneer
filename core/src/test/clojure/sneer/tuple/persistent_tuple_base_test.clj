@@ -69,6 +69,29 @@
         (async/close! lease)
         (<!!? query) => nil))))
 
+(facts "About tuple query with history"
+  (with-open [db (jdbc-database/create-sqlite-db)
+              subject (create db)]
+    (let [old-tuples (async/chan)
+          new-tuples (async/chan)
+          lease (async/chan)
+          _ (store-tuple subject t1)
+          query (query-with-history subject {"type" "tweet"} old-tuples new-tuples lease)]
+
+      (fact "It sends old stored tuples"
+        (<!!? old-tuples) => (contains t1))
+
+      (fact "It closes the tuple history channel"
+        (<!!? old-tuples) => nil)
+
+      (fact "It sends new tuples"
+        (store-tuple subject t2)
+        (<!!? new-tuples) => (contains t2))
+
+      (fact "When lease channel is closed query is terminated"
+        (async/close! lease)
+        (<!!? query) => nil))))
+
 (tabular "About query criteria"
   (with-open [db (jdbc-database/create-sqlite-db)
               subject (create db)]
