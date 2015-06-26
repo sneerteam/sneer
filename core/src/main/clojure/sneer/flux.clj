@@ -24,8 +24,11 @@
 
     (reify
       Dispatcher
-      (dispatch [_ action]
-        (go-trace (>! actions (->map action))))
+      (dispatch [this action]
+        (.dispatchMap this (->map action)))
+
+      (dispatchMap [_ action-map]
+        (go-trace (>! actions action-map)))
 
       (request [_ request]
         (let [response (chan 1)
