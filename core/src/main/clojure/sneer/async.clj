@@ -1,11 +1,12 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! alt! timeout mult tap close!]]
+  (:require [clojure.core.async :as async :refer [chan go >! <! <!! alts! timeout mult tap close!]]
             [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
             [sneer.commons :refer :all])
   (:import [rx Subscriber]))
 
-(def IMMEDIATELY (doto (async/chan) async/close!))
+(def closed-chan (doto (async/chan) async/close!))
+(def IMMEDIATELY closed-chan)
 
 (defn close-with!
   "Closes victim channel when ch emits a value."
@@ -92,37 +93,51 @@
             (>! out latest)
             (recur latest (timeout period))))))
 
-(defn state-machine [initial-state function events-in]
+(defn state-machine
   "Returns a channel that accepts other channels as taps for this state machine
    in a way similar to clojure.core.async/tap.
    Reduces initial-state applying (function state event) to each event from the
    events-in channel and puts each resulting state onto the tap channels."
-  (let [taps-in (chan)
-        states-out (chan)
-        mult (mult states-out)]
+  ([initial-state f events-in]
+   (let [no-history closed-chan]
+     (state-machine initial-state f no-history events-in)))
 
-    (go-trace
-      (loop [state initial-state]
-        (alt! :priority true
+  ([initial-state f event-history events-in]
+   (let [taps-in (chan)
+         states-out (chan)
+         mult (mult states-out)]
 
-          taps-in
-          ([tap]
-            (when (some? tap)
-              (>! tap state)
-              (async/tap mult tap)
-              (recur state)))
+     (go-trace
+       (loop [state initial-state
+              inputs [taps-in event-history]
+              current? false]
+         (let [[v ch] (alts! inputs :priority true)]
+           (condp = ch
 
-          events-in
-          ([event]
-            (when (some? event)
-              (let [state' (function state event)]
-                (>! states-out state')
-                (recur state'))))))
+             taps-in
+             (when-some [tap v]
+               (when current?
+                 (>! tap state))
+               (async/tap mult tap)
+               (recur state inputs current?))
 
-      (close! taps-in)
-      (close! states-out))
+             event-history
+             (if-some [event v]
+               (recur (f state event) inputs false)
+               (do
+                 (>! states-out state)
+                 (recur state [taps-in events-in] true)))
 
-    taps-in))
+             events-in
+             (when-some [event v]
+               (let [state' (f state event)]
+                 (>! states-out state')
+                 (recur state' inputs true))))))
+
+       (close! taps-in)
+       (close! states-out))
+
+     taps-in)))
 
 (defn tap-state
   ([machine]

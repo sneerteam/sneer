@@ -36,3 +36,23 @@
     (close! events)
     tap2 => closes
     tap3 => closes))
+
+(fact "State machine taps see state only after history is replayed"
+  (let [history (chan)
+        events (chan)
+        function +
+        initial-state 0
+        machine (state-machine initial-state function history events)
+        tap (chan 1)]
+
+    (>!!? machine tap)
+    (>!!? history 1)
+    (>!!? history 2)
+
+    (close! history)
+    (<!!? tap) => 3
+
+    (>!!? events  100)
+    (<!!? tap) => 103
+
+    (close! events)))
