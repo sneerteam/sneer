@@ -11,25 +11,25 @@
 
 (facts "Convos"
   (with-open [neide (sneer!)]
-    (let [convos ^Convos (neide Convos)]
-      (. convos summaries) => (emits #(.isEmpty %))
-      (. convos problemWithNewNickname "") => "cannot be empty"
-      (. convos problemWithNewNickname "Maico") => nil
-      (let [convo-id (<next (. convos startConvo "Maico"))
-            convo-obs (.getById convos convo-id)
-            convo (<next convo-obs)]
-        (. convos problemWithNewNickname "Maico") => "already used"
-        (. convos startConvo "Maico") => (emits-error FriendlyException)
-        (. convos summaries) => (emits #(-> % first .nickname (= "Maico")))
+    (let [n-convos ^Convos (neide Convos)]
+      (. n-convos summaries) => (emits #(.isEmpty %))
+      (. n-convos problemWithNewNickname "") => "cannot be empty"
+      (. n-convos problemWithNewNickname "Carla") => nil
+      (let [convo-id (<next (. n-convos startConvo "Carla"))
+            n->c-obs (.getById n-convos convo-id)
+            n->c (<next n->c-obs)]
+        (. n-convos problemWithNewNickname "Carla") => "already used"
+        (. n-convos startConvo "Carla") => (emits-error FriendlyException)
+        (. n-convos summaries) => (emits #(-> % first .nickname (= "Carla")))
 
-        (.nickname convo) => "Maico"
-        (.inviteCodePending convo) => some?
+        (.nickname n->c) => "Carla"
+        (.inviteCodePending n->c) => some?
 
-        (with-open [maico (sneer!)]
-          (connect! neide maico)
-          (.request (maico Dispatcher)
-                     (Convos$Actions/acceptInvite "Neide" (-> neide puk .toHex) (.inviteCodePending convo)))
-          convo-obs => (emits #(-> % .inviteCodePending nil?)))
+        (with-open [carla (sneer!)]
+          (connect! neide carla)
+          (.request (carla Dispatcher)
+                     (Convos$Actions/acceptInvite "Neide" (-> neide puk .toHex) (.inviteCodePending n->c)))
+          n->c-obs => (emits #(-> % .inviteCodePending nil?)))
 
 
 
