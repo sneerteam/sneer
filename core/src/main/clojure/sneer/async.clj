@@ -1,5 +1,5 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go >! <! <!! alts! timeout mult tap close!]]
+  (:require [clojure.core.async :as async :refer [chan go >! <! <!! alt! alts! timeout mult tap close!]]
             [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
             [sneer.commons :refer :all])
