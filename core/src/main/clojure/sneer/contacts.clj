@@ -1,13 +1,12 @@
 (ns sneer.contacts
   (:require
-    [clojure.core.async :refer [chan <! >!]]
+    [clojure.core.async :refer [chan <!! >!]]
     [sneer.async :refer [state-machine tap-state]]
     [sneer.commons :refer [now]]
     [sneer.flux :refer [tap-actions response]]
     [sneer.keys :refer [from-hex]]
     [sneer.tuple-base-provider :refer :all]
-    [sneer.tuple.protocols :refer [store-tuple]]
-    [sneer.tuple.persistent-tuple-base :as tb])
+    [sneer.tuple.protocols :refer [store-tuple query-tuples]])
   (:import
     [sneer.flux Dispatcher]
     [sneer.admin SneerAdmin]))
@@ -31,11 +30,12 @@
                             "payload" new-contact-nick
                             "party"   contact-puk}))
 
-(defn- handle-action! [nicks action]
+(defn- handle-events! [container nicks action]
   (case (action :type)
 
     "new-contact"
     (let [{:strs [nick]} action]
+      (<!! (store-contact! container nick nil))
       (conj nicks nick))
 
 ;    "set-nickname"
@@ -54,15 +54,12 @@
 
     (println "UNKNOWN ACTION: " action)))
 
-
-(defn- contact-puk [tuple]
+#_(defn- contact-puk [tuple]
   (tuple "party"))
-
-
 
 #_{:nick->id  {"Neide" 42}
    :puk->nick {NeidePuk "Neide"}}
-(defn- handle-contact [own-puk state tuple]
+#_(defn- handle-contact [own-puk state tuple]
   (if-not (= (tuple "author") own-puk)
     state
     (let [new-nick (tuple "payload")
@@ -77,12 +74,15 @@
 
 
 
-
+(defn- tuple-base [container]
+  (tuple-base-of (.produce container SneerAdmin)))
 
 (defn tap-nicks! [machine tap-ch]
   (tap-state machine tap-ch))
 
 (defn start! [container]
-  (let [actions (chan 1)
-        _ (tap-actions (.produce container Dispatcher) actions)]
-    (state-machine #{} handle-action! actions)))
+  (let [events (chan 1)
+        _ (tap-actions (.produce container Dispatcher) events)
+        lease (.produce container :lease)]
+    (query-tuples (tuple-base container) #_{after-id starting-id} {} events lease)
+    (state-machine #{} (partial handle-events! container) events)))
