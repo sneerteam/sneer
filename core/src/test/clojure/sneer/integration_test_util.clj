@@ -54,3 +54,18 @@
 
       Closeable
       (close [_] (close! (.produce delegate :lease))))))
+
+(defn restarted! [old-sneer]
+  (let [delegate (Container. (CoreLoader.))]
+    (.inject delegate PersistenceFolder (old-sneer PersistenceFolder))
+    (.inject delegate Database (old-sneer Database))
+    (.produce delegate Startup)
+
+    (.close old-sneer)
+
+    (reify
+      IFn
+      (invoke [_ component] (.produce delegate component))
+
+      Closeable
+      (close [_] (close! (.produce delegate :lease))))))
