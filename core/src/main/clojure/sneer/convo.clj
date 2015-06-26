@@ -15,10 +15,6 @@
 (defn- tuple-base [container]
   (tuple-base-of (.produce container sneer.admin.SneerAdmin)))
 
-(defn- query-convo-tuples [container starting-id tuples]
-  ; contact, push (invite accept), message
-  (query-tuples (tuple-base container) {after-id starting-id} tuples))
-
 (defn- update-nick [state tuple]
   (some->> (tuple "payload")
            (assoc state :nick)))
@@ -55,6 +51,10 @@
      state)
    (assoc :last-id (tuple "id"))))
 
+(defn- query-convo-tuples [container starting-id tuples]
+  ; contact, push (invite accept), message
+  (query-tuples (tuple-base container) {after-id starting-id} tuples))
+
 (defn- catch-up [container id]
   (let [tuples (chan)]
     (query-convo-tuples container (dec id) tuples)
@@ -67,16 +67,15 @@
 
 (defn- start!
   "`id' is the id of the first contact tuple for this party"
-  [container id convo-ch lease]
-  (let [contacts (.produce container sneer.contacts/handle)]
-    (go-trace
-      ; don't emit historical snapshots upon startup
-      (let [state (<! (catch-up container id))]
-        (>! convo-ch state)
-        (let [events (query-remaining-tuples container (:last-id state) lease)
-              taps (state-machine state handle-tuple events)]
-          (>! taps convo-ch)
-          (<! lease))))))
+  [container id state-out lease]
+  (go-trace
+    ; don't emit historical snapshots upon startup
+    (let [state (<! (catch-up container id))]
+      (>! state-out state)
+      (let [tuples (query-remaining-tuples container (:last-id state) lease)
+            taps (state-machine state handle-tuple tuples)]
+        (>! taps state-out)
+        (<! lease)))))
 
 ; public Convo(long id, String nick, String inviteCodePending, Chat chat, List<SessionSummary> sessionSummaries)
 ; public SessionSummary(long id, String type, String title, String date, String unread)
@@ -88,8 +87,8 @@
 (defn convo-by-id [container id]
   (rx/observable*
    (fn [^Subscriber subscriber]
-     (let [convo-ch (sliding-chan 1 (map to-foreign))
+     (let [state-out (sliding-chan 1 (map to-foreign))
            lease (chan)]
-       (close-on-unsubscribe! subscriber convo-ch lease)
-       (pipe-to-subscriber! convo-ch subscriber "convo")
-       (start! container id convo-ch lease)))))
+       (close-on-unsubscribe! subscriber state-out lease)
+       (pipe-to-subscriber! state-out subscriber "convo")
+       (start! container id state-out lease)))))

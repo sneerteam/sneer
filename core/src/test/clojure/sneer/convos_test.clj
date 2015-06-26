@@ -20,8 +20,8 @@
             n->c (<next n->c-obs)]
         (. n-convos problemWithNewNickname "Carla") => "already used"
         (. n-convos startConvo "Carla") => (emits-error FriendlyException)
-        (. n-convos summaries) => (emits #(-> % first .nickname (= "Carla")))
 
+        (. n-convos summaries) => (emits #(-> % first .nickname (= "Carla")))
         (.nickname n->c) => "Carla"
         (.inviteCodePending n->c) => some?
 
@@ -31,10 +31,8 @@
                      (Convos$Actions/acceptInvite "Neide" (-> neide puk .toHex) (.inviteCodePending n->c)))
           n->c-obs => (emits #(-> % .inviteCodePending nil?)))
 
-
-
-        ;(.dispatch (neide Dispatcher) (.setNickname convo "Maico Costa"))
-        ;convo-obs => (emits #(-> % .nickname (= "Maico Costa")))
+        (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
+;        n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))
 
         ))))
 
