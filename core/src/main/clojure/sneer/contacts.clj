@@ -1,7 +1,7 @@
 (ns sneer.contacts
   (:require
     [clojure.core.async :refer [chan <! >! alt!]]
-    [sneer.async :refer [state-machine tap-state peek-state! go-loop-trace]]
+    [sneer.async :refer [state-machine tap-state peek-state! go-loop-trace wait-for!]]
     [sneer.commons :refer [now]]
     [sneer.flux :refer [tap-actions response request request!!]]
     [sneer.keys :refer [from-hex]]
@@ -71,17 +71,14 @@
     (query-with-history (tuple-base container) #_{after-id starting-id} {"type" "contact"} old-tuples new-tuples lease)
     (state-machine {:last-id 0} (partial handle-tuple own-puk) old-tuples new-tuples)))
 
-(defn- wait-for-state-to-catch-up [initial states id]
-  (go-loop-trace [state initial]
-    (if (and state (< (state :last-id) id))
-      (recur (<! states))
-      state)))
-
 (defn- problem-with-nick [state nick]
   (cond
     (.isEmpty nick) "cannot be empty"
     (get-in state [:nick->id nick]) "already used"
     :else :nil))
+
+(defn up-to-date? [state id]
+  (>= (state :last-id) id))
 
 (defn handle-actions! [container tuple-machine]
   (let [states (tap-state tuple-machine)
@@ -104,7 +101,7 @@
                   (let [{:strs [nick]} action]
                     ; Ignore duplicates
                     (let [tuple (<! (store-contact! container nick nil))]
-                      (<! (wait-for-state-to-catch-up state states (tuple "id")))))
+                      (<! (wait-for! states #(up-to-date? % (tuple "id"))))))
 
                   "problem-with-new-nickname"
                   (let [{:strs [nick]} action]

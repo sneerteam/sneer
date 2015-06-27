@@ -158,3 +158,10 @@
 
 (defn with-nil [v]
   (if (= v :nil) nil v))
+
+(defn wait-for! [ch pred]
+  (go-loop-trace []
+    (when-let [v (<! ch)]
+      (if (pred v)
+        v
+        (recur)))))
