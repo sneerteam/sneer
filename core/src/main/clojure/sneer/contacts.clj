@@ -2,7 +2,7 @@
   (:require
     [clojure.core.async :refer [chan <! >! alt!]]
     [sneer.async :refer [state-machine tap-state peek-state! go-loop-trace wait-for!]]
-    [sneer.commons :refer [now]]
+    [sneer.commons :refer [now nvl]]
     [sneer.flux :refer [tap-actions response request request!!]]
     [sneer.keys :refer [from-hex]]
     [sneer.tuple-base-provider :refer :all]
@@ -75,7 +75,7 @@
   (cond
     (.isEmpty nick) "cannot be empty"
     (get-in state [:nick->id nick]) "already used"
-    :else :nil))
+    :else nil))
 
 (defn up-to-date? [state id]
   (>= (state :last-id) id))
@@ -99,13 +99,14 @@
 
                   "new-contact"
                   (let [{:strs [nick]} action]
-                    ; Ignore duplicates
-                    (let [tuple (<! (store-contact! container nick nil))]
-                      (<! (wait-for! states #(up-to-date? % (tuple "id"))))))
+                    (if (problem-with-nick state nick)
+                      state
+                      (let [tuple (<! (store-contact! container nick nil))]
+                        (<! (wait-for! states #(up-to-date? % (tuple "id")))))))
 
                   "problem-with-new-nickname"
                   (let [{:strs [nick]} action]
-                    (>! (response action) (problem-with-nick state nick))
+                    (>! (response action) (nvl (problem-with-nick state nick) :nil))
                     state)
 
                   ;    "set-nickname"

@@ -18,6 +18,7 @@
       (problem-with-new-nickname subject "Neide") => (emits nil)
 
       (.dispatch (sneer Dispatcher) (action "new-contact" "nick" "Neide"))
+      (.dispatch (sneer Dispatcher) (action "new-contact" "nick" "Neide")) ; Ignored
 
       (problem-with-new-nickname subject "Neide") => (emits "already used"))
 
