@@ -105,6 +105,7 @@
                         (>! (response action) (FriendlyException. (str "Nickname " problem)))
                         state)
                       (let [tuple (<! (store-contact! container nick nil))]
+                        (>! (response action) (tuple "id"))
                         (<! (wait-for! states #(up-to-date? % (tuple "id")))))))
 
                   "problem-with-new-nickname"

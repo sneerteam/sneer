@@ -25,6 +25,8 @@
       (let [subject (sneer contacts/handle)
             id (<next (-new-contact sneer "Neide"))]
 
+        id => #(instance? Long %)
+
         (fact "Duplicate contacts are bad"
           (problem-with-new-nickname subject "Neide") => (emits "already used")
           (-new-contact sneer "Neide") => (emits-error FriendlyException)))
