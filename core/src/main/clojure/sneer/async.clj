@@ -98,11 +98,11 @@
    in a way similar to clojure.core.async/tap.
    Reduces initial-state applying (function state event) to each event from the
    events-in channel and puts each resulting state onto the tap channels."
-  ([initial-state f events-in]
+  ([f initial-state events-in]
    (let [no-history closed-chan]
-     (state-machine initial-state f no-history events-in)))
+     (state-machine f initial-state no-history events-in)))
 
-  ([initial-state f event-history events-in]
+  ([f initial-state event-history events-in]
    (let [taps-in (chan)
          states-out (chan)
          mult (mult states-out)]

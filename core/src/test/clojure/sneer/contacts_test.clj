@@ -25,5 +25,3 @@
     (with-open [sneer (restarted! sneer)]
       (let [subject (sneer contacts/handle)]
         (problem-with-new-nickname subject "Neide") => (emits "already used")))))
-
-; TODO: reorder args for state-machine to be the same as reduce.

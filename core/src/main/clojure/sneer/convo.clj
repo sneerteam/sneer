@@ -74,7 +74,7 @@
     (let [state (<! (catch-up container id))]
       (>! state-out state)
       (let [tuples (query-remaining-tuples container (:last-id state) lease)
-            taps (state-machine state handle-tuple tuples)]
+            taps (state-machine handle-tuple state tuples)]
         (>! taps state-out)
         (<! lease)))))
 

@@ -95,7 +95,7 @@
 
 (defn- summarization-loop! [previous-state own-puk tuples]
   (let [previous-state (or previous-state {:last-id 0})]
-    (state-machine previous-state (partial handle-tuple own-puk) tuples)))
+    (state-machine (partial handle-tuple own-puk) previous-state tuples)))
 
 ; state: {:last-id long
 ;         :puk->nick {puk "Neide"}

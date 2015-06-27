@@ -10,7 +10,7 @@
   (let [events (chan)
         function +
         initial-state 42
-        machine (state-machine initial-state function events)
+        machine (state-machine function initial-state events)
         tap1 (sliding-chan)
         tap2 (sliding-chan)
         tap3 (sliding-chan)]
@@ -42,7 +42,7 @@
         events (chan)
         function +
         initial-state 0
-        machine (state-machine initial-state function history events)
+        machine (state-machine function initial-state history events)
         tap (chan 1)]
 
     (>!!? machine tap)
