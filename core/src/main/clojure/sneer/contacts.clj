@@ -9,7 +9,8 @@
     [sneer.tuple.protocols :refer [store-tuple query-with-history]])
   (:import
     [sneer.flux Dispatcher]
-    [sneer.admin SneerAdmin]))
+    [sneer.admin SneerAdmin]
+    [sneer.commons.exceptions FriendlyException]))
 
 (def handle ::contacts)
 
@@ -99,8 +100,10 @@
 
                   "new-contact"
                   (let [{:strs [nick]} action]
-                    (if (problem-with-nick state nick)
-                      state
+                    (if-let [problem (problem-with-nick state nick)]
+                      (do
+                        (>! (response action) (FriendlyException. (str "Nickname " problem)))
+                        state)
                       (let [tuple (<! (store-contact! container nick nil))]
                         (<! (wait-for! states #(up-to-date? % (tuple "id")))))))
 

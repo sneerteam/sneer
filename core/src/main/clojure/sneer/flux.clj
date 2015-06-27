@@ -16,6 +16,13 @@
   (assoc (apply hash-map (.keyValuePairs a))
          :type (.type a)))
 
+(defn emit [subject res]
+  (if (instance? Exception res)
+    (rx/on-error subject res)
+    (do
+      (rx/on-next subject res)
+      (rx/on-completed subject))))
+
 (defn reify-Dispatcher [^Container container]
   (let [actions (chan) #_(chan 1 (map #(do (println "ACTION:" %) %)))
         mult (mult actions)
@@ -34,9 +41,9 @@
 
           (>!! actions (assoc (->map request) ::response response))
           (go-trace
-            (rx/on-next subject (with-nil (<! response)))
-            (close! response)
-            (rx/on-completed subject))
+            (let [res (with-nil (<! response))]
+              (close! response)
+              (emit subject res)))
 
           subject))
 
