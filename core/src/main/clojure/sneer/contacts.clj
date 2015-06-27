@@ -68,7 +68,7 @@
         new-tuples (chan 1)
         lease (.produce container :lease)
         own-puk (own-puk container)]
-    (query-with-history (tuple-base container) #_{after-id starting-id} {"type" "contact"} old-tuples new-tuples lease)
+    (query-with-history (tuple-base container) {"type" "contact" #_after-id #_starting-id} old-tuples new-tuples lease)
     (state-machine (partial handle-tuple own-puk) {:last-id 0} old-tuples new-tuples)))
 
 (defn- problem-with-nick [state nick]

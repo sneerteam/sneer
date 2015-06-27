@@ -2,7 +2,6 @@
   (:require [midje.sweet :refer :all]
             [sneer.async :refer [sliding-chan]]
             [sneer.contacts :as contacts :refer [handle problem-with-new-nickname]]
-            [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! restarted!]]
             [sneer.flux :refer [action]]
             [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
