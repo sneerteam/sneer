@@ -18,7 +18,7 @@
       (problem-with-new-nickname subject "Neide") => (emits nil)
 
       (.dispatch (sneer Dispatcher) (action "new-contact" "nick" "Neide"))
-      (.dispatch (sneer Dispatcher) (action "new-contact" "nick" "Neide")) ; Ignored
+      (.dispatch (sneer Dispatcher) (action "new-contact" "nick" "Neide")) ; Duplicated nick is simply ignored.
 
       (problem-with-new-nickname subject "Neide") => (emits "already used"))
 
