@@ -149,9 +149,12 @@
      (>! machine tap-ch))
     tap-ch))
 
-(defn peek-state [machine]
+(defn peek-state! [machine]
   (go
     (let [tap (tap-state machine)
           result (<! tap)]
       (close! tap)
       result)))
+
+(defn with-nil [v]
+  (if (= v :nil) nil v))

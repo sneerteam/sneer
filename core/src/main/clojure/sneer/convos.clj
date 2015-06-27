@@ -1,6 +1,6 @@
 (ns sneer.convos
   (:require
-    [clojure.core.async :refer [go chan close! <! >! <!! sliding-buffer alt! timeout mult]]
+    [clojure.core.async :refer [go chan close! <! >! <!! sliding-buffer timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [close-with! sliding-chan sliding-tap

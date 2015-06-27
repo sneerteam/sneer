@@ -1,12 +1,12 @@
 (ns sneer.contacts
   (:require
-    [clojure.core.async :refer [chan <!! >!]]
-    [sneer.async :refer [state-machine tap-state]]
+    [clojure.core.async :refer [chan <! >! alt!]]
+    [sneer.async :refer [state-machine tap-state peek-state! go-loop-trace]]
     [sneer.commons :refer [now]]
-    [sneer.flux :refer [tap-actions response]]
+    [sneer.flux :refer [tap-actions response request request!!]]
     [sneer.keys :refer [from-hex]]
     [sneer.tuple-base-provider :refer :all]
-    [sneer.tuple.protocols :refer [store-tuple query-tuples]])
+    [sneer.tuple.protocols :refer [store-tuple query-with-history]])
   (:import
     [sneer.flux Dispatcher]
     [sneer.admin SneerAdmin]))
@@ -15,6 +15,9 @@
 
 (defn- puk [^SneerAdmin admin]
   (.. admin privateKey publicKey))
+
+(defn- own-puk [container]
+  (puk (.produce container SneerAdmin)))
 
 (defn- -store-tuple! [container tuple]
   (let [admin (.produce container SneerAdmin)
@@ -30,36 +33,12 @@
                             "payload" new-contact-nick
                             "party"   contact-puk}))
 
-(defn- handle-events! [container nicks action]
-  (case (action :type)
-
-    "new-contact"
-    (let [{:strs [nick]} action]
-      (<!! (store-contact! container nick nil))
-      (conj nicks nick))
-
-;    "set-nickname"
-    #_(let [{:strs [convo-id new-nick]} action]
-      (println "set-nickname" convo-id new-nick))
-
-;    "accept-invite"
-    #_(let [{:strs [new-contact-nick contact-puk invite-code-received]} action
-          contact-puk (from-hex contact-puk)
-          contact-tuple (<! (store-contact! container new-contact-nick contact-puk))]
-      (-store-tuple! container {"type"        "push"
-                                "audience"    contact-puk
-                                "invite-code" invite-code-received})
-
-      (>! (response a) (contact-tuple "id")))
-
-    (println "UNKNOWN ACTION: " action)))
-
-#_(defn- contact-puk [tuple]
+(defn- contact-puk [tuple]
   (tuple "party"))
 
 #_{:nick->id  {"Neide" 42}
    :puk->nick {NeidePuk "Neide"}}
-#_(defn- handle-contact [own-puk state tuple]
+(defn- handle-contact [own-puk state tuple]
   (if-not (= (tuple "author") own-puk)
     state
     (let [new-nick (tuple "payload")
@@ -73,16 +52,83 @@
           (assoc-in  [:puk->nick puk] new-nick)))))
 
 
+(defn- handle-tuple [own-puk state tuple]
+  (->
+    (handle-contact own-puk state tuple)
+    (assoc :last-id (tuple "id"))))
 
 (defn- tuple-base [container]
   (tuple-base-of (.produce container SneerAdmin)))
 
-(defn tap-nicks! [machine tap-ch]
-  (tap-state machine tap-ch))
+(defn problem-with-new-nickname [contacts nick]
+  (.request (contacts :dispatcher) (request "problem-with-new-nickname" "nick" nick)))
+
+(defn tuple-machine! [container]
+  (let [old-tuples (chan 1)
+        new-tuples (chan 1)
+        lease (.produce container :lease)
+        own-puk (own-puk container)]
+    (query-with-history (tuple-base container) #_{after-id starting-id} {"type" "contact"} old-tuples new-tuples lease)
+    (state-machine {:last-id 0} (partial handle-tuple own-puk) old-tuples new-tuples)))
+
+(defn- wait-for-state-to-catch-up [initial states id]
+  (go-loop-trace [state initial]
+    (if (and state (< (state :last-id) id))
+      (recur (<! states))
+      state)))
+
+(defn- problem-with-nick [state nick]
+  (cond
+    (.isEmpty nick) "cannot be empty"
+    (get-in state [:nick->id nick]) "already used"
+    :else :nil))
+
+(defn handle-actions! [container tuple-machine]
+  (let [states (tap-state tuple-machine)
+        actions (chan 1)]
+    (tap-actions (.produce container Dispatcher) actions)
+
+    (go-loop-trace [state (<! states)]
+      (when state
+        (recur
+          (alt!
+            states
+            ([new-state] new-state)
+
+            actions
+            ([action]
+              (when action
+                (case (action :type)
+
+                  "new-contact"
+                  (let [{:strs [nick]} action]
+                    ; Ignore duplicates
+                    (let [tuple (<! (store-contact! container nick nil))]
+                      (<! (wait-for-state-to-catch-up state states (tuple "id")))))
+
+                  "problem-with-new-nickname"
+                  (let [{:strs [nick]} action]
+                    (>! (response action) (problem-with-nick state nick))
+                    state)
+
+                  ;    "set-nickname"
+                  #_(let [{:strs [convo-id new-nick]} action]
+                                    (println "set-nickname" convo-id new-nick))
+
+                  ;    "accept-invite"
+                  #_(let [{:strs [new-contact-nick contact-puk invite-code-received]} action
+                                        contact-puk (from-hex contact-puk)
+                                        contact-tuple (<! (store-contact! container new-contact-nick contact-puk))]
+                                    (-store-tuple! container {"type"        "push"
+                                                              "audience"    contact-puk
+                                                              "invite-code" invite-code-received})
+
+                                    (>! (response a) (contact-tuple "id")))
+
+                  (println "CONTACTS - UNKNOWN ACTION: " action))))))))))
 
 (defn start! [container]
-  (let [events (chan 1)
-        _ (tap-actions (.produce container Dispatcher) events)
-        lease (.produce container :lease)]
-    (query-tuples (tuple-base container) #_{after-id starting-id} {} events lease)
-    (state-machine #{} (partial handle-events! container) events)))
+  (let [machine (tuple-machine! container)]
+    (handle-actions! container machine)
+    {:tuple-machine machine
+     :dispatcher    (.produce container Dispatcher)}))

@@ -1,28 +1,28 @@
 (ns sneer.contacts-test
   (:require [midje.sweet :refer :all]
             [sneer.async :refer [sliding-chan]]
-            [sneer.contacts :as contacts :refer [handle tap-nicks!]]
+            [sneer.contacts :as contacts :refer [handle problem-with-new-nickname]]
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! restarted!]]
-            [sneer.test-util :refer [<emits emits-error ->chan <!!? <next]])
-  (:import [sneer.flux Dispatcher Action]))
+            [sneer.flux :refer [action]]
+            [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
+  (:import [sneer.flux Dispatcher]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-#_(facts "Contacts Test"
+(facts "Contacts Test"
   (with-open [sneer (sneer!)]
-    (let [subject (sneer contacts/handle)
-          nicks (sliding-chan)]
+    (let [subject (sneer contacts/handle)]
 
-      (tap-nicks! subject nicks)
-      nicks => (<emits #(nil? ((% :nick->id) "Neide")))
+      (problem-with-new-nickname subject "") => (emits "cannot be empty")
+      (problem-with-new-nickname subject "Neide") => (emits nil)
 
-      (.dispatchMap (sneer Dispatcher) {:type  "new-contact"
-                                        "nick" "Neide"})
-      nicks => (<emits #((% :nick->id) "Neide")))
+      (.dispatch (sneer Dispatcher) (action "new-contact" "nick" "Neide"))
+
+      (problem-with-new-nickname subject "Neide") => (emits "already used"))
 
     (with-open [sneer (restarted! sneer)]
-      (let [subject (sneer contacts/handle)
-            nicks (sliding-chan)]
-        (tap-nicks! subject nicks)
-        nicks => (<emits #((% :nick->id) "Neide"))))))
+      (let [subject (sneer contacts/handle)]
+        (problem-with-new-nickname subject "Neide") => (emits "already used")))))
+
+; TODO: reorder args for state-machine to be the same as reduce.

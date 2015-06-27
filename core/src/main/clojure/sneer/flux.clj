@@ -1,8 +1,9 @@
 (ns sneer.flux
   (:require
-    [clojure.core.async :refer [chan close! mult tap go >! <!]]
+    [clojure.core.async :refer [chan close! mult tap go >!! <!]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [close-with! go-trace]])
+    [sneer.async :refer [close-with! go-trace with-nil]]
+    [sneer.test-util :refer [<!!? ->chan]])
   (:import
     [rx.subjects AsyncSubject]
     [sneer.commons Container]
@@ -25,18 +26,15 @@
     (reify
       Dispatcher
       (dispatch [this action]
-        (.dispatchMap this (->map action)))
-
-      (dispatchMap [_ action-map]
-        (go-trace (>! actions action-map)))
+        (>!! actions (->map action)))
 
       (request [_ request]
         (let [response (chan 1)
               subject (AsyncSubject/create)]
 
+          (>!! actions (assoc (->map request) ::response response))
           (go-trace
-            (>! actions (assoc (->map request) ::response response))
-            (rx/on-next subject (<! response))
+            (rx/on-next subject (with-nil (<! response)))
             (close! response)
             (rx/on-completed subject))
 
@@ -50,3 +48,8 @@
 
 (defn response [request]
   (request ::response))
+
+(defn action [type & keyValuePairs]
+  (Action/action type (into-array keyValuePairs)))
+(defn request [type & keyValuePairs]
+  (Request/request type (into-array keyValuePairs)))

@@ -2,7 +2,7 @@
   (:require
     [clojure.core.async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
-    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace close-on-unsubscribe! pipe-to-subscriber! state-machine tap-state peek-state]]
+    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace close-on-unsubscribe! pipe-to-subscriber! state-machine tap-state peek-state!]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
@@ -178,7 +178,7 @@
 
       (getIdByNick
        [_ nick]
-       (nick->id (<!! (peek-state machine)) nick))
+       (nick->id (<!! (peek-state! machine)) nick))
 
       (processUpToId
        [_ id]

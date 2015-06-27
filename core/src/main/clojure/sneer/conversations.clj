@@ -1,6 +1,6 @@
 (ns sneer.conversations
   (:require
-    [clojure.core.async :refer [go chan close! <! >! sliding-buffer alt! timeout]]
+    [clojure.core.async :refer [go chan close! <! >! sliding-buffer timeout]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [sliding-chan go-while-let go-loop-trace close-on-unsubscribe! pipe-to-subscriber!]]

@@ -55,7 +55,7 @@
               subject (create db)]
     (let [result (async/chan)
           lease (async/chan)
-          _ (store-tuple subject t1)
+          _ (<!!? (store-tuple subject t1))
           query (query-tuples subject {"type" "tweet"} result lease)]
 
       (fact "It sends stored tuples"
@@ -75,7 +75,7 @@
     (let [old-tuples (async/chan)
           new-tuples (async/chan)
           lease (async/chan)
-          _ (store-tuple subject t1)
+          _ (<!!? (store-tuple subject t1))
           query (query-with-history subject {"type" "tweet"} old-tuples new-tuples lease)]
 
       (fact "It sends old stored tuples"
