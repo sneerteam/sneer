@@ -41,7 +41,7 @@
         (catch Exception e
           false))))
 
-(defn <wait-for! [ch expected]
+(defn <wait-trace! [ch expected]
   (let [expected (nvl expected :nil)
         pred (->robust (->predicate expected))]
     (loop-trace [last-value "<none>"]
@@ -99,7 +99,7 @@
 
 (defn <emits [expected]
   (fn [ch]
-    (<wait-for! ch expected)))
+    (<wait-trace! ch expected)))
 
 (defn closes [ch]
   (loop-trace [last-value "<none>"]
@@ -114,7 +114,7 @@
 (defn emits [expected]
   (fn [obs]
     (let [ch (->chan obs)]
-      (<wait-for! ch expected))))
+      (<wait-trace! ch expected))))
 
 (defn emits-error [exception-type]
   (emits #(instance? exception-type (::error %))))

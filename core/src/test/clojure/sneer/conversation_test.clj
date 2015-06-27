@@ -4,7 +4,7 @@
             [sneer.admin :refer [new-sneer-admin]]
             [sneer.contact :refer [produce-contact create-contacts-state]]
             [sneer.tuple.persistent-tuple-base :as tb]
-            [sneer.test-util :refer [<!!? ->chan <wait-for! <emits]]
+            [sneer.test-util :refer [<!!? ->chan <emits]]
             [sneer.tuple.protocols :refer :all]
             [sneer.rx :refer [subscribe-on-io]]
             [sneer.keys :refer [->puk create-prik]]
