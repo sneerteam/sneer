@@ -3,7 +3,7 @@
     [clojure.core.async :refer [chan <! >! alt!]]
     [sneer.async :refer [state-machine tap-state peek-state! go-loop-trace wait-for!]]
     [sneer.commons :refer [now nvl]]
-    [sneer.flux :refer [tap-actions response request request!!]]
+    [sneer.flux :refer [tap-actions response request]]
     [sneer.keys :refer [from-hex]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer [store-tuple query-with-history]])
