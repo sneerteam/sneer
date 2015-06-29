@@ -1,10 +1,9 @@
 (ns sneer.convo
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :as async :refer [<! >! chan]]
-            [sneer.async :refer [pipe-to-subscriber! close-on-unsubscribe! state-machine go-trace go-loop-trace sliding-chan]]
-            [sneer.chat :refer [reify-Chat]]
+            [sneer.async :refer [state-machine go-trace go-loop-trace sliding-chan]]
             [sneer.contacts]
-            [sneer.rx :refer [shared-latest]]
+            [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe! shared-latest]]
             [sneer.tuple.protocols :refer :all]
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.persistent-tuple-base :refer [after-id]])

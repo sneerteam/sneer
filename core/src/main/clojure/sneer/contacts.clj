@@ -5,6 +5,7 @@
     [sneer.commons :refer [now nvl]]
     [sneer.flux :refer [tap-actions response request]]
     [sneer.keys :refer [from-hex]]
+    [sneer.rx :refer [obs-tap]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer [store-tuple query-with-history]])
   (:import
@@ -38,6 +39,7 @@
   (tuple "party"))
 
 #_{:nick->id  {"Neide" 42}
+   :id->nick  {42 "Neide"}
    :puk->nick {NeidePuk "Neide"}}
 (defn- handle-contact [own-puk state tuple]
   (if-not (= (tuple "author") own-puk)
@@ -50,6 +52,7 @@
       (-> state
           (update-in [:nick->id] dissoc old-nick)
           (assoc-in  [:nick->id new-nick] id)
+          (assoc-in  [:id->nick id] new-nick)
           (assoc-in  [:puk->nick puk] new-nick)))))
 
 
@@ -61,10 +64,7 @@
 (defn- tuple-base [container]
   (tuple-base-of (.produce container SneerAdmin)))
 
-(defn problem-with-new-nickname [contacts nick]
-  (.request (contacts :dispatcher) (request "problem-with-new-nickname" "nick" nick)))
-
-(defn tuple-machine! [container]
+(defn- tuple-machine! [container]
   (let [old-tuples (chan 1)
         new-tuples (chan 1)
         lease (.produce container :lease)
@@ -78,10 +78,10 @@
     (get-in state [:nick->id nick]) "already used"
     :else nil))
 
-(defn up-to-date? [state id]
+(defn- up-to-date? [state id]
   (>= (state :last-id) id))
 
-(defn handle-actions! [container tuple-machine]
+(defn- handle-actions! [container tuple-machine]
   (let [states (tap-state tuple-machine)
         actions (chan 1)]
     (tap-actions (.produce container Dispatcher) actions)
@@ -129,8 +129,17 @@
 
                   (println "CONTACTS - UNKNOWN ACTION: " action))))))))))
 
+(defn problem-with-new-nickname [contacts nick]
+  (.request (contacts :dispatcher) (request "problem-with-new-nickname" "nick" nick)))
+
+(defn- -nickname [id state]
+  (get-in state [:id->nick id]))
+
+(defn nickname [contacts id]
+  (obs-tap (contacts :machine) "nickname" (map #(-nickname id %))))
+
 (defn start! [container]
   (let [machine (tuple-machine! container)]
     (handle-actions! container machine)
-    {:tuple-machine machine
-     :dispatcher    (.produce container Dispatcher)}))
+    {:machine    machine
+     :dispatcher (.produce container Dispatcher)}))

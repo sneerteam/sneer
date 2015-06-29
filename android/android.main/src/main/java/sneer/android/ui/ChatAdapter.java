@@ -21,22 +21,22 @@ import java.util.Random;
 
 import sneer.android.ui.drawable.TriangleLeftDrawable;
 import sneer.android.ui.drawable.TriangleRightDrawable;
-import sneer.convos.Chat;
+import sneer.convos.ChatMessage;
 import sneer.main.R;
 
 import static sneer.android.ui.SneerActivity.findTextView;
 
-public class ChatAdapter extends ArrayAdapter<Chat.Message> implements OnClickListener{
+public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickListener{
 
 	private final LayoutInflater inflater;
     private String partyNick = "";
 
     public ChatAdapter(Context context, LayoutInflater inflater) {
-        super(context, -1, new ArrayList<Chat.Message>());
+        super(context, -1, new ArrayList<ChatMessage>());
 		this.inflater = inflater;
     }
 
-    public void update(String partyNick, List<Chat.Message> messages) {
+    public void update(String partyNick, List<ChatMessage> messages) {
         this.partyNick = partyNick;
         this.clear();
         this.addAll(messages);
@@ -45,7 +45,7 @@ public class ChatAdapter extends ArrayAdapter<Chat.Message> implements OnClickLi
 
 	@SuppressLint("ViewHolder") @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final Chat.Message message = this.getItem(position);
+        final ChatMessage message = this.getItem(position);
 
         View view = convertView == null
                 ? inflater.inflate(message.isOwn ? R.layout.list_item_user_message : R.layout.list_item_party_message, parent, false)
@@ -56,7 +56,7 @@ public class ChatAdapter extends ArrayAdapter<Chat.Message> implements OnClickLi
         return view;
     }
 
-    private View updateView(final Chat.Message message, final View view) {
+    private View updateView(final ChatMessage message, final View view) {
         final TextView messageView = findTextView(view, R.id.messageContent);
 
         SpannableString messageContent = new SpannableString(message.text);

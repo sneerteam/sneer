@@ -3,7 +3,7 @@
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! connect! puk]]
             [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
-  (:import [sneer.convos Convos Convos$Actions]
+  (:import [sneer.convos Convos]
            [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))
 

@@ -1,7 +1,7 @@
 (ns sneer.contacts-test
   (:require [midje.sweet :refer :all]
             [sneer.async :refer [sliding-chan]]
-            [sneer.contacts :as contacts :refer [handle problem-with-new-nickname]]
+            [sneer.contacts :as contacts :refer [handle problem-with-new-nickname nickname #_set-nickname]]
             [sneer.integration-test-util :refer [sneer! restarted!]]
             [sneer.flux :refer [request]]
             [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
@@ -13,25 +13,27 @@
 (defn- -new-contact [sneer nick]
   (.request (sneer Dispatcher) (request "new-contact" "nick" nick)))
 
-(facts "Contacts - Fresh Start"
+(facts "No Contacts"
   (with-open [sneer (sneer!)]
     (let [subject (sneer contacts/handle)]
       (problem-with-new-nickname subject "")      => (emits "cannot be empty")
       (problem-with-new-nickname subject "Neide") => (emits nil))))
 
-(facts "First Contact"
+(facts "One Contact"
   (with-open [sneer (sneer!)]
-    (try
-      (let [subject (sneer contacts/handle)
-            id (<next (-new-contact sneer "Neide"))]
+    (let [subject (sneer contacts/handle)
+          id (<next (-new-contact sneer "Neide"))]
 
-        id => #(instance? Long %)
+      (fact "Duplicate contacts are bad"
+        (problem-with-new-nickname subject "Neide") => (emits "already used")
+        (-new-contact sneer "Neide") => (emits-error FriendlyException))
 
-        (fact "Duplicate contacts are bad"
-          (problem-with-new-nickname subject "Neide") => (emits "already used")
-          (-new-contact sneer "Neide") => (emits-error FriendlyException)))
-      (catch Exception e
-        (.printStackTrace e System/out)))
+      (fact "Nickname can be changed"
+        (let [nick-obs (nickname subject id)]
+          nick-obs => (emits "Neide")
+;          (set-nickname subject id "Neide Silva")
+;          nick-obs => (emits "Neide Silva")
+          )))
 
     (with-open [sneer (restarted! sneer)]
       (let [subject (sneer contacts/handle)]

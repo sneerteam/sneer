@@ -12,10 +12,10 @@ import java.util.List;
 import rx.Subscription;
 import rx.functions.Action1;
 import sneer.convos.Convos;
+import sneer.convos.Summary;
 import sneer.main.R;
 
 import static sneer.android.SneerAndroidContainer.component;
-import static sneer.convos.Convos.Summary;
 
 
 public class ConvosActivity extends SneerActionBarActivity {

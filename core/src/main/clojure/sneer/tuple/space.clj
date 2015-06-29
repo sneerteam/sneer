@@ -1,9 +1,10 @@
 (ns sneer.tuple.space
   (:require
-   [rx.lang.clojure.core :as rx]
-   [sneer.async :refer [go-trace pipe-to-subscriber!]]
-   [sneer.commons :refer [now reify+ while-let]]
    [clojure.core.async :refer [thread chan <! <!! close!]]
+   [rx.lang.clojure.core :as rx]
+   [sneer.async :refer [go-trace]]
+   [sneer.commons :refer [now reify+ while-let]]
+   [sneer.rx :refer [pipe-to-subscriber!]]
    [sneer.tuple.persistent-tuple-base :refer [last-by-id store-sub timestamped]]
    [sneer.tuple.protocols :refer [store-tuple query-tuples]]
    [sneer.tuple.macros :refer :all]

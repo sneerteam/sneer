@@ -5,12 +5,12 @@
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [close-with! sliding-chan sliding-tap
                          go-trace go-while-let go-loop-trace
-                         close-on-unsubscribe! pipe-to-subscriber! republish-latest-every!]]
+                         republish-latest-every!]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.convo :refer [convo-by-id]]
     [sneer.convo-summarization :refer :all] ; Force compilation of interface
-    [sneer.rx :refer [shared-latest]]
+    [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]]
     [sneer.party :refer [party->puk]]
     [sneer.serialization :refer [serialize deserialize]]
     [sneer.tuple.protocols :refer :all]
@@ -22,14 +22,14 @@
     [rx Subscriber]
     [sneer.admin SneerAdmin]
     [sneer.commons Clock]
-    [sneer.convos Convos Convos$Summary]
+    [sneer.convos Convos Summary]
     [sneer.commons.exceptions FriendlyException]
     [sneer.interfaces ConvoSummarization]
     [rx.subjects AsyncSubject]))
 
 (defn- to-foreign-summary [pretty-time {:keys [nick summary timestamp unread id]}]
   (let [date (.format pretty-time (Date. ^long timestamp))]
-    (Convos$Summary. nick summary date (str unread) id)))
+    (Summary. nick summary date (str unread) id)))
 
 (defn to-foreign [summaries]
   (mapv (partial to-foreign-summary (PrettyTime. (Date. (Clock/now))))

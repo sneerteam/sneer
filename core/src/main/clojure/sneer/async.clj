@@ -21,8 +21,11 @@
 (defn sliding-chan [& [n xform]]
   (chan (async/sliding-buffer (or n 1)) xform))
 
+(defn dropping-tap [mult]
+  (tap mult (dropping-chan)))
+
 (defn sliding-tap [mult]
-  (let [ch (sliding-chan)] (async/tap mult ch) ch))
+  (tap mult (sliding-chan)))
 
 (defn connection [in out]
   [in out])
@@ -56,27 +59,6 @@
   `(go-trace
      (while-let ~binding
                 ~@forms)))
-
-(defn dropping-tap [mult]
-  (tap mult (dropping-chan)))
-
-(defn close-on-unsubscribe!
-  "Closes the channel when the subscriber is unsubscribed."
-  [^Subscriber subscriber & chans]
-  (.add subscriber (rx/subscription #(doseq [c chans] (async/close! c)))))
-
-(defn pipe-to-subscriber!
-  "Copies values from channel to rx subscriber in a separate thread."
-  [chan ^Subscriber subscriber ^String thread-name]
-  (async/thread
-    (.setName (Thread/currentThread) thread-name)
-    (while-let [value (<!! chan)]
-      (try
-        (rx/on-next subscriber value)
-        (catch Exception e
-          (throw (RuntimeException. (str "onNext Exception. subscriber: " subscriber " value: " value "thread: " thread-name)
-                                    e)))))
-    (rx/on-completed subscriber)))
 
 (defn republish-latest-every! [period in out] ; This republish fn would be cool as a transducer. :)
   (go-loop-trace [latest nil
@@ -139,14 +121,10 @@
 
      taps-in)))
 
-(defn tap-state
-  ([machine]
-   (let [result (sliding-chan)]
-     (tap-state machine result)
-     result))
-  ([machine tap-ch]
-   (go
-     (>! machine tap-ch))
+(defn tap-state [machine & [tap-ch]]
+  (let [tap-ch (or tap-ch (sliding-chan))]
+    (go
+      (>! machine tap-ch))
     tap-ch))
 
 (defn peek-state! [machine]
