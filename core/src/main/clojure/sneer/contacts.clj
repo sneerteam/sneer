@@ -120,9 +120,11 @@
                         (>! (response action) (FriendlyException. (str "Nickname " problem)))
                         state)
                       (let [invite-code (-> (UUID/randomUUID) .toString (.replaceAll "-" ""))
-                            tuple (<! (store-contact! container nick nil invite-code))]
-                        (>! (response action) (tuple "id"))
-                        (<! (wait-for! states #(up-to-date? % (tuple "id")))))))
+                            tuple (<! (store-contact! container nick nil invite-code))
+                            id (tuple "id")
+                            state' (<! (wait-for! states #(up-to-date? % id)))]
+                        (>! (response action) id)
+                        state')))
 
                   "accept-invite"
                   (let [{:strs [nick puk-hex invite-code-received]} action]
@@ -132,9 +134,11 @@
                         state)
                       (let [contact-puk (from-hex puk-hex)
                             _ (<! (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received}))
-                            tuple (<! (store-contact! container nick contact-puk nil))]
-                        (>! (response action) (tuple "id"))
-                        (<! (wait-for! states #(up-to-date? % (tuple "id")))))))
+                            tuple (<! (store-contact! container nick contact-puk nil))
+                            id (tuple "id")
+                            state' (<! (wait-for! states #(up-to-date? % id)))]
+                        (>! (response action) id)
+                        state')))
 
                   "problem-with-new-nickname"
                   (let [{:strs [nick]} action]
