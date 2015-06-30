@@ -51,7 +51,7 @@ public class ConvosSim implements Convos {
 
     @Override
     public Observable<Convo> getById(long id) {
-        return Observable.just(new Convo(id, "Nicholas", null, messages(), new ArrayList<SessionSummary>()));
+        return Observable.just(new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>()));
     }
 
 	private List<ChatMessage> messages() {
