@@ -8,7 +8,7 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-#_(facts "Convos"
+(facts "Convos"
   (with-open [neide (sneer!)]
     (let [convos ^Convos (neide Convos)]
       (. convos summaries) => (emits #(.isEmpty %))
@@ -16,8 +16,8 @@
       (. convos problemWithNewNickname "Maico") => nil
       (let [convo-id (<!!? (->chan (. convos startConvo "Maico")))]
         convo-id => #(instance? Long %)
-        (.. (.getById convos convo-id) nickname) => (emits "Maico"))
-      (. convos summaries) => (emits #(-> % first (.nickname) (= "Maico")))
+        (.getById convos convo-id) => (emits #(-> % .nickname (= "Maico"))))
+      (. convos summaries) => (emits #(-> % first .nickname (= "Maico")))
       (. convos problemWithNewNickname "Maico") => "already used"
       (. convos startConvo "Maico") => (emits-error FriendlyException))))
 

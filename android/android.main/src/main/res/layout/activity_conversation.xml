@@ -17,10 +17,12 @@
     <TextView
         android:id="@+id/waitingMessage"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
         android:textSize="20sp"
-        android:textStyle="normal|italic"/>
+        android:textStyle="normal|italic"
+        android:text="INvite code ijw wiejg woeigj wegioj "
+        android:padding="15dp" />
 
     <ListView
         android:id="@+id/messageList"

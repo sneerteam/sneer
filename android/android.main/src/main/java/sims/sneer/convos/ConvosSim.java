@@ -2,15 +2,20 @@ package sims.sneer.convos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
 import sneer.convos.SessionSummary;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 
+COnvosAc
 @SuppressWarnings("unused")
 public class ConvosSim implements Convos {
 
@@ -41,7 +46,17 @@ public class ConvosSim implements Convos {
 
     @Override
     public Observable<Convo> getById(long id) {
-        return Observable.just(new Convo("Nicholas", null, new ChatSim(), new ArrayList<SessionSummary>()));
+        String inviteCodePending = id % 2 == 1 ? null : "InviteCode" + id;
+        return inviteCodePending == null
+            ? Observable.just(new Convo("Nicholas", null, new ChatSim(), new ArrayList<SessionSummary>()))
+//            : Observable.just(new Convo("Nicholas", inviteCodePending, new ChatSim(), new ArrayList<SessionSummary>()));
+            : Observable.just(new Convo("Nicholas", inviteCodePending, new ChatSim(), new ArrayList<SessionSummary>())).concatWith(
+                Observable.timer(3, SECONDS, AndroidSchedulers.mainThread()).map(new Func1<Long, Convo>() {
+                    @Override
+                    public Convo call(Long aLong) {
+                        return new Convo("Nicholas", null, new ChatSim(), new ArrayList<SessionSummary>());
+                    }
+                }));
     }
 
     private static final String[] UNREAD_OPTIONS = {"?", "*", ""};

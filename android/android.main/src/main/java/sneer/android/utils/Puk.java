@@ -1,13 +1,13 @@
 package sneer.android.utils;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 import sneer.Party;
 
 public class Puk {
 
-	public static void shareOwnPublicKey(Activity activity, Party self, String inviteCode, String receiver) {
+	public static void shareOwnPublicKey(Context context, Party self, String inviteCode, String receiver) {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Sneer Invite");
@@ -19,8 +19,8 @@ public class Puk {
 		String title = ("Send invite to ") + receiver;
 		Intent chooser = Intent.createChooser(sharingIntent, title);
 
-		if (sharingIntent.resolveActivity(activity.getPackageManager()) != null)
-		    activity.startActivity(chooser);
+		if (sharingIntent.resolveActivity(context.getPackageManager()) != null)
+		    context.startActivity(chooser);
 	}
 
 

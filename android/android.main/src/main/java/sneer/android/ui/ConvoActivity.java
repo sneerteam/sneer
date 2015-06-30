@@ -43,6 +43,8 @@ import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 public class ConvoActivity extends SneerActionBarActivity {
     private static final String ACTIVITY_TITLE = "activityTitle";
 
+    private long convoId;
+
     private Observable<Convo> convoObservable;
     private Subscription convoSubscription;
     private Convo currentConvo;
@@ -81,7 +83,7 @@ public class ConvoActivity extends SneerActionBarActivity {
             // Ignore
         }
 
-        long convoId = getIntent().getLongExtra("id", -1);
+        convoId = getIntent().getLongExtra("id", -1);
         convoObservable = component(Convos.class).getById(convoId);
 
 		chatAdapter = new ChatAdapter(this, this.getLayoutInflater());
@@ -106,27 +108,28 @@ public class ConvoActivity extends SneerActionBarActivity {
 
     private void refreshInvitePendingMessage() {
         boolean pending = currentConvo.inviteCodePending != null;
-        messageInput.setEnabled(!pending);
-        messageButton.setEnabled(!pending);
-
         final TextView waiting = (TextView) findViewById(R.id.waitingMessage);
-        final ListView messageList = (ListView) findViewById(R.id.messageList);
+        final View messageList = (ListView) findViewById(R.id.messageList);
+        final View messageSender = findViewById(R.id.messageSender);
+        messageButton.setEnabled(!pending);
         if (pending) {
             String waitingMessage = ConvoActivity.this.getResources().getString(R.string.conversation_activity_waiting);
             waiting.setText(Html.fromHtml(String.format(waitingMessage, currentConvo.nickname)));
             waiting.setMovementMethod(new LinkMovementMethod() {
                 @Override
                 public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
-                    // TODO Restore
-                    // if (event.getAction() == MotionEvent.ACTION_UP)
-                    //    shareOwnPublicKey(ConvoActivity.this, sneer().self(), contact.inviteCode(), contact.nickname().current());
+                    if (event.getAction() == MotionEvent.ACTION_UP)
+                        InviteSender.send(getApplicationContext(), convoId);
                     return true;
                 }
             });
             messageList.setVisibility(View.GONE);
+            messageSender.setVisibility(View.GONE);
+            waiting.setVisibility(View.VISIBLE);
         } else {
             waiting.setVisibility(View.GONE);
             messageList.setVisibility(View.VISIBLE);
+            messageSender.setVisibility(View.VISIBLE);
         }
     }
 
@@ -228,7 +231,7 @@ public class ConvoActivity extends SneerActionBarActivity {
 	protected void onPause() {
         unsubscribeToConvo();
         super.onPause();
-        // TODO What about notificationsStopIgnoring???
+        // TODO Restore sneer().conversations().notificationsStopIgnoring();
     }
 
 
@@ -246,10 +249,13 @@ public class ConvoActivity extends SneerActionBarActivity {
         convoSubscription = ui(convoObservable).subscribe(new Action1<Convo>() {
             @Override
             public void call(Convo convo) {
+                System.out.println("-------------CALL");
                 currentConvo = convo;
                 refresh();
             }
         });
+        System.out.println("-------------AFTER SUBSCRIBE");
+
     }
 
 

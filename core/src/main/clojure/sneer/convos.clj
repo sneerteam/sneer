@@ -8,7 +8,7 @@
                          close-on-unsubscribe! pipe-to-subscriber! republish-latest-every!]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
-    [sneer.convo :refer [reify-Convo]]
+    [sneer.convo :refer [convo-by-id]]
     [sneer.convo-summarization :refer :all] ; Force compilation of interface
     [sneer.rx :refer [shared-latest]]
     [sneer.party :refer [party->puk]]
@@ -39,7 +39,7 @@
     (rx/observable*
       (fn [^Subscriber subscriber]
         (let [in (.slidingSummaries summarization)
-              out (chan 0 (map to-foreign))]
+              out (chan 1 (map to-foreign))]
           (close-on-unsubscribe! subscriber in out)
           (pipe-to-subscriber!   out subscriber "conversation summaries")
           (republish-latest-every! (* 60 1000) in out))))))
@@ -87,5 +87,4 @@
         (start-convo! container newContactNick))
 
       (getById [_ id]
-        (niy)
-        (reify-Convo nil nil)))))
+        (convo-by-id container id)))))

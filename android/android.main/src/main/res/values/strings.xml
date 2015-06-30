@@ -20,7 +20,7 @@
 
     <!-- ConversationActivity -->
     <string name="conversation_activity_action_button">Action</string>
-    <string name="conversation_activity_waiting">Waiting for %s to accept your invite. &lt;a href=""&gt;Invite Again.&lt;/a&gt;</string>
+    <string name="conversation_activity_waiting">Waiting for %s to accept your invite. &lt;a href=""&gt;Send invite again&lt;/a&gt;</string>
     <!-- ConversationActivity -->
 
 
