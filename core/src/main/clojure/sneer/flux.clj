@@ -41,7 +41,7 @@
 
           (>!! actions (assoc (->map request) ::response response))
           (go-trace
-            (let [res (with-nil (<! response))]
+            (let [res (decode-nil (<! response))]
               (close! response)
               (emit subject res)))
 
