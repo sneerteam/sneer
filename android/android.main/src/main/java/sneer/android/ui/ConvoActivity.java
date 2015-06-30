@@ -31,13 +31,13 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
-import sneer.Sneer;
-import sneer.convos.Chat;
+import sneer.convos.ChatMessage;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
 import sneer.main.R;
 
 import static sneer.android.SneerAndroidContainer.component;
+import static sneer.android.SneerAndroidFlux.dispatch;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 
 public class ConvoActivity extends SneerActionBarActivity {
@@ -97,19 +97,17 @@ public class ConvoActivity extends SneerActionBarActivity {
     private void refresh() {
         actionBar.setTitle(currentConvo.nickname);
         refreshInvitePendingMessage();
-        chatAdapter.update(currentConvo.nickname, currentConvo.chat.messages());
+        chatAdapter.update(currentConvo.nickname, currentConvo.messages);
 
-        Chat.Message last = lastMessageReceived(currentConvo.chat.messages());
-        if (last != null) {
-            currentConvo.chat.setMessageRead(last.id);
-        }
+        ChatMessage last = lastMessageReceived(currentConvo.messages);
+        if (last != null) dispatch(last.setRead());
     }
 
 
     private void refreshInvitePendingMessage() {
         boolean pending = currentConvo.inviteCodePending != null;
         final TextView waiting = (TextView) findViewById(R.id.waitingMessage);
-        final View messageList = (ListView) findViewById(R.id.messageList);
+        final View messageList = findViewById(R.id.messageList);
         final View messageSender = findViewById(R.id.messageSender);
         messageButton.setEnabled(!pending);
         if (pending) {
@@ -177,7 +175,7 @@ public class ConvoActivity extends SneerActionBarActivity {
         String text = messageInput.getText().toString().trim();
 
 		if (!text.isEmpty()) {
-            currentConvo.chat.sendMessage(text);
+            dispatch(currentConvo.sendMessage(text));
             messageInput.setText("");
         } else
             openInteractionMenu();
@@ -265,18 +263,13 @@ public class ConvoActivity extends SneerActionBarActivity {
     }
 
 
-    private Chat.Message lastMessageReceived(List<Chat.Message> msgs) {
+    private ChatMessage lastMessageReceived(List<ChatMessage> msgs) {
 		for (int i = msgs.size() - 1; i >= 0; --i) {
-			Chat.Message message = msgs.get(i);
+			ChatMessage message = msgs.get(i);
 			if (!message.isOwn)
 				return message;
 		}
 		return null;
-	}
-
-
-	private static Sneer sneer() {
-		return component(Sneer.class);
 	}
 
 }
