@@ -3,7 +3,7 @@
     [clojure.core.async :as async :refer [<!!]]
     [rx.lang.clojure.core :as rx]
     [rx.lang.clojure.interop :as interop]
-    [sneer.async :refer [tap-state sliding-chan]])
+    [sneer.async :refer [tap-state sliding-chan decode-nil]])
   (:import [rx.subjects BehaviorSubject]
            [rx.schedulers Schedulers]
            [rx Observable Observable$OnSubscribe Subscriber Observer]
@@ -119,7 +119,7 @@
           (instance? Exception v) (rx/on-error subscriber v)
           :else (do
                   (try
-                    (rx/on-next subscriber v)
+                    (rx/on-next subscriber (decode-nil v))
                     (catch Exception e
                       (println "onNext Exception. subscriber:" subscriber "value:" v "thread:" thread-name)
                       (.printStackTrace e)))

@@ -134,8 +134,11 @@
       (close! tap)
       result)))
 
-(defn with-nil [v]
+(defn decode-nil [v]
   (if (= v :nil) nil v))
+
+(defn encode-nil [v]
+  (if (nil? v) :nil v))
 
 (defn wait-for! [ch pred]
   (go-loop-trace []
