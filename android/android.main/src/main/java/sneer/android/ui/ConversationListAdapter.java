@@ -12,12 +12,12 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import sneer.convos.Summary;
 import sneer.main.R;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static sneer.android.ui.SneerActivity.findView;
-import static sneer.convos.Convos.Summary;
 
 class ConversationListAdapter extends ArrayAdapter<Summary> {
 

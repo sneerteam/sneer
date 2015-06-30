@@ -1,10 +1,12 @@
 (ns sneer.async
-  (:require [clojure.core.async :as async :refer [chan go remove< >! <! <!! alt! timeout mult tap close!]]
+  (:require [clojure.core.async :as async :refer [chan go >! <! <!! alt! alts! timeout mult tap close!]]
             [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
-            [sneer.commons :refer :all]))
+            [sneer.commons :refer :all])
+  (:import [rx Subscriber]))
 
-(def IMMEDIATELY (doto (async/chan) async/close!))
+(def closed-chan (doto (async/chan) async/close!))
+(def IMMEDIATELY closed-chan)
 
 (defn close-with!
   "Closes victim channel when ch emits a value."
@@ -19,8 +21,11 @@
 (defn sliding-chan [& [n xform]]
   (chan (async/sliding-buffer (or n 1)) xform))
 
+(defn dropping-tap [mult]
+  (tap mult (dropping-chan)))
+
 (defn sliding-tap [mult]
-  (let [ch (sliding-chan)] (async/tap mult ch) ch))
+  (tap mult (sliding-chan)))
 
 (defn connection [in out]
   [in out])
@@ -55,27 +60,6 @@
      (while-let ~binding
                 ~@forms)))
 
-(defn dropping-tap [mult]
-  (tap mult (dropping-chan)))
-
-(defn close-on-unsubscribe!
-  "Closes the channel when the subscriber is unsubscribed."
-  [^rx.Subscriber subscriber & chans]
-  (.add subscriber (rx/subscription #(doseq [c chans] (async/close! c)))))
-
-(defn pipe-to-subscriber!
-  "Copies values from channel to rx subscriber in a separate thread."
-  [chan ^rx.Subscriber subscriber ^String thread-name]
-  (async/thread
-    (.setName (Thread/currentThread) thread-name)
-    (while-let [value (<!! chan)]
-      (try
-        (rx/on-next subscriber value)
-        (catch Exception e
-          (throw (RuntimeException. (str "onNext Exception. subscriber: " subscriber " value: " value "thread: " thread-name)
-                                    e)))))
-    (rx/on-completed subscriber)))
-
 (defn republish-latest-every! [period in out] ; This republish fn would be cool as a transducer. :)
   (go-loop-trace [latest nil
                   period-timeout (chan)]
@@ -91,34 +75,74 @@
             (>! out latest)
             (recur latest (timeout period))))))
 
-(defn state-machine [initial-state function events-in]
+(defn state-machine
   "Returns a channel that accepts other channels as taps for this state machine
    in a way similar to clojure.core.async/tap.
    Reduces initial-state applying (function state event) to each event from the
    events-in channel and puts each resulting state onto the tap channels."
-  (let [taps-in (chan)
-        states-out (chan)
-        mult (mult states-out)]
+  ([f initial-state events-in]
+   (let [no-history closed-chan]
+     (state-machine f initial-state no-history events-in)))
 
-    (go-trace
-      (loop [state initial-state]
-        (alt! :priority true
+  ([f initial-state event-history events-in]
+   (let [taps-in (chan)
+         states-out (chan)
+         mult (mult states-out)]
 
-          taps-in
-          ([tap]
-            (when (some? tap)
-              (>! tap state)
-              (async/tap mult tap)
-              (recur state)))
+     (go-trace
+       (loop [state initial-state
+              inputs [taps-in event-history]
+              current? false]
+         (let [[v ch] (alts! inputs :priority true)]
+           (condp = ch
 
-          events-in
-          ([event]
-            (when (some? event)
-              (let [state' (function state event)]
-                (>! states-out state')
-                (recur state'))))))
+             taps-in
+             (when-some [tap v]
+               (when current?
+                 (>! tap state))
+               (async/tap mult tap)
+               (recur state inputs current?))
 
-      (close! taps-in)
-      (close! states-out))
+             event-history
+             (if-some [event v]
+               (recur (f state event) inputs false)
+               (do
+                 (>! states-out state)
+                 (recur state [taps-in events-in] true)))
 
-    taps-in))
+             events-in
+             (when-some [event v]
+               (let [state' (f state event)]
+                 (>! states-out state')
+                 (recur state' inputs true))))))
+
+       (close! taps-in)
+       (close! states-out))
+
+     taps-in)))
+
+(defn tap-state [machine & [tap-ch]]
+  (let [tap-ch (or tap-ch (sliding-chan))]
+    (go
+      (>! machine tap-ch))
+    tap-ch))
+
+(defn peek-state! [machine]
+  (go
+    (let [tap (tap-state machine)
+          result (<! tap)]
+      (close! tap)
+      result)))
+
+(defn decode-nil [v]
+  (if (= v :nil) nil v))
+
+(defn encode-nil [v]
+  (if (nil? v) :nil v))
+
+(defn wait-for! [ch pred]
+  (go-loop-trace []
+    (when-let [v (<! ch)]
+      (if (pred v)
+        v
+        (recur)))))

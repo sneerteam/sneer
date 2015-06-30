@@ -18,6 +18,13 @@
      will keep receiving new stored tuples until the lease emits a
      value.")
 
+  (query-with-history
+    [this criteria old-tuples new-tuples lease]
+    "Filters tuples by the criteria represented as a map of
+     field/value. When a lease channel is passed, tuples-out
+     will keep receiving new stored tuples until the lease emits a
+     value.")
+
   (set-local-attribute
     ^Void [this attribute value tuple-id])
   (get-local-attribute

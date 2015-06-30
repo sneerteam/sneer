@@ -8,13 +8,6 @@ public class SessionSummary {
     public final String date;
     public final String unread;
 
-    public SessionSummary(long id, String type, String title, String date, String unread) {
-        this.id = id;
-        this.type = type;
-        this.title = title;
-        this.date = date;
-        this.unread = unread;
-    }
+    public SessionSummary(long id, String type, String title, String date, String unread) { this.id = id; this.type = type; this.title = title; this.date = date; this.unread = unread; }
 
 }
-

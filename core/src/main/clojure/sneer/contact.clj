@@ -1,7 +1,7 @@
 (ns sneer.contact
   (:require
     [rx.lang.clojure.core :as rx]
-    [sneer.rx :refer [atom->observable combine-latest]]
+    [sneer.rx :refer [atom->obs combine-latest]]
     [sneer.party :refer [party->puk produce-party!]]
     [sneer.party-impl :refer [name-subject]])
   (:import
@@ -63,7 +63,7 @@
           (throw (FriendlyException. "This contact already has a party.")))
         (when (get @puk->contact-atom (.publicKey party))
           (throw (FriendlyException. "Another contact already has this party.")))
-        (publish-contact tuple-space own-puk nickname party invite-code)
+        (publish-contact tuple-space own-puk nickname party nil)
         (swap! puk->contact-atom #(-> %
                                       (dissoc (.. this nickname current))
                                       (assoc (.. party publicKey current) this)))
@@ -133,7 +133,7 @@
      :nick->contact       nick->contact
      :puk->contact        puk->contact
      :observable-contacts (rx/map ->contact-list
-                                  (atom->observable nick->contact))}))
+                                  (atom->obs nick->contact))}))
 
 (defn find-contact-in [puk->contact party]
   (get puk->contact (party->puk party)))

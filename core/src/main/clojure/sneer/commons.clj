@@ -1,6 +1,5 @@
 (ns sneer.commons
-  (:import [java.lang AutoCloseable]
-           [sneer.commons ActionBus]))
+  (:import [java.lang AutoCloseable]))
 
 (defprotocol Disposable
   (dispose [resource]))

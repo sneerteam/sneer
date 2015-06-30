@@ -3,7 +3,6 @@
     [sneer.commons :refer [nvl loop-trace]]
     [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [go-loop-trace]]
     [sneer.rx :refer [observe-for-io subscribe-on-io]])
   (:import [java.io File]))
 
@@ -41,7 +40,7 @@
         (catch Exception e
           false))))
 
-(defn <wait-for! [ch expected]
+(defn <wait-trace! [ch expected]
   (let [expected (nvl expected :nil)
         pred (->robust (->predicate expected))]
     (loop-trace [last-value "<none>"]
@@ -71,7 +70,7 @@
   (rx/subscribe observable
                 #(>!! c (nvl % :nil))  ; Channels cannot take nil
                 #(do
-                   (.printStackTrace %)
+                   #_(.printStackTrace %)
                    (>!! c {::error %})
                    (close! c))
                 #(close! c)))
@@ -99,15 +98,27 @@
 
 (defn <emits [expected]
   (fn [ch]
-    (<wait-for! ch expected)))
+    (<wait-trace! ch expected)))
+
+(defn closes [ch]
+  (loop-trace [last-value "<none>"]
+    (if-some [current (<!!? ch)]
+      (if (= current :timeout)
+        (do
+          (println "TIMEOUT. Last value emitted:" last-value)
+          false)
+        (recur current))
+      true)))
 
 (defn emits [expected]
   (fn [obs]
     (let [ch (->chan obs)]
-      (<wait-for! ch expected))))
+      (<wait-trace! ch expected))))
 
 (defn emits-error [exception-type]
   (emits #(instance? exception-type (::error %))))
 
+(defn <next [obs]
+  (<!!? (->chan obs)))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))

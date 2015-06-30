@@ -256,10 +256,10 @@
             (close! tuples-out))))
 
       (query-tuples [_ criteria tuples-out lease]
-        (let [new-tuples (dropping-tap new-tuples-mult)
+        (let [new-tuples-in (dropping-tap new-tuples-mult)  ;TODO: Optimization: Transducer: Simply filter the new tuple using the criteria instead of rerunning the DB query. In that case, new-tuples can no longer be a dropping channel and needs a buffer (size 100?) (buffers are LinkedLists so they don't use up space when empty).
               criteria (atom criteria)]
           (go (<! lease)
-              (close! new-tuples))
+              (close! new-tuples-in))
           (go-loop []
             (do
               (let [tuples (query-tuples-from-db db @criteria)]
@@ -267,9 +267,24 @@
                   (doseq [tuple tuples]
                     (>! tuples-out tuple))
                   (swap! criteria assoc ::after-id (-> tuples last (get "id")))))
-              ;TODO: (>! tuples-out :up-to-date)
-              (when (<! new-tuples) ;TODO: Optimization: Simply check the new tuple against the criteria instead of rerunning the DB query. In that case, new-tuples can no longer be a sliding/dropping channel.
+              (when (<! new-tuples-in)
                 (recur))))))
+
+      (query-with-history [_ criteria old-out new-out lease] ;TODO: DRY: Very similar to the query-tuples fn.
+        (let [new-tuples-in (dropping-tap new-tuples-mult)  ;TODO: Optimization: Transducer: Simply filter the new tuple using the criteria instead of rerunning the DB query. In that case, new-tuples can no longer be a dropping channel and needs a buffer (size 100?) (buffers are LinkedLists so they don't use up space when empty).
+              criteria (atom criteria)]
+          (go (<! lease)
+              (close! new-tuples-in))
+          (go-loop [tuples-out old-out]
+            (do
+              (let [tuples (query-tuples-from-db db @criteria)]
+                (when-not (empty? tuples)
+                  (doseq [tuple tuples]
+                    (>! tuples-out tuple))
+                  (swap! criteria assoc ::after-id (-> tuples last (get "id")))))
+              (close! old-out)
+              (when (<! new-tuples-in)
+                (recur new-out))))))
 
       (set-local-attribute [_ attribute value tuple-id]
         (>!! requests {:set-attribute attribute

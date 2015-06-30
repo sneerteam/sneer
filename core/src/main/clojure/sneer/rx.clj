@@ -1,13 +1,15 @@
 (ns sneer.rx
   (:require
+    [clojure.core.async :as async :refer [<!!]]
     [rx.lang.clojure.core :as rx]
-    [rx.lang.clojure.interop :as interop])
+    [rx.lang.clojure.interop :as interop]
+    [sneer.async :refer [tap-state sliding-chan decode-nil]])
   (:import [rx.subjects BehaviorSubject]
            [rx.schedulers Schedulers]
            [rx Observable Observable$OnSubscribe Subscriber Observer]
            [sneer.rx CompositeSubject]
-           (rx.functions FuncN)
-           (java.util List)))
+           [rx.functions FuncN]
+           [java.util List]))
 
 (defn on-subscribe [f]
   "Reifies a rx.Observable.OnSubscribe instance from a regular clojure function `f'."
@@ -36,7 +38,7 @@
 (defn seq->observable [^Iterable iterable]
   (Observable/from iterable))
 
-(defn atom->observable [atom]
+(defn atom->obs [atom]
   (let [subject (BehaviorSubject/create @atom)]
     (add-watch atom (Object.) (fn [_key _ref _old-value new-value]
                                 (rx/on-next subject new-value)))
@@ -99,3 +101,33 @@
 
 (defn behavior-subject [& [initial-value]]
   (BehaviorSubject/create initial-value))
+
+(defn close-on-unsubscribe!
+  "Closes the channel when the subscriber is unsubscribed."
+  [^Subscriber subscriber & chans]
+  (.add subscriber (rx/subscription #(doseq [c chans] (async/close! c)))))
+
+(defn pipe-to-subscriber!
+  "Copies values from channel to rx subscriber in a separate thread."
+  [chan ^Subscriber subscriber ^String thread-name]
+  (async/thread                                             ;TODO: Revise: One thread per observable? How about using the rx computation pool or something? Klaus
+    (.setName (Thread/currentThread) thread-name)
+    (loop []
+      (let [v (<!! chan)]
+        (cond
+          (nil? v) (rx/on-completed subscriber)
+          (instance? Exception v) (rx/on-error subscriber v)
+          :else (do
+                  (try
+                    (rx/on-next subscriber (decode-nil v))
+                    (catch Exception e
+                      (println "onNext Exception. subscriber:" subscriber "value:" v "thread:" thread-name)
+                      (.printStackTrace e)))
+                  (recur)))))))
+
+(defn obs-tap [state-machine debug-name & [xform]]
+  (rx/observable*
+    (fn [^Subscriber subscriber]
+      (let [tap (tap-state state-machine (sliding-chan 1 xform))]
+        (close-on-unsubscribe! subscriber tap)
+        (pipe-to-subscriber! tap subscriber debug-name)))))

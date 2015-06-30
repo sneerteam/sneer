@@ -3,7 +3,7 @@
             [clojure.core.async :refer [chan close!]]
             [sneer.async :refer [sliding-chan]]
             [sneer.commons :refer [submap?]]
-            [sneer.test-util :refer [<!!? >!!? <emits tmp-file]]
+            [sneer.test-util :refer [<!!? >!!? <emits closes tmp-file]]
             [sneer.tuple.protocols :refer :all]
             [sneer.keys :as keys]
             [sneer.convo-summarization :as subject]))
@@ -56,7 +56,7 @@
 
     (fact "Output is closed when input is closed"
       (close! tuples-in)
-      (<!!? summaries-out) => nil)))
+      summaries-out => closes)))
 
 (let [unknown (keys/->puk "unknown puk")
       ann     (keys/->puk "ann puk")

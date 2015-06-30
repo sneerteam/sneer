@@ -2,7 +2,7 @@
   :description "The Sneer Temporary Server"
   :dependencies [[me.sneer/sneer-java-api "0.1.5"]
                  [me.sneer/core "0.1.5"]
-                 [http-kit "2.1.16"]
+                 [http-kit "2.1.18"]
                  [org.clojure/core.match "0.2.2"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/clojure "1.7.0-alpha5"]

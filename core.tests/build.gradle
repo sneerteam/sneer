@@ -44,8 +44,8 @@ sourceSets {
 }
 
 dependencies {
-  provided 'org.clojure:clojure:1.6.0'
-  provided 'org.clojure:core.async:0.1.303.0-886421-alpha'
+  provided external['clojure.core']
+  provided external['clojure.core.async']
   provided external['clojure.core.match']
   optional 'org.clojure:java.jdbc:0.3.4'
   provided 'com.netflix.rxjava:rxjava-clojure:' + external.rx.version

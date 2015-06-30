@@ -2,6 +2,8 @@ ext {
   external = [
     rx: [version: '0.20.7'],
     'clojure.core.match': 'org.clojure:core.match:0.2.2',
+    'clojure.core': 'org.clojure:clojure:1.7.0-alpha5',
+    'clojure.core.async': 'org.clojure:core.async:0.1.346.0-17112a-alpha',
   ]
 }
 
