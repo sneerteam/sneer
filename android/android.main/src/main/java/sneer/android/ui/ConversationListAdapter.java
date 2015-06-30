@@ -19,11 +19,11 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static sneer.android.ui.SneerActivity.findView;
 
-class ConvosAdapter extends ArrayAdapter<Summary> {
+class ConversationListAdapter extends ArrayAdapter<Summary> {
 
 	private final LayoutInflater inflater;
 
-	public ConvosAdapter(Activity activity) {
+	public ConversationListAdapter(Activity activity) {
         super(activity, R.layout.list_item_main);
 		inflater = activity.getLayoutInflater();
     }

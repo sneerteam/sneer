@@ -42,7 +42,7 @@ public class ConvosActivity extends SneerActionBarActivity {
 	}
 
 	private void setUpConversationList() {
-		final ConvosAdapter adapter = new ConvosAdapter(this);
+		final ConversationListAdapter adapter = new ConversationListAdapter(this);
 
 		final ListView list = (ListView)findViewById(R.id.conversationList);
 		list.setAdapter(adapter);
