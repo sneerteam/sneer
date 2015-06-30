@@ -57,6 +57,6 @@
   (request ::response))
 
 (defn action [type & keyValuePairs]
-  (Action/action type (into-array keyValuePairs)))
+  (Action/action type (into-array Object keyValuePairs)))
 (defn request [type & keyValuePairs]
-  (Request/request type (into-array keyValuePairs)))
+  (Request/request type (into-array Object keyValuePairs)))

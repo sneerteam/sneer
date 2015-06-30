@@ -24,8 +24,8 @@
                      (fn [follower-puk tuples-out & _]
                        (assert (= follower-puk other-puk))
                        (go-while-let [[tuple ack-ch] (<! tuples-out)]
-                                     (>! out tuple)
-                                     (>! ack-ch tuple)))))
+                         (>! out tuple)
+                         (>! ack-ch tuple)))))
 
 (defn connect-admins! [admin-a admin-b]
   (let [->a (chan)
