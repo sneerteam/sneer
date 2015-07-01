@@ -22,4 +22,14 @@ public class Convo {
 	public Action setNickname(String newNick) { return action("set-nickname", "contact-id", contactId, "new-nick", newNick); }
 	public Action sendMessage(String text) { return action("send-message", "contact-id", contactId, "text", text); }
 
+	@Override
+	public String toString() {
+		return "Convo{" +
+				"nickname='" + nickname + '\'' +
+				", inviteCodePending='" + inviteCodePending + '\'' +
+				", messages=" + messages +
+				", sessionSummaries=" + sessionSummaries +
+				", contactId=" + contactId +
+				'}';
+	}
 }
