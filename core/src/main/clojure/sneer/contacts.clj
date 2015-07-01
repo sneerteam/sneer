@@ -40,6 +40,7 @@
 #_{:nick->id        {"Neide" 42}
    :id->nick        {42 "Neide"}
    :id->invite-code {42 "ea4e35a3ea54e3"}
+   :id->puk         {42 NeidePuk}
    :invite-code->id {"ea4e35a3ea54e3" 42}
    :puk->nick       {NeidePuk "Neide"}}
 (defn- handle-contact [state own-puk tuple]
@@ -55,6 +56,7 @@
           (update-in [:nick->id] dissoc old-nick)
           (assoc-in  [:nick->id new-nick] id)
           (assoc-in  [:id->nick id] new-nick)
+          (assoc-in  [:id->puk id] puk)
           (assoc-in  [:puk->nick puk] new-nick)
           (assoc-in  [:id->invite-code id] invite-code)
           (assoc-in  [:invite-code->id invite-code] id)))))
@@ -62,10 +64,12 @@
 (defn- handle-push [state tuple]
   ; (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received})
   (let [invite-code (tuple "invite-code")
-        id   (get-in state [:invite-code->id invite-code])
-        nick (get-in state [:id->nick] id)]
+        contack-puk (tuple "author")
+        id (get-in state [:invite-code->id invite-code])
+        nick (get-in state [:id->nick id])]
     (-> state
-      (assoc-in  [:puk->nick (tuple "author")] nick)
+      (assoc-in  [:puk->nick contack-puk] nick)
+      (assoc-in  [:id->puk id] contack-puk)
       (update-in [:id->invite-code] dissoc id)
       (update-in [:invite-code->id] dissoc invite-code))))
 
@@ -145,30 +149,19 @@
                     (>! (response action) (encode-nil (problem-with-nick state nick)))
                     state)
 
-;                  "set-nickname"
-                  #_(let [{:strs [nick]} action]
-                    (if-let [problem (problem-with-nick state nick)]
+                  "set-nickname"
+                  (let [{:strs [contact-id new-nick]} action]
+                    (if-let [problem (problem-with-nick state new-nick)]
                       (do
-                        ; Emit in "toast" observable: (>! (response action) (FriendlyException. (str "Nickname " problem)))
+                        ; TODO: Emit in "toast" observable: (str "Nickname " problem)
                         state)
-                      (let [tuple (<! (store-contact! container nick nil))]
-                        (>! (response action) (tuple "id"))
-                        (<! (wait-for! states #(up-to-date? % (tuple "id")))))))
-
-
-                  ;    "set-nickname"
-                  #_(let [{:strs [convo-id new-nick]} action]
-                                    (println "set-nickname" convo-id new-nick))
-
-                  ;    "accept-invite"
-                  #_(let [{:strs [new-contact-nick contact-puk invite-code-received]} action
-                                        contact-puk (from-hex contact-puk)
-                                        contact-tuple (<! (store-contact! container new-contact-nick contact-puk))]
-                                    (-store-tuple! container {"type"        "push"
-                                                              "audience"    contact-puk
-                                                              "invite-code" invite-code-received})
-
-                                    (>! (response a) (contact-tuple "id")))
+                      (let [contact-puk (get-in state [:id->puk contact-id])]
+                        (if contact-puk
+                          (do
+                            (let [tuple (<! (store-contact! container new-nick contact-puk nil))
+                                  id (tuple "id")]
+                              (<! (wait-for! states #(up-to-date? % id)))))
+                          state))))  ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
 
                   (println "CONTACTS - UNKNOWN ACTION: " action))))))))))
 
