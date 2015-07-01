@@ -31,9 +31,9 @@
                   "author"    own-puk}]
       (store-tuple tuple-base (merge defaults tuple))))
 
-(defn- store-contact! [container new-contact-nick contact-puk invite-code]
+(defn- store-contact! [container nick contact-puk invite-code]
   (-store-tuple! container {"type"        "contact"
-                            "payload"     new-contact-nick
+                            "payload"     nick
                             "party"       contact-puk
                             "invite-code" invite-code}))
 
