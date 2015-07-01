@@ -41,10 +41,10 @@
   `(go
      (try
        ~@forms
-       (catch Throwable ~'e
-         (println "GO ERROR" ~'e)
-         #_(print-throwable ~'e)
-         (.printStackTrace ~'e)))))
+       (catch Throwable e#
+         (println "GO ERROR" e#)
+         #_(print-throwable e#)
+         (.printStackTrace e#)))))
 
 (defmacro go-loop-trace
   "Same as go-loop but prints unhandled exception stack trace"
