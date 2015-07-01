@@ -37,6 +37,7 @@
                             "party"       contact-puk
                             "invite-code" invite-code}))
 
+;TODO: Normalize: :id->contact (map with nick, puk and invite code)
 #_{:nick->id        {"Neide" 42}
    :id->nick        {42 "Neide"}
    :id->invite-code {42 "ea4e35a3ea54e3"}
