@@ -37,41 +37,47 @@
                             "party"       contact-puk
                             "invite-code" invite-code}))
 
-;TODO: Normalize: :id->contact (map with nick, puk and invite code)
-#_{:nick->id        {"Neide" 42}
-   :id->nick        {42 "Neide"}
-   :id->invite-code {42 "ea4e35a3ea54e3"}
-   :id->puk         {42 NeidePuk}
-   :invite-code->id {"ea4e35a3ea54e3" 42}
-   :puk->nick       {NeidePuk "Neide"}}
+(defn- -puk [id state]
+  (get-in state [:id->contact id :puk]))
+
+(defn- -invite-code [id state]
+  (get-in state [:id->contact id :invite-code]))
+
+(defn- -nickname [id state]
+  (get-in state [:id->contact id :nick]))
+
+(defn- -contact-id [puk state]
+  (get-in state [:puk->id puk]))
+
+
+#_{:id->contact {42 {:nick "Neide"
+                     :puk NeidePuk
+                     :invite-code "ea4e35a3ea54e3"}}
+   :nick->id        {"Neide" 42}
+   :puk->id         {NeidePuk "Neide"}
+   :invite-code->id {"ea4e35a3ea54e3" 42}}
 (defn- handle-contact [state own-puk tuple]
   (if-not (= (tuple "author") own-puk)
     state
-    (let [new-nick (tuple "payload")
-          puk (tuple "party")
-          old-nick (get-in state [:puk->nick puk])
-          id (get-in state [:nick->id old-nick])
-          id (or id (tuple "id"))
-          invite-code (tuple "invite-code")]
+    (let [{new-nick "payload" puk "party" invite-code "invite-code"} tuple
+          id (or (-contact-id puk state) (tuple "id"))
+          old-nick (-nickname id state)]
       (-> state
+          (assoc-in  [:id->contact id] {:nick new-nick :puk puk :invite-code invite-code})
           (update-in [:nick->id] dissoc old-nick)
           (assoc-in  [:nick->id new-nick] id)
-          (assoc-in  [:id->nick id] new-nick)
-          (assoc-in  [:id->puk id] puk)
-          (assoc-in  [:puk->nick puk] new-nick)
-          (assoc-in  [:id->invite-code id] invite-code)
+          (assoc-in  [:puk->id puk] id)
           (assoc-in  [:invite-code->id invite-code] id)))))
 
 (defn- handle-push [state tuple]
   ; (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received})
   (let [invite-code (tuple "invite-code")
-        contack-puk (tuple "author")
+        contact-puk (tuple "author")
         id (get-in state [:invite-code->id invite-code])
-        nick (get-in state [:id->nick id])]
+        nick (-nickname id state)]
     (-> state
-      (assoc-in  [:puk->nick contack-puk] nick)
-      (assoc-in  [:id->puk id] contack-puk)
-      (update-in [:id->invite-code] dissoc id)
+      (assoc-in  [:id->contact id] {:nick nick :puk contact-puk})
+      (assoc-in  [:puk->id contact-puk] id)
       (update-in [:invite-code->id] dissoc invite-code))))
 
 (defn- handle-tuple [own-puk state tuple]
@@ -156,7 +162,7 @@
                       (do
                         ; TODO: Emit in "toast" observable: (str "Nickname " problem)
                         state)
-                      (let [contact-puk (get-in state [:id->puk contact-id])]
+                      (let [contact-puk (-puk contact-id state)]
                         (if contact-puk
                           (do
                             (let [tuple (<! (store-contact! container new-nick contact-puk nil))
@@ -169,14 +175,8 @@
 (defn problem-with-new-nickname [contacts nick]
   (.request (contacts :dispatcher) (request "problem-with-new-nickname" "nick" nick)))
 
-(defn- -invite-code [id state]
-  (get-in state [:id->invite-code id]))
-
 (defn invite-code [contacts id]
   (obs-tap (contacts :machine) "invite-code tap" (map #(encode-nil (-invite-code id %)))))
-
-(defn- -nickname [id state]
-  (get-in state [:id->nick id]))
 
 (defn nickname [contacts id]
   (obs-tap (contacts :machine) "nickname tap" (map #(-nickname id %))))
