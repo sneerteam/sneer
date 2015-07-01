@@ -187,10 +187,10 @@
 (defn nickname [contacts id]
   (obs-tap (contacts :machine) "nickname tap" (map #(-nickname id %))))
 
-#_(defn new-contact [contacts nick]
+(defn new-contact [contacts nick]
   (.request (contacts :dispatcher) (request "new-contact" "nick" nick)))
 
-#_(defn accept-invite [contacts nick puk-hex invite-code-received]
+(defn accept-invite [contacts nick puk-hex invite-code-received]
   (.request (contacts :dispatcher) (request "accept-invite" "nick" nick "puk-hex" puk-hex "invite-code-received" invite-code-received)))
 
 (defn start! [container]
