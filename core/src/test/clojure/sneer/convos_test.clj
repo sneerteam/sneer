@@ -27,8 +27,7 @@
 
         (with-open [carla (sneer!)]
           (connect! neide carla)
-          (.request (carla Dispatcher)
-                     (Convos$Actions/acceptInvite "Neide" (-> neide puk .toHex) (.inviteCodePending n->c)))
+          (.acceptInvite (carla Convos) "Neide" (-> neide puk .toHex) (.inviteCodePending n->c))
           n->c-obs => (emits #(-> % .inviteCodePending nil?)))
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))

@@ -49,36 +49,46 @@
 (defn- -contact-id [puk state]
   (get-in state [:puk->id puk]))
 
+(defn contact-list [state]
+  (-> state :id->contact vals))
 
-#_{:id->contact {42 {:nick "Neide"
+#_{:id->contact {42 {:id 42
+                     :nick "Neide"
                      :puk NeidePuk
-                     :invite-code "ea4e35a3ea54e3"}}
+                     :invite-code "ea4e35a3ea54e3"
+                     :timestamp long}}
    :nick->id        {"Neide" 42}
    :puk->id         {NeidePuk "Neide"}
    :invite-code->id {"ea4e35a3ea54e3" 42}}
 (defn- handle-contact [state own-puk tuple]
   (if-not (= (tuple "author") own-puk)
     state
-    (let [{new-nick "payload" puk "party" invite-code "invite-code"} tuple
+    (let [{new-nick "payload" puk "party" invite-code "invite-code" timestamp "timestamp"} tuple
           id (or (-contact-id puk state) (tuple "id"))
-          old-nick (-nickname id state)]
+          old-nick (-nickname id state)
+          contact {:id id
+                   :nick new-nick
+                   :puk puk
+                   :invite-code invite-code
+                   :timestamp timestamp}]
       (-> state
-          (assoc-in  [:id->contact id] {:nick new-nick :puk puk :invite-code invite-code})
+          (assoc-in  [:id->contact id] contact)
           (update-in [:nick->id] dissoc old-nick)
           (assoc-in  [:nick->id new-nick] id)
           (assoc-in  [:puk->id puk] id)
           (assoc-in  [:invite-code->id invite-code] id)))))
 
 (defn- handle-push [state tuple]
-  ; (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received})
+;; {"type" "push" "audience" contact-puk "invite-code" invite-code-received}
   (let [invite-code (tuple "invite-code")
-        contact-puk (tuple "author")
-        id (get-in state [:invite-code->id invite-code])
-        nick (-nickname id state)]
-    (-> state
-      (assoc-in  [:id->contact id] {:nick nick :puk contact-puk})
-      (assoc-in  [:puk->id contact-puk] id)
-      (update-in [:invite-code->id] dissoc invite-code))))
+        contact-puk (tuple "author")]
+    (if-some [id (get-in state [:invite-code->id invite-code])]
+      (-> state
+          (update-in [:id->contact id] assoc :puk contact-puk :timestamp (tuple "timestamp"))
+          (update-in [:id->contact id] dissoc :invite-code)
+          (assoc-in  [:puk->id contact-puk] id)
+          (update-in [:invite-code->id] dissoc invite-code))
+      state)))
 
 (defn- handle-tuple [own-puk state tuple]
   (let [state (case (tuple "type")

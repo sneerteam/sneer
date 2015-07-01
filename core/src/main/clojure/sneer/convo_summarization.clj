@@ -1,6 +1,6 @@
 (ns sneer.convo-summarization
   (:require
-    [clojure.core.async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
+    [clojure.core.async :as async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace state-machine tap-state peek-state!]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
@@ -23,23 +23,8 @@
 (defn- contact-puk [tuple]
   (tuple "party"))
 
-(defn- handle-contact [own-puk state tuple]
-  (if-not (= (tuple "author") own-puk)
-    state
-    (let [new-nick (tuple "payload")
-          nick-already-used? (get-in state [:nick->summary new-nick])]
-      (if nick-already-used?
-        state
-        (let [puk (contact-puk tuple)
-              old-nick (get-in state [:puk->nick puk])
-              summary  (get-in state [:nick->summary old-nick])
-              summary  (or summary {:id (tuple "id")})
-              summary  (assoc summary :nick new-nick
-                                      :timestamp (tuple "timestamp"))]
-          (-> state
-            (update-in [:nick->summary] dissoc old-nick)
-            (assoc-in  [:nick->summary new-nick] summary)
-            (assoc-in  [:puk->nick puk] new-nick)))))))
+(defn- handle-contacts [own-puk state event]
+  (assoc state :contacts (event :state)))
 
 (defn- unread-status [label old-status]
   (cond
@@ -67,9 +52,9 @@
   (let [author (message "author")
         own? (= author own-puk)
         contact-puk (if own? (message "audience") author)]
-    (if-let [nick (get-in state [:puk->nick contact-puk])]
-      (update-in state [:nick->summary nick] #(update-summary own? message %))
-      state)))
+    (update-in state
+               [:puk->summary contact-puk]
+               #(update-summary own? message %))))
 
 (defn- update-with-read [summary tuple]
   (let [msg-id (tuple "payload")]
@@ -77,33 +62,32 @@
       (= msg-id (:last-received summary)) (assoc :unread ""))))
 
 (defn- handle-read-receipt [own-puk state tuple]
-  (let [contact-puk (tuple "audience")
-        nick (get-in state [:puk->nick contact-puk])]
+  (let [contact-puk (tuple "audience")]
     (cond-> state
       (= (tuple "author") own-puk)
-      (update-in [:nick->summary nick]
+      (update-in [:puk->summary contact-puk]
                  update-with-read tuple))))
 
-(defn handle-tuple [own-puk state tuple]
-  (->
-   (case (tuple "type")
-     "contact"      (handle-contact      own-puk state tuple)
-     "message"      (handle-message      own-puk state tuple)
-     "message-read" (handle-read-receipt own-puk state tuple)
-     state)
-   (assoc :last-id (tuple "id"))))
+(defn handle-event [own-puk state event]
+  (let [type (event "type")]
+    (if (= type :contacts)
+      (handle-contacts own-puk state event)
+      (->
+       (case type
+         "message"      (handle-message      own-puk state event)
+         "message-read" (handle-read-receipt own-puk state event)
+         state)
+       (assoc :last-id (event "id"))))))
 
-(defn- summarization-loop! [previous-state own-puk tuples]
+(defn- summarization-loop! [previous-state own-puk events]
   (let [previous-state (or previous-state {:last-id 0})]
-    (state-machine (partial handle-tuple own-puk) previous-state tuples)))
+    (state-machine (partial handle-event own-puk) previous-state events)))
 
-; state: {:last-id long
-;         :puk->nick {puk "Neide"}
-;         :nick->summary {"Neide" {:nick "Neide"
-;                                  :timestamp long
-;                                  :unread "*"
-;                                  :preview "Hi, Maico"
-;                                  :id long}}
+;; state: {:last-id long
+;;         :puk->summary {NeidePuk {:timestamp long
+;;                                  :preview "Hi, Maico"
+;;                                  :unread "*"
+;;                                  :last-received original_id}}
 (defn- start-summarization-machine! [container previous-state]
   (let [lease (.produce container :lease)
         admin (.produce container SneerAdmin)
@@ -112,12 +96,14 @@
         tuples (chan)
         all-tuples-criteria (if (some? previous-state)
                               {tb/after-id (previous-state :last-id)}
-                              {})]
+                              {})
+
+        contacts (.produce container sneer.contacts/handle)
+        contacts-updates (tap-state (contacts :machine) (chan 1 (map #(do {"type" :contacts :state %}))))]
 
     (query-tuples tuple-base all-tuples-criteria tuples lease)
     (close-with! lease tuples)
-
-    (summarization-loop! previous-state own-puk tuples)))
+    (summarization-loop! previous-state own-puk (async/merge [tuples contacts-updates]))))
 
 (defn- read-snapshot [file]
   (when (and file (.exists file))
@@ -157,11 +143,25 @@
 (defn- nick->id [state nick]
   (get-in state [:nick->summary nick :id]))
 
-(def ^:private xsummarize (comp (map :nick->summary)
-                                (dedupe)
-                                (map vals)
-                                (map #(sort-by :timestamp descending %))
-                                (map vec)))
+;; State -> [{:id :nick :timestamp :summary}]
+(defn -summarize [{:keys [puk->summary contacts]}]
+  (->>
+   contacts
+   sneer.contacts/contact-list
+   (map
+    (fn [{:keys [id puk nick timestamp] :as contact}]
+      (let [puk (contact :puk)]
+        (if-some [summary (get puk->summary puk)]
+          (assoc summary
+                 :id id
+                 :nick nick
+                 :timestamp (max timestamp (or (summary :timestamp) 0)))
+          (assoc contact :preview "" :unread "")))))
+   (sort-by :timestamp descending)
+   vec))
+
+(def ^:private xsummarize (comp (dedupe)
+                                (map -summarize)))
 
 (defn sliding-summaries!
   ([own-puk tuples-in]
@@ -175,10 +175,6 @@
     (reify ConvoSummarization
 
       (slidingSummaries [_] sliding-summaries)
-
-      (getIdByNick
-       [_ nick]
-       (nick->id (<!! (peek-state! machine)) nick))
 
       (processUpToId
        [_ id]

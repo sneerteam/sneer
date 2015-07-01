@@ -58,7 +58,7 @@
       (close! tuples-in)
       summaries-out => closes)))
 
-(let [unknown (keys/->puk "unknown puk")
+#_(let [unknown (keys/->puk "unknown puk")
       ann     (keys/->puk "ann puk")
       jon     (keys/->puk "jon puk")]
   (tabular "Conversation summarization"

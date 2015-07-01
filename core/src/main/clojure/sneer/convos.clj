@@ -56,39 +56,21 @@
                              "author"      own-puk
                              "invite-code" invite-code})))
 
-(defn- invite-code []
-  (-> (UUID/randomUUID) .toString (.replaceAll "-" "")))
-
-(defn- start-convo! [container newContactNick]
-  (let [result (AsyncSubject/create)
-        summarization ^ConvoSummarization (.produce container ConvoSummarization)]
-
-    (go-trace
-      (let [tuple (<! (store-contact! container newContactNick (invite-code)))
-            attempt-id (tuple "id")
-            _ (<! (.processUpToId summarization attempt-id))
-            actual-id (.getIdByNick summarization newContactNick)]
-        (if (= actual-id attempt-id)
-          (do
-            (rx/on-next result attempt-id)
-            (rx/on-completed result))
-          (rx/on-error result (FriendlyException. (if actual-id (str newContactNick " was already a contact") "Unknown error"))))))
-
-    result))
-
 (defn reify-Convos [container]
   (let [summarization ^ConvoSummarization (.produce container ConvoSummarization)
-        summaries-obs (summaries-obs* summarization)]
+        summaries-obs (summaries-obs* summarization)
+        contacts (.produce container sneer.contacts/handle)]
     (reify Convos
       (summaries [_] summaries-obs)
 
       (problemWithNewNickname [_ newContactNick]
-        (cond
-          (.isEmpty newContactNick) "cannot be empty"
-          (.getIdByNick summarization newContactNick) "already used"))
+        (sneer.contacts/problem-with-new-nickname contacts newContactNick))
 
       (startConvo [_ newContactNick]
-        (start-convo! container newContactNick))
+        (sneer.contacts/new-contact contacts newContactNick))
+
+      (acceptInvite [_ newContactNick contactPuk inviteCodeReceived]
+        (sneer.contacts/accept-invite contacts newContactNick contactPuk inviteCodeReceived))
 
       (getById [_ id]
         (convo-by-id container id)))))
