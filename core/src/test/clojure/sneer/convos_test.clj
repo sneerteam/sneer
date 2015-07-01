@@ -13,12 +13,12 @@
   (with-open [neide (sneer!)]
     (let [n-convos ^Convos (neide Convos)]
       (. n-convos summaries) => (emits #(.isEmpty %))
-      (. n-convos problemWithNewNickname "") => "cannot be empty"
-      (. n-convos problemWithNewNickname "Carla") => nil
+      (. n-convos problemWithNewNickname "") => (emits "cannot be empty")
+      (. n-convos problemWithNewNickname "Carla") => (emits nil)
       (let [convo-id (<next (. n-convos startConvo "Carla"))
             n->c-obs (.getById n-convos convo-id)
             n->c (<next n->c-obs)]
-        (. n-convos problemWithNewNickname "Carla") => "already used"
+        (. n-convos problemWithNewNickname "Carla") => (emits "already used")
         (. n-convos startConvo "Carla") => (emits-error FriendlyException)
 
         (. n-convos summaries) => (emits #(-> % first .nickname (= "Carla")))
