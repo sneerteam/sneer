@@ -20,13 +20,14 @@ public class InviteSender {
 		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 		sharingIntent.setType("text/plain");
 		sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Sneer Invite");
-        Convo convo = component(Convos.class).getById(convoId).toBlocking().first();
+        Convos convos = component(Convos.class);
+        Convo convo = convos.getById(convoId).toBlocking().first();
         if (convo.inviteCodePending == null) return;
 
         sharingIntent.putExtra(Intent.EXTRA_TEXT,
 				"If you don't have the Sneer app, install it using the Play Store: https://play.google.com/store/apps/details?id=sneer.main\n\n" +
 				"Then, tap to add me as a Sneer contact: " +
-				buildSneerUri(component(Sneer.class).self().publicKey().current().toHex(), convo.inviteCodePending));
+				buildSneerUri(convos.ownPuk(), convo.inviteCodePending));
 
 		String title = ("Send invite to ") + convo.nickname;
 		Intent chooser = Intent.createChooser(sharingIntent, title);

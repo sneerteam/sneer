@@ -20,4 +20,6 @@ public interface Convos {
 
 	Observable<Convo> getById(long contactId);
 
+    String ownPuk();
+
 }

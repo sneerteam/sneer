@@ -2,9 +2,12 @@ package sims.sneer.convos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 import sneer.commons.exceptions.FriendlyException;
 import sneer.convos.ChatMessage;
@@ -40,7 +43,7 @@ public class ConvosSim implements Convos {
 		if (newContactNick.equals("Wesley"))
 			return Observable.error(
 					new FriendlyException("Wesley is already a contact"));
-		return Observable.just(4242L);
+		return Observable.just(4241L);
 	}
 
 	@Override
@@ -50,11 +53,28 @@ public class ConvosSim implements Convos {
 	}
 
     @Override
-    public Observable<Convo> getById(long id) {
-        return Observable.just(new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>()));
+    public Observable<Convo> getById(final long id) {
+        return id % 2 == 0
+           ? Observable.just(new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>()))
+           : Observable.concat(
+                Observable.just(new Convo(id, "Pending " + id, "INVITE CODE", Collections.<ChatMessage>emptyList(), Collections.<SessionSummary>emptyList())),
+                Observable.timer(3, TimeUnit.SECONDS).map(new Func1<Long, Convo>() {
+                    @Override
+                    public Convo call(Long aLong) {
+                        return new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>());
+                    }
+                })
+
+        );
+
     }
 
-	private List<ChatMessage> messages() {
+    @Override
+    public String ownPuk() {
+        return "BABACABABACABABACABABACABABACA00BABACABABACABABACABABACABABACA00";
+    }
+
+    private List<ChatMessage> messages() {
 		return Arrays.asList(
 			new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
 			new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),

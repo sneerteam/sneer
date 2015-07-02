@@ -164,7 +164,7 @@ public class SneerActionBarActivity extends ActionBarActivity {
 	}
 
 	public static <T> Observable<T> ui(Observable<T> observable) {
-		return onMainThread(observable.debounce(6000, TimeUnit.MILLISECONDS));
+		return onMainThread(observable);
 	}
 
 	public static Bitmap toBitmap(byte[] bytes) {
