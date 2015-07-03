@@ -21,6 +21,7 @@
               :skummet-skip-vars []
               :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
               :aot [sneer.commons
+                    sneer.time
                     sneer.async
                     sneer.flux
                     sneer.io

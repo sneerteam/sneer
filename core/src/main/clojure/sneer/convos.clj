@@ -13,26 +13,25 @@
     [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]]
     [sneer.party :refer [party->puk]]
     [sneer.serialization :refer [serialize deserialize]]
+    [sneer.time :as time]
     [sneer.tuple.protocols :refer :all]
     [sneer.tuple-base-provider :refer :all]
     [sneer.interfaces])
   (:import
-    [java.util Date UUID]
-    [org.ocpsoft.prettytime PrettyTime]
+    [java.util UUID]
     [rx Subscriber]
     [sneer.admin SneerAdmin]
-    [sneer.commons Clock Container]
+    [sneer.commons Container]
     [sneer.convos Convos Summary]
     [sneer.commons.exceptions FriendlyException]
     [sneer.interfaces ConvoSummarization]
     [rx.subjects AsyncSubject]))
 
 (defn- to-foreign-summary [pretty-time {:keys [nick summary timestamp unread id]}]
-  (let [date (.format pretty-time (Date. ^long timestamp))]
-    (Summary. nick summary date (str unread) id)))
+  (Summary. nick summary (pretty-time timestamp) (str unread) id))
 
 (defn to-foreign [summaries]
-  (mapv (partial to-foreign-summary (PrettyTime. (Date. (Clock/now))))
+  (mapv (partial to-foreign-summary (time/pretty-printer))
         summaries))
 
 (defn- summaries-obs* [summarization]
