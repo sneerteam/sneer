@@ -3,11 +3,14 @@
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! connect! puk]]
             [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
-  (:import [sneer.convos Convos]
+  (:import [sneer.convos Convos ChatMessage]
            [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
+
+(defn text [^ChatMessage m]
+  (.text m))
 
 (facts "Convos"
   (with-open [neide (sneer!)]
@@ -27,11 +30,27 @@
 
         (with-open [carla (sneer!)]
           (connect! neide carla)
-          (.acceptInvite (carla Convos) "Neide" (-> neide puk .toHex) (.inviteCodePending n->c))
-          n->c-obs => (emits #(-> % .inviteCodePending nil?)))
+
+          (let [c-convos (carla Convos)
+                convo-id (<next (.acceptInvite c-convos
+                                               "Neide"
+                                               (-> neide puk .toHex)
+                                               (.inviteCodePending n->c)))
+                c->n-obs (.getById c-convos convo-id)]
+
+            n->c-obs => (emits #(-> % .inviteCodePending nil?))
+
+            ;; (.dispatch (neide Dispatcher) (.sendMessage n->c "hi"))
+            ;; n->c-obs => (emits #(->> % .chatMessages (map text) (= ["hi"])))
+            ;; c->n-obs => (emits #(->> % .chatMessages (map text) (= ["hi"])))
+
+            )
+
+          )
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
         n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))
+
 
         ))))
 
