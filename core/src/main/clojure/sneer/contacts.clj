@@ -190,7 +190,7 @@
                               (<! (wait-for! states #(up-to-date? % id)))))
                           state))))  ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
 
-                  (println "CONTACTS - UNKNOWN ACTION: " action))))))))))
+                  state)))))))))
 
 (defn problem-with-new-nickname [contacts nick]
   (.request (contacts :dispatcher) (request "problem-with-new-nickname" "nick" nick)))
