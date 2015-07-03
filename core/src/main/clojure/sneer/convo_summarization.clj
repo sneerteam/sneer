@@ -17,7 +17,7 @@
   (:import
     [java.io File]
     [sneer.admin SneerAdmin]
-    [sneer.commons PersistenceFolder]
+    [sneer.commons Container PersistenceFolder]
     [sneer.interfaces ConvoSummarization]))
 
 (defn- contact-puk [tuple]
@@ -88,7 +88,7 @@
 ;;                                  :preview "Hi, Maico"
 ;;                                  :unread "*"
 ;;                                  :last-received original_id}}
-(defn- start-summarization-machine! [container previous-state]
+(defn- start-summarization-machine! [^Container container previous-state]
   (let [lease (.produce container :lease)
         admin (.produce container SneerAdmin)
         own-puk (.. admin privateKey publicKey)
@@ -99,7 +99,7 @@
                               {})
 
         contacts (sneer.contacts/from container)
-        contacts-updates (tap-state (contacts :machine) (chan 1 (map #(do {"type" :contacts :state %}))))]
+        contacts-updates (sneer.contacts/tap contacts (chan 1 (map #(do {"type" :contacts :state %}))))]
 
     (query-tuples tuple-base all-tuples-criteria tuples lease)
     (close-with! lease tuples)
@@ -139,9 +139,6 @@
         machine (start-summarization-machine! container previous-state)]
     (start-saving-snapshots-to! file (tap-state machine))
     machine))
-
-(defn- nick->id [state nick]
-  (get-in state [:nick->summary nick :id]))
 
 ;; State -> [{:id :nick :timestamp :summary}]
 (defn -summarize [{:keys [puk->summary contacts]}]

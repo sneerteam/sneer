@@ -59,8 +59,8 @@
 (defn by-id [id state]
   (get-in state [:id->contact id]))
 
-(defn tap [contacts]
-  (-> contacts :machine tap-state))
+(defn tap [contacts & [ch]]
+ (-> contacts :machine (tap-state ch)))
 
 #_{:id->contact {42 {:id 42
                      :nick "Neide"
