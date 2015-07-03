@@ -20,7 +20,7 @@ import sneer.convos.Summary;
 @SuppressWarnings("unused")
 public class ConvosSim implements Convos {
 
-	@Override
+    @Override
 	public Observable<List<Summary>> summaries() {
 		BehaviorSubject<List<Summary>> ret = BehaviorSubject.create();
 		ArrayList<Summary> data = new ArrayList<>(10000);
@@ -57,7 +57,7 @@ public class ConvosSim implements Convos {
         return id % 2 == 0
            ? Observable.just(new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>()))
            : Observable.concat(
-                Observable.just(new Convo(id, "Pending " + id, "INVITE CODE", Collections.<ChatMessage>emptyList(), Collections.<SessionSummary>emptyList())),
+                Observable.just(new Convo(id, "Pending " + id, "INVITE_CODE", Collections.<ChatMessage>emptyList(), Collections.<SessionSummary>emptyList())),
                 Observable.timer(3, TimeUnit.SECONDS).map(new Func1<Long, Convo>() {
                     @Override
                     public Convo call(Long aLong) {
@@ -67,6 +67,15 @@ public class ConvosSim implements Convos {
 
         );
 
+    }
+
+    private int findConvoCount = 0;
+    @Override
+    public Observable<Long> findConvo(String inviterPuk, String inviteCode) {
+        findConvoCount++;
+        return findConvoCount % 2 == 0
+                        ? Observable.just(4242L)
+                        : Observable.just((Long) null);
     }
 
     @Override

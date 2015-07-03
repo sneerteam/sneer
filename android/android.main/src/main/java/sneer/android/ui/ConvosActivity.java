@@ -1,6 +1,5 @@
 package sneer.android.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -48,7 +47,7 @@ public class ConvosActivity extends SneerActionBarActivity {
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
     		long convoId = adapter.getItem(position).convoId;
-            openConversation(convoId);
+            ConvoActivity.open(ConvosActivity.this, convoId);
 		}});
 
 		subscription = ui(convos.summaries()).subscribe(new Action1<List<Summary>>() { @Override public void call(List<Summary> summaries) {
@@ -58,13 +57,6 @@ public class ConvosActivity extends SneerActionBarActivity {
 
     public void onAddContactClicked(View view) {
         navigateTo(AddContactActivity.class);
-    }
-
-    private void openConversation(long id) {
-        Intent intent = new Intent();
-        intent.setClass(this, ConvoActivity.class);
-        intent.putExtra("id", id);
-        startActivity(intent);
     }
 
 }

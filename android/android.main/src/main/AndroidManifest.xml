@@ -99,8 +99,10 @@
                 android:value="sneer.android.ui.MainActivity" />
         </activity>
         <activity
-            android:name="sneer.android.ui.ContactActivity"
-            android:label="@string/title_activity_contact" >
+            android:name="sneer.android.ui.AcceptInviteActivity"
+            android:label="@string/title_activity_accept_invite"
+            android:theme="@android:style/Theme.Holo.Light.Dialog">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="sneer.android.ui.MainActivity" />

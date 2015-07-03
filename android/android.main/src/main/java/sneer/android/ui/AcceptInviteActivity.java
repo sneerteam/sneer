@@ -1,6 +1,7 @@
 package sneer.android.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,56 +14,67 @@ import rx.Subscriber;
 import rx.functions.Action1;
 import sneer.android.SneerAndroidContainer;
 import sneer.android.utils.AndroidUtils;
-
 import sneer.convos.Convos;
 import sneer.main.R;
 
 import static sneer.android.ui.SneerActivity.ui;
 
-public class AddContactActivity extends Activity {
+public class AcceptInviteActivity extends Activity {
 
 	private EditText nicknameEdit;
-	private Button btnSendInvite;
+	private Button btnDone;
 
 	private String nickname;
     private Convos convos;
+    private String contactPuk;
+    private String inviteCode;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        parseQuery(getIntent());
+
+        if (contactPuk == null || inviteCode == null) {
+            AndroidUtils.finishWith("Invalid Invite", this);
+            return;
+        }
+
+        // TODO Call Convos.findConvo() with puk and inviteCode and if found open ConvoActiviy then finish
+
 		setContentView(R.layout.activity_add_contact);
 
         convos = SneerAndroidContainer.component(Convos.class);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
-		btnSendInvite = (Button) findViewById(R.id.btn_done);
+		btnDone = (Button) findViewById(R.id.btn_done);
 
-        btnSendInvite.setText("SEND INVITE >");
-
-        btnSendInvite.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-                convos.startConvo(nickname).subscribe(new Subscriber<Long>() {
+        btnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                convos.acceptInvite(getNickname(), contactPuk, inviteCode).subscribe(new Subscriber<Long>() {
                     @Override
                     public final void onCompleted() {
                     }
+
                     @Override
                     public final void onError(Throwable e) {
-                        AndroidUtils.toast(AddContactActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                        AndroidUtils.toast(AcceptInviteActivity.this, e.getMessage(), Toast.LENGTH_LONG);
                     }
+
                     @Override
                     public final void onNext(Long convoId) {
-                        InviteSender.send(AddContactActivity.this, convoId);
+                        ConvoActivity.open(AcceptInviteActivity.this, convoId);
                         finish();
                     }
                 });
-			}
-		});
+            }
+        });
 
-		validationOnTextChanged(nicknameEdit);
+		setNicknameValidationOnTextChanged(nicknameEdit);
 	}
 
-	private void validationOnTextChanged(final EditText editText) {
+	private void setNicknameValidationOnTextChanged(final EditText editText) {
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -81,7 +93,20 @@ public class AddContactActivity extends Activity {
 
     private void refreshNicknameProblem(String error) {
         if (!nickname.isEmpty() && error != null) nicknameEdit.setError(error);
-        btnSendInvite.setEnabled(!nickname.isEmpty() && error == null);
+        btnDone.setEnabled(!nickname.isEmpty() && error == null);
+    }
+
+    private void parseQuery(Intent intent) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String[] query = intent.getData().getQuery().split("&invite=");
+            if (query.length != 2) return;
+            contactPuk = query[0];
+            inviteCode = query[1];
+        }
+    }
+
+    private String getNickname() {
+        return nicknameEdit.getText().toString().trim();
     }
 
 }

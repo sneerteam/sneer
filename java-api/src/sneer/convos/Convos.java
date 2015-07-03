@@ -8,17 +8,21 @@ public interface Convos {
 
 	Observable<List<Summary>> summaries();
 
-	/** @return null if the new nickname is ok or a reason why the new nickname is not ok (empty or already used by another Contact). */
-	Observable<String> problemWithNewNickname(String newContactNick);
+    /** Emits null if the new nickname is ok or a reason why the new nickname is not ok (empty or already used by another Contact). */
+	Observable<String> problemWithNewNickname(String newNickname);
 
-	/** @return The new contact id.
+	/** Emits the new Convo id.
 	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
-	Observable<Long> startConvo(String newContactNick);
-	/** @return The new contact id.
-	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
-	Observable<Long> acceptInvite(String newContactNick, String contactPuk, String inviteCodeReceived);
+	Observable<Long> startConvo(String newContactNickname);
 
-	Observable<Convo> getById(long contactId);
+    /** Emits the new Convo id.
+	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
+	Observable<Long> acceptInvite(String newContactNickname, String inviterPuk, String inviteCodeReceived);
+
+    Observable<Convo> getById(long convoId);
+
+    /** Emits null if the user has not yet accepted the invite */
+    Observable<Long> findConvo(String inviterPuk, String inviteCode);
 
     String ownPuk();
 

@@ -272,4 +272,12 @@ public class ConvoActivity extends SneerActionBarActivity {
 		return null;
 	}
 
+
+    static void open(Context context, long id) {
+        Intent intent = new Intent();
+        intent.setClass(context, ConvoActivity.class);
+        intent.putExtra("id", id);
+        context.startActivity(intent);
+    }
+
 }

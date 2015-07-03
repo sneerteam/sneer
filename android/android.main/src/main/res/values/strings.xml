@@ -38,7 +38,7 @@
 
     <!-- ContactActivity -->
     <string name="action_add_contact">Add Sovereign Contact</string>
-    <string name="add_contact_send_invite">Next ></string>
+    <string name="add_contact_done">DONE</string>
     <!-- ContactActivity -->
 
     <string name="search_hint">Search conversation</string>
@@ -49,6 +49,6 @@
     <string name="title_activity_system_report">System Report</string>
 
     <!-- This appears on the menu for url viewing -->
-    <string name="title_activity_contact">Sneer Contact</string>
+    <string name="title_activity_accept_invite">Accept Sneer Invite</string>
     <string name="action_share">Share Public Key</string>
 </resources>
