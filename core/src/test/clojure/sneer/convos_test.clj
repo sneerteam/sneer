@@ -9,7 +9,7 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
-#_(facts "Convos"
+(facts "Convos"
   (with-open [neide (sneer!)]
     (let [n-convos ^Convos (neide Convos)]
       (. n-convos summaries) => (emits #(.isEmpty %))

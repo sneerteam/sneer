@@ -98,7 +98,7 @@
                               {tb/after-id (previous-state :last-id)}
                               {})
 
-        contacts (.produce container sneer.contacts/handle)
+        contacts (sneer.contacts/from container)
         contacts-updates (tap-state (contacts :machine) (chan 1 (map #(do {"type" :contacts :state %}))))]
 
     (query-tuples tuple-base all-tuples-criteria tuples lease)

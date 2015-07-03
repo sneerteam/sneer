@@ -21,7 +21,7 @@
     [org.ocpsoft.prettytime PrettyTime]
     [rx Subscriber]
     [sneer.admin SneerAdmin]
-    [sneer.commons Clock]
+    [sneer.commons Clock Container]
     [sneer.convos Convos Summary]
     [sneer.commons.exceptions FriendlyException]
     [sneer.interfaces ConvoSummarization]
@@ -56,10 +56,10 @@
                              "author"      own-puk
                              "invite-code" invite-code})))
 
-(defn reify-Convos [container]
+(defn reify-Convos [^Container container]
   (let [summarization ^ConvoSummarization (.produce container ConvoSummarization)
         summaries-obs (summaries-obs* summarization)
-        contacts (.produce container sneer.contacts/handle)]
+        contacts (sneer.contacts/from container)]
     (reify Convos
       (summaries [_] summaries-obs)
 

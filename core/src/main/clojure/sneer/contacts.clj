@@ -9,12 +9,16 @@
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer [store-tuple query-with-history]])
   (:import
+    [sneer.commons Container]
     [sneer.flux Dispatcher]
     [sneer.admin SneerAdmin]
     [sneer.commons.exceptions FriendlyException]
     [java.util UUID]))
 
 (def handle ::contacts)
+
+(defn from [^Container container]
+  (.produce container handle))
 
 (defn- puk [^SneerAdmin admin]
   (.. admin privateKey publicKey))
@@ -51,6 +55,12 @@
 
 (defn contact-list [state]
   (-> state :id->contact vals))
+
+(defn by-id [id state]
+  (get-in state [:id->contact id]))
+
+(defn tap [contacts]
+  (-> contacts :machine tap-state))
 
 #_{:id->contact {42 {:id 42
                      :nick "Neide"
