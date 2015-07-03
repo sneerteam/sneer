@@ -1,18 +1,32 @@
 (ns sneer.convo
+
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :as async :refer [<! >! chan]]
             [sneer.async :refer [state-machine go-trace go-loop-trace sliding-chan close-with!]]
             [sneer.contacts]
-            [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe! shared-latest]]
+            [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe!]]
+            [sneer.time :as time]
             [sneer.tuple.protocols :refer :all]
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.persistent-tuple-base :refer [after-id]])
-  (:import
-    [sneer.convos Convo]
-    [rx Subscriber]
-    [sneer.admin SneerAdmin]))
 
-(defn- tuple-base [container]
+  (:import  [sneer.commons Container]
+            [sneer.convos Convo ChatMessage]
+            [rx Subscriber]
+            [sneer.admin SneerAdmin]))
+
+(defn- handle-message [message state]
+  (let [{:strs [id author timestamp label]} message
+        own? (= author (:own-puk state))
+        message {:id id :own? own? :timestamp timestamp :text label}]
+    (update state :messages conj message)))
+
+(defn- handle-event [event state]
+  ;; TODO:
+  state
+  )
+
+(defn- tuple-base [^Container container]
   (tuple-base-of (.produce container SneerAdmin)))
 
 (defn- start!
@@ -25,12 +39,19 @@
     (close-with! lease contacts-in)
     (async/pipeline 1 state-out xconvo contacts-in)))
 
-; public Convo(long contactId, String nickname, String inviteCodePending, List<ChatMessage> messages, List<SessionSummary> sessionSummaries)
-; public SessionSummary(long id, String type, String title, String date, String unread)
-; interface Chat { List<Message> messages(); }
-; public Message(long id, String text, boolean isOwn, String date)
-(defn- to-foreign [{:keys [id nick invite-code]}]
-  (Convo. id nick invite-code nil nil))
+(defn- ->ChatMessageList [messages]
+  (if (empty? messages)
+    []
+    (let [pretty-time (time/pretty-printer)]
+      (->> messages
+           (mapv (fn [{:keys [id text own? timestamp]}]
+                   (ChatMessage. id text own? (pretty-time timestamp))))))))
+
+; Convo(long contactId, String nickname, String inviteCodePending, List<ChatMessage> messages, List<SessionSummary> sessionSummaries)
+; SessionSummary(long id, String type, String title, String date, String unread)
+; ChatMessage(long id, String text, boolean isOwn, String date)
+(defn- to-foreign [{:keys [id nick invite-code messages]}]
+  (Convo. id nick invite-code (->ChatMessageList messages) nil))
 
 (defn convo-by-id [container id]
   (rx/observable*
