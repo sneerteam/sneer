@@ -31,7 +31,7 @@
           n->c-obs => (emits #(-> % .inviteCodePending nil?)))
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
-;        n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))
+        n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))
 
         ))))
 
