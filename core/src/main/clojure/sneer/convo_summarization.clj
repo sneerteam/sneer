@@ -147,13 +147,12 @@
    sneer.contacts/contact-list
    (map
     (fn [{:keys [id puk nick timestamp] :as contact}]
-      (let [puk (contact :puk)]
-        (if-some [summary (get puk->summary puk)]
-          (assoc summary
-                 :id id
-                 :nick nick
-                 :timestamp (max timestamp (or (summary :timestamp) 0)))
-          (assoc contact :preview "" :unread "")))))
+      (if-some [summary (get puk->summary puk)]
+        (assoc summary
+               :id id
+               :nick nick
+               :timestamp (max timestamp (or (summary :timestamp) 0)))
+        (assoc contact :preview "" :unread ""))))
    (sort-by :timestamp descending)
    vec))
 
