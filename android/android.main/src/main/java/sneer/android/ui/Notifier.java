@@ -11,24 +11,23 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
-import java.util.List;
-
-import sneer.main.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import sneer.Conversation;
-import sneer.Conversations;
 import sneer.commons.Clock;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.Exceptions;
+import sneer.convos.Convo;
+import sneer.convos.Convos;
+import sneer.convos.Notifications;
+import sneer.main.R;
 
-import static sneer.android.SneerAndroidSingleton.sneer;
+import static sneer.android.SneerAndroidContainer.component;
 
 public class Notifier {
 
-	private static final String TAG = "UNREAD CONVERSATIONS";
+	private static final String TAG = "UNREAD CONVOS";
 	private static final int NOTIFICATION_ID = 1;
 
 	private static Context context;
@@ -61,41 +60,45 @@ public class Notifier {
 	private static void doResume() {
 		if (isSubscribed()) return;
 
-		subscription = notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Conversations.Notification>() { @Override public void call(Conversations.Notification notification) {
+		subscription = notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Notifications.Notification>() { @Override public void call(Notifications.Notification notification) {
 			refresh(notification);
 		}});
 	}
 
-	private static Observable<Conversations.Notification> notifications() {
-		return sneer().conversations().notifications();
+	private static Observable<Notifications.Notification> notifications() {
+		return component(Notifications.class).get();
 	}
 
-	private static void refresh(Conversations.Notification notification) {
-		List<Conversation> conversations = notification.conversations();
-		if (conversations.size() == 0) {
+	private static void refresh(Notifications.Notification notification) {
+		if (notification == null) {
 			cancelNotification();
 			return;
 		}
-		Intent intent = conversations.size() == 1
-				? conversationActivityIntent(conversations.get(0))
-				: mainActivityIntent();
+//		Intent intent = convos.size() == 1
+//				? convoActivityIntent(notification.convoId())
+//				: convosActivityIntent();
+
+		// Temp
+		Intent intent = convosActivityIntent();
+		//
+
 		notify(notification, intent);
 	}
 
-	private static Intent mainActivityIntent() {
+	private static Intent convosActivityIntent() {
 		Intent intent = new Intent();
-		intent.setClass(context, MainActivity.class);
+		intent.setClass(context, Convos.class);
 		return intent;
 	}
 
-	private static Intent conversationActivityIntent(Conversation conversation) {
+	private static Intent convoActivityIntent(Long convoId) {
 		Intent intent = new Intent();
-		intent.setClass(context, ConversationActivityOld.class);
-		intent.putExtra("nick", conversation.contact().nickname().current());
+		intent.setClass(context, Convo.class);
+		intent.putExtra("id", convoId);
 		return intent;
 	}
 
-	private static void notify(Conversations.Notification notification, Intent intent) {
+	private static void notify(Notifications.Notification notification, Intent intent) {
 		notify(intent, notification.title(), notification.subText(), notification.text());
 	}
 

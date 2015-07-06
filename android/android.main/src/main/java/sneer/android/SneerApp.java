@@ -31,12 +31,12 @@ public class SneerApp extends MultiDexApplication {
 
 		// TODO: Migrate to container.
 		// Old pre-container way:
+		Notifier.start(app);
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
 		if (SneerAndroidSingleton.admin() == null)
 			System.out.println("CORE NOT FOUND.");
 		else {
 			PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
-			Notifier.start(app);
 			GcmRegistrationAlarmReceiver.schedule(app);
 
 			// New container way:

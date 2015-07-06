@@ -31,11 +31,14 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
+import sneer.android.SneerAndroidContainer;
 import sneer.convos.ChatMessage;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
+import sneer.convos.Notifications;
 import sneer.main.R;
 
+import static sneer.android.SneerAndroidContainer.*;
 import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.SneerAndroidFlux.dispatch;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
@@ -138,34 +141,39 @@ public class ConvoActivity extends SneerActionBarActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 messageButton.setImageResource(messageInput.getText().toString().trim().isEmpty()
-                ? R.drawable.ic_action_new
-                : R.drawable.ic_action_send);
+                        ? R.drawable.ic_action_new
+                        : R.drawable.ic_action_send);
             }
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
 
-        messageInput.setOnKeyListener(new OnKeyListener() { @Override public boolean onKey(View v, int keyCode, KeyEvent event) {
-            if (!isHardwareKeyboardAvailable()) return false;
-            if (!(event.getAction() == KeyEvent.ACTION_DOWN)) return false;
-            if (!(keyCode == KeyEvent.KEYCODE_ENTER)) return false;
-            sendMessageClicked();
-            return true;
-        }});
+        messageInput.setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (!isHardwareKeyboardAvailable()) return false;
+                if (!(event.getAction() == KeyEvent.ACTION_DOWN)) return false;
+                if (!(keyCode == KeyEvent.KEYCODE_ENTER)) return false;
+                sendMessageClicked();
+                return true;
+            }
+        });
 
         messageButton = (ImageButton)findViewById(R.id.actionButton);
 
         messageButton.setImageResource(R.drawable.ic_action_new);
         messageButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessageClicked();
-            }
-        });
+			@Override
+			public void onClick(View v) {
+				sendMessageClicked();
+			}
+		});
     }
 
 
@@ -228,8 +236,8 @@ public class ConvoActivity extends SneerActionBarActivity {
     @Override
 	protected void onPause() {
         unsubscribeToConvo();
+		component(Notifications.class).stopIgnoring();
         super.onPause();
-        // TODO Restore sneer().conversations().notificationsStopIgnoring();
     }
 
 
@@ -238,7 +246,7 @@ public class ConvoActivity extends SneerActionBarActivity {
 		super.onResume();
 		hideKeyboard();
         subscribeToConvo();
-		// TODO Restore sneer().conversations().notificationsStartIgnoring(conversation);
+		component(Notifications.class).startIgnoring(convoId);
 	}
 
 

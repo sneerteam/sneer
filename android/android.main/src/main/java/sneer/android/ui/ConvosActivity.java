@@ -45,14 +45,29 @@ public class ConvosActivity extends SneerActionBarActivity {
 
 		final ListView list = (ListView)findViewById(R.id.conversationList);
 		list.setAdapter(adapter);
-		list.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
-    		long convoId = adapter.getItem(position).convoId;
-            ConvoActivity.open(ConvosActivity.this, convoId);
-		}});
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
+				long convoId = adapter.getItem(position).convoId;
+				ConvoActivity.open(ConvosActivity.this, convoId);
+			}
+		});
 
 		subscription = ui(convos.summaries()).subscribe(new Action1<List<Summary>>() { @Override public void call(List<Summary> summaries) {
 			adapter.update(summaries);
 		}});
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Notifier.resume();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Notifier.pause();
 	}
 
     public void onAddContactClicked(View view) {
