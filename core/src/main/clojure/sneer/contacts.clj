@@ -1,7 +1,7 @@
 (ns sneer.contacts
   (:require
     [clojure.core.async :refer [chan <! >! alt!]]
-    [sneer.async :refer [state-machine tap-state peek-state! go-loop-trace wait-for! encode-nil]]
+    [sneer.async :refer [go-trace state-machine tap-state peek-state! go-loop-trace wait-for! encode-nil]]
     [sneer.commons :refer [now nvl]]
     [sneer.flux :refer [tap-actions response request]]
     [sneer.keys :refer [from-hex]]
@@ -127,6 +127,14 @@
 (defn- up-to-date? [state id]
   (>= (state :last-id) id))
 
+(defn wait-for-store-contact! [container nick contact-puk invite-code contacts-states]
+  (go-trace
+    (let [tuple (<! (store-contact! container nick contact-puk invite-code))
+          id (tuple "id")
+          state (<! (wait-for! contacts-states #(up-to-date? % id)))]
+      {:state state
+       :id    id})))
+
 (defn- handle-actions! [container tuple-machine]
   (let [states (tap-state tuple-machine)
         actions (chan 1)]
@@ -151,11 +159,9 @@
                         (>! (response action) (FriendlyException. (str "Nickname " problem)))
                         state)
                       (let [invite-code (-> (UUID/randomUUID) .toString (.replaceAll "-" ""))
-                            tuple (<! (store-contact! container nick nil invite-code))
-                            id (tuple "id")
-                            state' (<! (wait-for! states #(up-to-date? % id)))]
-                        (>! (response action) id)
-                        state')))
+                            result (<! (wait-for-store-contact! container nick nil invite-code states))]
+                        (>! (response action) (result :id))
+                        (result :state))))
 
                   "accept-invite"
                   (let [{:strs [nick puk-hex invite-code-received]} action]
@@ -165,11 +171,9 @@
                         state)
                       (let [contact-puk (from-hex puk-hex)
                             _ (<! (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received}))
-                            tuple (<! (store-contact! container nick contact-puk nil))
-                            id (tuple "id")
-                            state' (<! (wait-for! states #(up-to-date? % id)))]
-                        (>! (response action) id)
-                        state')))
+                            result (<! (wait-for-store-contact! container nick contact-puk nil states))]
+                        (>! (response action) (result :id))
+                        (result :state))))
 
                   "problem-with-new-nickname"
                   (let [{:strs [nick]} action]
@@ -184,10 +188,8 @@
                         state)
                       (let [contact-puk (-puk contact-id state)]
                         (if contact-puk
-                          (do
-                            (let [tuple (<! (store-contact! container new-nick contact-puk nil))
-                                  id (tuple "id")]
-                              (<! (wait-for! states #(up-to-date? % id)))))
+                          (let [result (<! (wait-for-store-contact! container new-nick contact-puk nil states))]
+                            (result :state))
                           state))))  ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
 
                   state)))))))))
