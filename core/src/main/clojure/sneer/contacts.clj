@@ -1,7 +1,7 @@
 (ns sneer.contacts
   (:require
     [clojure.core.async :refer [chan <! >! alt!]]
-    [sneer.async :refer [go-trace state-machine tap-state peek-state! go-loop-trace wait-for! encode-nil]]
+    [sneer.async :refer [go-trace state-machine tap-state peek-state! go-loop-trace wait-for! encode-nil sliding-chan close-with!]]
     [sneer.commons :refer [now nvl]]
     [sneer.flux :refer [tap-actions response request]]
     [sneer.keys :refer [from-hex]]
@@ -56,11 +56,17 @@
 (defn contact-list [state]
   (-> state :id->contact vals))
 
-(defn by-id [id state]
-  (get-in state [:id->contact id]))
-
 (defn tap [contacts & [ch]]
  (-> contacts :machine (tap-state ch)))
+
+(defn tap-id [contacts id lease]
+  (let [xcontact (map (fn [state] (get-in state [:id->contact id])))
+        result (sliding-chan 1 xcontact)]
+    (close-with! lease result)
+    (tap contacts result)
+    result))
+
+
 
 #_{:id->contact {42 {:id 42
                      :nick "Neide"

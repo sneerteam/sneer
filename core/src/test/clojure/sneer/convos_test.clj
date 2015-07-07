@@ -40,7 +40,7 @@
 
             n->c-obs => (emits #(-> % .inviteCodePending nil?))
 
-            ;; (.dispatch (neide Dispatcher) (.sendMessage n->c "hi"))
+            (.dispatch (neide Dispatcher) (.sendMessage n->c "hi"))
             ;; n->c-obs => (emits #(->> % .chatMessages (map text) (= ["hi"])))
             ;; c->n-obs => (emits #(->> % .chatMessages (map text) (= ["hi"])))
 
