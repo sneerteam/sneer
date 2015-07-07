@@ -18,14 +18,10 @@
     [sneer.tuple-base-provider :refer :all]
     [sneer.interfaces])
   (:import
-    [java.util UUID]
     [rx Subscriber]
-    [sneer.admin SneerAdmin]
     [sneer.commons Container]
     [sneer.convos Convos Summary]
-    [sneer.commons.exceptions FriendlyException]
-    [sneer.interfaces ConvoSummarization]
-    [rx.subjects AsyncSubject]))
+    [sneer.interfaces ConvoSummarization]))
 
 (defn- to-foreign-summary [pretty-time {:keys [nick summary timestamp unread id]}]
   (Summary. nick summary (pretty-time timestamp) (str unread) id))
@@ -43,17 +39,6 @@
           (close-on-unsubscribe! subscriber in out)
           (pipe-to-subscriber!   out subscriber "conversation summaries")
           (republish-latest-every! (* 60 1000) in out))))))
-
-(defn store-contact! [container newContactNick invite-code]
-  (let [admin (.produce container SneerAdmin)
-        own-puk (.. admin privateKey publicKey)
-        tuple-base (tuple-base-of admin)]
-    (store-tuple tuple-base {"type"        "contact"
-                             "payload"     newContactNick
-                             "timestamp"   (now)
-                             "audience"    own-puk
-                             "author"      own-puk
-                             "invite-code" invite-code})))
 
 (defn reify-Convos [^Container container]
   (let [summarization ^ConvoSummarization (.produce container ConvoSummarization)
