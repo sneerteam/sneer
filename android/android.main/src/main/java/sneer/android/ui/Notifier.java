@@ -18,8 +18,6 @@ import rx.functions.Action1;
 import sneer.commons.Clock;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.Exceptions;
-import sneer.convos.Convo;
-import sneer.convos.Convos;
 import sneer.convos.Notifications;
 import sneer.main.R;
 
@@ -74,26 +72,23 @@ public class Notifier {
 			cancelNotification();
 			return;
 		}
-//		Intent intent = convos.size() == 1
-//				? convoActivityIntent(notification.convoId())
-//				: convosActivityIntent();
-
-		// Temp
-		Intent intent = convosActivityIntent();
-		//
+		Long convoId = notification.convoId();
+		Intent intent = convoId != null
+				? convoActivityIntent(convoId)
+				: convosActivityIntent();
 
 		notify(notification, intent);
 	}
 
 	private static Intent convosActivityIntent() {
 		Intent intent = new Intent();
-		intent.setClass(context, Convos.class);
+		intent.setClass(context, ConvosActivity.class);
 		return intent;
 	}
 
 	private static Intent convoActivityIntent(Long convoId) {
 		Intent intent = new Intent();
-		intent.setClass(context, Convo.class);
+		intent.setClass(context, ConvoActivity.class);
 		intent.putExtra("id", convoId);
 		return intent;
 	}

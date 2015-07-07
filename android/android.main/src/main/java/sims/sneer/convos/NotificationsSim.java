@@ -9,8 +9,8 @@ public class NotificationsSim implements Notifications {
 
 	@Override
 	public Observable<Notification> get() {
-		Notification n = buildNotification(1043L, "Test title", "Test text", "Test subText");
-		return Observable.just(n);
+		Log.i("NOTIFTEST", "get->called");
+		return Observable.just(null);
 	}
 
 	@Override
@@ -21,30 +21,6 @@ public class NotificationsSim implements Notifications {
 	@Override
 	public void stopIgnoring() {
 		Log.i("NOTIFTEST", "stopIgnoring->called");
-	}
-
-	private Notifications.Notification buildNotification(final Long convoId, final String title, final String text, final String subText) {
-		return new Notification() {
-			@Override
-			public Long convoId() {
-				return convoId;
-			}
-
-			@Override
-			public String title() {
-				return title;
-			}
-
-			@Override
-			public String text() {
-				return text;
-			}
-
-			@Override
-			public String subText() {
-				return subText;
-			}
-		};
 	}
 
 }
