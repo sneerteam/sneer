@@ -64,7 +64,6 @@ public class ConvosSim implements Convos {
                         return new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>());
                     }
                 })
-
         );
 
     }
