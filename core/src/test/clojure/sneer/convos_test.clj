@@ -41,19 +41,13 @@
             n->c-obs => (emits #(-> % .inviteCodePending nil?))
 
             (.dispatch (neide Dispatcher) (.sendMessage n->c "hi"))
-            ;; n->c-obs => (emits #(->> % .chatMessages (map text) (= ["hi"])))
-            ;; c->n-obs => (emits #(->> % .chatMessages (map text) (= ["hi"])))
+            n->c-obs => (emits #(->> % .messages (mapv text) (= ["hi"])))
 
-            )
-
-          )
+            ;c->n-obs => (emits #(->> % .messages (mapv text) (= ["hi"]))) ; TODO: Subs for conversations.
+            ))
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
-        n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))
-
-
-        ))))
+        n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))))))
 
   ; set-nickname action with duplicate nick emits error warning via "toaster"
-  ; Subs for conversations.
   ; Reads not being emitted by old logic or not being processed by new summarization.

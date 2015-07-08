@@ -1,18 +1,14 @@
 (ns sneer.convos
   (:require
-    [clojure.core.async :refer [go chan close! <! >! <!! sliding-buffer timeout mult]]
-    [clojure.stacktrace :refer [print-stack-trace]]
+    [clojure.core.async :refer [chan <!]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [close-with! sliding-chan sliding-tap
-                         go-trace go-while-let go-loop-trace
-                         republish-latest-every!]]
-    [sneer.commons :refer [now produce! descending loop-trace niy]]
-    [sneer.contact :refer [get-contacts puk->contact]]
+    [sneer.async :refer [go-while-let republish-latest-every!]]
+    [sneer.contacts :refer [id->puk]]
     [sneer.convo :refer [convo-by-id]]
-    [sneer.convo-summarization :refer :all] ; Force compilation of interface
+    [sneer.convo-summarization :refer :all]                 ; Force compilation of interface
+    [sneer.flux :refer [tap-actions]]
     [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]]
-    [sneer.party :refer [party->puk]]
-    [sneer.serialization :refer [serialize deserialize]]
+    [sneer.tuple.persistent-tuple-base :refer [timestamped]]
     [sneer.time :as time]
     [sneer.tuple.protocols :refer :all]
     [sneer.tuple-base-provider :refer :all]
@@ -21,12 +17,14 @@
     [rx Subscriber]
     [sneer.commons Container]
     [sneer.convos Convos Summary]
-    [sneer.interfaces ConvoSummarization]))
+    [sneer.interfaces ConvoSummarization]
+    [sneer.flux Dispatcher]
+    [sneer.admin SneerAdmin]))
 
 (defn- to-foreign-summary [pretty-time {:keys [nick summary timestamp unread id]}]
   (Summary. nick summary (pretty-time timestamp) (str unread) id))
 
-(defn to-foreign [summaries]
+(defn- to-foreign [summaries]
   (mapv (partial to-foreign-summary (time/pretty-printer))
         summaries))
 
@@ -37,13 +35,35 @@
         (let [in (.slidingSummaries summarization)
               out (chan 1 (map to-foreign))]
           (close-on-unsubscribe! subscriber in out)
-          (pipe-to-subscriber!   out subscriber "conversation summaries")
+          (pipe-to-subscriber! out subscriber "conversation summaries")
           (republish-latest-every! (* 60 1000) in out))))))
+
+(defn- handle-msg-actions! [container]
+  (let [admin (.produce container SneerAdmin)
+        tb (tuple-base-of admin)
+        own-puk (.. admin privateKey publicKey)
+        contacts (sneer.contacts/from container)
+        actions (chan 1)]
+    (tap-actions (.produce container Dispatcher) actions)
+    (go-while-let [action (<! actions)]
+      (when (= (action :type) "send-message")
+        (let [{:strs [contact-id text]} action
+              contact-puk (<! (id->puk contacts contact-id))]
+          (when contact-puk
+            (let [tuple {"type"         "message"
+                         "author"       own-puk
+                         "audience"     contact-puk
+                         "message-type" "chat"
+                         "label"        text}]
+              (store-tuple tb (timestamped tuple)))))))))   ;TODO Create a tb function to store a new tuple, that takes care of own-puk and timestamp.
 
 (defn reify-Convos [^Container container]
   (let [summarization ^ConvoSummarization (.produce container ConvoSummarization)
         summaries-obs (summaries-obs* summarization)
         contacts (sneer.contacts/from container)]
+
+    (handle-msg-actions! container)
+
     (reify Convos
       (summaries [_] summaries-obs)
 
