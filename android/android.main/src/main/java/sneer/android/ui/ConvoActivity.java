@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
@@ -31,14 +32,13 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
-import sneer.android.SneerAndroidContainer;
 import sneer.convos.ChatMessage;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
 import sneer.convos.Notifications;
 import sneer.main.R;
 
-import static sneer.android.SneerAndroidContainer.*;
+import static android.text.TextUtils.*;
 import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.SneerAndroidFlux.dispatch;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
@@ -182,7 +182,7 @@ public class ConvoActivity extends SneerActionBarActivity {
 
         String text = messageInput.getText().toString().trim();
 
-		if (!text.isEmpty()) {
+		if (!isEmpty(text)) {
             dispatch(currentConvo.sendMessage(text));
             messageInput.setText("");
         } else
