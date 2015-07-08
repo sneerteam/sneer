@@ -7,22 +7,23 @@ import sneer.convos.Notifications;
 
 public class NotificationsSim implements Notifications {
 
+	private static final String TAG = NotificationsSim.class.getSimpleName();
 	private static Notification notifications;
 
 	@Override
 	public Observable<Notification> get() {
-		Log.i("NOTIFTEST", "get->called");
+		Log.i(TAG, "get->called");
 		return Observable.just(notifications);
 	}
 
 	@Override
 	public void startIgnoring(Long convoId) {
-		Log.i("NOTIFTEST", "startIgnoring->" + convoId);
+		Log.i(TAG, "startIgnoring->" + convoId);
 	}
 
 	@Override
 	public void stopIgnoring() {
-		Log.i("NOTIFTEST", "stopIgnoring->called");
+		Log.i(TAG, "stopIgnoring->called");
 	}
 
 	public static void turnNotificationsOn() {
