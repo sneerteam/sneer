@@ -4,13 +4,12 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import sneer.Contact;
-import sneer.Conversation;
-import sneer.Party;
-import sneer.PublicKey;
+import rx.functions.Action1;
+import sneer.convos.Convo;
+import sneer.convos.Convos;
 
-import static sneer.android.SneerAndroidSingleton.sneer;
-import static sneer.android.SneerAndroidSingleton.sneerAndroid;
+import static sneer.android.SneerAndroidContainer.component;
+import static sneer.android.SneerAndroidFlux.dispatch;
 
 public class SendMessage extends IntentService {
 
@@ -21,10 +20,10 @@ public class SendMessage extends IntentService {
     }
 
 
-	static Intent intentFor(Conversation convo) {
+	static Intent intentFor(Convo convo) {
 		return new Intent()
 			.setClassName("sneer.main", SendMessage.class.getName())
-			.putExtra(TOKEN, convo.contact().party().current().publicKey().current().toHex());
+			.putExtra(TOKEN, convo.id);
 	}
 
 
@@ -41,13 +40,18 @@ public class SendMessage extends IntentService {
 
 	private void tryToHandle(Intent intent) {
 		Log.d(getClass().getName(), "Intent received");
-		String pukHex  = intent.getStringExtra(TOKEN);
-		String message = intent.getAction();
+		long convoId  = intent.getLongExtra(TOKEN, -1);
+		final String message = intent.getAction();
 
-		PublicKey puk = sneerAndroid().admin().keys().createPublicKey(pukHex);
-		Party party = sneer().produceParty(puk);
-		Contact contact = sneer().findContact(party);
-		sneer().conversations().withContact(contact).sendMessage(message);
+		Log.d("FELIPETEST", "convoId->" + convoId);
+
+		component(Convos.class).getById(convoId).subscribe(new Action1<Convo>() {
+			@Override
+			public void call(Convo convo) {
+				Log.d("FELIPETEST", "send-message->" + message);
+				dispatch(convo.sendMessage(message));
+			}
+		});
 	}
 
 }

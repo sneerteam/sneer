@@ -4,13 +4,13 @@ import android.app.Activity;
 
 import java.util.List;
 
+import sneer.Conversation;
 import sneer.ConversationItem;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.ipc.Plugin;
-import sneer.convos.Convo;
 
-public interface SneerAndroid {
+public interface SneerAndroidOld {
 
 	SneerAdmin admin();
 	Sneer sneer();
@@ -18,9 +18,9 @@ public interface SneerAndroid {
 	boolean checkOnCreate(Activity activity);
 
 	List<Plugin> plugins();
-	void startActivity(Plugin plugin, Convo convo);
+	void startActivity(Plugin plugin, Conversation conversation);
 
 	boolean isClickable(ConversationItem item);
-	void doOnClick(ConversationItem item, Convo convo);
+	void doOnClick(ConversationItem item, Conversation convo);
 
 }

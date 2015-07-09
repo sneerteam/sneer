@@ -19,22 +19,26 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import sneer.Conversation;
 import sneer.android.ipc.Plugin;
-import sneer.android.ipc.PluginActivities;
+import sneer.android.ipc.PluginActivitiesOld;
 import sneer.android.ipc.Plugins;
-import sneer.convos.Convo;
 import sneer.main.R;
 
-public class StartPluginDialogFragment extends DialogFragment {
+public class StartPluginDialogFragmentOld extends DialogFragment {
 
-    private static final String SEARCH_SNEER_APPS_URL = "https://play.google.com/store/search?q=SneerApp";
+  private static final String SEARCH_SNEER_APPS_URL = "https://play.google.com/store/search?q=SneerApp";
 
-    private SingleConvoProvider convoProvider;
+    private SingleConversationProvider conversationProvider;
 
-    public StartPluginDialogFragment() { }
+
+    public StartPluginDialogFragmentOld() {
+    }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
         final Activity activity = getActivity();
         final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Apps")
@@ -63,7 +67,7 @@ public class StartPluginDialogFragment extends DialogFragment {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             dialog.dismiss();
-            PluginActivities.start(activity, plugins.get(position), convoProvider.getConvo());
+            PluginActivitiesOld.start(activity, plugins.get(position), conversationProvider.getConversation());
         }});
 
         dialog.setView(listView, 0, 0, 0, 0);
@@ -88,18 +92,17 @@ public class StartPluginDialogFragment extends DialogFragment {
 
     @Override
     public void onAttach(Activity activity) {
-        if (!(activity instanceof SingleConvoProvider))
+        if (!(activity instanceof SingleConversationProvider))
             throw new ClassCastException(activity.toString()
-                    + " must implement " + SingleConvoProvider.class.getName());
+                    + " must implement " + SingleConversationProvider.class.getName());
 
-        convoProvider = (SingleConvoProvider) activity;
+        conversationProvider = (SingleConversationProvider) activity;
 
         super.onAttach(activity);
     }
 
-
-    public static interface SingleConvoProvider {
-        Convo getConvo();
+    public static interface SingleConversationProvider {
+        Conversation getConversation();
     }
 
 }

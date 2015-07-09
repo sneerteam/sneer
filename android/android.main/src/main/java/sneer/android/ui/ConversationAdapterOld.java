@@ -147,7 +147,7 @@ public class ConversationAdapterOld extends ArrayAdapter<ConversationItem> imple
 
 	@Override
 	public void onClick(View v) {
-		sneerAndroid().doOnClick((ConversationItem) v.getTag(), convo);
+//		sneerAndroid().doOnClick((ConversationItem) v.getTag(), convo);
 	}
 
 }

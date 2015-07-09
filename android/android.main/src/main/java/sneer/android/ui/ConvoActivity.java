@@ -10,9 +10,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -38,12 +39,12 @@ import sneer.convos.Convos;
 import sneer.convos.Notifications;
 import sneer.main.R;
 
-import static android.text.TextUtils.*;
+import static android.text.TextUtils.isEmpty;
 import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.SneerAndroidFlux.dispatch;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 
-public class ConvoActivity extends SneerActionBarActivity {
+public class ConvoActivity extends SneerActionBarActivity implements StartPluginDialogFragment.SingleConvoProvider {
     private static final String ACTIVITY_TITLE = "activityTitle";
 
     private long convoId;
@@ -87,7 +88,8 @@ public class ConvoActivity extends SneerActionBarActivity {
         }
 
         convoId = getIntent().getLongExtra("id", -1);
-        convoObservable = component(Convos.class).getById(convoId);
+
+		convoObservable = component(Convos.class).getById(convoId);
 
 		chatAdapter = new ChatAdapter(this, this.getLayoutInflater());
 		((ListView)findViewById(R.id.messageList)).setAdapter(chatAdapter);
@@ -99,6 +101,9 @@ public class ConvoActivity extends SneerActionBarActivity {
 
     private void refresh() {
         actionBar.setTitle(currentConvo.nickname);
+
+		Log.d("FELIPETEST", "currentConvo->" + currentConvo.toString());
+
         refreshInvitePendingMessage();
         chatAdapter.update(currentConvo.nickname, currentConvo.messages);
 
@@ -288,4 +293,8 @@ public class ConvoActivity extends SneerActionBarActivity {
         context.startActivity(intent);
     }
 
+    @Override
+    public Convo getConvo() {
+        return currentConvo;
+    }
 }

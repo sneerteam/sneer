@@ -41,7 +41,7 @@ import static sneer.android.SneerAndroidSingleton.sneer;
 import static sneer.android.ui.ContactActivity.CURRENT_NICKNAME;
 import static sneer.android.utils.Puk.shareOwnPublicKey;
 
-public class ConversationActivityOld extends SneerActivity implements StartPluginDialogFragment.SingleConversationProvider {
+public class ConversationActivityOld extends SneerActivity implements StartPluginDialogFragmentOld.SingleConversationProvider {
 
     private static final String ACTIVITY_TITLE = "activityTitle";
 

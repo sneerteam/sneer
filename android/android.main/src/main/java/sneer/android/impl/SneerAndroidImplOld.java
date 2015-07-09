@@ -17,31 +17,31 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.Contact;
+import sneer.Conversation;
 import sneer.ConversationItem;
 import sneer.PublicKey;
 import sneer.Session;
 import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.admin.SneerAdminFactory;
-import sneer.android.SneerAndroid;
+import sneer.android.SneerAndroidOld;
 import sneer.android.database.SneerSqliteDatabase;
 import sneer.android.ipc.Plugin;
-import sneer.android.ipc.PluginActivities;
+import sneer.android.ipc.PluginActivitiesOld;
 import sneer.android.ipc.Plugins;
 import sneer.android.utils.AndroidUtils;
 import sneer.commons.SystemReport;
 import sneer.commons.exceptions.FriendlyException;
-import sneer.convos.Convo;
 import sneer.crypto.impl.KeysImpl;
 
-public class SneerAndroidImpl implements SneerAndroid {
+public class SneerAndroidImplOld implements SneerAndroidOld {
 
 	private final Context context;
 	private SneerAdmin sneerAdmin;
 	private static String error;
 	public static AlertDialog errorDialog;
 
-	public SneerAndroidImpl(Context context) {
+	public SneerAndroidImplOld(Context context) {
 		this.context = context;
 
 		try {
@@ -90,7 +90,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 										new Action1<Long>() {
 											@Override
 											public void call(Long aLong) {
-//												sneer.convos().withContact(c).sendMessage("Message ");
+												sneer.conversations().withContact(c).sendMessage("Message ");
 											}
 										});
 
@@ -167,8 +167,8 @@ public class SneerAndroidImpl implements SneerAndroid {
 	}
 
 	@Override
-	public void startActivity(Plugin plugin, Convo convo) {
-		PluginActivities.start(context, plugin, convo);
+	public void startActivity(Plugin plugin, Conversation conversation) {
+		PluginActivitiesOld.start(context, plugin, conversation);
 	}
 
 
@@ -184,9 +184,9 @@ public class SneerAndroidImpl implements SneerAndroid {
 	}
 
 	@Override
-	public void doOnClick(ConversationItem item, Convo convo) {
+	public void doOnClick(ConversationItem item, Conversation convo) {
 		if (item instanceof Session)
-			PluginActivities.open(context, (Session)item, convo);
+			PluginActivitiesOld.open(context, (Session)item, convo);
 		else
 			Toast.makeText(context, "Message clicked: " + item, Toast.LENGTH_LONG).show();
 	}
