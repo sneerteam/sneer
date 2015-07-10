@@ -1,6 +1,6 @@
 (ns sneer.contacts
   (:require
-    [clojure.core.async :refer [chan <! >! alt!]]
+    [clojure.core.async :refer [chan <! >! alt! go close!]]
     [sneer.async :refer [go-trace state-machine tap-state peek-state! go-loop-trace wait-for! encode-nil sliding-chan close-with!]]
     [sneer.commons :refer [now nvl]]
     [sneer.flux :refer [tap-actions response request]]
@@ -66,7 +66,13 @@
     (tap contacts result)
     result))
 
-
+(defn id->puk [contacts id]
+  (go
+    (let [lease (chan)
+          contact (<! (tap-id contacts id lease))
+          puk (contact :puk)]
+      (close! lease)
+      puk)))
 
 #_{:id->contact {42 {:id 42
                      :nick "Neide"
