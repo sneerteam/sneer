@@ -29,7 +29,7 @@ import sneer.android.ui.drawable.TriangleLeftDrawable;
 import sneer.android.ui.drawable.TriangleRightDrawable;
 import sneer.main.R;
 
-import static sneer.android.SneerAndroidSingleton.sneerAndroid;
+import static sneer.android.SneerAndroidSingletonOld.sneerAndroid;
 import static sneer.android.ui.SneerActivity.findImageView;
 import static sneer.android.ui.SneerActivity.findTextView;
 
@@ -147,7 +147,7 @@ public class ConversationAdapterOld extends ArrayAdapter<ConversationItem> imple
 
 	@Override
 	public void onClick(View v) {
-//		sneerAndroid().doOnClick((ConversationItem) v.getTag(), convo);
+		sneerAndroid().doOnClick((ConversationItem) v.getTag(), convo);
 	}
 
 }
