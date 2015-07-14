@@ -14,9 +14,9 @@
     [sneer.tuple-base-provider :refer :all]
     [sneer.interfaces])
   (:import
-    [rx Subscriber]
+    [rx Subscriber Observable]
     [sneer.commons Container]
-    [sneer.convos Convos Summary]
+    [sneer.convos Convos Summary Notifications]
     [sneer.interfaces ConvoSummarization]
     [sneer.flux Dispatcher]
     [sneer.admin SneerAdmin]))
@@ -78,3 +78,14 @@
 
       (getById [_ id]
         (convo-by-id container id)))))
+
+(defn reify-Notifications [^Container container]
+  (reify Notifications
+    (get [_]
+      (Observable/just nil))
+
+    (startIgnoring [_ convoId]
+      )
+
+    (stopIgnoring [_]
+      )))

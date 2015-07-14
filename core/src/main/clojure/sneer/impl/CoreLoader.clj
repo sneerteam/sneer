@@ -33,5 +33,8 @@
     sneer.convos.Convos
     (sneer.convos/reify-Convos container)
 
+    sneer.convos.Notifications
+    (sneer.convos/reify-Notifications container)
+
     sneer.interfaces.ConvoSummarization
     (sneer.convo-summarization/reify-ConvoSummarization container)))
