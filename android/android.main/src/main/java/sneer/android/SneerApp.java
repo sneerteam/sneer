@@ -14,6 +14,7 @@ import sneer.android.ipc.PartnerSessions;
 import sneer.android.ui.Notifier;
 import sneer.android.utils.UncaughtExceptionReporter;
 import sneer.commons.PersistenceFolder;
+import sneer.commons.Startup;
 
 import static sneer.android.SneerAndroidContainer.container;
 
@@ -48,6 +49,7 @@ public class SneerApp extends MultiDexApplication {
 					return getFilesDir();
 				}
 			});
+			container().produce(Startup.class);
 		}
 	}
 

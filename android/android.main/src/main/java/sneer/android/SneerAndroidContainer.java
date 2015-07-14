@@ -1,13 +1,12 @@
 package sneer.android;
 
 import sneer.commons.Container;
-import sneer.commons.Startup;
 
 import static sneer.commons.Container.ComponentLoader;
 
 public class SneerAndroidContainer {
 
-	private static final Container container = initContainer();
+	private static final Container container = new Container(loader());
 
 	public static <T> T component(Class<T> componentInterface) {
 		return container.produce(componentInterface);
@@ -15,12 +14,6 @@ public class SneerAndroidContainer {
 
 	public static Container container() {
 		return container;
-	}
-
-	private static Container initContainer() {
-		Container ret = new Container(loader());
-		ret.produce(Startup.class);
-		return ret;
 	}
 
 	private static ComponentLoader loader() {
