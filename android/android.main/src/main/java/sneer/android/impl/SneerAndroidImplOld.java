@@ -39,7 +39,6 @@ public class SneerAndroidImplOld implements SneerAndroidOld {
 	private final Context context;
 	private SneerAdmin sneerAdmin;
 	private static String error;
-	public static AlertDialog errorDialog;
 
 	public SneerAndroidImplOld(Context context) {
 		this.context = context;

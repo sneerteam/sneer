@@ -13,7 +13,6 @@ import rx.Subscriber;
 import rx.functions.Action1;
 import sneer.android.SneerAndroidContainer;
 import sneer.android.utils.AndroidUtils;
-
 import sneer.convos.Convos;
 import sneer.main.R;
 
