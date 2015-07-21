@@ -12,11 +12,11 @@ import android.widget.Toast;
 import rx.Subscriber;
 import rx.functions.Action1;
 import sneer.android.SneerAndroidContainer;
-import sneer.android.utils.AndroidUtils;
 import sneer.convos.Convos;
 import sneer.main.R;
 
 import static sneer.android.ui.SneerActivity.ui;
+import static sneer.android.utils.AndroidUtils.toastOnMainThread;
 
 public class AddContactActivity extends Activity {
 
@@ -47,7 +47,7 @@ public class AddContactActivity extends Activity {
                     }
                     @Override
                     public final void onError(Throwable e) {
-                        AndroidUtils.toast(AddContactActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                        toastOnMainThread(AddContactActivity.this, e.getMessage(), Toast.LENGTH_LONG);
                     }
                     @Override
                     public final void onNext(Long convoId) {
