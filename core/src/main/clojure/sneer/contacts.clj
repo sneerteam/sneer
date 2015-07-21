@@ -67,8 +67,8 @@
 ;    result))
 
 (defn tap-id [contacts id lease]
-  (let [xcontact (comp (map (fn [state] (get-in state [:id->contact id]))
-                            (filter some?)))
+  (let [xcontact (comp (map (fn [state] (get-in state [:id->contact id])))
+                       (filter some?))
         result (sliding-chan 1 xcontact)]
     (close-with! lease result)
     (tap contacts result)
