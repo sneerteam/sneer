@@ -43,12 +43,9 @@ public class SendMessage extends IntentService {
 		long convoId  = intent.getLongExtra(TOKEN, -1);
 		final String message = intent.getAction();
 
-		Log.d("FELIPETEST", "convoId->" + convoId);
-
 		component(Convos.class).getById(convoId).subscribe(new Action1<Convo>() {
 			@Override
 			public void call(Convo convo) {
-				Log.d("FELIPETEST", "send-message->" + message);
 				dispatch(convo.sendMessage(message));
 			}
 		});
