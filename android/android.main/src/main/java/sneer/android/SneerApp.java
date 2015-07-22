@@ -10,7 +10,6 @@ import sneer.Sneer;
 import sneer.admin.SneerAdmin;
 import sneer.android.gcm.GcmRegistrationAlarmReceiver;
 import sneer.android.impl.SneerAndroidImpl;
-import sneer.android.impl.SneerAndroidImplOld;
 import sneer.android.ipc.PartnerSessions;
 import sneer.android.ui.Notifier;
 import sneer.android.utils.UncaughtExceptionReporter;
@@ -35,8 +34,6 @@ public class SneerApp extends MultiDexApplication {
 		// Old pre-container way:
 		Notifier.start(app);
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
-		SneerAndroidSingletonOld.setInstance(new SneerAndroidImplOld(app));
-
 		if (SneerAndroidSingleton.admin() == null)
 			System.out.println("CORE NOT FOUND.");
 		else {
