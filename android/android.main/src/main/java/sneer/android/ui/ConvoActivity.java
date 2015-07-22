@@ -102,8 +102,6 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
     private void refresh() {
         actionBar.setTitle(currentConvo.nickname);
 
-		Log.d("FELIPETEST", "currentConvo->" + currentConvo.toString());
-
         refreshInvitePendingMessage();
         chatAdapter.update(currentConvo.nickname, currentConvo.messages);
 
@@ -125,7 +123,7 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
                 @Override
                 public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP)
-                        InviteSender.send(getApplicationContext(), convoId);
+                        InviteSender.send(ConvoActivity.this, convoId);
                     return true;
                 }
             });
