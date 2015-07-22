@@ -5,10 +5,15 @@
     android:background="#FFF"
     tools:context=".MainActivity">
 
-    <include
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:local="http://schemas.android.com/apk/res-auto"
         android:id="@+id/toolbar"
-        layout="@layout/toolbar_conversation_list"
-    />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/ColorPrimary"
+        local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        elevation="4dp">
+    </android.support.v7.widget.Toolbar>
 
     <ListView
         android:id="@+id/conversationList"
