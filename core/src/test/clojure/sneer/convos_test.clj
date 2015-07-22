@@ -34,7 +34,7 @@
           (let [c-convos (carla Convos)
                 convo-id (<next (.acceptInvite c-convos
                                                "Neide"
-                                               (-> neide puk .toHex)
+                                               (.ownPuk n-convos)
                                                (.inviteCodePending n->c)))
                 c->n-obs (.getById c-convos convo-id)]
 

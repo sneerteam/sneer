@@ -38,10 +38,8 @@
           (pipe-to-subscriber! out subscriber "conversation summaries")
           (republish-latest-every! (* 60 1000) in out))))))
 
-(defn- handle-msg-actions! [container]
-  (let [admin (.produce container SneerAdmin)
-        tb (tuple-base-of admin)
-        own-puk (.. admin privateKey publicKey)
+(defn- handle-msg-actions! [container admin own-puk]
+  (let [tb (tuple-base-of admin)
         contacts (sneer.contacts/from container)
         actions (chan 1)]
     (tap-actions (.produce container Dispatcher) actions)
@@ -58,11 +56,13 @@
               (store-tuple tb (timestamped tuple)))))))))   ;TODO Create a tb function to store a new tuple, that takes care of own-puk and timestamp.
 
 (defn reify-Convos [^Container container]
-  (let [summarization ^ConvoSummarization (.produce container ConvoSummarization)
+  (let [admin (.produce container SneerAdmin)
+        own-puk (.. admin privateKey publicKey)
+        summarization ^ConvoSummarization (.produce container ConvoSummarization)
         summaries-obs (summaries-obs* summarization)
         contacts (sneer.contacts/from container)]
 
-    (handle-msg-actions! container)
+    (handle-msg-actions! container admin own-puk)
 
     (reify Convos
       (summaries [_] summaries-obs)
@@ -77,7 +77,13 @@
         (sneer.contacts/accept-invite contacts newContactNick contactPuk inviteCodeReceived))
 
       (getById [_ id]
-        (convo-by-id container id)))))
+        (convo-by-id container id))
+
+      (findConvo [_ inviterPuk inviteCode]
+        )
+
+      (ownPuk [_]
+        (.toHex own-puk)))))
 
 (defn reify-Notifications [^Container container]
   (reify Notifications
