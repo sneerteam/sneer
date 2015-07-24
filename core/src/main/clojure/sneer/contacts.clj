@@ -92,6 +92,7 @@
           contact {:id id
                    :nick new-nick
                    :puk puk
+                   :inviter-puk (.toHex own-puk)
                    :invite-code invite-code
                    :timestamp timestamp}]
       (-> state
@@ -99,17 +100,20 @@
           (update-in [:nick->id] dissoc old-nick)
           (assoc-in  [:nick->id new-nick] id)
           (assoc-in  [:puk->id puk] id)
+          (assoc-in  [:inviter-puk->id (.toHex own-puk)] id)
           (assoc-in  [:invite-code->id invite-code] id)))))
 
 (defn- handle-push [state tuple]
 ;; {"type" "push" "audience" contact-puk "invite-code" invite-code-received}
   (let [invite-code (tuple "invite-code")
-        contact-puk (tuple "author")]
+        contact-puk (tuple "author")
+        inviter-puk (tuple "audience")]
     (if-some [id (get-in state [:invite-code->id invite-code])]
       (-> state
           (update-in [:id->contact id] assoc :puk contact-puk :timestamp (tuple "timestamp"))
           (update-in [:id->contact id] dissoc :invite-code)
           (assoc-in  [:puk->id contact-puk] id)
+          (assoc-in  [:inviter-puk->id inviter-puk] id)
           (update-in [:invite-code->id] dissoc invite-code))
       state)))
 
@@ -188,6 +192,12 @@
                         (>! (response action) (result :id))
                         (result :state))))
 
+                  "find-convo"
+                  (let [{:strs [inviter-puk invite-code]} action
+                        inviter-puk->id (get-in state [:inviter-puk->id inviter-puk])
+                        invite-code->id (get-in state [:invite-code->id invite-code])]
+                    (>! (response action) (or inviter-puk->id invite-code->id)))
+
                   "problem-with-new-nickname"
                   (let [{:strs [nick]} action]
                     (>! (response action) (encode-nil (problem-with-nick state nick)))
@@ -221,6 +231,9 @@
 
 (defn accept-invite [contacts nick puk-hex invite-code-received]
   (.request (contacts :dispatcher) (request "accept-invite" "nick" nick "puk-hex" puk-hex "invite-code-received" invite-code-received)))
+
+(defn find-convo [contacts inviter-puk invite-code]
+  (.request (contacts :dispatcher) (request "find-convo" "inviter-puk" inviter-puk "invite-code" invite-code)))
 
 (defn start! [container]
   (let [machine (tuple-machine! container)]

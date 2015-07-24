@@ -80,7 +80,7 @@
         (convo-by-id container id))
 
       (findConvo [_ inviterPuk inviteCode]
-        )
+        (sneer.contacts/find-convo contacts inviterPuk inviteCode))
 
       (ownPuk [_]
         (.toHex own-puk)))))

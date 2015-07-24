@@ -28,6 +28,8 @@
         (.nickname n->c) => "Carla"
         (.inviteCodePending n->c) => some?
 
+        (.findConvo n-convos (.ownPuk n-convos) (.inviteCodePending n->c)) => (emits 1)
+
         (with-open [carla (sneer!)]
           (connect! neide carla)
 
