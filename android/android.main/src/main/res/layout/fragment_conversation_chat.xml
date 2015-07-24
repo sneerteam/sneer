@@ -1,0 +1,68 @@
+<LinearLayout
+    android:id="@+id/chat_detail"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="0dp"
+    android:textIsSelectable="true"
+    android:orientation="vertical"
+    tools:context=".ConversationActivity">
+
+    <TextView
+        android:id="@+id/waitingMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="normal|italic"
+        android:text="Invitation pending"
+        android:padding="15dp"
+        android:shadowColor="@color/ColorPrimary" />
+
+    <ListView
+        android:id="@+id/messageList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:padding="0dp"
+        android:stackFromBottom="true"
+        android:transcriptMode="normal"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.3dp"
+        android:visibility="visible"
+        android:background="#5000"/>
+
+    <LinearLayout
+        android:id="@+id/messageSender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="textMultiLine"
+            android:lines="4"
+            android:minLines="1"
+            android:scrollbars="vertical">
+        </EditText>
+
+        <ImageButton
+            android:id="@+id/actionButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/conversation_activity_action_button"
+            android:src="@drawable/ic_action_send">
+        </ImageButton>
+
+    </LinearLayout>
+
+</LinearLayout>

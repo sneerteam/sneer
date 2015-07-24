@@ -64,8 +64,14 @@
         <activity
             android:name="sneer.android.ui.ConvoActivity"
             android:label="@string/title_conversation"
-            android:parentActivityName="sneer.android.ui.ConvoActivity"
-            android:theme="@style/AppThemeMaterial"/>
+            android:theme="@style/AppThemeMaterial"
+            android:parentActivityName="sneer.android.ui.ConvosActivity" />
+
+        <activity
+            android:name="sneer.android.ui.ConvoActivityWithTabs"
+            android:label="@string/title_conversation"
+            android:theme="@style/AppThemeMaterial"
+            android:parentActivityName="sneer.android.ui.ConvosActivity" />
 
         <activity
             android:name="sneer.android.ui.SystemReportActivity"
