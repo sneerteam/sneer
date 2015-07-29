@@ -92,7 +92,6 @@
           contact {:id id
                    :nick new-nick
                    :puk puk
-                   :inviter-puk (.toHex own-puk)
                    :invite-code invite-code
                    :timestamp timestamp}]
       (-> state
@@ -100,7 +99,6 @@
           (update-in [:nick->id] dissoc old-nick)
           (assoc-in  [:nick->id new-nick] id)
           (assoc-in  [:puk->id puk] id)
-          (assoc-in  [:inviter-puk->id (.toHex own-puk)] id)
           (assoc-in  [:invite-code->id invite-code] id)))))
 
 (defn- handle-push [state tuple]
@@ -182,21 +180,23 @@
 
                   "accept-invite"
                   (let [{:strs [nick puk-hex invite-code-received]} action]
-                    (if-let [problem (problem-with-nick state nick)]
-                      (do
-                        (>! (response action) (FriendlyException. (str "Nickname " problem)))
-                        state)
-                      (let [contact-puk (from-hex puk-hex)
-                            _ (<! (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received}))
-                            result (<! (wait-for-store-contact! container nick contact-puk nil states))]
-                        (>! (response action) (result :id))
-                        (result :state))))
+                    (if-let [puk->id (get-in state [:puk->id (from-hex puk-hex)])]
+                      (do (>! (response action) puk->id)
+                          state)
+                      (if-let [problem (problem-with-nick state nick)]
+                        (do
+                          (>! (response action) (FriendlyException. (str "Nickname " problem)))
+                          state)
+                        (let [contact-puk (from-hex puk-hex)
+                              _ (<! (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received}))
+                              result (<! (wait-for-store-contact! container nick contact-puk nil states))]
+                          (>! (response action) (result :id))
+                          (result :state)))))
 
-                  "find-convo"
-                  (let [{:strs [inviter-puk invite-code]} action
-                        inviter-puk->id (get-in state [:inviter-puk->id inviter-puk])
-                        invite-code->id (get-in state [:invite-code->id invite-code])]
-                    (>! (response action) (or inviter-puk->id invite-code->id)))
+                  #_"find-convo"
+                  #_(let [{:strs [inviter-puk]} action
+                        inviter-puk->id (get-in state [:inviter-puk->id inviter-puk])]
+                    (>! (response action) inviter-puk->id))
 
                   "problem-with-new-nickname"
                   (let [{:strs [nick]} action]
@@ -232,8 +232,8 @@
 (defn accept-invite [contacts nick puk-hex invite-code-received]
   (.request (contacts :dispatcher) (request "accept-invite" "nick" nick "puk-hex" puk-hex "invite-code-received" invite-code-received)))
 
-(defn find-convo [contacts inviter-puk invite-code]
-  (.request (contacts :dispatcher) (request "find-convo" "inviter-puk" inviter-puk "invite-code" invite-code)))
+#_(defn find-convo [contacts inviter-puk]
+  (.request (contacts :dispatcher) (request "find-convo" "inviter-puk" inviter-puk)))
 
 (defn start! [container]
   (let [machine (tuple-machine! container)]

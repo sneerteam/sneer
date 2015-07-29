@@ -79,8 +79,8 @@
       (getById [_ id]
         (convo-by-id container id))
 
-      (findConvo [_ inviterPuk inviteCode]
-        (sneer.contacts/find-convo contacts inviterPuk inviteCode))
+      #_(findConvo [_ inviterPuk]
+        (sneer.contacts/find-convo contacts inviterPuk))
 
       (ownPuk [_]
         (.toHex own-puk)))))

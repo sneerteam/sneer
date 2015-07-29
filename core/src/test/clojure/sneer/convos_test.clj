@@ -28,17 +28,23 @@
         (.nickname n->c) => "Carla"
         (.inviteCodePending n->c) => some?
 
-        (.findConvo n-convos (.ownPuk n-convos) (.inviteCodePending n->c)) => (emits 1)
-
         (with-open [carla (sneer!)]
           (connect! neide carla)
 
           (let [c-convos (carla Convos)
-                convo-id (<next (.acceptInvite c-convos
+                convo-id-1 (<next (.acceptInvite c-convos
                                                "Neide"
                                                (.ownPuk n-convos)
                                                (.inviteCodePending n->c)))
-                c->n-obs (.getById c-convos convo-id)]
+
+                convo-id-2 (<next (.acceptInvite c-convos
+                                               "Neide"
+                                               (.ownPuk n-convos)
+                                               (.inviteCodePending n->c)))
+
+                c->n-obs (.getById c-convos convo-id-1)
+
+                c->n-obs-2 (.getById c-convos convo-id-2)]
 
             n->c-obs => (emits #(-> % .inviteCodePending nil?))
 

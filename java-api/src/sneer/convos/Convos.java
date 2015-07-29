@@ -22,7 +22,7 @@ public interface Convos {
     Observable<Convo> getById(long convoId);
 
     /** Emits null if the user has not yet accepted the invite */
-    Observable<Long> findConvo(String inviterPuk, String inviteCode);
+    Observable<Long> findConvo(String inviterPuk);
 
     String ownPuk();
 
