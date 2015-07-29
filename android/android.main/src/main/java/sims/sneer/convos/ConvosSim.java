@@ -70,7 +70,7 @@ public class ConvosSim implements Convos {
 
     private int findConvoCount = 0;
     @Override
-    public Observable<Long> findConvo(String inviterPuk, String inviteCode) {
+    public Observable<Long> findConvo(String inviterPuk) {
         findConvoCount++;
         return findConvoCount % 2 == 0
                         ? Observable.just(4242L)
