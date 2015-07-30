@@ -55,20 +55,30 @@ public class ConvosSim implements Convos {
     @Override
     public Observable<Convo> getById(final long id) {
         return id % 2 == 0
-           ? Observable.just(new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>()))
+           ? Observable.just(new Convo(id, "Wesley " + id, null, messages(), newSessionSummaries()))
            : Observable.concat(
                 Observable.just(new Convo(id, "Pending " + id, "INVITE_CODE", Collections.<ChatMessage>emptyList(), Collections.<SessionSummary>emptyList())),
                 Observable.timer(3, TimeUnit.SECONDS).map(new Func1<Long, Convo>() {
                     @Override
                     public Convo call(Long aLong) {
-                        return new Convo(id, "Wesley " + id, null, messages(), new ArrayList<SessionSummary>());
+                        return new Convo(id, "Wesley " + id, null, messages(), newSessionSummaries());
                     }
                 })
         );
 
     }
 
-    private int findConvoCount = 0;
+	private List<SessionSummary> newSessionSummaries() {
+		SessionSummary[] sums = new SessionSummary[]{
+			new SessionSummary(1, "Chess", "Chess game with Kasparov", "6 minutes ago", "*"),
+			new SessionSummary(2, "Shopping List", "Shopping List with Jane", "1 hour ago", "*"),
+			new SessionSummary(3, "ToroGo", "ToroGo game with Hikaru (ended)", "3 days ago", ""),
+			new SessionSummary(4, "SnitCoin", "SnitCoin transfer from Klaus", "1 week ago", "")
+		};
+		return Arrays.asList(sums);
+	}
+
+	private int findConvoCount = 0;
     @Override
     public Observable<Long> findConvo(String inviterPuk) {
         findConvoCount++;

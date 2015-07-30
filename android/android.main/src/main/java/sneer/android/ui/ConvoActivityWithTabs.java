@@ -55,7 +55,8 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
     private Subscription convoSubscription;
     private Convo currentConvo;
 
-	private ChatAdapter chatAdapter;
+    private ChatAdapter chatAdapter;
+    private SessionListAdapter sessionsAdapter;
 
     private ActionBar actionBar;
     private ViewPager viewPager;
@@ -64,6 +65,8 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
     private View chatView;
     private ImageButton messageButton;
 	private EditText messageInput;
+
+    private View sessionsView;
 
 
     @Override
@@ -77,7 +80,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
         setupViewPager();
 
         setupChatTab();
-        setupSessions();
+        setupSessionsTab();
 
         setupTabLayout();
     }
@@ -93,9 +96,10 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
         refreshInvitePendingMessage();
         refreshChatMessages();
-
         ChatMessage last = lastMessageReceived(currentConvo.messages);
         if (last != null) dispatch(last.setRead());
+
+        refreshSessions();
     }
 
 
@@ -126,9 +130,16 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
         }
     }
 
+
     private void refreshChatMessages() {
         chatAdapter.update(currentConvo.nickname, currentConvo.messages);
     }
+
+
+    private void refreshSessions() {
+        sessionsAdapter.update(currentConvo.sessionSummaries);
+    }
+
 
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);     // Attaching the layout to the toolbar object
@@ -208,8 +219,22 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
     }
 
 
-    private void setupSessions() {
-        final View sessionsView = getLayoutInflater().inflate(R.layout.fragment_conversation_sessions, viewPager, false);
+    private void sendMessageClicked() {
+        if (currentConvo == null) return;
+
+        String text = messageInput.getText().toString().trim();
+
+        if (!isEmpty(text)) {
+            dispatch(currentConvo.sendMessage(text));
+            messageInput.setText("");
+        } else
+            openInteractionMenu();
+    }
+
+
+    private void setupSessionsTab() {
+        sessionsView = getLayoutInflater().inflate(R.layout.fragment_conversation_sessions, viewPager, false);
+        setupSessionsList();
         Fragment sessionsFragment = new Fragment() {
             @Override
             public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -219,17 +244,11 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
         viewPagerAdapter.addFragment(sessionsFragment, "SESSIONS");
     }
 
-    private void sendMessageClicked() {
-        if (currentConvo == null) return;
 
-        String text = messageInput.getText().toString().trim();
-
-		if (!isEmpty(text)) {
-            dispatch(currentConvo.sendMessage(text));
-            messageInput.setText("");
-        } else
-            openInteractionMenu();
-	}
+    private void setupSessionsList() {
+        sessionsAdapter = new SessionListAdapter(this);
+        ((ListView) sessionsView.findViewById(R.id.sessionList)).setAdapter(sessionsAdapter);
+    }
 
 
     private void openInteractionMenu() {

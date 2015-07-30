@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:id="@+id/sessionPicture"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/conversation_summary_picture"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/sessionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/conversationPicture"
+        android:divider="@null"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:textSize="16sp"
+        android:textStyle="normal|bold"
+        android:minHeight="58dp" />
+
+    <TextView
+        android:id="@+id/sessionDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:divider="@null"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:textSize="14sp" />
+
+    <TableRow
+        android:id="@+id/rowName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/sessionDate"
+        android:layout_margin="5dp"
+        android:background="#a43234" >
+
+        <TextView
+            android:id="@+id/sessionUnread"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:lines="1"
+            android:paddingBottom="3dip"
+            android:paddingLeft="6dip"
+            android:paddingRight="6dip"
+            android:paddingTop="3dip"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:textColor="#ffffff"
+            android:textStyle="bold" >
+        </TextView>
+    </TableRow>
+
+</RelativeLayout>
