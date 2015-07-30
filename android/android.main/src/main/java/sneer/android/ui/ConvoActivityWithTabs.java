@@ -167,7 +167,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
                 return chatView;
             }
         };
-        viewPagerAdapter.addFragment(chatFragment, "MESSAGES");
+        viewPagerAdapter.addFragment(chatFragment, "CHAT");
     }
 
 
