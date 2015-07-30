@@ -1,6 +1,7 @@
 (ns sneer.test-util
   (:require
     [sneer.commons :refer [nvl loop-trace]]
+    [sneer.async :refer [decode-nil]]
     [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]]
     [rx.lang.clojure.core :as rx]
     [sneer.rx :refer [observe-for-io subscribe-on-io]])
@@ -119,6 +120,6 @@
   (emits #(instance? exception-type (::error %))))
 
 (defn <next [obs]
-  (<!!? (->chan obs)))
+  (decode-nil (<!!? (->chan obs))))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))

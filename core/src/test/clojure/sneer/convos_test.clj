@@ -28,14 +28,17 @@
         (.nickname n->c) => "Carla"
         (.inviteCodePending n->c) => some?
 
+        #_(. n-convos startConvo "Maico")
+        #_(. n-convos summaries) => (emits #(-> % (mapv (fn [summary] (.nickname summary))) (= ["Maico" "Carla"])))
+
         (with-open [carla (sneer!)]
           (connect! neide carla)
 
           (let [c-convos (carla Convos)
-                convo-id (<next (.acceptInvite c-convos
-                                               "Neide"
-                                               (.ownPuk n-convos)
-                                               (.inviteCodePending n->c)))
+                _ (.acceptInvite c-convos
+                                 "Neide"
+                                 (.ownPuk n-convos)
+                                 (.inviteCodePending n->c))
 
                 accepted-convo-id (<next (.findConvo c-convos (.ownPuk n-convos)))
 

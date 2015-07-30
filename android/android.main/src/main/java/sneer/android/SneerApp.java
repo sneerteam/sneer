@@ -30,8 +30,6 @@ public class SneerApp extends MultiDexApplication {
 		Context app = getApplicationContext();
 		UncaughtExceptionReporter.start(app, "klauswuestefeld@gmail.com", "Sneer");
 
-		// TODO: Migrate to container.
-		// Old pre-container way:
 		Notifier.start(app);
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
 		if (SneerAndroidSingleton.admin() == null)

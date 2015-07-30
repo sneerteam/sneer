@@ -75,6 +75,11 @@
       (close! lease)
       puk)))
 
+(defn assoc-puk [state puk id]
+  (if puk
+    (assoc-in state [:puk->id puk] id)
+    state))
+
 #_{:id->contact {42 {:id 42
                      :nick "Neide"
                      :puk NeidePuk
@@ -98,7 +103,7 @@
           (assoc-in  [:id->contact id] contact)
           (update-in [:nick->id] dissoc old-nick)
           (assoc-in  [:nick->id new-nick] id)
-          (assoc-in  [:puk->id puk] id)
+          (assoc-puk puk id)
           (assoc-in  [:invite-code->id invite-code] id)))))
 
 (defn- handle-push [state tuple]
