@@ -37,14 +37,22 @@ public class AcceptInviteActivity extends Activity {
 
         if (contactPuk == null || inviteCode == null) {
             AndroidUtils.finishWith("Invalid Invite", this);
-            return;
-        }
+			return;
+		}
 
-        // TODO Call Convos.findConvo() with puk and inviteCode and if found open ConvoActiviy then finish
+		convos = SneerAndroidContainer.component(Convos.class);
+
+		// TODO Call Convos.findConvo() with puk and, if found, open ConvoActiviy then finish
+		convos.findConvo(contactPuk).subscribe(new Action1<Long>() {
+			@Override
+			public void call(Long convoId) {
+				ConvoActivity.open(AcceptInviteActivity.this, convoId);
+                finish();
+			}
+		});
 
 		setContentView(R.layout.activity_add_contact);
 
-        convos = SneerAndroidContainer.component(Convos.class);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		btnDone = (Button) findViewById(R.id.btn_done);
