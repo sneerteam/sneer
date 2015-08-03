@@ -33,7 +33,8 @@
         feed-message! #(feed-tuple! (merge proto-message %))
 
         label->msg (atom {})
-        feed-read! (fn [contact-puk msg] (feed-tuple! {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "original_id")}))
+        feed-read! (fn [contact-puk msg]
+                     (feed-tuple! {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "original_id")}))
 
         summaries-out (subject/sliding-summaries! own-puk tuples-in)]
 
