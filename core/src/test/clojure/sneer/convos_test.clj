@@ -12,6 +12,9 @@
 (defn text [^ChatMessage m]
   (.text m))
 
+(defn emits-messages [& ms]
+  (emits #(->> % .messages (mapv text) (= ms))))
+
 (facts "Convos"
   (with-open [neide (sneer!)]
     (let [n-convos ^Convos (neide Convos)]
@@ -47,9 +50,8 @@
             n->c-obs => (emits #(-> % .inviteCodePending nil?))
 
             (.dispatch (neide Dispatcher) (.sendMessage n->c "hi"))
-            n->c-obs => (emits #(->> % .messages (mapv text) (= ["hi"])))
-
-            c->n-obs => (emits #(->> % .messages (mapv text) (= ["hi"])))))
+            n->c-obs => (emits-messages "hi")
+            c->n-obs => (emits-messages "hi")))
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
         n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))))))
