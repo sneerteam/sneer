@@ -67,7 +67,7 @@ public class AcceptInviteActivity extends Activity {
 
                     @Override
                     public final void onError(Throwable e) {
-                        AndroidUtils.toast(AcceptInviteActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                        AndroidUtils.toastOnMainThread(AcceptInviteActivity.this, e.getMessage(), Toast.LENGTH_LONG);
                     }
 
                     @Override
