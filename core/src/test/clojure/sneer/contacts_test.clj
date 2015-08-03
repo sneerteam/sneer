@@ -40,17 +40,3 @@
           nick-obs => (emits "Carla")
           (.dispatch (neide Dispatcher) (action "set-nickname" "new-nick" "Carla Silva" "contact-id" id))
           nick-obs => (emits "Carla Silva"))))))
-
-#_(facts "Two Contacts"
-  (with-open [neide (sneer!)]
-    (let [contacts (neide contacts/handle)
-          c-id (<next (new-contact contacts "Carla"))
-          c-invite (invite-code contacts c-id)
-          m-id (<next (new-contact contacts "Michael"))
-          m-invite (invite-code contacts m-id)]
-
-      c-invite => (emits some?)
-      m-invite => (emits some?)
-
-      (let [n-convos ^Convos (neide Convos)]
-        ))))
