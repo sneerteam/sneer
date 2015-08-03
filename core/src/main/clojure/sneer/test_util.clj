@@ -39,6 +39,7 @@
       (try
         (f arg)
         (catch Exception e
+          (println "->robust" e)
           false))))
 
 (defn <wait-trace! [ch expected]
