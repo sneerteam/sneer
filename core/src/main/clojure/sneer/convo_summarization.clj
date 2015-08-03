@@ -7,6 +7,7 @@
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
     [sneer.io :as io]
+    [sneer.message-subs]
     [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]]
     [sneer.party :refer [party->puk]]
     [sneer.serialization :refer [serialize deserialize]]
@@ -101,6 +102,7 @@
         contacts (sneer.contacts/from container)
         contacts-updates (sneer.contacts/tap contacts (chan 1 (map #(do {"type" :contacts :state %}))))]
 
+    (sneer.message-subs/from container)
     (query-tuples tuple-base all-tuples-criteria tuples lease)
     (close-with! lease tuples)
     (summarization-loop! previous-state own-puk (async/merge [tuples contacts-updates]))))

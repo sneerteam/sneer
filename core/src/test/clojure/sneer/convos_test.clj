@@ -49,8 +49,7 @@
             (.dispatch (neide Dispatcher) (.sendMessage n->c "hi"))
             n->c-obs => (emits #(->> % .messages (mapv text) (= ["hi"])))
 
-            ;c->n-obs => (emits #(->> % .messages (mapv text) (= ["hi"]))) ; TODO: Subs for conversations.
-            ))
+            c->n-obs => (emits #(->> % .messages (mapv text) (= ["hi"])))))
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
         n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))))))

@@ -38,6 +38,7 @@
                     sneer.admin
                     sneer.contact
                     sneer.contacts
+                    sneer.message-subs
                     sneer.conversation
                     sneer.convo
                     sneer.convo-summarization

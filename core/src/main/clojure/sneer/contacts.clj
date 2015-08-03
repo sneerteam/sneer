@@ -56,6 +56,9 @@
 (defn contact-list [state]
   (-> state :id->contact vals))
 
+(defn puks [state]
+  (-> state :puk->id keys set))
+
 (defn tap [contacts & [ch]]
  (-> contacts :machine (tap-state ch)))
 
@@ -80,6 +83,8 @@
     (assoc-in state [:puk->id puk] id)
     state))
 
+
+;; Contacts schema
 #_{:id->contact {42 {:id 42
                      :nick "Neide"
                      :puk NeidePuk

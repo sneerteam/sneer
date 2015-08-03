@@ -5,7 +5,8 @@
             sneer.interfaces
             sneer.flux
             sneer.convos
-            sneer.convo-summarization)
+            sneer.convo-summarization
+            sneer.message-subs)
   (:import [sneer.commons Startup]))
 
 (defn- start-components! [container]
@@ -23,6 +24,9 @@
 
     sneer.contacts/handle
     (sneer.contacts/start! container)
+
+    sneer.message-subs/handle
+    (sneer.message-subs/start! container)
 
     sneer.admin.SneerAdmin
     (sneer.admin/reify-SneerAdmin container)
