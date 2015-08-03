@@ -44,16 +44,27 @@
         actions (chan 1)]
     (tap-actions (.produce container Dispatcher) actions)
     (go-while-let [action (<! actions)]
-      (when (= (action :type) "send-message")
+      (case (action :type)
+
+        "send-message"
         (let [{:strs [contact-id text]} action
-              contact-puk (<! (id->puk contacts contact-id))]
+              contact-puk (<! (id->puk contacts contact-id))] ; TODO: don't block here?
           (when contact-puk
             (let [tuple {"type"         "message"
                          "author"       own-puk
                          "audience"     contact-puk
                          "message-type" "chat"
                          "label"        text}]
-              (store-tuple tb (timestamped tuple)))))))))   ;TODO Create a tb function to store a new tuple, that takes care of own-puk and timestamp.
+              (store-tuple tb (timestamped tuple))))) ;TODO Create a tb function to store a new tuple, that takes care of own-puk and timestamp.
+
+        "set-message-read"
+        (let [{:strs [id]} action
+              contact-puk nil ; TODO: either query it from the message id OR pass the puk in the action
+              tuple {"author" own-puk "type" "message-read" "audience" contact-puk "payload" id}]
+          (assert (some? contact-puk) "NOT IMPLEMENTED")
+          (store-tuple tb (timestamped tuple)))
+
+        :pass))))
 
 (defn reify-Convos [^Container container]
   (let [admin (.produce container SneerAdmin)
