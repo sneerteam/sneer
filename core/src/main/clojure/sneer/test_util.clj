@@ -34,28 +34,32 @@
 (defn ->predicate [expected]
   (if (fn? expected) expected #(= % expected)))
 
-(defn ->robust [f]
-  (fn [arg]
-      (try
-        (f arg)
-        (catch Exception e
-          (println "->robust" e)
-          false))))
+(defn try? [pred current]
+  (try
+    [(pred current) nil]
+    (catch Exception e
+      [false e])))
+
+(defn not-ok [msg last-value last-exception]
+  (do
+    (println msg last-value)
+    (when last-exception
+      (.printStackTrace last-exception))
+    false))
 
 (defn <wait-trace! [ch expected]
   (let [expected (nvl expected :nil)
-        pred (->robust (->predicate expected))]
-    (loop-trace [last-value "<none>"]
+        pred (->predicate expected)]
+    (loop-trace [last-value "<none>"
+                 last-exception nil]
       (let [current (<!!? ch)]
         (cond
-          (pred current) true
-          (nil? current) (do
-                           (println "COMPLETED/CLOSED. Last value emitted: " last-value)
-                           false)
-          (= current :timeout) (do
-                                 (println "TIMEOUT. Last value emitted:" last-value)
-                                 false)
-          :else (recur current))))))
+          (= current :timeout) (not-ok "TIMEOUT. Last value emitted:" last-value last-exception)
+          (nil? current)       (not-ok "COMPLETED/CLOSED. Last value emitted:" last-value last-exception)
+          :else (let [[success exception] (try? pred current)]
+                  (if success
+                    true
+                    (recur current (or exception last-exception)))))))))
 
 (defn compromised
   ([ch] (compromised ch 0.7))
