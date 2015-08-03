@@ -28,8 +28,8 @@
         (.nickname n->c) => "Carla"
         (.inviteCodePending n->c) => some?
 
-        #_(. n-convos startConvo "Maico")
-        #_(. n-convos summaries) => (emits #(-> % (mapv (fn [summary] (.nickname summary))) (= ["Maico" "Carla"])))
+        (. n-convos startConvo "Maico" )
+        (. n-convos summaries) => (emits #(->> % (mapv (fn [summary] (.nickname summary))) (= ["Maico" "Carla"])))
 
         (with-open [carla (sneer!)]
           (connect! neide carla)
