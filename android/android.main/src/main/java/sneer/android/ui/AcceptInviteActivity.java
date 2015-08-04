@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,12 +43,13 @@ public class AcceptInviteActivity extends Activity {
 
 		convos = SneerAndroidContainer.component(Convos.class);
 
-		// TODO Call Convos.findConvo() with puk and, if found, open ConvoActiviy then finish
 		convos.findConvo(contactPuk).subscribe(new Action1<Long>() {
 			@Override
 			public void call(Long convoId) {
-				ConvoActivity.open(AcceptInviteActivity.this, convoId);
-                finish();
+                if (convoId != null) {
+                    ConvoActivityWithTabs.open(AcceptInviteActivity.this, convoId);
+                    finish();
+                }
 			}
 		});
 
@@ -72,7 +74,7 @@ public class AcceptInviteActivity extends Activity {
 
                     @Override
                     public final void onNext(Long convoId) {
-                        ConvoActivity.open(AcceptInviteActivity.this, convoId);
+                        ConvoActivityWithTabs.open(AcceptInviteActivity.this, convoId);
                         finish();
                     }
                 });
@@ -87,12 +89,16 @@ public class AcceptInviteActivity extends Activity {
 			@Override
 			public void afterTextChanged(Editable s) {
 				nickname = nicknameEdit.getText().toString();
+				Log.d("FELIPETESTE", "nickname->" + nickname);
+
 				ui(convos.problemWithNewNickname(nickname)).subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String error) {
-                        refreshNicknameProblem(error);
-                    }
-                });
+					@Override
+					public void call(String error) {
+						Log.d("FELIPETESTE", "error->" + error);
+
+						refreshNicknameProblem(error);
+					}
+				});
 			}
 			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
 			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -102,7 +108,8 @@ public class AcceptInviteActivity extends Activity {
     private void refreshNicknameProblem(String error) {
         if (!nickname.isEmpty() && error != null) nicknameEdit.setError(error);
         btnDone.setEnabled(!nickname.isEmpty() && error == null);
-    }
+		Log.d("FELIPETESTE", "btnDone.isEnabled?->" + btnDone.isEnabled());
+	}
 
     private void parseQuery(Intent intent) {
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
