@@ -52,9 +52,7 @@
                                  "Neide"
                                  (.ownPuk n-convos)
                                  (.inviteCodePending n->c))
-
                 accepted-convo-id (<next (.findConvo c-convos (.ownPuk n-convos)))
-
                 c->n-obs (.getById c-convos accepted-convo-id)]
 
             n->c-obs => (emits #(-> % .inviteCodePending nil?))
@@ -68,9 +66,5 @@
               (->> (.setRead convo (last-message convo)) (.dispatch (carla Dispatcher)))
               (. c-convos summaries) => (emits #(->> % (mapv unread) (= [""]))))))
 
-
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
         n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))))))
-
-  ; set-nickname action with duplicate nick emits error warning via "toaster"
-  ; Reads not being emitted by old logic or not being processed by new summarization.
