@@ -59,9 +59,8 @@
 
         "set-message-read"
         (let [{:strs [id]} action
-              contact-puk nil ; TODO: either query it from the message id OR pass the puk in the action
+              contact-puk (<! (id->puk contacts id))
               tuple {"author" own-puk "type" "message-read" "audience" contact-puk "payload" id}]
-          (assert (some? contact-puk) "NOT IMPLEMENTED")
           (store-tuple tb (timestamped tuple)))
 
         :pass))))
