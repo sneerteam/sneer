@@ -202,8 +202,7 @@
 
                   "find-convo"
                   (let [{:strs [inviter-puk]} action]
-                    (if-let [inviter-puk->id (get-in state [:puk->id (from-hex inviter-puk)])]
-                      (>! (response action) inviter-puk->id)))
+                    (>! (response action) (encode-nil (get-in state [:puk->id (from-hex inviter-puk)]))))
 
                   "problem-with-new-nickname"
                   (let [{:strs [nick]} action]
