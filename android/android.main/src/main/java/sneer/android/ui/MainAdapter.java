@@ -22,9 +22,9 @@ import sneer.Conversation;
 import sneer.main.R;
 import sneer.rx.ObservedSubject;
 
+import static sneer.android.ui.SneerActivity.*;
 import static sneer.android.ui.SneerActivity.deferUI;
 import static sneer.android.ui.SneerActivity.findView;
-import static sneer.android.ui.SneerActivity.onMainThread;
 import static sneer.android.ui.SneerActivity.plug;
 import static sneer.android.ui.SneerActivity.prettyTime;
 
@@ -137,7 +137,7 @@ public class MainAdapter extends ArrayAdapter<Conversation> {
 
 		private Subscription bindUnread(ObservedSubject<Long> subject) {
 			setMessageUnread(subject.current());
-			return onMainThread(subject.observable()).subscribe(new Action1<Long>() { @Override public void call(Long unread) {
+			return ui(subject.observable()).subscribe(new Action1<Long>() { @Override public void call(Long unread) {
 				setMessageUnread(unread);
 			}});
 		}

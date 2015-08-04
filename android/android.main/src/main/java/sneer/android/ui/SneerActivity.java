@@ -54,16 +54,22 @@ public class SneerActivity extends Activity {
 
 
 	public static Subscription plug(final TextView textView, Observable<?> observable) {
-		return onMainThread(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			textView.setText(obj == null ? "" : obj.toString());
-		}});
+		return ui(observable).subscribe(new Action1<Object>() {
+			@Override
+			public void call(Object obj) {
+				textView.setText(obj == null ? "" : obj.toString());
+			}
+		});
 	}
 
 
 	public static Subscription plug(final EditText editText, Observable<?> observable) {
-		return onMainThread(observable).subscribe(new Action1<Object>() { @Override public void call(Object obj) {
-			editText.setText(obj == null ? "" : obj.toString());
-		}});
+		return ui(observable).subscribe(new Action1<Object>() {
+			@Override
+			public void call(Object obj) {
+				editText.setText(obj == null ? "" : obj.toString());
+			}
+		});
 	}
 
 
@@ -155,16 +161,11 @@ public class SneerActivity extends Activity {
 
 
 	public static <T> Observable<T> deferUI(Observable<T> observable) {
-		return onMainThread(
-				observable.subscribeOn(Schedulers.io()));
-	}
-
-	public static <T> Observable<T> onMainThread(Observable<T> observable) {
-		return observable.observeOn(AndroidSchedulers.mainThread());
+		return ui(observable.subscribeOn(Schedulers.io()));
 	}
 
 	public static <T> Observable<T> ui(Observable<T> observable) {
-		return onMainThread(observable.debounce(300, TimeUnit.MILLISECONDS));
+		return observable.observeOn(AndroidSchedulers.mainThread());
 	}
 
 	public static Bitmap toBitmap(byte[] bytes) {
