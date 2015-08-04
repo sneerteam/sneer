@@ -25,8 +25,12 @@
   (with-open [neide (sneer!)]
     (let [n-convos ^Convos (neide Convos)]
       (. n-convos summaries) => (emits #(.isEmpty %))
-      (. n-convos problemWithNewNickname "") => (emits "cannot be empty")
+
+      (. n-convos problemWithNewNickname "")      => (emits "cannot be empty")
+      (. n-convos problemWithNewNickname "Ca")    => (emits nil)
+      (. n-convos problemWithNewNickname "Car")   => (emits nil)
       (. n-convos problemWithNewNickname "Carla") => (emits nil)
+
       (let [convo-id (<next (. n-convos startConvo "Carla"))
             n->c-obs (.getById n-convos convo-id)
             n->c (<next n->c-obs)]
