@@ -48,7 +48,7 @@
 
         "send-message"
         (let [{:strs [contact-id text]} action
-              contact-puk (<! (id->puk contacts contact-id))] ; TODO: don't block here?
+              contact-puk (<! (id->puk contacts contact-id))] ;WARNING: if the contact-id is invalid this will block FOREVER!
           (when contact-puk
             (let [tuple {"type"         "message"
                          "author"       own-puk
