@@ -3,7 +3,7 @@
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! connect! puk]]
             [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
-  (:import [sneer.convos Convos ChatMessage Summary]
+  (:import [sneer.convos Convo Convos ChatMessage Summary]
            [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))
 
@@ -14,6 +14,9 @@
 
 (defn unread [^Summary summary]
   (.unread summary))
+
+(defn last-message-id [^Convo convo]
+  (-> convo .messages last .id))
 
 (defn emits-messages [& ms]
   (emits #(->> % .messages (mapv text) (= ms))))
@@ -58,10 +61,8 @@
 
             (let [convo (<next c->n-obs)]
               (. c-convos summaries) => (emits #(->> % (mapv unread) (= ["*"])))
-              (->> convo .messages last .setRead (.dispatch (carla Dispatcher)))
-              ;(. c-convos summaries) => (emits #(->> % (mapv unread) (= [""])))
-              )
-            ))
+              (->> (.setRead convo (last-message-id convo)) (.dispatch (carla Dispatcher)))
+              (. c-convos summaries) => (emits #(->> % (mapv unread) (= [""]))))))
 
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))

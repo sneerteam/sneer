@@ -58,9 +58,9 @@
               (store-tuple tb (timestamped tuple))))) ;TODO Create a tb function to store a new tuple, that takes care of own-puk and timestamp.
 
         "set-message-read"
-        (let [{:strs [id]} action
-              contact-puk (<! (id->puk contacts id))
-              tuple {"author" own-puk "type" "message-read" "audience" contact-puk "payload" id}]
+        (let [{:strs [contact-id message-id]} action
+              contact-puk (<! (id->puk contacts contact-id))
+              tuple {"author" own-puk "type" "message-read" "audience" contact-puk "payload" message-id}]
           (store-tuple tb (timestamped tuple)))
 
         :pass))))
