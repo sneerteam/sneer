@@ -7,19 +7,15 @@ public interface Notifications {
 	/** Emits null when there's no notification */
 	Observable<Notification> get();
 
-	/** Ignores convo when emitting notifications for unread messages. */
-	void startIgnoring(Long convoId);
-	void stopIgnoring();
+	public class Notification {
+		public final Long convoId;
+		public final String title;
+		public final String text;
+		public final String subText;
 
-	interface Notification {
-		/** Null if more than one convo */
-		Long convoId();
-
-		String title();
-
-		String text();
-
-		String subText();
+		public Notification(Long convoId, String title, String text, String subText) {
+			this.convoId = convoId; this.title = title; this.text = text; this.subText = subText;
+		}
 	}
 
 }

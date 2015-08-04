@@ -16,16 +16,6 @@ public class NotificationsSim implements Notifications {
 		return Observable.just(notifications);
 	}
 
-	@Override
-	public void startIgnoring(Long convoId) {
-		Log.i(TAG, "startIgnoring->" + convoId);
-	}
-
-	@Override
-	public void stopIgnoring() {
-		Log.i(TAG, "stopIgnoring->called");
-	}
-
 	public static void turnNotificationsOn() {
 		long currentTimeMillis = System.currentTimeMillis();
 		notifications = buildNotification(currentTimeMillis, "Title " + currentTimeMillis, "Text " + currentTimeMillis, "SubText " + currentTimeMillis);
@@ -36,26 +26,6 @@ public class NotificationsSim implements Notifications {
 	}
 
 	private static Notification buildNotification(final Long convoId, final String title, final String text, final String subText) {
-		return new Notification() {
-			@Override
-			public Long convoId() {
-				return convoId;
-			}
-
-			@Override
-			public String title() {
-				return title;
-			}
-
-			@Override
-			public String text() {
-				return text;
-			}
-
-			@Override
-			public String subText() {
-				return subText;
-			}
-		};
+		return new Notification(convoId, title, text, subText);
 	}
 }

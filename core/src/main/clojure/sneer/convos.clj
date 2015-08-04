@@ -98,10 +98,4 @@
 (defn reify-Notifications [^Container container]
   (reify Notifications
     (get [_]
-      (Observable/just nil))
-
-    (startIgnoring [_ convoId]
-      )
-
-    (stopIgnoring [_]
-      )))
+      (Observable/just nil))))

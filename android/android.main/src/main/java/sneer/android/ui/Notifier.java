@@ -72,7 +72,7 @@ public class Notifier {
 			cancelNotification();
 			return;
 		}
-		Long convoId = notification.convoId();
+		Long convoId = notification.convoId;
 		Intent intent = convoId != null
 				? convoActivityIntent(convoId)
 				: convosActivityIntent();
@@ -94,7 +94,7 @@ public class Notifier {
 	}
 
 	private static void notify(Notifications.Notification notification, Intent intent) {
-		notify(intent, notification.title(), notification.subText(), notification.text());
+		notify(intent, notification.title, notification.subText, notification.text);
 	}
 
 	private static void doPause() {

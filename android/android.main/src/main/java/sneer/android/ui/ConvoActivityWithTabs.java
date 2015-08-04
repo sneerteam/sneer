@@ -97,7 +97,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
         refreshInvitePendingMessage();
         refreshChatMessages();
         ChatMessage last = lastMessageReceived(currentConvo.messages);
-        if (last != null) dispatch(last.setRead());
+        if (last != null) dispatch(currentConvo.setRead(last));
 
         refreshSessions();
     }
@@ -274,7 +274,6 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
     @Override
 	protected void onPause() {
         unsubscribeToConvo();
-		component(Notifications.class).stopIgnoring();
         super.onPause();
     }
 
@@ -284,7 +283,6 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 		super.onResume();
 		hideKeyboard();
         subscribeToConvo();
-		component(Notifications.class).startIgnoring(convoId);
 	}
 
 

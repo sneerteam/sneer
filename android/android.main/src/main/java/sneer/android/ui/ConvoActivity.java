@@ -106,7 +106,7 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
         chatAdapter.update(currentConvo.nickname, currentConvo.messages);
 
         ChatMessage last = lastMessageReceived(currentConvo.messages);
-        if (last != null) dispatch(last.setRead());
+        if (last != null) dispatch(currentConvo.setRead(last));
     }
 
 
@@ -239,7 +239,6 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
     @Override
 	protected void onPause() {
         unsubscribeToConvo();
-		component(Notifications.class).stopIgnoring();
         super.onPause();
     }
 
@@ -249,7 +248,6 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
 		super.onResume();
 		hideKeyboard();
         subscribeToConvo();
-		component(Notifications.class).startIgnoring(convoId);
 	}
 
 
