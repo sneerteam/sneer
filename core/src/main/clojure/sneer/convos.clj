@@ -28,7 +28,7 @@
   (mapv (partial to-foreign-summary (time/pretty-printer))
         summaries))
 
-(defn- summaries-obs* [summarization]
+(defn- summaries-obs* [^ConvoSummarization summarization]
   (shared-latest
     (rx/observable*
       (fn [^Subscriber subscriber]
@@ -38,7 +38,7 @@
           (pipe-to-subscriber! out subscriber "conversation summaries")
           (republish-latest-every! (* 60 1000) in out))))))
 
-(defn- handle-msg-actions! [container admin own-puk]
+(defn- handle-msg-actions! [^Container container admin own-puk]
   (let [tb (tuple-base-of admin)
         contacts (sneer.contacts/from container)
         actions (chan 1)]
@@ -66,7 +66,7 @@
         :pass))))
 
 (defn reify-Convos [^Container container]
-  (let [admin (.produce container SneerAdmin)
+  (let [admin ^SneerAdmin (.produce container SneerAdmin)
         own-puk (.. admin privateKey publicKey)
         summarization ^ConvoSummarization (.produce container ConvoSummarization)
         summaries-obs (summaries-obs* summarization)
