@@ -17,7 +17,7 @@ public class Convo {
 
 	public Action setNickname(String newNick) { return action("set-nickname", "contact-id", id, "new-nick", newNick); }
 	public Action sendMessage(String text) { return action("send-message", "contact-id", id, "text", text); }
-	public Action setRead(long messageId) { return action("set-message-read", "contact-id", id, "message-id", messageId); }
+	public Action setRead(ChatMessage message) { return action("set-message-read", "contact-id", id, "message-id", message.originalId); }
 
 	@Override
 	public String toString() {

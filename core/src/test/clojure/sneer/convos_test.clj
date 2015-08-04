@@ -15,8 +15,8 @@
 (defn unread [^Summary summary]
   (.unread summary))
 
-(defn last-message-id [^Convo convo]
-  (-> convo .messages last .id))
+(defn last-message [^Convo convo]
+  (-> convo .messages last))
 
 (defn emits-messages [& ms]
   (emits #(->> % .messages (mapv text) (= ms))))
@@ -61,7 +61,7 @@
 
             (let [convo (<next c->n-obs)]
               (. c-convos summaries) => (emits #(->> % (mapv unread) (= ["*"])))
-              (->> (.setRead convo (last-message-id convo)) (.dispatch (carla Dispatcher)))
+              (->> (.setRead convo (last-message convo)) (.dispatch (carla Dispatcher)))
               (. c-convos summaries) => (emits #(->> % (mapv unread) (= [""]))))))
 
 
