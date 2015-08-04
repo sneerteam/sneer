@@ -6,7 +6,8 @@
             sneer.flux
             sneer.convos
             sneer.convo-summarization
-            sneer.message-subs)
+            sneer.message-subs
+            sneer.notifications)
   (:import [sneer.commons Startup]))
 
 (defn- start-components! [container]
@@ -38,7 +39,7 @@
     (sneer.convos/reify-Convos container)
 
     sneer.convos.Notifications
-    (sneer.convos/reify-Notifications container)
+    (sneer.notifications/reify-Notifications container)
 
     sneer.interfaces.ConvoSummarization
     (sneer.convo-summarization/reify-ConvoSummarization container)))

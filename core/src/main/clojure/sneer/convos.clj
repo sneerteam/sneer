@@ -16,7 +16,7 @@
   (:import
     [rx Subscriber Observable]
     [sneer.commons Container]
-    [sneer.convos Convos Summary Notifications]
+    [sneer.convos Convos Summary]
     [sneer.interfaces ConvoSummarization]
     [sneer.flux Dispatcher]
     [sneer.admin SneerAdmin]))
@@ -95,7 +95,3 @@
       (ownPuk [_]
         (.toHex own-puk)))))
 
-(defn reify-Notifications [^Container container]
-  (reify Notifications
-    (get [_]
-      (Observable/just nil))))
