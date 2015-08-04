@@ -71,7 +71,6 @@
     (compromised ch)
     ch))
 
-
 (defn subscribe-chan [c observable]
   (rx/subscribe observable
                 #(>!! c (nvl % :nil))  ; Channels cannot take nil
