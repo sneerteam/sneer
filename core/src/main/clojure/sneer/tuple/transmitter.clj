@@ -1,4 +1,4 @@
-(ns sneer.tuple.tuple-transmitter
+(ns sneer.tuple.transmitter
   (:require [clojure.core.async :refer [chan go-loop >! <! filter> map>]]
             [sneer.async :refer [go-while-let go-trace sliding-chan dropping-chan]]
             [sneer.commons :refer [produce!]]
@@ -13,23 +13,12 @@
 (defn normalize-audience-for-sub [tuple]
   (assoc tuple "audience" (get-in tuple ["criteria" "author"])))
 
-(defn start [own-puk tuple-base tuples-in connect-to-follower-fn]
-  (let [peer-chans (atom {})
-        chan-for-peer (fn [follower-puk]
-                        (let [c (chan)]
-                          (connect-to-follower-fn follower-puk c)
-                          c))
-        produce-chan (partial produce! chan-for-peer peer-chans)]
+(defn- set-last-ids-sent [acks tuple-base sub-id]
+  (go-while-let [last-tuple-sent (<! acks)]
+    (set-local-attribute tuple-base "last-id-sent" (last-tuple-sent "id") sub-id)))
 
-    (go-while-let [tuple (<! tuples-in)]
-      (store-tuple tuple-base tuple))
-
-    (let [subs (chan)
-          subs-lease (chan)]
-      (query-tuples tuple-base {"type" "sub" "audience" own-puk} subs subs-lease)
-
-      (go-while-let [sub (<! subs)]
-
+(defn- handle-subs [tuple-base produce-chan subs]
+  (go-while-let [sub (<! subs)]
         (SystemReport/updateReport "tuples/last-sub" sub)
 
         (let [sub-id (sub "id")
@@ -50,8 +39,37 @@
                           follower-chan
                           sub-lease))
 
-          (go-while-let [last-tuple-sent (<! acks)]
-            (set-local-attribute tuple-base "last-id-sent" (last-tuple-sent "id") sub-id)))))
+          (set-last-ids-sent acks tuple-base sub-id))))
+
+(defn- do-send-acks [followee-chan tuple send-acks]
+  (go-trace (>! followee-chan [tuple send-acks])))
+
+(defn- get-sent [send send-acks own-puk tuple-base sent? produce-chan]
+  (go-while-let [tuple (<! send)]
+        (if-some [followee (get tuple "audience")]
+          (when-not (= own-puk followee)
+            (get-local-attribute tuple-base "sent?" false (tuple "id") sent?)
+            (when-not (<! sent?)
+              (let [followee-chan (produce-chan followee)]
+                (do-send-acks followee-chan tuple send-acks))))
+          (println "INVALID SUB! Audience missing:" tuple))))
+
+(defn start [own-puk tuple-base tuples-in connect-to-follower-fn]
+  (let [peer-chans (atom {})
+        chan-for-peer (fn [follower-puk]
+                        (let [c (chan)]
+                          (connect-to-follower-fn follower-puk c)
+                          c))
+        produce-chan (partial produce! chan-for-peer peer-chans)]
+
+    (go-while-let [tuple (<! tuples-in)]
+      (store-tuple tuple-base tuple))
+
+    (let [subs (chan)
+          subs-lease (chan)]
+      (query-tuples tuple-base {"type" "sub" "audience" own-puk} subs subs-lease)
+
+      (handle-subs tuple-base produce-chan subs))
 
     (let [send (chan)
           send-lease (chan)
@@ -67,11 +85,4 @@
       (go-while-let [ack (<! send-acks)]
         (set-local-attribute tuple-base "sent?" true (ack "id")))
 
-      (go-while-let [tuple (<! send)]
-        (if-some [followee (get tuple "audience")]
-          (when-not (= own-puk followee)
-            (get-local-attribute tuple-base "sent?" false (tuple "id") sent?)
-            (when-not (<! sent?)
-              (let [followee-chan (produce-chan followee)]
-                (go-trace (>! followee-chan [tuple send-acks])))))
-          (println "INVALID SUB! Audience missing:" tuple))))))
+      (get-sent send send-acks own-puk tuple-base sent? produce-chan))))

@@ -34,7 +34,7 @@
                     sneer.tuple.persistent-tuple-base
                     sneer.tuple.space
                     sneer.tuple.queue
-                    sneer.tuple.tuple-transmitter
+                    sneer.tuple.transmitter
                     sneer.admin
                     sneer.contact
                     sneer.contacts

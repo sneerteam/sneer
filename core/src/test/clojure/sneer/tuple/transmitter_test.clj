@@ -1,5 +1,5 @@
-(ns sneer.tuple.tuple-transmitter-test
-  (:require [sneer.tuple.tuple-transmitter :as tuple-transmitter]
+(ns sneer.tuple.transmitter-test
+  (:require [sneer.tuple.transmitter :as transmitter]
             [sneer.tuple.jdbc-database :as jdbc-database]
             [sneer.keys :refer [->puk]]
             [midje.sweet :refer :all]
@@ -31,7 +31,7 @@
               tuple-base (tuple-base/create db)]
     (let [{:keys [tuples-in connect-to-follower tuples-for!]} (get-transmitter-state)]
 
-      (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
+      (transmitter/start A tuple-base tuples-in connect-to-follower)
 
       (fact "It satisfies subs from stored tuples"
         (>!!? tuples-in {"type" "sub" "author" B "audience" A "criteria" {"type" "tweet"}})
@@ -53,7 +53,7 @@
         (close! tuples-in)
         (with-open [^AutoCloseable tuple-base (restarted tuple-base)]
           (let [tuples-in (chan)]
-            (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
+            (transmitter/start A tuple-base tuples-in connect-to-follower)
 
             (let [new-tweet {"type" "tweet" "author" A "payload" "S2"}]
               (store-tuple tuple-base new-tweet)
@@ -67,7 +67,7 @@
               tuple-base (tuple-base/create db)]
     (let [{:keys [tuples-in connect-to-follower tuples-for!]} (get-transmitter-state)]
 
-      (tuple-transmitter/start A tuple-base tuples-in connect-to-follower)
+      (transmitter/start A tuple-base tuples-in connect-to-follower)
 
       (fact "It sends pushes"
         (let [push-sent {"type" "push" "author" A "value" 42 "audience" C}]

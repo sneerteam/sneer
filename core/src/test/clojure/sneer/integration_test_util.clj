@@ -5,7 +5,7 @@
             [sneer.test-util :refer [emits]]
             [sneer.tuple.jdbc-database :refer [create-sqlite-db]]
             [sneer.tuple-base-provider :refer :all]
-            [sneer.tuple.tuple-transmitter :as transmitter])
+            [sneer.tuple.transmitter :as transmitter])
   (:import [clojure.lang IFn]
            [sneer.commons Container PersistenceFolder Startup]
            [sneer.impl CoreLoader]

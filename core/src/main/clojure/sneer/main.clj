@@ -5,7 +5,7 @@
             [sneer.networking.client :as network-client]
             [sneer.networking.udp :as udp]
             [sneer.async :refer [go-trace]]
-            [sneer.tuple.tuple-transmitter :as transmitter])
+            [sneer.tuple.transmitter :as transmitter])
   (:import [java.net InetSocketAddress]
            [sneer.commons SystemReport]
            [sneer.admin SneerAdmin]))
