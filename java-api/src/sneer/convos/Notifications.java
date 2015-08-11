@@ -16,6 +16,16 @@ public interface Notifications {
 		public Notification(Long convoId, String title, String text, String subText) {
 			this.convoId = convoId; this.title = title; this.text = text; this.subText = subText;
 		}
+
+		@Override
+		public String toString() {
+			return "Notification{" +
+					"convoId=" + convoId +
+					", title='" + title + '\'' +
+					", text='" + text + '\'' +
+					", subText='" + subText + '\'' +
+					'}';
+		}
 	}
 
 }

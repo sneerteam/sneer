@@ -168,11 +168,11 @@
    (tap-state machine (sliding-chan 1 xsummarize))))
 
 (defn reify-ConvoSummarization [container]
-  (let [machine (start-machine! container)
-        sliding-summaries (sliding-summaries! machine)]
+  (let [machine (start-machine! container)]
     (reify ConvoSummarization
 
-      (slidingSummaries [_] sliding-summaries)
+      (slidingSummaries [_]
+        (sliding-summaries! machine))
 
       (processUpToId
        [_ id]
