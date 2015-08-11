@@ -160,6 +160,57 @@
       {:state state
        :id    id})))
 
+(defn handle-action! [container states state action]
+  (go
+    (case (action :type)
+
+      "new-contact"
+      (let [{:strs [nick]} action]
+        (if-let [problem (problem-with-nick state nick)]
+          (do
+            (>! (response action) (FriendlyException. (str "Nickname " problem)))
+            state)
+          (let [invite-code (-> (UUID/randomUUID) .toString (.replaceAll "-" ""))
+                result (<! (wait-for-store-contact! container nick nil invite-code states))]
+            (>! (response action) (result :id))
+            (result :state))))
+
+      "accept-invite"
+      (let [{:strs [nick puk-hex invite-code-received]} action]
+        (if-let [problem (problem-with-nick state nick)]
+          (do
+            (>! (response action) (FriendlyException. (str "Nickname " problem)))
+            state)
+          (let [contact-puk (from-hex puk-hex)
+                _ (<! (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received}))
+                result (<! (wait-for-store-contact! container nick contact-puk nil states))]
+            (>! (response action) (result :id))
+            (result :state))))
+
+      "find-convo"
+      (let [{:strs [inviter-puk]} action]
+        (>! (response action) (encode-nil (get-in state [:puk->id (from-hex inviter-puk)])))
+        state)
+
+      "problem-with-new-nickname"
+      (let [{:strs [nick]} action]
+        (>! (response action) (encode-nil (problem-with-nick state nick)))
+        state)
+
+      "set-nickname"
+      (let [{:strs [contact-id new-nick]} action]
+        (if-let [problem (problem-with-nick state new-nick)]
+          (do
+            ; TODO: Emit in "toast" observable: (str "Nickname " problem)
+            state)
+          (let [contact-puk (-puk contact-id state)]
+            (if contact-puk
+              (let [result (<! (wait-for-store-contact! container new-nick contact-puk nil states))]
+                (result :state))
+              state)))) ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
+
+      state)))
+
 (defn- handle-actions! [container tuple-machine]
   (let [states (tap-state tuple-machine)
         actions (chan 1)]
@@ -175,54 +226,7 @@
             actions
             ([action]
               (when action
-                (case (action :type)
-
-                  "new-contact"
-                  (let [{:strs [nick]} action]
-                    (if-let [problem (problem-with-nick state nick)]
-                      (do
-                        (>! (response action) (FriendlyException. (str "Nickname " problem)))
-                        state)
-                      (let [invite-code (-> (UUID/randomUUID) .toString (.replaceAll "-" ""))
-                            result (<! (wait-for-store-contact! container nick nil invite-code states))]
-                        (>! (response action) (result :id))
-                        (result :state))))
-
-                  "accept-invite"
-                  (let [{:strs [nick puk-hex invite-code-received]} action]
-                    (if-let [problem (problem-with-nick state nick)]
-                        (do
-                          (>! (response action) (FriendlyException. (str "Nickname " problem)))
-                          state)
-                        (let [contact-puk (from-hex puk-hex)
-                              _ (<! (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received}))
-                              result (<! (wait-for-store-contact! container nick contact-puk nil states))]
-                          (>! (response action) (result :id))
-                          (result :state))))
-
-                  "find-convo"
-                  (let [{:strs [inviter-puk]} action]
-                    (>! (response action) (encode-nil (get-in state [:puk->id (from-hex inviter-puk)])))
-                    state)
-
-                  "problem-with-new-nickname"
-                  (let [{:strs [nick]} action]
-                    (>! (response action) (encode-nil (problem-with-nick state nick)))
-                    state)
-
-                  "set-nickname"
-                  (let [{:strs [contact-id new-nick]} action]
-                    (if-let [problem (problem-with-nick state new-nick)]
-                      (do
-                        ; TODO: Emit in "toast" observable: (str "Nickname " problem)
-                        state)
-                      (let [contact-puk (-puk contact-id state)]
-                        (if contact-puk
-                          (let [result (<! (wait-for-store-contact! container new-nick contact-puk nil states))]
-                            (result :state))
-                          state))))  ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
-
-                  state)))))))))
+                (<! (handle-action! container states state action))))))))))
 
 (defn problem-with-new-nickname [contacts nick]
   (.request (contacts :dispatcher) (request "problem-with-new-nickname" "nick" nick)))
