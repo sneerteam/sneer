@@ -79,11 +79,17 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickLis
 		if (own) {
 			color = darkColorDeterminedBy(partyNick);
 			View arrow = row.findViewById(R.id.speechBubbleArrowRight);
-			arrow.setBackground(new TriangleRightDrawable(color));  //Color.parseColor("#ce5343")
+			if (arrow == null)
+				System.out.println("speechBubbleArrowRight IS NULL!");
+			else
+				arrow.setBackground(new TriangleRightDrawable(color));  //Color.parseColor("#ce5343")
 		} else {
 			color = lightColorDeterminedBy(partyNick);
 			View arrow = row.findViewById(R.id.speechBubbleArrowLeft);
-			arrow.setBackground(new TriangleLeftDrawable(color));
+			if (arrow == null)
+				System.out.println("speechBubbleArrowLeft IS NULL!");
+			else
+				arrow.setBackground(new TriangleLeftDrawable(color));
 		}
 
 		LayerDrawable bubbleLayer = (LayerDrawable) speechBubble.getBackground();
