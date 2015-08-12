@@ -1,26 +1,31 @@
 (ns sneer.notifications
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :refer [chan pipe]]
-            [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]])
+            [clojure.string :as str]
+            [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]]
+            [sneer.async :refer [debounce]])
   (:import [sneer.commons Container]
            [sneer.convos Notifications Notifications$Notification]
            [sneer.interfaces ConvoSummarization]
            [rx Observable Subscriber]))
 
-(defn- to-foreign-notification [{:keys [convo-id title text sub-text]}]
-  (Notifications$Notification. convo-id title text sub-text))
+(def ^:dynamic *debounce-timeout* 1500)
 
-(defn notification [summaries]
-  {:convo-id 0
-   :title ""
-   :text (apply str (map :preview summaries))
-   :sub-text ""})
+(defn format-notification-text [unread]
+  (str/join "\n"
+            (map #(str (:nick %) ": " (:preview %)) unread)) )
+
+(defn notification [unread]
+  (if (= (count unread) 1)
+    (let [[{:keys [id nick preview]}] unread]
+      (Notifications$Notification. (long id) nick preview ""))
+    (Notifications$Notification. nil "New Messages" (format-notification-text unread) "")))
 
 (defn- to-foreign [summaries]
-  (let [unread (->> summaries (filter #(= "*" (:unread %))))]
+  (let [unread (->> summaries (remove #(-> % :unread empty?)))]
     (if (empty? unread)
       :nil
-      (to-foreign-notification (notification unread)))))
+      (notification unread))))
 
 (defn- notifications* [^ConvoSummarization summarization]
   (shared-latest
@@ -28,7 +33,7 @@
       (fn [^Subscriber subscriber]
         (let [in (.slidingSummaries summarization)
               out (chan 1 (map to-foreign))]
-          (pipe in out)
+          (debounce in out *debounce-timeout*)
           (close-on-unsubscribe! subscriber in out)
           (pipe-to-subscriber! out subscriber "notifications"))))))
 
