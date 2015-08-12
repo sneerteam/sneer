@@ -300,6 +300,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
     private void unsubscribeToConvo() {
         convoSubscription.unsubscribe();
+        convoSubscription = null;
         currentConvo = null;
     }
 
