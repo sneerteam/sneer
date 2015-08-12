@@ -43,6 +43,7 @@
                     sneer.convo
                     sneer.convo-summarization
                     sneer.convos
+                    sneer.notifications
                     sneer.impl
                     sneer.keys
                     sneer.party
