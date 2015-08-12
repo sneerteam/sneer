@@ -25,18 +25,17 @@
      :carla carla
      :c->n c->n}))
 
-(defn text [^Notifications$Notification n]
-  (.text n))
+(facts "About notifications"
+  (let [{:keys [neide carla n->c c->n]} (neide-and-carla)]
+    (with-open [neide neide
+                carla carla]
+      (let [notifications (neide Notifications)
+            send-message #(.dispatch (carla Dispatcher)
+                                     (.sendMessage c->n %))]
 
-#_(facts "About notifications"
-  (let [{:keys [neide carla n->c c->n]} (neide-and-carla)
-        notifications (neide Notifications)
-        send-message #(.dispatch (carla Dispatcher)
-                                 (.sendMessage c->n %))]
+        (fact "Starts empty"
+          (<next (.get notifications)) => nil)
 
-    (fact "Starts empty"
-      (<next (.get notifications)) => nil)
-
-    (fact "New message causes new notification"
-      (send-message "hi")
-      (<next (.get notifications)) => #(-> % text (= "hi")))))
+        (fact "New message causes new notification"
+          (send-message "hi")
+          (.get notifications) => (emits #(= (.text %) "hi")))))))
