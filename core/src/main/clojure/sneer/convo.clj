@@ -84,7 +84,7 @@
 ; SessionSummary(long id, String type, String title, String date, String unread)
 ; ChatMessage(long id, String text, boolean isOwn, String date)
 (defn- to-foreign [{:keys [id nick invite-code messages]}]
-  (Convo. id nick invite-code (->ChatMessageList messages) nil))
+  (Convo. id nick invite-code (->ChatMessageList messages) []))
 
 (defn convo-by-id [container id]
   (rx/observable*
