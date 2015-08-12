@@ -91,7 +91,7 @@
 ;;                                  :last-received original_id}}
 (defn- start-summarization-machine! [^Container container previous-state]
   (let [lease (.produce container :lease)
-        admin (.produce container SneerAdmin)
+        admin ^SneerAdmin (.produce container SneerAdmin)
         own-puk (.. admin privateKey publicKey)
         tuple-base (tuple-base-of admin)
         tuples (chan)
@@ -127,7 +127,7 @@
     (go-while-let [snapshot (<! snapshots)]
       (write-snapshot file snapshot))))
 
-(defn- start-machine! [container]
+(defn- start-machine! [^Container container]
   (let [file (some-> (.produce container PersistenceFolder)
                      (.get)
                      (File. "conversation-summaries.tmp"))
