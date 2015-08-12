@@ -2,7 +2,7 @@
   (:require
     [clojure.core.async :as async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
-    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace state-machine tap-state peek-state!]]
+    [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace state-machine tap-state peek-state! debounce]]
     [sneer.commons :refer [now produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
@@ -122,16 +122,10 @@
              "conversations, last-id:" (:last-id snapshot))))
 
 (defn- start-saving-snapshots-to! [file ch]
-  (let [never (chan)]
-    (go-loop-trace [snapshot nil
-                    debounce never]
-      (alt! :priority true
-        ch       ([snapshot]
-                   (when snapshot
-                     (recur snapshot (timeout 5000))))
-        debounce ([_]
-                   (write-snapshot file snapshot)
-                   (recur nil never))))))
+  (let [snapshots (chan)]
+    (debounce ch snapshots 5000)
+    (go-while-let [snapshot (<! snapshots)]
+      (write-snapshot file snapshot))))
 
 (defn- start-machine! [container]
   (let [file (some-> (.produce container PersistenceFolder)

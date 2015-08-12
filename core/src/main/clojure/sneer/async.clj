@@ -1,9 +1,7 @@
 (ns sneer.async
   (:require [clojure.core.async :as async :refer [chan go >! <! <!! alt! alts! timeout mult tap close!]]
-            [rx.lang.clojure.core :as rx]
             [clojure.stacktrace :refer [print-throwable]]
-            [sneer.commons :refer :all])
-  (:import [rx Subscriber]))
+            [sneer.commons :refer :all]))
 
 (def closed-chan (doto (async/chan) async/close!))
 (def IMMEDIATELY closed-chan)
@@ -146,3 +144,15 @@
       (if (pred v)
         v
         (recur)))))
+
+(defn debounce [in out timeout-ms]
+  (let [never (chan)]
+    (go-loop-trace [value nil
+                    debounce never]
+      (alt! :priority true
+        in       ([v]
+                   (when v
+                     (recur v (timeout timeout-ms))))
+        debounce ([_]
+                   (>! out value)
+                   (recur nil never))))))
