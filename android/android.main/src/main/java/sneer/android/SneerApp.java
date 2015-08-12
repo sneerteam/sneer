@@ -29,8 +29,6 @@ public class SneerApp extends MultiDexApplication {
 
 		Context app = getApplicationContext();
 		UncaughtExceptionReporter.start(app, "klauswuestefeld@gmail.com", "Sneer");
-
-		Notifier.start(app);
 		SneerAndroidSingleton.setInstance(new SneerAndroidImpl(app));
 		if (SneerAndroidSingleton.admin() == null)
 			System.out.println("CORE NOT FOUND.");
@@ -49,6 +47,7 @@ public class SneerApp extends MultiDexApplication {
 			});
 			container().produce(Startup.class);
 		}
+		Notifier.start(app);
 	}
 
 	private void setStrictMode() {
