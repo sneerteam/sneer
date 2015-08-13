@@ -1,12 +1,12 @@
 (ns sneer.convos
   (:require
-    [clojure.core.async :refer [chan <!]]
+    [clojure.core.async :refer [chan <! >!]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [go-while-let republish-latest-every!]]
     [sneer.contacts :refer [id->puk]]
     [sneer.convo :refer [convo-by-id]]
     [sneer.convo-summarization :refer :all]                 ; Force compilation of interface
-    [sneer.flux :refer [tap-actions]]
+    [sneer.flux :refer [tap-actions response]]
     [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]]
     [sneer.tuple.persistent-tuple-base :refer [timestamped]]
     [sneer.time :as time]
@@ -62,6 +62,16 @@
               contact-puk (<! (id->puk contacts contact-id))
               tuple {"author" own-puk "type" "message-read" "audience" contact-puk "payload" message-id}]
           (store-tuple tb (timestamped tuple)))
+
+        "start-session"
+        (let [{:strs [contact-id session-type]} action
+              contact-puk (<! (id->puk contacts contact-id))
+              tuple {"type"        "session"
+                     "author"       own-puk
+                     "audience"     contact-puk
+                     "session-type" session-type}]
+          (let [session-id (<! (store-tuple tb (timestamped tuple)))]
+            (>! (response action) session-id)))
 
         :pass))))
 

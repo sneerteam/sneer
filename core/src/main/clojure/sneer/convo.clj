@@ -27,9 +27,14 @@
 (defn- handle-contact [state contact]
   (merge state contact))
 
+(defn- handle-session [own-puk state event]
+  (println "handle-session" event)
+  state)
+
 (defn- handle-event [own-puk state event]
-  (if (= (event "type") "message")
-    (handle-message own-puk state event)
+  (case (event "type")
+    "message" (handle-message own-puk state event)
+    "session" (handle-session own-puk state event)
     (handle-contact state event)))
 
 (defn- query-messages-by! [tuple-base author-puk audience-puk lease]
@@ -47,6 +52,14 @@
         old-msgs (async/merge [old-sent old-rcvd])
         new-msgs (async/merge [new-sent new-rcvd])]
     [old-msgs new-msgs]))
+
+(defn- query-sessions! [tb own-puk contact-puk lease]
+  (let [tuples-out (chan 1)
+        criteria {"type"     "session"
+                  "author"   own-puk
+                  "audience" contact-puk}]
+    (query-tuples tb criteria tuples-out lease)
+    tuples-out))
 
 (defn- pipe-until-contact-has-puk! [contact-in state-out]
   (go-loop-trace []
@@ -68,7 +81,9 @@
       (let [contact (<! (pipe-until-contact-has-puk! contact-in state-out))
             state (assoc contact :messages (sorted-set-by msg-ids))
             [old-events new-events] (query-messages! tb own-puk (contact :puk) lease)
+            sessions-in (query-sessions! tb own-puk (contact :puk) lease)
             _ (pipe contact-in new-events)
+            _ (pipe sessions-in new-events)
             machine (state-machine (partial handle-event own-puk) state old-events new-events)]
         (tap-state machine state-out)))))
 

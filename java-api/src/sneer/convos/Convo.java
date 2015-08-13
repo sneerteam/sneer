@@ -2,7 +2,10 @@ package sneer.convos;
 
 import java.util.List;
 import sneer.flux.Action;
+import sneer.flux.Request;
+
 import static sneer.flux.Action.action;
+import static sneer.flux.Request.request;
 
 public class Convo {
 
@@ -18,6 +21,7 @@ public class Convo {
 	public Action setNickname(String newNick) { return action("set-nickname", "contact-id", id, "new-nick", newNick); }
 	public Action sendMessage(String text) { return action("send-message", "contact-id", id, "text", text); }
 	public Action setRead(ChatMessage message) { return action("set-message-read", "contact-id", id, "message-id", message.originalId); }
+	public Request<Long> startSession(String sessionType) { return request("start-session", "contact-id", id, "session-type", sessionType); }
 
 	@Override
 	public String toString() {
