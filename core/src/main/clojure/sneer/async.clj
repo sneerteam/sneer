@@ -42,7 +42,7 @@
        (catch Throwable e#
          (println "GO ERROR" e#)
          #_(print-throwable e#)
-         (.printStackTrace e#)))))
+         (.printStackTrace ^Throwable e#)))))
 
 (defmacro go-loop-trace
   "Same as go-loop but prints unhandled exception stack trace"

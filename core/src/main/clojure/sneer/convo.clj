@@ -10,8 +10,9 @@
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.persistent-tuple-base :refer [after-id]])
 
-  (:import  [sneer.convos Convo ChatMessage]
-            [rx Subscriber]
+  (:import  [rx Subscriber]
+            [sneer.commons Container]
+            [sneer.convos Convo ChatMessage]
             [sneer.admin SneerAdmin]))
 
 (defn- msg-ids [msg1 msg2]
@@ -72,8 +73,8 @@
 
 (defn- start!
   "`id' is the id of the first contact tuple for this party"
-  [container id state-out lease]
-  (let [admin (.produce container SneerAdmin)
+  [^Container container id state-out lease]
+  (let [admin ^SneerAdmin (.produce container SneerAdmin)
         own-puk (.. admin privateKey publicKey)
         tb (tuple-base-of admin)
         contact-in (tap-id (contacts/from container) id lease)]
