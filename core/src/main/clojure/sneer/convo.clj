@@ -12,7 +12,7 @@
 
   (:import  [rx Subscriber]
             [sneer.commons Container]
-            [sneer.convos Convo ChatMessage]
+            [sneer.convos Convo ChatMessage SessionSummary]
             [sneer.admin SneerAdmin]))
 
 (defn- msg-ids [msg1 msg2]
@@ -28,9 +28,11 @@
 (defn- handle-contact [state contact]
   (merge state contact))
 
-(defn- handle-session [own-puk state event]
-  (println "handle-session" event)
-  state)
+(defn- handle-session [own-puk state {:strs [original_id session-type timestamp]}]
+  (update-in state
+             [:sessions]
+             (fnil conj [])
+             {:id original_id :type session-type :timestamp timestamp}))
 
 (defn- handle-event [own-puk state event]
   (case (event "type")
@@ -88,19 +90,24 @@
             machine (state-machine (partial handle-event own-puk) state old-events new-events)]
         (tap-state machine state-out)))))
 
-(defn- ->ChatMessageList [messages]
-  (if (empty? messages)
-    []
-    (let [pretty-time (time/pretty-printer)]
-      (->> messages
-           (mapv (fn [{:keys [id text own? timestamp]}]
-                   (ChatMessage. id text own? (pretty-time timestamp))))))))
+(defn- ->ChatMessageList [messages pretty-time]
+  (mapv (fn [{:keys [id text own? timestamp]}]
+          (ChatMessage. id text own? (pretty-time timestamp)))
+        messages))
+
+(defn- ->SessionSummaryList [sessions pretty-time]
+  (mapv (fn [{:keys [id type timestamp]}]
+          (SessionSummary. id type type (pretty-time timestamp) ""))
+        sessions))
 
 ; Convo(long contactId, String nickname, String inviteCodePending, List<ChatMessage> messages, List<SessionSummary> sessionSummaries)
 ; SessionSummary(long id, String type, String title, String date, String unread)
 ; ChatMessage(long id, String text, boolean isOwn, String date)
-(defn- to-foreign [{:keys [id nick invite-code messages]}]
-  (Convo. id nick invite-code (->ChatMessageList messages) []))
+(defn- to-foreign [{:keys [id nick invite-code messages sessions]}]
+  (let [pretty-time (time/pretty-printer)]
+    (Convo. id nick invite-code
+            (->ChatMessageList messages pretty-time)
+            (->SessionSummaryList sessions pretty-time))))
 
 (defn convo-by-id [container id]
   (rx/observable*

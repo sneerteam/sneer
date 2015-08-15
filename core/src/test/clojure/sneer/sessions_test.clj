@@ -15,9 +15,11 @@
 (defn session-id [^SessionSummary ss]
   (.id ss))
 
+(defn session-title [^SessionSummary ss]
+  (.title ss))
+
 (facts "About sessions"
   (let [{:keys [neide carla n->c c->n]} (neide-and-carla)
-        _ (println "n->c" n->c)
         neide-sessions #(sessions neide (.id n->c))]
     (with-open [neide neide
                 carla carla]
@@ -25,8 +27,9 @@
       (fact "In the beginning there were no sessions"
         (neide-sessions) => (emits empty?))
 
-      #_(fact "And then Neide said, start a session"
+      (fact "And then Neide said, start a session"
         (let [start-session   (.startSession n->c "candy-crush")
               n->c-session-id (<next (.request (neide Dispatcher) start-session))]
-          (println "sessions" (<next (neide-sessions)))
-          (neide-sessions) => (emits #(->> % (map session-id) (= [n->c-session-id]))))))))
+          (neide-sessions) => (emits #(->> %
+                                           (map (juxt session-id session-title))
+                                           (= [[n->c-session-id "candy-crush"]]))))))))

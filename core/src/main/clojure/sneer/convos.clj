@@ -70,8 +70,8 @@
                      "author"       own-puk
                      "audience"     contact-puk
                      "session-type" session-type}]
-          (let [session-id (<! (store-tuple tb (timestamped tuple)))]
-            (>! (response action) session-id)))
+          (let [session (<! (store-tuple tb (timestamped tuple)))]
+            (>! (response action) (session "id"))))
 
         :pass))))
 
