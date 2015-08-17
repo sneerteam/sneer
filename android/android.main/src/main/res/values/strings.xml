@@ -4,51 +4,25 @@
     <string name="app_name">Sneer</string>
     <string name="action_advanced">Advanced</string>
     <string name="action_search_for_apps">Search for Apps</string>
-    <string name="action_advanced_report">System Report</string>
-    <string name="action_settings">Settings</string>
-    <string name="send_contact">Send</string>
-    <string name="chat_contact">Chat</string>
-    <string name="edit_contact">Edit</string>
-    <string name="remove_contact">Remove</string>
-    <string name="nickname">Nickname</string>
-    <string name="comments">Comments</string>
-    <string name="button_send">Send</string>
     <string name="title_conversation">Conversation</string>
-    <string name="action_new_conversation">New Message</string>
-
-    <string name="empty_contact_list">Tap the \"Add contact\" icon to invite a friend to a conversation using Sneer.</string>
 
     <!-- ConversationActivity -->
     <string name="conversation_activity_action_button">Action</string>
     <string name="conversation_activity_waiting">Waiting for %s to accept your invite. &lt;a href=""&gt;Send invite again&lt;/a&gt;</string>
     <!-- ConversationActivity -->
 
-
     <!-- ContactActivity -->
     <string name="add_contact_view_nickname">Choose a nickname</string>
-    <string name="contact_view_nickname">Nickname</string>
-    <string name="contact_view_public_key">Public key</string>
-    <string name="contact_view_share_public_key">Share Public key</string>
-    <!-- ContactActivity -->
-
-
-    <!-- ContactActivity -->
-    <string name="add_contact_not_connected_yet">Not connected yet</string>
-    <!-- ContactActivity -->
-
-    <!-- ContactActivity -->
     <string name="action_add_contact">Add Sovereign Contact</string>
+    <string name="contact_view_nickname">Nickname</string>
     <string name="add_contact_done">DONE</string>
     <!-- ContactActivity -->
 
-    <string name="search_hint">Search conversation</string>
-    <string name="action_search">Search Conversation</string>
-    <string name="action_cancel">Cancel</string>
     <string name="pick_image_action_list_icon_description">Action Icon</string>
     <string name="conversation_summary_picture">Conversation Summary Picture</string>
     <string name="title_activity_system_report">System Report</string>
 
     <!-- This appears on the menu for url viewing -->
     <string name="title_activity_accept_invite">Accept Sneer Invite</string>
-    <string name="action_share">Share Public Key</string>
+
 </resources>
