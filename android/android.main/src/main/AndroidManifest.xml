@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="sneer.main"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          android:installLocation="internalOnly">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="sneer.main"
+    android:installLocation="internalOnly">
 
-    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera" />
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- GCM (Google Cloud Messages) -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <permission
         android:name="sneer.main.C2D_MESSAGE"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
 
-    <uses-permission android:name="sneer.main.C2D_MESSAGE"/>
+    <uses-permission android:name="sneer.main.C2D_MESSAGE" />
 
     <application
         android:name="sneer.android.SneerApp"
@@ -29,49 +30,49 @@
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
+            android:value="@integer/google_play_services_version" />
 
         <receiver android:name="sneer.android.SneerBoot">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <receiver android:name="sneer.android.gcm.GcmBroadcastReceiver">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="sneer.main"/>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="sneer.main" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="sneer.android.gcm.GcmRegistrationAlarmReceiver"/>
+        <receiver android:name="sneer.android.gcm.GcmRegistrationAlarmReceiver" />
 
         <service
             android:name="sneer.android.ipc.SendMessage"
-            android:exported="true"/>
+            android:exported="true" />
         <service
             android:name="sneer.android.ipc.PartnerSessions"
-            android:exported="true"/>
+            android:exported="true" />
 
         <activity
             android:name="sneer.android.ui.ConvosActivity"
             android:theme="@style/AppThemeMaterial">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name="sneer.android.ui.ConvoActivity"
             android:label="@string/title_conversation"
-            android:theme="@style/AppThemeMaterial"
-            android:parentActivityName="sneer.android.ui.ConvosActivity" />
+            android:parentActivityName="sneer.android.ui.ConvosActivity"
+            android:theme="@style/AppThemeMaterial" />
 
         <activity
             android:name="sneer.android.ui.ConvoActivityWithTabs"
             android:label="@string/title_conversation"
-            android:theme="@style/AppThemeMaterial"
-            android:parentActivityName="sneer.android.ui.ConvosActivity" />
+            android:parentActivityName="sneer.android.ui.ConvosActivity"
+            android:theme="@style/AppThemeMaterial" />
 
         <activity
             android:name="sneer.android.ui.SystemReportActivity"
@@ -79,7 +80,7 @@
             android:parentActivityName="sneer.android.ui.ConvoActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.ConvoActivity"/>
+                android:value="sneer.android.ui.ConvoActivity" />
         </activity>
         <activity
             android:name="sneer.android.ui.AcceptInviteActivity"
@@ -88,18 +89,18 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.ConvoActivity"/>
+                android:value="sneer.android.ui.ConvoActivity" />
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
                     android:host="sneer.me"
                     android:pathPrefix="/public-key"
-                    android:scheme="http"/>
+                    android:scheme="http" />
             </intent-filter>
         </activity>
         <activity
@@ -109,7 +110,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.ConvoActivity"/>
+                android:value="sneer.android.ui.ConvoActivity" />
         </activity>
     </application>
 
