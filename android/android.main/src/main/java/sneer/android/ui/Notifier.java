@@ -36,7 +36,7 @@ public class Notifier {
 	public static void start(Context context) {
 		Notifier.context = context;
 		handler = new Handler(context.getMainLooper());
-		notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		resume();
 	}
@@ -44,23 +44,34 @@ public class Notifier {
 	public static void resume() {
 		Exceptions.check(context != null);
 
-		new AsyncTask<Void, Void, Void>() { @Override protected Void doInBackground(Void[] ignored) {
-			doResume(); return null;
-		}}.execute();
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void[] ignored) {
+				doResume();
+				return null;
+			}
+		}.execute();
 	}
 
 	public static void pause() {
-		new AsyncTask<Void, Void, Void>() { @Override protected Void doInBackground(Void[] ignored) {
-			doPause(); return null;
-		}}.execute();
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void[] ignored) {
+				doPause();
+				return null;
+			}
+		}.execute();
 	}
 
 	private static void doResume() {
 		if (isSubscribed()) return;
 
-		subscription = notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Notifications.Notification>() { @Override public void call(Notifications.Notification notification) {
-			refresh(notification);
-		}});
+		subscription = notifications().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Notifications.Notification>() {
+			@Override
+			public void call(Notifications.Notification notification) {
+				refresh(notification);
+			}
+		});
 	}
 
 	private static Observable<Notifications.Notification> notifications() {
@@ -104,11 +115,11 @@ public class Notifier {
 		cancelNotification();
 	}
 
-    private static void cancelNotification() {
-        handler.post(new Runnable() { public void run() {
-            notificationManager.cancel(TAG, NOTIFICATION_ID);
-        }});
-    }
+	private static void cancelNotification() {
+		handler.post(new Runnable() { public void run() {
+			notificationManager.cancel(TAG, NOTIFICATION_ID);
+		}});
+	}
 
 	private static void unsubscribe() {
 		subscription.unsubscribe();

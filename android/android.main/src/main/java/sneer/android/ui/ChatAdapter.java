@@ -27,50 +27,51 @@ import sneer.main.R;
 
 import static sneer.android.ui.SneerActivity.findTextView;
 
-public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickListener{
+public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickListener {
 
 	private final LayoutInflater inflater;
-    private String partyNick = "";
+	private String partyNick = "";
 
-    public ChatAdapter(Context context, LayoutInflater inflater) {
-        super(context, -1, new ArrayList<ChatMessage>());
+	public ChatAdapter(Context context, LayoutInflater inflater) {
+		super(context, -1, new ArrayList<ChatMessage>());
 		this.inflater = inflater;
-    }
+	}
 
-    public void update(String partyNick, List<ChatMessage> messages) {
-        this.partyNick = partyNick;
-        this.clear();
-        this.addAll(messages);
-        this.notifyDataSetChanged();
-    }
+	public void update(String partyNick, List<ChatMessage> messages) {
+		this.partyNick = partyNick;
+		this.clear();
+		this.addAll(messages);
+		this.notifyDataSetChanged();
+	}
 
-	@SuppressLint("ViewHolder") @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final ChatMessage message = this.getItem(position);
+	@SuppressLint("ViewHolder")
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		final ChatMessage message = this.getItem(position);
 
-        View view = convertView == null
-                ? inflater.inflate(message.isOwn ? R.layout.list_item_user_message : R.layout.list_item_party_message, parent, false)
-                : convertView;
+		View view = convertView == null
+				? inflater.inflate(message.isOwn ? R.layout.list_item_user_message : R.layout.list_item_party_message, parent, false)
+				: convertView;
 
-        updateView(message, view);
+		updateView(message, view);
 
-        return view;
-    }
+		return view;
+	}
 
-    private View updateView(final ChatMessage message, final View view) {
-        final TextView messageView = findTextView(view, R.id.messageContent);
+	private View updateView(final ChatMessage message, final View view) {
+		final TextView messageView = findTextView(view, R.id.messageContent);
 
-        SpannableString messageContent = new SpannableString(message.text);
+		SpannableString messageContent = new SpannableString(message.text);
 
-        messageView.setAutoLinkMask(Linkify.ALL);
-        messageView.setText(messageContent);
+		messageView.setAutoLinkMask(Linkify.ALL);
+		messageView.setText(messageContent);
 
-        findTextView(view, R.id.messageTime).setText(message.date);
+		findTextView(view, R.id.messageTime).setText(message.date);
 
-        setColors(view, partyNick, message.isOwn);
+		setColors(view, partyNick, message.isOwn);
 
-        return view;
-    }
+		return view;
+	}
 
 	private void setColors(View row, String partyNick, boolean own) {
 		int color;
@@ -120,8 +121,8 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickLis
 	}
 
 	@Override
-    public void onClick(View v) {
-        // do nothing
-    }
+	public void onClick(View v) {
+		// do nothing
+	}
 
 }

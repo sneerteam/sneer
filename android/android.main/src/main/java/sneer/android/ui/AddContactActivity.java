@@ -24,37 +24,39 @@ public class AddContactActivity extends Activity {
 	private Button btnSendInvite;
 
 	private String nickname;
-    private Convos convos;
+	private Convos convos;
 
-    @Override
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_contact);
 
-        convos = SneerAndroidContainer.component(Convos.class);
+		convos = SneerAndroidContainer.component(Convos.class);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		btnSendInvite = (Button) findViewById(R.id.btn_done);
 
-        btnSendInvite.setText("SEND INVITE >");
+		btnSendInvite.setText("SEND INVITE >");
 
-        btnSendInvite.setOnClickListener(new View.OnClickListener() {
+		btnSendInvite.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-                convos.startConvo(nickname).subscribe(new Subscriber<Long>() {
-                    @Override
-                    public final void onCompleted() {
-                    }
-                    @Override
-                    public final void onError(Throwable e) {
-                        toastOnMainThread(AddContactActivity.this, e.getMessage(), Toast.LENGTH_LONG);
-                    }
-                    @Override
-                    public final void onNext(Long convoId) {
-                        InviteSender.send(AddContactActivity.this, convoId);
-                        finish();
-                    }
-                });
+				convos.startConvo(nickname).subscribe(new Subscriber<Long>() {
+					@Override
+					public final void onCompleted() {
+					}
+
+					@Override
+					public final void onError(Throwable e) {
+						toastOnMainThread(AddContactActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+					}
+
+					@Override
+					public final void onNext(Long convoId) {
+						InviteSender.send(AddContactActivity.this, convoId);
+						finish();
+					}
+				});
 			}
 		});
 
@@ -67,20 +69,26 @@ public class AddContactActivity extends Activity {
 			public void afterTextChanged(Editable s) {
 				nickname = nicknameEdit.getText().toString();
 				ui(convos.problemWithNewNickname(nickname)).subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String error) {
-                        refreshNicknameProblem(error);
-                    }
-                });
+					@Override
+					public void call(String error) {
+						refreshNicknameProblem(error);
+					}
+				});
 			}
-			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
-			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
 		});
 	}
 
-    private void refreshNicknameProblem(String error) {
-        if (!nickname.isEmpty() && error != null) nicknameEdit.setError(error);
-        btnSendInvite.setEnabled(!nickname.isEmpty() && error == null);
-    }
+	private void refreshNicknameProblem(String error) {
+		if (!nickname.isEmpty() && error != null) nicknameEdit.setError(error);
+		btnSendInvite.setEnabled(!nickname.isEmpty() && error == null);
+	}
 
 }

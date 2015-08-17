@@ -24,9 +24,9 @@ class ConversationListAdapter extends ArrayAdapter<Summary> {
 	private final LayoutInflater inflater;
 
 	public ConversationListAdapter(Activity activity) {
-        super(activity, R.layout.list_item_main);
+		super(activity, R.layout.list_item_main);
 		inflater = activity.getLayoutInflater();
-    }
+	}
 
 	void update(List<Summary> summaries) {
 		clear();
@@ -37,8 +37,8 @@ class ConversationListAdapter extends ArrayAdapter<Summary> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView == null
-			? inflateConversationView(parent)
-			: convertView;
+				? inflateConversationView(parent)
+				: convertView;
 
 		updateConversation(position, view);
 		return view;
@@ -52,21 +52,21 @@ class ConversationListAdapter extends ArrayAdapter<Summary> {
 		Summary summary = getItem(position);
 
 //		ImageView pic     = findView(view, R.id.conversationPicture);
-		TextView  nickname   = findView(view, R.id.conversationNickname);
-		TextView  date    = findView(view, R.id.conversationDate);
-		TextView  unread  = findView(view, R.id.conversationUnread);
-		TextView  preview = findView(view, R.id.conversationSummary);
+		TextView nickname = findView(view, R.id.conversationNickname);
+		TextView date = findView(view, R.id.conversationDate);
+		TextView unread = findView(view, R.id.conversationUnread);
+		TextView preview = findView(view, R.id.conversationSummary);
 		preview.getPaint().setShader(textShader);
 
 		nickname.setText(summary.nickname);
 		preview.setText(summary.textPreview);
-		date   .setText(summary.date);
-		unread .setText(summary.unread);
+		date.setText(summary.date);
+		unread.setText(summary.unread);
 		unread.setVisibility(summary.unread.isEmpty() ? GONE : VISIBLE);
 	}
 
 	private final Shader textShader = new LinearGradient(200, 0, 650, 0,
-			new int[] {Color.DKGRAY, Color.LTGRAY},
-			new float[] {0, 1}, Shader.TileMode.CLAMP);
+			new int[]{Color.DKGRAY, Color.LTGRAY},
+			new float[]{0, 1}, Shader.TileMode.CLAMP);
 
 }

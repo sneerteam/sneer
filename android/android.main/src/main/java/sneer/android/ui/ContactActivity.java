@@ -76,7 +76,7 @@ public class ContactActivity extends Activity {
 		loadContact();
 		if (!newContact)
 			plug(nicknameEdit, contact.nickname().observable());
-		
+
 		validationOnTextChanged(nicknameEdit);
 	}
 
@@ -157,12 +157,18 @@ public class ContactActivity extends Activity {
 	private void validationOnTextChanged(final EditText editText) {
 		editText.addTextChangedListener(new TextWatcher() {
 
-			@Override public void afterTextChanged(Editable s) {
+			@Override
+			public void afterTextChanged(Editable s) {
 				nicknameEdit.setError(sneer().problemWithNewNickname(editText.getText().toString(), party));
 			}
 
-			@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
-			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
 		});
 	}
 

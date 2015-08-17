@@ -98,7 +98,7 @@ public class StartPluginDialogFragment extends DialogFragment {
     }
 
 
-    public static interface SingleConvoProvider {
+    public interface SingleConvoProvider {
         Convo getConvo();
     }
 
