@@ -1,7 +1,5 @@
 package sims.sneer.convos;
 
-import android.util.Log;
-
 import rx.Observable;
 import sneer.convos.Notifications;
 
@@ -12,7 +10,6 @@ public class NotificationsSim implements Notifications {
 
 	@Override
 	public Observable<Notification> get() {
-		Log.i(TAG, "get->called");
 		return Observable.just(notifications);
 	}
 
