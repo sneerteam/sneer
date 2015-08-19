@@ -33,14 +33,14 @@ sourceSets {
 
 dependencies {
   compile 'http-kit:http-kit:2.1.18'
-  compile 'ring:ring-core:1.3.2'
-  compile 'compojure:compojure:1.3.1'
+  compile 'ring:ring-core:1.4.0'
+  compile 'compojure:compojure:1.4.0'
   compile external['clojure.core']
   compile external['clojure.core.async']
   compile external['clojure.core.match']
   compile project(':core')
-  testCompile 'midje:midje:1.6.3'
-  testRuntime 'org.xerial:sqlite-jdbc:3.8.6'
+  testCompile 'midje:midje:1.7.0'
+  testRuntime 'org.xerial:sqlite-jdbc:3.8.11.1'
 }
 
 apply plugin: 'application'
