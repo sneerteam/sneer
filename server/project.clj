@@ -13,5 +13,4 @@
   :profiles {:uberjar {:aot :all}
              :dev {:dependencies [[midje "1.7.0"]
                                   [org.xerial/sqlite-jdbc "3.8.11.1"]]
-                   :plugins [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
-                             [lein-midje "3.1.3"]]}})
+                   :plugins [[lein-midje "3.1.3"]]}})
