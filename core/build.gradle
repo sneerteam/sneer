@@ -58,9 +58,9 @@ dependencies {
   }
   compile project(':crypto')
   compile project(':sneer-java-api')
-  testCompile 'midje:midje:1.6.3'
-  compile 'org.clojure:java.jdbc:0.3.6'
-  optional 'org.xerial:sqlite-jdbc:3.8.6'
+  testCompile 'midje:midje:1.7.0'
+  compile 'org.clojure:java.jdbc:0.4.1'
+  optional 'org.xerial:sqlite-jdbc:3.8.11.1'
 }
 
 
