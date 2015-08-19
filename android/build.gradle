@@ -29,3 +29,7 @@ allprojects {
         jcenter()
     }
 }
+
+configurations {
+    all*.exclude group: 'com.android.support', module: 'support-v4'
+}
