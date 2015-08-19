@@ -15,7 +15,7 @@
                  [org.clojure/java.jdbc "0.4.1"]]
 
   :profiles {:lean
-             {:dependencies [[org.skummet/clojure-android "1.7.0-alpha6" :use-resources true]]
+             {:dependencies [[org.skummet/clojure-android "1.7.0-alpha5-r2" :use-resources true]]
               :exclusions [[org.clojure/clojure]]
               :omit-source true
               :skummet-skip-vars []
