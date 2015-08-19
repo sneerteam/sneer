@@ -5,13 +5,13 @@
                  [http-kit "2.1.18"]
                  [org.clojure/core.match "0.2.2"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [org.clojure/clojure "1.7.0-alpha5"]
-                 [compojure "1.3.1"]
-                 [ring/ring-core "1.3.2"]]
+                 [org.clojure/clojure "1.7.0"]
+                 [compojure "1.4.0"]
+                 [ring/ring-core "1.4.0"]]
   :main ^:skip-aot sneer.server.main
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[midje "1.6.3"]
-                                  [org.xerial/sqlite-jdbc "3.8.6"]]
+             :dev {:dependencies [[midje "1.7.0"]
+                                  [org.xerial/sqlite-jdbc "3.8.11.1"]]
                    :plugins [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
                              [lein-midje "3.1.3"]]}})
