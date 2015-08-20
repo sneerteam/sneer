@@ -44,14 +44,25 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickLis
 		this.notifyDataSetChanged();
 	}
 
+
+	@Override
+	public int getViewTypeCount() {
+		return 2;
+	}
+
+	@Override
+	public int getItemViewType(int position) {
+		return getItem(position).isOwn ? 1 : 0;
+	}
+
 	@SuppressLint("ViewHolder")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		final ChatMessage message = this.getItem(position);
 
-		View view = convertView == null
-				? inflater.inflate(message.isOwn ? R.layout.list_item_user_message : R.layout.list_item_party_message, parent, false)
-				: convertView;
+		View view = convertView;
+		if (view == null)
+			view = inflater.inflate(getItemViewType(position) == 1 ? R.layout.list_item_user_message : R.layout.list_item_party_message, parent, false);
 
 		updateView(message, view);
 
@@ -80,17 +91,11 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickLis
 		if (own) {
 			color = darkColorDeterminedBy(partyNick);
 			View arrow = row.findViewById(R.id.speechBubbleArrowRight);
-			if (arrow == null)
-				System.out.println("speechBubbleArrowRight IS NULL!");
-			else
-				arrow.setBackground(new TriangleRightDrawable(color));  //Color.parseColor("#ce5343")
+			arrow.setBackground(new TriangleRightDrawable(color));  //Color.parseColor("#ce5343")
 		} else {
 			color = lightColorDeterminedBy(partyNick);
 			View arrow = row.findViewById(R.id.speechBubbleArrowLeft);
-			if (arrow == null)
-				System.out.println("speechBubbleArrowLeft IS NULL!");
-			else
-				arrow.setBackground(new TriangleLeftDrawable(color));
+			arrow.setBackground(new TriangleLeftDrawable(color));
 		}
 
 		LayerDrawable bubbleLayer = (LayerDrawable) speechBubble.getBackground();
