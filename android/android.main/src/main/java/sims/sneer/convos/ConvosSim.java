@@ -94,9 +94,30 @@ public class ConvosSim implements Convos {
 
     private List<ChatMessage> messages() {
 		return Arrays.asList(
-			new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
-			new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
-			new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"));
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
+				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
+				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
+				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago")
+		);
 	}
 
 	private static final String[] UNREAD_OPTIONS = {"?", "*", ""};
