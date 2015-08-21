@@ -66,7 +66,7 @@
 
 (defn- pipe-until-contact-has-puk! [contact-in state-out]
   (go-loop-trace []
-    (let [contact (<! contact-in)]
+    (when-let [contact (<! contact-in)]
       (if (contact :puk)
         contact
         (do
@@ -81,14 +81,14 @@
         tb (tuple-base-of admin)
         contact-in (tap-id (contacts/from container) id lease)]
     (go-trace
-      (let [contact (<! (pipe-until-contact-has-puk! contact-in state-out))
-            state (assoc contact :messages (sorted-set-by msg-ids))
-            [old-events new-events] (query-messages! tb own-puk (contact :puk) lease)
-            sessions-in (query-sessions! tb own-puk (contact :puk) lease)
-            _ (pipe contact-in new-events)
-            _ (pipe sessions-in new-events)
-            machine (state-machine (partial handle-event own-puk) state old-events new-events)]
-        (tap-state machine state-out)))))
+      (when-let [contact (<! (pipe-until-contact-has-puk! contact-in state-out))]
+        (let [state (assoc contact :messages (sorted-set-by msg-ids))
+              [old-events new-events] (query-messages! tb own-puk (contact :puk) lease)
+              sessions-in (query-sessions! tb own-puk (contact :puk) lease)
+              _ (pipe contact-in new-events)
+              _ (pipe sessions-in new-events)
+              machine (state-machine (partial handle-event own-puk) state old-events new-events)]
+          (tap-state machine state-out))))))
 
 (defn- ->ChatMessageList [messages pretty-time]
   (mapv (fn [{:keys [id text own? timestamp]}]
