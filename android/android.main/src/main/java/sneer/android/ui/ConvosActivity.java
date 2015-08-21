@@ -20,6 +20,7 @@ import static sneer.android.SneerAndroidContainer.component;
 public class ConvosActivity extends SneerActionBarActivity {
 
 	private final Convos convos = component(Convos.class);
+    private ConversationListAdapter adapter;
 	private Subscription subscription;
 
 
@@ -34,16 +35,24 @@ public class ConvosActivity extends SneerActionBarActivity {
         setUpConversationList();
 	}
 
-	@Override
+    @Override
+    protected void onStart() {
+        super.onStart();
+        subscription = ui(convos.summaries()).subscribe(new Action1<List<Summary>>() { @Override public void call(List<Summary> summaries) {
+            adapter.update(summaries);
+        }});
+    }
+
+    @Override
 	protected void onStop() {
-		if (subscription != null) subscription.unsubscribe();
+        if (subscription != null) subscription.unsubscribe();
 		super.onStop();
 	}
 
 	private void setUpConversationList() {
-		final ConversationListAdapter adapter = new ConversationListAdapter(this);
+        adapter = new ConversationListAdapter(this);
 
-		final ListView list = (ListView)findViewById(R.id.conversationList);
+        final ListView list = (ListView)findViewById(R.id.conversationList);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -52,10 +61,6 @@ public class ConvosActivity extends SneerActionBarActivity {
 				ConvoActivityWithTabs.open(ConvosActivity.this, convoId);
 			}
 		});
-
-		subscription = ui(convos.summaries()).subscribe(new Action1<List<Summary>>() { @Override public void call(List<Summary> summaries) {
-			adapter.update(summaries);
-		}});
 	}
 
 	@Override

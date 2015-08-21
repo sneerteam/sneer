@@ -40,7 +40,6 @@ import rx.functions.Action1;
 import sneer.convos.ChatMessage;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
-import sneer.convos.Notifications;
 import sneer.main.R;
 
 import static android.text.TextUtils.isEmpty;
@@ -92,7 +91,8 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 
 	private void refresh() {
-		actionBar.setTitle(currentConvo.nickname);
+        System.out.println(">> > > > > REFRESH");
+        actionBar.setTitle(currentConvo.nickname);
 
 		refreshInvitePendingMessage();
 		refreshChatMessages();
@@ -273,7 +273,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 	@Override
 	protected void onPause() {
-		unsubscribeToConvo();
+		unsubscribeFromConvo();
 		super.onPause();
 	}
 
@@ -287,7 +287,6 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 
 	private void subscribeToConvo() {
-		if (convoSubscription != null) return;
 		convoSubscription = ui(convoObservable).subscribe(new Action1<Convo>() {
 			@Override
 			public void call(Convo convo) {
@@ -298,10 +297,9 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 	}
 
 
-	private void unsubscribeToConvo() {
-		convoSubscription.unsubscribe();
-		convoSubscription = null;
-		currentConvo = null;
+	private void unsubscribeFromConvo() {
+        if (convoSubscription != null)
+            convoSubscription.unsubscribe();
 	}
 
 
