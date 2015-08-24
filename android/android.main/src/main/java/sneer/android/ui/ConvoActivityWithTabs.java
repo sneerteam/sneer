@@ -61,6 +61,8 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 	private ViewPager viewPager;
 	private ViewPagerAdapter viewPagerAdapter;
 
+	private TextView waiting;
+
 	private View chatView;
 	private ImageButton messageButton;
 	private EditText messageInput;
@@ -75,6 +77,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 		convoId = getIntent().getLongExtra("id", -1);
 		convoObservable = component(Convos.class).getById(convoId);
+
 		setupToolbar();
 		setupViewPager();
 
@@ -83,6 +86,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 		setupTabLayout();
 	}
+
 
 	private void setupTabLayout() {
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -105,7 +109,6 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 	private void refreshInvitePendingMessage() {
 		boolean pending = currentConvo.inviteCodePending != null;
-		final TextView waiting = (TextView) chatView.findViewById(R.id.waitingMessage);
 		final View messageList = chatView.findViewById(R.id.messageList);
 		final View messageSender = chatView.findViewById(R.id.messageSender);
 		messageButton.setEnabled(!pending);
@@ -159,6 +162,8 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 	private void setupChatTab() {
 		chatView = getLayoutInflater().inflate(R.layout.fragment_conversation_chat, viewPager, false);
+		waiting = (TextView) chatView.findViewById(R.id.waitingMessage);
+		waiting.setVisibility(View.GONE);
 		setupChatMessagesList();
 		setupChatMessageFields();
 		Fragment chatFragment = new Fragment() {
@@ -298,8 +303,8 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 
 	private void unsubscribeFromConvo() {
-        if (convoSubscription != null)
-            convoSubscription.unsubscribe();
+		if (convoSubscription != null)
+			convoSubscription.unsubscribe();
 	}
 
 
