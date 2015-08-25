@@ -72,4 +72,12 @@ RUN cd ~ \
  && cd bin \
  && wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein \
  && chmod a+x ~/bin/lein \
- && lein
+ && lein \
+ && echo y | lein downgrade 2.4.3
+
+# Install Cursive
+RUN mkdir -p /home/developer/.AndroidStudio1.3/config/plugins/ \
+ && cd /home/developer/.AndroidStudio1.3/config/plugins/ \
+ && curl -L https://cursiveclojure.com/cursive-14.1-0.1.59.zip > cursive.zip \
+ && unzip cursive.zip \
+ && ls
