@@ -1,0 +1,23 @@
+#!/bin/bash
+
+for dir in .studio-home .gradle .idea .android/avd .lein; do
+  mkdir -p .docker-dev/$dir
+done
+
+CURRENT_DIR=`pwd`
+
+xhost +
+set -x
+docker run -ti --rm \
+          --net=host \
+          --name studio \
+          --privileged \
+          -e DISPLAY \
+          -v /tmp/.X11-unix:/tmp/.X11-unix \
+          -v $CURRENT_DIR:/workspace \
+          -v $CURRENT_DIR/.docker-dev/.studio-home:/home/developer/.AndroidStudio1.3 \
+          -v $CURRENT_DIR/.docker-dev/.android/avd:/home/developer/.android/avd \
+          sneerteam/android-studio \
+          /bin/studio
+set +x
+xhost -
