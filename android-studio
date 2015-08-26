@@ -14,7 +14,7 @@ docker run -ti --rm \
           --privileged \
           -e DISPLAY \
           -v /tmp/.X11-unix:/tmp/.X11-unix \
-          -v $CURRENT_DIR:/workspace \
+          -v $CURRENT_DIR:/home/developer/sneer \
           -v $CURRENT_DIR/.docker-dev/.studio-home:/home/developer/.AndroidStudio1.3 \
           -v $CURRENT_DIR/.docker-dev/.android/avd:/home/developer/.android/avd \
           sneerteam/android-studio \
