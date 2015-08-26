@@ -56,12 +56,16 @@
         new-msgs (async/merge [new-sent new-rcvd])]
     [old-msgs new-msgs]))
 
+(defn- query-session-tuples [tb author audience tuples-out lease]
+  (let [criteria {"type"     "session"
+                  "author"   author
+                  "audience" audience}]
+    (query-tuples tb criteria tuples-out lease)))
+
 (defn- query-sessions! [tb own-puk contact-puk lease]
-  (let [tuples-out (chan 1)
-        criteria {"type"     "session"
-                  "author"   own-puk
-                  "audience" contact-puk}]
-    (query-tuples tb criteria tuples-out lease)
+  (let [tuples-out (chan 1)]
+    (query-session-tuples tb own-puk contact-puk tuples-out lease)
+    (query-session-tuples tb contact-puk own-puk tuples-out lease)
     tuples-out))
 
 (defn- pipe-until-contact-has-puk! [contact-in state-out]
