@@ -21,8 +21,8 @@
     [sneer.flux Dispatcher]
     [sneer.admin SneerAdmin]))
 
-(defn- to-foreign-summary [pretty-time {:keys [nick summary timestamp unread id]}]
-  (Summary. nick summary (pretty-time timestamp) (str unread) id))
+(defn- to-foreign-summary [pretty-time {:keys [nick preview timestamp unread id]}]
+  (Summary. nick preview (pretty-time timestamp) (str unread) id))
 
 (defn- to-foreign [summaries]
   (mapv (partial to-foreign-summary (time/pretty-printer))

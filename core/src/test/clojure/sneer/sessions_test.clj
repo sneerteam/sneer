@@ -7,16 +7,14 @@
   (:import [sneer.convos Convos SessionSummary]
            [sneer.flux Dispatcher]))
 
+(defn extract [coll & fields]
+  (map (comp (apply juxt fields) ->clj)
+       coll))
+
 (defn sessions [sneer convo-id]
   (rx/map
    #(.sessionSummaries %)
    (.getById (sneer Convos) convo-id)))
-
-(defn session-id [^SessionSummary ss]
-  (.id ss))
-
-(defn session-title [^SessionSummary ss]
-  (.title ss))
 
 (facts "About sessions"
   (let [{:keys [neide carla n->c c->n]} (neide-and-carla)
@@ -30,6 +28,10 @@
       (fact "And then Neide said, start a session"
         (let [start-session   (.startSession n->c "candy-crush")
               n->c-session-id (<next (.request (neide Dispatcher) start-session))]
-          (neide-sessions) => (emits #(->> %
-                                           (map (juxt session-id session-title))
-                                           (= [[n->c-session-id "candy-crush"]]))))))))
+          (neide-sessions) => (emits #(-> % (extract :id :type)
+                                            (= [[n->c-session-id "candy-crush"]])))))
+
+      (fact "Carla sees unread session message"
+        (let [c-convos (carla Convos)]
+          (. c-convos summaries) => (emits #(-> % (extract :nickname :textPreview :unread)
+                                                  (= [["Neide" "candy-crush" "*"]]))))))))

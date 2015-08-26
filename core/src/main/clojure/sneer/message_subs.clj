@@ -23,5 +23,6 @@
     (go-loop-trace [subscribed-puks #{}]
       (when-some [puks (<! contacts-puks)]
         (doseq [puk (difference puks subscribed-puks)]
-          (store-sub tuple-base own-puk {"type" "message" "audience" own-puk "author" puk}))
+          (doseq [type ["message" "session" "session-message"]]
+            (store-sub tuple-base own-puk {"type" type "audience" own-puk "author" puk})))
         (recur puks)))))

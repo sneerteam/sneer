@@ -38,24 +38,27 @@
     (assoc :last-received id)
     (update :unread #(unread-status label %))))
 
-(defn- update-summary [own? message old-summary]
-  (let [label     (message "label")
-        timestamp (message "timestamp")]
+(defn- update-summary-from [label-field own? tuple old-summary]
+  (let [label     (tuple label-field)
+        timestamp (tuple "timestamp")]
     (->
-      (if own?
-        old-summary
-        (update-with-received (message "original_id") label old-summary))
-      (assoc
-        :preview (or label "")
-        :timestamp timestamp))))
+     (if own?
+       old-summary
+       (update-with-received (tuple "original_id") label old-summary))
+     (assoc
+      :preview (or label "")
+      :timestamp timestamp))))
 
-(defn- handle-message [own-puk state message]
+(defn- update-summary-from-tuple [label-field own-puk state message]
   (let [author (message "author")
         own? (= author own-puk)
         contact-puk (if own? (message "audience") author)]
     (update-in state
                [:puk->summary contact-puk]
-               #(update-summary own? message %))))
+               #(update-summary-from label-field own? message %))))
+
+(defn- handle-message [own-puk state message]
+  (update-summary-from-tuple "label" own-puk state message))
 
 (defn- update-with-read [summary tuple]
   (let [msg-id (tuple "payload")]
@@ -69,6 +72,12 @@
       (update-in [:puk->summary contact-puk]
                  update-with-read tuple))))
 
+(defn- handle-session-message [own-puk state message]
+  (update-summary-from-tuple "label" own-puk state message))
+
+(defn- handle-session [own-puk state tuple]
+  (update-summary-from-tuple "session-type" own-puk state tuple))
+
 (defn handle-event [own-puk state event]
   (let [type (event "type")]
     (if (= type :contacts)
@@ -77,6 +86,8 @@
        (case type
          "message"      (handle-message      own-puk state event)
          "message-read" (handle-read-receipt own-puk state event)
+         "session"         (handle-session own-puk state event)
+         "session-message" (handle-session-message own-puk state event)
          state)
        (assoc :last-id (event "id"))))))
 

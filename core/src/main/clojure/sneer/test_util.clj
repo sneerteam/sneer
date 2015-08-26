@@ -7,6 +7,10 @@
     [sneer.rx :refer [observe-for-io subscribe-on-io]])
   (:import [java.io File]))
 
+(defn ->clj [o]
+  (into {} (map (fn [f] [(keyword (.getName f)) (.get f o)])
+                (.getFields (class o)))))
+
 (defn tmp-file []
   (doto
     (File/createTempFile "test-" ".tmp")
