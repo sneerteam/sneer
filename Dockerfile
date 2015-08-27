@@ -1,11 +1,12 @@
 FROM ubuntu:14.04
+MAINTAINER "Felipe Bueno" <bueno.felipe@gmail.com>
 
-# Development user
+# Create development user
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     && useradd -u 1000 -G sudo -d /home/developer --shell /bin/bash -m developer \
     && echo "secret\nsecret" | passwd developer
 
-# Basic packages and Java 8
+# Basic packages and Oracle Java 8
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
                       blackbox \
@@ -79,5 +80,4 @@ RUN cd ~ \
 RUN mkdir -p /home/developer/.AndroidStudio1.3/config/plugins/ \
  && cd /home/developer/.AndroidStudio1.3/config/plugins/ \
  && curl -L https://cursiveclojure.com/cursive-14.1-0.1.59.zip > cursive.zip \
- && unzip cursive.zip \
- && ls
+ && unzip cursive.zip
