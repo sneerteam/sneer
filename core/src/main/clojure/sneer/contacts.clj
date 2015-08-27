@@ -17,17 +17,20 @@
 
 (def handle ::contacts)
 
-(defn from [^Container container]
-  (.produce container handle))
+(defn- produce [^Container con class]
+  (.produce con class))
+
+(defn from [container]
+  (produce container handle))
 
 (defn- puk [^SneerAdmin admin]
   (.. admin privateKey publicKey))
 
 (defn- own-puk [container]
-  (puk (.produce container SneerAdmin)))
+  (puk (produce container SneerAdmin)))
 
-(defn- -store-tuple! [container tuple]
-  (let [admin (.produce container SneerAdmin)
+(defn- -store-tuple! [^Container container tuple]
+  (let [admin (produce container SneerAdmin)
         own-puk (puk admin)
         tuple-base (tuple-base-of admin)
         defaults {"timestamp" (now)
@@ -133,12 +136,12 @@
     (assoc state :last-id (tuple "id"))))
 
 (defn- tuple-base [container]
-  (tuple-base-of (.produce container SneerAdmin)))
+  (tuple-base-of (produce container SneerAdmin)))
 
 (defn- tuple-machine! [container]
   (let [old-tuples (chan 1)
         new-tuples (chan 1)
-        lease (.produce container :lease)
+        lease (produce container :lease)
         own-puk (own-puk container)]
     (query-with-history (tuple-base container) {#_after-id #_starting-id} old-tuples new-tuples lease)
     (state-machine (partial handle-tuple own-puk) {:last-id 0} old-tuples new-tuples)))
@@ -214,7 +217,7 @@
 (defn- handle-actions! [container tuple-machine]
   (let [states (tap-state tuple-machine)
         actions (chan 1)]
-    (tap-actions (.produce container Dispatcher) actions)
+    (tap-actions (produce container Dispatcher) actions)
 
     (go-loop-trace [state (<! states)]
       (when state
@@ -250,4 +253,4 @@
   (let [machine (tuple-machine! container)]
     (handle-actions! container machine)
     {:machine    machine
-     :dispatcher (.produce container Dispatcher)}))
+     :dispatcher (produce container Dispatcher)}))

@@ -10,7 +10,7 @@
            [sneer.commons SystemReport]
            [sneer.admin SneerAdmin]))
 
-(defn- resolved-address!! [host port]
+(defn- resolved-address!! [^String host ^Long port]
   (let [ret (InetSocketAddress. host port)]
     (if (.isUnresolved ret)
       (do

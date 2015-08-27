@@ -42,14 +42,14 @@
     (DatagramSocket. ^int port)
     (DatagramSocket.)))
 
-(defn- close-socket [port socket]
+(defn- close-socket [port ^DatagramSocket socket]
   (when (is-open socket)
     (when port (println "Closing port" port))
     (try
       (.close socket)
       (catch Exception _ :ignored))))
 
-(defn on-open-error [exception]
+(defn on-open-error [^Throwable exception]
   (println "Error opening socket:")
   (.printStackTrace exception)
   (SystemReport/updateReport "network/open" exception)
