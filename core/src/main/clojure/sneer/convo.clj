@@ -28,11 +28,11 @@
 (defn- handle-contact [state contact]
   (merge state contact))
 
-(defn- handle-session [own-puk state {:strs [original_id session-type timestamp]}]
-  (update-in state
-             [:sessions]
-             (fnil conj [])
-             {:id original_id :type session-type :timestamp timestamp}))
+(defn- handle-session [own-puk state {:strs [original_id session-type author timestamp]}]
+  (update-in state [:sessions] (fnil conj []) {:id original_id
+                                               :type session-type
+                                               :own? (= author own-puk)
+                                               :timestamp timestamp}))
 
 (defn- handle-event [own-puk state event]
   (case (event "type")
@@ -100,8 +100,8 @@
         messages))
 
 (defn- ->SessionSummaryList [sessions pretty-time]
-  (mapv (fn [{:keys [id type timestamp]}]
-          (SessionSummary. id type type (pretty-time timestamp) ""))
+  (mapv (fn [{:keys [id type own? timestamp]}]
+          (SessionSummary. id type own? type (pretty-time timestamp) ""))
         sessions))
 
 ; Convo(long contactId, String nickname, String inviteCodePending, List<ChatMessage> messages, List<SessionSummary> sessionSummaries)

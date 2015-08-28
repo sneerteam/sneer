@@ -166,11 +166,6 @@ public class SneerAndroidImpl implements SneerAndroid {
 		return Plugins.all(context);
 	}
 
-	@Override
-	public void startActivity(Plugin plugin, Convo convo) {
-		PluginActivities.start(context, plugin, convo);
-	}
-
 
 	@Override
 	public Sneer sneer() {

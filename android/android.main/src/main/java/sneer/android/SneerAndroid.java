@@ -18,7 +18,6 @@ public interface SneerAndroid {
 	boolean checkOnCreate(Activity activity);
 
 	List<Plugin> plugins();
-	void startActivity(Plugin plugin, Convo convo);
 
 	boolean isClickable(ConversationItem item);
 	void doOnClick(ConversationItem item, Convo convo);

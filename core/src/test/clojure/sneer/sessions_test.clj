@@ -43,3 +43,5 @@
         (let [c-convos (carla Convos)]
           (. c-convos summaries) => (emits #(-> % (extract :nickname :textPreview :unread)
                                                   (= [["Neide" "candy-crush" "*"]]))))))))
+
+;TODO: Move convo.startSession to Sessions.startSession(convoId)

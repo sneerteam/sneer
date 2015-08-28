@@ -70,10 +70,10 @@ public class ConvosSim implements Convos {
 
 	private List<SessionSummary> newSessionSummaries() {
 		SessionSummary[] sums = new SessionSummary[]{
-			new SessionSummary(1, "chess", "Chess game, your turn", "6 minutes ago", "*"),
-			new SessionSummary(2, "shopping", "Shopping List", "1 hour ago", "*"),
-			new SessionSummary(3, "torogo", "ToroGo game (you won)", "3 days ago", ""),
-			new SessionSummary(4, "snitcoin", "SnitCoin transfer received", "1 week ago", "")
+			new SessionSummary(1, "chess", true, "Chess game, your turn", "6 minutes ago", "*"),
+			new SessionSummary(2, "shopping", false, "Shopping List", "1 hour ago", "*"),
+			new SessionSummary(3, "torogo", true, "ToroGo game (you won)", "3 days ago", ""),
+			new SessionSummary(4, "snitcoin", false, "SnitCoin transfer received", "1 week ago", "")
 		};
 		return Arrays.asList(sums);
 	}

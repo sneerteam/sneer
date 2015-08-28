@@ -20,6 +20,7 @@ import sneer.Session;
 import sneer.android.impl.Envelope;
 import sneer.android.impl.IPCProtocol;
 import sneer.commons.exceptions.Exceptions;
+import sneer.convos.SessionHandle;
 
 import static android.os.Message.obtain;
 import static sneer.android.impl.Envelope.envelope;
@@ -107,10 +108,10 @@ public class PartnerSessions extends Service {
 		}
 	}
 
-	public static Intent intentFor(Session session) {
+	public static Intent intentFor(SessionHandle session) {
 		return new Intent()
 				.setClassName("sneer.main", PartnerSessions.class.getName())
-				.putExtra(TOKEN, session.id());
+				.putExtra(TOKEN, session.id);
 	}
 
 	public static void init(Conversations conversations) {

@@ -1,14 +1,14 @@
 package sneer.convos;
 
-public class SessionSummary {
+public class SessionSummary extends SessionHandle {
 
-    public final long id;
-    public final String type;
     public final String title;
     public final String date;
     public final String unread;
 
-    public SessionSummary(long id, String type, String title, String date, String unread) { this.id = id; this.type = type; this.title = title; this.date = date; this.unread = unread; }
+    public SessionSummary(long id, String type, boolean isOwn, String title, String date, String unread) {
+        super(id, type, isOwn);
+        this.title = title; this.date = date; this.unread = unread; }
 
     @Override
     public String toString() {
