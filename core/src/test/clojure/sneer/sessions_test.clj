@@ -4,7 +4,7 @@
             [sneer.test-util :refer :all]
             [sneer.neide-and-carla :refer :all]
             [midje.sweet :refer :all])
-  (:import [sneer.convos Convos SessionSummary]
+  (:import [sneer.convos Convos Sessions$Actions]
            [sneer.flux Dispatcher]))
 
 (defn extract [coll & fields]
@@ -13,8 +13,8 @@
 
 (defn sessions [sneer convo-id]
   (rx/map
-   #(.sessionSummaries %)
-   (.getById (sneer Convos) convo-id)))
+    #(.sessionSummaries %)
+    (.getById (sneer Convos) convo-id)))
 
 (defn emits-sessions [fields expected]
   (emits #(= expected (apply extract % fields))))
@@ -30,7 +30,7 @@
         (neide-sessions) => (emits empty?))
 
       (fact "And then Neide said, start a session"
-        (let [start-session   (.startSession n->c "candy-crush")
+        (let [start-session   (Sessions$Actions/startSession (.id n->c) "candy-crush")
               n->c-session-id (<next (.request (neide Dispatcher) start-session))]
           (neide-sessions) => (emits-sessions [:id :type]
                                               [[n->c-session-id "candy-crush"]])))
@@ -43,5 +43,3 @@
         (let [c-convos (carla Convos)]
           (. c-convos summaries) => (emits #(-> % (extract :nickname :textPreview :unread)
                                                   (= [["Neide" "candy-crush" "*"]]))))))))
-
-;TODO: Move convo.startSession to Sessions.startSession(convoId)
