@@ -9,32 +9,35 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
 # Basic packages and Oracle Java 8
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+                      bison \
                       blackbox \
                       build-essential \
                       curl \
-                      bison \
                       git \
                       gperf \
-                      lib32gcc1 \
                       lib32bz2-1.0 \
+                      lib32gcc1 \
                       lib32ncurses5 \
                       lib32stdc++6 \
                       lib32z1 \
+                      libX11-dev \
                       libc6-i386 \
+                      libxext-dev \
                       libxml2-utils \
-                      make \
+                      libxrender-dev \
+                      libxtst-dev \
                       software-properties-common \
-                      unzip \
-                      libX11-dev libxext-dev libxrender-dev libxtst-dev
-    RUN add-apt-repository ppa:webupd8team/java \
-    && apt-get update \
-    && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections \
-    && apt-get install -y oracle-java8-installer \
-                      ca-certificates-java \
-    && sudo apt-get install oracle-java8-set-default \
-    && apt-get clean \
-    && apt-get autoremove \
-    && rm -rf /var/lib/apt/lists/*
+                      unzip
+
+RUN add-apt-repository ppa:webupd8team/java \
+ && apt-get update \
+ && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections \
+ && apt-get install -y oracle-java8-installer \
+                       ca-certificates-java \
+ && sudo apt-get install oracle-java8-set-default \
+ && apt-get clean \
+ && apt-get autoremove \
+ && rm -rf /var/lib/apt/lists/*
 
 # Set things up using the dev user and reduce the need for `chown`s
 USER developer
@@ -75,9 +78,3 @@ RUN cd ~ \
  && chmod a+x ~/bin/lein \
  && lein \
  && echo y | lein downgrade 2.4.3
-
-# Install Cursive
-RUN mkdir -p /home/developer/.AndroidStudio1.3/config/plugins/ \
- && cd /home/developer/.AndroidStudio1.3/config/plugins/ \
- && curl -L https://cursiveclojure.com/cursive-14.1-0.1.59.zip > cursive.zip \
- && unzip cursive.zip
