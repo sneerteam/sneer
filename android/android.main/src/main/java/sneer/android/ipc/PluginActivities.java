@@ -8,6 +8,7 @@ import rx.functions.Action1;
 import sneer.android.utils.AndroidUtils;
 import sneer.convos.Convo;
 import sneer.convos.SessionHandle;
+import sneer.convos.Sessions;
 
 import static sneer.android.SneerAndroidFlux.request;
 import static sneer.android.impl.IPCProtocol.IS_OWN;
@@ -35,7 +36,7 @@ public class PluginActivities {
 		intent.putExtra(SEND_MESSAGE, SendMessage.intentFor(convo));
 
 		if (plugin.partnerSessionType != null && session == null)
-			request(convo.startSession(plugin.partnerSessionType)).subscribe(new Action1<Long>() {
+			request(Sessions.Actions.startSession(convo.id, plugin.partnerSessionType)).subscribe(new Action1<Long>() {
 				@Override
 				public void call(Long sessionId) {
 					startActivity(context, intent, new SessionHandle(sessionId, plugin.partnerSessionType, true));

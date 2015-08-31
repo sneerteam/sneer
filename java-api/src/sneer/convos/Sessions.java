@@ -19,7 +19,7 @@ public interface Sessions {
 
 		public static Action sendMessage(long sessionId, Object payload) { return action("send-session-message", "session-id", sessionId, "payload", payload); }
 
-		public Request<Long> startSession(long contactId, String sessionType) { return request("start-session", "contact-id", contactId, "session-type", sessionType); }
+		public static Request<Long> startSession(long contactId, String sessionType) { return request("start-session", "contact-id", contactId, "session-type", sessionType); }
 
 	}
 }

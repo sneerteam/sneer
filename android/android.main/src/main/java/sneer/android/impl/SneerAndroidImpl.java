@@ -181,7 +181,8 @@ public class SneerAndroidImpl implements SneerAndroid {
 	@Override
 	public void doOnClick(ConversationItem item, Convo convo) {
 		if (item instanceof Session)
-			PluginActivities.open(context, (Session)item, convo);
+			//PluginActivities.open(context, (Session)item, convo);
+			System.out.println("CHANGE TO NEW SESSION COMPONENTS.");
 		else
 			Toast.makeText(context, "Message clicked: " + item, Toast.LENGTH_LONG).show();
 	}
