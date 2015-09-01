@@ -8,8 +8,9 @@
   (:import [java.io File]))
 
 (defn ->clj [o]
-  (into {} (map (fn [f] [(keyword (.getName f)) (.get f o)])
-                (.getFields (class o)))))
+  (when (some? o)
+    (into {} (map (fn [field] [(keyword (.getName field)) (.get field o)])
+                  (.getFields (class o))))))
 
 (defn tmp-file []
   (doto
