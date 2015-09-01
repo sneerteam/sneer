@@ -73,7 +73,7 @@
                  update-with-read tuple))))
 
 (defn- handle-session-message [own-puk state message]
-  (update-summary-from-tuple "label" own-puk state message))
+  (update-summary-from-tuple "type" own-puk state message))
 
 (defn- handle-session [own-puk state tuple]
   (update-summary-from-tuple "session-type" own-puk state tuple))

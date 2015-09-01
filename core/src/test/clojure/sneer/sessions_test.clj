@@ -1,11 +1,14 @@
 (ns sneer.sessions-test
   (:require [rx.lang.clojure.core :as rx]
             [sneer.convos]
+            [sneer.sessions]
             [sneer.test-util :refer :all]
             [sneer.neide-and-carla :refer :all]
             [midje.sweet :refer :all])
-  (:import [sneer.convos Convos Sessions$Actions]
-           [sneer.flux Dispatcher]))
+  (:import [sneer.convos Convos Sessions Sessions$Actions]
+           [sneer.flux Dispatcher]
+           [sneer.rx Timeline]
+           [rx Observable]))
 
 (defn extract [coll & fields]
   (map (comp (apply juxt fields) ->clj)
@@ -18,6 +21,16 @@
 
 (defn emits-sessions [fields expected]
   (emits #(= expected (apply extract % fields))))
+
+(defn play [^Timeline timeline]
+  (->> (rx/concat (.past timeline)
+                  (.future timeline))
+       (rx/filter some?)))
+
+(defn first-session [^Observable sessions]
+  (->> sessions
+       (rx/map first)
+       (rx/filter some?)))
 
 (facts "About sessions"
   (let [{:keys [neide carla n->c c->n]} (neide-and-carla)
@@ -42,4 +55,13 @@
       (fact "Carla sees unread session summary"
         (let [c-convos (carla Convos)]
           (. c-convos summaries) => (emits #(-> % (extract :nickname :textPreview :unread)
-                                                  (= [["Neide" "candy-crush" "*"]]))))))))
+                                                  (= [["Neide" "candy-crush" "*"]])))))
+
+      (fact "Carla sees unread message"
+        (let [n->c-session (<next (first-session (neide-sessions)))
+              c->n-session (<next (first-session (carla-sessions)))
+              payload 42]
+          (.dispatch (neide Dispatcher)
+                     (Sessions$Actions/sendMessage (.id n->c-session) payload))
+          (let [timeline (.messages (carla Sessions) (.id c->n-session))]
+            (rx/map ->clj (play timeline)) => (emits {:payload payload :isOwn false})))))))

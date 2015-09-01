@@ -7,11 +7,12 @@
             sneer.convos
             sneer.convo-summarization
             sneer.message-subs
-            sneer.notifications)
+            sneer.notifications
+            sneer.sessions)
   (:import [sneer.commons Startup]))
 
 (defn- start-components! [container]
-  (mapv #(.produce container %) [sneer.contacts/handle])
+  (mapv #(.produce container %) [sneer.contacts/handle sneer.convos.Sessions])
   (reify Startup))
 
 (defn -load [_this component-handle container]
@@ -37,6 +38,9 @@
 
     sneer.convos.Convos
     (sneer.convos/reify-Convos container)
+
+    sneer.convos.Sessions
+    (sneer.sessions/reify-Sessions container)
 
     sneer.convos.Notifications
     (sneer.notifications/reify-Notifications container)
