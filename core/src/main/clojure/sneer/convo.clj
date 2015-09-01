@@ -4,6 +4,7 @@
             [clojure.core.async :as async :refer [<! >! chan alts! pipe]]
             [sneer.async :refer [state-machine tap-state go-trace go-loop-trace sliding-chan close-with!]]
             [sneer.contacts :as contacts :refer [tap-id]]
+            [sneer.queries :refer [query-convo-tuples]]
             [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe!]]
             [sneer.time :as time]
             [sneer.tuple.protocols :refer :all]
@@ -40,22 +41,6 @@
     "session" (handle-session own-puk state event)
     (handle-contact state event)))
 
-(defn- query-messages-by! [tuple-base author-puk audience-puk lease]
-  (let [old (chan 1)
-        new (chan 1)
-        criteria {"type"     "message"
-                  "author"   author-puk
-                  "audience" audience-puk}]
-    (query-with-history tuple-base criteria old new lease)
-    [old new]))
-
-(defn- query-messages! [tb own-puk contact-puk lease]
-  (let [[old-sent new-sent] (query-messages-by! tb own-puk contact-puk lease)
-        [old-rcvd new-rcvd] (query-messages-by! tb contact-puk own-puk lease)
-        old-msgs (async/merge [old-sent old-rcvd])
-        new-msgs (async/merge [new-sent new-rcvd])]
-    [old-msgs new-msgs]))
-
 (defn- query-session-tuples [tb author audience tuples-out lease]
   (let [criteria {"type"     "session"
                   "author"   author
@@ -87,7 +72,7 @@
     (go-trace
       (when-let [contact (<! (pipe-until-contact-has-puk! contact-in state-out))]
         (let [state (assoc contact :messages (sorted-set-by msg-ids))
-              [old-events new-events] (query-messages! tb own-puk (contact :puk) lease)
+              [old-events new-events] (query-convo-tuples tb {"type" "message"} own-puk (contact :puk) lease)
               sessions-in (query-sessions! tb own-puk (contact :puk) lease)
               _ (pipe contact-in new-events)
               _ (pipe sessions-in new-events)
