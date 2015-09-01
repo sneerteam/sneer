@@ -20,9 +20,11 @@
 (defn tmp-folder []
   (doto (tmp-file) (.mkdir)))
 
+(def ^:private default-timeout 400)
+
 (defn >!!?
   ([ch v]
-    (>!!? ch v 200))
+    (>!!? ch v default-timeout))
   ([ch v timeout-millis]
     (alt!!
       (timeout timeout-millis) (throw (RuntimeException. (str "TIMEOUT putting: " v)))
@@ -30,7 +32,7 @@
 
 (defn <!!?
   ([ch]
-    (<!!? ch 200))
+    (<!!? ch default-timeout))
   ([ch timeout-millis]
     (alt!!
       (timeout timeout-millis) :timeout
