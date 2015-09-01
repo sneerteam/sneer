@@ -1,7 +1,7 @@
 (ns sneer.keys
   (:import [sneer.crypto.impl KeysImpl]))
 
-(def ^:private keys-impl (KeysImpl.))
+(def ^:private ^KeysImpl keys-impl (KeysImpl.))
 
 (defn create-prik []
   (.createPrivateKey keys-impl))

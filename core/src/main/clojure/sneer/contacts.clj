@@ -231,8 +231,11 @@
               (when action
                 (<! (handle-action! container states state action))))))))))
 
+(defn- dispatch [contacts request]
+  (.request ^Dispatcher (contacts :dispatcher) request))
+
 (defn problem-with-new-nickname [contacts nick]
-  (.request (contacts :dispatcher) (request "problem-with-new-nickname" "nick" nick)))
+  (dispatch contacts (request "problem-with-new-nickname" "nick" nick)))
 
 (defn invite-code [contacts id]
   (obs-tap (contacts :machine) "invite-code tap" (map #(encode-nil (-invite-code id %)))))
@@ -241,13 +244,13 @@
   (obs-tap (contacts :machine) "nickname tap" (map #(-nickname id %))))
 
 (defn new-contact [contacts nick]
-  (.request (contacts :dispatcher) (request "new-contact" "nick" nick)))
+  (dispatch contacts (request "new-contact" "nick" nick)))
 
 (defn accept-invite [contacts nick puk-hex invite-code-received]
-  (.request (contacts :dispatcher) (request "accept-invite" "nick" nick "puk-hex" puk-hex "invite-code-received" invite-code-received)))
+  (dispatch contacts (request "accept-invite" "nick" nick "puk-hex" puk-hex "invite-code-received" invite-code-received)))
 
 (defn find-convo [contacts inviter-puk]
-  (.request (contacts :dispatcher) (request "find-convo" "inviter-puk" inviter-puk)))
+  (dispatch contacts (request "find-convo" "inviter-puk" inviter-puk)))
 
 (defn start! [container]
   (let [machine (tuple-machine! container)]

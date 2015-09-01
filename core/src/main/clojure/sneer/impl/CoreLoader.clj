@@ -9,9 +9,9 @@
             sneer.message-subs
             sneer.notifications
             sneer.sessions)
-  (:import [sneer.commons Startup]))
+  (:import [sneer.commons Container Startup]))
 
-(defn- start-components! [container]
+(defn- start-components! [^Container container]
   (mapv #(.produce container %) [sneer.contacts/handle sneer.convos.Sessions])
   (reify Startup))
 
