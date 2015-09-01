@@ -9,4 +9,13 @@ public class SessionMessage {
         this.payload = payload;
         this.isOwn = isOwn;
     }
+
+    @Override
+    public String toString() {
+        return "SessionMessage{" +
+                "payload=" + payload +
+                ", isOwn=" + isOwn +
+                '}';
+    }
+
 }
