@@ -66,10 +66,11 @@
         "start-session"
         (let [{:strs [contact-id session-type]} action
               contact-puk (<! (id->puk contacts contact-id))
-              tuple {"type"        "session"
-                     "author"       own-puk
-                     "audience"     contact-puk
-                     "session-type" session-type}]
+              tuple {"type"           "session"
+                     "author"         own-puk
+                     "audience"       contact-puk
+                     "session-author" own-puk
+                     "session-type"   session-type}]
           (let [session (<! (store-tuple tb (timestamped tuple)))]
             (>! (response action) (session "id"))))
 

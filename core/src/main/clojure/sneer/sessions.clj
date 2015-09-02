@@ -1,7 +1,7 @@
 (ns sneer.sessions
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :refer [go chan <! <!! close!]]
-            [sneer.async :refer [go-while-let]]
+            [sneer.async :refer [go-while-let closed-chan]]
             [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber!]]
             [sneer.flux :refer [tap-actions]]
             [sneer.tuple.protocols :refer :all]
@@ -27,7 +27,7 @@
      (close-on-unsubscribe! subscriber ch)
      (pipe-to-subscriber! ch subscriber label))))
 
-(def ^:private no-messages (doto (chan) close!))
+(def ^:private no-messages closed-chan)
 
 (defn- query-session-tuple [tuple-base session-id]
   (let [session-tuples (chan 1)]
@@ -39,20 +39,28 @@
 
 (defn- query-session-messages [own-puk tuple-base session-id lease]
   (go
-    (if-some [{:strs [author audience]} (<! (query-session-tuple tuple-base session-id))]
-      (let [criteria {"type" "session-message" "session-id" session-id}
-            xform    (map #(->SessionMessage own-puk %))]
-        (query-convo-tuples tuple-base criteria author audience lease xform))
-      [no-messages no-messages])))
+    (if-some [{:strs [session-author original_id]} (<! (query-session-tuple tuple-base session-id))]
+      (let [criteria {"type"           "session-message"
+                      "session-author" session-author
+                      "session-id"     original_id}
+            xform    (map #(->SessionMessage own-puk %))
+            past     (chan 1 xform)
+            future   (chan 1 xform)]
+        (query-with-history tuple-base criteria past future lease)
+        [past future])
+      (do
+        (println (str "WARNING: invalid session id `" session-id "'"))
+        [no-messages (chan)]))))
 
 (defn- handle-send-session-message [own-puk tuple-base {:strs [session-id payload]}]
   (go
-    (when-some [{:strs [author audience]} (<! (query-session-tuple tuple-base session-id))]
-      (let [tuple {"type"         "session-message"
-                   "session-id"   session-id
-                   "author"       own-puk
-                   "audience"     (if (= own-puk author) audience author)
-                   "payload"      payload}]
+    (when-some [{:strs [author audience session-author]} (<! (query-session-tuple tuple-base session-id))]
+      (let [tuple {"type"           "session-message"
+                   "session-author" session-author
+                   "session-id"     session-id
+                   "author"         own-puk
+                   "audience"       (if (= own-puk author) audience author)
+                   "payload"        payload}]
         (store-tuple tuple-base (timestamped tuple))))))
 
 (defn- handle-actions! [own-puk dispatcher tuple-base]

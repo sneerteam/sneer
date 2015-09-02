@@ -23,9 +23,8 @@
   (emits #(= expected (apply extract % fields))))
 
 (defn play [^Timeline timeline]
-  (->> (rx/concat (.past timeline)
-                  (.future timeline))
-       (rx/filter some?)))
+  (rx/concat (.past timeline)
+             (.future timeline)))
 
 (defn first-session [^Observable sessions]
   (->> sessions

@@ -29,8 +29,8 @@
 (defn- handle-contact [state contact]
   (merge state contact))
 
-(defn- handle-session [own-puk state {:strs [original_id session-type author timestamp]}]
-  (update-in state [:sessions] (fnil conj []) {:id original_id
+(defn- handle-session [own-puk state {:strs [id session-type author timestamp]}]
+  (update-in state [:sessions] (fnil conj []) {:id id
                                                :type session-type
                                                :own? (= author own-puk)
                                                :timestamp timestamp}))
