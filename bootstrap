@@ -93,8 +93,7 @@ esac
 echo "Cleaning Android build"
 cd android && ./gradlew clean && cd .. || exit -1;
 
-PATH_TO_ADB=$(which adb)
-if [ -x "$PATH_TO_ADB" ] ; then
+if command -v adb; then
     adb devices | while read line
     do
         if [ ! "$line" = "" ] && [ `echo $line | awk '{print $2}'` = "device" ]
