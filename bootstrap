@@ -74,15 +74,15 @@ echo "Gradlew clean ckeck install"
 case $TARGET in
     SIMS)
         echo "Cleaning core"
-        cd core && ../gradlew clean && cd .. || exit -1
+        rm -rf ~/.m2/repository/me/sneer/core;
         ;;
     SKUMMET)
         echo "Publishing Skummet jar"
-        ./gradlew :core:publish || exit -1
+        ./gradlew :core:publish || exit -1;
         ;;
     DEFAULT)
         echo "Removing Skummet artifacts"
-        rm -rf skummet-artifacts/
+        rm -rf skummet-artifacts/;
         ;;
     *)
         echo "ERROR: unknown target \"$PARAM\""
