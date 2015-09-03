@@ -1,0 +1,102 @@
+#!/bin/bash
+
+function help_text()
+{
+    echo "Usage: bootstrap               (default values)
+    or bootstrap OPTION(S) TARGET
+    or bootstrap TARGET OPTION(S)
+Example: bootstrap --skip-clean SKUMMET
+
+Available OPTIONs
+  -h,  --help              show this text
+  -sp, --skip-pull         skip git pull --rebase
+  -sc, --skip-clean        keep untracked files and directories
+
+Available TARGETs: SIMS, SKUMMET and DEFAULT"
+}
+
+SKIP_PULL=false
+SKIP_CLEAN=false
+TARGET=DEFAULT
+
+if [ -z "$1" ]
+then
+    echo "Using default values"
+fi
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    case $PARAM in
+        -h | --help)
+            help_text
+            exit
+            ;;
+        -sp | --skip-pull)
+            SKIP_PULL=true
+            ;;
+        -sc | --skip-clean)
+            SKIP_CLEAN=true
+            ;;
+        DEFAULT | SKUMMET | SIMS)
+            TARGET=$PARAM
+            ;;
+        *)
+            echo "ERROR: unknown parameter \"$PARAM\""
+            help_text
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if [ "$SKIP_PULL" = true ];
+then
+    echo "Skipping git pull"
+else
+    echo "rebasing"
+    git pull --rebase || exit -1
+fi
+
+if [ "$SKIP_CLEAN" = true ];
+then
+    echo "Skipping git clean"
+else
+    echo "cleanning"
+    git clean -d -x --force --quiet
+fi
+
+echo "Force-removing Sneer jars"
+rm -rf ~/.m2/repository/me/sneer/
+
+echo "Gradlew clean ckeck install"
+./gradlew clean check install
+
+case $TARGET in
+    SIMS)
+        echo "Cleaning core"
+        cd core && ../gradlew clean && cd .. || exit -1
+        ;;
+    SKUMMET)
+        echo "Publishing Skummet jar"
+        ./gradlew :core:publish || exit -1
+        ;;
+    DEFAULT)
+        echo "Removing Skummet artifacts"
+        rm -rf skummet-artifacts/
+        ;;
+    *)
+        echo "ERROR: unknown target \"$PARAM\""
+        exit 1
+        ;;
+esac
+
+echo "Cleaning Android build"
+cd android && ./gradlew clean && cd .. || exit -1
+
+if ["$ANDROID_RUNNING" = true];
+then
+    echo "Installing on available Android devices/emulators"
+    # WIP
+fi
+
+echo "Reset environment successful"
