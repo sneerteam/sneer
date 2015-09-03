@@ -2,17 +2,27 @@
 
 function help_text()
 {
-    echo "Usage: bootstrap               (default values)
-    or bootstrap OPTION(S) TARGET
-    or bootstrap TARGET OPTION(S)
-Example: bootstrap --skip-clean SKUMMET
+    echo "
+Usage:
+   bootstrap                 (default values)
+or bootstrap OPTION(S) TARGET
+or bootstrap TARGET OPTION(S)
 
-Available OPTIONs
+Available OPTIONs:
   -h,  --help              show this text
   -sp, --skip-pull         skip git pull --rebase
   -sc, --skip-clean        keep untracked files and directories
 
-Available TARGETs: SIMS, SKUMMET and DEFAULT"
+Available TARGETs:
+  SIMS, SKUMMET and DEFAULT
+
+Examples:
+  bootstrap
+  bootstrap SIMS
+  bootstrap -sp DEFAULT
+  bootstrap --skip-clean SKUMMET
+  bootstrap -sp -sc SIMS
+"
 }
 
 SKIP_PULL=false
@@ -54,7 +64,7 @@ then
     echo "Skipping git pull"
 else
     echo "rebasing"
-    git pull --rebase || exit -1
+    git pull --rebase || exit -1;
 fi
 
 if [ "$SKIP_CLEAN" = true ];
@@ -62,7 +72,7 @@ then
     echo "Skipping git clean"
 else
     echo "cleanning"
-    git clean -d -x --force --quiet
+    git clean -d -x --force --quiet;
 fi
 
 echo "Force-removing Sneer jars"
