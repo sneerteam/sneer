@@ -66,10 +66,10 @@ else
 fi
 
 echo "Force-removing Sneer jars"
-rm -rf ~/.m2/repository/me/sneer/
+rm -rf ~/.m2/repository/me/sneer/;
 
 echo "Gradlew clean ckeck install"
-./gradlew clean check install
+./gradlew clean check install;
 
 case $TARGET in
     SIMS)
@@ -91,12 +91,12 @@ case $TARGET in
 esac
 
 echo "Cleaning Android build"
-cd android && ./gradlew clean && cd .. || exit -1
+cd android && ./gradlew clean && cd .. || exit -1;
 
-if ["$ANDROID_RUNNING" = true];
-then
-    echo "Installing on available Android devices/emulators"
-    # WIP
-fi
+#if ["$ANDROID_RUNNING" = true];
+#then
+#    echo "Installing on available Android devices/emulators"
+#    # WIP
+#fi
 
 echo "Reset environment successful"
