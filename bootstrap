@@ -93,10 +93,17 @@ esac
 echo "Cleaning Android build"
 cd android && ./gradlew clean && cd .. || exit -1;
 
-#if ["$ANDROID_RUNNING" = true];
-#then
-#    echo "Installing on available Android devices/emulators"
-#    # WIP
-#fi
+PATH_TO_ADB=$(which adb)
+if [ -x "$PATH_TO_ADB" ] ; then
+    adb devices | while read line
+    do
+        if [ ! "$line" = "" ] && [ `echo $line | awk '{print $2}'` = "device" ]
+        then
+            echo "Installing on available Android devices/emulators"
+            cd android && ./gradlew installDebug && cd .. || exit -1;
+            break;
+        fi
+    done
+fi
 
 echo "Reset environment successful"
