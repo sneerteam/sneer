@@ -1,23 +1,25 @@
-language: android
-jdk: oraclejdk7
-env:
-  matrix:
-    - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+language: java
+# language: android
+# jdk: oraclejdk7
+# env:
+#   matrix:
+#     - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
 
-android:
-  components:
-    - build-tools-19.1.0
+# android:
+#   components:
+#     - build-tools-19.1.0
 
 before_script:
   # Create and start emulator
-  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb devices
-  - adb shell input keyevent 82 &
+  -#  echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  # - emulator -avd test -no-skin -no-audio -no-window &
+  # - android-wait-for-emulator
+  # - adb devices
+  # -
+  #  adb shell input keyevent 82 &
   - wget https://raw.githubusercontent.com/technomancy/leiningen/2.4.3/bin/lein && chmod +x lein
   - export PATH=$PATH:$(pwd)
 
 script:
-  - ./gradlew check install :core:publish
-  - android/gradlew --build-file android/build.gradle connectedAndroidTest
+  - ./gradlew check check install :core:publish
+  #- android/gradlew --build-file android/build.gradle connectedAndroidTest
