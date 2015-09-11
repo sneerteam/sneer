@@ -3,7 +3,7 @@
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :as async :refer [<! >! chan alts! pipe]]
             [sneer.async :refer [state-machine tap-state go-trace go-loop-trace sliding-chan close-with!]]
-            [sneer.contacts :as contacts :refer [tap-id]]
+            [sneer.contacts :as contacts :refer [tap-id encode-invite]]
             [sneer.queries :refer [query-convo-tuples]]
             [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe!]]
             [sneer.time :as time]
@@ -92,16 +92,16 @@
 ; Convo(long contactId, String nickname, String inviteCodePending, List<ChatMessage> messages, List<SessionSummary> sessionSummaries)
 ; SessionSummary(long id, String type, String title, String date, String unread)
 ; ChatMessage(long id, String text, boolean isOwn, String date)
-(defn- to-foreign [{:keys [id nick invite-code messages sessions]}]
+(defn- to-foreign [own-puk {:keys [id nick invite-code messages sessions]}]
   (let [pretty-time (time/pretty-printer)]
-    (Convo. id nick invite-code
+    (Convo. id nick (encode-invite own-puk invite-code)
             (->ChatMessageList messages pretty-time)
             (->SessionSummaryList sessions pretty-time))))
 
-(defn convo-by-id [container id]
+(defn convo-by-id [container own-puk id]
   (rx/observable*
    (fn [^Subscriber subscriber]
-     (let [state-out (sliding-chan 1 (map to-foreign))
+     (let [state-out (sliding-chan 1 (map (partial to-foreign own-puk)))
            lease (chan)]
        (close-on-unsubscribe! subscriber state-out lease)
        (pipe-to-subscriber! state-out subscriber "convo")

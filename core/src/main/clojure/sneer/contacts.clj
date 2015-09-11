@@ -163,6 +163,16 @@
       {:state state
        :id    id})))
 
+(defn encode-invite [own-puk invite-code-suffix]
+  (when invite-code-suffix
+    (str (.toHex own-puk) "-" invite-code-suffix)))
+
+(defn- decode-contact-puk [invite-code-received]
+  (let [parts (.split invite-code-received "-")
+        inviter-puk (from-hex (aget parts 0))
+        suffix (aget parts 1)]
+    [inviter-puk suffix]))
+
 (defn handle-action! [container states state action]
   (go
     (case (action :type)
@@ -179,20 +189,21 @@
             (result :state))))
 
       "accept-invite"
-      (let [{:strs [nick puk-hex invite-code-received]} action]
+      (let [{:strs [nick invite-code-received]} action]
         (if-let [problem (problem-with-nick state nick)]
           (do
             (>! (response action) (FriendlyException. (str "Nickname " problem)))
             state)
-          (let [contact-puk (from-hex puk-hex)
-                _ (<! (-store-tuple! container {"type" "push" "audience" contact-puk "invite-code" invite-code-received}))
-                result (<! (wait-for-store-contact! container nick contact-puk nil states))]
+          (let [[inviter-puk suffix] (decode-contact-puk invite-code-received)
+                _ (<! (-store-tuple! container {"type" "push" "audience" inviter-puk "invite-code" suffix}))
+                result (<! (wait-for-store-contact! container nick inviter-puk nil states))]
             (>! (response action) (result :id))
             (result :state))))
 
       "find-convo"
-      (let [{:strs [inviter-puk]} action]
-        (>! (response action) (encode-nil (get-in state [:puk->id (from-hex inviter-puk)])))
+      (let [{:strs [encoded-invite]} action
+            [inviter-puk _suffix] (decode-contact-puk encoded-invite)]
+        (>! (response action) (encode-nil (get-in state [:puk->id inviter-puk])))
         state)
 
       "problem-with-new-nickname"
@@ -246,11 +257,22 @@
 (defn new-contact [contacts nick]
   (dispatch contacts (request "new-contact" "nick" nick)))
 
-(defn accept-invite [contacts nick puk-hex invite-code-received]
-  (dispatch contacts (request "accept-invite" "nick" nick "puk-hex" puk-hex "invite-code-received" invite-code-received)))
+(defn accept-invite [contacts nick invite-code-received]
+  (try
+    (decode-contact-puk invite-code-received)
+    (catch Throwable t
+      (println "EXCEPTION")
+      (.printStackTrace t System/out)))
+  (dispatch contacts (request "accept-invite" "nick" nick "invite-code-received" invite-code-received)))
 
-(defn find-convo [contacts inviter-puk]
-  (dispatch contacts (request "find-convo" "inviter-puk" inviter-puk)))
+(defn find-convo [contacts encoded-invite]
+  (println "ENCODED------*" encoded-invite)
+  (try
+    (decode-contact-puk encoded-invite)
+    (catch Exception e
+      (.printStackTrace e)))
+
+  (dispatch contacts (request "find-convo" "encoded-invite" encoded-invite)))
 
 (defn start! [container]
   (let [machine (tuple-machine! container)]

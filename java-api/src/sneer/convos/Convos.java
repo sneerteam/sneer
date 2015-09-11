@@ -18,12 +18,16 @@ public interface Convos {
 	/** Emits the new Convo id.
 	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
 	Observable<Long> acceptInvite(String newContactNickname, String inviterPuk, String inviteCodeReceived);
+	/** Emits the new Convo id.
+	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
+	Observable<Long> acceptInvite(String newContactNickname, String encodedInvite);
 
 	Observable<Convo> getById(long convoId);
 
 	/** Emits null if the user has not yet accepted the invite */
-	Observable<Long> findConvo(String inviterPuk);
+	Observable<Long> findConvo(String encodedInvite);
 
+	@Deprecated
 	String ownPuk();
 
 }

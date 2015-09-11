@@ -52,6 +52,12 @@ public class ConvosSim implements Convos {
 		return startConvo(newContactNick);
 	}
 
+	@Override
+	public Observable<Long> acceptInvite(String newContactNick, String inviteCodeReceived) {
+		System.out.println("Convos.acceptInvite: " + newContactNick + " inviteCode: " + inviteCodeReceived);
+		return startConvo(newContactNick);
+	}
+
     @Override
     public Observable<Convo> getById(final long id) {
         return id % 2 == 0

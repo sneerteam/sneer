@@ -94,14 +94,14 @@
       (startConvo [_ newContactNick]
         (sneer.contacts/new-contact contacts newContactNick))
 
-      (acceptInvite [_ newContactNick contactPuk inviteCodeReceived]
-        (sneer.contacts/accept-invite contacts newContactNick contactPuk inviteCodeReceived))
+      (acceptInvite [_ newContactNick inviteCodeReceived]
+        (sneer.contacts/accept-invite contacts newContactNick inviteCodeReceived))
 
       (getById [_ id]
-        (convo-by-id container id))
+        (convo-by-id container own-puk id))
 
-      (findConvo [_ inviterPuk]
-        (sneer.contacts/find-convo contacts inviterPuk))
+      (findConvo [_ encodedInvite]
+        (sneer.contacts/find-convo contacts encodedInvite))
 
       (ownPuk [_]
         (.toHex own-puk)))))

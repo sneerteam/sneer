@@ -1,13 +1,12 @@
 (ns sneer.contacts-test
   (:require [midje.sweet :refer :all]
             [sneer.async :refer [sliding-chan]]
-            [sneer.contacts :as contacts :refer [handle invite-code problem-with-new-nickname new-contact accept-invite nickname]]
+            [sneer.contacts :as contacts :refer [handle invite-code problem-with-new-nickname new-contact accept-invite nickname encode-invite]]
             [sneer.integration-test-util :refer [sneer! restarted! connect! puk]]
             [sneer.flux :refer [request action]]
             [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
   (:import [sneer.commons.exceptions FriendlyException]
-           [sneer.flux Dispatcher]
-           (sneer.convos Convos)))
+           [sneer.flux Dispatcher]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
@@ -32,7 +31,9 @@
 
       (with-open [carla (sneer!)]
         (connect! neide carla)
-        (accept-invite (carla contacts/handle) "Neide" (-> neide puk .toHex) invite)
+        (accept-invite (carla contacts/handle)
+                       "Neide"
+                       (encode-invite (puk neide) invite))
         invite-obs => (emits nil))
 
       (fact "Nickname can be changed after invite is accepted" ; TODO: Nickname can be changed before invite is accepted too (use id as identifier in tuple instead of nick)

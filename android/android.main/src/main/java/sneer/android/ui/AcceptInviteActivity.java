@@ -27,39 +27,37 @@ public class AcceptInviteActivity extends Activity {
 
 	private String nickname;
     private Convos convos;
-    private String contactPuk;
     private String inviteCode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		parseQuery(getIntent());
+		inviteCode = getURIQuery(getIntent());
 
-		if (contactPuk == null || inviteCode == null) {
+		if (inviteCode == null) {
 			finishWith("Invalid Invite", this);
 			return;
 		}
 
 		convos = SneerAndroidContainer.component(Convos.class);
 
-		ui(convos.findConvo(contactPuk)).subscribe(new Action1<Long>() { @Override public void call(Long convoId) {
-			if (convoId != null) {
+		ui(convos.findConvo(inviteCode)).subscribe(new Action1<Long>() { @Override public void call(Long convoId) {
+			if (convoId == null)
+				obtainNickname();
+			else
 				navigateToConvo(convoId);
-			} else {
-				showNicknameDialog();
-			}
 		}});
 	}
 
-	private void showNicknameDialog() {
+	private void obtainNickname() {
 		setContentView(R.layout.activity_add_contact);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		btnDone = (Button) findViewById(R.id.btn_done);
 
 		btnDone.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
-			convos.acceptInvite(getNickname(), contactPuk, inviteCode).subscribe(new Subscriber<Long>() {
+			convos.acceptInvite(getNickname(), inviteCode).subscribe(new Subscriber<Long>() {
 				@Override
 				public final void onCompleted() {}
 
@@ -105,13 +103,10 @@ public class AcceptInviteActivity extends Activity {
         btnDone.setEnabled(!nickname.isEmpty() && error == null);
 	}
 
-    private void parseQuery(Intent intent) {
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            String[] query = intent.getData().getQuery().split("&invite=");
-            if (query.length != 2) return;
-            contactPuk = query[0];
-            inviteCode = query[1];
-        }
+    private String getURIQuery(Intent intent) {
+	    return Intent.ACTION_VIEW.equals(intent.getAction())
+			? intent.getData().getQuery()
+			: null;
     }
 
     private String getNickname() {

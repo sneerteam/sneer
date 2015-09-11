@@ -1,42 +1,40 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#e6e6e6"
-                android:orientation="vertical"
-                tools:context="${relativePackage}.${activityClass}">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f6f6f6"
+    android:orientation="vertical"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="16dp"
+    tools:context="${relativePackage}.${activityClass}">
 
-    <RelativeLayout
-        android:id="@+id/nicknameRelativeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#f6f6f6"
-        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/nameLabel"
+            android:text="Name"/>
 
         <EditText
             android:id="@+id/nickname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="15dp"
-            android:hint="@string/add_contact_view_nickname"
-            android:inputType="textPersonName"
-            android:textAppearance="@android:style/TextAppearance.Large">
+            android:hint="Mom, John Smith, etc"
+            android:inputType="textCapWords"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            >
         </EditText>
 
         <Button
             android:id="@+id/btn_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:enabled="false"
-            style="?android:attr/buttonBarButtonStyle"
+            android:enabled="true"
+            style="?android:attr/borderlessButtonStyle"
             android:text="@string/add_contact_done"
-            android:layout_below="@+id/nickname"
-            android:layout_alignRight="@+id/nickname"
-            android:layout_alignEnd="@+id/nickname"/>
-    </RelativeLayout>
+            android:layout_margin="8dp"
+            android:layout_gravity="end"/>
 
-</RelativeLayout>
+</LinearLayout>

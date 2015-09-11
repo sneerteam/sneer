@@ -48,11 +48,11 @@
           (connect! neide carla)
 
           (let [c-convos (carla Convos)
+                inviteCode (.inviteCodePending n->c)
                 _ (.acceptInvite c-convos
                                  "Neide"
-                                 (.ownPuk n-convos)
-                                 (.inviteCodePending n->c))
-                accepted-convo-id (<next (.findConvo c-convos (.ownPuk n-convos)))
+                                 inviteCode)
+                accepted-convo-id (<next (.findConvo c-convos inviteCode))
                 c->n-obs (.getById c-convos accepted-convo-id)]
 
             n->c-obs => (emits #(-> % .inviteCodePending nil?))

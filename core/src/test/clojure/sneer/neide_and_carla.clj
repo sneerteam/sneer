@@ -11,11 +11,11 @@
         n->c-id  (<next (. n-convos startConvo "Carla"))
         n->c     (<next (.getById n-convos n->c-id))
         c-convos ^Convos (carla Convos)
-        c->n-id  (.acceptInvite c-convos
+        _        (.acceptInvite c-convos
                                 "Neide"
-                                (.ownPuk n-convos)
+                                #_(.ownPuk n-convos)
                                 (.inviteCodePending n->c))
-        c->n-id  (<next (.findConvo c-convos (.ownPuk n-convos)))
+        c->n-id  (<next (.findConvo c-convos (.inviteCodePending n->c)))
         c->n     (<next (.getById c-convos c->n-id))]
     {:neide neide
      :n->c n->c
