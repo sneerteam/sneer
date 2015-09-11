@@ -29,15 +29,23 @@ import sneer.android.SneerAndroidSingleton;
 import sneer.commons.SystemReport;
 
 import static sneer.commons.Streams.readString;
+import static sneer.commons.exceptions.Exceptions.check;
 
 public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
 
     private static final String SENDER_ID = "670346118517";
+    private static Context appContext;
 
-    public static void schedule(Context context) {
-        Intent newIntent = new Intent(context, GcmRegistrationAlarmReceiver.class);
-        PendingIntent pending = PendingIntent.getBroadcast(context, 0, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager service = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    public static void schedule(Context appContext_) {
+        check(appContext == null);
+        appContext = appContext_;
+        schedule();
+    }
+
+    public static void schedule() {
+        Intent newIntent = new Intent(appContext, GcmRegistrationAlarmReceiver.class);
+        PendingIntent pending = PendingIntent.getBroadcast(appContext, 0, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager service = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
         service.set(AlarmManager.RTC, oneMinuteFromNow(), pending);
     }
 
@@ -61,18 +69,17 @@ public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
         }.execute();
     }
 
-    private void runIn(Context context) {
+    private void runIn(Context ignored) {
         try {
-            Context applicationContext = context.getApplicationContext();
-            RegistrationControllerHost host = new RegistrationControllerHost(applicationContext);
-            new RegistrationController(getGCMPreferences(applicationContext), host, host, host).run();
+            RegistrationControllerHost host = new RegistrationControllerHost();
+            new RegistrationController(getGCMPreferences(appContext), host, host, host).run();
             updateReport("Registration successful.");
         } catch (IOException ex) {
             String msg = "Error during registration: " + ex.getMessage();
             // TODO: Consider exponential back-off.
             log(msg);
             updateReport(msg);
-            schedule(context);
+            schedule();
         }
     }
 
@@ -91,20 +98,14 @@ public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
 
     class RegistrationControllerHost implements RegistrationController.AppVersionProvider, RegistrationController.BackendClient, RegistrationController.GcmClient {
 
-        private Context applicationContext;
-
-        public RegistrationControllerHost(Context applicationContext) {
-            this.applicationContext = applicationContext;
-        }
-
         @Override
         public int appVersion() {
-            return getAppVersion(applicationContext);
+            return getAppVersion(appContext);
         }
 
         @Override
         public void register(String gcmId) throws IOException {
-            AndroidHttpClient client = AndroidHttpClient.newInstance("sneer.android.main", applicationContext);
+            AndroidHttpClient client = AndroidHttpClient.newInstance("sneer.android.main", appContext);
             try {
                 log("GCM: sending id to server...");
                 HttpResponse response = client.execute(new HttpGet(registrationUriFor(gcmId)));
@@ -119,8 +120,12 @@ public class GcmRegistrationAlarmReceiver extends BroadcastReceiver {
 
         @Override
         public String register() throws IOException {
-            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(applicationContext);
-            return gcm.register(SENDER_ID);
+            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(appContext);
+            try {
+                return gcm.register(SENDER_ID);
+            } catch (RuntimeException rx) {
+                throw new IOException("Exception thrown by GoogleCloudMessaging.register(): " + rx.getClass() + ": " + rx.getMessage(), rx);
+            }
         }
 
         String registrationUriFor(String gcmId) {
