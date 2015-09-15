@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: '../sdktools.gradle'
 
 android {
 
@@ -16,8 +17,8 @@ android {
     exclude 'META-INF/NOTICE'
   }
 
-  compileSdkVersion external.android.sdkVersion
-  buildToolsVersion external.android.buildToolsVersion
+  compileSdkVersion project.getSDKIfPossible(22)
+  buildToolsVersion project.getHighestAvailableTools("22.0.1")
 
   defaultConfig {
     minSdkVersion external.android.minSdkVersion
