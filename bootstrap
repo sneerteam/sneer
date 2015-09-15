@@ -59,6 +59,10 @@ while [ "$1" != "" ]; do
     shift
 done
 
+echo "Checking for Java installation";
+[ -z "$JAVA_HOME" ] && echo "JAVA_HOME cannot be empty" && exit 1;
+echo "[OK] " $JAVA_HOME;
+
 if [ "$SKIP_PULL" = true ];
 then
     echo "Skipping git pull"
@@ -79,15 +83,14 @@ echo "Force-removing Sneer jars"
 rm -rf ~/.m2/repository/me/sneer/;
 
 
-# Checking for correct Leiningen installation.
+echo "Checking for correct Leiningen installation."
 if command -v lein; then
     CUR=$(lein version | awk '{print $2}' 2>&1)
     echo $CUR
     if [[ ! $CUR == 2.4.3 ]]; then
         echo "
-    For now Sneer needs Leiningen version 2.4.3
-    and you are using $CUR. Downloading version
-    2.4.3.
+    Currently Sneer depends on Leiningen version 2.4.3
+    and you are using $CUR. Downloading version 2.4.3.
     ";
         echo y | lein downgrade 2.4.3;
     fi
@@ -121,6 +124,10 @@ case $TARGET in
         exit 1
         ;;
 esac
+
+echo "Checking for Android SDK installation";
+[ -z "$ANDROID_HOME" ] && echo "ANDROID_HOME cannot be empty" && exit 1;
+echo "[OK] " $ANDROID_HOME;
 
 echo "Cleaning Android build"
 cd android && ./gradlew clean && cd .. || exit -1;
