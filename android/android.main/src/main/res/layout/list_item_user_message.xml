@@ -24,7 +24,6 @@
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/img"
             android:minWidth="40dp"
             android:paddingLeft="5dp"
             android:textIsSelectable="true"
