@@ -121,8 +121,8 @@ public class ConvosSim implements Convos {
 				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
 				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago"),
 				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
-				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
-				new ChatMessage(3, "Hi. Sorry, too late...", false, "15 mins ago")
+				new ChatMessage(2, "This is a very long text with a link in the middle \nhttps://www.google.com \nThis is a very long text with a link in the middle", true, "20 mins ago"),
+				new ChatMessage(3, "This is a very long text with a link in the middle \nhttps://www.google.com \nThis is a very long text with a link in the middle", false, "5 mins ago")
 		);
 	}
 
