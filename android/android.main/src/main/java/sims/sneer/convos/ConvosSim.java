@@ -20,12 +20,12 @@ import sneer.convos.Summary;
 @SuppressWarnings("unused")
 public class ConvosSim implements Convos {
 
-    @Override
+	@Override
 	public Observable<List<Summary>> summaries() {
 		BehaviorSubject<List<Summary>> ret = BehaviorSubject.create();
 		ArrayList<Summary> data = new ArrayList<>(10000);
 		for (int i = 0; i < 10000; i++)
-			data.add(new Summary("Wesley " + i, "Hello " + i, i + " Days Ago", unread(i), 1042+i));
+			data.add(new Summary("Wesley " + i, "Hello " + i, i + " Days Ago", unread(i), 1042 + i));
 		ret.onNext(data);
 		return ret;
 	}
@@ -58,47 +58,48 @@ public class ConvosSim implements Convos {
 		return startConvo(newContactNick);
 	}
 
-    @Override
-    public Observable<Convo> getById(final long id) {
-        return id % 2 == 0
-           ? Observable.just(new Convo(id, "Wesley " + id, null, messages(), newSessionSummaries()))
-           : Observable.concat(
-                Observable.just(new Convo(id, "Pending " + id, "INVITE_CODE", Collections.<ChatMessage>emptyList(), Collections.<SessionSummary>emptyList())),
-                Observable.timer(3, TimeUnit.SECONDS).map(new Func1<Long, Convo>() {
-                    @Override
-                    public Convo call(Long aLong) {
-                        return new Convo(id, "Wesley " + id, null, messages(), newSessionSummaries());
-                    }
-                })
-        );
+	@Override
+	public Observable<Convo> getById(final long id) {
+		return id % 2 == 0
+				? Observable.just(new Convo(id, "Wesley " + id, null, messages(), newSessionSummaries()))
+				: Observable.concat(
+				Observable.just(new Convo(id, "Pending " + id, "INVITE_CODE", Collections.<ChatMessage>emptyList(), Collections.<SessionSummary>emptyList())),
+				Observable.timer(3, TimeUnit.SECONDS).map(new Func1<Long, Convo>() {
+					@Override
+					public Convo call(Long aLong) {
+						return new Convo(id, "Wesley " + id, null, messages(), newSessionSummaries());
+					}
+				})
+		);
 
-    }
+	}
 
 	private List<SessionSummary> newSessionSummaries() {
 		SessionSummary[] sums = new SessionSummary[]{
-			new SessionSummary(1, "chess", true, "Chess game, your turn", "6 minutes ago", "*"),
-			new SessionSummary(2, "shopping", false, "Shopping List", "1 hour ago", "*"),
-			new SessionSummary(3, "torogo", true, "ToroGo game (you won)", "3 days ago", ""),
-			new SessionSummary(4, "snitcoin", false, "SnitCoin transfer received", "1 week ago", "")
+				new SessionSummary(1, "chess", true, "Chess game, your turn", "6 minutes ago", "*"),
+				new SessionSummary(2, "shopping", false, "Shopping List", "1 hour ago", "*"),
+				new SessionSummary(3, "torogo", true, "ToroGo game (you won)", "3 days ago", ""),
+				new SessionSummary(4, "snitcoin", false, "SnitCoin transfer received", "1 week ago", "")
 		};
 		return Arrays.asList(sums);
 	}
 
 	private int findConvoCount = 0;
-    @Override
-    public Observable<Long> findConvo(String inviterPuk) {
-        findConvoCount++;
-        return findConvoCount % 2 == 0
-                        ? Observable.just(4242L)
-                        : Observable.just((Long) null);
-    }
 
-    @Override
-    public String ownPuk() {
-        return "BABACABABACABABACABABACABABACA00BABACABABACABABACABABACABABACA00";
-    }
+	@Override
+	public Observable<Long> findConvo(String inviterPuk) {
+		findConvoCount++;
+		return findConvoCount % 2 == 0
+				? Observable.just(4242L)
+				: Observable.just((Long) null);
+	}
 
-    private List<ChatMessage> messages() {
+	@Override
+	public String ownPuk() {
+		return "BABACABABACABABACABABACABABACA00BABACABABACABABACABABACABABACA00";
+	}
+
+	private List<ChatMessage> messages() {
 		return Arrays.asList(
 				new ChatMessage(1, "Yo bro, sup?", false, "Mar 23"),
 				new ChatMessage(2, "My bad, just saw your message", true, "30 mins ago"),
@@ -127,6 +128,7 @@ public class ConvosSim implements Convos {
 	}
 
 	private static final String[] UNREAD_OPTIONS = {"?", "*", ""};
+
 	private static String unread(int i) {
 		return UNREAD_OPTIONS[i % 3];
 	}

@@ -17,7 +17,7 @@ public class DispatcherSim implements Dispatcher {
 		System.out.println("Dispatching " + action.type + ": " + Arrays.toString(action.keyValuePairs));
 
 		if (!action.type.equals("send-message")) return;
-		if (Arrays.toString(action.keyValuePairs).contains("non"))  turnNotificationsOn();
+		if (Arrays.toString(action.keyValuePairs).contains("non")) turnNotificationsOn();
 		if (Arrays.toString(action.keyValuePairs).contains("noff")) turnNotificationsOff();
 	}
 

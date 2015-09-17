@@ -95,8 +95,8 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 
 	private void refresh() {
-        System.out.println(">> > > > > REFRESH");
-        actionBar.setTitle(currentConvo.nickname);
+		System.out.println(">> > > > > REFRESH");
+		actionBar.setTitle(currentConvo.nickname);
 
 		refreshInvitePendingMessage();
 		refreshChatMessages();

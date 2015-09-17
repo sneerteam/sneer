@@ -46,7 +46,7 @@ public class SneerAndroidImpl implements SneerAndroid {
 
 		try {
 			init();
-		 } catch (FriendlyException e) {
+		} catch (FriendlyException e) {
 			error = e.getMessage();
 		}
 	}
@@ -77,28 +77,28 @@ public class SneerAndroidImpl implements SneerAndroid {
 			return;
 		final KeysImpl keys = new KeysImpl();
 		every(1, TimeUnit.SECONDS)
-			.take(42)
-			.subscribe(
-					new Action1<Long>() {
-						@Override
-						public void call(Long aLong) {
-							String contactName = "Contact " + aLong;
-							try {
-								PublicKey contactPuk = keys.createPublicKey(contactName.getBytes());
-								final Contact c = sneer.produceContact(contactName, sneer.produceParty(contactPuk), null);
-								every(5, TimeUnit.SECONDS).take(5).subscribe(
-										new Action1<Long>() {
-											@Override
-											public void call(Long aLong) {
+				.take(42)
+				.subscribe(
+						new Action1<Long>() {
+							@Override
+							public void call(Long aLong) {
+								String contactName = "Contact " + aLong;
+								try {
+									PublicKey contactPuk = keys.createPublicKey(contactName.getBytes());
+									final Contact c = sneer.produceContact(contactName, sneer.produceParty(contactPuk), null);
+									every(5, TimeUnit.SECONDS).take(5).subscribe(
+											new Action1<Long>() {
+												@Override
+												public void call(Long aLong) {
 //												sneer.convos().withContact(c).sendMessage("Message ");
-											}
-										});
+												}
+											});
 
-							} catch (FriendlyException e) {
-								e.printStackTrace();
+								} catch (FriendlyException e) {
+									e.printStackTrace();
+								}
 							}
-						}
-					});
+						});
 	}
 
 	private Observable<Long> every(int t, TimeUnit unit) {
