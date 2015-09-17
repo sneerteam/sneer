@@ -111,7 +111,8 @@
              events-in
              (when-some [event v]
                (let [state' (f state event)]
-                 (>! states-out state')
+                 (when-not (= state state')
+                   (>! states-out state'))
                  (recur state' inputs true))))))
 
        (close! taps-in)
