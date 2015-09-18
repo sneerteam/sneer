@@ -61,7 +61,7 @@
         (let [{:strs [contact-id message-id]} action
               contact-puk (<! (id->puk contacts contact-id))
               tuple {"author" own-puk "type" "message-read" "audience" contact-puk "payload" message-id}]
-          (store-tuple tb (timestamped tuple)))
+          (store-tuple tb (timestamped tuple) tuple))
 
         "start-session"
         (let [{:strs [contact-id session-type]} action
