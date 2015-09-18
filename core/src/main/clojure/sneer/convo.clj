@@ -21,9 +21,9 @@
            (msg2 :id)))
 
 (defn- handle-message [own-puk state message]
-  (let [{:strs [original_id author timestamp label]} message
+  (let [{:strs [id author timestamp label]} message
         own? (= author own-puk)
-        message {:id original_id :own? own? :timestamp timestamp :text label}]
+        message {:id id :own? own? :timestamp timestamp :text label}]
     (update state :messages conj message)))
 
 (defn- handle-contact [state contact]

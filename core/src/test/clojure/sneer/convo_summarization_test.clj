@@ -34,7 +34,7 @@
 
         label->msg (atom {})
         feed-read! (fn [contact-puk msg]
-                     (feed-tuple! {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "original_id")}))
+                     (feed-tuple! {"author" own-puk "type" "message-read" "audience" contact-puk "payload" (msg "id")}))
 
         summaries-out (subject/sliding-summaries! own-puk tuples-in)]
 

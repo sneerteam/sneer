@@ -44,7 +44,7 @@
     (->
      (if own?
        old-summary
-       (update-with-received (tuple "original_id") label old-summary))
+       (update-with-received (tuple "id") label old-summary))
      (assoc
       :preview (or label "")
       :timestamp timestamp))))

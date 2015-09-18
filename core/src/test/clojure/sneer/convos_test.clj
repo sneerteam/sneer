@@ -12,11 +12,14 @@
 (defn text [^ChatMessage m]
   (.text m))
 
+(defn own? [^ChatMessage m]
+  (.isOwn m))
+
 (defn unread [^Summary summary]
   (.unread summary))
 
-(defn last-message [^Convo convo]
-  (-> convo .messages last))
+(defn last-message-received [^Convo convo]
+  (->> convo .messages (remove own?) last))
 
 (defn emits-messages [& ms]
   (emits #(->> % .messages (mapv text) (= ms))))
@@ -53,7 +56,8 @@
                                  "Neide"
                                  inviteCode)
                 accepted-convo-id (<next (.findConvo c-convos inviteCode))
-                c->n-obs (.getById c-convos accepted-convo-id)]
+                c->n-obs (.getById c-convos accepted-convo-id)
+                c->n (<next c->n-obs)]
 
             n->c-obs => (emits #(-> % .inviteCodePending nil?))
 
@@ -61,9 +65,13 @@
             n->c-obs => (emits-messages "hi")
             c->n-obs => (emits-messages "hi")
 
+            (.dispatch (carla Dispatcher) (.sendMessage c->n "hello"))
+            n->c-obs => (emits-messages "hi" "hello")
+            c->n-obs => (emits-messages "hi" "hello")
+
             (let [convo (<next c->n-obs)]
               (. c-convos summaries) => (emits #(->> % (mapv unread) (= ["*"])))
-              (->> (.setRead convo (last-message convo)) (.dispatch (carla Dispatcher)))
+              (->> (.setRead convo (last-message-received convo)) (.dispatch (carla Dispatcher)))
               (. c-convos summaries) => (emits #(->> % (mapv unread) (= [""]))))))
 
         (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
