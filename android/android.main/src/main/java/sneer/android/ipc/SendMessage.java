@@ -40,15 +40,10 @@ public class SendMessage extends IntentService {
 
 	private void tryToHandle(Intent intent) {
 		Log.d(getClass().getName(), "Intent received");
-		long convoId  = intent.getLongExtra(TOKEN, -1);
-		final String message = intent.getAction();
+		long convoId = intent.getLongExtra(TOKEN, -1);
+		String message = intent.getAction();
 
-		component(Convos.class).getById(convoId).subscribe(new Action1<Convo>() {
-			@Override
-			public void call(Convo convo) {
-				dispatch(convo.sendMessage(message));
-			}
-		});
+		dispatch(Convo.sendMessage(convoId, message));
 	}
 
 }
