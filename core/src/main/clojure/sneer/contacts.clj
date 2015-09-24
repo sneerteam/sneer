@@ -266,7 +266,6 @@
   (dispatch contacts (request "accept-invite" "nick" nick "invite-code-received" invite-code-received)))
 
 (defn find-convo [contacts encoded-invite]
-  (println "ENCODED------*" encoded-invite)
   (try
     (decode-contact-puk encoded-invite)
     (catch Exception e
