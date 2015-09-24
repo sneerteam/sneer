@@ -4,11 +4,8 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import rx.functions.Action1;
 import sneer.convos.Convo;
-import sneer.convos.Convos;
 
-import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.SneerAndroidFlux.dispatch;
 
 public class SendMessage extends IntentService {
@@ -20,10 +17,10 @@ public class SendMessage extends IntentService {
     }
 
 
-	static Intent intentFor(Convo convo) {
+	static Intent intentFor(long convoId) {
 		return new Intent()
 			.setClassName("sneer.main", SendMessage.class.getName())
-			.putExtra(TOKEN, convo.id);
+			.putExtra(TOKEN, convoId);
 	}
 
 

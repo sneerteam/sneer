@@ -63,7 +63,7 @@ public class StartPluginDialogFragment extends DialogFragment {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             dialog.dismiss();
-            PluginActivities.start(activity, plugins.get(position), convoProvider.getConvo());
+            PluginActivities.start(activity, plugins.get(position), convoProvider.getConvo().id);
         }});
 
         dialog.setView(listView, 0, 0, 0, 0);

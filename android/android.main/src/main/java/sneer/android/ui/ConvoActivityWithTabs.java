@@ -26,10 +26,7 @@ import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +34,11 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
+import sneer.android.ipc.PluginActivities;
 import sneer.convos.ChatMessage;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
+import sneer.convos.SessionSummary;
 import sneer.main.R;
 
 import static android.text.TextUtils.isEmpty;
@@ -252,7 +251,16 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 	private void setupSessionsList() {
 		sessionsAdapter = new SessionListAdapter(this);
-		((ListView) sessionsView.findViewById(R.id.sessionList)).setAdapter(sessionsAdapter);
+		ListView sessions = (ListView) sessionsView.findViewById(R.id.sessionList);
+		sessions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SessionSummary summary = sessionsAdapter.getItem(position);
+                System.out.println("=============== " + summary);
+                PluginActivities.open(ConvoActivityWithTabs.this, summary, convoId);
+            }
+		});
+		sessions.setAdapter(sessionsAdapter);
 	}
 
 

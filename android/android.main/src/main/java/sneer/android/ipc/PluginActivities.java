@@ -6,7 +6,6 @@ import android.widget.Toast;
 
 import rx.functions.Action1;
 import sneer.android.utils.AndroidUtils;
-import sneer.convos.Convo;
 import sneer.convos.SessionHandle;
 import sneer.convos.Sessions;
 
@@ -17,26 +16,26 @@ import static sneer.android.impl.IPCProtocol.SEND_MESSAGE;
 
 public class PluginActivities {
 
-	public static void start(final Context context, Plugin plugin, Convo convo) {
-		start(context, plugin, convo, null);
+	public static void start(final Context context, Plugin plugin, long convoId) {
+		start(context, plugin, convoId, null);
 	}
 
-	public static void open(Context context, SessionHandle session, Convo convo) {
+	public static void open(Context context, SessionHandle session, long convoId) {
 		Plugin plugin = Plugins.forSessionType(context, session.type);
 		if (plugin == null)
 			Toast.makeText(context, "Please install an app for " + session.type, Toast.LENGTH_LONG).show();
 		else
-			start(context, plugin, convo, session);
+			start(context, plugin, convoId, session);
 	}
 
-	private static void start(final Context context, final Plugin plugin, Convo convo, SessionHandle session) {
+	private static void start(final Context context, final Plugin plugin, long convoId, SessionHandle session) {
 		final Intent intent = new Intent();
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setClassName(plugin.packageName, plugin.activityName);
-		intent.putExtra(SEND_MESSAGE, SendMessage.intentFor(convo));
+		intent.putExtra(SEND_MESSAGE, SendMessage.intentFor(convoId));
 
 		if (plugin.partnerSessionType != null && session == null)
-			request(Sessions.Actions.startSession(convo.id, plugin.partnerSessionType)).subscribe(new Action1<Long>() {
+			request(Sessions.Actions.startSession(convoId, plugin.partnerSessionType)).subscribe(new Action1<Long>() {
 				@Override
 				public void call(Long sessionId) {
 					startActivity(context, intent, new SessionHandle(sessionId, plugin.partnerSessionType, true));
