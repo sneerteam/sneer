@@ -20,7 +20,7 @@ android {
   }
 
   compileSdkVersion project.getSDKIfPossible(23)
-  buildToolsVersion project.getHighestAvailableTools("23.0.0")
+  buildToolsVersion project.getHighestAvailableTools("23.0.1")
 
   defaultConfig {
     minSdkVersion external.android.minSdkVersion
