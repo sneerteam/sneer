@@ -3,7 +3,8 @@
             [clojure.core.async :refer [chan pipe]]
             [clojure.string :as str]
             [sneer.rx :refer [close-on-unsubscribe! pipe-to-subscriber! shared-latest]]
-            [sneer.async :refer [debounce]])
+            [sneer.async :refer [debounce]]
+            [sneer.interfaces])
   (:import [sneer.commons Container]
            [sneer.convos Notifications Notifications$Notification]
            [sneer.interfaces ConvoSummarization]
