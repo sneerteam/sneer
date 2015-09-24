@@ -2,8 +2,7 @@
   (:require
     [clojure.core.async :refer [chan close! mult tap go >!! <!]]
     [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [close-with! go-trace decode-nil]]
-    [sneer.test-util :refer [<!!? ->chan]])
+    [sneer.async :refer [close-with! go-trace decode-nil]])
   (:import
     [rx.subjects AsyncSubject]
     [sneer.commons Container]
