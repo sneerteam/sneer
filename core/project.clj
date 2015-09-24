@@ -59,7 +59,7 @@
                                    #"^clojure/test/"
                                    #"^javassist"]
               :jvm-opts ["-Dclojure.compile.ignore-lean-classes=true"]
-              :plugins [[org.skummet/lein-skummet "0.2.2"]]}
+              :plugins [[org.skummet/lein-skummet "0.2.1"]]}
 
 
              :dev
