@@ -19,8 +19,8 @@ android {
     exclude 'META-INF/NOTICE'
   }
 
-  compileSdkVersion project.getSDKIfPossible(22)
-  buildToolsVersion project.getHighestAvailableTools("22.0.1")
+  compileSdkVersion project.getSDKIfPossible(23)
+  buildToolsVersion project.getHighestAvailableTools("23.0.0")
 
   defaultConfig {
     minSdkVersion external.android.minSdkVersion
