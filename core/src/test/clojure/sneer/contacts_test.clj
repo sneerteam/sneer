@@ -36,7 +36,7 @@
                        (encode-invite (puk neide) invite))
         invite-obs => (emits nil))
 
-      (fact "Nickname can be changed after invite is accepted" ; TODO: Nickname can be changed before invite is accepted too (use id as identifier in tuple instead of nick)
+      (fact "Nickname can be changed after invite is accepted"
         (let [nick-obs (nickname subject id)]
           nick-obs => (emits "Carla")
           (.dispatch (neide Dispatcher) (action "set-nickname" "new-nick" "Carla Silva" "contact-id" id))
