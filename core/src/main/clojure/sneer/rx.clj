@@ -7,7 +7,6 @@
   (:import [rx.subjects BehaviorSubject]
            [rx.schedulers Schedulers]
            [rx Observable Observable$OnSubscribe Subscriber Observer]
-           [sneer.rx CompositeSubject]
            [rx.functions FuncN]
            [java.util List]))
 
@@ -21,11 +20,6 @@
   (on-subscribe
     (fn [^Subscriber subscriber]
       (.add subscriber (.subscribe observable subscriber)))))
-
-(defn subject* [^Observable observable ^Observer observer]
-  "Creates a rx.Subject from an `observable' part and an `observer' part."
-  (let [subscriber (on-subscribe-for observable)]
-    (CompositeSubject. subscriber observer)))
 
 (defn filter-by [criteria observable]
   "Filters an `observable' of maps by `criteria' represented as a map.
