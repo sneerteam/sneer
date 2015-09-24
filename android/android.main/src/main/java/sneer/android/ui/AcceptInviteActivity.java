@@ -22,7 +22,9 @@ import static sneer.android.utils.AndroidUtils.toastOnMainThread;
 
 public class AcceptInviteActivity extends Activity {
 
-	private EditText nicknameEdit;
+    public static final String REFERRER_CODE = "REFERRER_CODE";
+
+    private EditText nicknameEdit;
 	private Button btnDone;
 
 	private String nickname;
@@ -33,7 +35,7 @@ public class AcceptInviteActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		inviteCode = getURIQuery(getIntent());
+		inviteCode = getInviteCode();
 
 		if (inviteCode == null) {
 			finishWith("Invalid Invite", this);
@@ -50,7 +52,14 @@ public class AcceptInviteActivity extends Activity {
 		}});
 	}
 
-	private void obtainNickname() {
+    private String getInviteCode() {
+        String referrerCode = getIntent().getStringExtra(REFERRER_CODE);
+        return referrerCode != null
+            ? referrerCode
+            : getURIQuery(getIntent());
+    }
+
+    private void obtainNickname() {
 		setContentView(R.layout.activity_add_contact);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
