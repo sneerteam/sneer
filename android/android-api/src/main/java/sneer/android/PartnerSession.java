@@ -27,7 +27,7 @@ import static sneer.android.impl.IPCProtocol.IS_OWN;
 
 public class PartnerSession implements Closeable {
 
-	private boolean isBound;
+	private static boolean wasBound;
 
 	public static PartnerSession join(Activity activity, Listener listener) {
 		return new PartnerSession(activity, listener);
@@ -52,7 +52,7 @@ public class PartnerSession implements Closeable {
 
 	@Override
 	public void close() {
-		if (isBound) activity.unbindService(connection);
+		if (wasBound) activity.unbindService(connection);
 	}
 
 
@@ -88,14 +88,16 @@ public class PartnerSession implements Closeable {
 		this.activity = activity;
         this.listener = listener;
 
+        if (wasBound) finish("PartnerSession has already been joined.");
+
 	    Intent sneer = activity.getIntent().getParcelableExtra(IPCProtocol.JOIN_SESSION);
 	    if (sneer == null) {
 		    if (SneerInstallation.checkConversationContext(activity))
 			    finish(activity.getLocalClassName() + ": Make sure Sneer session metadata is correctly set in your AndroidManifest.xml file");
 		    return;
 	    }
-		isBound = activity.bindService(sneer, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
-		if (!isBound) finish("Unable to connect to Sneer");
+		wasBound = activity.bindService(sneer, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
+		if (!wasBound) finish("Unable to connect to Sneer");
     }
 
 
@@ -105,7 +107,7 @@ public class PartnerSession implements Closeable {
 	}
 
 
-	public void handleMessageFromSneer(android.os.Message msg) {
+	void handleMessageFromSneer(android.os.Message msg) {
 		Bundle data = msg.getData();
 		data.setClassLoader(getClass().getClassLoader());
 		Object content = ((Envelope)data.getParcelable(ENVELOPE)).content;
