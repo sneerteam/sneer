@@ -93,13 +93,13 @@ public class Notifier {
 
 	private static Intent convosActivityIntent() {
 		Intent intent = new Intent();
-		intent.setClass(context, ConvosActivity.class);
+		intent.setClass(context, ConvoActivityWithTabs.class);
 		return intent;
 	}
 
 	private static Intent convoActivityIntent(Long convoId) {
 		Intent intent = new Intent();
-		intent.setClass(context, ConvoActivity.class);
+		intent.setClass(context, ConvoActivityWithTabs.class);
 		intent.putExtra("id", convoId);
 		return intent;
 	}
