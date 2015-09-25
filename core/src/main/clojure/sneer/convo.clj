@@ -93,8 +93,13 @@
 ; SessionSummary(long id, String type, String title, String date, String unread)
 ; ChatMessage(long id, String text, boolean isOwn, String date)
 (defn- to-foreign [own-puk {:keys [id nick invite-code messages sessions]}]
-  (let [pretty-time (time/pretty-printer)]
-    (Convo. id nick (encode-invite own-puk invite-code)
+  (let [pretty-time (time/pretty-printer)
+        invite (if (seq messages)   ;Some contacts from old versions, for some reason, still have a pending invite code even after they have messages. In those cases we ignore the invite code.
+                 nil
+                 (encode-invite own-puk invite-code))]
+    (Convo. id
+            nick
+            invite
             (->ChatMessageList messages pretty-time)
             (->SessionSummaryList sessions pretty-time))))
 
