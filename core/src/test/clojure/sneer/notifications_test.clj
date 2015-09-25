@@ -5,11 +5,11 @@
             [sneer.neide-and-carla :refer [neide-and-carla]]
             [sneer.notifications :refer :all])
   (:import [sneer.flux Dispatcher]
-           [sneer.convos Convos Notifications Notifications$Notification]))
+           [sneer.convos Notifications]))
 
 (facts "About notifications"
   (binding [sneer.notifications/*debounce-timeout* 0]
-    (let [{:keys [neide carla n->c c->n]} (neide-and-carla)]
+    (let [{:keys [neide carla c->n]} (neide-and-carla)]
       (with-open [neide neide
                   carla carla]
         (let [notifications (neide Notifications)

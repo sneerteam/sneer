@@ -8,7 +8,7 @@
   (:import [sneer.commons Container]
            [sneer.convos Notifications Notifications$Notification]
            [sneer.interfaces ConvoSummarization]
-           [rx Observable Subscriber]))
+           [rx Subscriber]))
 
 (def ^:dynamic *debounce-timeout* 1500)
 
