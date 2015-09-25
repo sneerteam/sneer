@@ -22,6 +22,7 @@ public class ReferrerReceiver extends BroadcastReceiver {
         Toast.makeText(context, "REFERRER: " + referrerString, Toast.LENGTH_LONG).show();
 
         Intent accept = new Intent(context, AcceptInviteActivity.class);
+        accept.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         accept.putExtra(REFERRER_CODE, referrerString);
         context.startActivity(accept);
     }
