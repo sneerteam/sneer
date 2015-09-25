@@ -56,7 +56,6 @@ class ConversationListAdapter extends ArrayAdapter<Summary> {
 		TextView date = findView(view, R.id.conversationDate);
 		TextView unread = findView(view, R.id.conversationUnread);
 		TextView preview = findView(view, R.id.conversationSummary);
-		preview.getPaint().setShader(textShader);
 
 		nickname.setText(summary.nickname);
 		preview.setText(summary.textPreview);
@@ -64,9 +63,5 @@ class ConversationListAdapter extends ArrayAdapter<Summary> {
 		unread.setText(summary.unread);
 		unread.setVisibility(summary.unread.isEmpty() ? GONE : VISIBLE);
 	}
-
-	private final Shader textShader = new LinearGradient(200, 0, 650, 0,
-			new int[]{Color.DKGRAY, Color.LTGRAY},
-			new float[]{0, 1}, Shader.TileMode.CLAMP);
 
 }
