@@ -93,7 +93,7 @@ public class Notifier {
 
 	private static Intent convosActivityIntent() {
 		Intent intent = new Intent();
-		intent.setClass(context, ConvoActivityWithTabs.class);
+		intent.setClass(context, ConvosActivity.class);
 		return intent;
 	}
 
