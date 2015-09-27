@@ -23,6 +23,6 @@
     <string name="title_activity_system_report">System Report</string>
 
     <!-- This appears on the menu for url viewing -->
-    <string name="title_activity_accept_invite">Accept Sneer Invite</string>
+    <string name="title_activity_accept_invite">Who sent you this invite?</string>
 
 </resources>
