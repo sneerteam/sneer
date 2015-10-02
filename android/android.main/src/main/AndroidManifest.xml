@@ -62,7 +62,6 @@
 
         <activity
             android:name="sneer.android.ui.ConvosActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppThemeMaterial">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -78,7 +77,6 @@
         <activity
             android:name="sneer.android.ui.ConvoActivityWithTabs"
             android:label="@string/title_conversation"
-            android:screenOrientation="portrait"
             android:parentActivityName="sneer.android.ui.ConvosActivity"
             android:theme="@style/AppThemeMaterial" />
 

@@ -6,9 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -18,7 +16,6 @@ import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,7 +23,11 @@ import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +95,6 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 
 	private void refresh() {
-		System.out.println(">> > > > > REFRESH");
 		actionBar.setTitle(currentConvo.nickname);
 
 		refreshInvitePendingMessage();
@@ -154,7 +154,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 	private void setupViewPager() {
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
-		viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+		viewPagerAdapter = new ViewPagerAdapter();
 		viewPager.setAdapter(viewPagerAdapter);
 	}
 
@@ -165,14 +165,10 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 		waiting.setVisibility(View.GONE);
 		setupChatMessagesList();
 		setupChatMessageFields();
-		Fragment chatFragment = new Fragment() {
-			@Override
-			public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-				return chatView;
-			}
-		};
-		viewPagerAdapter.addFragment(chatFragment, "CHAT");
+		viewPager.addView(chatView);
+		viewPagerAdapter.addPage(chatView, "CHAT");
 	}
+
 
 
 	private void setupChatMessagesList() {
@@ -239,15 +235,9 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 	private void setupSessionsTab() {
 		sessionsView = getLayoutInflater().inflate(R.layout.fragment_conversation_sessions, viewPager, false);
 		setupSessionsList();
-		Fragment sessionsFragment = new Fragment() {
-			@Override
-			public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-				return sessionsView;
-			}
-		};
-		viewPagerAdapter.addFragment(sessionsFragment, "SESSIONS");
+		viewPager.addView(sessionsView);
+		viewPagerAdapter.addPage(sessionsView, "SESSIONS");
 	}
-
 
 	private void setupSessionsList() {
 		sessionsAdapter = new SessionListAdapter(this);
@@ -258,7 +248,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
                 SessionSummary summary = sessionsAdapter.getItem(position);
                 System.out.println("=============== " + summary);
                 PluginActivities.open(ConvoActivityWithTabs.this, summary, convoId);
-            }
+		            }
 		});
 		sessions.setAdapter(sessionsAdapter);
 	}
@@ -339,33 +329,38 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 	}
 
 
-	class ViewPagerAdapter extends FragmentPagerAdapter {
-		private final List<Fragment> fragmentList = new ArrayList<>();
-		private final List<String> fragmentTitleList = new ArrayList<>();
-
-		public ViewPagerAdapter(FragmentManager manager) {
-			super(manager);
-		}
+	class ViewPagerAdapter extends PagerAdapter {
+		private final List<View> pageList = new ArrayList<>();
+		private final List<String> pageTitleList = new ArrayList<>();
 
 		@Override
-		public Fragment getItem(int position) {
-			return fragmentList.get(position);
+		public Object instantiateItem(ViewGroup collection, int position) {
+
+			System.out.println(">>>>>>>  INSTANTIATE:" + position + "; coll: " + collection);
+
+
+			return pageList.get(position);
 		}
 
 		@Override
 		public int getCount() {
-			return fragmentList.size();
+			return pageList.size();
 		}
 
-		public void addFragment(Fragment fragment, String title) {
-			fragmentList.add(fragment);
-			fragmentTitleList.add(title);
+		public void addPage(View page, String title) {
+			pageList.add(page);
+			pageTitleList.add(title);
 			notifyDataSetChanged();
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
-			return fragmentTitleList.get(position);
+			return pageTitleList.get(position);
+		}
+
+		@Override
+		public boolean isViewFromObject(View arg0, Object arg1) {
+			return arg0 == ((View) arg1);
 		}
 
 	}
