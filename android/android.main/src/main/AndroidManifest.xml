@@ -69,12 +69,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="sneer.android.ui.ConvoActivity"
-            android:label="@string/title_conversation"
-            android:parentActivityName="sneer.android.ui.ConvosActivity"
-            android:theme="@style/AppThemeMaterial" />
-
-        <activity
             android:name="sneer.android.ui.ConvoActivityWithTabs"
             android:label="@string/title_conversation"
             android:parentActivityName="sneer.android.ui.ConvosActivity"
@@ -83,10 +77,10 @@
         <activity
             android:name="sneer.android.ui.SystemReportActivity"
             android:label="@string/title_activity_system_report"
-            android:parentActivityName="sneer.android.ui.ConvoActivity">
+            android:parentActivityName="sneer.android.ui.ConvosActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.ConvoActivity" />
+                android:value="sneer.android.ui.ConvosActivity" />
         </activity>
         <activity
             android:name="sneer.android.ui.AcceptInviteActivity"
@@ -95,7 +89,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.ConvoActivity" />
+                android:value="sneer.android.ui.ConvosActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -116,7 +110,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sneer.android.ui.ConvoActivity" />
+                android:value="sneer.android.ui.ConvosActivity" />
         </activity>
     </application>
 
