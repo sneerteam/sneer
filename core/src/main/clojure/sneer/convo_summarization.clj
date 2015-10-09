@@ -3,7 +3,7 @@
     [clojure.core.async :as async :refer [go chan close! <! >! <!! >!! sliding-buffer alt! timeout mult]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [sneer.async :refer [close-with! sliding-chan sliding-tap go-while-let go-trace go-loop-trace state-machine tap-state peek-state! debounce]]
-    [sneer.commons :refer [now produce! descending loop-trace niy]]
+    [sneer.commons :refer [produce! descending loop-trace niy]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
     [sneer.io :as io]

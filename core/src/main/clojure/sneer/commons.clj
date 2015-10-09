@@ -1,11 +1,13 @@
 (ns sneer.commons
-  (:import [java.lang AutoCloseable]))
+  (:import [java.lang AutoCloseable]
+           (java.io Closeable)
+           (java.util Arrays)))
 
 (defprotocol Disposable
   (dispose [resource]))
 
 (extend-protocol Disposable
-  java.io.Closeable
+  Closeable
   (dispose [closeable]
     (.close closeable))
   AutoCloseable
@@ -39,7 +41,7 @@
 (def empty-queue clojure.lang.PersistentQueue/EMPTY)
 
 (defn byte-array= [^bytes a1 ^bytes a2]
-  (java.util.Arrays/equals a1 a2))
+  (Arrays/equals a1 a2))
 
 (defn produce! [fn-if-absent map-atom key]
   (if-some [existing (get @map-atom key)]

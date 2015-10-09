@@ -4,7 +4,7 @@
     [clojure.stacktrace :refer [print-stack-trace]]
     [rx.lang.clojure.core :as rx]
     [sneer.async :refer [sliding-chan go-while-let go-loop-trace]]
-    [sneer.commons :refer [now produce! descending]]
+    [sneer.commons :refer [produce! descending]]
     [sneer.contact :refer [get-contacts puk->contact]]
     [sneer.conversation :refer :all]
     [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe! subscribe-on-io latest shared-latest combine-latest switch-map behavior-subject]]

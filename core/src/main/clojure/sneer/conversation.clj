@@ -4,7 +4,7 @@
     [rx.lang.clojure.core :as rx]
     [rx.lang.clojure.interop :as interop]
     [sneer.async :refer [go-trace]]
-    [sneer.commons :refer [now produce! while-let]]
+    [sneer.commons :refer [produce! while-let]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer :all]
     [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe! subscribe-on-io latest shared-latest combine-latest switch-map switch-map-some map-some]]
