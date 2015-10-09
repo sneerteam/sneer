@@ -3,7 +3,7 @@
     [clojure.core.async :as async :refer [to-chan chan close! go <!! >!! thread alts!!]]
     [clojure.core.async.impl.protocols :as impl]
     [clojure.core.match :refer [match]]
-    [sneer.test-util :refer :all]
+;    [sneer.test-util :refer :all]
     [sneer.async :refer :all]
     [sneer.commons :refer [empty-queue loop-state]]
     [sneer.server.prevalence :as p]
