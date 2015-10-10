@@ -4,7 +4,8 @@
             [sneer.contacts :as contacts :refer [handle invite-code problem-with-new-nickname new-contact accept-invite nickname encode-invite]]
             [sneer.integration-test-util :refer [sneer! restarted! connect! puk]]
             [sneer.flux :refer [request action]]
-            [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
+            [sneer.rx-test-util :refer [emits emits-error ->chan <next]]
+            [sneer.test-util :refer [<!!?]])
   (:import [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))
 

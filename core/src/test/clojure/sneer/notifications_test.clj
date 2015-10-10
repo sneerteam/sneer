@@ -2,6 +2,7 @@
   (:require [midje.sweet :refer :all]
             [rx.lang.clojure.core :as rx]
             [sneer.test-util :refer :all]
+            [sneer.rx-test-util :refer :all]
             [sneer.neide-and-carla :refer [neide-and-carla]]
             [sneer.notifications :refer :all])
   (:import [sneer.flux Dispatcher]

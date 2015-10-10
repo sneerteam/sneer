@@ -2,7 +2,7 @@
   (:require [midje.sweet :refer :all]
             [clojure.core.async :refer [close! chan <! >!]]
             [sneer.async :refer [go-while-let]]
-            [sneer.test-util :refer [emits]]
+            [sneer.rx-test-util :refer [emits]]
             [sneer.tuple.jdbc-database :refer [create-sqlite-db]]
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.transmitter :as transmitter])

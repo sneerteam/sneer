@@ -1,6 +1,6 @@
 (ns sneer.neide-and-carla
   (:require [sneer.integration-test-util :refer [sneer! connect!]]
-            [sneer.test-util :refer [<next]])
+            [sneer.rx-test-util :refer [<next]])
   (:import [sneer.convos Convos]))
 
 (defn neide-and-carla []

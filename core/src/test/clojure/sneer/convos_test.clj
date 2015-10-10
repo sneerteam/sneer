@@ -2,7 +2,8 @@
   (:require [midje.sweet :refer :all]
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! connect! puk]]
-            [sneer.test-util :refer [emits emits-error ->chan <!!? <next]])
+            [sneer.rx-test-util :refer [emits emits-error ->chan <next]]
+            [sneer.test-util :refer [<!!?]])
   (:import [sneer.convos Convo Convos ChatMessage Summary]
            [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))

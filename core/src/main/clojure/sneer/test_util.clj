@@ -2,9 +2,7 @@
   (:require
     [sneer.commons :refer [nvl loop-trace]]
     [sneer.async :refer [decode-nil]]
-    [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]]
-    [rx.lang.clojure.core :as rx]
-    [sneer.rx :refer [observe-for-io subscribe-on-io]])
+    [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]])
   (:import [java.io File]))
 
 (defn ->clj [o]
@@ -78,35 +76,9 @@
     (compromised ch)
     ch))
 
-(defn subscribe-chan [c observable]
-  (rx/subscribe observable
-                #(>!! c (nvl % :nil))  ; Channels cannot take nil
-                #(do
-                   #_(.printStackTrace %)
-                   (>!! c {::error %})
-                   (close! c))
-                #(close! c)))
-
-(defn observable->chan
-  ([obs]
-   (doto (chan)
-     (subscribe-chan obs)))
-  ([obs xform]
-   (doto (chan 1 xform)
-     (subscribe-chan obs))))
-
-(defn ->chan2
-  ([obs]
-   (observable->chan (subscribe-on-io obs)))
-  ([obs xform]
-   (observable->chan (subscribe-on-io obs) xform)))
-
 (defn pst [fn]
   (try (fn)
        (catch Exception e (.printStackTrace e))))
-
-(defn ->chan [^rx.Observable o]
-  (->> o observe-for-io observable->chan))
 
 (defn <emits [expected]
   (fn [ch]
@@ -114,23 +86,12 @@
 
 (defn closes [ch]
   (loop-trace [last-value "<none>"]
-    (if-some [current (<!!? ch)]
-      (if (= current :timeout)
-        (do
-          (println "TIMEOUT. Last value emitted:" last-value)
-          false)
-        (recur current))
-      true)))
-
-(defn emits [expected]
-  (fn [obs]
-    (let [ch (->chan obs)]
-      (<wait-trace! ch expected))))
-
-(defn emits-error [exception-type]
-  (emits #(instance? exception-type (::error %))))
-
-(defn <next [obs]
-  (decode-nil (<!!? (->chan obs))))
+              (if-some [current (<!!? ch)]
+                (if (= current :timeout)
+                  (do
+                    (println "TIMEOUT. Last value emitted:" last-value)
+                    false)
+                  (recur current))
+                true)))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))

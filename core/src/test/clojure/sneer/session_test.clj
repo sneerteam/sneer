@@ -4,7 +4,8 @@
 
             [sneer.tuple-base-provider :refer :all]
             [sneer.rx :refer [subscribe-on-io]]
-            [sneer.test-util :refer [<!!? ->chan ->chan2 subscribe-chan]]
+            [sneer.test-util :refer [<!!?]]
+            [sneer.rx-test-util :refer [->chan ->chan2 subscribe-chan]]
             [sneer.keys :refer [->puk]]
             [sneer.conversation-test :refer [neide-maico-conversation-scenario!]]))
 

@@ -2,6 +2,7 @@
   (:require [rx.lang.clojure.core :as rx]
             [sneer.convos]
             [sneer.sessions]
+            [sneer.rx-test-util :refer :all]
             [sneer.test-util :refer :all]
             [sneer.neide-and-carla :refer :all]
             [midje.sweet :refer :all])
