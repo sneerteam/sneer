@@ -1,9 +1,9 @@
 (ns sneer.tuple.persistent-tuple-base
-  (:import [sneer.commons SystemReport]
+  (:import [sneer.commons SystemReport Clock]
            [sneer.admin UniqueConstraintViolated]
            [java.lang AutoCloseable]
            (sneer PublicKey))
-  (:require [sneer.commons :refer [now submap?]]
+  (:require [sneer.commons :refer [submap?]]
             [sneer.async :refer [dropping-chan go-trace dropping-tap]]
             [clojure.core.async :as async :refer [go-loop <! >! >!! <!! mult tap chan close! go thread]]
             [sneer.rx :refer [filter-by seq->observable]]
@@ -311,7 +311,7 @@
 
 (defn timestamped [proto-tuple]
   (let [max-size 1000]
-    (serialization/roundtrip (assoc proto-tuple "timestamp" (now)) max-size)))
+    (serialization/roundtrip (assoc proto-tuple "timestamp" (Clock/now)) max-size)))
 
 (defn store-sub [tuple-base own-puk criteria]
   (let [sub {"type" "sub" "author" own-puk "criteria" criteria}]

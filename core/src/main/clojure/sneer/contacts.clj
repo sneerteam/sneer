@@ -2,14 +2,14 @@
   (:require
     [clojure.core.async :refer [chan <! >! alt! go close!]]
     [sneer.async :refer [go-trace state-machine tap-state peek-state! go-loop-trace wait-for! encode-nil sliding-chan close-with!]]
-    [sneer.commons :refer [now nvl]]
+    [sneer.commons :refer [nvl]]
     [sneer.flux :refer [tap-actions response request]]
     [sneer.keys :refer [from-hex]]
     [sneer.rx :refer [obs-tap]]
     [sneer.tuple-base-provider :refer :all]
     [sneer.tuple.protocols :refer [store-tuple query-with-history]])
   (:import
-    [sneer.commons Container]
+    [sneer.commons Container Clock]
     [sneer.flux Dispatcher]
     [sneer.admin SneerAdmin]
     [sneer.commons.exceptions FriendlyException]
@@ -33,7 +33,7 @@
   (let [admin (produce container SneerAdmin)
         own-puk (puk admin)
         tuple-base (tuple-base-of admin)
-        defaults {"timestamp" (now)
+        defaults {"timestamp" (Clock/now)
                   "audience"  own-puk
                   "author"    own-puk}]
       (store-tuple tuple-base (merge defaults tuple))))
