@@ -1,7 +1,8 @@
 (ns sneer.commons
   (:import [java.lang AutoCloseable]
            (java.io Closeable)
-           (java.util Arrays)))
+           (java.util Arrays Map)
+           (clojure.lang PersistentQueue)))
 
 (defprotocol Disposable
   (dispose [resource]))
@@ -38,7 +39,7 @@
   [& body]
   `(reify ~@(map macroexpand body)))
 
-(def empty-queue clojure.lang.PersistentQueue/EMPTY)
+(def empty-queue PersistentQueue/EMPTY)
 
 (defn byte-array= [^bytes a1 ^bytes a2]
   (Arrays/equals a1 a2))
@@ -69,7 +70,7 @@
 (defn flip [f]
   (fn [x y] (f y x)))
 
-(defn update-java-map [^java.util.Map jmap key fn]
+(defn update-java-map [^Map jmap key fn]
   (let [old-value (.get jmap key)]
     (.put jmap key (fn old-value))))
 
