@@ -1,7 +1,6 @@
 (ns sneer.test-util
   (:require
     [sneer.commons :refer [nvl loop-trace]]
-    [sneer.async :refer [decode-nil]]
     [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]])
   (:import [java.io File]))
 
