@@ -2,6 +2,7 @@ package sneer.android;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -29,12 +30,15 @@ public class PartnerSession implements Closeable {
 
 	private static boolean wasBound;
 
-	public static PartnerSession join(Activity activity, Listener listener) {
-		return new PartnerSession(activity, listener);
-	}
+    public static PartnerSession join(Activity activity, Listener listener) {
+        return join(activity, activity.getIntent(), listener);
+    }
+    /** @param intent The intent started by Sneer for an app's activity. */
+    public static PartnerSession join(Context context, Intent intent, Listener listener) {
+        return new PartnerSession(context, intent, listener);
+    }
 
 	public boolean wasStartedByMe() {
-		Intent intent = activity.getIntent();
 		if (!intent.hasExtra(IS_OWN)) throw new IllegalStateException("Unable to determine who started the session.");
 		return intent.getBooleanExtra(IS_OWN, false);
 	}
@@ -52,11 +56,12 @@ public class PartnerSession implements Closeable {
 
 	@Override
 	public void close() {
-		if (wasBound) activity.unbindService(connection);
+		if (wasBound) context.unbindService(connection);
 	}
 
 
-	private final Activity activity;
+	private final Context context;
+    private Intent intent;
     private final Listener listener;
 	private final CountDownLatch connectionPending = new CountDownLatch(1);
 	private final ServiceConnection connection = createConnection();
@@ -84,26 +89,38 @@ public class PartnerSession implements Closeable {
 	}
 
 
-    private PartnerSession(Activity activity, Listener listener) {
-		this.activity = activity;
+    private PartnerSession(Context context_, Intent intent_, Listener listener) {
+		this.context = context_;
+        this.intent = intent_;
         this.listener = listener;
 
         if (wasBound) finish("PartnerSession has already been joined.");
 
-	    Intent sneer = activity.getIntent().getParcelableExtra(IPCProtocol.JOIN_SESSION);
+	    Intent sneer = intent.getParcelableExtra(IPCProtocol.JOIN_SESSION);
 	    if (sneer == null) {
-		    if (SneerInstallation.checkConversationContext(activity))
-			    finish(activity.getLocalClassName() + ": Make sure Sneer session metadata is correctly set in your AndroidManifest.xml file");
-		    return;
+            handleSneerNotfound();
+            return;
 	    }
-		wasBound = activity.bindService(sneer, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
+		wasBound = context.bindService(sneer, connection, BIND_AUTO_CREATE | BIND_IMPORTANT);
 		if (!wasBound) finish("Unable to connect to Sneer");
     }
 
 
-	private void finish(String endingToast) {
+    private void handleSneerNotfound() {
+        String message = context.getClass().getSimpleName() + ": Make sure Sneer session metadata is correctly set in your AndroidManifest.xml file";
+
+        if (context instanceof Activity) {
+            if (SneerInstallation.checkConversationContext((Activity)context))
+                finish(message);
+        } else
+            throw new IllegalStateException(message);
+    }
+
+
+    private void finish(String endingToast) {
 		toast(endingToast);
-		activity.finish();
+        if (context instanceof Activity)
+            ((Activity)context).finish();
 	}
 
 
@@ -116,13 +133,22 @@ public class PartnerSession implements Closeable {
 		else
 			listener.onMessage(getMessage(content));
 
-		if (isUpToDate)	activity.runOnUiThread(new Runnable() { @Override public void run() {
-			listener.onUpToDate();
-		}});
+		if (isUpToDate)
+            handleUpToDate();
 	}
 
+    private void handleUpToDate() {
+        Runnable runnable = new Runnable() { @Override public void run() {
+            listener.onUpToDate();
+        }};
+        if (context instanceof Activity)
+            ((Activity)context).runOnUiThread(runnable);
+        else
+            runnable.run();
+    }
 
-	private void sendToSneer(Object data) {
+
+    private void sendToSneer(Object data) {
 		android.os.Message msg = asMessage(data);
 		try {
 			doSendToSneer(msg);
@@ -174,7 +200,7 @@ public class PartnerSession implements Closeable {
 
 
 	private void toast(String message) {
-		Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+		Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 	}
 
 
