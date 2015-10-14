@@ -28,8 +28,6 @@ import static sneer.android.impl.IPCProtocol.IS_OWN;
 
 public class PartnerSession implements Closeable {
 
-	private static boolean wasBound;
-
     public static PartnerSession join(Activity activity, Listener listener) {
         return join(activity, activity.getIntent(), listener);
     }
@@ -65,8 +63,10 @@ public class PartnerSession implements Closeable {
     private final Listener listener;
 	private final CountDownLatch connectionPending = new CountDownLatch(1);
 	private final ServiceConnection connection = createConnection();
-	private boolean isUpToDate = false;
+
 	private Messenger toSneer;
+    private boolean wasBound;
+    private boolean isUpToDate = false;
 
 
 	private ServiceConnection createConnection() {
@@ -93,8 +93,6 @@ public class PartnerSession implements Closeable {
 		this.context = context_;
         this.intent = intent_;
         this.listener = listener;
-
-        if (wasBound) finish("PartnerSession has already been joined.");
 
 	    Intent sneer = intent.getParcelableExtra(IPCProtocol.JOIN_SESSION);
 	    if (sneer == null) {
