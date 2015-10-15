@@ -23,6 +23,5 @@ local.properties
 
 .byke
 
-custom.sh
-
-.docker-dev/
+android/SnicTacToe
+android/location
