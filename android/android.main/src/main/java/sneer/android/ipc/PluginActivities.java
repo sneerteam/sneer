@@ -2,6 +2,7 @@ package sneer.android.ipc;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.widget.Toast;
 
 import rx.functions.Action1;
@@ -16,15 +17,19 @@ import static sneer.android.impl.IPCProtocol.SEND_MESSAGE;
 
 public class PluginActivities {
 
+	public static final String SEARCH_SNEER_APPS_URL = "https://play.google.com/store/search?q=SneerApp";
+
 	public static void start(final Context context, Plugin plugin, long convoId) {
 		start(context, plugin, convoId, null);
 	}
 
 	public static void open(Context context, SessionHandle session, long convoId) {
 		Plugin plugin = Plugins.forSessionType(context, session.type);
-		if (plugin == null)
-			Toast.makeText(context, "Please install an app for " + session.type, Toast.LENGTH_LONG).show();
-		else
+		if (plugin == null) {
+			Intent urlIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SEARCH_SNEER_APPS_URL + " " + session.type));
+			urlIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			context.startActivity(urlIntent);
+		} else
 			start(context, plugin, convoId, session);
 	}
 
