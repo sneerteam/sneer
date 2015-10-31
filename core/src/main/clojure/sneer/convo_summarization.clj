@@ -177,16 +177,4 @@
     (reify ConvoSummarization
 
       (slidingSummaries [_]
-        (sliding-summaries! machine))
-
-      (processUpToId
-       [_ id]
-       (let [state (tap-state machine)]
-         (go-trace
-           (loop []
-             (let [current (<! state)
-                   last-id (current :last-id)]
-               (when (< last-id id)
-                 (recur))))
-           (close! state)
-           nil))))))
+        (sliding-summaries! machine)))))
