@@ -1,4 +1,4 @@
-(ns sneer.convo-summarization-test
+(ns sneer.convo-summarization-test-old
   (:require [midje.sweet :refer :all]
             [clojure.core.async :refer [chan close!]]
             [sneer.async :refer [sliding-chan]]
@@ -7,8 +7,7 @@
             [sneer.integration-test-util :refer [sneer!]]
             [sneer.tuple.protocols :refer :all]
             [sneer.tuple-base-provider :refer [tuple-base-of]]
-            [sneer.keys :as keys]
-            [sneer.convo-summarization :as subject])
+            [sneer.keys :as keys])
   (:import (sneer.admin SneerAdmin)
            (sneer.interfaces ConvoSummarization)
            (java.io Closeable)))
