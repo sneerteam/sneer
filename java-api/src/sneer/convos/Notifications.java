@@ -8,6 +8,8 @@ public interface Notifications {
 	Observable<Notification> get();
 
 	public class Notification {
+
+        /** Null for multiple conversations. */
 		public final Long convoId;
 		public final String title;
 		public final String text;

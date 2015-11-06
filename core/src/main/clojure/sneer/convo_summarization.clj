@@ -99,7 +99,8 @@
 ;;         :puk->summary {NeidePuk {:timestamp long
 ;;                                  :preview "Hi, Maico"
 ;;                                  :unread "*"
-;;                                  :last-received original_id}}
+;;                                  :last-received original_id}
+;;         :contacts {...} }
 (defn- start-summarization-machine! [^Container container previous-state]
   (let [lease (.produce container :lease)
         admin ^SneerAdmin (.produce container SneerAdmin)
@@ -147,7 +148,7 @@
     (start-saving-snapshots-to! file (tap-state machine))
     machine))
 
-;; State -> [{:id :nick :timestamp :summary}]
+;; State -> [{:id :nick :timestamp :preview :unread}]
 (defn -summarize [{:keys [puk->summary contacts]}]
   (->>
    contacts
