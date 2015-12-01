@@ -33,7 +33,6 @@ public class SneerApp extends MultiDexApplication {
 		if (SneerAndroidSingleton.admin() == null)
 			System.out.println("CORE NOT FOUND.");
 		else {
-			PartnerSessions.init(SneerAndroidSingleton.sneer().conversations());
 			GcmRegistrationAlarmReceiver.schedule(app);
 
 			// New container way:
