@@ -69,7 +69,7 @@
     (go-while-let [action (<! actions)]
       (case (:type action)
         "send-session-message"
-        (<! (handle-send-session-message own-puk tuple-base action))
+          (<! (handle-send-session-message own-puk tuple-base action))
         :pass))))
 
 (defn reify-Sessions [container]

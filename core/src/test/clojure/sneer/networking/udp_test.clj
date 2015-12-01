@@ -1,8 +1,8 @@
 (ns sneer.networking.udp-test
-  (:require [midje.sweet :refer :all]
+  (:require [midje.sweet :refer [fact]]
             [sneer.networking.udp :refer [start-udp-server]]
             [sneer.test-util :refer :all]
-            [clojure.core.async :as async :refer [chan >!! close!]])
+            [clojure.core.async :refer [chan >!! close!]])
   (:import [java.net InetSocketAddress]))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))

@@ -5,8 +5,8 @@
             [sneer.rx-test-util :refer :all]
             [sneer.test-util :refer :all]
             [sneer.neide-and-carla :refer :all]
-            [midje.sweet :refer :all])
-  (:import [sneer.convos Convos Sessions Sessions$Actions]
+            [midje.sweet :refer [fact facts]])
+  (:import [sneer.convos Convos Sessions Sessions$Actions Convo]
            [sneer.flux Dispatcher]
            [sneer.rx Timeline]
            [rx Observable]))
@@ -33,7 +33,7 @@
        (rx/filter some?)))
 
 (facts "About sessions"
-  (let [{:keys [neide carla n->c c->n]} (neide-and-carla)
+  (let [{:keys [neide carla ^Convo n->c ^Convo c->n]} (neide-and-carla)
         neide-sessions #(sessions neide (.id n->c))
         carla-sessions #(sessions carla (.id c->n))]
     (with-open [neide neide

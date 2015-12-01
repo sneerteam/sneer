@@ -1,7 +1,7 @@
 (ns sneer.networking.client-test
   (:require
-   [midje.sweet :refer :all]
-   [clojure.core.async :as async :refer [thread to-chan chan close! >!! map>]]
+   [midje.sweet :refer [fact]]
+   [clojure.core.async :refer [thread to-chan chan close! >!! map>]]
    [sneer.test-util :refer :all]
    [sneer.async :refer :all]
    [sneer.networking.client :refer :all]))
@@ -10,7 +10,6 @@
 
 (def t1 {"id" 1 "author" :A :payload "1"})
 (def t2 {"id" 2 "author" :A :payload "2"})
-(def t3 {"id" 3 "author" :A :payload "3"})
 
 (def tC {"id" 42 "author" :C :payload "42"})
 

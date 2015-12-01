@@ -1,5 +1,5 @@
 (ns sneer.notifications-test
-  (:require [midje.sweet :refer :all]
+  (:require [midje.sweet :refer [fact facts]]
             [rx.lang.clojure.core :as rx]
             [sneer.test-util :refer :all]
             [sneer.rx-test-util :refer :all]

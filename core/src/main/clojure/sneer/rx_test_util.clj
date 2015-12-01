@@ -5,7 +5,7 @@
     [sneer.async :refer [decode-nil]]
     [sneer.commons :refer [nvl]]
     [sneer.rx :refer [observe-for-io subscribe-on-io]]
-    [sneer.test-util :refer [<wait-trace! <!!?]]
+    [sneer.test-util :refer [<wait-trace! <!!? closes]]
     )
   (:import [rx Observable]))
 
@@ -45,5 +45,8 @@
 
 (defn <next [obs]
   (decode-nil (<!!? (->chan obs))))
+
+(defn completes [obs]
+  (closes (->chan2 obs)))
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
