@@ -12,7 +12,7 @@
            [rx Observable]))
 
 (defn extract [coll & fields]
-  (map (comp (apply juxt fields) ->clj)
+  (map (comp (apply juxt fields) ->clj-map)
        coll))
 
 (defn sessions [sneer convo-id]
@@ -57,11 +57,30 @@
           (. c-convos summaries) => (emits #(-> % (extract :nickname :textPreview :unread)
                                                   (= [["Neide" "candy-crush" "*"]])))))
 
-      (fact "Carla sees unread message"
+      (fact "Messages are exchanged"
         (let [n->c-session (<next (first-session (neide-sessions)))
-              c->n-session (<next (first-session (carla-sessions)))
-              payload 42]
-          (.dispatch (neide Dispatcher)
-                     (Sessions$Actions/sendMessage (.id n->c-session) payload))
-          (let [timeline (.messages (carla Sessions) (.id c->n-session))]
-            (rx/map ->clj (play timeline)) => (emits {:payload payload :isOwn false})))))))
+              c->n-session (<next (first-session (carla-sessions)))]
+
+          (let [c-timeline (.messages (carla Sessions) (.id c->n-session))
+                n-timeline (.messages (neide Sessions) (.id n->c-session))]
+            (.past c-timeline) => completes
+            (.past n-timeline) => completes
+
+            (.dispatch (neide Dispatcher)
+                       (Sessions$Actions/sendMessage (.id n->c-session) "candy"))
+
+            (rx/map ->clj-map (.future n-timeline)) => (emits {:payload "candy" :isOwn true })
+            (rx/map ->clj-map (.future c-timeline)) => (emits {:payload "candy" :isOwn false}))
+
+          (let [c-timeline (.messages (carla Sessions) (.id c->n-session))
+                n-timeline (.messages (neide Sessions) (.id n->c-session))]
+            (rx/map ->clj-map (.past   n-timeline)) => (emits {:payload "candy" :isOwn true })
+            (rx/map ->clj-map (.past   c-timeline)) => (emits {:payload "candy" :isOwn false})
+            (.past n-timeline) => completes
+            (.past c-timeline) => completes
+
+            (.dispatch (carla Dispatcher)
+                       (Sessions$Actions/sendMessage (.id c->n-session) "crush"))
+
+            (rx/map ->clj-map (.future n-timeline)) => (emits {:payload "crush" :isOwn false})
+            (rx/map ->clj-map (.future c-timeline)) => (emits {:payload "crush" :isOwn true })            ))))))

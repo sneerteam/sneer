@@ -4,7 +4,7 @@
     [clojure.core.async :refer [alt!! timeout filter> >!! <!! close! chan]])
   (:import [java.io File]))
 
-(defn ->clj [o]
+(defn ->clj-map [o]
   (when (some? o)
     (into {} (map (fn [field] [(keyword (.getName field)) (.get field o)])
                   (.getFields (class o))))))
