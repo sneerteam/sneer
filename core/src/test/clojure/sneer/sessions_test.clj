@@ -57,7 +57,7 @@
           (. c-convos summaries) => (emits #(-> % (extract :nickname :textPreview :unread)
                                                   (= [["Neide" "candy-crush" "*"]])))))
 
-      (fact "Messages are exchanged"
+      #_(fact "Messages are exchanged"
         (let [n->c-session (<next (first-session (neide-sessions)))
               c->n-session (<next (first-session (carla-sessions)))]
 

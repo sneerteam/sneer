@@ -2,7 +2,8 @@
   (:require [midje.sweet :refer :all]
             [clojure.core.async :refer [close! chan <! >!]]
             [sneer.async :refer [go-while-let]]
-            [sneer.rx-test-util :refer [emits]]
+            [sneer.tuple.persistent-tuple-base :refer [starting-id]]
+            [sneer.rx-test-util :refer [emits <next]]
             [sneer.tuple.jdbc-database :refer [create-sqlite-db]]
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.transmitter :as transmitter])
@@ -11,7 +12,9 @@
            [sneer.impl CoreLoader]
            [java.io Closeable]
            [sneer.tuple.protocols Database]
-           (sneer.admin SneerAdmin)))
+           (sneer.admin SneerAdmin)
+           (java.util Random)
+           (sneer.convos Convos)))
 
 (defn admin->puk [admin]
   (.. admin privateKey publicKey))
@@ -41,7 +44,11 @@
 (defn connect! [container-a container-b]
   (connect-admins! (container-a SneerAdmin) (container-b SneerAdmin)))
 
+(defn- avoid-id-coincidences []
+  (swap! starting-id #(+ 1000 %)))
+
 (defn sneer! []
+  (avoid-id-coincidences)
   (let [delegate (Container. (CoreLoader.))
         transient nil]
     (.inject delegate PersistenceFolder (reify PersistenceFolder (get [_] transient)))

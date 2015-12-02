@@ -154,9 +154,10 @@
   (let [rs (query-tuples-from-db db criteria)]
     (-> rs empty?)))
 
+(def starting-id (atom 0))
 (defn max-tuple-id [db]
   (let [rs (db-query db ["SELECT MAX(id) FROM tuple"])]
-    (or (-> rs second first) 0)))
+    (or (-> rs second first) @starting-id)))
 
 (defn idempotently [creation-fn]
   (try
