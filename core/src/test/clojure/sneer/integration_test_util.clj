@@ -76,3 +76,27 @@
 
       Closeable
       (close [_] (close! (.produce delegate :lease))))))
+
+(defn- connect-all! [community new-member]
+  (doseq [member community]
+    (connect! new-member member))
+  (conj community new-member))
+
+(defn- step [community random invites]
+  (let [inviter-index (.nextInt random (count community))
+        _ ()
+        invited-index (.nextInt random (count community))
+        inviter (community inviter-index)
+        invited (community invited-index)
+        inviter-convo-id (<next (.startConvo (inviter Convos) (str "Nick " invited-index)))
+        inviter-convo (<next (.getById (inviter Convos) inviter-convo-id))
+        invite-code (.inviteCodePending inviter-convo)]
+    (println "CODE" invite-code)
+    (println "ID" (<next (.acceptInvite (invited Convos) (str "Nick " inviter-index) invite-code)))))
+
+(defn randest []
+  (let [community (vec (repeatedly 2 sneer!))
+        random (Random.)
+        invites (atom (list))]
+    (reduce connect-all! [] community)
+    (repeatedly 50 #(step community random invites))))
