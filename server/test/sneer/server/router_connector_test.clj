@@ -1,6 +1,6 @@
 (ns sneer.server.router-connector-test
   (:require
-    [midje.sweet :refer :all]
+    [midje.sweet :refer [tabular fact]]
     [clojure.core.async :as async :refer [thread to-chan chan close! >!! <!]]
     [clojure.core.match :refer [match]]
     [sneer.test-util :refer :all]

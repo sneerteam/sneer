@@ -1,6 +1,6 @@
 (ns sneer.server.router-test
   (:require
-   [midje.sweet :refer :all]
+   [midje.sweet :refer [fact facts]]
    [sneer.test-util :refer :all]
    [sneer.server.router :refer :all]))
 
