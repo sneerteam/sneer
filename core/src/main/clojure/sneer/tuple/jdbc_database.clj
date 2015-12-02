@@ -5,10 +5,9 @@
   (:import [java.sql DriverManager SQLException]
            [sneer.admin UniqueConstraintViolated]
            [java.util.concurrent.locks Lock ReentrantReadWriteLock]
-           [java.io Closeable]
-           [sneer.commons PersistenceFolder]))
+           [java.io Closeable File]))
 
-(defn- get-connection [databaseFile]
+(defn- get-connection [^File databaseFile]
   (DriverManager/getConnection
    (if databaseFile
      (str "jdbc:sqlite:" (.getAbsolutePath databaseFile))
