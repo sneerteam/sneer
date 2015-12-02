@@ -58,7 +58,7 @@
             (.. subject (type "has-id") (pub "42"))
             (fn [tuple] (async/go (>! tuple-out tuple))))
 
-          (get (<!!? tuple-out) "id") => 1)))))
+          (get (<!!? tuple-out) "id") => some?)))))
 
 
 (facts "About TupleFilter#tuples"
