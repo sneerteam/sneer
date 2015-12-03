@@ -12,7 +12,8 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [com.cognitect/transit-clj "0.8.281"]
                  [com.netflix.rxjava/rxjava-core "0.20.7"]
-                 [org.clojure/java.jdbc "0.4.1"]]
+                 [org.clojure/java.jdbc "0.4.1"]
+                 [org.clojure/core.cache "0.6.4"]]
 
   :profiles {:lean
              {:dependencies [[org.skummet/clojure-android "1.7.0-alpha5-r1" :use-resources true]]
@@ -66,7 +67,8 @@
              {:aot [sneer.impl.CoreLoader]
               :dependencies [[org.clojure/clojure "1.7.0"]
                              [midje "1.7.0"]
-                             [org.xerial/sqlite-jdbc "3.8.11.1"]]
+                             [org.xerial/sqlite-jdbc "3.8.11.1"]
+                             [org.clojure/core.cache "0.6.4"]]
               :plugins [[lein-midje "3.1.3"]]}}
 
 

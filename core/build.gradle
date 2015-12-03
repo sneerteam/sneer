@@ -51,6 +51,7 @@ dependencies {
   compile external['clojure.core']
   compile external['clojure.core.async']
   compile external['clojure.core.match']
+  compile external['clojure.core.cache']
   compile('com.cognitect:transit-clj:0.8.269') {
     exclude group: 'org.msgpack', module: 'msgpack'
     exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
