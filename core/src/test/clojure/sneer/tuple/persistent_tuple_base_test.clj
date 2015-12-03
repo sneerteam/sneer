@@ -23,10 +23,9 @@
   (partial selecting ["id" "original_id"]))
 
 (facts "About store-tuple"
+  (reset! starting-id 0)
   (with-open [db (jdbc-database/create-sqlite-db)
               subject (create db)]
-
-    (reset! starting-id 0)
 
     (fact "It remembers original-id"
       (let [t (assoc t1 "id" 42)]
