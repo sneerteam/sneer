@@ -8,10 +8,7 @@
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.persistent-tuple-base :refer [timestamped]]
             [sneer.queries :refer :all])
-  (:import [sneer.commons Container]
-           [sneer.flux Dispatcher]
-           [sneer.admin SneerAdmin]
-           [sneer.convos Sessions SessionMessage]
+  (:import [sneer.convos SessionMessage]
            [sneer.rx Timeline]
            [rx Subscriber]))
 
@@ -54,10 +51,10 @@
 
 (defn- handle-send-session-message [own-puk tuple-base {:strs [session-id payload]}]
   (go
-    (when-some [{:strs [author audience session-author]} (<! (query-session-tuple tuple-base session-id))]
+    (when-some [{:strs [author audience session-author original_id]} (<! (query-session-tuple tuple-base session-id))]
       (let [tuple {"type"           "session-message"
                    "session-author" session-author
-                   "session-id"     session-id
+                   "session-id"     original_id
                    "author"         own-puk
                    "audience"       (if (= own-puk author) audience author)
                    "payload"        payload}]
