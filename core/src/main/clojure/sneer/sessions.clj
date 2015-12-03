@@ -9,6 +9,10 @@
             [sneer.tuple.persistent-tuple-base :refer [timestamped]]
             [sneer.queries :refer :all])
   (:import [sneer.convos SessionMessage]
+           [sneer.commons Container]
+           [sneer.flux Dispatcher]
+           [sneer.admin SneerAdmin]
+           [sneer.convos Sessions SessionMessage]
            [sneer.rx Timeline]
            [rx Subscriber]))
 
