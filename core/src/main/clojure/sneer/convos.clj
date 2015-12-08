@@ -61,7 +61,8 @@
         (let [{:strs [contact-id message-id]} action
               contact-puk (<! (id->puk contacts contact-id))
               tuple {"author" own-puk "type" "message-read" "audience" contact-puk "payload" message-id}]
-          (store-tuple tb (timestamped tuple) tuple))
+          #_(store-tuple tb (timestamped tuple) tuple)      ;Allow redundant message-read tuples to be generated as a hack to clear the unread status of convos that have session messages. See convo-summarization/update-with-read
+          (store-tuple tb (timestamped tuple)))
 
         "start-session"
         (let [{:strs [contact-id session-type]} action

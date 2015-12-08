@@ -62,8 +62,9 @@
 
 (defn- update-with-read [summary tuple]
   (let [msg-id (tuple "payload")]
-    (cond-> summary
-      (= msg-id (:last-received summary)) (assoc :unread ""))))
+    #_(cond-> summary
+      (= msg-id (:last-received summary)) (assoc :unread "")) ; Handle redundant message-read tuples as a hack to clear the unread status of convos that have session messages. See "set-message-read" event handling in convos.
+    (assoc summary :unread "")))
 
 (defn- handle-read-receipt [own-puk state tuple]
   (let [contact-puk (tuple "audience")]

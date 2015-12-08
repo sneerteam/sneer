@@ -42,19 +42,17 @@ public class PartnerSessions extends Service {
             messages.past.subscribe(new Observer<SessionMessage>() {
                 @Override
                 public void onCompleted() {
-                    System.out.println("############ PAST ON COMPLETED");
                     sendDataToApp(IPCProtocol.UP_TO_DATE);
+                    ////////////////////// Set message read.
                 }
 
                 @Override
                 public void onError(Throwable throwable) {
-                    System.out.println("############ PAST ON ERROR");
                     throwable.printStackTrace();
                 }
 
                 @Override
                 public void onNext(SessionMessage message) {
-                    System.out.println("############ PAST ON NEXT");
                     sendToApp(message);
                 }
             });
@@ -62,9 +60,8 @@ public class PartnerSessions extends Service {
             messages.future.subscribe(new Action1<SessionMessage>() {
                 @Override
                 public void call(SessionMessage message) {
-                    System.out.println("############ FUTURE ON NEXT");
                     sendToApp(message);
-                    System.out.println("############ FUTURE ON NEXT AFTER");
+                    ///////////////////// Set message read.
                 }
             });
 		}
