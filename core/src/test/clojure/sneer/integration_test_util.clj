@@ -1,9 +1,10 @@
 (ns sneer.integration-test-util
-  (:require [midje.sweet :refer :all]
-            [clojure.core.async :refer [close! chan <! >!]]
+  (:require [midje.sweet :refer [fact]]
+            [clojure.core.async :refer [close! chan <! >! mult tap]]
             [sneer.async :refer [go-while-let]]
             [sneer.tuple.persistent-tuple-base :refer [starting-id]]
             [sneer.rx-test-util :refer [emits <next]]
+            [sneer.test-util :refer :all]
             [sneer.tuple.jdbc-database :refer [create-sqlite-db]]
             [sneer.tuple-base-provider :refer :all]
             [sneer.tuple.transmitter :as transmitter])
@@ -12,9 +13,9 @@
            [sneer.impl CoreLoader]
            [java.io Closeable]
            [sneer.tuple.protocols Database]
-           (sneer.admin SneerAdmin)
-           (java.util Random)
-           (sneer.convos Convos)))
+           [sneer.admin SneerAdmin]
+           [java.util Random]
+           [sneer.convos Convos]))
 
 (defn admin->puk [admin]
   (.. admin privateKey publicKey))
@@ -84,7 +85,6 @@
 
 (defn- step [community random invites]
   (let [inviter-index (.nextInt random (count community))
-        _ ()
         invited-index (.nextInt random (count community))
         inviter (community inviter-index)
         invited (community invited-index)
@@ -92,11 +92,46 @@
         inviter-convo (<next (.getById (inviter Convos) inviter-convo-id))
         invite-code (.inviteCodePending inviter-convo)]
     (println "CODE" invite-code)
-    (println "ID" (<next (.acceptInvite (invited Convos) (str "Nick " inviter-index) invite-code)))))
+    (println "ID" (<next (.acceptInvite (invited Convos) (str "Nick " inviter-index) invite-code)))
+    (println "PENDING AFTER" )
+    (fact "BLA"
+      (.getById (inviter Convos) inviter-convo-id) => (emits #(nil? (.inviteCodePending %)))
+      (println "BELEZA============="))))
+
+(defn create-broadcaster []
+  (let [tuples-out (chan)]
+    {:tuples-out tuples-out
+     :tuples-out-mult (mult tuples-out)}))
+
+(defn create-tuples-in! [broadcaster]
+  (let [ret (chan)]
+    (tap (:tuples-out-mult broadcaster) ret)
+    ret))
+
+(defn tuples-out [broadcaster]
+  (:tuples-out broadcaster))
+
+(defn connect-broadcast! [broadcaster member]
+  (let [admin (member SneerAdmin)
+        puk (admin->puk admin)
+        tb (tuple-base-of admin)
+        tuples-in  (create-tuples-in! broadcaster)
+        tuples-out (tuples-out broadcaster)]
+    (println "START")
+    (transmitter/start puk tb tuples-in
+                       (fn [_follower-puk my-tuples-out & _]
+                         (println "FOLLOWER" _follower-puk)
+                         (go-while-let [[tuple ack-ch] (<! my-tuples-out)]
+                                       (>! tuples-out tuple)
+                                       (>! ack-ch tuple))))))
+
+
 
 (defn randest []
-  (let [community (vec (repeatedly 2 sneer!))
+  (let [community (vec (repeatedly 100 sneer!))
         random (Random.)
-        invites (atom (list))]
-    (reduce connect-all! [] community)
-    (repeatedly 50 #(step community random invites))))
+        invites (atom (list))
+        broadcaster (create-broadcaster)]
+    (doseq [member community]
+      (connect-broadcast! broadcaster member))
+    (repeatedly 5 #(step community random invites))))
