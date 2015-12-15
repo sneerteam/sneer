@@ -84,23 +84,23 @@ rm -rf ~/.m2/repository/me/sneer/;
 
 
 echo "Checking for correct Leiningen installation."
-if command -v lein; then
-    CUR=$(lein version | awk '{print $2}' 2>&1)
-    echo $CUR
-    if [[ ! $CUR == 2.4.3 ]]; then
-        echo "
-    Currently Sneer depends on Leiningen version 2.4.3
-    and you are using $CUR. Downloading version 2.4.3.
-    ";
-        echo y | lein downgrade 2.4.3;
-    fi
-else
-    echo "
-You don't seem to have Leiningen on your PATH.
-Please follow the instructions at http://leiningen.org/
-";
-    exit 1;
-fi
+# if command -v lein; then
+#     CUR=$(lein version | awk '{print $2}' 2>&1)
+#     echo $CUR
+#     if [[ ! $CUR == 2.4.3 ]]; then
+#         echo "
+#     Currently Sneer depends on Leiningen version 2.4.3
+#     and you are using $CUR. Downloading version 2.4.3.
+#     ";
+#         echo y | lein downgrade 2.4.3;
+#     fi
+# else
+#     echo "
+# You don't seem to have Leiningen on your PATH.
+# Please follow the instructions at http://leiningen.org/
+# ";
+#     exit 1;
+# fi
 
 
 echo "Gradlew clean ckeck install"
