@@ -1,40 +1,39 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FFF"
-    tools:context=".MainActivity">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FFF"
+                tools:context=".MainActivity">
 
-    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:local="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
+        elevation="4dp"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:local="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/ColorPrimary"
-        local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        elevation="4dp">
+        local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
     </android.support.v7.widget.Toolbar>
 
     <ListView
         android:id="@+id/conversationList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
         android:layout_below="@id/toolbar"
-        android:layout_alignParentBottom="true"
-    />
+        />
 
-    <ImageButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/addButton"
-        android:src="@drawable/ic_person_add_white_24dp"
-        android:background="@drawable/fab_shape"
-        android:layout_margin="16dp"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
-        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
         android:onClick="onAddContactClicked"
-    />
+        android:src="@drawable/ic_person_add_white_24dp"/>
 
 </RelativeLayout>
