@@ -77,7 +77,8 @@
         <activity
             android:name="sneer.android.ui.SystemReportActivity"
             android:label="@string/title_activity_system_report"
-            android:parentActivityName="sneer.android.ui.ConvosActivity">
+            android:parentActivityName="sneer.android.ui.ConvosActivity"
+            android:theme="@style/AppThemeMaterial">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="sneer.android.ui.ConvosActivity" />
