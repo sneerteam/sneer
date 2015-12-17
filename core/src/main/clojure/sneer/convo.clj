@@ -3,6 +3,7 @@
   (:require [rx.lang.clojure.core :as rx]
             [clojure.core.async :as async :refer [<! >! chan alts! pipe]]
             [sneer.async :refer [state-machine tap-state go-trace go-loop-trace sliding-chan close-with!]]
+            [sneer.commons :refer [flip]]
             [sneer.contacts :as contacts :refer [tap-id encode-invite]]
             [sneer.queries :refer [query-convo-tuples]]
             [sneer.rx :refer [pipe-to-subscriber! close-on-unsubscribe!]]
@@ -16,9 +17,9 @@
             [sneer.convos Convo ChatMessage SessionSummary]
             [sneer.admin SneerAdmin]))
 
-(defn- msg-ids [msg1 msg2]
-  (compare (msg1 :id)
-           (msg2 :id)))
+(defn- by-ids [v1 v2]
+  (compare (v1 :id)
+           (v2 :id)))
 
 (defn- handle-message [own-puk state message]
   (let [{:strs [id author timestamp label]} message
@@ -30,10 +31,10 @@
   (merge state contact))
 
 (defn- handle-session [own-puk state {:strs [id session-type author timestamp]}]
-  (update-in state [:sessions] (fnil conj []) {:id id
-                                               :type session-type
-                                               :own? (= author own-puk)
-                                               :timestamp timestamp}))
+  (update-in state [:sessions] conj {:id        id
+                                     :type      session-type
+                                     :own?      (= author own-puk)
+                                     :timestamp timestamp}))
 
 (defn- handle-event [own-puk state event]
   (case (event "type")
@@ -71,7 +72,9 @@
         contact-in (tap-id (contacts/from container) id lease)]
     (go-trace
       (when-let [contact (<! (pipe-until-contact-has-puk! contact-in state-out))]
-        (let [state (assoc contact :messages (sorted-set-by msg-ids))
+        (let [state (-> contact
+                        (assoc :messages (sorted-set-by by-ids))
+                        (assoc :sessions (sorted-set-by (flip by-ids))))
               [old-events new-events] (query-convo-tuples tb {"type" "message"} own-puk (contact :puk) lease)
               sessions-in (query-sessions! tb own-puk (contact :puk) lease)
               _ (pipe contact-in new-events)
