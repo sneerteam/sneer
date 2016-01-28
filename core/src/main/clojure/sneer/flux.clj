@@ -1,12 +1,12 @@
 (ns sneer.flux
   (:require
-    [clojure.core.async :refer [chan close! mult tap go >!! <!]]
-    [rx.lang.clojure.core :as rx]
-    [sneer.async :refer [close-with! go-trace decode-nil]])
+   [clojure.core.async :refer [chan close! mult tap go >!! <!]]
+   [rx.lang.clojure.core :as rx]
+   [sneer.async :refer [close-with! go-trace decode-nil]])
   (:import
-    [rx.subjects AsyncSubject]
-    [sneer.commons Container]
-    [sneer.flux Dispatcher Action Request ActionBase]))
+   [rx.subjects AsyncSubject]
+   [sneer.commons Container]
+   [sneer.flux Dispatcher Action Request ActionBase]))
 
 (defprotocol ActionSource
   (tap-actions [_ ch]))

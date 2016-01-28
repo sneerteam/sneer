@@ -1,6 +1,5 @@
 (ns sneer.async
   (:require [clojure.core.async :as async :refer [chan go >! <! <!! alt! alts! timeout mult tap close!]]
-            [clojure.stacktrace :refer [print-throwable]]
             [sneer.commons :refer :all]))
 
 (def closed-chan (doto (async/chan) async/close!))
