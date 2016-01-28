@@ -13,8 +13,8 @@
 
 (defn- start-components! [^Container container]
   (mapv #(.produce container %) [sneer.contacts/handle
-                                 sneer.convos.Sessions
-                                 sneer.convos.Convos])
+                                 sneer.convos.Convos
+                                 sneer.convos.Sessions])
   (reify Startup))
 
 (defn -load [_this component-handle container]
