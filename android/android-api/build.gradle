@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply from: '../sdktools.gradle'
 
-version = '0.1.8'
+version = '0.1.9'
 description = 'API for Sneer, the sovereign platform.'
 ext.packaging = 'jar'
 
