@@ -34,7 +34,9 @@ public class AddContactActivity extends Activity {
 		convos = SneerAndroidContainer.component(Convos.class);
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
+
 		btnSendInvite = (Button) findViewById(R.id.btn_done);
+		btnSendInvite.setEnabled(false);
 
 		btnSendInvite.setText("SEND INVITE >");
 
