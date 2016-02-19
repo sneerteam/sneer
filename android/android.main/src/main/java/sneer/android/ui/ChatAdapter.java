@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickLis
 
 	private void setColors(View row, String partyNick, boolean own) {
 		int color;
-		final RelativeLayout speechBubble = (RelativeLayout) row.findViewById(R.id.speechBubble);
+		final LinearLayout speechBubble = (LinearLayout) row.findViewById(R.id.speechBubble);
 
 		if (own) {
 			color = darkColorDeterminedBy(partyNick);

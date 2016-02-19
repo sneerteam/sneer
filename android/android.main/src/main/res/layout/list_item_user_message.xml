@@ -12,7 +12,8 @@
         android:layout_alignParentRight="true"
         android:background="@drawable/drawble_dummy"/>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:id="@+id/speechBubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,9 +24,10 @@
         <TextView
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="40dp"
-            android:paddingLeft="5dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:text="message content"
             android:textIsSelectable="true"
             android:textColor="#fff"
             android:textSize="15sp"/>
@@ -34,13 +36,13 @@
             android:id="@+id/messageTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignRight="@+id/messageContent"
-            android:layout_below="@+id/messageContent"
+            android:gravity="end"
+            android:layout_gravity="bottom|end"
             android:paddingLeft="5dp"
-            android:textColor="#fff"
+            android:text="message time"
+            android:textColor="#eee"
             android:textSize="12sp"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>
