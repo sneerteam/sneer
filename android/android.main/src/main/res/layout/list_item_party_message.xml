@@ -27,8 +27,8 @@
             android:layout_weight="1"
             android:gravity="start"
             android:text="message content"
+            android:textColor="#000"
             android:textIsSelectable="true"
-            android:textColor="#fff"
             android:textSize="15sp"/>
 
         <TextView
@@ -39,7 +39,7 @@
             android:layout_gravity="bottom|end"
             android:paddingLeft="5dp"
             android:text="message time"
-            android:textColor="#eee"
+            android:textColor="#111"
             android:textSize="12sp"/>
 
     </LinearLayout>
