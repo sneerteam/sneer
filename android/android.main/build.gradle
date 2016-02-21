@@ -61,14 +61,14 @@ if (file("$skummetArtifactsDir/me.sneer/core").exists()) {
     ivy { url skummetArtifactsDir }
   }
   repositories.remove(
-    repositories.getByName('MavenLocal'))
+      repositories.getByName('MavenLocal'))
 } else if (file("../../core/build").exists()) {
   dependencies {
     compile 'me.sneer:core:+'
   }
 } else {
-    dependencies {
-      compile 'me.sneer:crypto:+'
-      compile 'me.sneer:sneer-java-api:+'
+  dependencies {
+    compile 'me.sneer:crypto:+'
+    compile 'me.sneer:sneer-java-api:+'
   }
 }
