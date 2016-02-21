@@ -75,7 +75,12 @@ public int highestSdkAvailable(int preferredSdk) {
 public String[] buildToolsAvailable() {
     println "sdk dir: " + androidSDKDir()
     def buildToolsDir = new File(androidSDKDir(), "build-tools")
-    buildToolsDir.list([accept:{d, f-> !f.contains("android") }] as FilenameFilter).sort { a, b -> b <=> a }
+    String[] collection = buildToolsDir.list([accept:{ d, f-> !f.contains("android") }] as FilenameFilter)
+    for (int i = 0; i < collection.length; i++) {
+        String s = collection[i]
+        collection[i]=s.replace("build-tools-","")
+    }
+    collection.sort { a, b -> b <=> a }
 }
 
 public String latestBuildToolsAvailable(String defaultBuildTools) {
