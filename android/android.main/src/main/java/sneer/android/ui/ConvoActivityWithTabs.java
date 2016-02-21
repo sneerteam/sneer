@@ -328,6 +328,10 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 		return currentConvo;
 	}
 
+	public void onBtnOpenInteractionMenuClicked(View view) {
+		openInteractionMenu();
+	}
+
 
 	class ViewPagerAdapter extends PagerAdapter {
 		private final List<View> pageList = new ArrayList<>();
