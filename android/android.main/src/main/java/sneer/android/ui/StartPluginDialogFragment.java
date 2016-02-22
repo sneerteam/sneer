@@ -20,14 +20,14 @@ import android.widget.TextView;
 import java.util.List;
 
 import sneer.android.ipc.Plugin;
-import sneer.android.ipc.PluginActivities;
 import sneer.android.ipc.Plugins;
 import sneer.convos.Convo;
 import sneer.main.R;
 
-public class StartPluginDialogFragment extends DialogFragment {
+import static sneer.android.ipc.PluginActivities.SEARCH_SNEER_APPS_URL;
+import static sneer.android.ipc.PluginActivities.start;
 
-    private static final String SEARCH_SNEER_APPS_URL = "https://play.google.com/store/search?q=SneerApp";
+public class StartPluginDialogFragment extends DialogFragment {
 
     private SingleConvoProvider convoProvider;
 
@@ -63,7 +63,7 @@ public class StartPluginDialogFragment extends DialogFragment {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             dialog.dismiss();
-            PluginActivities.start(activity, plugins.get(position), convoProvider.getConvo().id);
+            start(activity, plugins.get(position), convoProvider.getConvo().id);
         }});
 
         dialog.setView(listView, 0, 0, 0, 0);
