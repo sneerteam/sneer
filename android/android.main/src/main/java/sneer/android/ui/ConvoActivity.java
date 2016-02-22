@@ -248,7 +248,7 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
                 SessionSummary summary = sessionsAdapter.getItem(position);
                 System.out.println("=============== " + summary);
                 PluginActivities.open(ConvoActivity.this, summary, convoId);
-		            }
+			}
 		});
 		sessions.setAdapter(sessionsAdapter);
 	}

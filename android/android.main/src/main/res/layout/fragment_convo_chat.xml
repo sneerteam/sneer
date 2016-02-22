@@ -4,20 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="0dp"
     android:textIsSelectable="true"
-    android:orientation="vertical"
     tools:context=".ConversationActivity">
 
     <TextView
         android:id="@+id/waitingMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="normal|italic"
-        android:text="Invitation pending"
         android:padding="15dp"
-        android:shadowColor="@color/ColorPrimary" />
+        android:shadowColor="@color/ColorPrimary"
+        android:text="Invitation pending"
+        android:textSize="20sp"
+        android:textStyle="normal|italic"/>
 
     <ListView
         android:id="@+id/messageList"
@@ -32,14 +32,15 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="0.3dp"
-        android:visibility="visible"
-        android:background="#5000"/>
+        android:background="#5000"
+        android:visibility="visible"/>
 
     <LinearLayout
         android:id="@+id/messageSender"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:layout_marginLeft="5dp"
         android:orientation="horizontal">
 
         <EditText
@@ -47,9 +48,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:hint="Type a message"
             android:inputType="textMultiLine"
             android:lines="4"
             android:minLines="1"
+            android:paddingRight="5dp"
             android:scrollbars="vertical">
         </EditText>
 
