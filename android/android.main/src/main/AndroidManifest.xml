@@ -69,7 +69,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="sneer.android.ui.ConvoActivityWithTabs"
+            android:name="sneer.android.ui.ConvoActivity"
             android:label="@string/title_conversation"
             android:parentActivityName="sneer.android.ui.ConvosActivity"
             android:theme="@style/AppThemeMaterial" />

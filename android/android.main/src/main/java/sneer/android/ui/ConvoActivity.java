@@ -46,7 +46,7 @@ import static android.text.TextUtils.isEmpty;
 import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.SneerAndroidFlux.dispatch;
 
-public class ConvoActivityWithTabs extends SneerActionBarActivity implements StartPluginDialogFragment.SingleConvoProvider {
+public class ConvoActivity extends SneerActionBarActivity implements StartPluginDialogFragment.SingleConvoProvider {
 
 	private long convoId;
 
@@ -73,7 +73,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		setContentView(R.layout.activity_convo_with_tabs);
+		setContentView(R.layout.activity_convo);
 
 		convoId = getIntent().getLongExtra("id", -1);
 		convoObservable = component(Convos.class).getById(convoId);
@@ -112,13 +112,13 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 		final View messageSender = chatView.findViewById(R.id.messageSender);
 		messageButton.setEnabled(!pending);
 		if (pending) {
-			String waitingMessage = ConvoActivityWithTabs.this.getResources().getString(R.string.conversation_activity_waiting);
+			String waitingMessage = ConvoActivity.this.getResources().getString(R.string.conversation_activity_waiting);
 			waiting.setText(Html.fromHtml(String.format(waitingMessage, currentConvo.nickname)));
 			waiting.setMovementMethod(new LinkMovementMethod() {
 				@Override
 				public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
 					if (event.getAction() == MotionEvent.ACTION_UP)
-						InviteSender.send(ConvoActivityWithTabs.this, convoId);
+						InviteSender.send(ConvoActivity.this, convoId);
 					return true;
 				}
 			});
@@ -247,7 +247,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 SessionSummary summary = sessionsAdapter.getItem(position);
                 System.out.println("=============== " + summary);
-                PluginActivities.open(ConvoActivityWithTabs.this, summary, convoId);
+                PluginActivities.open(ConvoActivity.this, summary, convoId);
 		            }
 		});
 		sessions.setAdapter(sessionsAdapter);
@@ -318,7 +318,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 	static void open(Context context, long id) {
 		Intent intent = new Intent();
-		intent.setClass(context, ConvoActivityWithTabs.class);
+		intent.setClass(context, ConvoActivity.class);
 		intent.putExtra("id", id);
 		context.startActivity(intent);
 	}

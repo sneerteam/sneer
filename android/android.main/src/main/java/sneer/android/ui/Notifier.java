@@ -99,7 +99,7 @@ public class Notifier {
 
 	private static Intent convoActivityIntent(Long convoId) {
 		Intent intent = new Intent();
-		intent.setClass(context, ConvoActivityWithTabs.class);
+		intent.setClass(context, ConvoActivity.class);
 		intent.putExtra("id", convoId);
 		return intent;
 	}

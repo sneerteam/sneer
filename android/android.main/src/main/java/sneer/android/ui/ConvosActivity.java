@@ -60,7 +60,7 @@ public class ConvosActivity extends SneerActionBarActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id_ignored) {
 				long convoId = adapter.getItem(position).convoId;
-				ConvoActivityWithTabs.open(ConvosActivity.this, convoId);
+				ConvoActivity.open(ConvosActivity.this, convoId);
 			}
 		});
 	}

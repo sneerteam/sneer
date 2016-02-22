@@ -86,7 +86,7 @@ public class AcceptInviteActivity extends Activity {
 	}
 
 	private void navigateToConvo(Long convoId) {
-		ConvoActivityWithTabs.open(AcceptInviteActivity.this, convoId);
+		ConvoActivity.open(AcceptInviteActivity.this, convoId);
 		finish();
 	}
 
