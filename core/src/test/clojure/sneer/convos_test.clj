@@ -3,7 +3,8 @@
             [sneer.convos :refer :all] ; Force compilation
             [sneer.integration-test-util :refer [sneer! connect! puk]]
             [sneer.rx-test-util :refer [emits emits-error ->chan <next]]
-            [sneer.test-util :refer [<!!?]])
+            [sneer.test-util :refer [<!!?]]
+            [sneer.flux :refer [dispatch]])
   (:import [sneer.convos Convo Convos ChatMessage Summary]
            [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))
@@ -62,7 +63,11 @@
 
             n->c-obs => (emits #(-> % .inviteCodePending nil?))
 
-            (.dispatch (neide Dispatcher) (.sendMessage n->c "hi"))
+            ;New way with less Java dependencies:
+            (dispatch (neide Dispatcher) "send-message"
+                      ["contact-id" (.id n->c)
+                       "text", "hi"])
+
             n->c-obs => (emits-messages "hi")
             c->n-obs => (emits-messages "hi")
 

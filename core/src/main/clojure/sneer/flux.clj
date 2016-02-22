@@ -22,6 +22,9 @@
       (rx/on-next subject res)
       (rx/on-completed subject))))
 
+(defprotocol SimpleDispatcher
+  (dispatch [this type key-value-pairs] "optional docs"))
+
 (defn reify-Dispatcher [^Container container]
   (let [actions (chan) #_(chan 1 (map #(do (println "ACTION:" %) %)))
         mult (mult actions)
@@ -50,7 +53,13 @@
           subject))
 
       ActionSource
-      (tap-actions [_ ch] (tap mult ch)))))
+      (tap-actions [_ ch] (tap mult ch))
+
+      SimpleDispatcher
+      (dispatch [this type key-value-pairs]
+        (let [action (assoc (apply hash-map key-value-pairs)
+                            :type type)]
+          (>!! actions action))))))
 
 (defn of-type [type]
   (fn [action] (-> action :type (= type))))
