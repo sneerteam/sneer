@@ -22,14 +22,14 @@ import static sneer.android.SneerAndroidContainer.component;
 public class ConvosActivity extends SneerActionBarActivity {
 
 	private final Convos convos = component(Convos.class);
-    private ConversationListAdapter adapter;
+    private ConvosAdapter adapter;
 	private Subscription subscription;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_conversation_list);
+		setContentView(R.layout.activity_convos);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);     // Attaching the layout to the toolbar object
         setSupportActionBar(toolbar);                               // Setting toolbar as the ActionBar with setSupportActionBar() call
@@ -52,7 +52,7 @@ public class ConvosActivity extends SneerActionBarActivity {
 	}
 
 	private void setUpConversationList() {
-        adapter = new ConversationListAdapter(this);
+        adapter = new ConvosAdapter(this);
 
         final ListView list = (ListView)findViewById(R.id.conversationList);
 		list.setAdapter(adapter);

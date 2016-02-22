@@ -73,7 +73,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		setContentView(R.layout.activity_conversation_with_tabs);
+		setContentView(R.layout.activity_convo_with_tabs);
 
 		convoId = getIntent().getLongExtra("id", -1);
 		convoObservable = component(Convos.class).getById(convoId);
@@ -160,7 +160,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 
 	private void setupChatTab() {
-		chatView = getLayoutInflater().inflate(R.layout.fragment_conversation_chat, viewPager, false);
+		chatView = getLayoutInflater().inflate(R.layout.fragment_convo_chat, viewPager, false);
 		waiting = (TextView) chatView.findViewById(R.id.waitingMessage);
 		waiting.setVisibility(View.GONE);
 		setupChatMessagesList();
@@ -233,7 +233,7 @@ public class ConvoActivityWithTabs extends SneerActionBarActivity implements Sta
 
 
 	private void setupSessionsTab() {
-		sessionsView = getLayoutInflater().inflate(R.layout.fragment_conversation_sessions, viewPager, false);
+		sessionsView = getLayoutInflater().inflate(R.layout.fragment_convo_sessions, viewPager, false);
 		setupSessionsList();
 		viewPager.addView(sessionsView);
 		viewPagerAdapter.addPage(sessionsView, "SESSIONS");

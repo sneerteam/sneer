@@ -1,9 +1,6 @@
 package sneer.android.ui;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +16,11 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static sneer.android.ui.SneerActivity.findView;
 
-class ConversationListAdapter extends ArrayAdapter<Summary> {
+class ConvosAdapter extends ArrayAdapter<Summary> {
 
 	private final LayoutInflater inflater;
 
-	public ConversationListAdapter(Activity activity) {
+	public ConvosAdapter(Activity activity) {
 		super(activity, R.layout.list_item_main);
 		inflater = activity.getLayoutInflater();
 	}
