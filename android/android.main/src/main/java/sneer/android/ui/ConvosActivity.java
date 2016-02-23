@@ -118,9 +118,11 @@ public class ConvosActivity extends SneerActionBarActivity {
 		switch (item.getItemId()) {
 			case R.id.edit_contact:
 				long convoId = adapter.getItem(info.position).convoId;
+				String oldNickname = adapter.getItem(info.position).nickname;
 				Intent intent = new Intent();
 				intent.setClass(this, EditContactActivity.class);
 				intent.putExtra("convoId", convoId);
+				intent.putExtra("oldNickname", oldNickname);
 				startActivity(intent);
 				return true;
 			case R.id.delete_contact:

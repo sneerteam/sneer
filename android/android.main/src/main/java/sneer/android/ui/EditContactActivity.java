@@ -26,6 +26,7 @@ public class EditContactActivity extends Activity {
 	private Button btnDone;
 
 	private String nickname;
+	private String oldNickname;
 	private final Convos convos = component(Convos.class);
 
 	@Override
@@ -33,7 +34,11 @@ public class EditContactActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_edit_contact);
 
+		final long convoId = getIntent().getLongExtra("convoId", -1);
+		oldNickname = getIntent().getStringExtra("oldNickname");
+
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
+		nicknameEdit.setText(oldNickname);
 
 		btnDone = (Button) findViewById(R.id.btn_done);
 		btnDone.setEnabled(false);
@@ -43,7 +48,6 @@ public class EditContactActivity extends Activity {
 		btnDone.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				long convoId = getIntent().getLongExtra("convoId", -1);
 				convos.getById(convoId).subscribe(new Subscriber<Convo>() {
 					@Override
 					public void onCompleted() {
@@ -92,7 +96,7 @@ public class EditContactActivity extends Activity {
 	}
 
 	private void refreshNicknameProblem(String error) {
-		if (!nickname.isEmpty() && error != null) nicknameEdit.setError(error);
+		if (!nickname.isEmpty() && !nickname.equals(oldNickname) && error != null) nicknameEdit.setError(error);
 		btnDone.setEnabled(!nickname.isEmpty() && error == null);
 	}
 
