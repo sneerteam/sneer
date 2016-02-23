@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/edit_contact"
+        android:orderInCategory="102"
+        android:title="Edit contact"/>
+    <item
+        android:id="@+id/delete_contact"
+        android:visible="false"
+        android:orderInCategory="103"
+        android:title="Delete contact"/>
+
+</menu>

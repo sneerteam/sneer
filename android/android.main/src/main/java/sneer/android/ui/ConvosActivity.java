@@ -1,8 +1,11 @@
 package sneer.android.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -63,6 +66,8 @@ public class ConvosActivity extends SneerActionBarActivity {
 				ConvoActivity.open(ConvosActivity.this, convoId);
 			}
 		});
+
+		registerForContextMenu(list);
 	}
 
 	@Override
@@ -96,6 +101,34 @@ public class ConvosActivity extends SneerActionBarActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		if (v.getId() == R.id.conversationList) {
+			MenuInflater inflater = getMenuInflater();
+			inflater.inflate(R.menu.convos_menu_list, menu);
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		switch (item.getItemId()) {
+			case R.id.edit_contact:
+				long convoId = adapter.getItem(info.position).convoId;
+				Intent intent = new Intent();
+				intent.setClass(this, EditContactActivity.class);
+				intent.putExtra("convoId", convoId);
+				startActivity(intent);
+				return true;
+			case R.id.delete_contact:
+				// not implemented yet
+				return true;
+			default:
+				return super.onContextItemSelected(item);
+		}
 	}
 
 }

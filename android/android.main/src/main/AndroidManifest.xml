@@ -113,6 +113,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="sneer.android.ui.ConvosActivity" />
         </activity>
+
+        <activity
+            android:name="sneer.android.ui.EditContactActivity"
+            android:label="@string/action_edit_contact"
+            android:theme="@android:style/Theme.Holo.Light.Dialog">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sneer.android.ui.ConvosActivity" />
+        </activity>
     </application>
 
 </manifest>

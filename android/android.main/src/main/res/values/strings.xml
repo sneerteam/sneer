@@ -14,6 +14,7 @@
     <!-- ContactActivity -->
     <string name="add_contact_view_nickname">Choose a nickname</string>
     <string name="action_add_contact">Add Sovereign Contact</string>
+    <string name="action_edit_contact">Edit Sovereign Contact</string>
     <string name="contact_view_nickname">Nickname</string>
     <string name="add_contact_done">DONE</string>
     <!-- ContactActivity -->
