@@ -16,6 +16,7 @@ import sneer.convos.Convos;
 import sneer.main.R;
 
 import static sneer.android.SneerAndroidContainer.component;
+import static sneer.android.SneerAndroidFlux.dispatch;
 import static sneer.android.ui.SneerActivity.ui;
 import static sneer.android.utils.AndroidUtils.toastOnMainThread;
 
@@ -57,7 +58,7 @@ public class EditContactActivity extends Activity {
 
 					@Override
 					public void onNext(Convo convo) {
-						convo.setNickname(nickname);
+						dispatch(convo.setNickname(nickname));
 						finish();
 					}
 				});
