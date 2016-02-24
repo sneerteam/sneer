@@ -1,6 +1,7 @@
 package sneer.android.ui;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ScrollView;
@@ -24,6 +25,8 @@ public class SystemReportActivity extends SneerActionBarActivity {
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);     // Attaching the layout to the toolbar object
 		setSupportActionBar(toolbar);                               // Setting toolbar as the ActionBar with setSupportActionBar() call
+		ActionBar actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		mReportView = (TextView)findViewById(R.id.reportView);
 		mScrollView = (ScrollView)findViewById(R.id.scrollView);
