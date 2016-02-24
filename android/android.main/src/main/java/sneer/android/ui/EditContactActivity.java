@@ -39,6 +39,7 @@ public class EditContactActivity extends Activity {
 
 		nicknameEdit = (EditText) findViewById(R.id.nickname);
 		nicknameEdit.setText(oldNickname);
+		nicknameEdit.selectAll();
 
 		btnDone = (Button) findViewById(R.id.btn_done);
 		btnDone.setEnabled(false);
@@ -50,19 +51,17 @@ public class EditContactActivity extends Activity {
 			public void onClick(View v) {
 				convos.getById(convoId).subscribe(new Subscriber<Convo>() {
 					@Override
-					public void onCompleted() {
-
-					}
+					public void onCompleted() {	}
 
 					@Override
 					public void onError(Throwable throwable) {
 						toastOnMainThread(EditContactActivity.this, throwable.getMessage(), Toast.LENGTH_LONG);
-
 					}
 
 					@Override
 					public void onNext(Convo convo) {
 						dispatch(convo.setNickname(nickname));
+						unsubscribe();
 						finish();
 					}
 				});
