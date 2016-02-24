@@ -1,20 +1,15 @@
-<LinearLayout
+<RelativeLayout
     android:id="@+id/sessions_detail"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp"
-    android:textIsSelectable="true"
-    android:orientation="vertical"
-    tools:context=".ConversationActivity">
+    tools:context=".ConvoActivity">
 
     <ListView
         android:id="@+id/sessionList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="0dp"
+        android:layout_height="match_parent"
         android:stackFromBottom="false"
         android:transcriptMode="normal"/>
 
@@ -30,5 +25,4 @@
         android:onClick="onBtnOpenInteractionMenuClicked"
         android:src="@drawable/ic_add_24dp"/>
 
-
-</LinearLayout>
+</RelativeLayout>
