@@ -36,8 +36,19 @@ public class StartPluginDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();
+
+        String title = "Apps";
+        switch (Plugins.appType) {
+            case SESSION:
+                title = "Session Apps";
+                break;
+            case TEXT:
+                title = "Text Apps";
+                break;
+        }
+
         final AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Apps")
+                .setTitle(title)
                 .create();
 
         final List<Plugin> plugins = Plugins.all(activity);

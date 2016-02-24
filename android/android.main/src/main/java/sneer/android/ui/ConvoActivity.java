@@ -36,6 +36,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import sneer.android.ipc.PluginActivities;
+import sneer.android.ipc.Plugins.AppType;
 import sneer.convos.ChatMessage;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
@@ -45,6 +46,7 @@ import sneer.main.R;
 import static android.text.TextUtils.isEmpty;
 import static sneer.android.SneerAndroidContainer.component;
 import static sneer.android.SneerAndroidFlux.dispatch;
+import static sneer.android.ipc.Plugins.appType;
 
 public class ConvoActivity extends SneerActionBarActivity implements StartPluginDialogFragment.SingleConvoProvider {
 
@@ -224,11 +226,13 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
 
 		String text = messageInput.getText().toString().trim();
 
-		if (!isEmpty(text)) {
+		if (isEmpty(text)) {
+			appType = AppType.TEXT;
+			openInteractionMenu();
+		} else {
 			dispatch(currentConvo.sendMessage(text));
 			messageInput.setText("");
-		} else
-			openInteractionMenu();
+		}
 	}
 
 
@@ -329,6 +333,7 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
 	}
 
 	public void onBtnOpenInteractionMenuClicked(View view) {
+		appType = AppType.SESSION;
 		openInteractionMenu();
 	}
 

@@ -16,6 +16,9 @@ import static android.content.pm.PackageManager.GET_META_DATA;
 
 public class Plugins {
 
+	public enum AppType {TEXT, SESSION, ALL};
+	public static AppType appType = AppType.ALL;
+
 	public static List<Plugin> all(Context context) {
 	    List<Plugin> ret = new ArrayList<>();
 
@@ -67,7 +70,21 @@ public class Plugins {
 				String sessionType = sessionType(ai);
 
 				Log.d("Plugins", "" + sessionType);
-				ret.add(new Plugin(caption, icon, packageName, activityClassName, sessionType));
+
+				switch (appType) {
+					case ALL:
+						ret.add(new Plugin(caption, icon, packageName, activityClassName, sessionType));
+						break;
+					case SESSION:
+						if (sessionType != null)
+							ret.add(new Plugin(caption, icon, packageName, activityClassName, sessionType));
+						break;
+					case TEXT:
+						if (sessionType == null)
+							ret.add(new Plugin(caption, icon, packageName, activityClassName, sessionType));
+						break;
+				}
+
 			}
 		}
         return ret;
