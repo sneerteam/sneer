@@ -216,13 +216,15 @@
       (let [{:strs [contact-id new-nick]} action]
         (if-let [problem (problem-with-nick state new-nick)]
           (do
-            ; TODO: Emit in "toast" observable: (str "Nickname " problem)
+            (>! (response action) (FriendlyException. (str "Nickname " problem)))
             state)
-          (let [contact-puk (-puk contact-id state)]
-            (if contact-puk
-              (let [result (<! (wait-for-store-contact! container new-nick contact-puk nil states))]
-                (result :state))
-              state)))) ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
+          (do
+            (close! (response action))
+            (let [contact-puk (-puk contact-id state)]
+              (if contact-puk
+                (let [result (<! (wait-for-store-contact! container new-nick contact-puk nil states))]
+                  (result :state))
+                state))))) ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
 
       state)))
 

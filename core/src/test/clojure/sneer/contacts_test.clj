@@ -4,7 +4,7 @@
             [sneer.contacts :as contacts :refer [handle invite-code problem-with-new-nickname new-contact accept-invite nickname encode-invite]]
             [sneer.integration-test-util :refer [sneer! restarted! connect! puk]]
             [sneer.flux :refer [request action]]
-            [sneer.rx-test-util :refer [emits emits-error ->chan <next]]
+            [sneer.rx-test-util :refer [emits emits-error ->chan <next completes]]
             [sneer.test-util :refer [<!!?]])
   (:import [sneer.commons.exceptions FriendlyException]
            [sneer.flux Dispatcher]))
@@ -40,5 +40,9 @@
       (fact "Nickname can be changed after invite is accepted"
         (let [nick-obs (nickname subject id)]
           nick-obs => (emits "Carla")
-          (.dispatch (neide Dispatcher) (action "set-nickname" "new-nick" "Carla Silva" "contact-id" id))
-          nick-obs => (emits "Carla Silva"))))))
+          (.request (neide Dispatcher) (request "set-nickname" "new-nick" "Carla Silva" "contact-id" id))
+          nick-obs => (emits "Carla Silva")
+          (.request (neide Dispatcher) (request "set-nickname" "new-nick" "Carla Silva" "contact-id" id))
+            => (emits-error FriendlyException)
+          (.request (neide Dispatcher) (request "set-nickname" "new-nick" "Carla Silva 2" "contact-id" id))
+            => completes)))))

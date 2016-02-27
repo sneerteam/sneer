@@ -75,5 +75,5 @@
               (->> (.setRead convo (last-message-received convo)) (.dispatch (carla Dispatcher)))
               (. c-convos summaries) => (emits #(->> % (mapv unread) (= [""]))))))
 
-        (.dispatch (neide Dispatcher) (.setNickname n->c "Carla Costa"))
+        (.request (neide Dispatcher) (.setNickname n->c "Carla Costa"))
         n->c-obs => (emits #(-> % .nickname (= "Carla Costa")))))))

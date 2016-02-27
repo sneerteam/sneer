@@ -15,7 +15,7 @@
   (assoc (apply hash-map (.keyValuePairs a))
          :type (.type a)))
 
-(defn emit [subject res]
+(defn- emit-and-complete [subject res]
   (if (instance? Exception res)
     (rx/on-error subject res)
     (do
@@ -40,9 +40,12 @@
 
           (>!! actions (assoc (->map request) ::response response))
           (go-trace
-            (let [res (decode-nil (<! response))]
-              (close! response)
-              (emit subject res)))
+            (let [res (<! response)]
+              (if (nil? res)
+                (rx/on-completed subject)
+                (do
+                  (close! response)
+                  (emit-and-complete subject (decode-nil res))))))
 
           subject))
 

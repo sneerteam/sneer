@@ -11,12 +11,12 @@ import android.widget.Toast;
 
 import rx.Subscriber;
 import rx.functions.Action1;
+import sneer.android.SneerAndroidFlux;
 import sneer.convos.Convo;
 import sneer.convos.Convos;
 import sneer.main.R;
 
 import static sneer.android.SneerAndroidContainer.component;
-import static sneer.android.SneerAndroidFlux.dispatch;
 import static sneer.android.ui.SneerActivity.ui;
 import static sneer.android.utils.AndroidUtils.toastOnMainThread;
 
@@ -49,9 +49,12 @@ public class EditContactActivity extends Activity {
 		btnDone.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				convos.getById(convoId).subscribe(new Subscriber<Convo>() {
+				Convo convo = convos.getById(convoId).toBlocking().first();
+				SneerAndroidFlux.request(convo.setNickname(nickname)).subscribe(new Subscriber<Void>() {
 					@Override
-					public void onCompleted() {	}
+					public void onCompleted() {
+						finish();
+					}
 
 					@Override
 					public void onError(Throwable throwable) {
@@ -59,12 +62,11 @@ public class EditContactActivity extends Activity {
 					}
 
 					@Override
-					public void onNext(Convo convo) {
-						dispatch(convo.setNickname(nickname));
-						unsubscribe();
-						finish();
+					public void onNext(Void aVoid) {
+
 					}
 				});
+
 			}
 		});
 
