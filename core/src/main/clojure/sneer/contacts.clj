@@ -189,6 +189,11 @@
             (>! (response action) (result :id))
             (result :state))))
 
+      "delete-contact"
+      (let [{:strs [id]} action]
+        (println (str "NOT IMPLEMENTED YET: delete-contact called with id->" id))
+        state)
+
       "accept-invite"
       (let [{:strs [nick invite-code-received]} action]
         (if-let [problem (problem-with-nick state nick)]
@@ -259,6 +264,9 @@
 
 (defn new-contact [contacts nick]
   (dispatch contacts (request "new-contact" "nick" nick)))
+
+(defn delete-contact [contacts id]
+  (dispatch contacts (request "delete-contact" "id" id)))
 
 (defn accept-invite [contacts nick invite-code-received]
   (try

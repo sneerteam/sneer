@@ -45,4 +45,12 @@
           (.request (neide Dispatcher) (request "set-nickname" "new-nick" "Carla Silva" "contact-id" id))
             => (emits-error FriendlyException)
           (.request (neide Dispatcher) (request "set-nickname" "new-nick" "Carla Silva 2" "contact-id" id))
-            => completes)))))
+            => completes))
+
+      (fact "Contact can be deleted"
+
+        (.dispatch (neide Dispatcher) (action "delete-contact" "id" id))
+
+        )
+
+      )))

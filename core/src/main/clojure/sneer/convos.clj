@@ -95,6 +95,9 @@
       (startConvo [_ newContactNick]
         (sneer.contacts/new-contact contacts newContactNick))
 
+      (deleteConvo [_ id]
+        (sneer.contacts/delete-contact contacts id))
+
       (acceptInvite [_ newContactNick inviteCodeReceived]
         (sneer.contacts/accept-invite contacts newContactNick inviteCodeReceived))
 
