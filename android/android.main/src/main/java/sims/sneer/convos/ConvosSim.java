@@ -47,6 +47,11 @@ public class ConvosSim implements Convos {
 	}
 
 	@Override
+	public Observable<String> deleteConvo(long convoId) {
+		return null;
+	}
+
+	@Override
 	public Observable<Long> acceptInvite(String newContactNick, String contactPuk, String inviteCodeReceived) {
 		System.out.println("Convos.acceptInvite: " + newContactNick + " puk: " + contactPuk + " inviteCode: " + inviteCodeReceived);
 		return startConvo(newContactNick);

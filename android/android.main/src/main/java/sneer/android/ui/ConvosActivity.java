@@ -1,5 +1,7 @@
 package sneer.android.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -115,9 +117,10 @@ public class ConvosActivity extends SneerActionBarActivity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		final long convoId = adapter.getItem(info.position).convoId;
+
 		switch (item.getItemId()) {
 			case R.id.edit_contact:
-				long convoId = adapter.getItem(info.position).convoId;
 				String oldNickname = adapter.getItem(info.position).nickname;
 				Intent intent = new Intent();
 				intent.setClass(this, EditContactActivity.class);
@@ -126,7 +129,21 @@ public class ConvosActivity extends SneerActionBarActivity {
 				startActivity(intent);
 				return true;
 			case R.id.delete_contact:
-				// not implemented yet
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage("Are you sure?");
+				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						toast("yep");
+					}
+				});
+				builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						toast("nope");
+					}
+				});
+				builder.show();
 				return true;
 			default:
 				return super.onContextItemSelected(item);

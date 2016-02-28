@@ -15,6 +15,9 @@ public interface Convos {
 	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
 	Observable<Long> startConvo(String newContactNickname);
 
+  /** Emits null if is ok or a reason why it's not ok. */
+	Observable<String> deleteConvo(long convoId);
+
 	/** Emits the new Convo id.
 	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
 	Observable<Long> acceptInvite(String newContactNickname, String inviterPuk, String inviteCodeReceived);
