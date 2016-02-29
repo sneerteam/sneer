@@ -1,0 +1,113 @@
+version = "0.1.5"
+
+apply plugin: "clojure"
+apply plugin: "java"
+apply plugin: "maven"
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+buildscript {
+  repositories {
+    maven { url "https://clojars.org/repo" }
+  }
+
+  dependencies {
+    classpath "clojuresque:clojuresque:1.7.0"
+  }
+}
+
+repositories {
+  maven { url "https://clojars.org/repo" }
+}
+
+buildscript {
+  repositories {
+    maven { url 'https://repo.spring.io/plugins-release' }
+  }
+
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
+  }
+}
+
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-eclipse'
+
+clojure.warnOnReflection = true
+
+sourceSets {
+  main {
+    clojure {
+      aotCompile = true
+    }
+  }
+}
+
+compileClojure.mustRunAfter compileJava //remove
+
+dependencies {
+  compile external['clojure.core']
+  compile external['clojure.core.async']
+  compile external['clojure.core.match']
+  compile external['clojure.core.cache']
+  compile 'http-kit:http-kit:2.1.18'
+  compile project(':core')
+  testCompile 'midje:midje:1.7.0'
+}
+
+
+class Lein extends Exec {
+  static def onWindows = System.properties['os.name'].toLowerCase().contains('windows')
+  Lein() {
+    executable (onWindows ? 'lein.bat' : 'lein')
+  }
+}
+
+task leinSkummet(type: Lein) {
+  inputs.source sourceSets.main.clojure
+  inputs.source 'project.clj'
+  outputs.dir 'target'
+  args 'with-profile', 'lean', 'do', 'skummet', 'compile', ',', 'skummet', 'jar'
+}
+
+def skummetBuildDir = "$buildDir/skummet"
+
+task skummetJar(type: Copy, dependsOn: leinSkummet) {
+  from('target') {
+    include "core-$version-standalone.jar"
+  }
+  into skummetBuildDir
+  rename { fileName ->
+    fileName.replace("standalone", "skummet")
+  }
+}
+
+task leinClean(type: Lein) {
+  args 'clean'
+}
+
+clean.dependsOn leinClean
+
+apply plugin: 'ivy-publish'
+
+publishing {
+  repositories {
+    ivy { url '../skummet-artifacts' }
+  }
+  publications {
+    skummet(IvyPublication) {
+      artifact(file("$skummetBuildDir/core-${version}-skummet.jar")) {
+        classifier 'skummet'
+        builtBy skummetJar
+      }
+    }
+  }
+}
+
+uploadArchives {
+  repositories {
+    mavenLocal()
+  }
+}
