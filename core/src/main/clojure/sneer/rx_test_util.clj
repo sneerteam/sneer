@@ -14,7 +14,7 @@
                 #(>!! c (nvl % :nil))  ; Channels cannot take nil
                 #(do
                   #_(.printStackTrace %)
-                  (>!! c {::error %})
+                  (>!! c {:sneer.test-util/error %})
                   (close! c))
                 #(close! c)))
 
@@ -41,7 +41,7 @@
       (<wait-trace! ch expected))))
 
 (defn emits-error [exception-type]
-  (emits #(instance? exception-type (::error %))))
+  (emits #(instance? exception-type (:sneer.test-util/error %))))
 
 (defn <next [obs]
   (decode-nil (<!!? (->chan obs))))

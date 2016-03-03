@@ -86,11 +86,14 @@
 (defn closes [ch]
   (loop-trace [last-value "<none>"]
               (if-some [current (<!!? ch)]
-                (if (= current :timeout)
-                  (do
-                    (println "TIMEOUT. Last value emitted:" last-value)
-                    false)
-                  (recur current))
+                (cond (= current :timeout) (do
+                                             (println "TIMEOUT. Last value emitted:" last-value)
+                                             false)
+                      (::error current) (do
+                                          (println "ERROR:" (::error current))
+                                          false)
+                      :else
+                      (recur current))
                 true)))
 
 (def => "Anything, just to prevent warnings 'symbol => undefined' from the midje fact macro.")
