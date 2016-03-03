@@ -3,6 +3,9 @@ package sneer.convos;
 import java.util.List;
 
 import rx.Observable;
+import sneer.flux.Action;
+
+import static sneer.flux.Action.action;
 
 public interface Convos {
 
@@ -14,9 +17,6 @@ public interface Convos {
 	/** Emits the new Convo id.
 	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
 	Observable<Long> startConvo(String newContactNickname);
-
-  /** Emits null if is ok or a reason why it's not ok. */
-	Observable<String> deleteConvo(long convoId);
 
 	/** Emits the new Convo id.
 	 * @throws sneer.commons.exceptions.FriendlyException (via Observable) (see problemWithNewNickname(newContactNick)). */
@@ -32,5 +32,11 @@ public interface Convos {
 
 	@Deprecated
 	String ownPuk();
+
+	class Actions {
+
+		public static Action deleteContact(long id) { return action("delete-contact", "contact-id", id); }
+
+	}
 
 }

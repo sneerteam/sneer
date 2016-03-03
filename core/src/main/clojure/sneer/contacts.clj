@@ -3,7 +3,7 @@
     [clojure.core.async :refer [chan <! >! alt! go close!]]
     [sneer.async :refer [go-trace state-machine tap-state peek-state! go-loop-trace wait-for! encode-nil sliding-chan close-with!]]
     [sneer.commons :refer [nvl]]
-    [sneer.flux :refer [tap-actions response request]]
+    [sneer.flux :refer [tap-actions response request action]]
     [sneer.keys :refer [from-hex]]
     [sneer.rx :refer [obs-tap]]
     [sneer.tuple-base-provider :refer :all]
@@ -107,12 +107,18 @@
                    :puk puk
                    :invite-code invite-code
                    :timestamp timestamp}]
-      (-> state
-          (assoc-in  [:id->contact id] contact)
-          (update-in [:nick->id] dissoc old-nick)
-          (assoc-in  [:nick->id new-nick] id)
-          (assoc-puk puk id)
-          (assoc-in  [:invite-code->id invite-code] id)))))
+      (if (= new-nick "DELETED")
+        (-> state
+            (update-in [:id->contact] dissoc id)
+            (update-in [:nick->id] dissoc old-nick)
+            (update-in [:puk->id] dissoc puk)
+            (update-in [:invite-code->id] dissoc (get-in state [:id->contact id :invite-code])))
+        (-> state
+            (assoc-in  [:id->contact id] contact)
+            (update-in [:nick->id] dissoc old-nick)
+            (assoc-in  [:nick->id new-nick] id)
+            (assoc-puk puk id)
+            (assoc-in  [:invite-code->id invite-code] id))))))
 
 (defn- handle-push [state tuple]
 ;; {"type" "push" "audience" contact-puk "invite-code" invite-code-received}
@@ -190,9 +196,12 @@
             (result :state))))
 
       "delete-contact"
-      (let [{:strs [id]} action]
-        (println (str "NOT IMPLEMENTED YET: delete-contact called with id->" id))
-        state)
+      (let [{:strs [contact-id]} action]
+        (let [contact-puk (-puk contact-id state)]
+          (if contact-puk
+            (let [result (<! (wait-for-store-contact! container "DELETED" contact-puk nil states))]
+              (result :state))
+            state)))
 
       "accept-invite"
       (let [{:strs [nick invite-code-received]} action]
@@ -229,7 +238,7 @@
               (if contact-puk
                 (let [result (<! (wait-for-store-contact! container new-nick contact-puk nil states))]
                   (result :state))
-                state))))) ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
+                state))              ))) ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
 
       state)))
 
@@ -264,9 +273,6 @@
 
 (defn new-contact [contacts nick]
   (dispatch contacts (request "new-contact" "nick" nick)))
-
-(defn delete-contact [contacts id]
-  (dispatch contacts (request "delete-contact" "id" id)))
 
 (defn accept-invite [contacts nick invite-code-received]
   (try

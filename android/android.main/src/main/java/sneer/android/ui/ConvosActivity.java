@@ -17,6 +17,7 @@ import java.util.List;
 
 import rx.Subscription;
 import rx.functions.Action1;
+import sneer.android.SneerAndroidFlux;
 import sneer.convos.Convos;
 import sneer.convos.Summary;
 import sneer.main.R;
@@ -131,13 +132,13 @@ public class ConvosActivity extends SneerActionBarActivity {
 			case R.id.delete_contact:
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("Are you sure?");
-				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						toast("yep");
+						SneerAndroidFlux.dispatch(Convos.Actions.deleteContact(convoId));
 					}
 				});
-				builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+				builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						toast("nope");

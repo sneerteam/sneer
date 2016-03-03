@@ -1,7 +1,7 @@
 (ns sneer.contacts-test
   (:require [midje.sweet :refer :all]
             [sneer.async :refer [sliding-chan]]
-            [sneer.contacts :as contacts :refer [handle invite-code problem-with-new-nickname new-contact accept-invite nickname encode-invite]]
+            [sneer.contacts :as contacts :refer [handle invite-code problem-with-new-nickname new-contact accept-invite nickname encode-invite contact-list]]
             [sneer.integration-test-util :refer [sneer! restarted! connect! puk]]
             [sneer.flux :refer [request action]]
             [sneer.rx-test-util :refer [emits emits-error ->chan <next completes]]
@@ -48,9 +48,7 @@
             => completes))
 
       (fact "Contact can be deleted"
-
-        (.dispatch (neide Dispatcher) (action "delete-contact" "id" id))
-
-        )
-
-      )))
+        (new-contact subject "Carla Silva 2") => (emits-error FriendlyException)
+        (.dispatch (neide Dispatcher) (action "delete-contact" "contact-id" id))
+        (new-contact subject "Carla Silva 2") => completes
+        (.dispatch (neide Dispatcher) (action "delete-contact" "contact-id" id)) ))))
