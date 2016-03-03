@@ -17,6 +17,9 @@ project.properties
 *.ipr
 *.iws
 
+.nrepl-port
+target
+
 .gradle/
 .gradletasknamecache
 local.properties
