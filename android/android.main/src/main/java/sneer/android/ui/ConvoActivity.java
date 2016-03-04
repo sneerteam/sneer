@@ -227,7 +227,7 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
 		String text = messageInput.getText().toString().trim();
 
 		if (isEmpty(text)) {
-			appType = AppType.TEXT;
+			appType = AppType.ALL;
 			openInteractionMenu();
 		} else {
 			dispatch(currentConvo.sendMessage(text));
@@ -333,7 +333,7 @@ public class ConvoActivity extends SneerActionBarActivity implements StartPlugin
 	}
 
 	public void onBtnOpenInteractionMenuClicked(View view) {
-		appType = AppType.SESSION;
+		appType = AppType.ALL;
 		openInteractionMenu();
 	}
 
