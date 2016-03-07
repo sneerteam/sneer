@@ -37,7 +37,7 @@
               "message-list" [{"id"     10000
                                "is-own" true
                                "text"   "Hi There! 0"
-                               "date"     "Today 0"}]}
+                               "date"   "Today 0"}]}
 
       (handle! subject {"event" "sim-next"})
       (count (@ui "message-list")) => 10000)))
