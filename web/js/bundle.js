@@ -1,0 +1,1 @@
+console.error("Error: Parsing file /Users/kalecserpasqualikurtz/projects/sneer/sneer/web/js/components/Chat.react.js: Unexpected token (6:6)");
