@@ -12,8 +12,8 @@
 (defn- convo-sim [n]
   {:id       (+ 1000 n)
    :nickname (str "Neide " n)
-   "preview"  (str "Hi There! " n)
-   "date"     (str "Today " n)
+   :preview  (str "Hi There! " n)
+   :date     (str "Today " n)
    :unread   (get unreads (mod n 3))})
 
 (defn- convo-sims [count]
