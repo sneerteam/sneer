@@ -53,10 +53,10 @@
     (handle-sim state)
     (handle-event state event)))
 
-(defn handle! [sneer event]
+(defn dispatch! [sneer event]
   (swap! sneer handle event)
   ((@sneer :ui-fn) (@sneer :view)))
 
-(defn sneer [ui-fn]
+(defn dispatcher [ui-fn]
   (atom {:ui-fn     ui-fn
          :view-sims view-sims}))
