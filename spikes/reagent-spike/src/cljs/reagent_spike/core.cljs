@@ -66,7 +66,7 @@
 
     [:div [:h2 (sim :view) " - " (str @action)]
      [:div [:button {:on-click #(swap! sims rest)} "Next Sim"]]
-     [sneer-view sim]]))
+     [sneer-view sim]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
 
 (defn about-page []
   [:div [:h2 "About reagent-spike"]
