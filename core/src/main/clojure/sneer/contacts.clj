@@ -87,6 +87,17 @@
     state))
 
 
+(defn- handle-contact-delete [state tuple]
+  (let [{puk "party" invite-code "invite-code"} tuple
+        id (or (-contact-id puk state)
+               (get-in state [:invite-code->id invite-code]))
+        old-nick (-nickname id state)]
+    (-> state
+        (update-in [:id->contact] dissoc id)
+        (update-in [:nick->id] dissoc old-nick)
+        (update-in [:puk->id] dissoc puk)
+        (update-in [:invite-code->id] dissoc (get-in state [:id->contact id :invite-code])))))
+
 ;; Contacts schema
 #_{:id->contact {42 {:id 42
                      :nick "Neide"
@@ -99,26 +110,23 @@
 (defn- handle-contact [state own-puk tuple]
   (if-not (= (tuple "author") own-puk)
     state
-    (let [{new-nick "payload" puk "party" invite-code "invite-code" timestamp "timestamp"} tuple
-          id (or (-contact-id puk state) (tuple "id"))
-          old-nick (-nickname id state)
-          contact {:id id
-                   :nick new-nick
-                   :puk puk
-                   :invite-code invite-code
-                   :timestamp timestamp}]
+    (let [{new-nick "payload"} tuple]
       (if (= new-nick "DELETED")
-        (-> state
-            (update-in [:id->contact] dissoc id)
-            (update-in [:nick->id] dissoc old-nick)
-            (update-in [:puk->id] dissoc puk)
-            (update-in [:invite-code->id] dissoc (get-in state [:id->contact id :invite-code])))
-        (-> state
-            (assoc-in  [:id->contact id] contact)
-            (update-in [:nick->id] dissoc old-nick)
-            (assoc-in  [:nick->id new-nick] id)
-            (assoc-puk puk id)
-            (assoc-in  [:invite-code->id invite-code] id))))))
+        (handle-contact-delete state tuple)
+        (let [{puk "party" invite-code "invite-code" timestamp "timestamp"} tuple
+              id (or (-contact-id puk state) (get-in state [:invite-code->id invite-code]) (tuple "id"))
+              old-nick (-nickname id state)
+              contact {:id id
+                       :nick new-nick
+                       :puk puk
+                       :invite-code invite-code
+                       :timestamp timestamp}]
+          (-> state
+              (assoc-in  [:id->contact id] contact)
+              (update-in [:nick->id] dissoc old-nick)
+              (assoc-in  [:nick->id new-nick] id)
+              (assoc-puk puk id)
+              (assoc-in  [:invite-code->id invite-code] id)))))))
 
 (defn- handle-push [state tuple]
 ;; {"type" "push" "audience" contact-puk "invite-code" invite-code-received}
@@ -197,11 +205,10 @@
 
       "delete-contact"
       (let [{:strs [contact-id]} action]
-        (let [contact-puk (-puk contact-id state)]
-          (if contact-puk
-            (let [result (<! (wait-for-store-contact! container "DELETED" contact-puk nil states))]
-              (result :state))
-            state)))
+        (let [invite-code (-invite-code contact-id state)
+              contact-puk (-puk contact-id state)]
+          (let [result (<! (wait-for-store-contact! container "DELETED" contact-puk invite-code states))]
+            (result :state))))
 
       "accept-invite"
       (let [{:strs [nick invite-code-received]} action]
@@ -234,11 +241,10 @@
             state)
           (do
             (close! (response action))
-            (let [contact-puk (-puk contact-id state)]
-              (if contact-puk
-                (let [result (<! (wait-for-store-contact! container new-nick contact-puk nil states))]
-                  (result :state))
-                state))              ))) ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
+            (let [invite-code (-invite-code contact-id state)
+                  contact-puk (-puk contact-id state)]
+              (let [result (<! (wait-for-store-contact! container new-nick contact-puk invite-code states))]
+                (result :state)))))) ;TODO: Change nickname even without puk, using id as "entity-id" in tuple.
 
       state)))
 
