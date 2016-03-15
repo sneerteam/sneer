@@ -64,9 +64,10 @@
 (defn home-page []
   (let [sim (first @sims)]
 
-    [:div [:h2 (sim :view) " - " (str @action)]
-     [:div [:button {:on-click #(swap! sims rest)} "Next Sim"]]
-     [sneer-view sim]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
+    [:div.row
+     [:div.col-md-4.col-sm-6.col-xs-12  [:h2 (sim :view) " - " (str @action)]]
+     [:div.col-md-4.col-sm-6.col-xs-12  [:button {:on-click #(swap! sims rest)} "Next Sim"]]
+     [:div.col-md-12 [sneer-view sim]]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
 
 (defn about-page []
   [:div [:h2 "About reagent-spike"]
