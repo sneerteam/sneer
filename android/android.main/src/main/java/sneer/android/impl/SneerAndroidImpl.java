@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -130,13 +132,33 @@ public class SneerAndroidImpl implements SneerAndroid {
 	}
 
 
-	private static SneerAdmin newSneerAdmin(SneerSqliteDatabase db) {
+	private static SneerAdmin newSneerAdmin(final SneerSqliteDatabase db) {
+		int largeStackSizeInBytesForClojure = 100000;
+		final AtomicReference<Object> ref = new AtomicReference<>();
+		final CountDownLatch latch = new CountDownLatch(1);
+		new Thread(Thread.currentThread().getThreadGroup(),
+				new Runnable() { @Override public void run() {
+					try {
+						ref.set(SneerAdminFactory.create(db));
+					} catch (Throwable t) {
+						ref.set(t);
+					}
+					latch.countDown();
+				}}, "LoaderWithLargeStack", largeStackSizeInBytesForClojure
+		).start();
+
 		try {
-			return SneerAdminFactory.create(db);
-		} catch (Throwable e) {
-			log(e);
-			throw new RuntimeException(e);
+			latch.await();
+		} catch (InterruptedException e) {
+			throw new IllegalStateException(e);
 		}
+
+		Object ret = ref.get();
+		if (ret instanceof Throwable) {
+			log((Throwable)ret);
+			throw new RuntimeException((Throwable)ret);
+		}
+		return (SneerAdmin) ret;
 	}
 
 
