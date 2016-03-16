@@ -13,8 +13,7 @@ public class Summary implements Serializable { private static final long serialV
 	public Summary(String nickname, String textPreview, String date, String unread, long convoId) { this.nickname = nickname; this.textPreview = textPreview; this.date = date; this.unread = unread; this.convoId = convoId; }
 
 	@Override
-	public String toString() {
-		return "Summary{" +
+	public String toString() {return "Summary{" +
 				"nickname='" + nickname + '\'' +
 				", textPreview='" + textPreview + '\'' +
 				", date='" + date + '\'' +
