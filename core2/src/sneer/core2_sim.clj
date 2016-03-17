@@ -1,19 +1,19 @@
 (ns sneer.core2-sim)
 
 (defn- message-sim [n]
-  {"id"     (+ 10000 n)
-   "text"   (str "Hi There! " n)
-   "date"   (str "Today " n)
-   "is-own" (zero? (mod n 3))})
+  {:id     (+ 10000 n)
+   :text   (str "Hi There! " n)
+   :date   (str "Today " n)
+   :is-own (zero? (mod n 3))})
 
 (def ^:private unreads ["" "*" "?"])
 
 (defn- convo-sim [n]
-  {"id"       (+ 1000 n)
-   "nickname" (str "Neide " n)
-   "preview"  (str "Hi There! " n)
-   "date"     (str "Today " n)
-   "unread"   (get unreads (mod n 3))})
+  {:id       (+ 1000 n)
+   :nickname (str "Neide " n)
+   :preview  (str "Hi There! " n)
+   :date     (str "Today " n)
+   :unread   (get unreads (mod n 3))})
 
 (defn- convo-sims [count]
   (map convo-sim (range count)))
@@ -22,14 +22,14 @@
   (map message-sim (range count)))
 
 (defn- convos-view-sim [count]
-  {"view"       "convos"
-   "convo-list" (convo-sims count)})
+  {:view :convos
+   :convo-list (convo-sims count)})
 
 (defn- convo-view-sim [count]
-  {"view" "convo"
-   "id"   1042
-   "tab"  "chat"
-   "message-list" (message-sims count)})
+  {:view :convo
+   :id 1042
+   :tab :chat
+   :message-list (message-sims count)})
 
 (def ^:private view-sims
   (cycle
@@ -46,10 +46,10 @@
     (update :view-sims rest)))
 
 (defn- handle-event [state event]
-  (assoc-in state [:view "toast"] (str event)))
+  (assoc-in state [:view :toast] (str event)))
 
 (defn- handle [state event]
-  (if (= (event "event") "sim-next")
+  (if (= (event :type) :sim-next)
     (handle-sim state)
     (handle-event state event)))
 
@@ -57,6 +57,6 @@
   (swap! sneer handle event)
   ((@sneer :ui-fn) (@sneer :view)))
 
-(defn dispatcher [ui-fn]
+(defn sneer-simulator [ui-fn]
   (atom {:ui-fn     ui-fn
          :view-sims view-sims}))
