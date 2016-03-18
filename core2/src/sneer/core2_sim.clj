@@ -22,14 +22,13 @@
   (map message-sim (range count)))
 
 (defn- convos-view-sim [count]
-  {:view :convos
-   :convo-list (convo-sims count)})
+  {:convo-list (convo-sims count)})
 
 (defn- convo-view-sim [count]
-  {:view :convo
-   :id 1042
-   :tab :chat
-   :message-list (message-sims count)})
+  {:convo-list (convo-sims 100)
+   :convo {:id 1042
+           :tab :chat
+           :message-list (message-sims count)}})
 
 (def ^:private view-sims
   (cycle
@@ -53,7 +52,7 @@
     (handle-sim state)
     (handle-event state event)))
 
-(defn dispatch! [sneer event]
+(defn handle! [sneer event]
   (swap! sneer handle event)
   ((@sneer :ui-fn) (@sneer :view)))
 
