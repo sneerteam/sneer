@@ -1,7 +1,8 @@
-(ns sneer.contact
-  (require
-    [sneer.util :refer [handle]]))
+(ns sneer.contact)
 
-(defmethod handle :contact-new [state data]
-  (let [contact (select-keys data [:nick])]
-    (update-in state [:view :convo-list] conj contact)))
+(defn add [state contact]
+  (let [state (or state [])]
+    (conj state contact)))
+
+(defn contact [event]
+  (select-keys event [:nick]))
