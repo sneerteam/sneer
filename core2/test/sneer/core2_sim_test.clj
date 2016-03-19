@@ -10,7 +10,7 @@
 
     (fact "Events are simulated as toasts"
       (handle! subject {:type :some-event
-                          :some-arg 42})
+                        :some-arg 42})
       (@fake-ui :toast) => "{:type :some-event, :some-arg 42}")
 
     (fact "View sims are generated"
