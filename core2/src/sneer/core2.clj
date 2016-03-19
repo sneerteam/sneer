@@ -32,14 +32,14 @@
       (update-in [:model :contacts] contact/add contact)
       (update-in [:view] view/add-contact contact))))
 
-(defn- update-ui [sneer]
+(defn- update-ui! [sneer]
   ((@sneer :ui-fn) (@sneer :view)))
 
 (defn handle! [sneer event]
   (let [old-view (@sneer :view)]
     (swap! sneer handle event)
     (when-not (= (@sneer :view) old-view)
-      (update-ui sneer))))
+      (update-ui! sneer))))
 
 ; State schema:
 #_{:ui-fn fn
@@ -47,9 +47,14 @@
    :model {:next-id 0
            :contacts [1 2 3]}}
 
-(defn sneer [ui-fn]
+(defn- restore! [sneer]
+
+  )
+
+(defn sneer [ui-fn streems]
   (doto
-    (atom {:ui-fn ui-fn
-           :view  {:convo-list []}
-           :model {:next-id 0}})
-    (update-ui)))
+    (atom {:ui-fn   ui-fn
+           :streems streems
+           :view    view/initial})
+    (restore!)
+    (update-ui!)))

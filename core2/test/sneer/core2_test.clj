@@ -6,7 +6,8 @@
 
 (facts "Contacts"
   (let [ui (atom nil)
-        subject (sneer #(reset! ui %))]
+        streems "To be implemented"
+        subject (sneer #(reset! ui %) streems)]
 
     @ui => {:convo-list []}
 
