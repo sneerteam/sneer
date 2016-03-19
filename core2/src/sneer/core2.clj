@@ -1,7 +1,8 @@
 (ns sneer.core2
-  (require [sneer.util :refer [handle]]
-           [sneer.contact :as contact :refer [contact]]
-           [sneer.view :as view]))
+  (require [sneer.contact :as contact :refer [contact]]
+           [sneer.view :as view]
+           [sneer.util :refer [handle]]
+           [sneer.streem :refer :all]))
 
 #_(defn- message-sim [n]
   {:id     (+ 10000 n)
@@ -51,7 +52,8 @@
            :contacts [1 2 3]}}
 
 (defn- restore! [streems]
-  {:view view/initial})
+  (let [initial {:view view/initial}]
+    (reduce handle initial (streem streems 0))))
 
 (defn sneer [ui-fn streems]
   (doto
