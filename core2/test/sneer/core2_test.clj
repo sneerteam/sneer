@@ -15,7 +15,12 @@
       (handle! subject {:type :contact-new
                         :nick "Carla"})
 
-      (get-in @ui [:convo-list 0 :nick]) => "Carla")
+      (get-in @ui [:convo-list 0 :nick]) => "Carla"
+
+      (handle! subject {:type :contact-new
+                        :nick "Maico"})
+
+      (get-in @ui [:convo-list 1 :nick]) => "Maico")
 
     (fact "Deleted contact is removed from convo list"
       (let [carla-id (get-in @ui [:convo-list 0 :contact-id])]
@@ -23,4 +28,5 @@
 
         (handle! subject {:type :contact-delete
                           :contact-id carla-id})
-        @ui => {:convo-list []}))))
+
+        @ui => {:convo-list [{:contact-id 1, :nick "Maico"}]}))))

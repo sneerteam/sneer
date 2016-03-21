@@ -28,20 +28,21 @@
    :message-list (message-sims count)})
 
 (defmethod handle :contact-new [state event]
-  (let [id (rand-int 100)
+  (let [id (get-in state [:model :next-id])
         contact (merge (contact event) {:contact-id id})]
     (-> state
       (update-in [:model :contacts] contact/add contact)
-      (update-in [:view] view/add-contact contact))))
-
-(defn- view [sneer]
-  (@(:state sneer) :view))
+      (update-in [:view] view/add-contact contact)
+      (update-in [:model :next-id] inc))))
 
 (defmethod handle :contact-delete [state event]
   (let [contact-id (:contact-id event)]
     (-> state
       (update-in [:model :contacts] contact/delete contact-id)
       (update-in [:view] view/delete-contact contact-id))))
+
+(defn- view [sneer]
+  (@(:state sneer) :view))
 
 (defn- update-ui! [sneer]
   ((sneer :ui-fn) (view sneer)))
@@ -59,7 +60,8 @@
            :contacts [1 2 3]}}
 
 (defn- restore! [streems]
-  (let [initial {:view view/initial}]
+  (let [initial {:view view/initial
+                 :model {:next-id 0}}]
     (reduce handle initial (streem streems 0))))
 
 (defn sneer [ui-fn streems]
