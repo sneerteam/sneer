@@ -14,9 +14,10 @@
     (fact "New contact appears on convo list"
       (handle! subject {:type :contact-new
                         :nick "Carla"})
+
       (get-in @ui [:convo-list 0 :nick]) => "Carla")
 
-    #_(fact "Deleted contact is removed from convo list"
+    (fact "Deleted contact is removed from convo list"
       (let [carla-id (get-in @ui [:convo-list 0 :contact-id])]
         carla-id => some?
 
