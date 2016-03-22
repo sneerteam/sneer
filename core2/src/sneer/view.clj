@@ -8,7 +8,7 @@
 
 (defn delete-contact [state contact-id]
   (let [same-id? (partial same-id? contact-id)]
-    (update-in state [:convo-list] #(remove same-id? %))))
+    (update-in state [:convo-list] #(into [] (remove same-id? %)))))
 
 (def initial
   {:convo-list []})
