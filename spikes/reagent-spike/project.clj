@@ -19,7 +19,8 @@
                   :scope "provided"]
                  [secretary "1.2.3"]
                  [venantius/accountant "0.1.7"
-                  :exclusions [org.clojure/tools.reader]]]
+                  :exclusions [org.clojure/tools.reader]]
+                 [com.cognitect/transit-cljs "0.8.237"]]
 
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]

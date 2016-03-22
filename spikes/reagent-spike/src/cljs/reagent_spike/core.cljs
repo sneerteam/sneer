@@ -2,7 +2,8 @@
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
-              [accountant.core :as accountant]))
+              [accountant.core :as accountant]
+              [cognitect.transit :as t]))
 
 ;; -------------------------
 ;; Views
@@ -49,6 +50,7 @@
 
 (defn- dispatch! [event]
   (.log js/console event)
+  (.log js/console (t/write (t/writer :json) {:foo {:bar "~:str"}}))
   (reset! action event))
 
 (defmethod sneer-view "convos" [data]
