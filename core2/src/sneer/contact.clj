@@ -8,8 +8,8 @@
     (conj state contact)))
 
 (defn delete [state contact-id]
-  (let [state (or state [])
-        same-id? (partial same-id? contact-id)]
+  (let [same-id? (partial same-id? contact-id)]
+    (into [] (remove same-id? state))))
     (into [] (remove same-id? state))))
 
 (defn contact [event]
