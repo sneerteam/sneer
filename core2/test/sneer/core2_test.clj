@@ -29,4 +29,14 @@
         (handle! subject {:type :contact-delete
                           :contact-id carla-id})
 
-        @ui => {:convo-list [{:contact-id 1, :nick "Maico"}]}))))
+        @ui => {:convo-list [{:contact-id 1, :nick "Maico"}]}))
+
+    (fact "Contacts can be renamed"
+      (let [maico-id (get-in @ui [:convo-list 0 :contact-id])]
+        maico-id => some?
+
+        (handle! subject {:type :contact-rename
+                          :contact-id maico-id
+                          :new-nick "Michael"})
+
+        @ui => {:convo-list [{:contact-id 1, :nick "Michael"}]}))))

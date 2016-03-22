@@ -41,6 +41,13 @@
       (update-in [:model :contacts] contact/delete contact-id)
       (update-in [:view] view/delete-contact contact-id))))
 
+(defmethod handle :contact-rename [state event]
+  (let [contact-id (:contact-id event)
+        new-nick (:new-nick event)]
+    (-> state
+        (update-in [:model :contacts] contact/rename contact-id new-nick)
+        (update-in [:view] view/rename-contact contact-id new-nick))))
+
 (defn- view [sneer]
   (@(:state sneer) :view))
 
