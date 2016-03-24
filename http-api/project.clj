@@ -3,21 +3,36 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :min-lein-version "2.3.3"
+  :global-vars {*warn-on-reflection* false
+                *assert* true}
 
-  :warn-on-reflection false
+  :dependencies
+  [
+   [org.clojure/clojure       "1.8.0"]
 
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [me.sneer/core2 "0.0.1-SNAPSHOT"]
-                 [http-kit "2.1.18"]
-                 [com.cognitect/transit-clj "0.8.285"]]
+   [org.clojure/clojurescript "1.7.170"]
+   [org.clojure/core.async    "0.2.374"]
 
-  :main http-server
+   [com.taoensso/sente        "1.8.1"]
+   [com.taoensso/timbre       "4.3.1"]
 
-  :profiles {
-             :dev
-             {:dependencies [[midje "1.7.0"]]
-              :plugins [[lein-midje "3.1.3"]]}}
+   [http-kit                  "2.2.0-alpha1"]
 
+   [ring                      "1.4.0"]
+   [ring/ring-defaults        "0.2.0"]
 
-  :source-paths ["src/main/clojure"]
-  :test-paths ["src/test/clojure"])
+   [compojure                 "1.5.0"]
+
+   [com.cognitect/transit-clj  "0.8.285"]]
+
+  :plugins
+  [[lein-pprint         "1.1.2"]
+   [lein-ancient        "0.6.8"]
+   [com.cemerick/austin "0.1.6"]
+   ]
+
+  :main example.server
+
+  :repositories
+  {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
