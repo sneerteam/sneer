@@ -26,42 +26,49 @@
    :message-list (message-sims count)})
 
 (defmethod handle :contact-new [state event]
-  (let [contact {:contact-id (event :id)
-                 :nick       (event :nick)}]
+  (let [nick (event :nick)
+        id (event :id)
+        contact {:contact-id id
+                 :nick       nick}]
     (-> state
-      (update-in [:convo-list] prepend contact)
-      (assoc :convo []))))
-
-(defn- remove-contact [contacts contact-id]
-  (vec (remove #(= (:contact-id %) contact-id) contacts)))
+      (update-in [:contacts :id->contact] assoc id contact))))
 
 (defmethod handle :contact-delete [state event]
-  (let [contact-id (:contact-id event)]
-    (update-in state [:convo-list] #(remove-contact % contact-id))))
-
-(defn- rename-contact [contacts contact-id new-nick]
-  (vec (map #(if (= (% :contact-id) contact-id)
-              (assoc % :nick new-nick)
-              %)
-            contacts)))
+  (update-in state [:contacts :id->contact] dissoc (:contact-id event)))
 
 (defmethod handle :contact-rename [state event]
-  (let [contact-id (:contact-id event)
+  (let [id (:contact-id event)
         new-nick (:new-nick event)]
-    (update-in state [:convo-list] #(rename-contact % contact-id new-nick))))
+    (assoc-in state [:contacts :id->contact id :nick] new-nick)))
 
-(defn view [streems]
-  (restore! streems handle {:convo-list (list)}))
+(defn- view [model view-request]
+  {:convo-list (->> model
+                  :contacts
+                  :id->contact
+                  vals
+                  (sort-by :contact-id)
+                  reverse
+                  vec)})
 
 (defn- update-ui [sneer]
-  ((sneer :ui-fn) (view (sneer :streems))))
+  (let [model (catch-up! (sneer :streems) handle)]
+
+
+    ((sneer :ui-fn) (view model (sneer :view-request)))))
+
+(defn handle-view [_state event]
+  (event :path))
 
 (defn handle! [sneer event]
-  (append (sneer :streems) event)
+  (if (= (event :type) :view)
+    (swap! (sneer :view-request) handle-view event)
+    (append (sneer :streems) event))
+
   (update-ui sneer))
 
 (defn sneer [ui-fn streems]
   (doto
-    {:ui-fn   ui-fn
-     :streems streems}
+    {:ui-fn      ui-fn
+     :streems    streems
+     :view-request (atom nil)}
     (update-ui)))

@@ -1,7 +1,7 @@
 (ns sneer.streem)
 
-(defn restore! [streems f initial-value]
-  (reduce f initial-value @streems))
+(defn catch-up! [streems f]
+  (reduce f nil @streems))
 
 (defn- conj-with-id [events event]
   (let [event-with-id (assoc event :id (count events))]
