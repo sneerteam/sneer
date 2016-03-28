@@ -1,7 +1,5 @@
 (ns sneer.core2
-  (require [sneer.contact :as contact :refer [contact]]
-           [sneer.view :as view]
-           [sneer.util :refer [handle]]
+  (require [sneer.util :refer [handle prepend]]
            [sneer.streem :refer :all]))
 
 #_(defn- message-sim [n]
@@ -28,53 +26,42 @@
    :message-list (message-sims count)})
 
 (defmethod handle :contact-new [state event]
-  (let [id (get-in state [:model :next-id])
-        contact (merge (contact event) {:contact-id id})]
+  (let [contact {:contact-id (event :id)
+                 :nick       (event :nick)}]
     (-> state
-      (update-in [:model :contacts] contact/add contact)
-      (update-in [:view] view/add-contact contact)
-      (update-in [:model :next-id] inc))))
+      (update-in [:convo-list] prepend contact)
+      (assoc :convo []))))
+
+(defn- remove-contact [contacts contact-id]
+  (vec (remove #(= (:contact-id %) contact-id) contacts)))
 
 (defmethod handle :contact-delete [state event]
   (let [contact-id (:contact-id event)]
-    (-> state
-      (update-in [:model :contacts] contact/delete contact-id)
-      (update-in [:view] view/delete-contact contact-id))))
+    (update-in state [:convo-list] #(remove-contact % contact-id))))
+
+(defn- rename-contact [contacts contact-id new-nick]
+  (vec (map #(if (= (% :contact-id) contact-id)
+              (assoc % :nick new-nick)
+              %)
+            contacts)))
 
 (defmethod handle :contact-rename [state event]
   (let [contact-id (:contact-id event)
         new-nick (:new-nick event)]
-    (-> state
-        (update-in [:model :contacts] contact/rename contact-id new-nick)
-        (update-in [:view] view/rename-contact contact-id new-nick))))
+    (update-in state [:convo-list] #(rename-contact % contact-id new-nick))))
 
-(defn- view [sneer]
-  (@(:state sneer) :view))
+(defn view [streems]
+  (restore! streems handle {:convo-list (list)}))
 
-(defn- update-ui! [sneer]
-  ((sneer :ui-fn) (view sneer)))
+(defn- update-ui [sneer]
+  ((sneer :ui-fn) (view (sneer :streems))))
 
 (defn handle! [sneer event]
-  (let [old-view (view sneer)]
-    (swap! (sneer :state) handle event)
-    (when-not (= (view sneer) old-view)
-      (update-ui! sneer))))
-
-; State schema:
-#_{:ui-fn fn
-   :view {:convo-list [1 2 3]}
-   :model {:next-id 0
-           :contacts [1 2 3]}}
-
-(defn- restore! [streems]
-  (let [initial {:view view/initial
-                 :model {:next-id 0}}]
-    (reduce handle initial (streem streems 0))))
+  (append (sneer :streems) event)
+  (update-ui sneer))
 
 (defn sneer [ui-fn streems]
   (doto
     {:ui-fn   ui-fn
-     :streems streems
-     :state   (atom (restore! streems))}
-    (update-ui!)))
-
+     :streems streems}
+    (update-ui)))
