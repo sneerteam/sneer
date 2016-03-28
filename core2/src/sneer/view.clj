@@ -12,7 +12,7 @@
     (update-in state [:convo-list] #(into [] (remove same-id? %)))))
 
 (defn rename-contact [state contact-id new-nick]
-  (update-in state [:convo-list] #(into [] (util/update-in %
+  (update-in state [:convo-list] #(into [] (util/update-where %
                                                            [:contact-id contact-id]
                                                            [:nick new-nick]))))
 

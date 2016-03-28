@@ -13,7 +13,7 @@
     (into [] (remove same-id? state))))
 
 (defn rename [state contact-id new-nick]
-  (util/update-in state [:contact-id contact-id] [:nick new-nick]))
+  (util/update-where state [:contact-id contact-id] [:nick new-nick]))
 
 (defn contact [event]
   (select-keys event [:nick]))

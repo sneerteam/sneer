@@ -3,7 +3,7 @@
 (defmulti handle (fn [_state event]
                    (event :type)))
 
-(defn update-in
+(defn update-where
   "Updates a value in a vector of maps where test-key = test-val.
   update-key is the field being updated with the value of update-val"
   [mapvec [test-key test-val] [update-key update-val]]
