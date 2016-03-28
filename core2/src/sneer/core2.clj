@@ -41,34 +41,28 @@
         new-nick (:new-nick event)]
     (assoc-in state [:contacts :id->contact id :nick] new-nick)))
 
-(defn- view [model view-request]
-  {:convo-list (->> model
-                  :contacts
-                  :id->contact
-                  vals
-                  (sort-by :contact-id)
-                  reverse
-                  vec)})
+(defn convo-list [model]
+  (->> model :contacts :id->contact vals (sort-by :contact-id) reverse vec))
+
+(defn- view [model [activity convo-id]]
+  (cond-> {:convo-list (convo-list model)}
+    (= activity :convo)
+    (assoc :convo {:nick (get-in model [:contacts :id->contact convo-id :nick])
+                   :chat []})))
 
 (defn- update-ui [sneer]
   (let [model (catch-up! (sneer :streems) handle)]
-
-
-    ((sneer :ui-fn) (view model (sneer :view-request)))))
-
-(defn handle-view [_state event]
-  (event :path))
+    ((sneer :ui-fn) (view model @(sneer :view-path)))))
 
 (defn handle! [sneer event]
   (if (= (event :type) :view)
-    (swap! (sneer :view-request) handle-view event)
-    (append (sneer :streems) event))
-
+    (reset! (sneer :view-path) (event :path))
+    (append! (sneer :streems) event))
   (update-ui sneer))
 
 (defn sneer [ui-fn streems]
   (doto
-    {:ui-fn      ui-fn
-     :streems    streems
-     :view-request (atom nil)}
+    {:ui-fn     ui-fn
+     :streems   streems
+     :view-path (atom nil)}
     (update-ui)))
