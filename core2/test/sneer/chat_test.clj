@@ -27,10 +27,8 @@
                           :contact-id carla-id
                           :text "Hi"})
         (get-in @ui [:convo :chat 0 :text]) => "Hi"
+
         (handle! subject {:type :message-send
                           :contact-id carla-id
                           :text "How are you?"})
-        (get-in @ui [:convo :chat 1 :text]) => "How are you?"
-        ))
-
-    ))
+        (get-in @ui [:convo :chat 1 :text]) => "How are you?"))))
