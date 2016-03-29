@@ -20,7 +20,9 @@
                  [secretary "1.2.3"]
                  [venantius/accountant "0.1.7"
                   :exclusions [org.clojure/tools.reader]]
-                 [com.cognitect/transit-cljs "0.8.237"]]
+                 [com.cognitect/transit-cljs "0.8.237"]
+                 [org.clojure/core.async    "0.2.374"]
+                 [com.taoensso/sente        "1.8.1"]]
 
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]

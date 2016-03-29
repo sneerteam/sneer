@@ -3,6 +3,7 @@
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
+              [reagent-spike.client]
               [cognitect.transit :as t]))
 
 ;; -------------------------
