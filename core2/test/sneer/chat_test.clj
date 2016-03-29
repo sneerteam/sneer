@@ -23,12 +23,20 @@
         (get-in @ui [:convo :chat]) => [])
 
       (fact "Sent message appears in chat"
-        (handle! subject {:type :message-send
+        (handle! subject {:type :msg-send
                           :contact-id carla-id
                           :text "Hi"})
         (get-in @ui [:convo :chat 0 :text]) => "Hi"
 
-        (handle! subject {:type :message-send
+        (handle! subject {:type :msg-send
                           :contact-id carla-id
                           :text "How are you?"})
-        (get-in @ui [:convo :chat 1 :text]) => "How are you?"))))
+        (get-in @ui [:convo :chat 1 :text]) => "How are you?")
+
+      (fact "Last sent message appears in convo-list summary preview"
+        (get-in @ui [:convo-list 0 :preview]) => "How are you?"
+
+        (handle! subject {:type :msg-send
+                          :contact-id carla-id
+                          :text "Answer me!!!"})
+        (get-in @ui [:convo-list 0 :preview]) => "Answer me!!!"))))

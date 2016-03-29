@@ -28,34 +28,37 @@
 (defmethod handle :contact-new [state event]
   (let [nick (event :nick)
         id (event :id)
-        contact {:contact-id id
-                 :nick       nick}]
+        summary {:contact-id    id
+                 :nick          nick
+                 :last-event-id id}]
     (-> state
-      (update-in [:contacts :id->contact] assoc id contact))))
+      (update-in [:summaries :id->summary] assoc id summary))))
 
 (defmethod handle :contact-delete [state event]
-  (update-in state [:contacts :id->contact] dissoc (:contact-id event)))
+  (update-in state [:summaries :id->summary] dissoc (:contact-id event)))
 
 (defmethod handle :contact-rename [state event]
   (let [id (:contact-id event)
         new-nick (:new-nick event)]
-    (assoc-in state [:contacts :id->contact id :nick] new-nick)))
+    (assoc-in state [:summaries :id->summary id :nick] new-nick)))
 
-(defmethod handle :message-send [state event]
-  ;(println "MESSAGE SEND DOES NOTHING FOR NOW. MUST UPDATE CONVO LIST")
-  state)
+(defmethod handle :msg-send [state event]
+  (let [contact-id (event :contact-id)]
+    (-> state
+      (assoc-in [:summaries :id->summary contact-id :preview]       (event :text))
+      (assoc-in [:summaries :id->summary contact-id :last-event-id] (event :id)))))
 
-(defn convo-list [model]
-  (->> model :contacts :id->contact vals (sort-by :contact-id) reverse vec))
+(defn- convo-list [model]
+  (->> model :summaries :id->summary vals (sort-by :last-event-id) reverse vec))
 
-(defn chat [streems contact-id]
+(defn- chat [streems contact-id]
   (catch-up! streems conj [] contact-id))
 
 (defn- view [sneer model [activity contact-id]]
   (cond-> {:convo-list (convo-list model)}
     (= activity :convo)
     (assoc :convo {:contact-id contact-id
-                   :nick (get-in model [:contacts :id->contact contact-id :nick])
+                   :nick (get-in model [:summaries :id->summary contact-id :nick])
                    :chat (chat (sneer :streems) contact-id)})))
 
 (defn- update-ui [sneer]
@@ -64,7 +67,7 @@
 
 (defn- streem-id [event]
   (case (event :type)
-    :message-send (event :contact-id)
+    :msg-send (event :contact-id)
     nil))
 
 (defn handle! [sneer event]
