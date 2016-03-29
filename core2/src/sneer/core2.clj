@@ -41,22 +41,31 @@
         new-nick (:new-nick event)]
     (assoc-in state [:contacts :id->contact id :nick] new-nick)))
 
+(defmethod handle :message-send [state event]
+  (println "MESSAGE SEND DOES NOTHING FOR NOW. MUST UPDATE CONVO LIST")
+  state)
+
 (defn convo-list [model]
   (->> model :contacts :id->contact vals (sort-by :contact-id) reverse vec))
 
-(defn- view [model [activity contact-id]]
+(defn chat [streems contact-id]
+  (catch-up! streems #() [] contact-id))
+
+(defn- view [sneer model [activity contact-id]]
   (cond-> {:convo-list (convo-list model)}
     (= activity :convo)
     (assoc :convo {:contact-id contact-id
                    :nick (get-in model [:contacts :id->contact contact-id :nick])
-                   :chat []})))
+                   :chat (chat (sneer :streems) contact-id)})))
 
 (defn- update-ui [sneer]
   (let [model (catch-up! (sneer :streems) handle)]
-    ((sneer :ui-fn) (view model @(sneer :view-path)))))
+    ((sneer :ui-fn) (view sneer model @(sneer :view-path)))))
 
 (defn- streem-id [event]
-  )
+  (case (event :type)
+    :message-send (event :contact-id)
+    nil))
 
 (defn handle! [sneer event]
   (if (= (event :type) :view)
