@@ -55,10 +55,13 @@
   (let [model (catch-up! (sneer :streems) handle)]
     ((sneer :ui-fn) (view model @(sneer :view-path)))))
 
+(defn- streem-id [event]
+  )
+
 (defn handle! [sneer event]
   (if (= (event :type) :view)
     (reset! (sneer :view-path) (event :path))
-    (append! (sneer :streems) event))
+    (append! (sneer :streems) event (streem-id event)))
   (update-ui sneer))
 
 (defn sneer [ui-fn streems]
