@@ -1,7 +1,7 @@
 (ns sneer.chat-test
   [:require
     [midje.sweet :refer [facts fact]]
-    [sneer.test-util :refer :all]
+    [sneer.midje-util :refer :all]
     [sneer.core2 :refer :all]
     [sneer.streem :refer :all]])
 

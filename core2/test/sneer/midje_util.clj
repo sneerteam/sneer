@@ -1,4 +1,4 @@
-(ns sneer.test-util)
+(ns sneer.midje-util)
 
 (def => "Anything, just to prevent warnings 'symbol => undefined' from the midje fact macro.")
 

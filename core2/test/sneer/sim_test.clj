@@ -1,7 +1,7 @@
 (ns sneer.sim-test
   [:require
     [midje.sweet :refer [facts fact]]
-    [sneer.test-util :refer :all]
+    [sneer.midje-util :refer :all]
     [sneer.core2-sim :refer :all]])
 
 (facts "UI Sims"
