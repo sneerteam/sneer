@@ -1,4 +1,6 @@
-(ns sneer.streem)
+(ns sneer.streem
+  (:require
+    [sneer.util :refer [conj-vec]]))
 
 (defn catch-up!
   ([streems f]
@@ -8,15 +10,15 @@
   ([streems f initial-value streem-id]
    (reduce f initial-value (@streems streem-id))))
 
-(defn- conj-with-id [events event]
-  (let [event-with-id (assoc event :id (count events))]
-    (conj events event-with-id)))
-
-(defn- append-with-id [state event streem-id] 
-  (update-in state [::all-events] conj-with-id event))
+(defn- append-with-id [state event streem-id]
+  (let [all-events (state ::all-events)
+        event (assoc event :id (count all-events))]
+    (cond-> (assoc state ::all-events (conj-vec all-events event))
+      streem-id
+      (update-in [streem-id] conj-vec event))))
 
 (defn append! [streems event streem-id]
   (swap! streems append-with-id event streem-id))
 
 (defn streems []
-  (atom {::all-events []}))
+  (atom {}))

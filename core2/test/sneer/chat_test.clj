@@ -22,7 +22,7 @@
         (get-in @ui [:convo :nick]) => "Carla"
         (get-in @ui [:convo :chat]) => [])
 
-      #_(fact "Sent message appears in chat"
+      (fact "Sent message appears in chat"
         (handle! subject {:type :message-send
                           :contact-id carla-id
                           :text "Hi"})
