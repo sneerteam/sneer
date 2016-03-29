@@ -44,10 +44,11 @@
 (defn convo-list [model]
   (->> model :contacts :id->contact vals (sort-by :contact-id) reverse vec))
 
-(defn- view [model [activity convo-id]]
+(defn- view [model [activity contact-id]]
   (cond-> {:convo-list (convo-list model)}
     (= activity :convo)
-    (assoc :convo {:nick (get-in model [:contacts :id->contact convo-id :nick])
+    (assoc :convo {:contact-id contact-id
+                   :nick (get-in model [:contacts :id->contact contact-id :nick])
                    :chat []})))
 
 (defn- update-ui [sneer]
