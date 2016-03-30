@@ -52,38 +52,69 @@
       (assoc-in [:summaries :id->summary contact-id :preview]       (event :text))
       (assoc-in [:summaries :id->summary contact-id :last-event-id] (event :id)))))
 
+(defmethod handle :keys-init [state event]
+  (assoc state :key-pair (select-keys event [:prik :puk])))
+
 (defn- convo-list [model]
   (->> model :summaries :id->summary vals (sort-by :last-event-id) reverse vec))
 
 (defn- chat [streems contact-id]
   (catch-up! streems conj [] contact-id))
 
-(defn- view [sneer model [activity contact-id]]
+(defn- view [streems model [activity contact-id]]
   (cond-> {:convo-list (convo-list model)
            :profile (:profile model)}
     (= activity :convo)
     (assoc :convo {:contact-id contact-id
                    :nick (get-in model [:summaries :id->summary contact-id :nick])
-                   :chat (chat (sneer :streems) contact-id)})))
+                   :chat (chat streems contact-id)})))
 
-(defn- update-ui [sneer]
-  (let [model (catch-up! (sneer :streems) handle)]
-    ((sneer :ui-fn) (view sneer model @(sneer :view-path)))))
+(defn- update-ui! [sneer model]
+  ((sneer :ui-fn) (view (sneer :streems) model @(sneer :view-path))))
 
 (defn- streem-id [event]
   (case (event :type)
     :msg-send (event :contact-id)
     nil))
 
-(defn handle! [sneer event]
-  (if (= (event :type) :view)
-    (reset! (sneer :view-path) (event :path))
-    (append! (sneer :streems) event (streem-id event)))
-  (update-ui sneer))
+(defn update-network! [sneer model]
 
-(defn sneer [ui-fn streems]
-  (doto
-    {:ui-fn     ui-fn
-     :streems   streems
-     :view-path (atom nil)}
-    (update-ui)))
+  )
+
+(defn puk [sneer model]
+  )
+
+(defn catch-up-model! [streems]
+  (catch-up! streems handle))
+
+(defn handle! [sneer event]
+  (let [streems (sneer :streems)]
+    (if (= (event :type) :view)
+      (reset! (sneer :view-path) (event :path))
+      (append! streems event (streem-id event)))
+    (let [model (catch-up-model! streems)]
+      (update-network! sneer model)
+      (update-ui! sneer model))))
+
+(defn keys-init-if-necessary [sneer model]
+  (when-not (:key-pair model)
+    (let [key-pair ((get-in sneer [:crypto-fns :generate-key-pair]))]
+      (handle! sneer {:type :keys-init
+                      :puk  (key-pair "puk")
+                      :prik (key-pair "prik")}))))
+
+(defn sneer
+  ([ui-fn streems]
+    (println "core2/sneer Move to test-util")
+    (sneer ui-fn streems nil {:generate-key-pair #(do {"prik" "foo-prik",
+                                                       "puk" "foo-puk"})}))
+  ([ui-fn streems server> crypto-fns]
+   (let [sneer {:ui-fn      ui-fn
+                :streems    streems
+                :server>    server>
+                :crypto-fns crypto-fns
+                :view-path  (atom nil)}
+         model (catch-up-model! (sneer :streems))]
+     (keys-init-if-necessary sneer model)
+     (update-ui! sneer model)
+     sneer)))
