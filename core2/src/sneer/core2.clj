@@ -25,6 +25,10 @@
    :tab :chat
    :message-list (message-sims count)})
 
+(defmethod handle :own-name-set [state event]
+  (let [own-name (event :own-name)]
+    (assoc-in state [:profile :own-name] own-name)))
+
 (defmethod handle :contact-new [state event]
   (let [nick (event :nick)
         id (event :id)
@@ -55,7 +59,8 @@
   (catch-up! streems conj [] contact-id))
 
 (defn- view [sneer model [activity contact-id]]
-  (cond-> {:convo-list (convo-list model)}
+  (cond-> {:convo-list (convo-list model)
+           :profile (:profile model)}
     (= activity :convo)
     (assoc :convo {:contact-id contact-id
                    :nick (get-in model [:summaries :id->summary contact-id :nick])

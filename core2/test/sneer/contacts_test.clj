@@ -10,7 +10,7 @@
         streems (streems)
         subject (sneer #(reset! ui %) streems)]
 
-    @ui => {:convo-list []}
+    (@ui :convo-list) => []
 
     (fact "New contact appears on top of convo list"
       (handle! subject {:type :contact-new
