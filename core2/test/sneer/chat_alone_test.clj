@@ -1,11 +1,11 @@
-(ns sneer.chat-test
+(ns sneer.chat-alone-test
   [:require
     [midje.sweet :refer [facts fact]]
     [sneer.midje-util :refer :all]
     [sneer.core2 :refer :all]
     [sneer.streem :refer :all]])
 
-(facts "Chat"
+(facts "Chatting alone (before contact accepts invite)"
   (let [ui (atom nil)
         streems (streems)
         subject (sneer #(reset! ui %) streems)]
