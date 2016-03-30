@@ -6,11 +6,17 @@
     [sneer.streem :refer :all]])
 
 (defn sneer-community []
+  (atom nil))
+
+(defn server> [community packet] ;packet {:from own-puk :send tuple :to puk}
+  ()
   )
 
 (defn join [community ui-fn own-name]
-  (sneer ui-fn (streems))
-  )
+  (let [server> (partial server> community)
+        member (sneer ui-fn (streems) server>)]
+    (swap! community assoc (puk member) member)
+    member))
 
 #_(facts "Invite"
   (let [subject (sneer-community)
