@@ -103,18 +103,13 @@
                       :puk  (key-pair "puk")
                       :prik (key-pair "prik")}))))
 
-(defn sneer
-  ([ui-fn streems]
-    (println "core2/sneer Move to test-util")
-    (sneer ui-fn streems nil {:generate-key-pair #(do {"prik" "foo-prik",
-                                                       "puk" "foo-puk"})}))
-  ([ui-fn streems server> crypto-fns]
-   (let [sneer {:ui-fn      ui-fn
-                :streems    streems
-                :server>    server>
-                :crypto-fns crypto-fns
-                :view-path  (atom nil)}
-         model (catch-up-model! (sneer :streems))]
-     (keys-init-if-necessary sneer model)
-     (update-ui! sneer model)
-     sneer)))
+(defn sneer [ui-fn streems server> crypto-fns]
+  (let [sneer {:ui-fn      ui-fn
+               :streems    streems
+               :server>    server>
+               :crypto-fns crypto-fns
+               :view-path  (atom nil)}
+        model (catch-up-model! (sneer :streems))]
+    (keys-init-if-necessary sneer model)
+    (update-ui! sneer model)
+    sneer))
