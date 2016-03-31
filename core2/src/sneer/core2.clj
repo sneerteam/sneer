@@ -34,40 +34,56 @@
         id (event :id)
         summary {:contact-id    id
                  :nick          nick
+                 :invite        "fooooinvite"
                  :last-event-id id}]
     (-> state
-      (update-in [:summaries :id->summary] assoc id summary))))
+      (update-in [:convos :id->summary] assoc id summary))))
 
 (defmethod handle :contact-delete [state event]
-  (update-in state [:summaries :id->summary] dissoc (:contact-id event)))
+  (update-in state [:convos :id->summary] dissoc (:contact-id event)))
 
 (defmethod handle :contact-rename [state event]
   (let [id (:contact-id event)
         new-nick (:new-nick event)]
-    (assoc-in state [:summaries :id->summary id :nick] new-nick)))
+    (assoc-in state [:convos :id->summary id :nick] new-nick)))
+
+(defn- invite->contact-id [state invite]
+  (:contact-id
+    (some #(= (% :invite) invite)
+          (-> state :convos :id->summary vals))))
+
+(defmethod handle :contact-invite-accept [state event]
+  ; THE FOLLOWING HAPPENS IN THE SENDER:
+  #_(let [invite (:invite event)
+        contact-id (invite->contact-id state invite)]
+    (update-in state [:convos :id->summary contact-id] dissoc :invite)))
 
 (defmethod handle :msg-send [state event]
   (let [contact-id (event :contact-id)]
     (-> state
-      (assoc-in [:summaries :id->summary contact-id :preview]       (event :text))
-      (assoc-in [:summaries :id->summary contact-id :last-event-id] (event :id)))))
+      (assoc-in [:convos :id->summary contact-id :preview]       (event :text))
+      (assoc-in [:convos :id->summary contact-id :last-event-id] (event :id)))))
 
 (defmethod handle :keys-init [state event]
   (assoc state :key-pair (select-keys event [:prik :puk])))
 
 (defn- convo-list [model]
-  (->> model :summaries :id->summary vals (sort-by :last-event-id) reverse vec))
+  (->> model :convos :id->summary vals (sort-by :last-event-id) reverse vec))
 
 (defn- chat [streems contact-id]
   (catch-up! streems conj [] contact-id))
+
+(defn- convo [streems model contact-id]
+  (-> model
+    (get-in [:convos :id->summary contact-id])
+    (select-keys [:contact-id :nick :invite])
+    (assoc :chat (chat streems contact-id))))
 
 (defn- view [streems model [activity contact-id]]
   (cond-> {:convo-list (convo-list model)
            :profile (:profile model)}
     (= activity :convo)
-    (assoc :convo {:contact-id contact-id
-                   :nick (get-in model [:summaries :id->summary contact-id :nick])
-                   :chat (chat streems contact-id)})))
+    (assoc :convo (convo streems model contact-id))))
 
 (defn- update-ui! [sneer model]
   ((sneer :ui-fn) (view (sneer :streems) model @(sneer :view-path))))
@@ -77,15 +93,15 @@
     :msg-send (event :contact-id)
     nil))
 
-(defn update-network! [sneer model]
+(defn- update-network! [sneer model]
 
   )
 
-(defn puk [sneer model]
-  )
-
-(defn catch-up-model! [streems]
+(defn- catch-up-model! [streems]
   (catch-up! streems handle))
+
+(defn- model! [sneer]
+  (catch-up-model! (sneer :streems)))
 
 (defn handle! [sneer event]
   (let [streems (sneer :streems)]
@@ -96,12 +112,16 @@
       (update-network! sneer model)
       (update-ui! sneer model))))
 
-(defn keys-init-if-necessary [sneer model]
+(defn- keys-init-if-necessary [sneer model]
   (when-not (:key-pair model)
     (let [key-pair ((get-in sneer [:crypto-fns :generate-key-pair]))]
       (handle! sneer {:type :keys-init
                       :puk  (key-pair "puk")
                       :prik (key-pair "prik")}))))
+
+
+(defn puk [sneer]
+  (get-in (model! sneer) [:key-pair :puk]))
 
 (defn sneer [ui-fn streems server> crypto-fns]
   (let [sneer {:ui-fn      ui-fn
@@ -109,7 +129,7 @@
                :server>    server>
                :crypto-fns crypto-fns
                :view-path  (atom nil)}
-        model (catch-up-model! (sneer :streems))]
+        model (model! sneer)]
     (keys-init-if-necessary sneer model)
     (update-ui! sneer model)
     sneer))

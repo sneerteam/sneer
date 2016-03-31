@@ -12,9 +12,14 @@
   ()
   )
 
+(defn dummy-key [prefix key-type]
+  (str (subs prefix 0 3) "-" key-type))
+
 (defn join [community ui-fn own-name]
   (let [server> (partial server> community)
-        member (sneer ui-fn (streems) server>)]
+        crypto-fns {:generate-key-pair #(do {"prik" (dummy-key own-name "prik")
+                                             "puk"  (dummy-key own-name "puk")})}
+        member (sneer ui-fn (streems) server> crypto-fns)]
     (swap! community assoc (puk member) member)
     member))
 
