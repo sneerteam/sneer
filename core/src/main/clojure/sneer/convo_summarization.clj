@@ -140,10 +140,17 @@
     (go-while-let [snapshot (<! snapshots)]
       (write-snapshot file snapshot))))
 
+(defn- delete-old-buggy-snapshot! [^Container container]
+  (some-> (.produce container PersistenceFolder)
+          (.get)
+          (File. "conversation-summaries.tmp")
+          (.delete)))
+
 (defn- start-machine! [^Container container]
+  (delete-old-buggy-snapshot! container)
   (let [file (some-> (.produce container PersistenceFolder)
                      (.get)
-                     (File. "conversation-summaries.tmp"))
+                     (File. "conversation-summaries2.tmp"))
         previous-state (read-snapshot file)
         machine (start-summarization-machine! container previous-state)]
     (start-saving-snapshots-to! file (tap-state machine))

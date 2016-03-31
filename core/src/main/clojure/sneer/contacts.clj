@@ -81,11 +81,15 @@
       (close! lease)
       puk)))
 
-(defn assoc-puk [state puk id]
+(defn- assoc-puk [state puk id]
   (if puk
     (assoc-in state [:puk->id puk] id)
     state))
 
+(defn- assoc-invite-code [state invite-code id]
+  (if invite-code
+    (assoc-in state [:invite-code->id invite-code] id)
+    state))
 
 (defn- handle-contact-delete [state tuple]
   (let [{puk "party" invite-code "invite-code"} tuple
@@ -126,7 +130,7 @@
               (update-in [:nick->id] dissoc old-nick)
               (assoc-in  [:nick->id new-nick] id)
               (assoc-puk puk id)
-              (assoc-in  [:invite-code->id invite-code] id)))))))
+              (assoc-invite-code invite-code id)))))))
 
 (defn- handle-push [state tuple]
 ;; {"type" "push" "audience" contact-puk "invite-code" invite-code-received}
