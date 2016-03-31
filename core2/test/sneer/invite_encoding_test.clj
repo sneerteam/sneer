@@ -1,4 +1,4 @@
-(ns sneer.invite-test
+(ns sneer.invite-encoding-test
   [:require
     [midje.sweet :refer [facts fact]]
     [sneer.midje-util :refer :all]
