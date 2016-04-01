@@ -50,7 +50,5 @@
         (get-in @neide-ui [:convo :invite]) => nil
         (get-in @neide-ui [:convo-list 0 :invite]) => nil)
 
-      "TODO" => "Encode name in invite"
-
       (fact "Inviter's own name appears as contact nick"
         (get-in @carla-ui [:convo-list 0 :nick]) => "Neide da Silva"))))
