@@ -1,5 +1,5 @@
 (ns sneer.core2
-  (require [sneer.util :refer [handle prepend]]
+  (require [sneer.util.core :refer [handle prepend]]
            [sneer.streem :refer :all]))
 
 #_(defn- message-sim [n]

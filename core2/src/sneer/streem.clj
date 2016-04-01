@@ -1,6 +1,6 @@
 (ns sneer.streem
   (:require
-    [sneer.util :refer [conj-vec]]))
+    [sneer.util.core :refer [conj-vec]]))
 
 (defn catch-up!
   ([streems f]

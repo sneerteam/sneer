@@ -1,4 +1,4 @@
-(ns sneer.util)
+(ns sneer.util.core)
 
 (defmulti handle (fn [_state event]
                    (event :type)))
