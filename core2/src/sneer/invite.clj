@@ -23,5 +23,5 @@
         [version] vector]
     (assert (= version 1) "You need to update Sneer to accept this invite")
     (let [[_ puk name] vector]
-      {:puk         puk
-       :name        name})))
+      {:puk  puk
+       :name name})))
