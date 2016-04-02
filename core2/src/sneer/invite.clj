@@ -8,8 +8,8 @@
 (defn- ->string [^bytes bytes]
   (String. bytes "UTF8"))
 
-(defn encode [{:keys [puk name invite-code]}]
-  (let [vector [version puk name invite-code]]
+(defn encode [{:keys [puk name nonce]}]
+  (let [vector [version puk name nonce]]
     (-> vector
       msg/pack
       base64/encode
@@ -22,7 +22,6 @@
                  (msg/unpack))
         [version] vector]
     (assert (= version 1) "You need to update Sneer to accept this invite")
-    (let [[_ puk name invite-code] vector]
+    (let [[_ puk name] vector]
       {:puk         puk
-       :name        name
-       :invite-code invite-code})))
+       :name        name})))
