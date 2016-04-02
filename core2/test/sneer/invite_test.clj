@@ -40,9 +40,6 @@
         invite => some?
         (get-in @neide-ui [:convo-list 0 :invite]) => invite)
 
-      (fact "Carla starts with no contacts"
-        (get-in @carla-ui [:convo-list]) => [])
-
       (fact "Invite disappears on sender's side after being accepted by receiver"
         (handle! carla {:type   :contact-invite-accept
                         :invite invite})
