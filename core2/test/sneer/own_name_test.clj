@@ -10,9 +10,6 @@
         subject (sneer-local #(reset! ui %))]
 
     (fact "She has a name"
-      (get-in @ui [:profile :own-name]) => nil
-
       (handle! subject {:type :own-name-set
-                        :own-name "Neide da Silva"})
-
-      (get-in @ui [:profile :own-name]) => "Neide da Silva")))
+                        :own-name "Neide da Silva II"})
+      (get-in @ui [:profile :own-name]) => "Neide da Silva II")))

@@ -20,5 +20,5 @@
 (defn append! [streems event streem-id]
   (swap! streems append-with-id event streem-id))
 
-(defn streems []
+(defn transient-streems []
   (atom {}))

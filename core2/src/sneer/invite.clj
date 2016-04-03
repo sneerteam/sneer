@@ -9,6 +9,7 @@
   (String. bytes "UTF8"))
 
 (defn encode [{:keys [puk name nonce]}]
+  (assert (and puk name nonce))
   (let [vector [version puk name nonce]]
     (-> vector
       msg/pack
