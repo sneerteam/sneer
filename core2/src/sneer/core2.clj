@@ -36,7 +36,6 @@
 (defn summary-append [state summary]
   (let [id (summary :contact-id)
         summary (assoc summary :last-event-id id)]
-;    (println (str "Appending:" state "::" summary))
     (update-in state [:convos :id->summary] assoc id summary)))
 
 (defn puk2 [state]
@@ -73,11 +72,10 @@
 (defmethod handle :contact-invite-accept [state event]
   (let [invite (invite/decode (event :invite))]
 
-    (println "Reply with invite code acceptance")
-    (invite :invite)
+    (println "Reply with invite acceptance")
 
     (summary-append state
-      {:contact-id (event :id)
+      {:contact-id (event  :id)
        :nick       (invite :name)
        :puk        (invite :puk)}))
 
@@ -161,9 +159,9 @@
 (defn puk [sneer]
   (-> sneer model! puk2))
 
-(defn sneer [ui-fn streems server> crypto-fns]
-  (let [sneer {:ui-fn      ui-fn
-               :streems    streems
+(defn sneer [streems ui-fn server> crypto-fns]
+  (let [sneer {:streems    streems
+               :ui-fn      ui-fn
                :server>    server>
                :crypto-fns crypto-fns
                :view-path  (atom nil)}
