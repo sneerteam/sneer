@@ -8,3 +8,10 @@
 
 (defn conj-vec [?vec v]
   (vec (conj ?vec v)))
+
+(defn assoc-some
+  "Same as assoc but only for non-nil keys"
+  [map ?key val]
+  (if (some? ?key)
+    (assoc map ?key val)
+    map))

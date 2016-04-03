@@ -1,6 +1,8 @@
 (ns sneer.core2
-  (require [sneer.util.core :refer [handle prepend]]
-           [sneer.streem :refer :all]))
+  (require
+    [sneer.invite :as invite]
+    [sneer.util.core :refer [handle prepend assoc-some]]
+    [sneer.streem :refer :all]))
 
 #_(defn- message-sim [n]
   {:id     (+ 10000 n)
@@ -29,15 +31,30 @@
   (let [own-name (event :own-name)]
     (assoc-in state [:profile :own-name] own-name)))
 
+
+
+(defn summary-append [state summary]
+  (let [id (summary :contact-id)
+        summary (assoc summary :last-event-id id)]
+;    (println (str "Appending:" state "::" summary))
+    (update-in state [:convos :id->summary] assoc id summary)))
+
+(defn puk2 [state]
+  (get-in state [:key-pair :puk]))
+
+(defn- own-name [state]
+  (get-in state [:profile :own-name]))
+
+(defn- invite [state random-long]
+  (invite/encode {:puk   (puk2 state)
+                  :name  (own-name state)
+                  :nonce random-long}))
+
 (defmethod handle :contact-new [state event]
-  (let [nick (event :nick)
-        id (event :id)
-        summary {:contact-id    id
-                 :nick          nick
-                 :invite        "fooooinvite"
-                 :last-event-id id}]
-    (-> state
-      (update-in [:convos :id->summary] assoc id summary))))
+  (summary-append state
+    {:contact-id (event :id)
+     :nick       (event :nick)
+     :invite     (invite state (event :random-long))}))
 
 (defmethod handle :contact-delete [state event]
   (update-in state [:convos :id->summary] dissoc (:contact-id event)))
@@ -48,12 +65,23 @@
     (assoc-in state [:convos :id->summary id :nick] new-nick)))
 
 (defn- invite->contact-id [state invite]
+  (println "TODO thread this")
   (:contact-id
     (some #(= (% :invite) invite)
           (-> state :convos :id->summary vals))))
 
 (defmethod handle :contact-invite-accept [state event]
-  ; THE FOLLOWING HAPPENS IN THE SENDER:
+  (let [invite (invite/decode (event :invite))]
+
+    (println "Reply with invite code acceptance")
+    (invite :invite)
+
+    (summary-append state
+      {:contact-id (event :id)
+       :nick       (invite :name)
+       :puk        (invite :puk)}))
+
+  ; THE FOLLOWING MUST HAPPEN IN THE SENDER:
   #_(let [invite (:invite event)
         contact-id (invite->contact-id state invite)]
     (update-in state [:convos :id->summary contact-id] dissoc :invite)))
@@ -103,8 +131,19 @@
 (defn- model! [sneer]
   (catch-up-model! (sneer :streems)))
 
+(defn- random-long [sneer]
+  ((-> sneer :crypto-fns :random-long-generator)))
+
+(defn- deterministic!
+  "Adds information such as timestamp and random bytes when necessary."
+  [sneer event]
+  (if (-> event :type (= :contact-new))
+    (assoc event :random-long (random-long sneer))
+    event))
+
 (defn handle! [sneer event]
-  (let [streems (sneer :streems)]
+  (let [event (deterministic! sneer event)
+        streems (sneer :streems)]
     (if (= (event :type) :view)
       (reset! (sneer :view-path) (event :path))
       (append! streems event (streem-id event)))
@@ -119,9 +158,8 @@
                       :puk  (key-pair "puk")
                       :prik (key-pair "prik")}))))
 
-
 (defn puk [sneer]
-  (get-in (model! sneer) [:key-pair :puk]))
+  (-> sneer model! puk2))
 
 (defn sneer [ui-fn streems server> crypto-fns]
   (let [sneer {:ui-fn      ui-fn
