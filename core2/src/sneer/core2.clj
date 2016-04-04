@@ -53,7 +53,7 @@
   (summary-append state
     {:contact-id (event :id)
      :nick       (event :nick)
-     :invite     (invite state (event :random-long))}))
+     :invite     (invite state (event :random-bytes))}))
 
 (defmethod handle :contact-delete [state event]
   (update-in state [:convos :id->summary] dissoc (:contact-id event)))
@@ -129,14 +129,14 @@
 (defn- model! [sneer]
   (catch-up-model! (sneer :streems)))
 
-(defn- random-long [sneer]
-  ((-> sneer :crypto-fns :random-long-generator)))
+(defn- random-bytes [sneer array-size]
+  ((-> sneer :crypto-fns :generate-random-bytes) array-size))
 
 (defn- deterministic!
   "Adds information such as timestamp and random bytes when necessary."
   [sneer event]
   (if (-> event :type (= :contact-new))
-    (assoc event :random-long (random-long sneer))
+    (assoc event :random-bytes (random-bytes sneer 8))
     event))
 
 (defn handle! [sneer event]

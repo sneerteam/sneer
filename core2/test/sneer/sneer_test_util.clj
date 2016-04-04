@@ -9,9 +9,10 @@
 (def ^:private dummy-random (atom 1234))
 
 (defn dummy-crypto-fns [own-name]
-  {:generate-key-pair #(do {"prik" (dummy-key own-name "prik")
-                            "puk"  (dummy-key own-name "puk")})
-   :random-long-generator #(swap! dummy-random inc)})
+  {:generate-key-pair     #(do {"prik" (dummy-key own-name "prik")
+                                "puk"  (dummy-key own-name "puk")})
+   :generate-random-bytes #(do (swap! dummy-random inc)
+                               (byte-array (take % (repeat @dummy-random))))})
 
 (defn- sneer-community []
   (atom nil))
