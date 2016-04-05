@@ -70,10 +70,10 @@
 (defn puk [sneer]
   (-> sneer model! puk2))
 
-(defn sneer [streems ui-fn server> crypto-fns]
+(defn sneer [streems ui-fn outbox-fn crypto-fns]
   (let [sneer {:streems    streems
                :ui-fn      ui-fn
-               :server>    server>
+               :outbox-fn  outbox-fn
                :crypto-fns crypto-fns
                :view-path  (atom nil)}
         model (model! sneer)]
