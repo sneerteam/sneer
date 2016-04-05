@@ -64,20 +64,20 @@
     (assoc-in state [:convos :id->summary id :nick] new-nick)))
 
 (defn- invite->contact-id [state invite]
-  (println "TODO thread this")
-  (:contact-id
-    (some #(= (% :invite) invite)
-          (-> state :convos :id->summary vals))))
+  (->> state
+    :convos
+    :id->summary
+    vals
+    (some #(-> % :invite (= invite)))
+    :contact-id))
 
 (defmethod handle :contact-invite-accept [state event]
   (let [invite (invite/decode (event :invite))]
-
-    (println "Reply with invite acceptance")
-
-    (summary-append state
-      {:contact-id (event  :id)
-       :nick       (invite :name)
-       :puk        (invite :puk)}))
+    (-> state
+      (summary-append {:contact-id (event :id)
+                       :nick       (invite :name)
+                       :puk        (invite :puk)})
+      ))
 
   ; THE FOLLOWING MUST HAPPEN IN THE SENDER:
   #_(let [invite (:invite event)

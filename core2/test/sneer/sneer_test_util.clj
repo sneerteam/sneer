@@ -14,7 +14,7 @@
    :generate-random-bytes #(do (swap! dummy-random inc)
                                (byte-array (take % (repeat @dummy-random))))})
 
-(defn- sneer-community []
+(defn sneer-community []
   (atom nil))
 
 (defn- server> [community packet]  ;packet {:from own-puk :send tuple :to puk}
