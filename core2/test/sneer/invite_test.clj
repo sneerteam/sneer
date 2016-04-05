@@ -28,13 +28,13 @@
         (handle! carla {:type   :contact-invite-accept
                         :invite invite})
 
-        ;(get-in @neide-ui [:convo :invite]) => nil
-        ;(get-in @neide-ui [:convo-list 0 :invite]) => nil
-        )
+        (get-in @neide-ui [:convo :invite]) => nil
+        (get-in @neide-ui [:convo-list 0 :invite]) => nil)
 
       (fact "Inviter's name appears as contact nick"
         (get-in @carla-ui [:convo-list 0 :nick]) => "Neide da Silva")))
 
-  ;  "TODO" => "Duplicate nicks not allowed"
-  ;  "TODO" => "Duplicate puks not allowed"
+;    "TODO" => "Remove sent network packets"
+;    "TODO" => "Duplicate nicks not allowed"
+;    "TODO" => "Duplicate puks not allowed"
   )

@@ -1,8 +1,11 @@
 (ns sneer.core2
   (require
-    [sneer.model :refer :all]
+    [sneer.model :as model]
     [sneer.util.core :refer [handle prepend assoc-some]]
     [sneer.streem :refer :all]))
+
+
+;================== VIEW
 
 (defn- convo-list [model]
   (->> model :convos :id->summary vals (sort-by :last-event-id) reverse vec))
@@ -25,14 +28,32 @@
 (defn- update-ui! [sneer model]
   ((sneer :ui-fn) (view (sneer :streems) model @(sneer :view-path))))
 
+
+;================== NETWORK
+
+(defn- update-network! [sneer model]
+  (doseq [event-out (get-in model [:network :events-out])]
+    ((sneer :outbox-fn) (assoc-in event-out [:event :from] (model/puk model)))))
+
+#_{:type :event-in
+   :event {:from puk
+           :type :some-type
+           :some-attribute :some-value}}
+(defmethod handle :event-in [state event-in]
+  (let [event (:event event-in)]
+    (if (:from event)
+      (handle state event)
+      (do
+        (println "Ignoring event without sender:" event)
+        state))))
+
+
+;================== PERSISTENCE
+
 (defn- streem-id [event]
   (case (event :type)
     :msg-send (event :contact-id)
     nil))
-
-(defn- update-network! [sneer model]
-
-  )
 
 (defn- catch-up-model! [streems]
   (catch-up! streems handle))
@@ -50,6 +71,9 @@
     (assoc event :random-bytes (random-bytes sneer 8))
     event))
 
+
+;================== HANDLE!
+
 (defn handle! [sneer event]
   (let [event (deterministic! sneer event)
         streems (sneer :streems)]
@@ -60,6 +84,9 @@
       (update-network! sneer model)
       (update-ui! sneer model))))
 
+
+;================== KEYS
+
 (defn- keys-init-if-necessary [sneer model]
   (when-not (:key-pair model)
     (let [key-pair ((get-in sneer [:crypto-fns :generate-key-pair]))]
@@ -68,7 +95,10 @@
                       :prik (key-pair "prik")}))))
 
 (defn puk [sneer]
-  (-> sneer model! puk2))
+  (-> sneer model! model/puk))
+
+
+;================== CONSTRUCTOR
 
 (defn sneer [streems ui-fn outbox-fn crypto-fns]
   (let [sneer {:streems    streems

@@ -1,7 +1,7 @@
 (ns sneer.model
   (require
     [sneer.invite :as invite]
-    [sneer.util.core :refer [handle prepend assoc-some]]
+    [sneer.util.core :refer [handle prepend assoc-some conj-vec]]
     [sneer.streem :refer :all]))
 
 #_(defn- message-sim [n]
@@ -36,14 +36,14 @@
         summary (assoc summary :last-event-id id)]
     (update-in state [:convos :id->summary] assoc id summary)))
 
-(defn puk2 [state]
+(defn puk [state]
   (get-in state [:key-pair :puk]))
 
 (defn- own-name [state]
   (get-in state [:profile :own-name]))
 
 (defn- invite [state random-long]
-  (invite/encode {:puk   (puk2 state)
+  (invite/encode {:puk   (puk state)
                   :name  (own-name state)
                   :nonce random-long}))
 
@@ -66,21 +66,32 @@
     :convos
     :id->summary
     vals
-    (some #(-> % :invite (= invite)))
+    (filter #(-> % :invite (= invite)))
+    first
     :contact-id))
 
+(defmethod handle :contact-invite-thanks [state event]
+  (let [invite (:invite event)
+        from   (:from event)]
+    (if-some [contact-id (invite->contact-id state invite)]
+      (-> state
+        (update-in [:convos :id->summary contact-id] dissoc :invite)
+        (update-in [:convos :id->summary contact-id] assoc :puk from))
+      state)))
+
+(defn- thank-for-invite [state puk invite]
+  (let [event {:type   :contact-invite-thanks
+               :invite invite}]
+    (update-in state [:network :events-out] conj-vec {:to puk, :event event})))
+
 (defmethod handle :contact-invite-accept [state event]
-  (let [invite (invite/decode (event :invite))]
+  (let [invite (event :invite)
+        {:keys [name puk]} (invite/decode invite)]
     (-> state
       (summary-append {:contact-id (event :id)
-                       :nick       (invite :name)
-                       :puk        (invite :puk)})
-      ))
-
-  ; THE FOLLOWING MUST HAPPEN IN THE SENDER:
-  #_(let [invite (:invite event)
-        contact-id (invite->contact-id state invite)]
-    (update-in state [:convos :id->summary contact-id] dissoc :invite)))
+                       :nick       name
+                       :puk        puk})
+      (thank-for-invite puk invite))))
 
 (defmethod handle :msg-send [state event]
   (let [contact-id (event :contact-id)]

@@ -15,8 +15,9 @@
    :generate-random-bytes #(do (swap! dummy-random inc)
                                (byte-array (take % (repeat @dummy-random))))})
 
-(defn- outbox-fn [network-sim from packet]  ;packet {:from own-puk :send tuple :to puk}
-  (net/send-packet network-sim (assoc packet :from from)))
+(defn- outbox-fn [network-sim from event-out]  ;packet {:from own-puk :send tuple :to puk}
+  (net/send-packet network-sim {:to   (:to event-out)
+                                :send (:event event-out)}))
 
 (defn- sneer-with-name [own-name ui-fn outbox-fn]
   (doto
@@ -24,15 +25,15 @@
     (handle! {:type :own-name-set, :own-name own-name})))
 
 (defn- handle-packet [member packet]
-  (handle! member {:type    :packet-in
-                   :payload (packet :send)}))
+  (handle! member {:type  :event-in
+                   :event (packet :send)}))
 
 (defn join [network-sim own-name ui-fn]
   (let [puk (atom nil)
         outbox-fn (partial outbox-fn network-sim @puk)
         member (sneer-with-name own-name ui-fn outbox-fn)]
     (reset! puk (core/puk member))
-    (net/join network-sim puk (partial handle-packet member))
+    (net/join network-sim @puk (partial handle-packet member))
     member))
 
 (defn sneer-local [ui-fn]
