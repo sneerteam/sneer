@@ -1,6 +1,7 @@
 (ns sneer.sneer-test-util
   (:require
-   [sneer.core2 :refer :all]
+   [sneer.core2 :refer :all :as core]
+   [sneer.network-sim :as net]
    [sneer.streem :refer [transient-streems]]))
 
 (defn- dummy-key [prefix key-type]
@@ -14,24 +15,26 @@
    :generate-random-bytes #(do (swap! dummy-random inc)
                                (byte-array (take % (repeat @dummy-random))))})
 
-(defn sneer-community []
-  (atom nil))
+(defn- outbox-fn [network-sim from packet]  ;packet {:from own-puk :send tuple :to puk}
+  (net/send-packet network-sim (assoc packet :from from)))
 
-(defn- server> [community packet]  ;packet {:from own-puk :send tuple :to puk}
-  ()
-  )
-
-(defn- sneer-with-name [own-name ui-fn server>]
+(defn- sneer-with-name [own-name ui-fn outbox-fn]
   (doto
-    (sneer (transient-streems) ui-fn server> (dummy-crypto-fns own-name))
+    (sneer (transient-streems) ui-fn outbox-fn (dummy-crypto-fns own-name))
     (handle! {:type :own-name-set, :own-name own-name})))
 
-(defn join [community own-name ui-fn]
-  (let [server> (partial server> community)
-        member (sneer-with-name own-name ui-fn server>)]
-    (swap! community assoc (puk member) member)
+(defn- handle-packet [member packet]
+  (handle! member {:type    :packet-in
+                   :payload (packet :send)}))
+
+(defn join [network-sim own-name ui-fn]
+  (let [puk (atom nil)
+        outbox-fn (partial outbox-fn network-sim @puk)
+        member (sneer-with-name own-name ui-fn outbox-fn)]
+    (reset! puk (core/puk member))
+    (net/join network-sim puk (partial handle-packet member))
     member))
 
 (defn sneer-local [ui-fn]
-  (let [server> nil]
-    (sneer-with-name "Neide da Silva" ui-fn server>)))
+  (let [outbox-fn nil]
+    (sneer-with-name "Neide da Silva" ui-fn outbox-fn)))

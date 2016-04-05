@@ -2,16 +2,17 @@
   [:require
     [midje.sweet :refer [facts fact]]
     [sneer.midje-util :refer :all]
+    [sneer.network-sim :as net]
     [sneer.sneer-test-util :refer :all]
     [sneer.core2 :refer :all]
     [sneer.streem :refer :all]])
 
 (facts "Invite"
-  (let [subject (sneer-community)
+  (let [network (net/network-sim)
         neide-ui (atom nil)
         carla-ui (atom nil)
-        neide (join subject "Neide da Silva" #(reset! neide-ui %))
-        carla (join subject "Carla Costa" #(reset! carla-ui %))]
+        neide (join network "Neide da Silva" #(reset! neide-ui %))
+        carla (join network "Carla Costa"    #(reset! carla-ui %))]
 
     (handle! neide {:type :contact-new, :nick "Carla"})
 

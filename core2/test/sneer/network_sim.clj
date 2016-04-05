@@ -3,7 +3,7 @@
 (defn send-packet [network packet]
   (let [addr     (packet :to)
         inbox-fn (@network addr)]
-    (inbox-fn (dissoc packet :to))))
+    (inbox-fn {:send (packet :send)})))
 
 (defn join [network addr inbox-fn]
   (swap! network assoc addr inbox-fn))
