@@ -33,19 +33,7 @@
 
 (defn- update-network! [sneer model]
   (doseq [event-out (get-in model [:network :events-out])]
-    ((sneer :outbox-fn) (assoc-in event-out [:event :from] (model/puk model)))))
-
-#_{:type :event-in
-   :event {:from puk
-           :type :some-type
-           :some-attribute :some-value}}
-(defmethod handle :event-in [state event-in]
-  (let [event (:event event-in)]
-    (if (:from event)
-      (handle state event)
-      (do
-        (println "Ignoring event without sender:" event)
-        state))))
+    ((sneer :outbox-fn) event-out)))
 
 
 ;================== PERSISTENCE

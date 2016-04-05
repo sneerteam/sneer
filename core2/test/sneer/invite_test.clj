@@ -34,7 +34,6 @@
       (fact "Inviter's name appears as contact nick"
         (get-in @carla-ui [:convo-list 0 :nick]) => "Neide da Silva")))
 
-;    "TODO" => "Remove sent network packets"
 ;    "TODO" => "Duplicate nicks not allowed"
 ;    "TODO" => "Duplicate puks not allowed"
   )

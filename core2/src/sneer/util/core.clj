@@ -9,6 +9,9 @@
 (defn conj-vec [?vec v]
   (vec (conj ?vec v)))
 
+(defn remove-vec [coll v]
+  (vec (remove #(= % v) coll)))
+
 (defn assoc-some
   "Same as assoc but only for non-nil keys"
   [map ?key val]

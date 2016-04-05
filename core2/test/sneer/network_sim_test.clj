@@ -14,8 +14,8 @@
     (subject/join network :addr1 (partial inbox peer1))
     (subject/join network :addr2 (partial inbox peer2))
 
-    (subject/send-packet network {:send "Hi!", :to :addr1})
+    (subject/send-packet network {:send "Hi!", :from :foo-addr, :to :addr1})
     @peer1 => "Hi!"
 
-    (subject/send-packet network {:send "Hey", :to :addr2})
+    (subject/send-packet network {:send "Hey", :from :foo-addr, :to :addr2})
     @peer2 => "Hey"))

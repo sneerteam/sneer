@@ -1,7 +1,7 @@
 (ns sneer.model
   (require
     [sneer.invite :as invite]
-    [sneer.util.core :refer [handle prepend assoc-some conj-vec]]
+    [sneer.util.core :refer [handle prepend assoc-some conj-vec remove-vec]]
     [sneer.streem :refer :all]))
 
 #_(defn- message-sim [n]
@@ -101,3 +101,22 @@
 
 (defmethod handle :keys-init [state event]
   (assoc state :key-pair (select-keys event [:prik :puk])))
+
+
+;================== NETWORK
+
+(defmethod handle :event-sent [state event-sent]
+  (let [event-out (:event event-sent)]
+    (update-in state [:network :events-out] remove-vec event-out)))
+
+#_{:type :event-in
+   :event {:from puk
+           :type :some-type
+           :some-attribute :some-value}}
+(defmethod handle :event-in [state event-in]
+  (let [event (:event event-in)]
+    (if (:from event)
+      (handle state event)
+      (do
+        (println "Ignoring event without sender:" event)
+        state))))
