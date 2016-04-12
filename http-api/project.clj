@@ -32,6 +32,14 @@
    [com.cemerick/austin "0.1.6"]
    ]
 
+  ; Temporary setup resource-paths (used by compojure.route/resources)
+  ; Static html and css files:
+  ;     spikes/reagend-spike/resources/public/main.html    -> /main.html
+  ;     spikes/reagend-spike/resources/public/css/site.css -> /css/site.css
+  ; Dynamic clojurescript files:
+  ;     ../spikes/reagent-spike/target/cljsbuild/js/app.js -> /js/app.js
+  :resource-paths ["../spikes/reagent-spike/resources" "../spikes/reagent-spike/target/cljsbuild"]
+
   :main example.server
 
   :repositories
