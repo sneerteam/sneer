@@ -37,6 +37,20 @@
     (fact "Nicks with problems are ignored. The ui should never actually trigger this event because it can validate nicks first."
       (handle! subject {:type :contact-new
                         :nick "Kharla"})
-      (-> @ui :convo-list count) => 1
-      )
-    ))
+      (-> @ui :convo-list count) => 1)
+
+    (fact "Problems with new nickname can be validated"
+      (handle! subject {:type          :view
+                        :nick-validation "Maicon"})
+      (-> @ui :nick-validation :nick)    => "Maicon"
+      (-> @ui :nick-validation :problem) => nil
+
+      (handle! subject {:type          :view
+                        :nick-validation ""})
+      (-> @ui :nick-validation :nick)    => ""
+      (-> @ui :nick-validation :problem) => "cannot be empty"
+
+      (handle! subject {:type          :view
+                        :nick-validation "Kharla"})
+      (-> @ui :nick-validation :nick)    => "Kharla"
+      (-> @ui :nick-validation :problem) => "already used")))

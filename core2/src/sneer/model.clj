@@ -56,19 +56,19 @@
     first
     :contact-id))
 
-(defn- problem-with-nickname
+(defn problem-with-nickname
   ([state new-nick]
     (problem-with-nickname state nil new-nick))
   ([state old-nick new-nick]
     (cond
       (or (nil? new-nick) (.isEmpty ^String new-nick))
-      "Nickname cannot be empty"
+      "cannot be empty"
 
       (= old-nick new-nick)
       nil
 
       (some? (contact-id-given state :nick new-nick))
-      "Nickname already used")))
+      "already used")))
 
 (defmethod handle :contact-new [state event]
   (let [nick (event :nick)]

@@ -19,14 +19,18 @@
     (select-keys [:contact-id :nick :invite])
     (assoc :chat (chat streems contact-id))))
 
-(defn- view [streems model [activity contact-id]]
+(defn- view [streems model demand]
   (cond-> {:convo-list (convo-list model)
            :profile (:profile model)}
-    (= activity :convo)
-    (assoc :convo (convo streems model contact-id))))
+    (-> demand :path first (= :convo))
+    (assoc :convo (convo streems model #_contact-id (-> demand :path second)))
+
+    (-> demand :nick-validation)
+    (assoc :nick-validation {:nick (-> demand :nick-validation)
+                             :problem (model/problem-with-nickname model (-> demand :nick-validation))})))
 
 (defn- update-ui! [sneer model]
-  ((sneer :ui-fn) (view (sneer :streems) model @(sneer :view-path))))
+  ((sneer :ui-fn) (view (sneer :streems) model @(sneer :view))))
 
 
 ;================== NETWORK
@@ -66,7 +70,7 @@
   (let [event (determine! sneer event)
         streems (sneer :streems)]
     (if (= (event :type) :view)
-      (reset! (sneer :view-path) (event :path))
+      (reset! (sneer :view) event)
       (append! streems event (streem-id event)))
     (let [model (catch-up-model! streems)]
       (update-network! sneer model)
@@ -93,7 +97,7 @@
                :ui-fn      ui-fn
                :outbox-fn  outbox-fn
                :crypto-fns crypto-fns
-               :view-path  (atom nil)}
+               :view  (atom nil)}
         model (model! sneer)]
     (keys-init-if-necessary sneer model)
     (update-ui! sneer model)
