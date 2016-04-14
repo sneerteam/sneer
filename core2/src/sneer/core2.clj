@@ -30,7 +30,7 @@
                              :problem (model/problem-with-nickname model (-> demand :nick-validation))})))
 
 (defn- update-ui! [sneer model]
-  ((sneer :ui-fn) (view (sneer :streems) model @(sneer :view))))
+  ((sneer :ui-fn) (view (sneer :streems) model @(sneer :view-demand))))
 
 
 ;================== NETWORK
@@ -70,7 +70,7 @@
   (let [event (determine! sneer event)
         streems (sneer :streems)]
     (if (= (event :type) :view)
-      (reset! (sneer :view) event)
+      (reset! (sneer :view-demand) event)
       (append! streems event (streem-id event)))
     (let [model (catch-up-model! streems)]
       (update-network! sneer model)
@@ -97,7 +97,7 @@
                :ui-fn      ui-fn
                :outbox-fn  outbox-fn
                :crypto-fns crypto-fns
-               :view  (atom nil)}
+               :view-demand  (atom nil)}
         model (model! sneer)]
     (keys-init-if-necessary sneer model)
     (update-ui! sneer model)
