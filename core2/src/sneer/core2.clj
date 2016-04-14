@@ -52,7 +52,7 @@
 (defn- random-bytes [sneer array-size]
   ((-> sneer :crypto-fns :generate-random-bytes) array-size))
 
-(defn- deterministic!
+(defn- determine!
   "Adds information such as timestamp and random bytes when necessary."
   [sneer event]
   (if (-> event :type (= :contact-new))
@@ -63,7 +63,7 @@
 ;================== HANDLE!
 
 (defn handle! [sneer event]
-  (let [event (deterministic! sneer event)
+  (let [event (determine! sneer event)
         streems (sneer :streems)]
     (if (= (event :type) :view)
       (reset! (sneer :view-path) (event :path))
