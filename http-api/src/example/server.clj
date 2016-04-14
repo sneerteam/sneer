@@ -16,7 +16,9 @@
    [taoensso.sente.server-adapters.http-kit :refer (sente-web-server-adapter)]
 
    ;; Optional, for Transit encoding:
-   [taoensso.sente.packers.transit :as sente-transit]))
+   [taoensso.sente.packers.transit :as sente-transit]
+
+   [sneer.core2-sim :refer :all]))
 
 ;; (timbre/set-level! :trace) ; Uncomment for more logging
 
@@ -63,36 +65,34 @@
   (ring.middleware.defaults/wrap-defaults
     ring-routes ring.middleware.defaults/site-defaults))
 
+;;;; Sneer simulator
+
+(def fake-ui  (atom nil))
+(def simulator  (sneer-simulator #(reset! fake-ui %)))
+
 ;;;; Sente event handlers
 
-(defmulti -event-msg-handler
-  "Multimethod to handle Sente `event-msg`s"
-  :id ; Dispatch on event-id
-  )
-
-(defmethod -event-msg-handler :sneer.core2-sim/sim-next [event]
-  (println "next sim TDB"))
-
-(comment (defn event-msg-handler
-           "Wraps `-event-msg-handler` with logging, error catching, etc."
-           [{:as ev-msg :keys [id ?data event]}]
-           (-event-msg-handler ev-msg)))
-
-(defmethod -event-msg-handler
-  :default ; Default/fallback case (no other matching handler)
+(defn -event-msg-handler
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
-        uid     (:uid     session)]
-    (debugf "Unhandled event: %s" event)
-    (when ?reply-fn
-      (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
+        uid (:uid session)]
+
+    (if (= :sneer/handle (first event))
+      (do
+        (handle! simulator (second event))
+        (debugf "Fake UI: %s" @fake-ui))
+
+      (debugf "Unhandled event: %s" event))
+    (comment (when ?reply-fn
+               (?reply-fn {:umatched-event-as-echoed-from-from-server event})))
+    ))
 
 ;; TODO Add your (defmethod -event-msg-handler <event-id> [ev-msg] <body>)s here...
 
 ;;;; Sente event router (our `event-msg-handler` loop)
 
 (defonce router_ (atom nil))
-(defn  stop-router! [] (when-let [stop-f @router_] (stop-f)))
+(defn stop-router! [] (when-let [stop-f @router_] (stop-f)))
 (defn start-router! []
   (stop-router!)
   (reset! router_

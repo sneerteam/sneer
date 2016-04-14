@@ -66,7 +66,7 @@
 
 (defn- next-sim []
   (swap! sims rest)
-  (client/chsk-send! [:sneer.core2-sim/sim-next]))
+  (client/chsk-send! [:sneer/handle {:type :sim-next}]))
 
 (defn home-page []
   (let [sim (first @sims)]

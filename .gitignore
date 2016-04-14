@@ -26,6 +26,8 @@ local.properties
 
 .byke
 
+pom.xml
+
 android/SnicTacToe
 android/location
 core/.projectile
