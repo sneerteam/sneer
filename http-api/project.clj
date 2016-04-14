@@ -11,20 +11,17 @@
   [
    [org.clojure/clojure       "1.8.0"]
 
-   [org.clojure/clojurescript "1.7.170"]
-   [org.clojure/core.async    "0.2.374"]
-
    [com.taoensso/sente        "1.8.1"]
    [com.taoensso/timbre       "4.3.1"]
-
-   [http-kit                  "2.2.0-alpha1"]
+   [com.cognitect/transit-clj "0.8.285"]
+   [org.clojure/core.async    "0.2.374"]
 
    [ring                      "1.4.0"]
    [ring/ring-defaults        "0.2.0"]
-
+   [http-kit                  "2.2.0-alpha1"]
    [compojure                 "1.5.0"]
 
-   [com.cognitect/transit-clj  "0.8.285"]]
+   [me.sneer/core2            "0.0.1-SNAPSHOT"]]
 
   :plugins
   [[lein-pprint         "1.1.2"]
