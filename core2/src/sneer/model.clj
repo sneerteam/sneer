@@ -47,11 +47,36 @@
                   :name  (own-name state)
                   :nonce random-long}))
 
+(defn- contact-id-given [state atribute value]
+  (->> state
+    :convos
+    :id->summary
+    vals
+    (filter #(-> % atribute (= value)))
+    first
+    :contact-id))
+
+(defn- problem-with-nickname
+  ([state new-nick]
+    (problem-with-nickname state nil new-nick))
+  ([state old-nick new-nick]
+    (cond
+      (or (nil? new-nick) (.isEmpty ^String new-nick))
+      "Nickname cannot be empty"
+
+      (= old-nick new-nick)
+      nil
+
+      (some? (contact-id-given state :nick new-nick))
+      "Nickname already used")))
+
 (defmethod handle :contact-new [state event]
-  (summary-append state
-    {:contact-id (event :id)
-     :nick       (event :nick)
-     :invite     (invite state (event :random-bytes))}))
+  (let [nick (event :nick)]
+    (if (problem-with-nickname state nick)
+      state
+      (summary-append state {:contact-id (event :id)
+                             :nick       nick
+                             :invite     (invite state (event :random-bytes))}))))
 
 (defmethod handle :contact-delete [state event]
   (update-in state [:convos :id->summary] dissoc (:contact-id event)))
@@ -61,19 +86,10 @@
         new-nick (:new-nick event)]
     (assoc-in state [:convos :id->summary id :nick] new-nick)))
 
-(defn- invite->contact-id [state invite]
-  (->> state
-    :convos
-    :id->summary
-    vals
-    (filter #(-> % :invite (= invite)))
-    first
-    :contact-id))
-
 (defmethod handle :contact-invite-thanks [state event]
   (let [invite (:invite event)
         from   (:from event)]
-    (if-some [contact-id (invite->contact-id state invite)]
+    (if-some [contact-id (contact-id-given state :invite invite)]
       (-> state
         (update-in [:convos :id->summary contact-id] dissoc :invite)
         (update-in [:convos :id->summary contact-id] assoc :puk from))

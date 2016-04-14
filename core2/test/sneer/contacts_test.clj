@@ -32,4 +32,11 @@
         (handle! subject {:type :contact-rename
                           :contact-id carla-id
                           :new-nick "Kharla"})
-        (get-in @ui [:convo-list 0 :nick]) => "Kharla"))))
+        (get-in @ui [:convo-list 0 :nick]) => "Kharla"))
+
+    (fact "Nicks with problems are ignored. The ui should never actually trigger this event because it can validate nicks first."
+      (handle! subject {:type :contact-new
+                        :nick "Kharla"})
+      (-> @ui :convo-list count) => 1
+      )
+    ))
