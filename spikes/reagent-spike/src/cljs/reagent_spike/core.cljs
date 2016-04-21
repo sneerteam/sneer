@@ -69,7 +69,7 @@
   (client/chsk-send! [:sneer/handle {:type :sim-next}]))
 
 (defn home-page []
-  (let [sim (first @sims)]
+  (let [sim @client/view]
 
     [:div.row
      [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (sim :view) " - " (str @action)]]

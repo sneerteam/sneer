@@ -4,8 +4,9 @@
    [clojure.string  :as str]
    [cljs.core.async :as async  :refer (<! >! put! chan)]
    [taoensso.sente  :as sente  :refer (cb-success?)]
+   [reagent.core    :as r]
 
-   ;; Optional, for Transit encoding:
+    ;; Optional, for Transit encoding:
    [taoensso.sente.packers.transit :as sente-transit])
 
   (:require-macros
@@ -54,15 +55,30 @@
   [{:as ev-msg :keys [event]}]
   (->output! "Unhandled event: %s" event))
 
+(defmethod -event-msg-handler :sneer/view
+  [{:as ev-msg :keys [?data event]}]
+  (->output! "Event: %s Data: %s" event ?data))
+
 (defmethod -event-msg-handler :chsk/state
   [{:as ev-msg :keys [?data]}]
   (if (= ?data {:first-open? true})
     (->output! "Channel socket successfully established!")
     (->output! "Channel socket state change: %s" ?data)))
 
+(def view (r/atom {:view "convo"
+                 :id 1042
+                 "tab" "chat"
+                 :message-list [{:id     10000
+                                 :is-own true
+                                 :text   "Hi There! 0"
+                                 :date   "Today 0"}]}))
+
 (defmethod -event-msg-handler :chsk/recv
   [{:as ev-msg :keys [?data]}]
-  (->output! "Push event from server: %s" ?data))
+  (when (-> (first ?data) (= :sneer/view))
+    (println "received... " (second ?data))
+    (reset! view (second ?data)))
+  )
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]

@@ -32,6 +32,7 @@
 
 
 ;;;; Define our Sente channel socket (chsk) server
+(defn- user-id [req] (:client-id req))
 
 (let [;; Serializtion format, must use same val for client + server:
       packer :edn ; Default packer, a good choice in most cases
@@ -40,7 +41,8 @@
       {:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn
               connected-uids]}
       (sente/make-channel-socket-server! sente-web-server-adapter
-        {:packer packer})]
+        {:packer packer
+         :user-id-fn user-id})]
 
   (def ring-ajax-post                ajax-post-fn)
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
@@ -75,12 +77,13 @@
 (defn -event-msg-handler
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
-        uid (:uid session)]
+        uid (:uid session)
+        client-id (:client-id ev-msg)]
 
     (if (= :sneer/handle (first event))
       (do
         (handle! simulator (second event))
-        (debugf "Fake UI: %s" @fake-ui))
+        (send-fn client-id [:sneer/view, @fake-ui]))
 
       (debugf "Unhandled event: %s" event))
     (comment (when ?reply-fn
