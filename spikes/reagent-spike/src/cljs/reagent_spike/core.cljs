@@ -8,73 +8,47 @@
 
 ;; -------------------------
 ;; Views
-
-(def ^:private unreads ["" "*" "?"])
-
-(defn- convo-sim [n]
-  {:id       (+ 1000 n)
-   :nickname (str "Neide " n)
-   :preview  (str "Hi There! " n)
-   :date     (str "Today " n)
-   :unread   (get unreads (mod n 3))})
-
-(defn- convo-sims [count]
-  (map convo-sim (range count)))
-
 (def action (atom nil))
 
-(def sims
-  (atom (cycle [{:view "convos"
-                 :convo-list (convo-sims 0)}
 
-                {:view "convos"
-                 :convo-list (convo-sims 1)}
 
-                {:view "convos"
-                 :convo-list (convo-sims 5)}
 
-                {:view "convo"
-                 :id 1042
-                 "tab" "chat"
-                 :message-list [{:id     10000
-                                 :is-own true
-                                 :text   "Hi There! 0"
-                                 :date   "Today 0"}]}])))
+(defn- choose-view [data]
+  (cond (:convo data) :convo
+        :else         :convo-list))
 
-#_{"id"       1000
-   "nickname" "Neide 0"
-   "preview"  "Hi There! 0"
-   "date"     "Today 0"
-   "unread"   ""}
+(defmulti sneer-view choose-view)
 
-(defmulti sneer-view :view)
+(defmethod sneer-view :convo [data]
+  [:ul
+   (for [msg (-> data :convo :message-list)]
+     ^{:key (msg :id)} [:li (msg :text) " - " (msg :date)])])
 
 (defn- dispatch! [event]
   (.log js/console event)
   (.log js/console (t/write (t/writer :json) {:foo {:bar "~:str"}}))
   (reset! action event))
 
-(defmethod sneer-view "convos" [data]
+#_{"id"       1000
+   "nickname" "Neide 0"
+   "preview"  "Hi There! 0"
+   "date"     "Today 0"
+   "unread"   ""}
+(defmethod sneer-view :convo-list [data]
   [:ul
    (for [convo (data :convo-list)]
      ^{:key (convo :id)} [:li {:on-click #(dispatch! (convo :id))} "Nick " (convo :nickname) " - " (convo :unread)])])
 
-(defmethod sneer-view "convo" [data]
-  [:ul
-   (for [msg (data :message-list)]
-     ^{:key (msg :id)} [:li (msg :text) " - " (msg :date)])])
-
 (defn- next-sim []
-  (swap! sims rest)
   (client/chsk-send! [:sneer/handle {:type :sim-next}]))
 
 (defn home-page []
-  (let [sim @client/view]
+  (let [data @client/view]
 
     [:div.row
-     [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (sim :view) " - " (str @action)]]
+     [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (name (choose-view data)) " - " (str @action)]]
      [:div.col-md-4.col-sm-6.col-xs-12   [:button {:on-click next-sim} "Next Sim"]]
-     [:div.col-md-12.col-sm-12.col-xs-12 [sneer-view sim]]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
+     [:div.col-md-12.col-sm-12.col-xs-12 [sneer-view data]]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
 
 (defn about-page []
   [:div [:h2 "About reagent-spike"]
