@@ -34,9 +34,14 @@
                           :new-nick "Kharla"})
         (get-in @ui [:convo-list 0 :nick]) => "Kharla"))
 
-    (fact "Nicks with problems are ignored. The ui should never actually trigger this event because it can validate nicks first."
+    (fact "Duplicate nicks are ignored. The ui should never actually trigger this event because it can validate nicks first."
       (handle! subject {:type :contact-new
                         :nick "Kharla"})
+      (-> @ui :convo-list count) => 1)
+
+    (fact "Empty Nicks are ignored. The ui should never actually trigger this event because it can validate nicks first."
+      (handle! subject {:type :contact-new
+                        :nick ""})
       (-> @ui :convo-list count) => 1)
 
     (fact "Problems with new nickname can be validated"
