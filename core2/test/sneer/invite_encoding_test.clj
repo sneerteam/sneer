@@ -11,5 +11,5 @@
         encoded (subject/encode original)
         decoded (subject/decode encoded)]
     encoded => "lAHaAC5+YkFBRUNBd1FGQmdjSUNRb0xEQTBPRHhBUkVoTVVGUllYR0JrYUd4d2RIaDg9uldFSVJEIE5BTUUgw6HDqcOtw7PDuiDwnYyGrn5iQUFFQ0F3UUZCZ2M9" ; Regression
-    (seq (decoded :puk))   => (range 32)
-    (decoded :name)        => "WEIRD NAME áéíóú \uD834\uDF06"))
+    (seq (decoded :puk)) => (range 32)
+    (decoded :name)      => "WEIRD NAME áéíóú \uD834\uDF06"))

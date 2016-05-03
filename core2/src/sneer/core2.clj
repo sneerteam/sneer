@@ -53,6 +53,9 @@
 (defn- model! [sneer]
   (catch-up-model! (sneer :streems)))
 
+
+;================== HANDLE!
+
 (defn- random-bytes [sneer array-size]
   ((-> sneer :crypto-fns :generate-random-bytes) array-size))
 
@@ -62,9 +65,6 @@
   (if (-> event :type (= :contact-new))
     (assoc event :random-bytes (random-bytes sneer 8))
     event))
-
-
-;================== HANDLE!
 
 (defn handle! [sneer event]
   (let [event (determine! sneer event)
