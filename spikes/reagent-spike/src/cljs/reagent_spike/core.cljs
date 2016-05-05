@@ -10,9 +10,6 @@
 ;; Views
 (def action (atom nil))
 
-
-
-
 (defn- choose-view [data]
   (cond (:convo data) :convo
         :else         :convo-list))
@@ -25,9 +22,7 @@
      ^{:key (msg :id)} [:li (msg :text) " - " (msg :date)])])
 
 (defn- dispatch! [event]
-  (.log js/console event)
-  (.log js/console (t/write (t/writer :json) {:foo {:bar "~:str"}}))
-  (reset! action event))
+  (client/chsk-send! [:sneer/handle event]))
 
 #_{"id"       1000
    "nickname" "Neide 0"
@@ -37,14 +32,15 @@
 (defmethod sneer-view :convo-list [data]
   [:ul
    (for [convo (data :convo-list)]
-     ^{:key (convo :id)} [:li {:on-click #(dispatch! (convo :id))} "Nick " (convo :nickname) " - " (convo :unread)])])
+     ^{:key (convo :id)} [:li {:on-click #(dispatch! {:type :view :path [:convo (convo :id)]})} "Nick " (convo :nickname) " - " (convo :unread)])])
 
 (defn- next-sim []
-  (client/chsk-send! [:sneer/handle {:type :sim-next}]))
+  (dispatch! {:type :sim-next}))
 
 (defn home-page []
   (let [data @client/view]
-
+    (when-let [toast (data :toast)]
+      (.info js/toastr toast))
     [:div.row
      [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (name (choose-view data)) " - " (str @action)]]
      [:div.col-md-4.col-sm-6.col-xs-12   [:button {:on-click next-sim} "Next Sim"]]
@@ -56,25 +52,11 @@
 
 (defn current-page []
   [:div
-   ;;Bootstrap
-   [:link {:rel         "stylesheet"
-           :href        "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-           :integrity   "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
-           :crossOrigin "anonymous"}]
-   [:link {:rel         "stylesheet"
-           :href        "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
-           :integrity   "sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r"
-           :crossOrigin "anonymous"}]
-   [:script
-          {:src        "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
-           :integrity   "sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
-           :crossOrigin "anonymous"}]
    ;;Content
    [:div [(session/get :current-page)]]])
 
 ;; -------------------------
 ;; Routes
-
 (secretary/defroute "/" []
   (session/put! :current-page #'home-page))
 
