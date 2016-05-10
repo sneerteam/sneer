@@ -30,9 +30,12 @@
    "date"     "Today 0"
    "unread"   ""}
 (defmethod sneer-view :convo-list [data]
-  [:ul
+  [:div
    (for [convo (data :convo-list)]
-     ^{:key (convo :id)} [:li {:on-click #(dispatch! {:type :view :path [:convo (convo :id)]})} "Nick " (convo :nickname) " - " (convo :unread)])])
+     ^{:key (convo :id)}
+     [:div [:a {:on-click #(dispatch! {:type :view :path [:convo (convo :id)]})
+                :href     (str "#" (convo :id))}
+           "Nick " (convo :nickname) " - " (convo :unread)]])])
 
 (defn- next-sim []
   (dispatch! {:type :sim-next}))
