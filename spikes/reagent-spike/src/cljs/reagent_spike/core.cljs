@@ -33,7 +33,7 @@
   [:div
    (for [convo (data :convo-list)]
      ^{:key (convo :id)}
-     [:div [:a {:on-click #(dispatch! {:type :view :path [:convo (convo :id)]})
+     [:div [:a {:on-click #(dispatch! {:type :view :convo (convo :id)})
                 :href     (str "#" (convo :id))}
            "Nick " (convo :nickname) " - " (convo :unread)]])])
 

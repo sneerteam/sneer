@@ -37,7 +37,7 @@
      (convos-view-sim 100)
      (convo-view-sim  0)
      (convo-view-sim  1)
-     (convo-view-sim  10000)]))
+     (convo-view-sim  1000)]))
 
 (defn- handle-sim [state]
   (-> state
