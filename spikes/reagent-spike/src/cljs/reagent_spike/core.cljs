@@ -24,6 +24,9 @@
 (defn- dispatch! [event]
   (client/chsk-send! [:sneer/handle event]))
 
+(defn- new-contact []
+  (dispatch! {:type :contact-new, :nick "Carla"}))
+
 #_{"id"       1000
    "nickname" "Neide 0"
    "preview"  "Hi There! 0"
@@ -31,11 +34,13 @@
    "unread"   ""}
 (defmethod sneer-view :convo-list [data]
   [:div
-   (for [convo (data :convo-list)]
-     ^{:key (convo :id)}
-     [:div [:a {:on-click #(dispatch! {:type :view :convo (convo :id)})
-                :href     (str "#" (convo :id))}
-           "Nick " (convo :nickname) " - " (convo :unread)]])])
+   [:button {:on-click new-contact} "New Contact"]
+   [:div
+    (for [convo (data :convo-list)]
+      ^{:key (convo :id)}
+      [:div [:a {:on-click #(dispatch! {:type :view :convo (convo :id)})
+                 :href     (str "#" (convo :id))}
+             "Nick " (convo :nickname) " - " (convo :unread)]])]])
 
 (defn- next-sim []
   (dispatch! {:type :sim-next}))
