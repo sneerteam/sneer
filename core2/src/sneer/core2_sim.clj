@@ -30,9 +30,15 @@
            :tab :chat
            :message-list (message-sims count)}})
 
+(defn- new-contact-sim [nick problem]
+  {:convo-list (convo-sims 2)
+   :nick-validation {:nick nick :problem problem}})
+
 (def ^:private view-sims
   (cycle
-    [(convos-view-sim 0)
+    [(new-contact-sim "Carla" nil)
+     (new-contact-sim "Neide" "already used")
+     (convos-view-sim 0)
      (convos-view-sim 1)
      (convos-view-sim 100)
      (convo-view-sim  0)

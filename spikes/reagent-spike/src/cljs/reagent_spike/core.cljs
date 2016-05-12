@@ -6,26 +6,40 @@
               [reagent-spike.client :as client]
               [cognitect.transit :as t]))
 
-;; -------------------------
-;; Views
+(defn- dispatch! [event]
+  (client/chsk-send! [:sneer/handle event]))
+
+
+;; ------------------------- Views
 (def action (atom nil))
 
 (defn- choose-view [data]
-  (cond (:convo data) :convo
-        :else         :convo-list))
+  (cond
+    (:nick-validation data) :contact-new
+    (:convo data)           :convo
+    :else                   :convo-list))
 
 (defmulti sneer-view choose-view)
+
+(defn- send-invite []
+  )
+
+(defmethod sneer-view :contact-new [data]
+  (let [nick (-> data :nick-validation :nick)]
+    [:div {:class "input-group"}
+     [:span {:class "input-group-addon" :id "basic-addon1"} "Name"]
+     [:input {:type             "text"
+              :class            "form-control"
+              :aria-describedby "basic-addon1"
+              :placeholder      "Mom, John Smith, etc"
+              :value            nick
+              :on-change        #(dispatch! {:type :view, :nick-validation (-> % .-target .-value)})}]
+     [:button {:on-click #(dispatch! {:type :contact-new, :nick nick})} "SEND INVITE >"]]))
 
 (defmethod sneer-view :convo [data]
   [:ul
    (for [msg (-> data :convo :message-list)]
      ^{:key (msg :id)} [:li (msg :text) " - " (msg :date)])])
-
-(defn- dispatch! [event]
-  (client/chsk-send! [:sneer/handle event]))
-
-(defn- new-contact []
-  (dispatch! {:type :contact-new, :nick "Carla"}))
 
 #_{"id"       1000
    "nickname" "Neide 0"
@@ -34,7 +48,7 @@
    "unread"   ""}
 (defmethod sneer-view :convo-list [data]
   [:div
-   [:button {:on-click new-contact} "New Contact"]
+   [:button {:on-click #(dispatch! {:todo "Switch to contact-new view without dispatching."})} "New Contact"]
    [:div
     (for [convo (data :convo-list)]
       ^{:key (convo :id)}
