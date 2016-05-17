@@ -24,7 +24,9 @@
 (defn- send-invite []
   )
 
-(defmethod sneer-view :contact-new [data]
+(def contact-new-atom (r/atom false))
+
+(defn- contact-new-view [data]
   (let [nick (-> data :nick-validation :nick)
         problem (-> data :nick-validation :problem)]
     [:div [:div {:class "input-group"}
@@ -39,19 +41,17 @@
        [:div {:class "alert alert-danger" :role "alert"}
         [:span {:class "glyphicon glyphicon-exclamation-sign"}]
         problem])
-     [:button {:on-click #(dispatch! {:type :contact-new, :nick nick})} "SEND INVITE >"]]))
-
-(defmethod sneer-view :convo [data]
-  [:ul
-   (for [msg (-> data :convo :message-list)]
-     ^{:key (msg :id)} [:li (msg :text) " - " (msg :date)])])
+     [:button {:on-click #(reset! contact-new-atom false) #_(dispatch! {:type :contact-new, :nick nick})} "SEND INVITE >"]]))
 
 #_{"id"       1000
    "nickname" "Neide 0"
    "preview"  "Hi There! 0"
    "date"     "Today 0"
    "unread"   ""}
-(def contact-new-atom (r/atom false))
+(defmethod sneer-view :convo [data]
+  [:ul
+   (for [msg (-> data :convo :message-list)]
+     ^{:key (msg :id)} [:li (msg :text) " - " (msg :date)])])
 
 (defmethod sneer-view :convo-list [data]
   [:div
@@ -74,8 +74,7 @@
     [:div.row
      [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (name (choose-view data)) " - " (str @action)]]
      [:div.col-md-4.col-sm-6.col-xs-12   [:button {:on-click next-sim} "Next Sim"]]
-     [:div.col-md-12.col-sm-12.col-xs-12 [sneer-view data]]
-     (when contact-new? [:div "TODO: show view contact-new"])])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
+     [:div.col-md-12.col-sm-12.col-xs-12 (if contact-new? [contact-new-view data] [sneer-view data])]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
 
 (defn about-page []
   [:div [:h2 "About reagent-spike"]
