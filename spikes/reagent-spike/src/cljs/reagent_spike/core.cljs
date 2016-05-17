@@ -25,15 +25,20 @@
   )
 
 (defmethod sneer-view :contact-new [data]
-  (let [nick (-> data :nick-validation :nick)]
-    [:div {:class "input-group"}
-     [:span {:class "input-group-addon" :id "basic-addon1"} "Name"]
-     [:input {:type             "text"
-              :class            "form-control"
-              :aria-describedby "basic-addon1"
-              :placeholder      "Mom, John Smith, etc"
-              :value            nick
-              :on-change        #(dispatch! {:type :view, :nick-validation (-> % .-target .-value)})}]
+  (let [nick (-> data :nick-validation :nick)
+        problem (-> data :nick-validation :problem)]
+    [:div [:div {:class "input-group"}
+      [:span {:class "input-group-addon" :id "basic-addon1"} "Name"]
+      [:input {:type             "text"
+               :class            (str "form-control")
+               :aria-describedby "basic-addon1"
+               :placeholder      "Mom, John Smith, etc"
+               :value            nick
+               :on-change        #(dispatch! {:type :view, :nick-validation (-> % .-target .-value)})}]]
+     (when problem
+       [:div {:class "alert alert-danger" :role "alert"}
+        [:span {:class "glyphicon glyphicon-exclamation-sign"}]
+        problem])
      [:button {:on-click #(dispatch! {:type :contact-new, :nick nick})} "SEND INVITE >"]]))
 
 (defmethod sneer-view :convo [data]
