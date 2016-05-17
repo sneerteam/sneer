@@ -4,7 +4,7 @@
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
               [reagent-spike.client :as client]
-              [cognitect.transit :as t]))
+              [reagent.core    :as r]))
 
 (defn- dispatch! [event]
   (client/chsk-send! [:sneer/handle event]))
@@ -51,9 +51,11 @@
    "preview"  "Hi There! 0"
    "date"     "Today 0"
    "unread"   ""}
+(def contact-new-atom (r/atom false))
+
 (defmethod sneer-view :convo-list [data]
   [:div
-   [:button {:on-click #(dispatch! {:todo "Switch to contact-new view without dispatching."})} "New Contact"]
+   [:button {:on-click #(reset! contact-new-atom true)} "New Contact"]
    [:div
     (for [convo (data :convo-list)]
       ^{:key (convo :id)}
@@ -65,13 +67,15 @@
   (dispatch! {:type :sim-next}))
 
 (defn home-page []
-  (let [data @client/view]
+  (let [data @client/view
+        contact-new? @contact-new-atom]
     (when-let [toast (data :toast)]
       (.info js/toastr toast))
     [:div.row
      [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (name (choose-view data)) " - " (str @action)]]
      [:div.col-md-4.col-sm-6.col-xs-12   [:button {:on-click next-sim} "Next Sim"]]
-     [:div.col-md-12.col-sm-12.col-xs-12 [sneer-view data]]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
+     [:div.col-md-12.col-sm-12.col-xs-12 [sneer-view data]]
+     (when contact-new? [:div "TODO: show view contact-new"])])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
 
 (defn about-page []
   [:div [:h2 "About reagent-spike"]
