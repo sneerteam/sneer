@@ -22,16 +22,19 @@
   (map message-sim (range count)))
 
 (defn- convos-view-sim [count]
-  {:convo-list (convo-sims count)})
+  {:view :convo-list
+   :convo-list (convo-sims count)})
 
 (defn- convo-view-sim [count]
-  {:convo-list (convo-sims 100)
+  {:view :convo
+   :convo-list (convo-sims 100)
    :convo {:id 1042
            :tab :chat
            :message-list (message-sims count)}})
 
 (defn- new-contact-sim [nick problem]
-  {:convo-list (convo-sims 2)
+  {:view :contact-new
+   :convo-list (convo-sims 2)
    :nick-validation {:nick nick :problem problem}})
 
 (def ^:private view-sims

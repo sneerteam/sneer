@@ -13,20 +13,12 @@
 ;; ------------------------- Views
 (def action (atom nil))
 
-(defn- choose-view [data]
-  (cond
-    (:nick-validation data) :contact-new
-    (:convo data)           :convo
-    :else                   :convo-list))
-
-(defmulti sneer-view choose-view)
+(defmulti sneer-view :view)
 
 (defn- send-invite []
   )
 
-(def contact-new-atom (r/atom false))
-
-(defn- contact-new-view [data]
+(defmethod sneer-view :contact-new [data]
   (let [nick (-> data :nick-validation :nick)
         problem (-> data :nick-validation :problem)]
     [:div [:div {:class "input-group"}
@@ -41,7 +33,7 @@
        [:div {:class "alert alert-danger" :role "alert"}
         [:span {:class "glyphicon glyphicon-exclamation-sign"}]
         problem])
-     [:button {:on-click #(reset! contact-new-atom false) #_(dispatch! {:type :contact-new, :nick nick})} "SEND INVITE >"]]))
+     [:button {:on-click #(dispatch! {:type :contact-new, :nick nick})} "SEND INVITE >"]]))
 
 #_{"id"       1000
    "nickname" "Neide 0"
@@ -53,13 +45,16 @@
    (for [msg (-> data :convo :message-list)]
      ^{:key (msg :id)} [:li (msg :text) " - " (msg :date)])])
 
+(defmethod sneer-view :loading [_data]
+  [:div "Loading..."])
+
 (defmethod sneer-view :convo-list [data]
   [:div
-   [:button {:on-click #(reset! contact-new-atom true)} "New Contact"]
+   [:button {:on-click #(dispatch! {:type :view, :contact-new true})} "New Contact"]
    [:div
     (for [convo (data :convo-list)]
       ^{:key (convo :id)}
-      [:div [:a {:on-click #(dispatch! {:type :view :convo (convo :id)})
+      [:div [:a {:on-click #(dispatch! {:type :view, :convo (convo :id)})
                  :href     (str "#" (convo :id))}
              "Nick " (convo :nickname) " - " (convo :unread)]])]])
 
@@ -67,14 +62,13 @@
   (dispatch! {:type :sim-next}))
 
 (defn home-page []
-  (let [data @client/view
-        contact-new? @contact-new-atom]
+  (let [data @client/view]
     (when-let [toast (data :toast)]
       (.info js/toastr toast))
     [:div.row
-     [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (name (choose-view data)) " - " (str @action)]]
+     [:div.col-md-4.col-sm-6.col-xs-12   [:h2 (name (:view data)) " - " (str @action)]]
      [:div.col-md-4.col-sm-6.col-xs-12   [:button {:on-click next-sim} "Next Sim"]]
-     [:div.col-md-12.col-sm-12.col-xs-12 (if contact-new? [contact-new-view data] [sneer-view data])]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
+     [:div.col-md-12.col-sm-12.col-xs-12 [sneer-view data]]])) ;;Notice sneer-view function is not invoked with (), shortcut from reagent, see: https://reagent-project.github.io/
 
 (defn about-page []
   [:div [:h2 "About reagent-spike"]

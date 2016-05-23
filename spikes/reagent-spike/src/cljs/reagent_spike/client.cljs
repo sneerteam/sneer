@@ -65,13 +65,7 @@
     (->output! "Channel socket successfully established!")
     (->output! "Channel socket state change: %s" ?data)))
 
-(def view (r/atom {:view "convo"
-                 :id 1042
-                 "tab" "chat"
-                 :message-list [{:id     10000
-                                 :is-own true
-                                 :text   "Hi There! 0"
-                                 :date   "Today 0"}]}))
+(def view (r/atom {:view :loading}))
 
 (defmethod -event-msg-handler :chsk/recv
   [{:as ev-msg :keys [?data]}]
