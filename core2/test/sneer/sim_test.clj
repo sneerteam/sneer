@@ -4,7 +4,7 @@
     [sneer.midje-util :refer :all]
     [sneer.core2-sim :refer :all]])
 
-(facts "UI Sims"
+#_(facts "UI Sims"
   (let [fake-ui (atom nil)
         subject (sneer-simulator #(reset! fake-ui %))]
 

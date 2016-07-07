@@ -5,7 +5,7 @@
   (:import [java.net DatagramPacket DatagramSocket]
            [sneer.commons SystemReport]))
 
-(def MTU 1400)  ; Anecdotal suggestions on the web.
+(def MTU 1400)  ; "Maximum Transmission Unit" size based on anecdotal suggestions on the web.
 
 (defn- new-datagram []
   (DatagramPacket. (byte-array MTU) MTU))

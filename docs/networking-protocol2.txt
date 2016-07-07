@@ -1,0 +1,14 @@
+Client Originates                              Server Replies
+=================                              ==============
+
+{:from own-puk :send tuple :to puk}            {:ack tuple-id :for puk}
+                                               or
+                                               {:nak tuple-id :for puk}   (Server rejects (nak) the tuple if the send queue to puk is full.)
+
+
+Client Replies                                 Server Originates
+==============                                 =================
+
+{:from own-puk :ack author-puk :id tuple-id}   {:send tuple}   (Tuple is being routed)
+
+{:from own-puk :ack puk}                       {:cts puk}   (CTS (Clear To Send) - The send queue to puk became empty)

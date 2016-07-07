@@ -74,7 +74,7 @@
       (SystemReport/updateReport "network/last-packet-in" packet)
       (match packet
         {:send tuple}
-        (do (when-not (= @last-tuple tuple)
+        (do (when-not (= @last-tuple tuple)                 ; Avoid wasting time trying to store redundant tuples.
               (reset! last-tuple tuple)
               (>! tuples-received tuple))
             (>! packets-out (->ack tuple)))

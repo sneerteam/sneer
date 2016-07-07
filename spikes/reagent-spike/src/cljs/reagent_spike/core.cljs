@@ -15,9 +15,6 @@
 
 (defmulti sneer-view :view)
 
-(defn- send-invite []
-  )
-
 (defmethod sneer-view :contact-new [data]
   (let [nick (-> data :nick-validation :nick)
         problem (-> data :nick-validation :problem)]
