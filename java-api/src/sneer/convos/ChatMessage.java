@@ -10,6 +10,6 @@ public class ChatMessage {
    	public final String date;
    	public final DeliveryStatus delivery;
 
-   	public ChatMessage(long id, String text, boolean isOwn, String date, DeliveryStatus delivery) { this.id = id; this.text = text; this.isOwn = isOwn; this.date = date; this.delivery = delivery}
+   	public ChatMessage(long id, String text, boolean isOwn, String date, DeliveryStatus delivery) { this.id = id; this.text = text; this.isOwn = isOwn; this.date = date; this.delivery = delivery; }
 
 }
