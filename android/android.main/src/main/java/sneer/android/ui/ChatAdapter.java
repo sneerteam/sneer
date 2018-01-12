@@ -72,7 +72,7 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> implements OnClickLis
 	private View updateView(final ChatMessage message, final View view) {
 		final TextView messageView = findTextView(view, R.id.messageContent);
 
-		SpannableString messageContent = new SpannableString(message.text);
+		SpannableString messageContent = new SpannableString(message.text + " (" + message.delivery + ")");
 
 		messageView.setAutoLinkMask(Linkify.ALL);
 		messageView.setText(messageContent);
