@@ -34,7 +34,8 @@
        (->> gcm-out     (async/into []) <!!?) => ?gcm-out))
   
   ?fact ?packets-in ?packets-out ?gcm-out
-  
+
+
   "No packets"
   []
   []
@@ -60,14 +61,14 @@
   [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B} {:nak   3 :to   :A :for :B}]
   [:B]
 
-  "B receives a tuple with another enqueued"
+  "B receives enqueued tuples"
   [{:send t1 :from :A :to  :B} {:send t2 :from :A :to  :B} {:from :B} :resend {:ack :A :id 1 :from :B} :resend]
   [{:ack   1 :to   :A :for :B} {:ack   2 :to   :A :for :B}            {:send t1 :to :B}                {:send t2      :to   :B}]
   [:B]
 
   "Duplicate tuple sends are ignored."
   [{:send t1 :from :A :to  :B} {:send t1 :from :A :to  :B} {:from :B} :resend {:ack :A :id 1 :from :B} :resend]
-  [{:ack   1 :to   :A :for :B} {:ack   1 :to   :A :for :B}            {:send t1 :to :B}                #_"Was not enqueued"]
+  [{:ack   1 :to   :A :for :B} {:ack   1 :to   :A :for :B}            {:send t1 :to :B}]
   [:B]
 
   "After N sends without reply, client is considered offline and server stops sending packets to it and sends it a GCM."
