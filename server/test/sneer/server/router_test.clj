@@ -6,21 +6,31 @@
 
 ; (do (require 'midje.repl) (midje.repl/autotest))
 
+(defn router-test-dsl []
+  (let [max-q-size 3
+        subject (atom nil)
+        restart! #(reset! subject (create-router max-q-size))
+        enq! (fn [from to msg & [priority]]
+                (let [msg {:msg msg}
+                      msg (if priority
+                            (assoc msg :priority priority)
+                            msg)]
+                  (-> subject (swap! enqueue from to msg)
+                              (queue-full? from to)
+                              not)))
+        peek #(let [packet (peek-packet-for @subject %)]
+                 (if (:send packet)
+                   (-> packet :send :msg)
+                   packet)) ; :send holds the encapsulated tuple.
+        pop! #(do
+                 (swap! subject pop-packet-for %)
+                 (peek %))]
+    {:restart! restart!, :enq! enq!, :peek peek, :pop! pop!}))
+
 (facts
   "Routing"
 
-  (let [max-q-size 3
-        subject (atom nil)
-        ; DSL:
-        restart! #(reset! subject (create-router max-q-size))
-        enq! (fn [from to msg] (-> subject (swap! enqueue from to msg)
-                                 (queue-full? from to)
-                                 not))
-        peek #(let [packet (peek-packet-for @subject %)]
-                (if (:send packet) (:send packet) packet))
-        pop! #(do
-                (swap! subject pop-packet-for %)
-                (peek %))]
+  (let [{:keys [restart! enq! peek pop!]} (router-test-dsl)]
     
     (restart!)
     (fact "Queues start empty and accept tuples."
